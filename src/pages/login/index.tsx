@@ -7,6 +7,7 @@ import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth'
 import { toast } from 'sonner'
+import { Logo } from '@/components/Logo'
 
 export function Login() {
   const navigate = useNavigate()
@@ -52,45 +53,25 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background dark:bg-background-dark flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         {/* Logo e Título */}
         <div className="text-center">
-          <div className="w-20 h-20 bg-primary-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-12 h-12 text-primary-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-100 tracking-tight">
-            Air Finance
-          </h2>
-          <p className="mt-2 text-sm text-gray-400">
-            Faça login para acessar sua conta
-          </p>
+          <Logo showSlogan className="mx-auto" />
         </div>
 
         {/* Formulário de Login */}
-        <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+        <Card className="bg-card/50 dark:bg-card-dark/50 border-border dark:border-border-dark backdrop-blur-sm">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div className="space-y-4">
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                   Email
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    <Mail className="h-5 w-5 text-brand-arrow dark:text-brand-leaf" />
                   </div>
                   <Input
                     type="email"
@@ -98,7 +79,7 @@ export function Login() {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="pl-10 bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
+                    className="pl-10 bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf"
                     placeholder="seu@email.com"
                   />
                 </div>
@@ -106,12 +87,12 @@ export function Login() {
 
               {/* Senha */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                   Senha
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                    <Lock className="h-5 w-5 text-brand-arrow dark:text-brand-leaf" />
                   </div>
                   <Input
                     type={showPassword ? 'text' : 'password'}
@@ -119,7 +100,7 @@ export function Login() {
                     value={formData.password}
                     onChange={handleChange}
                     required
-                    className="pl-10 pr-10 bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
+                    className="pl-10 pr-10 bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf"
                     placeholder="••••••••"
                   />
                   <button
@@ -128,9 +109,9 @@ export function Login() {
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300" />
+                      <EyeOff className="h-5 w-5 text-brand-arrow dark:text-brand-leaf hover:opacity-80" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300" />
+                      <Eye className="h-5 w-5 text-brand-arrow dark:text-brand-leaf hover:opacity-80" />
                     )}
                   </button>
                 </div>
@@ -145,15 +126,15 @@ export function Login() {
                   name="rememberMe"
                   checked={formData.rememberMe}
                   onChange={handleChange}
-                  className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-primary-500 focus:ring-primary-500 focus:ring-offset-gray-800"
+                  className="h-4 w-4 rounded border-border dark:border-border-dark bg-card dark:bg-card-dark text-brand-arrow dark:text-brand-leaf focus:ring-brand-arrow dark:focus:ring-brand-leaf"
                 />
-                <label className="ml-2 block text-sm text-gray-400">
+                <label className="ml-2 block text-sm text-text dark:text-text-dark">
                   Lembrar-me
                 </label>
               </div>
               <button
                 type="button"
-                className="text-sm font-medium text-primary-400 hover:text-primary-300"
+                className="text-sm font-medium text-brand-arrow hover:text-brand-arrow/80 dark:text-brand-leaf dark:hover:text-brand-leaf/80"
               >
                 Esqueceu a senha?
               </button>
@@ -164,7 +145,7 @@ export function Login() {
               type="submit"
               disabled={isLoading}
               className={cn(
-                "w-full h-11 bg-primary-500 hover:bg-primary-600 text-white transition-colors",
+                "w-full h-11 bg-brand-arrow hover:bg-brand-arrow/90 dark:bg-brand-leaf dark:hover:bg-brand-leaf/90 text-white transition-colors",
                 isLoading && "opacity-70 cursor-not-allowed"
               )}
             >
@@ -201,19 +182,19 @@ export function Login() {
 
         {/* Links de Ajuda */}
         <div className="text-center space-y-2">
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-text dark:text-text-dark">
             Não tem uma conta?{' '}
-            <button className="font-medium text-primary-400 hover:text-primary-300">
+            <button className="font-medium text-brand-arrow hover:text-brand-arrow/80 dark:text-brand-leaf dark:hover:text-brand-leaf/80">
               Criar conta
             </button>
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-text/60 dark:text-text-dark/60">
             Ao continuar, você concorda com nossos{' '}
-            <button className="text-gray-400 hover:text-gray-300">
+            <button className="text-brand-arrow hover:text-brand-arrow/80 dark:text-brand-leaf dark:hover:text-brand-leaf/80">
               Termos de Serviço
             </button>{' '}
             e{' '}
-            <button className="text-gray-400 hover:text-gray-300">
+            <button className="text-brand-arrow hover:text-brand-arrow/80 dark:text-brand-leaf dark:hover:text-brand-leaf/80">
               Política de Privacidade
             </button>
           </p>

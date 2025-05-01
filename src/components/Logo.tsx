@@ -25,17 +25,16 @@ export function Logo({ className, showSlogan = false, variant = 'default' }: Log
           >
             {/* Folha */}
             <path
-              d="M24.5 8C19.5 8 16 11.5 16 16.5C16 21.5 12.5 24 7.5 24C12.5 24 16 20.5 16 15.5C16 10.5 19.5 8 24.5 8Z"
+              d="M7 24C7 24 16 24 16 16C16 8 25 8 25 8C25 8 16 8 16 16C16 24 7 24 7 24Z"
               fill="currentColor"
             />
             {/* Seta */}
             <path
               d="M13 19L19 13M19 13H15M19 13V17"
-              stroke="currentColor"
+              stroke={variant === 'white' ? 'white' : '#2D6B4E'}
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className={variant === 'white' ? 'text-white' : 'text-brand-arrow'}
             />
           </svg>
         </div>
