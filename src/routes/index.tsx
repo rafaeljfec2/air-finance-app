@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { Login } from '@/pages/auth/Login';
+import { Login } from '@/pages/login';
 import { Dashboard } from '@/pages/dashboard/Dashboard';
 import { Statement } from '@/pages/statement';
 import { NewTransaction } from '@/pages/transactions/new';

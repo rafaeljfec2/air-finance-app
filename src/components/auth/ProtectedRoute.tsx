@@ -1,21 +1,18 @@
-import { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { Navigate, useLocation } from 'react-router-dom'
+import { useAuthStore } from '@/stores/auth'
 
 interface ProtectedRouteProps {
-  children: ReactNode;
+  children: React.ReactNode
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated } = useAuth();
-
-  console.log('ProtectedRoute - isAuthenticated:', isAuthenticated);
+  const { isAuthenticated } = useAuthStore()
+  const location = useLocation()
 
   if (!isAuthenticated) {
-    console.log('Usuário não autenticado, redirecionando para login...');
-    return <Navigate to="/auth/login" replace />;
+    // Redireciona para o login mantendo a URL original como state
+    return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  console.log('Usuário autenticado, renderizando conteúdo protegido...');
-  return <>{children}</>;
+  return children
 }
