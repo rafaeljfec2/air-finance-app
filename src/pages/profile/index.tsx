@@ -117,11 +117,12 @@ export function Profile() {
                 <div className="p-6">
                   <div className="flex flex-col sm:flex-row gap-6">
                     {/* Avatar */}
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="relative">
+                    <div className="flex flex-col items-center justify-center gap-3 min-w-[8rem]">
+                      <div className="relative flex items-center justify-center">
                         <img
                           src={avatar}
-                          alt="Avatar"
+                          alt={`Foto de perfil de ${formData.name}`}
+                          aria-label="Foto de perfil"
                           className="w-32 h-32 rounded-full object-cover border-4 border-border dark:border-border-dark"
                         />
                         <label
