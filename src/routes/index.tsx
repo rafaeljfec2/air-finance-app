@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 import { Login } from '@/pages/login';
 import { Dashboard } from '@/pages/dashboard/Dashboard';
 import { Statement } from '@/pages/statement';
@@ -10,11 +10,12 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { Settings } from '@/pages/settings';
+import {LandingPage} from '@/pages/landing';
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate to="/auth/login" replace />,
+    element: <LandingPage />,
     errorElement: <ErrorPage />,
   },
   {
