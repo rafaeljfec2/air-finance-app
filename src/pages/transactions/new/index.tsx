@@ -9,7 +9,7 @@ import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { ArrowDownCircle, ArrowUpCircle, Receipt, ChevronLeft } from 'lucide-react'
+import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react'
 
 export function NewTransaction() {
   const navigate = useNavigate()
@@ -47,31 +47,17 @@ export function NewTransaction() {
         {/* Header Fixo */}
         <div className="sticky top-0 z-10 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
           <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => navigate('/transactions')}
-                  className="p-2 -ml-2 hover:bg-gray-800 rounded-lg transition-colors"
-                >
-                  <ChevronLeft className="h-5 w-5 text-gray-400" />
-                </button>
-                <div>
-                  <h1 className="text-lg font-semibold text-gray-100">Novo Lançamento</h1>
-                  <p className="text-xs text-gray-400">Preencha os dados da transação</p>
-                </div>
-              </div>
-              <Button 
-                type="submit"
-                form="transaction-form"
-                className={cn(
-                  'transition-all text-sm px-4 py-2 h-9',
-                  transactionType === 'DESPESA'
-                    ? 'bg-red-500 hover:bg-red-600 text-white'
-                    : 'bg-green-500 hover:bg-green-600 text-white'
-                )}
+            <div className="flex items-center">
+              <button
+                onClick={() => navigate('/transactions')}
+                className="p-2 -ml-2 hover:bg-gray-800 rounded-lg transition-colors"
               >
-                Salvar
-              </Button>
+                <ChevronLeft className="h-5 w-5 text-gray-400" />
+              </button>
+              <div className="ml-3">
+                <h1 className="text-lg font-semibold text-gray-100">Novo Lançamento</h1>
+                <p className="text-xs text-gray-400">Preencha os dados da transação</p>
+              </div>
             </div>
           </div>
         </div>
@@ -222,6 +208,21 @@ export function NewTransaction() {
                     className="bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
                     placeholder="Adicione informações complementares sobre a transação (opcional)"
                   />
+                </div>
+
+                {/* Botão Salvar no final do formulário */}
+                <div className="pt-4 flex justify-end">
+                  <Button 
+                    type="submit"
+                    className={cn(
+                      'transition-all text-sm h-11 px-8',
+                      transactionType === 'DESPESA'
+                        ? 'bg-red-500 hover:bg-red-600 text-white'
+                        : 'bg-green-500 hover:bg-green-600 text-white'
+                    )}
+                  >
+                    Salvar
+                  </Button>
                 </div>
               </div>
             </form>
