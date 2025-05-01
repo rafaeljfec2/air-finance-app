@@ -76,30 +76,30 @@ export function Statement() {
   if (error) {
     return (
       <ViewDefault>
-        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
-          <div className="text-center max-w-md mx-auto p-8">
-            <ExclamationTriangleIcon className="h-16 w-16 text-red-500 dark:text-red-400 mx-auto mb-6" />
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] px-4">
+          <div className="text-center max-w-md mx-auto p-4 sm:p-8">
+            <ExclamationTriangleIcon className="h-12 w-12 sm:h-16 sm:w-16 text-red-500 dark:text-red-400 mx-auto mb-4 sm:mb-6" />
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
               Ops! Algo deu errado
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">
               {error}
             </p>
             
             {/* Detalhes técnicos do erro */}
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               <button
                 onClick={() => setShowErrorDetails(!showErrorDetails)}
                 className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               >
                 <ChevronDownIcon 
-                  className={`h-5 w-5 mr-1 transition-transform ${showErrorDetails ? 'transform rotate-180' : ''}`}
+                  className={`h-4 w-4 sm:h-5 sm:w-5 mr-1 transition-transform ${showErrorDetails ? 'transform rotate-180' : ''}`}
                 />
                 Detalhes técnicos
               </button>
               
               {showErrorDetails && (
-                <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-left">
+                <div className="mt-4 p-3 sm:p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-left">
                   <pre className="text-xs text-gray-800 dark:text-gray-200 overflow-x-auto">
                     {JSON.stringify(errorDetails, null, 2)}
                   </pre>
@@ -109,7 +109,7 @@ export function Statement() {
 
             <button
               onClick={() => loadTransactions()}
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-800 transition-colors"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm sm:text-base font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-800 transition-colors"
             >
               Tentar novamente
             </button>
@@ -121,9 +121,9 @@ export function Statement() {
 
   return (
     <ViewDefault>
-      <div {...containerProps} className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+      <div {...containerProps} className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
             Extrato Financeiro
           </h1>
 
@@ -137,31 +137,35 @@ export function Statement() {
           />
         </div>
 
-        <div className="space-y-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Transações</h2>
+        <div className="space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+              Transações
+            </h2>
 
             <button
               onClick={() => navigate('/transactions/new')}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center"
             >
               Nova Transação
             </button>
           </div>
 
-          <StatementFilters
-            categories={categories}
-            onSearch={handleSearch}
-            onFilterCategory={handleFilterCategory}
-          />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 space-y-4">
+            <StatementFilters
+              categories={categories}
+              onSearch={handleSearch}
+              onFilterCategory={handleFilterCategory}
+            />
 
-          <TransactionList
-            transactions={filteredTransactions}
-            onEdit={handleEdit}
-            onRemove={handleRemove}
-            onRefresh={loadTransactions}
-            isLoading={isLoading}
-          />
+            <TransactionList
+              transactions={filteredTransactions}
+              onEdit={handleEdit}
+              onRemove={handleRemove}
+              onRefresh={loadTransactions}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
       </div>
     </ViewDefault>

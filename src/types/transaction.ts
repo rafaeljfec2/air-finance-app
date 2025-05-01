@@ -8,15 +8,21 @@ export interface Category {
 
 export interface Transaction {
   id: string;
+  tipo: 'RECEITA' | 'DESPESA';
   descricao: string;
   valor: number;
   data: string;
-  tipo: 'RECEITA' | 'DESPESA';
-  categoria: Category;
+  categoriaId: string;
+  contaId: string;
   observacao?: string;
   anexos?: string[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Account {
+  id: string;
+  nome: string;
 }
 
 export type TransactionInput = Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>;

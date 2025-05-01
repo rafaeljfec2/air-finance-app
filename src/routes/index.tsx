@@ -1,10 +1,10 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { Login } from '@/pages/auth/Login';
 import { Dashboard } from '@/pages/dashboard/Dashboard';
-import { Statement } from '@/pages/Statement';
-import { NewTransaction } from '@/pages/NewTransaction';
-import { Transactions } from '@/pages/Transactions';
-import { Reports } from '@/pages/Reports';
+import { Statement } from '@/pages/statement';
+import { NewTransaction } from '@/pages/transactions/new';
+import { Transactions } from '@/pages/transactions';
+import { Reports } from '@/pages/reports';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { ErrorPage } from '@/components/error/ErrorPage';

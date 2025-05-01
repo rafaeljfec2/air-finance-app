@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { Card } from '@/components/ui/Card';
+import { Card } from '@/components/ui/card';
 import { PieChart } from '@/components/charts/PieChart';
 import { TransactionList } from '@/components/transactions/TransactionList';
-import { PullToRefresh } from '@/components/ui/PullToRefresh';
+import { PullToRefresh } from '@/components/ui/pullToRefresh';
 import { cn } from '@/lib/utils';
 
 // Dados mockados para exemplo

@@ -1,40 +1,21 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Icon } from '@/components/Icon';
+import { ReactNode } from 'react'
+import { Sidebar } from '@/components/layout/Sidebar'
+import { Header } from '@/components/layout/Header'
 
 interface ViewDefaultProps {
-  title?: string;
-  children: React.ReactNode;
-  showBackButton?: boolean;
+  children: ReactNode
 }
 
-export function ViewDefault({ title, children, showBackButton = false }: ViewDefaultProps) {
-  const navigate = useNavigate();
-
+export default function ViewDefault({ children }: ViewDefaultProps) {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              {showBackButton && (
-                <button
-                  onClick={() => navigate(-1)}
-                  className="mr-4 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
-                >
-                  <Icon name="ArrowLeftIcon" className="text-gray-500 dark:text-gray-400" size={20} />
-                </button>
-              )}
-              {title && (
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {title}
-                </h1>
-              )}
-            </div>
-          </div>
-        </div>
-        <main>{children}</main>
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header />
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-gray-900">
+          {children}
+        </main>
       </div>
     </div>
-  );
+  )
 } 
