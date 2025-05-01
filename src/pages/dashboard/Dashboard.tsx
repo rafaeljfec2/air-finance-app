@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { BalanceChart } from '@/components/charts/BalanceChart';
 
 // Dados mockados para exemplo (manter temporariamente)
 const mockData = {
@@ -55,6 +56,17 @@ const mockData = {
     },
   ],
 };
+
+// Adicionar dados mockados para o gráfico
+const mockBalanceHistory = [
+  { date: '2024-03-01', balance: 1500 },
+  { date: '2024-03-05', balance: 2300 },
+  { date: '2024-03-10', balance: 1800 },
+  { date: '2024-03-15', balance: 2800 },
+  { date: '2024-03-20', balance: 2500 },
+  { date: '2024-03-25', balance: 3200 },
+  { date: '2024-03-30', balance: 2000 },
+];
 
 type TimeRange = 'day' | 'week' | 'month' | 'year';
 
@@ -206,10 +218,7 @@ export function Dashboard() {
                     <ArrowTrendingUpIcon className="h-5 w-5 text-green-400" />
                   </div>
                   <div className="h-80">
-                    {/* TODO: Implementar gráfico de linha mostrando evolução do saldo */}
-                    <div className="flex items-center justify-center h-full text-gray-400">
-                      Em desenvolvimento
-                    </div>
+                    <BalanceChart data={mockBalanceHistory} />
                   </div>
                 </div>
               </Card>

@@ -1023,6 +1023,13 @@
     "@types/prop-types" "*"
     csstype "^3.0.2"
 
+"@types/recharts@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@types/recharts/-/recharts-2.0.1.tgz#8ca180f515daa6150a95fef7635ab28190f597bc"
+  integrity sha512-/cFs7oiafzByUwBSWA1IzE6FW+ppPwQAWsDTadSgVOwzveY9MESpyLHyyHY0SfPPKLW4+4qVNYHPXd0rFiC8vg==
+  dependencies:
+    recharts "*"
+
 "@typescript-eslint/eslint-plugin@^7.0.0":
   version "7.18.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-7.18.0.tgz#b16d3cf3ee76bf572fdf511e79c248bdec619ea3"
@@ -3975,9 +3982,9 @@ recharts-scale@^0.4.4:
   dependencies:
     decimal.js-light "^2.4.1"
 
-recharts@^2.15.3:
+recharts@*, recharts@^2.15.3:
   version "2.15.3"
-  resolved "https://registry.npmjs.org/recharts/-/recharts-2.15.3.tgz"
+  resolved "https://registry.yarnpkg.com/recharts/-/recharts-2.15.3.tgz#b94d05e91e3a5df1b02368ef64400dec9e9a77d4"
   integrity sha512-EdOPzTwcFSuqtvkDoaM5ws/Km1+WTAO2eizL7rqiG0V2UVhTnz0m7J2i0CjVPUCdEkZImaWvXLbZDS2H5t6GFQ==
   dependencies:
     clsx "^2.0.0"
