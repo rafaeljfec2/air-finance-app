@@ -6,7 +6,7 @@ import { TransactionList } from '@/components/statement/TransactionList';
 import { StatementFilters } from '@/components/statement/StatementFilters';
 import { useStatementStore } from '@/stores/statement';
 import { Transaction } from '@/types/transaction';
-import { usePullToRefresh } from '../hooks/usePullToRefresh';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { ExclamationTriangleIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
 export function Statement() {
@@ -166,4 +166,4 @@ export function Statement() {
       </div>
     </ViewDefault>
   );
-}
+} 
