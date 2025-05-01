@@ -54,36 +54,34 @@ export function Dashboard() {
   return (
     <ViewDefault>
       <PullToRefresh onRefresh={handleRefresh} isRefreshing={isRefreshing}>
-        <div className="space-y-6">
+        <div className="space-y-6 p-6">
           {/* Resumo Financeiro */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
+            <Card className="bg-gray-800 border-gray-700">
               <div className="p-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Receitas</h3>
-                <p className="mt-2 text-3xl font-bold text-green-600 dark:text-green-400">
+                <h3 className="text-lg font-medium text-gray-100">Receitas</h3>
+                <p className="mt-2 text-3xl font-bold text-green-400">
                   R$ {mockData.totalIncome.toLocaleString('pt-BR')}
                 </p>
               </div>
             </Card>
 
-            <Card>
+            <Card className="bg-gray-800 border-gray-700">
               <div className="p-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Despesas</h3>
-                <p className="mt-2 text-3xl font-bold text-red-600 dark:text-red-400">
+                <h3 className="text-lg font-medium text-gray-100">Despesas</h3>
+                <p className="mt-2 text-3xl font-bold text-red-400">
                   R$ {mockData.totalExpenses.toLocaleString('pt-BR')}
                 </p>
               </div>
             </Card>
 
-            <Card>
+            <Card className="bg-gray-800 border-gray-700">
               <div className="p-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Saldo</h3>
+                <h3 className="text-lg font-medium text-gray-100">Saldo</h3>
                 <p
                   className={cn(
                     'mt-2 text-3xl font-bold',
-                    mockData.balance >= 0
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-red-600 dark:text-red-400'
+                    mockData.balance >= 0 ? 'text-green-400' : 'text-red-400'
                   )}
                 >
                   R$ {mockData.balance.toLocaleString('pt-BR')}
@@ -94,9 +92,9 @@ export function Dashboard() {
 
           {/* Gráfico e Lista de Transações */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
+            <Card className="bg-gray-800 border-gray-700">
               <div className="p-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                <h3 className="text-lg font-medium text-gray-100 mb-4">
                   Despesas por Categoria
                 </h3>
                 <div className="h-80">
@@ -105,9 +103,9 @@ export function Dashboard() {
               </div>
             </Card>
 
-            <Card>
+            <Card className="bg-gray-800 border-gray-700">
               <div className="p-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                <h3 className="text-lg font-medium text-gray-100 mb-4">
                   Últimas Transações
                 </h3>
                 <TransactionList transactions={mockData.recentTransactions} />
