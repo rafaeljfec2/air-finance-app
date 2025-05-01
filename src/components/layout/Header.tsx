@@ -24,7 +24,7 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 z-10 relative">
+    <header className="bg-card dark:bg-card-dark border-b border-border dark:border-border-dark shadow-sm z-10 relative">
       <div className="h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Logo */}
         <div className="flex-shrink-0">
@@ -38,7 +38,7 @@ export function Header() {
           {/* Botão de Tema */}
           <button
             onClick={toggleTheme}
-            className="p-1.5 sm:p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             aria-label={isDarkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
           >
             {isDarkMode ? <SunIcon className="h-4 w-4 sm:h-5 sm:w-5" /> : <MoonIcon className="h-4 w-4 sm:h-5 sm:w-5" />}
@@ -48,7 +48,7 @@ export function Header() {
           <Menu as="div" className="relative">
             {({ open }) => (
               <>
-                <Menu.Button className="p-1.5 sm:p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <Menu.Button className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                   <span className="sr-only">Ver notificações</span>
                   <div className="relative">
                     <BellIcon className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -60,7 +60,6 @@ export function Header() {
 
                 <Transition
                   as={Fragment}
-                  show={open}
                   enter="transition ease-out duration-100"
                   enterFrom="transform opacity-0 scale-95"
                   enterTo="transform opacity-100 scale-100"
@@ -68,33 +67,39 @@ export function Header() {
                   leaveFrom="transform opacity-100 scale-100"
                   leaveTo="transform opacity-0 scale-95"
                 >
-                  <Menu.Items className="absolute right-0 mt-2 w-[280px] sm:w-80 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-                    <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                      <h2 className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                  <Menu.Items className="absolute right-0 mt-2 w-80 origin-top-right rounded-md bg-card dark:bg-card-dark shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <div className="py-1">
+                      <div className="px-4 py-2 text-sm text-text dark:text-text-dark">
                         Notificações
-                      </h2>
-                    </div>
-                    <div className="max-h-64 overflow-y-auto">
-                      <Menu.Item>
-                        <div className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
-                          <p className="text-sm text-gray-700 dark:text-gray-200">
-                            Nova transação registrada
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            Há 5 minutos
-                          </p>
-                        </div>
-                      </Menu.Item>
-                      <Menu.Item>
-                        <div className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
-                          <p className="text-sm text-gray-700 dark:text-gray-200">
-                            Limite de orçamento atingido
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            Há 2 horas
-                          </p>
-                        </div>
-                      </Menu.Item>
+                      </div>
+                      <div className="border-t border-border dark:border-border-dark">
+                        <Menu.Item>
+                          {({ active }) => (
+                            <a
+                              href="#"
+                              className={cn(
+                                active ? 'bg-background dark:bg-background-dark' : '',
+                                'block px-4 py-2 text-sm text-text dark:text-text-dark'
+                              )}
+                            >
+                              Nova transação registrada
+                            </a>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <a
+                              href="#"
+                              className={cn(
+                                active ? 'bg-background dark:bg-background-dark' : '',
+                                'block px-4 py-2 text-sm text-text dark:text-text-dark'
+                              )}
+                            >
+                              Lembrete de fatura
+                            </a>
+                          )}
+                        </Menu.Item>
+                      </div>
                     </div>
                   </Menu.Items>
                 </Transition>
@@ -106,19 +111,13 @@ export function Header() {
           <Menu as="div" className="relative">
             {({ open }) => (
               <>
-                <Menu.Button className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 p-1.5 sm:p-2">
-                  <UserCircleIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <div className="hidden md:flex flex-col items-start">
-                    <span className="text-sm font-medium">Rafael Silva</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Conta Pessoal
-                    </span>
-                  </div>
+                <Menu.Button className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                  <span className="sr-only">Abrir menu do usuário</span>
+                  <UserCircleIcon className="h-8 w-8 text-text dark:text-text-dark" />
                 </Menu.Button>
 
                 <Transition
                   as={Fragment}
-                  show={open}
                   enter="transition ease-out duration-100"
                   enterFrom="transform opacity-0 scale-95"
                   enterTo="transform opacity-100 scale-100"
@@ -126,50 +125,53 @@ export function Header() {
                   leaveFrom="transform opacity-100 scale-100"
                   leaveTo="transform opacity-0 scale-95"
                 >
-                  <Menu.Items className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-                    <Menu.Item>
-                      {({ active }) => (
-                        <button
-                          onClick={() => navigate('/profile')}
-                          className={cn(
-                            'flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300',
-                            active && 'bg-gray-100 dark:bg-gray-700'
+                  <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-card dark:bg-card-dark shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <div className="py-1">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            onClick={() => navigate('/profile')}
+                            className={cn(
+                              active ? 'bg-background dark:bg-background-dark' : '',
+                              'flex w-full items-center px-4 py-2 text-sm text-text dark:text-text-dark'
+                            )}
+                          >
+                            <UserCircleIcon className="mr-3 h-5 w-5" />
+                            Meu Perfil
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            onClick={() => navigate('/settings')}
+                            className={cn(
+                              active ? 'bg-background dark:bg-background-dark' : '',
+                              'flex w-full items-center px-4 py-2 text-sm text-text dark:text-text-dark'
+                            )}
+                          >
+                            <Cog6ToothIcon className="mr-3 h-5 w-5" />
+                            Configurações
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <div className="border-t border-border dark:border-border-dark">
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              onClick={handleLogout}
+                              className={cn(
+                                active ? 'bg-background dark:bg-background-dark' : '',
+                                'flex w-full items-center px-4 py-2 text-sm text-text dark:text-text-dark'
+                              )}
+                            >
+                              <ArrowRightOnRectangleIcon className="mr-3 h-5 w-5" />
+                              Sair
+                            </button>
                           )}
-                        >
-                          <UserCircleIcon className="h-5 w-5 mr-2" />
-                          Meu Perfil
-                        </button>
-                      )}
-                    </Menu.Item>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <button
-                          onClick={() => navigate('/settings')}
-                          className={cn(
-                            'flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300',
-                            active && 'bg-gray-100 dark:bg-gray-700'
-                          )}
-                        >
-                          <Cog6ToothIcon className="h-5 w-5 mr-2" />
-                          Configurações
-                        </button>
-                      )}
-                    </Menu.Item>
-                    <div className="border-t border-gray-200 dark:border-gray-700" />
-                    <Menu.Item>
-                      {({ active }) => (
-                        <button
-                          onClick={handleLogout}
-                          className={cn(
-                            'flex items-center w-full px-4 py-2 text-sm text-red-700 dark:text-red-400',
-                            active && 'bg-gray-100 dark:bg-gray-700'
-                          )}
-                        >
-                          <ArrowRightOnRectangleIcon className="h-5 w-5 mr-2" />
-                          Sair
-                        </button>
-                      )}
-                    </Menu.Item>
+                        </Menu.Item>
+                      </div>
+                    </div>
                   </Menu.Items>
                 </Transition>
               </>

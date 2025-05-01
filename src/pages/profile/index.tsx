@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { useAuthStore } from '@/stores/auth'
+import { useTheme } from '@/stores/useTheme'
 import { toast } from 'sonner'
 import {
   User,
@@ -25,6 +26,7 @@ import { cn } from '@/lib/utils'
 
 export function Profile() {
   const { user } = useAuthStore()
+  const { isDarkMode, setTheme } = useTheme()
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [avatar, setAvatar] = useState('/avatars/default.png')
@@ -40,7 +42,6 @@ export function Profile() {
       updates: false
     },
     preferences: {
-      darkMode: true,
       currency: 'BRL',
       language: 'pt-BR'
     }
@@ -93,7 +94,7 @@ export function Profile() {
 
   return (
     <ViewDefault>
-      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900">
+      <div className="flex-1 overflow-x-hidden overflow-y-auto">
         <div className="container mx-auto px-4 py-6 sm:py-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
@@ -112,7 +113,7 @@ export function Profile() {
             {/* Coluna da Esquerda - Informações Principais */}
             <div className="lg:col-span-2 space-y-6">
               {/* Card de Perfil */}
-              <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+              <Card className="border-gray-700">
                 <div className="p-6">
                   <div className="flex flex-col sm:flex-row gap-6">
                     {/* Avatar */}
@@ -277,7 +278,7 @@ export function Profile() {
               </Card>
 
               {/* Card de Segurança */}
-              <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+              <Card className="border-gray-700">
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Shield className="h-5 w-5 text-primary-400" />
@@ -313,7 +314,7 @@ export function Profile() {
             {/* Coluna da Direita - Preferências */}
             <div className="space-y-6">
               {/* Card de Notificações */}
-              <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+              <Card className="border-gray-700">
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Bell className="h-5 w-5 text-primary-400" />
@@ -378,7 +379,7 @@ export function Profile() {
               </Card>
 
               {/* Card de Preferências */}
-              <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+              <Card className="border-gray-700">
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Palette className="h-5 w-5 text-primary-400" />
@@ -397,19 +398,11 @@ export function Profile() {
                           variant="outline"
                           className={cn(
                             "border-gray-600 hover:bg-gray-700",
-                            formData.preferences.darkMode
+                            isDarkMode
                               ? "bg-gray-700 text-primary-400"
                               : "text-gray-400"
                           )}
-                          onClick={() =>
-                            setFormData(prev => ({
-                              ...prev,
-                              preferences: {
-                                ...prev.preferences,
-                                darkMode: true
-                              }
-                            }))
-                          }
+                          onClick={() => setTheme(true)}
                         >
                           <Moon className="h-4 w-4 mr-2" />
                           Escuro
@@ -418,19 +411,11 @@ export function Profile() {
                           variant="outline"
                           className={cn(
                             "border-gray-600 hover:bg-gray-700",
-                            !formData.preferences.darkMode
+                            !isDarkMode
                               ? "bg-gray-700 text-primary-400"
                               : "text-gray-400"
                           )}
-                          onClick={() =>
-                            setFormData(prev => ({
-                              ...prev,
-                              preferences: {
-                                ...prev.preferences,
-                                darkMode: false
-                              }
-                            }))
-                          }
+                          onClick={() => setTheme(false)}
                         >
                           <Sun className="h-4 w-4 mr-2" />
                           Claro

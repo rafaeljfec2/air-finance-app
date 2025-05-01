@@ -20,10 +20,10 @@ export function TransactionList({ transactions }: TransactionListProps) {
       {transactions.map(transaction => (
         <div
           key={transaction.id}
-          className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+          className="flex items-center justify-between p-4 bg-background dark:bg-background-dark rounded-lg"
         >
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
+            <p className="text-sm font-medium text-text dark:text-text-dark">
               {transaction.description}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">{transaction.category}</p>

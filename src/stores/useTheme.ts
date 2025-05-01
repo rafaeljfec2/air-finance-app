@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 interface ThemeState {
   isDarkMode: boolean;
   toggleTheme: () => void;
+  setTheme: (isDark: boolean) => void;
 }
 
 export const useTheme = create<ThemeState>()(
@@ -16,6 +17,11 @@ export const useTheme = create<ThemeState>()(
           // Atualiza a classe no documento
           document.documentElement.classList.toggle('dark', newIsDarkMode);
           return { isDarkMode: newIsDarkMode };
+        }),
+      setTheme: (isDark: boolean) =>
+        set(() => {
+          document.documentElement.classList.toggle('dark', isDark);
+          return { isDarkMode: isDark };
         }),
     }),
     {

@@ -18,7 +18,7 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-background dark:bg-background-dark">
       <Header />
       
       {/* Mobile menu button */}
@@ -51,7 +51,7 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
         >
           <div className="relative h-full">
             <div className="h-full bg-black bg-opacity-25" onClick={toggleMobileMenu} />
-            <div className="absolute top-0 left-0 h-full w-64 bg-white dark:bg-gray-800">
+            <div className="absolute top-0 left-0 h-full w-64 bg-card dark:bg-card-dark">
               <Sidebar />
             </div>
           </div>
