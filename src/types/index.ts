@@ -8,10 +8,18 @@ export interface Transacao {
   id: string;
   descricao: string;
   valor: number;
-  tipo: "RECEITA" | "DESPESA";
+  tipo: 'RECEITA' | 'DESPESA';
   categoria: string;
   data: string;
   usuarioId: string;
+}
+
+export interface Transaction {
+  id: string;
+  description: string;
+  amount: number;
+  category: string;
+  date: string;
 }
 
 export interface Categoria {
@@ -26,6 +34,30 @@ export interface Dashboard {
   receitas: number;
   despesas: number;
   transacoes: Transacao[];
+}
+
+export interface MonthlyReport {
+  summary: {
+    income: {
+      total: number;
+      categories: Array<{
+        name: string;
+        value: number;
+      }>;
+    };
+    expenses: {
+      total: number;
+      categories: Array<{
+        name: string;
+        value: number;
+      }>;
+    };
+    balance: {
+      current: number;
+      previous: number;
+      variation: number;
+    };
+  };
 }
 
 export interface AuthState {
