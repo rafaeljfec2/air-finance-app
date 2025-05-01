@@ -13,12 +13,15 @@ import {
   Headphones
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import heroImage from '@/assets/images/landing/hero.svg';
 import dashboardImage from '@/assets/images/landing/dashboard.svg';
 import securityImage from '@/assets/images/landing/security.svg';
 import mobileImage from '@/assets/images/landing/mobile.svg';
 
 export function LandingPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-white text-text">
       {/* Header */}
@@ -32,6 +35,7 @@ export function LandingPage() {
             <Button 
               variant="default"
               className="bg-brand-arrow hover:bg-brand-arrow/90 text-white px-6"
+              onClick={() => navigate('/auth/login')}
             >
               Entrar
             </Button>
