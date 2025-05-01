@@ -157,22 +157,27 @@ export function Transactions() {
     return () => clearTimeout(timer)
   }, [])
 
-  const filteredTransactions = mockTransactions.filter((transaction) => {
-    const matchesSearch = transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesType = selectedType === 'all' || transaction.tipo === selectedType
-    // Implementar filtro por período quando necessário
-    return matchesSearch && matchesType
+  const filteredTransactions = mockTransactions
+    .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()) // Ordenar por data decrescente
+    .filter((transaction) => {
+      const matchesSearch = transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesType = selectedType === 'all' || transaction.tipo === selectedType
+      return matchesSearch && matchesType
+    })
+
+  // Calcular saldo acumulado para cada transação
+  let saldoAcumulado = 0
+  const transactionsWithBalance = filteredTransactions.map(transaction => {
+    const credito = transaction.tipo === 'RECEITA' ? transaction.valor : 0
+    const debito = transaction.tipo === 'DESPESA' ? transaction.valor : 0
+    saldoAcumulado += credito - debito
+    return {
+      ...transaction,
+      credito,
+      debito,
+      saldo: saldoAcumulado
+    }
   })
-
-  const totalReceitas = filteredTransactions
-    .filter(t => t.tipo === 'RECEITA')
-    .reduce((sum, t) => sum + t.valor, 0)
-
-  const totalDespesas = filteredTransactions
-    .filter(t => t.tipo === 'DESPESA')
-    .reduce((sum, t) => sum + t.valor, 0)
-
-  const saldo = totalReceitas - totalDespesas
 
   return (
     <ViewDefault>
@@ -274,15 +279,17 @@ export function Transactions() {
                       <thead>
                         <tr className="border-b border-gray-700">
                           <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Data</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Descrição</th>
                           <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Categoria</th>
+                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Descrição</th>
                           <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Conta</th>
-                          <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Valor</th>
+                          <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Crédito</th>
+                          <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Débito</th>
+                          <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Saldo</th>
                           <th className="w-10"></th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-700">
-                        {filteredTransactions.map((transaction) => (
+                        {transactionsWithBalance.map((transaction) => (
                           <tr
                             key={transaction.id}
                             className="hover:bg-gray-700/30 transition-colors"
@@ -291,22 +298,31 @@ export function Transactions() {
                               {formatDate(transaction.data)}
                             </td>
                             <td className="py-3 px-4 text-sm text-gray-300">
-                              {transaction.descricao}
+                              {transaction.categoria.nome}
                             </td>
                             <td className="py-3 px-4 text-sm text-gray-300">
-                              {transaction.categoria.nome}
+                              {transaction.descricao}
                             </td>
                             <td className="py-3 px-4 text-sm text-gray-300">
                               {transaction.conta.nome}
                             </td>
+                            <td className="py-3 px-4 text-sm font-medium text-right text-emerald-400">
+                              {transaction.credito > 0 ? formatCurrency(transaction.credito) : '-'}
+                            </td>
+                            <td className="py-3 px-4 text-sm font-medium text-right text-red-400">
+                              {transaction.debito > 0 ? formatCurrency(transaction.debito) : '-'}
+                            </td>
                             <td className={cn(
                               "py-3 px-4 text-sm font-medium text-right",
-                              transaction.tipo === 'RECEITA' ? "text-green-400" : "text-red-400"
+                              transaction.saldo >= 0 ? "text-emerald-400" : "text-red-400"
                             )}>
-                              {formatCurrency(transaction.valor)}
+                              {formatCurrency(transaction.saldo)}
                             </td>
                             <td className="py-3 px-4">
-                              <button className="text-gray-400 hover:text-gray-300">
+                              <button 
+                                onClick={() => navigate(`/transactions/edit/${transaction.id}`)}
+                                className="text-gray-400 hover:text-gray-300"
+                              >
                                 <MoreHorizontal className="h-5 w-5" />
                               </button>
                             </td>
@@ -318,7 +334,7 @@ export function Transactions() {
 
                   {/* Mobile Card View */}
                   <div className="md:hidden space-y-4">
-                    {filteredTransactions.map((transaction) => (
+                    {transactionsWithBalance.map((transaction) => (
                       <div
                         key={transaction.id}
                         className="bg-gray-800/30 rounded-lg p-4 space-y-3 hover:bg-gray-700/30 transition-colors"
@@ -328,19 +344,34 @@ export function Transactions() {
                             <p className="font-medium text-gray-200">{transaction.descricao}</p>
                             <p className="text-sm text-gray-400">{formatDate(transaction.data)}</p>
                           </div>
-                          <p className={cn(
-                            "text-base font-medium",
-                            transaction.tipo === 'RECEITA' ? "text-green-400" : "text-red-400"
-                          )}>
-                            {formatCurrency(transaction.valor)}
-                          </p>
+                          <div className="text-right">
+                            {transaction.credito > 0 && (
+                              <p className="text-sm font-medium text-emerald-400">
+                                +{formatCurrency(transaction.credito)}
+                              </p>
+                            )}
+                            {transaction.debito > 0 && (
+                              <p className="text-sm font-medium text-red-400">
+                                -{formatCurrency(transaction.debito)}
+                              </p>
+                            )}
+                            <p className={cn(
+                              "text-xs mt-1",
+                              transaction.saldo >= 0 ? "text-emerald-400" : "text-red-400"
+                            )}>
+                              Saldo: {formatCurrency(transaction.saldo)}
+                            </p>
+                          </div>
                         </div>
                         <div className="flex items-center justify-between text-sm text-gray-400">
                           <div className="space-y-1">
                             <p>Categoria: {transaction.categoria.nome}</p>
                             <p>Conta: {transaction.conta.nome}</p>
                           </div>
-                          <button className="p-2 hover:bg-gray-700/50 rounded-full transition-colors">
+                          <button 
+                            onClick={() => navigate(`/transactions/edit/${transaction.id}`)}
+                            className="p-2 hover:bg-gray-700/50 rounded-full transition-colors"
+                          >
                             <ChevronRight className="h-5 w-5" />
                           </button>
                         </div>
