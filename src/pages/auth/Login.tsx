@@ -1,23 +1,24 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/hooks/useAuth';
+import { cn } from '@/lib/utils';
 
 const loginSchema = z.object({
-  email: z.string().min(1, 'E-mail é obrigatório').email('E-mail inválido'),
-  password: z
-    .string()
-    .min(1, 'Senha é obrigatória')
-    .min(6, 'Senha deve ter no mínimo 6 caracteres'),
+  email: z.string().email('E-mail inválido'),
+  password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export function Login() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,10 +34,13 @@ export function Login() {
     try {
       setIsLoading(true);
       setError(null);
-      // TODO: Implementar chamada à API de autenticação
-      console.log(data);
-    } catch {
-      setError('Ocorreu um erro ao tentar fazer login. Tente novamente.');
+      console.log('Iniciando processo de login...');
+      await login(data.email, data.password);
+      console.log('Redirecionando para o dashboard...');
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Erro durante o login:', err);
+      setError('Erro ao fazer login. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -61,31 +65,30 @@ export function Login() {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          {error && (
-            <div className="rounded-md bg-red-50 dark:bg-red-900/50 p-4">
-              <div className="text-sm text-red-700 dark:text-red-200">{error}</div>
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <Input
+                label="E-mail"
+                type="email"
+                autoComplete="email"
+                error={errors.email?.message}
+                icon={<EnvelopeIcon className="h-5 w-5 text-gray-400" />}
+                {...register('email')}
+              />
             </div>
-          )}
-
-          <div className="rounded-md shadow-sm space-y-4">
-            <Input
-              label="E-mail"
-              type="email"
-              autoComplete="email"
-              error={errors.email?.message}
-              icon={<EnvelopeIcon className="h-5 w-5 text-gray-400" />}
-              {...register('email')}
-            />
-
-            <Input
-              label="Senha"
-              type="password"
-              autoComplete="current-password"
-              error={errors.password?.message}
-              icon={<LockClosedIcon className="h-5 w-5 text-gray-400" />}
-              {...register('password')}
-            />
+            <div>
+              <Input
+                label="Senha"
+                type="password"
+                autoComplete="current-password"
+                error={errors.password?.message}
+                icon={<LockClosedIcon className="h-5 w-5 text-gray-400" />}
+                {...register('password')}
+              />
+            </div>
           </div>
+
+          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
 
           <div className="flex items-center justify-between">
             <div className="text-sm">
@@ -99,8 +102,15 @@ export function Login() {
           </div>
 
           <div>
-            <Button type="submit" className="w-full" isLoading={isLoading}>
-              Entrar
+            <Button
+              type="submit"
+              className={cn(
+                'w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500',
+                isLoading && 'opacity-50 cursor-not-allowed'
+              )}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Entrando...' : 'Entrar'}
             </Button>
           </div>
         </form>
