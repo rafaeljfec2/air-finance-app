@@ -9,9 +9,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const { isDarkMode } = useTheme();
 
   useEffect(() => {
-    // Aplica o tema inicial
+    // Aplica o tema quando mudar
     document.documentElement.classList.toggle('dark', isDarkMode);
-  }, []);
+  }, [isDarkMode]);
 
   return <>{children}</>;
 }

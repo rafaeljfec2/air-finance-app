@@ -67,12 +67,12 @@ export function TransactionGrid({
   }
 
   return (
-    <Card className={cn("bg-gray-800/50 border-gray-700 backdrop-blur-sm", className)}>
+    <Card className={cn("bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm", className)}>
       <div className="p-4 sm:p-6">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <Loader2 className="h-8 w-8 text-primary-500 animate-spin mb-4" />
-            <p className="text-sm text-gray-400">Carregando transações...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Carregando transações...</p>
           </div>
         ) : (
           <>
@@ -80,33 +80,33 @@ export function TransactionGrid({
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-700">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Data</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Categoria</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Descrição</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Conta</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Crédito</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Débito</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Saldo</th>
+                  <tr className="border-b border-border dark:border-border-dark">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-text dark:text-text-dark">Data</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-text dark:text-text-dark">Categoria</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-text dark:text-text-dark">Descrição</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-text dark:text-text-dark">Conta</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-text dark:text-text-dark">Crédito</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-text dark:text-text-dark">Débito</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-text dark:text-text-dark">Saldo</th>
                     {showActions && <th className="w-10"></th>}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-700">
+                <tbody className="divide-y divide-border dark:divide-border-dark">
                   {transactionsWithBalance.map((transaction) => (
                     <tr
                       key={transaction.id}
-                      className="hover:bg-gray-700/30 transition-colors"
+                      className="hover:bg-background dark:hover:bg-background-dark transition-colors"
                     >
-                      <td className="py-3 px-4 text-sm text-gray-300">
+                      <td className="py-3 px-4 text-sm text-text dark:text-text-dark">
                         {formatDate(transaction.data)}
                       </td>
-                      <td className="py-3 px-4 text-sm text-gray-300">
+                      <td className="py-3 px-4 text-sm text-text dark:text-text-dark">
                         {transaction.categoria.nome}
                       </td>
-                      <td className="py-3 px-4 text-sm text-gray-300">
+                      <td className="py-3 px-4 text-sm text-text dark:text-text-dark">
                         {transaction.descricao}
                       </td>
-                      <td className="py-3 px-4 text-sm text-gray-300">
+                      <td className="py-3 px-4 text-sm text-text dark:text-text-dark">
                         {transaction.conta.nome}
                       </td>
                       <td className="py-3 px-4 text-sm font-medium text-right text-emerald-400">
@@ -125,7 +125,7 @@ export function TransactionGrid({
                         <td className="py-3 px-4">
                           <button
                             onClick={() => handleActionClick(transaction)}
-                            className="text-gray-400 hover:text-gray-300"
+                            className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark"
                           >
                             <MoreHorizontal className="h-5 w-5" />
                           </button>
@@ -142,12 +142,12 @@ export function TransactionGrid({
               {transactionsWithBalance.map((transaction) => (
                 <div
                   key={transaction.id}
-                  className="bg-gray-800/30 rounded-lg p-4 space-y-3 hover:bg-gray-700/30 transition-colors"
+                  className="bg-card dark:bg-card-dark rounded-lg p-4 space-y-3 hover:bg-background dark:hover:bg-background-dark transition-colors"
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-medium text-gray-200">{transaction.descricao}</p>
-                      <p className="text-sm text-gray-400">{formatDate(transaction.data)}</p>
+                      <p className="font-medium text-text dark:text-text-dark">{transaction.descricao}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(transaction.data)}</p>
                     </div>
                     <div className="text-right">
                       {transaction.credito > 0 && (
@@ -168,7 +168,7 @@ export function TransactionGrid({
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between text-sm text-gray-400">
+                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                     <div className="space-y-1">
                       <p>Categoria: {transaction.categoria.nome}</p>
                       <p>Conta: {transaction.conta.nome}</p>
@@ -176,7 +176,7 @@ export function TransactionGrid({
                     {showActions && (
                       <button
                         onClick={() => handleActionClick(transaction)}
-                        className="p-2 hover:bg-gray-700/50 rounded-full transition-colors"
+                        className="p-2 hover:bg-background dark:hover:bg-background-dark rounded-full transition-colors"
                       >
                         <ChevronRight className="h-5 w-5" />
                       </button>
