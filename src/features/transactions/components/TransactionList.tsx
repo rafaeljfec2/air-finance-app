@@ -1,12 +1,12 @@
 import { formatCurrency, formatDateTime } from '../../../utils/formatters';
-import { Transacao } from '../../../types';
+import { Transaction } from '../../../types';
 
 interface TransactionListProps {
-  transacoes: Transacao[];
+  transactions: Transaction[];
 }
 
-export function TransactionList({ transacoes }: TransactionListProps) {
-  if (transacoes.length === 0) {
+export function TransactionList({ transactions }: TransactionListProps) {
+  if (transactions.length === 0) {
     return (
       <div className="text-center text-gray-500 dark:text-gray-400">
         Nenhuma transação encontrada
@@ -46,26 +46,26 @@ export function TransactionList({ transacoes }: TransactionListProps) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-          {transacoes.map(transacao => (
-            <tr key={transacao.id}>
+          {transactions.map(transaction => (
+            <tr key={transaction.id}>
               <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                {transacao.descricao}
+                {transaction.descricao}
               </td>
               <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                {transacao.categoria}
+                {transaction.categoria.nome}
               </td>
               <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                {formatDateTime(transacao.data)}
+                {formatDateTime(transaction.data)}
               </td>
               <td
                 className={`whitespace-nowrap px-6 py-4 text-right text-sm font-medium ${
-                  transacao.tipo === 'RECEITA'
+                  transaction.tipo === 'RECEITA'
                     ? 'text-green-600 dark:text-green-400'
                     : 'text-red-600 dark:text-red-400'
                 }`}
               >
-                {transacao.tipo === 'RECEITA' ? '+' : '-'}
-                {formatCurrency(transacao.valor)}
+                {transaction.tipo === 'RECEITA' ? '+' : '-'}
+                {formatCurrency(transaction.valor)}
               </td>
             </tr>
           ))}

@@ -1,17 +1,32 @@
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-export function formatCurrency(valor: number): string {
+export function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-  }).format(valor);
+  }).format(value);
 }
 
-export function formatDate(data: string): string {
-  return format(new Date(data), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+export function formatPercentual(value: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'percent',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(value / 100);
 }
 
-export function formatDateTime(data: string): string {
-  return format(new Date(data), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+export function formatDate(dateStr: string): string {
+  const date = parseISO(dateStr);
+  return format(date, 'dd/MM/yyyy', { locale: ptBR });
+}
+
+export function formatMonthYear(date: Date | string): string {
+  const dateObj = date instanceof Date ? date : parseISO(date);
+  return format(dateObj, "MMMM 'de' yyyy", { locale: ptBR });
+}
+
+export function formatDateTime(dateStr: string, pattern: string): string {
+  const date = parseISO(dateStr);
+  return format(date, pattern, { locale: ptBR });
 }

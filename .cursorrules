@@ -1,0 +1,130 @@
+# Ajustado para desenvolvimento avançado em React Native
+paths = [
+  "node_modules",
+  "build",
+  "dist",
+  ".git",
+  "coverage",
+  "android",
+  "ios"
+]
+
+[focus]
+paths = [
+  "src/views",
+  "src/components",
+  "src/types",
+  "src/contexts",
+  "src/hooks",
+  "src/services",
+  "src/utils",
+  "src/assets",
+  "src/navigation",
+  "src/store",
+  "__tests__",
+  "src/features"
+]
+
+[metadata]
+project = "Front-end App Financeiro"
+description = "Aplicativo de gestão financeira pessoal desenvolvido com React Native"
+tech_stack = [
+  "React Native",
+  "TypeScript",
+  "React Navigation",
+  "React Query",
+  "Expo",
+  "React Native Elements",
+  "Zustand",
+  "AsyncStorage",
+  "ESLint + Prettier"
+]
+package_manager = "yarn"
+
+[guidelines]
+linguagem = "Todo código, documentação e comentários devem ser em inglês. Conversas e respostas em português"
+arquitetura = "Aplicar princípios de Clean Architecture"
+boas_praticas = [
+  "Sempre criar codigo e layout de forma profissional, com boas praticas de UX e UI",
+  "Seguir os princípios SOLID",
+  "Aplicar práticas de Clean Code",
+  "Separar bem camadas: components, views, services, etc",
+  "Evitar side-effects fora de hooks controlados",
+  "Usar hooks customizados para encapsular lógica de negócio",
+  "Centralizar temas e estilos com styled-components ou StyleSheetTheme",
+  "Criar componentes pequenos e reutilizáveis",
+  "Evitar lógica de negócio em componentes visuais",
+  "Nomear arquivos e variáveis com clareza e consistência",
+  "Evitar renderizações desnecessárias (memoização com React.memo e useCallback)",
+  "Utilizar FlatList e SectionList para listas performáticas",
+  "Implementar Skeletons ou placeholders para carregamento de dados",
+  "Gerenciar estados locais com hooks e globais com Zustand/Recoil/Jotai",
+  "Usar navegação tipada com React Navigation e TypeScript",
+  "Separar as validações de formulário com zod ou yup",
+  "Utilizar ENV para armazenar configurações sensíveis (com react-native-dotenv)",
+  "Usar diretórios contextuais por feature (feature-based structure)",
+  "Garantir acessibilidade e compatibilidade com diferentes tamanhos de tela",
+  "Evitar usar valores fixos de padding/margin — usar constantes ou utilitários de espaçamento",
+  "Toda nova tela deve obrigatoriamente utilizar o componente ViewDefault como base estrutural",
+  "Nenhuma alteração deve modificar o comportamento visual, estrutural ou funcional da aplicação sem validação e justificativa clara"
+]
+style = "Seguir o padrão atual do projeto, respeitando o que já foi feito como: themas, estilos, etc"
+types = "Usar TypeScript fortemente tipado"
+tratamento_de_erros = "Sempre tratar erros com try/catch e mensagens claras"
+log = "Usar o logger central da aplicação (ex: react-native-logs ou Logger próprio)"
+sem_efeitos_colaterais = true
+melhor_solucao = "Sempre sugerir a melhor implementação possível"
+revisao_automatica = "Após cada sugestão, revisar e corrigir automaticamente erros de lint e imports"
+documentacao = "Sempre documentar funções e componentes públicos"
+testes = "Sugerir cenários de teste unitário e de integração para novos módulos"
+seguranca = "Evitar práticas inseguras como eval, uso direto de dados sensíveis no código, etc"
+reutilizacao = "Buscar reutilizar código existente e criar bibliotecas internas quando necessário"
+melhorias = "Sugerir refatorações não-invasivas quando necessário"
+evitar = [
+  "Funções que modificam estado global sem necessidade",
+  "Código duplicado",
+  "Responsabilidades misturadas",
+  "Acesso direto a APIs externas sem camada de abstração"
+]
+
+[review]
+ativar = true
+modo = "Sugira revisão técnica ou refatoração com base no código e contexto"
+
+[reuse]
+verificacao_previa = "Antes de sugerir novo código, procure soluções similares já existentes no projeto"
+
+[convencao_arquivos]
+padrao = ["src/features", "src/services", "src/hooks", "src/components", "__tests__"]
+
+[metricas]
+ferramentas = ["SonarQube", "Istanbul", "React Profiler"]
+
+[dependencias]
+criterios = [
+  "Verificar se já existe dependência semelhante instalada",
+  "Priorizar libs estáveis e amplamente adotadas",
+  "Evitar dependências sem manutenção ativa",
+  "Auditar pacotes antes da inclusão (ex: npm audit, Snyk)"
+]
+substituicao = "Caso uma lib esteja obsoleta, sugerir alternativas com mesma funcionalidade e melhor suporte"
+
+[modo_review]
+ativar = true
+acoes = ["Sugerir melhorias técnicas", "Identificar complexidades desnecessárias", "Apontar padrões divergentes"]
+
+[seguranca]
+boas_praticas = [
+  "Nunca expor segredos ou chaves diretamente no código",
+  "Usar arquivos .env e bibliotecas como react-native-dotenv para variáveis sensíveis",
+  "Sanitizar todas as entradas de usuário (XSS, injections, etc)",
+  "Evitar o uso de eval, new Function ou qualquer forma de execução dinâmica de código",
+  "Sempre validar e tratar respostas de APIs externas",
+  "Usar HTTPS em todas as comunicações",
+  "Configurar headers de segurança em chamadas HTTP (CORS, CSP, etc)",
+  "Atualizar regularmente dependências com alertas de segurança",
+  "Monitorar pacotes com ferramentas como npm audit ou Snyk",
+  "Evitar o uso de bibliotecas sem manutenção ou sem histórico confiável",
+  "Implementar autenticação segura (mesmo que mock) e controle de acesso básico",
+  "Desabilitar logs sensíveis em produção"
+]

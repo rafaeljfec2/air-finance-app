@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   HomeIcon,
@@ -7,18 +6,25 @@ import {
   Cog6ToothIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  BanknotesIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
+import { useSidebarStore } from '@/stores/sidebar';
 
 export function Sidebar() {
   const location = useLocation();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isCollapsed, toggleCollapse } = useSidebarStore();
 
   const navigation = [
     {
       name: 'Dashboard',
       href: '/dashboard',
       icon: HomeIcon,
+    },
+    {
+      name: 'Extrato',
+      href: '/statement',
+      icon: BanknotesIcon,
     },
     {
       name: 'Transações',
@@ -47,7 +53,7 @@ export function Sidebar() {
       <div className="h-full flex flex-col">
         <div className="flex items-center justify-end p-4">
           <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={toggleCollapse}
             className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
             aria-label={isCollapsed ? 'Expandir menu' : 'Recolher menu'}
           >
