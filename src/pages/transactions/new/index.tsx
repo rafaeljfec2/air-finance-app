@@ -9,7 +9,7 @@ import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react'
+import { ArrowDownCircle, ArrowUpCircle, Receipt } from 'lucide-react'
 
 export function NewTransaction() {
   const navigate = useNavigate()
@@ -47,7 +47,10 @@ export function NewTransaction() {
         <div className="container mx-auto px-4 py-8 max-w-3xl">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-gray-100">Nova Transação</h1>
+              <div className="flex items-center gap-3 mb-2">
+                <Receipt className="h-8 w-8 text-primary-400" />
+                <h1 className="text-2xl font-bold text-gray-100">Novo Lançamento</h1>
+              </div>
               <p className="mt-1 text-sm text-gray-400">
                 Preencha os dados abaixo para registrar uma nova transação
               </p>

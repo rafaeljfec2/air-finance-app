@@ -3,7 +3,7 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { useMonthlyReport } from '@/hooks/useMonthlyReport';
 import { formatMonthYear } from '@/utils/formatters';
 import { ArrowLeftIcon, ArrowRightIcon, ChartPieIcon } from '@heroicons/react/24/outline';
-import { Button } from '@/components/Button';
+import { Button } from '@/components/ui/button';
 import { FinancialSummary } from '@/components/reports/FinancialSummary';
 import { CategoryCharts } from '@/components/reports/CategoryCharts';
 import { CategoryDetails } from '@/components/reports/CategoryDetails';
