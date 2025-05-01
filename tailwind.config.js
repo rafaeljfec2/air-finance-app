@@ -28,10 +28,10 @@ module.exports = {
           900: '#0c1a14',
         },
         // Cores semânticas para o tema claro
-        background: '#ffffff',
-        card: '#ffffff',
-        text: '#1f2937',
-        border: '#e5e7eb',
+        background: '#F8FAF9', // Fundo mais suave, com um toque de verde
+        card: '#FFFFFF',
+        text: '#1A2825', // Verde muito escuro, quase preto
+        border: '#E8EFEC', // Borda mais suave com tom esverdeado
         // Cores semânticas para o tema escuro
         'background-dark': '#111827',
         'card-dark': '#1f2937',
