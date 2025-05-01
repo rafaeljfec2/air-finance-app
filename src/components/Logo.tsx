@@ -36,11 +36,11 @@ export function Logo({ className, showSlogan = false, variant = 'default' }: Log
         {/* Texto "Finely" */}
         <h1 
           className={cn(
-            'text-3xl font-bold',
+            'text-2xl font-bold',
             variant === 'white' ? 'text-white' : 'text-brand-arrow dark:text-brand-leaf'
           )}
         >
-          Finely
+            AirFinance
         </h1>
       </div>
 
