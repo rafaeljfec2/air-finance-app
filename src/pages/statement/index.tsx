@@ -6,8 +6,14 @@ import { TransactionList } from '@/components/statement/TransactionList';
 import { useStatementStore } from '@/stores/statement';
 import { Transaction } from '@/types/transaction';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
-import { ExclamationTriangleIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
-import { FileText, ArrowUpCircle, ArrowDownCircle, Plus } from 'lucide-react';
+import { 
+  ExclamationTriangleIcon, 
+  ChevronDownIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
+  DocumentTextIcon,
+  PlusIcon
+} from '@heroicons/react/24/outline';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatters';
@@ -137,7 +143,7 @@ export function Statement() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <FileText className="h-8 w-8 text-primary-400" />
+                <DocumentTextIcon className="h-8 w-8 text-primary-400" />
                 <h1 className="text-2xl font-bold text-gray-100">Extrato Financeiro</h1>
               </div>
               <p className="text-sm text-gray-400">
@@ -152,7 +158,7 @@ export function Statement() {
               <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-medium text-gray-400">Total de Receitas</h3>
-                  <ArrowUpCircle className="h-5 w-5 text-green-400" />
+                  <ArrowTrendingUpIcon className="h-5 w-5 text-green-400" />
                 </div>
                 <p className="text-xl sm:text-2xl font-semibold text-green-400">
                   {formatCurrency(income)}
@@ -169,7 +175,7 @@ export function Statement() {
               <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-medium text-gray-400">Total de Despesas</h3>
-                  <ArrowDownCircle className="h-5 w-5 text-red-400" />
+                  <ArrowTrendingDownIcon className="h-5 w-5 text-red-400" />
                 </div>
                 <p className="text-xl sm:text-2xl font-semibold text-red-400">
                   {formatCurrency(expenses)}
@@ -190,7 +196,7 @@ export function Statement() {
                     "h-5 w-5",
                     availableBalance >= 0 ? "text-green-400" : "text-red-400"
                   )}>
-                    {availableBalance >= 0 ? <ArrowUpCircle /> : <ArrowDownCircle />}
+                    {availableBalance >= 0 ? <ArrowTrendingUpIcon /> : <ArrowTrendingDownIcon />}
                   </div>
                 </div>
                 <p className={cn(
@@ -221,7 +227,7 @@ export function Statement() {
                     onClick={() => navigate('/transactions/new')}
                     className="w-full sm:w-auto px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
-                    <Plus className="h-4 w-4" />
+                    <PlusIcon className="h-4 w-4" />
                     Nova Transação
                   </button>
                 </div>
