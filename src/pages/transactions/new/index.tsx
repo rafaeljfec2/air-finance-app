@@ -163,7 +163,7 @@ export function NewTransaction() {
         </div>
 
         <div className="container mx-auto px-4 py-6">
-          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm w-full sm:max-w-[60%] sm:mx-auto">
             <form id="transaction-form" onSubmit={handleSubmit} className="divide-y divide-gray-700/50">
               {/* Tipo de Transação */}
               <div className="p-4 sm:p-6">
