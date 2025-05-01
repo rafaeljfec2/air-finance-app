@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useTransactionStore } from '@/stores/transaction'
-import { Transaction } from '@/types/transaction'
 import { ViewDefault } from '@/layouts/ViewDefault'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,14 +20,133 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+type MockTransaction = {
+  id: string
+  tipo: 'RECEITA' | 'DESPESA'
+  descricao: string
+  valor: number
+  data: string
+  categoriaId: string
+  contaId: string
+  observacao: string
+  categoria: {
+    id: string
+    nome: string
+    tipo: string
+  }
+  conta: {
+    id: string
+    nome: string
+  }
+}
+
+// Importando o mock de dados (temporário)
+const mockTransactions: MockTransaction[] = [
+  {
+    id: '1',
+    tipo: 'DESPESA',
+    descricao: 'Supermercado',
+    valor: 250.50,
+    data: '2024-03-15',
+    categoriaId: 'cat1',
+    contaId: 'conta1',
+    observacao: 'Compras do mês',
+    categoria: { id: 'cat1', nome: 'Alimentação', tipo: 'DESPESA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '2',
+    tipo: 'RECEITA',
+    descricao: 'Salário',
+    valor: 5000.00,
+    data: '2024-03-10',
+    categoriaId: 'cat2',
+    contaId: 'conta1',
+    observacao: 'Salário mensal',
+    categoria: { id: 'cat2', nome: 'Salário', tipo: 'RECEITA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '3',
+    tipo: 'DESPESA',
+    descricao: 'Aluguel',
+    valor: 1500.00,
+    data: '2024-03-05',
+    categoriaId: 'cat3',
+    contaId: 'conta1',
+    observacao: 'Aluguel do apartamento',
+    categoria: { id: 'cat3', nome: 'Moradia', tipo: 'DESPESA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '4',
+    tipo: 'DESPESA',
+    descricao: 'Academia',
+    valor: 120.00,
+    data: '2024-03-01',
+    categoriaId: 'cat4',
+    contaId: 'conta1',
+    observacao: 'Mensalidade',
+    categoria: { id: 'cat4', nome: 'Saúde', tipo: 'DESPESA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '5',
+    tipo: 'RECEITA',
+    descricao: 'Freelance',
+    valor: 800.00,
+    data: '2024-03-20',
+    categoriaId: 'cat5',
+    contaId: 'conta1',
+    observacao: 'Projeto de desenvolvimento',
+    categoria: { id: 'cat5', nome: 'Freelance', tipo: 'RECEITA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '6',
+    tipo: 'DESPESA',
+    descricao: 'Internet',
+    valor: 99.90,
+    data: '2024-03-15',
+    categoriaId: 'cat6',
+    contaId: 'conta1',
+    observacao: 'Mensalidade',
+    categoria: { id: 'cat6', nome: 'Serviços', tipo: 'DESPESA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '7',
+    tipo: 'DESPESA',
+    descricao: 'Combustível',
+    valor: 200.00,
+    data: '2024-03-18',
+    categoriaId: 'cat7',
+    contaId: 'conta1',
+    observacao: 'Posto Shell',
+    categoria: { id: 'cat7', nome: 'Transporte', tipo: 'DESPESA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '8',
+    tipo: 'RECEITA',
+    descricao: 'Investimentos',
+    valor: 150.00,
+    data: '2024-03-25',
+    categoriaId: 'cat8',
+    contaId: 'conta1',
+    observacao: 'Dividendos',
+    categoria: { id: 'cat8', nome: 'Investimentos', tipo: 'RECEITA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  }
+]
+
 export function Transactions() {
   const navigate = useNavigate()
-  const { transactions } = useTransactionStore()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedPeriod, setSelectedPeriod] = useState('all')
   const [selectedType, setSelectedType] = useState('all')
 
-  const filteredTransactions = transactions.filter((transaction: Transaction) => {
+  const filteredTransactions = mockTransactions.filter((transaction) => {
     const matchesSearch = transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesType = selectedType === 'all' || transaction.tipo === selectedType
     // Implementar filtro por período quando necessário
@@ -43,6 +160,8 @@ export function Transactions() {
   const totalDespesas = filteredTransactions
     .filter(t => t.tipo === 'DESPESA')
     .reduce((sum, t) => sum + t.valor, 0)
+
+  const saldo = totalReceitas - totalDespesas
 
   return (
     <ViewDefault>
@@ -148,16 +267,16 @@ export function Transactions() {
                   <h3 className="text-sm font-medium text-gray-400">Saldo do Período</h3>
                   <div className={cn(
                     "h-5 w-5",
-                    totalReceitas - totalDespesas >= 0 ? "text-green-400" : "text-red-400"
+                    saldo >= 0 ? "text-green-400" : "text-red-400"
                   )}>
-                    {totalReceitas - totalDespesas >= 0 ? <ArrowUpCircle /> : <ArrowDownCircle />}
+                    {saldo >= 0 ? <ArrowUpCircle /> : <ArrowDownCircle />}
                   </div>
                 </div>
                 <p className={cn(
                   "text-xl sm:text-2xl font-semibold",
-                  totalReceitas - totalDespesas >= 0 ? "text-green-400" : "text-red-400"
+                  saldo >= 0 ? "text-green-400" : "text-red-400"
                 )}>
-                  {formatCurrency(totalReceitas - totalDespesas)}
+                  {formatCurrency(saldo)}
                 </p>
               </div>
             </Card>
@@ -180,7 +299,7 @@ export function Transactions() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-700">
-                    {filteredTransactions.map((transaction: Transaction) => (
+                    {filteredTransactions.map((transaction) => (
                       <tr
                         key={transaction.id}
                         className="hover:bg-gray-700/30 transition-colors"
@@ -192,10 +311,10 @@ export function Transactions() {
                           {transaction.descricao}
                         </td>
                         <td className="py-3 px-4 text-sm text-gray-300">
-                          {transaction.categoriaId}
+                          {transaction.categoria.nome}
                         </td>
                         <td className="py-3 px-4 text-sm text-gray-300">
-                          {transaction.contaId}
+                          {transaction.conta.nome}
                         </td>
                         <td className={cn(
                           "py-3 px-4 text-sm font-medium text-right",
@@ -216,7 +335,7 @@ export function Transactions() {
 
               {/* Mobile Card View */}
               <div className="md:hidden space-y-4">
-                {filteredTransactions.map((transaction: Transaction) => (
+                {filteredTransactions.map((transaction) => (
                   <div
                     key={transaction.id}
                     className="bg-gray-800/30 rounded-lg p-4 space-y-3 hover:bg-gray-700/30 transition-colors"
@@ -235,8 +354,8 @@ export function Transactions() {
                     </div>
                     <div className="flex items-center justify-between text-sm text-gray-400">
                       <div className="space-y-1">
-                        <p>Categoria: {transaction.categoriaId}</p>
-                        <p>Conta: {transaction.contaId}</p>
+                        <p>Categoria: {transaction.categoria.nome}</p>
+                        <p>Conta: {transaction.conta.nome}</p>
                       </div>
                       <button className="p-2 hover:bg-gray-700/50 rounded-full transition-colors">
                         <ChevronRight className="h-5 w-5" />

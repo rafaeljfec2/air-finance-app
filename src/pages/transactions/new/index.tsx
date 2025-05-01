@@ -11,6 +11,106 @@ import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react'
 
+// Mock data para demonstração
+const mockTransactions = [
+  {
+    id: '1',
+    tipo: 'DESPESA',
+    descricao: 'Supermercado',
+    valor: 250.50,
+    data: '2024-03-15',
+    categoriaId: 'cat1',
+    contaId: 'conta1',
+    observacao: 'Compras do mês',
+    categoria: { id: 'cat1', nome: 'Alimentação', tipo: 'DESPESA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '2',
+    tipo: 'RECEITA',
+    descricao: 'Salário',
+    valor: 5000.00,
+    data: '2024-03-10',
+    categoriaId: 'cat2',
+    contaId: 'conta1',
+    observacao: 'Salário mensal',
+    categoria: { id: 'cat2', nome: 'Salário', tipo: 'RECEITA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '3',
+    tipo: 'DESPESA',
+    descricao: 'Aluguel',
+    valor: 1500.00,
+    data: '2024-03-05',
+    categoriaId: 'cat3',
+    contaId: 'conta1',
+    observacao: 'Aluguel do apartamento',
+    categoria: { id: 'cat3', nome: 'Moradia', tipo: 'DESPESA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '4',
+    tipo: 'DESPESA',
+    descricao: 'Academia',
+    valor: 120.00,
+    data: '2024-03-01',
+    categoriaId: 'cat4',
+    contaId: 'conta1',
+    observacao: 'Mensalidade',
+    categoria: { id: 'cat4', nome: 'Saúde', tipo: 'DESPESA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '5',
+    tipo: 'RECEITA',
+    descricao: 'Freelance',
+    valor: 800.00,
+    data: '2024-03-20',
+    categoriaId: 'cat5',
+    contaId: 'conta1',
+    observacao: 'Projeto de desenvolvimento',
+    categoria: { id: 'cat5', nome: 'Freelance', tipo: 'RECEITA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '6',
+    tipo: 'DESPESA',
+    descricao: 'Internet',
+    valor: 99.90,
+    data: '2024-03-15',
+    categoriaId: 'cat6',
+    contaId: 'conta1',
+    observacao: 'Mensalidade',
+    categoria: { id: 'cat6', nome: 'Serviços', tipo: 'DESPESA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '7',
+    tipo: 'DESPESA',
+    descricao: 'Combustível',
+    valor: 200.00,
+    data: '2024-03-18',
+    categoriaId: 'cat7',
+    contaId: 'conta1',
+    observacao: 'Posto Shell',
+    categoria: { id: 'cat7', nome: 'Transporte', tipo: 'DESPESA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  },
+  {
+    id: '8',
+    tipo: 'RECEITA',
+    descricao: 'Investimentos',
+    valor: 150.00,
+    data: '2024-03-25',
+    categoriaId: 'cat8',
+    contaId: 'conta1',
+    observacao: 'Dividendos',
+    categoria: { id: 'cat8', nome: 'Investimentos', tipo: 'RECEITA' },
+    conta: { id: 'conta1', nome: 'Conta Corrente' }
+  }
+]
+
 export function NewTransaction() {
   const navigate = useNavigate()
   const { addTransaction, categories, accounts } = useTransactionStore()
