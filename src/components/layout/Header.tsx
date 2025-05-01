@@ -12,6 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/stores/useTheme';
+import { Logo } from '@/components/Logo';
 
 export function Header() {
   const navigate = useNavigate();
@@ -28,9 +29,7 @@ export function Header() {
       <div className="h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Logo */}
         <div className="flex-shrink-0">
-          <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
-            Air Finance
-          </h1>
+          <Logo />
         </div>
 
         {/* Ações do Header */}

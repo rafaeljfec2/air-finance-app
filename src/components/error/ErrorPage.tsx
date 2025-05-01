@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { ExclamationTriangleIcon, HomeIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { ExclamationTriangleIcon, ArrowPathIcon, HomeIcon } from '@heroicons/react/24/outline';
+import { Logo } from '@/components/Logo';
 
 interface ErrorPageProps {
   error?: Error | null;
@@ -26,18 +27,21 @@ export function ErrorPage({ error, code = 404 }: ErrorPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background dark:bg-background-dark flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center">
+        {/* Logo */}
+        <Logo className="mx-auto mb-8" />
+
         {/* Ícone de Erro */}
         <div className="mx-auto h-24 w-24 text-yellow-500 mb-8">
           <ExclamationTriangleIcon />
         </div>
 
         {/* Código do Erro */}
-        <h1 className="text-6xl font-bold text-gray-900 dark:text-white mb-4">{code}</h1>
+        <h1 className="text-6xl font-bold text-text dark:text-text-dark mb-4">{code}</h1>
 
         {/* Título do Erro */}
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+        <h2 className="text-2xl font-semibold text-text dark:text-text-dark mb-4">
           {errorInfo.title}
         </h2>
 
@@ -65,7 +69,7 @@ export function ErrorPage({ error, code = 404 }: ErrorPageProps) {
 
           <button
             onClick={() => window.location.reload()}
-            className="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 w-full sm:w-auto"
+            className="flex items-center justify-center px-4 py-2 text-sm font-medium text-text dark:text-text-dark bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900 w-full sm:w-auto"
           >
             <ArrowPathIcon className="h-5 w-5 mr-2" />
             Tentar novamente
