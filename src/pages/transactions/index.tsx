@@ -20,126 +20,8 @@ import {
   Loader2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-type MockTransaction = {
-  id: string
-  tipo: 'RECEITA' | 'DESPESA'
-  descricao: string
-  valor: number
-  data: string
-  categoriaId: string
-  contaId: string
-  observacao: string
-  categoria: {
-    id: string
-    nome: string
-    tipo: string
-  }
-  conta: {
-    id: string
-    nome: string
-  }
-}
-
-// Importando o mock de dados (temporário)
-const mockTransactions: MockTransaction[] = [
-  {
-    id: '1',
-    tipo: 'DESPESA',
-    descricao: 'Supermercado',
-    valor: 250.50,
-    data: '2024-03-15',
-    categoriaId: 'cat1',
-    contaId: 'conta1',
-    observacao: 'Compras do mês',
-    categoria: { id: 'cat1', nome: 'Alimentação', tipo: 'DESPESA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
-  },
-  {
-    id: '2',
-    tipo: 'RECEITA',
-    descricao: 'Salário',
-    valor: 5000.00,
-    data: '2024-03-10',
-    categoriaId: 'cat2',
-    contaId: 'conta1',
-    observacao: 'Salário mensal',
-    categoria: { id: 'cat2', nome: 'Salário', tipo: 'RECEITA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
-  },
-  {
-    id: '3',
-    tipo: 'DESPESA',
-    descricao: 'Aluguel',
-    valor: 1500.00,
-    data: '2024-03-05',
-    categoriaId: 'cat3',
-    contaId: 'conta1',
-    observacao: 'Aluguel do apartamento',
-    categoria: { id: 'cat3', nome: 'Moradia', tipo: 'DESPESA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
-  },
-  {
-    id: '4',
-    tipo: 'DESPESA',
-    descricao: 'Academia',
-    valor: 120.00,
-    data: '2024-03-01',
-    categoriaId: 'cat4',
-    contaId: 'conta1',
-    observacao: 'Mensalidade',
-    categoria: { id: 'cat4', nome: 'Saúde', tipo: 'DESPESA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
-  },
-  {
-    id: '5',
-    tipo: 'RECEITA',
-    descricao: 'Freelance',
-    valor: 800.00,
-    data: '2024-03-20',
-    categoriaId: 'cat5',
-    contaId: 'conta1',
-    observacao: 'Projeto de desenvolvimento',
-    categoria: { id: 'cat5', nome: 'Freelance', tipo: 'RECEITA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
-  },
-  {
-    id: '6',
-    tipo: 'DESPESA',
-    descricao: 'Internet',
-    valor: 99.90,
-    data: '2024-03-15',
-    categoriaId: 'cat6',
-    contaId: 'conta1',
-    observacao: 'Mensalidade',
-    categoria: { id: 'cat6', nome: 'Serviços', tipo: 'DESPESA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
-  },
-  {
-    id: '7',
-    tipo: 'DESPESA',
-    descricao: 'Combustível',
-    valor: 200.00,
-    data: '2024-03-18',
-    categoriaId: 'cat7',
-    contaId: 'conta1',
-    observacao: 'Posto Shell',
-    categoria: { id: 'cat7', nome: 'Transporte', tipo: 'DESPESA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
-  },
-  {
-    id: '8',
-    tipo: 'RECEITA',
-    descricao: 'Investimentos',
-    valor: 150.00,
-    data: '2024-03-25',
-    categoriaId: 'cat8',
-    contaId: 'conta1',
-    observacao: 'Dividendos',
-    categoria: { id: 'cat8', nome: 'Investimentos', tipo: 'RECEITA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
-  }
-]
+import { TransactionGrid, Transaction } from '@/components/transactions/TransactionGrid'
+import { mockTransactions } from '@/mocks/transactions'
 
 export function Transactions() {
   const navigate = useNavigate()
@@ -158,7 +40,7 @@ export function Transactions() {
   }, [])
 
   const filteredTransactions = mockTransactions
-    .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()) // Ordenar por data decrescente
+    .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
     .filter((transaction) => {
       const matchesSearch = transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesType = selectedType === 'all' || transaction.tipo === selectedType
@@ -261,127 +143,15 @@ export function Transactions() {
                 </Button>
               </div>
             </div>
-          </Card>          
-
-          {/* Transactions List */}
-          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-            <div className="p-4 sm:p-6">
-              {isLoading ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 text-primary-500 animate-spin mb-4" />
-                  <p className="text-sm text-gray-400">Carregando transações...</p>
-                </div>
-              ) : (
-                <>
-                  {/* Desktop Table View */}
-                  <div className="hidden md:block overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-gray-700">
-                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Data</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Categoria</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Descrição</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Conta</th>
-                          <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Crédito</th>
-                          <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Débito</th>
-                          <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Saldo</th>
-                          <th className="w-10"></th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-700">
-                        {transactionsWithBalance.map((transaction) => (
-                          <tr
-                            key={transaction.id}
-                            className="hover:bg-gray-700/30 transition-colors"
-                          >
-                            <td className="py-3 px-4 text-sm text-gray-300">
-                              {formatDate(transaction.data)}
-                            </td>
-                            <td className="py-3 px-4 text-sm text-gray-300">
-                              {transaction.categoria.nome}
-                            </td>
-                            <td className="py-3 px-4 text-sm text-gray-300">
-                              {transaction.descricao}
-                            </td>
-                            <td className="py-3 px-4 text-sm text-gray-300">
-                              {transaction.conta.nome}
-                            </td>
-                            <td className="py-3 px-4 text-sm font-medium text-right text-emerald-400">
-                              {transaction.credito > 0 ? formatCurrency(transaction.credito) : '-'}
-                            </td>
-                            <td className="py-3 px-4 text-sm font-medium text-right text-red-400">
-                              {transaction.debito > 0 ? formatCurrency(transaction.debito) : '-'}
-                            </td>
-                            <td className={cn(
-                              "py-3 px-4 text-sm font-medium text-right",
-                              transaction.saldo >= 0 ? "text-emerald-400" : "text-red-400"
-                            )}>
-                              {formatCurrency(transaction.saldo)}
-                            </td>
-                            <td className="py-3 px-4">
-                              <button 
-                                onClick={() => navigate(`/transactions/edit/${transaction.id}`)}
-                                className="text-gray-400 hover:text-gray-300"
-                              >
-                                <MoreHorizontal className="h-5 w-5" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Mobile Card View */}
-                  <div className="md:hidden space-y-4">
-                    {transactionsWithBalance.map((transaction) => (
-                      <div
-                        key={transaction.id}
-                        className="bg-gray-800/30 rounded-lg p-4 space-y-3 hover:bg-gray-700/30 transition-colors"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className="font-medium text-gray-200">{transaction.descricao}</p>
-                            <p className="text-sm text-gray-400">{formatDate(transaction.data)}</p>
-                          </div>
-                          <div className="text-right">
-                            {transaction.credito > 0 && (
-                              <p className="text-sm font-medium text-emerald-400">
-                                +{formatCurrency(transaction.credito)}
-                              </p>
-                            )}
-                            {transaction.debito > 0 && (
-                              <p className="text-sm font-medium text-red-400">
-                                -{formatCurrency(transaction.debito)}
-                              </p>
-                            )}
-                            <p className={cn(
-                              "text-xs mt-1",
-                              transaction.saldo >= 0 ? "text-emerald-400" : "text-red-400"
-                            )}>
-                              Saldo: {formatCurrency(transaction.saldo)}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between text-sm text-gray-400">
-                          <div className="space-y-1">
-                            <p>Categoria: {transaction.categoria.nome}</p>
-                            <p>Conta: {transaction.conta.nome}</p>
-                          </div>
-                          <button 
-                            onClick={() => navigate(`/transactions/edit/${transaction.id}`)}
-                            className="p-2 hover:bg-gray-700/50 rounded-full transition-colors"
-                          >
-                            <ChevronRight className="h-5 w-5" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
           </Card>
+
+          {/* Transactions Grid */}
+          <TransactionGrid
+            transactions={transactionsWithBalance}
+            isLoading={isLoading}
+            showActions={true}
+            onActionClick={(transaction) => navigate(`/transactions/edit/${transaction.id}`)}
+          />
         </div>
       </div>
     </ViewDefault>

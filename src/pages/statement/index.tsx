@@ -17,11 +17,13 @@ import {
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatters';
+import { TransactionGrid } from '@/components/transactions/TransactionGrid';
 
 type TransactionWithDetails = Transaction & {
   categoria: {
     id: string;
     nome: string;
+    tipo: string;
   };
 };
 
@@ -65,6 +67,29 @@ export function Statement() {
 
     return matchesSearch && matchesCategory;
   });
+
+  // Calcular saldo acumulado para cada transação
+  let saldoAcumulado = 0
+  const transactionsWithBalance = filteredTransactions.map(transaction => {
+    const credito = transaction.tipo === 'RECEITA' ? transaction.valor : 0
+    const debito = transaction.tipo === 'DESPESA' ? transaction.valor : 0
+    saldoAcumulado += credito - debito
+    return {
+      ...transaction,
+      credito,
+      debito,
+      saldo: saldoAcumulado,
+      conta: {
+        id: transaction.contaId,
+        nome: 'Conta Principal' // TODO: Get from store
+      },
+      observacao: transaction.observacao || '',
+      categoria: {
+        ...transaction.categoria,
+        tipo: transaction.tipo
+      }
+    }
+  })
 
   const handleEdit = async (transaction: Transaction) => {
     // TODO: Implement edit modal
@@ -238,12 +263,11 @@ export function Statement() {
                   onFilterCategory={handleFilterCategory}
                 />
 
-                <TransactionList
-                  transactions={filteredTransactions}
-                  onEdit={handleEdit}
-                  onRemove={handleRemove}
-                  onRefresh={loadTransactions}
+                {/* Transactions Grid */}
+                <TransactionGrid
+                  transactions={transactionsWithBalance}
                   isLoading={isLoading}
+                  showActions={false}
                 />
               </div>
             </div>
