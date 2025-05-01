@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTransactionStore } from '@/stores/transaction'
 import { Transaction } from '@/types/transaction'
-import ViewDefault from '@/components/ViewDefault'
+import { ViewDefault } from '@/layouts/ViewDefault'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
@@ -17,7 +17,8 @@ import {
   Calendar,
   Filter,
   Download,
-  MoreHorizontal
+  MoreHorizontal,
+  ChevronRight
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -46,9 +47,9 @@ export function Transactions() {
   return (
     <ViewDefault>
       <div className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-6 sm:py-8">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <Receipt className="h-8 w-8 text-primary-400" />
@@ -60,7 +61,7 @@ export function Transactions() {
             </div>
             <Button
               onClick={() => navigate('/transactions/new')}
-              className="bg-primary-500 hover:bg-primary-600 text-white flex items-center gap-2"
+              className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
             >
               <Plus className="h-5 w-5" />
               Nova Transação
@@ -70,7 +71,7 @@ export function Transactions() {
           {/* Filters and Search */}
           <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm mb-6">
             <div className="p-4">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
@@ -82,11 +83,11 @@ export function Transactions() {
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-400" />
+                  <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
                   <Select
                     value={selectedPeriod}
                     onChange={(e) => setSelectedPeriod(e.target.value)}
-                    className="bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
+                    className="w-full bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
                   >
                     <option value="all">Todos os períodos</option>
                     <option value="current">Mês atual</option>
@@ -95,11 +96,11 @@ export function Transactions() {
                   </Select>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4 text-gray-400" />
+                  <Filter className="h-4 w-4 text-gray-400 flex-shrink-0" />
                   <Select
                     value={selectedType}
                     onChange={(e) => setSelectedType(e.target.value)}
-                    className="bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
+                    className="w-full bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
                   >
                     <option value="all">Todos os tipos</option>
                     <option value="RECEITA">Receitas</option>
@@ -108,7 +109,7 @@ export function Transactions() {
                 </div>
                 <Button
                   variant="outline"
-                  className="bg-gray-700/50 border-gray-600 text-gray-200 hover:bg-gray-600 flex items-center gap-2"
+                  className="w-full sm:w-auto bg-gray-700/50 border-gray-600 text-gray-200 hover:bg-gray-600 flex items-center justify-center gap-2"
                 >
                   <Download className="h-4 w-4" />
                   Exportar
@@ -118,31 +119,31 @@ export function Transactions() {
           </Card>
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
             <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-medium text-gray-400">Total de Receitas</h3>
                   <ArrowUpCircle className="h-5 w-5 text-green-400" />
                 </div>
-                <p className="text-2xl font-semibold text-green-400">
+                <p className="text-xl sm:text-2xl font-semibold text-green-400">
                   {formatCurrency(totalReceitas)}
                 </p>
               </div>
             </Card>
             <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-medium text-gray-400">Total de Despesas</h3>
                   <ArrowDownCircle className="h-5 w-5 text-red-400" />
                 </div>
-                <p className="text-2xl font-semibold text-red-400">
+                <p className="text-xl sm:text-2xl font-semibold text-red-400">
                   {formatCurrency(totalDespesas)}
                 </p>
               </div>
             </Card>
-            <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-              <div className="p-6">
+            <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm sm:col-span-2 lg:col-span-1">
+              <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-medium text-gray-400">Saldo do Período</h3>
                   <div className={cn(
@@ -153,7 +154,7 @@ export function Transactions() {
                   </div>
                 </div>
                 <p className={cn(
-                  "text-2xl font-semibold",
+                  "text-xl sm:text-2xl font-semibold",
                   totalReceitas - totalDespesas >= 0 ? "text-green-400" : "text-red-400"
                 )}>
                   {formatCurrency(totalReceitas - totalDespesas)}
@@ -164,8 +165,9 @@ export function Transactions() {
 
           {/* Transactions List */}
           <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-            <div className="p-6">
-              <div className="overflow-x-auto">
+            <div className="p-4 sm:p-6">
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-700">
@@ -210,6 +212,38 @@ export function Transactions() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-4">
+                {filteredTransactions.map((transaction: Transaction) => (
+                  <div
+                    key={transaction.id}
+                    className="bg-gray-800/30 rounded-lg p-4 space-y-3 hover:bg-gray-700/30 transition-colors"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="font-medium text-gray-200">{transaction.descricao}</p>
+                        <p className="text-sm text-gray-400">{formatDate(transaction.data)}</p>
+                      </div>
+                      <p className={cn(
+                        "text-base font-medium",
+                        transaction.tipo === 'RECEITA' ? "text-green-400" : "text-red-400"
+                      )}>
+                        {formatCurrency(transaction.valor)}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-gray-400">
+                      <div className="space-y-1">
+                        <p>Categoria: {transaction.categoriaId}</p>
+                        <p>Conta: {transaction.contaId}</p>
+                      </div>
+                      <button className="p-2 hover:bg-gray-700/50 rounded-full transition-colors">
+                        <ChevronRight className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </Card>
