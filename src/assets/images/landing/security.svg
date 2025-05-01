@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#F8FAF9"/>
+  
+  <!-- Shield Container -->
+  <path d="M400 100 L500 150 L500 350 C500 450 400 500 300 450 L300 150 Z" fill="white" stroke="#E2E8F0" stroke-width="2"/>
+  
+  <!-- Shield Pattern -->
+  <path d="M400 150 L450 175 L450 300 C450 350 400 375 350 350 L350 175 Z" fill="#8CCFB0" fill-opacity="0.2"/>
+  <path d="M400 200 L450 225 L450 350 C450 400 400 425 350 400 L350 225 Z" fill="#2D6B4E" fill-opacity="0.2"/>
+  
+  <!-- Lock -->
+  <rect x="375" y="250" width="50" height="60" rx="5" fill="#1B2B4D"/>
+  <rect x="385" y="270" width="30" height="40" rx="3" fill="#8CCFB0"/>
+  
+  <!-- Security Elements -->
+  <circle cx="300" cy="200" r="15" fill="#8CCFB0"/>
+  <circle cx="500" cy="200" r="15" fill="#2D6B4E"/>
+  <circle cx="400" cy="400" r="15" fill="#1B2B4D"/>
+  
+  <!-- Connection Lines -->
+  <path d="M300 200 L400 250" stroke="#8CCFB0" stroke-width="2" stroke-dasharray="5 5"/>
+  <path d="M500 200 L400 250" stroke="#2D6B4E" stroke-width="2" stroke-dasharray="5 5"/>
+  <path d="M400 250 L400 400" stroke="#1B2B4D" stroke-width="2" stroke-dasharray="5 5"/>
+  
+  <!-- Security Badges -->
+  <rect x="250" y="450" width="100" height="40" rx="5" fill="#8CCFB0" fill-opacity="0.2"/>
+  <rect x="450" y="450" width="100" height="40" rx="5" fill="#2D6B4E" fill-opacity="0.2"/>
+  
+  <!-- Encryption Symbol -->
+  <path d="M400 500 L420 480 L440 500 L420 520 Z" fill="#1B2B4D"/>
+</svg> 

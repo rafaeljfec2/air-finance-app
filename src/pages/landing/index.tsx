@@ -2,26 +2,21 @@ import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { 
   ArrowRight, 
-  BarChart2, 
   Shield, 
-  Smartphone, 
-  Wallet,
   CheckCircle2,
-  Zap,
   Users,
   Lock,
   Cloud,
   Bell,
-  CreditCard,
-  LineChart,
-  PieChart,
-  Calendar,
   FileText,
-  Globe,
   MessageSquare,
   Headphones
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import heroImage from '@/assets/images/landing/hero.svg';
+import dashboardImage from '@/assets/images/landing/dashboard.svg';
+import securityImage from '@/assets/images/landing/security.svg';
+import mobileImage from '@/assets/images/landing/mobile.svg';
 
 export function LandingPage() {
   return (
@@ -52,43 +47,59 @@ export function LandingPage() {
         className="relative overflow-hidden"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-brand-arrow/5 to-transparent" />
-        <div className="relative text-center px-6 py-32 max-w-7xl mx-auto">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-5xl md:text-7xl font-bold mb-6 text-brand-arrow leading-tight"
-          >
-            Transforme sua vida<br />financeira com inteligência
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl md:text-2xl mb-12 max-w-3xl mx-auto text-text/80"
-          >
-            O AirFinance revoluciona a forma como você gerencia seu dinheiro, 
-            oferecendo insights poderosos e uma experiência única de controle financeiro.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
-            <Button 
-              className="bg-brand-arrow hover:bg-brand-arrow/90 text-white px-8 py-6 text-lg inline-flex items-center gap-2"
+        <div className="relative max-w-7xl mx-auto px-6 py-32">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="text-left">
+              <motion.h2 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-5xl md:text-7xl font-bold mb-6 text-brand-arrow leading-tight"
+              >
+                Transforme sua vida<br />financeira com inteligência
+              </motion.h2>
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="text-xl md:text-2xl mb-12 text-text/80"
+              >
+                O AirFinance revoluciona a forma como você gerencia seu dinheiro, 
+                oferecendo insights poderosos e uma experiência única de controle financeiro.
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="flex flex-col sm:flex-row gap-4"
+              >
+                <Button 
+                  className="bg-brand-arrow hover:bg-brand-arrow/90 text-white px-8 py-6 text-lg inline-flex items-center gap-2"
+                >
+                  Comece gratuitamente
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="border-brand-arrow text-brand-arrow hover:bg-brand-arrow/10 px-8 py-6 text-lg"
+                >
+                  Ver demonstração
+                </Button>
+              </motion.div>
+            </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="hidden md:block"
             >
-              Comece gratuitamente
-              <ArrowRight className="w-5 h-5" />
-            </Button>
-            <Button 
-              variant="outline"
-              className="border-brand-arrow text-brand-arrow hover:bg-brand-arrow/10 px-8 py-6 text-lg"
-            >
-              Ver demonstração
-            </Button>
-          </motion.div>
+              <img 
+                src={heroImage} 
+                alt="Dashboard do AirFinance" 
+                className="w-full h-auto"
+              />
+            </motion.div>
+          </div>
         </div>
       </motion.main>
 
@@ -116,25 +127,29 @@ export function LandingPage() {
               viewport={{ once: true }}
               className="bg-background p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow"
             >
-              <div className="p-4 rounded-xl bg-brand-arrow/10 w-fit mb-6">
-                <LineChart className="w-8 h-8 text-brand-arrow" />
+              <div className="mb-6">
+                <img 
+                  src={dashboardImage} 
+                  alt="Dashboard Inteligente" 
+                  className="w-full h-auto mb-6"
+                />
+                <h3 className="text-2xl font-semibold mb-4 text-brand-arrow">Análise Inteligente</h3>
+                <p className="text-text/80 mb-6">Visualize seus gastos e receitas com gráficos interativos e insights personalizados.</p>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3 text-text/80">
+                    <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
+                    Dashboard personalizado
+                  </li>
+                  <li className="flex items-center gap-3 text-text/80">
+                    <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
+                    Relatórios automáticos
+                  </li>
+                  <li className="flex items-center gap-3 text-text/80">
+                    <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
+                    Previsões financeiras
+                  </li>
+                </ul>
               </div>
-              <h3 className="text-2xl font-semibold mb-4 text-brand-arrow">Análise Inteligente</h3>
-              <p className="text-text/80 mb-6">Visualize seus gastos e receitas com gráficos interativos e insights personalizados.</p>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-3 text-text/80">
-                  <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
-                  Dashboard personalizado
-                </li>
-                <li className="flex items-center gap-3 text-text/80">
-                  <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
-                  Relatórios automáticos
-                </li>
-                <li className="flex items-center gap-3 text-text/80">
-                  <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
-                  Previsões financeiras
-                </li>
-              </ul>
             </motion.div>
 
             <motion.div
@@ -144,25 +159,29 @@ export function LandingPage() {
               viewport={{ once: true }}
               className="bg-background p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow"
             >
-              <div className="p-4 rounded-xl bg-brand-arrow/10 w-fit mb-6">
-                <CreditCard className="w-8 h-8 text-brand-arrow" />
+              <div className="mb-6">
+                <img 
+                  src={mobileImage} 
+                  alt="Aplicativo Móvel" 
+                  className="w-full h-auto mb-6"
+                />
+                <h3 className="text-2xl font-semibold mb-4 text-brand-arrow">Gestão Simplificada</h3>
+                <p className="text-text/80 mb-6">Controle suas finanças de forma intuitiva e eficiente.</p>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3 text-text/80">
+                    <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
+                    Categorização automática
+                  </li>
+                  <li className="flex items-center gap-3 text-text/80">
+                    <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
+                    Orçamento personalizado
+                  </li>
+                  <li className="flex items-center gap-3 text-text/80">
+                    <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
+                    Metas financeiras
+                  </li>
+                </ul>
               </div>
-              <h3 className="text-2xl font-semibold mb-4 text-brand-arrow">Gestão Simplificada</h3>
-              <p className="text-text/80 mb-6">Controle suas finanças de forma intuitiva e eficiente.</p>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-3 text-text/80">
-                  <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
-                  Categorização automática
-                </li>
-                <li className="flex items-center gap-3 text-text/80">
-                  <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
-                  Orçamento personalizado
-                </li>
-                <li className="flex items-center gap-3 text-text/80">
-                  <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
-                  Metas financeiras
-                </li>
-              </ul>
             </motion.div>
 
             <motion.div
@@ -172,25 +191,29 @@ export function LandingPage() {
               viewport={{ once: true }}
               className="bg-background p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow"
             >
-              <div className="p-4 rounded-xl bg-brand-arrow/10 w-fit mb-6">
-                <Globe className="w-8 h-8 text-brand-arrow" />
+              <div className="mb-6">
+                <img 
+                  src={securityImage} 
+                  alt="Segurança" 
+                  className="w-full h-auto mb-6"
+                />
+                <h3 className="text-2xl font-semibold mb-4 text-brand-arrow">Multiplataforma</h3>
+                <p className="text-text/80 mb-6">Acesse suas finanças de qualquer lugar, a qualquer momento.</p>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3 text-text/80">
+                    <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
+                    Aplicativo móvel
+                  </li>
+                  <li className="flex items-center gap-3 text-text/80">
+                    <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
+                    Sincronização em tempo real
+                  </li>
+                  <li className="flex items-center gap-3 text-text/80">
+                    <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
+                    Backup automático
+                  </li>
+                </ul>
               </div>
-              <h3 className="text-2xl font-semibold mb-4 text-brand-arrow">Multiplataforma</h3>
-              <p className="text-text/80 mb-6">Acesse suas finanças de qualquer lugar, a qualquer momento.</p>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-3 text-text/80">
-                  <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
-                  Aplicativo móvel
-                </li>
-                <li className="flex items-center gap-3 text-text/80">
-                  <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
-                  Sincronização em tempo real
-                </li>
-                <li className="flex items-center gap-3 text-text/80">
-                  <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
-                  Backup automático
-                </li>
-              </ul>
             </motion.div>
           </div>
         </div>
