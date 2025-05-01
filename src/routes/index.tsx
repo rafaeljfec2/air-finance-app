@@ -5,6 +5,7 @@ import { Statement } from '@/pages/statement';
 import { NewTransaction } from '@/pages/transactions/new';
 import { Transactions } from '@/pages/transactions';
 import { Reports } from '@/pages/reports';
+import { Profile } from '@/pages/profile';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { ErrorPage } from '@/components/error/ErrorPage';
@@ -19,6 +20,17 @@ export const router = createBrowserRouter([
   {
     path: '/auth/login',
     element: <Login />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/profile',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
     errorElement: <ErrorPage />,
   },
   {
