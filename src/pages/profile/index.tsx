@@ -94,16 +94,16 @@ export function Profile() {
 
   return (
     <ViewDefault>
-      <div className="flex-1 overflow-x-hidden overflow-y-auto">
+      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
         <div className="container mx-auto px-4 py-6 sm:py-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <User className="h-8 w-8 text-primary-400" />
-                <h1 className="text-2xl font-bold text-gray-100">Meu Perfil</h1>
+                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Meu Perfil</h1>
               </div>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Gerencie suas informações pessoais e preferências
               </p>
             </div>
@@ -113,7 +113,7 @@ export function Profile() {
             {/* Coluna da Esquerda - Informações Principais */}
             <div className="lg:col-span-2 space-y-6">
               {/* Card de Perfil */}
-              <Card className="border-gray-700">
+              <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark">
                 <div className="p-6">
                   <div className="flex flex-col sm:flex-row gap-6">
                     {/* Avatar */}
@@ -122,7 +122,7 @@ export function Profile() {
                         <img
                           src={avatar}
                           alt="Avatar"
-                          className="w-32 h-32 rounded-full object-cover border-4 border-gray-700"
+                          className="w-32 h-32 rounded-full object-cover border-4 border-border dark:border-border-dark"
                         />
                         <label
                           htmlFor="avatar-upload"
@@ -138,22 +138,22 @@ export function Profile() {
                           onChange={handleAvatarChange}
                         />
                       </div>
-                      <p className="text-sm font-medium text-gray-300">
+                      <p className="text-sm font-medium text-text dark:text-text-dark">
                         {formData.name}
                       </p>
-                      <p className="text-xs text-gray-400">ID: {user?.id}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">ID: {user?.id}</p>
                     </div>
 
                     {/* Formulário */}
                     <div className="flex-1 space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                          <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                             Nome
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <User className="h-5 w-5 text-gray-400" />
+                              <User className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                             </div>
                             <Input
                               type="text"
@@ -161,18 +161,18 @@ export function Profile() {
                               value={formData.name}
                               onChange={handleChange}
                               disabled={!isEditing}
-                              className="pl-10 bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
+                              className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                             />
                           </div>
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                          <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                             Email
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <Mail className="h-5 w-5 text-gray-400" />
+                              <Mail className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                             </div>
                             <Input
                               type="email"
@@ -180,18 +180,18 @@ export function Profile() {
                               value={formData.email}
                               onChange={handleChange}
                               disabled={!isEditing}
-                              className="pl-10 bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
+                              className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                             />
                           </div>
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                          <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                             Telefone
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <Phone className="h-5 w-5 text-gray-400" />
+                              <Phone className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                             </div>
                             <Input
                               type="tel"
@@ -199,19 +199,18 @@ export function Profile() {
                               value={formData.phone}
                               onChange={handleChange}
                               disabled={!isEditing}
-                              className="pl-10 bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
-                              placeholder="(00) 00000-0000"
+                              className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                             />
                           </div>
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                          <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                             Localização
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <MapPin className="h-5 w-5 text-gray-400" />
+                              <MapPin className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                             </div>
                             <Input
                               type="text"
@@ -219,7 +218,7 @@ export function Profile() {
                               value={formData.location}
                               onChange={handleChange}
                               disabled={!isEditing}
-                              className="pl-10 bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
+                              className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                               placeholder="Cidade, Estado"
                             />
                           </div>
@@ -227,7 +226,7 @@ export function Profile() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                        <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                           Biografia
                         </label>
                         <Textarea
@@ -235,7 +234,7 @@ export function Profile() {
                           value={formData.bio}
                           onChange={handleChange}
                           disabled={!isEditing}
-                          className="bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
+                          className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                           placeholder="Conte um pouco sobre você..."
                           rows={3}
                         />
@@ -250,7 +249,7 @@ export function Profile() {
                         <Button
                           variant="outline"
                           onClick={() => setIsEditing(false)}
-                          className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                          className="border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
                         >
                           Cancelar
                         </Button>
@@ -278,11 +277,11 @@ export function Profile() {
               </Card>
 
               {/* Card de Segurança */}
-              <Card className="border-gray-700">
+              <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark">
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Shield className="h-5 w-5 text-primary-400" />
-                    <h2 className="text-lg font-semibold text-gray-100">
+                    <h2 className="text-lg font-semibold text-text dark:text-text-dark">
                       Segurança
                     </h2>
                   </div>
@@ -290,19 +289,19 @@ export function Profile() {
                   <div className="space-y-4">
                     <Button
                       variant="outline"
-                      className="w-full justify-start border-gray-600 text-gray-300 hover:bg-gray-700"
+                      className="w-full justify-start border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
                     >
                       Alterar Senha
                     </Button>
                     <Button
                       variant="outline"
-                      className="w-full justify-start border-gray-600 text-gray-300 hover:bg-gray-700"
+                      className="w-full justify-start border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
                     >
                       Autenticação em Duas Etapas
                     </Button>
                     <Button
                       variant="outline"
-                      className="w-full justify-start border-gray-600 text-gray-300 hover:bg-gray-700"
+                      className="w-full justify-start border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
                     >
                       Dispositivos Conectados
                     </Button>
@@ -314,11 +313,11 @@ export function Profile() {
             {/* Coluna da Direita - Preferências */}
             <div className="space-y-6">
               {/* Card de Notificações */}
-              <Card className="border-gray-700">
+              <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark">
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Bell className="h-5 w-5 text-primary-400" />
-                    <h2 className="text-lg font-semibold text-gray-100">
+                    <h2 className="text-lg font-semibold text-text dark:text-text-dark">
                       Notificações
                     </h2>
                   </div>
@@ -326,10 +325,10 @@ export function Profile() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-300">
+                        <p className="text-sm font-medium text-text dark:text-text-dark">
                           Notificações por Email
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           Receba atualizações importantes por email
                         </p>
                       </div>
@@ -343,10 +342,10 @@ export function Profile() {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-300">
+                        <p className="text-sm font-medium text-text dark:text-text-dark">
                           Notificações Push
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           Receba alertas em tempo real
                         </p>
                       </div>
@@ -360,10 +359,10 @@ export function Profile() {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-300">
+                        <p className="text-sm font-medium text-text dark:text-text-dark">
                           Atualizações do Sistema
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           Novidades e melhorias
                         </p>
                       </div>
@@ -379,28 +378,28 @@ export function Profile() {
               </Card>
 
               {/* Card de Preferências */}
-              <Card className="border-gray-700">
+              <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark">
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Palette className="h-5 w-5 text-primary-400" />
-                    <h2 className="text-lg font-semibold text-gray-100">
+                    <h2 className="text-lg font-semibold text-text dark:text-text-dark">
                       Preferências
                     </h2>
                   </div>
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                      <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                         Tema
                       </label>
                       <div className="grid grid-cols-2 gap-2">
                         <Button
                           variant="outline"
                           className={cn(
-                            "border-gray-600 hover:bg-gray-700",
+                            "border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark",
                             isDarkMode
-                              ? "bg-gray-700 text-primary-400"
-                              : "text-gray-400"
+                              ? "bg-card dark:bg-card-dark text-primary-400"
+                              : "text-gray-500 dark:text-gray-400"
                           )}
                           onClick={() => setTheme(true)}
                         >
@@ -410,10 +409,10 @@ export function Profile() {
                         <Button
                           variant="outline"
                           className={cn(
-                            "border-gray-600 hover:bg-gray-700",
+                            "border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark",
                             !isDarkMode
-                              ? "bg-gray-700 text-primary-400"
-                              : "text-gray-400"
+                              ? "bg-card dark:bg-card-dark text-primary-400"
+                              : "text-gray-500 dark:text-gray-400"
                           )}
                           onClick={() => setTheme(false)}
                         >
@@ -424,12 +423,12 @@ export function Profile() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                      <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                         Idioma
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Globe className="h-5 w-5 text-gray-400" />
+                          <Globe className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                         </div>
                         <select
                           value={formData.preferences.language}
@@ -442,7 +441,7 @@ export function Profile() {
                               }
                             }))
                           }
-                          className="w-full pl-10 pr-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-gray-100 focus:border-gray-500"
+                          className="w-full pl-10 pr-4 py-2 bg-background dark:bg-background-dark border border-border dark:border-border-dark rounded-lg text-text dark:text-text-dark focus:border-primary-500"
                         >
                           <option value="pt-BR">Português (Brasil)</option>
                           <option value="en-US">English (US)</option>
@@ -452,12 +451,12 @@ export function Profile() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                      <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                         Moeda
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <DollarSign className="h-5 w-5 text-gray-400" />
+                          <DollarSign className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                         </div>
                         <select
                           value={formData.preferences.currency}
@@ -470,7 +469,7 @@ export function Profile() {
                               }
                             }))
                           }
-                          className="w-full pl-10 pr-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-gray-100 focus:border-gray-500"
+                          className="w-full pl-10 pr-4 py-2 bg-background dark:bg-background-dark border border-border dark:border-border-dark rounded-lg text-text dark:text-text-dark focus:border-primary-500"
                         >
                           <option value="BRL">Real (R$)</option>
                           <option value="USD">US Dollar ($)</option>

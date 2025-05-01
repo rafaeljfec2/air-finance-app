@@ -162,16 +162,16 @@ export function Statement() {
 
   return (
     <ViewDefault>
-      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900">
+      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
         <div className="container mx-auto px-4 py-6 sm:py-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <DocumentTextIcon className="h-8 w-8 text-primary-400" />
-                <h1 className="text-2xl font-bold text-gray-100">Extrato Financeiro</h1>
+                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Extrato Financeiro</h1>
               </div>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Visualize o histórico detalhado das suas movimentações
               </p>
             </div>
@@ -179,44 +179,44 @@ export function Statement() {
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
-            <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+            <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
               <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-gray-400">Total de Receitas</h3>
+                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Total de Receitas</h3>
                   <ArrowTrendingUpIcon className="h-5 w-5 text-green-400" />
                 </div>
                 <p className="text-xl sm:text-2xl font-semibold text-green-400">
                   {formatCurrency(income)}
                 </p>
                 {previousIncome > 0 && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Mês anterior: {formatCurrency(previousIncome)}
                   </p>
                 )}
               </div>
             </Card>
             
-            <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+            <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
               <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-gray-400">Total de Despesas</h3>
+                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Total de Despesas</h3>
                   <ArrowTrendingDownIcon className="h-5 w-5 text-red-400" />
                 </div>
                 <p className="text-xl sm:text-2xl font-semibold text-red-400">
                   {formatCurrency(expenses)}
                 </p>
                 {previousExpenses > 0 && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Mês anterior: {formatCurrency(previousExpenses)}
                   </p>
                 )}
               </div>
             </Card>
 
-            <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm sm:col-span-2 lg:col-span-1">
+            <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
               <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-gray-400">Saldo do Período</h3>
+                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Saldo do Período</h3>
                   <div className={cn(
                     "h-5 w-5",
                     availableBalance >= 0 ? "text-green-400" : "text-red-400"
@@ -231,7 +231,7 @@ export function Statement() {
                   {formatCurrency(availableBalance)}
                 </p>
                 {previousBalance !== 0 && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Mês anterior: {formatCurrency(previousBalance)}
                   </p>
                 )}
@@ -239,39 +239,23 @@ export function Statement() {
             </Card>
           </div>
 
-          {/* Filters and Transactions List */}
-          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-            <div className="p-4 sm:p-6">
-              <div className="space-y-4 sm:space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <h2 className="text-lg font-semibold text-gray-100">
-                    Transações
-                  </h2>
+          {/* Filters */}
+          <StatementFilters
+            onSearch={handleSearch}
+            onFilterCategory={handleFilterCategory}
+            categories={categories}
+            selectedCategory={selectedCategory}
+          />
 
-                  <button
-                    onClick={() => navigate('/transactions/new')}
-                    className="w-full sm:w-auto px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
-                  >
-                    <PlusIcon className="h-4 w-4" />
-                    Nova Transação
-                  </button>
-                </div>
-
-                <StatementFilters
-                  categories={categories}
-                  onSearch={handleSearch}
-                  onFilterCategory={handleFilterCategory}
-                />
-
-                {/* Transactions Grid */}
-                <TransactionGrid
-                  transactions={transactionsWithBalance}
-                  isLoading={isLoading}
-                  showActions={false}
-                />
-              </div>
-            </div>
-          </Card>
+          {/* Transactions List */}
+          <div {...containerProps}>
+            <TransactionGrid
+              transactions={transactionsWithBalance}
+              isLoading={isLoading}
+              showActions={true}
+              onActionClick={handleEdit}
+            />
+          </div>
         </div>
       </div>
     </ViewDefault>

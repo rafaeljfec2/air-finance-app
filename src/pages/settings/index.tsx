@@ -22,36 +22,36 @@ export function Settings() {
 
   return (
     <ViewDefault>
-      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900">
+      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
         <div className="container mx-auto px-4 py-6 sm:py-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <SettingsIcon className="h-8 w-8 text-primary-400" />
-                <h1 className="text-2xl font-bold text-gray-100">Configurações</h1>
+                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Configurações</h1>
               </div>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Gerencie as configurações do seu aplicativo
               </p>
             </div>
           </div>
 
           {/* Personalização */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
+          <section className="bg-card dark:bg-card-dark rounded-lg shadow mb-8">
             <div className="px-4 py-5 sm:px-6">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+              <h2 className="text-lg font-medium text-text dark:text-text-dark">
                 Personalização
               </h2>
             </div>
-            <div className="border-t border-gray-200 dark:border-gray-700">
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            <div className="border-t border-border dark:border-border-dark">
+              <div className="divide-y divide-border dark:divide-border-dark">
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="SunIcon" className="text-gray-400 mr-3" size={20} />
+                      <Icon name="SunIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">Tema</p>
+                        <p className="text-sm font-medium text-text dark:text-text-dark">Tema</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           {theme === 'dark' ? 'Escuro' : 'Claro'}
                         </p>
@@ -74,9 +74,9 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="BellIcon" className="text-gray-400 mr-3" size={20} />
+                      <Icon name="BellIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">Notificações</p>
+                        <p className="text-sm font-medium text-text dark:text-text-dark">Notificações</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           {notifications ? 'Ativadas' : 'Desativadas'}
                         </p>
@@ -99,9 +99,9 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="CurrencyDollarIcon" className="text-gray-400 mr-3" size={20} />
+                      <Icon name="CurrencyDollarIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">Moeda</p>
+                        <p className="text-sm font-medium text-text dark:text-text-dark">Moeda</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">{currency}</p>
                       </div>
                     </div>
@@ -118,20 +118,20 @@ export function Settings() {
           </section>
 
           {/* Dados e Privacidade */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
+          <section className="bg-card dark:bg-card-dark rounded-lg shadow mb-8">
             <div className="px-4 py-5 sm:px-6">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+              <h2 className="text-lg font-medium text-text dark:text-text-dark">
                 Dados e Privacidade
               </h2>
             </div>
-            <div className="border-t border-gray-200 dark:border-gray-700">
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            <div className="border-t border-border dark:border-border-dark">
+              <div className="divide-y divide-border dark:divide-border-dark">
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="FingerPrintIcon" className="text-gray-400 mr-3" size={20} />
+                      <Icon name="FingerPrintIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">Segurança</p>
+                        <p className="text-sm font-medium text-text dark:text-text-dark">Segurança</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           {biometrics ? 'Biometria ativada' : 'Biometria desativada'}
                         </p>
@@ -154,9 +154,9 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="ArrowDownTrayIcon" className="text-gray-400 mr-3" size={20} />
+                      <Icon name="ArrowDownTrayIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">Exportar dados</p>
+                        <p className="text-sm font-medium text-text dark:text-text-dark">Exportar dados</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           Baixar suas informações
                         </p>
@@ -175,55 +175,55 @@ export function Settings() {
           </section>
 
           {/* Gerenciamento */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
+          <section className="bg-card dark:bg-card-dark rounded-lg shadow mb-8">
             <div className="px-4 py-5 sm:px-6">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+              <h2 className="text-lg font-medium text-text dark:text-text-dark">
                 Gerenciamento
               </h2>
             </div>
-            <div className="border-t border-gray-200 dark:border-gray-700">
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                <div className="px-4 py-5 sm:px-6 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+            <div className="border-t border-border dark:border-border-dark">
+              <div className="divide-y divide-border dark:divide-border-dark">
+                <div className="px-4 py-5 sm:px-6 hover:bg-background dark:hover:bg-background-dark cursor-pointer"
                   onClick={() => navigate('/settings/categories')}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="TagIcon" className="text-gray-400 mr-3" size={20} />
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Categorias</p>
+                      <Icon name="TagIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
+                      <p className="text-sm font-medium text-text dark:text-text-dark">Categorias</p>
                     </div>
-                    <Icon name="ChevronRightIcon" className="text-gray-400" size={20} />
+                    <Icon name="ChevronRightIcon" className="text-gray-500 dark:text-gray-400" size={20} />
                   </div>
                 </div>
 
-                <div className="px-4 py-5 sm:px-6 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                <div className="px-4 py-5 sm:px-6 hover:bg-background dark:hover:bg-background-dark cursor-pointer"
                   onClick={() => navigate('/settings/accounts')}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="CreditCardIcon" className="text-gray-400 mr-3" size={20} />
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Contas bancárias</p>
+                      <Icon name="CreditCardIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
+                      <p className="text-sm font-medium text-text dark:text-text-dark">Contas bancárias</p>
                     </div>
-                    <Icon name="ChevronRightIcon" className="text-gray-400" size={20} />
+                    <Icon name="ChevronRightIcon" className="text-gray-500 dark:text-gray-400" size={20} />
                   </div>
                 </div>
 
-                <div className="px-4 py-5 sm:px-6 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                <div className="px-4 py-5 sm:px-6 hover:bg-background dark:hover:bg-background-dark cursor-pointer"
                   onClick={() => navigate('/settings/cards')}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="CreditCardIcon" className="text-gray-400 mr-3" size={20} />
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Cartões de crédito</p>
+                      <Icon name="CreditCardIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
+                      <p className="text-sm font-medium text-text dark:text-text-dark">Cartões de crédito</p>
                     </div>
-                    <Icon name="ChevronRightIcon" className="text-gray-400" size={20} />
+                    <Icon name="ChevronRightIcon" className="text-gray-500 dark:text-gray-400" size={20} />
                   </div>
                 </div>
 
-                <div className="px-4 py-5 sm:px-6 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                <div className="px-4 py-5 sm:px-6 hover:bg-background dark:hover:bg-background-dark cursor-pointer"
                   onClick={() => navigate('/settings/goals')}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="FlagIcon" className="text-gray-400 mr-3" size={20} />
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Metas financeiras</p>
+                      <Icon name="FlagIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
+                      <p className="text-sm font-medium text-text dark:text-text-dark">Metas financeiras</p>
                     </div>
-                    <Icon name="ChevronRightIcon" className="text-gray-400" size={20} />
+                    <Icon name="ChevronRightIcon" className="text-gray-500 dark:text-gray-400" size={20} />
                   </div>
                 </div>
               </div>
@@ -231,20 +231,20 @@ export function Settings() {
           </section>
 
           {/* Preferências Financeiras */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
+          <section className="bg-card dark:bg-card-dark rounded-lg shadow mb-8">
             <div className="px-4 py-5 sm:px-6">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+              <h2 className="text-lg font-medium text-text dark:text-text-dark">
                 Preferências Financeiras
               </h2>
             </div>
-            <div className="border-t border-gray-200 dark:border-gray-700">
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            <div className="border-t border-border dark:border-border-dark">
+              <div className="divide-y divide-border dark:divide-border-dark">
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="CalendarIcon" className="text-gray-400 mr-3" size={20} />
+                      <Icon name="CalendarIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">Dia de fechamento</p>
+                        <p className="text-sm font-medium text-text dark:text-text-dark">Dia de fechamento</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           Dia {closingDay} de cada mês
                         </p>
@@ -263,19 +263,19 @@ export function Settings() {
           </section>
 
           {/* Sobre */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow">
+          <section className="bg-card dark:bg-card-dark rounded-lg shadow">
             <div className="px-4 py-5 sm:px-6">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+              <h2 className="text-lg font-medium text-text dark:text-text-dark">
                 Sobre
               </h2>
             </div>
-            <div className="border-t border-gray-200 dark:border-gray-700">
+            <div className="border-t border-border dark:border-border-dark">
               <div className="px-4 py-5 sm:px-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <Icon name="InformationCircleIcon" className="text-gray-400 mr-3" size={20} />
+                    <Icon name="InformationCircleIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Versão do aplicativo</p>
+                      <p className="text-sm font-medium text-text dark:text-text-dark">Versão do aplicativo</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">{appVersion}</p>
                     </div>
                   </div>

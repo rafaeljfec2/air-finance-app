@@ -63,16 +63,16 @@ export function Transactions() {
 
   return (
     <ViewDefault>
-      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900">
+      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
         <div className="container mx-auto px-4 py-6 sm:py-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <Receipt className="h-8 w-8 text-primary-400" />
-                <h1 className="text-2xl font-bold text-gray-100">Transações</h1>
+                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Transações</h1>
               </div>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Gerencie todas as suas transações financeiras
               </p>
             </div>
@@ -86,25 +86,25 @@ export function Transactions() {
           </div>
 
           {/* Filters and Search */}
-          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm mb-6">
+          <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm mb-6">
             <div className="p-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto_auto] gap-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                   <Input
                     type="text"
                     placeholder="Buscar transação..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
+                    className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                  <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                   <Select
                     value={selectedPeriod}
                     onChange={(e) => setSelectedPeriod(e.target.value)}
-                    className="w-full bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
+                    className="w-full bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                   >
                     <option value="all">Todos os períodos</option>
                     <option value="current">Mês atual</option>
@@ -113,11 +113,11 @@ export function Transactions() {
                   </Select>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                  <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                   <Select
                     value={selectedType}
                     onChange={(e) => setSelectedType(e.target.value)}
-                    className="w-full bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
+                    className="w-full bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                   >
                     <option value="all">Todos os tipos</option>
                     <option value="RECEITA">Receitas</option>
@@ -136,7 +136,7 @@ export function Transactions() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="bg-gray-700/50 border-gray-600 text-gray-200 hover:bg-gray-600 flex items-center justify-center gap-2"
+                  className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center justify-center gap-2"
                 >
                   <Download className="h-4 w-4" />
                   Exportar
