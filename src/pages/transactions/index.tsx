@@ -256,52 +256,7 @@ export function Transactions() {
                 </Button>
               </div>
             </div>
-          </Card>
-
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
-            <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-              <div className="p-4 sm:p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-gray-400">Total de Receitas</h3>
-                  <ArrowUpCircle className="h-5 w-5 text-green-400" />
-                </div>
-                <p className="text-xl sm:text-2xl font-semibold text-green-400">
-                  {formatCurrency(totalReceitas)}
-                </p>
-              </div>
-            </Card>
-            <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-              <div className="p-4 sm:p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-gray-400">Total de Despesas</h3>
-                  <ArrowDownCircle className="h-5 w-5 text-red-400" />
-                </div>
-                <p className="text-xl sm:text-2xl font-semibold text-red-400">
-                  {formatCurrency(totalDespesas)}
-                </p>
-              </div>
-            </Card>
-            <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm sm:col-span-2 lg:col-span-1">
-              <div className="p-4 sm:p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-gray-400">Saldo do Período</h3>
-                  <div className={cn(
-                    "h-5 w-5",
-                    saldo >= 0 ? "text-green-400" : "text-red-400"
-                  )}>
-                    {saldo >= 0 ? <ArrowUpCircle /> : <ArrowDownCircle />}
-                  </div>
-                </div>
-                <p className={cn(
-                  "text-xl sm:text-2xl font-semibold",
-                  saldo >= 0 ? "text-green-400" : "text-red-400"
-                )}>
-                  {formatCurrency(saldo)}
-                </p>
-              </div>
-            </Card>
-          </div>
+          </Card>          
 
           {/* Transactions List */}
           <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
