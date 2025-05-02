@@ -217,12 +217,16 @@ export function Login() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="text-center space-y-2"
           >
-            <p className="text-sm text-text dark:text-text-dark">
-              Não tem uma conta?{' '}
-              <button className="font-medium text-brand-arrow hover:text-brand-arrow/80 dark:text-brand-leaf dark:hover:text-brand-leaf/80">
+            <div className="mt-8 text-center text-sm text-text/60 dark:text-text-dark/60">
+              Não tem conta?{' '}
+              <button
+                type="button"
+                className="text-brand-arrow hover:underline font-medium"
+                onClick={() => navigate('/signup')}
+              >
                 Criar conta
               </button>
-            </p>
+            </div>
             <p className="text-xs text-text/60 dark:text-text-dark/60">
               Ao continuar, você concorda com nossos{' '}
               <button className="text-brand-arrow hover:text-brand-arrow/80 dark:text-brand-leaf dark:hover:text-brand-leaf/80">

@@ -11,11 +11,16 @@ import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { Settings } from '@/pages/settings';
 import {LandingPage} from '@/pages/landing';
-
+import {SignUpPage} from '@/pages/signup';
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/signup',
+    element: <SignUpPage />,
     errorElement: <ErrorPage />,
   },
   {

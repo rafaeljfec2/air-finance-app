@@ -33,6 +33,13 @@ export function LandingPage() {
             <a href="#security" className="text-text/80 hover:text-brand-arrow transition-colors">Segurança</a>
             <a href="#pricing" className="text-text/80 hover:text-brand-arrow transition-colors">Planos</a>
             <Button 
+              variant="outline"
+              className="border-brand-arrow text-brand-arrow hover:bg-brand-arrow/10 px-6"
+              onClick={() => navigate('/signup')}
+            >
+              Criar conta
+            </Button>
+            <Button 
               variant="default"
               className="bg-brand-arrow hover:bg-brand-arrow/90 text-white px-6"
               onClick={() => navigate('/auth/login')}
