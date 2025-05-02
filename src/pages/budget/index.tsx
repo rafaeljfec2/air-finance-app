@@ -40,11 +40,11 @@ export default function BudgetPage() {
 
   return (
     <ViewDefault>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-text dark:text-text-dark mb-8">Orçamento</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="container mx-auto px-2 sm:px-6 py-10">
+        <h1 className="text-3xl font-extrabold text-text dark:text-text-dark mb-10">Orçamento</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 auto-rows-fr">
           {/* Fluxo de Caixa */}
-          <CardContainer color="emerald">
+          <CardContainer color="emerald" className="min-h-[420px]">
             <CardHeader icon={<Wallet size={28} />} title="Fluxo de Caixa">
               <MonthYearFilter
                 month={cashFlowFilter.month}
@@ -69,7 +69,7 @@ export default function BudgetPage() {
           </CardContainer>
 
           {/* Contas a Receber */}
-          <CardContainer color="amber">
+          <CardContainer color="amber" className="min-h-[420px]">
             <CardHeader icon={<TrendingUp size={28} />} title="Contas a Receber">
               <MonthYearFilter
                 month={receivableFilter.month}
@@ -111,7 +111,7 @@ export default function BudgetPage() {
           </CardContainer>
 
           {/* Contas a Pagar */}
-          <CardContainer color="rose">
+          <CardContainer color="rose" className="min-h-[420px]">
             <CardHeader icon={<TrendingDown size={28} />} title="Contas a Pagar">
               <MonthYearFilter
                 month={payableFilter.month}
@@ -153,7 +153,7 @@ export default function BudgetPage() {
           </CardContainer>
 
           {/* Cartões de Crédito */}
-          <CardContainer color="violet">
+          <CardContainer color="violet" className="min-h-[420px]">
             <CardHeader icon={<CreditCard size={28} />} title="Cartões de Crédito">
               <MonthYearFilter
                 month={cardFilter.month}

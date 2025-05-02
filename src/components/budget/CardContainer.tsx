@@ -3,6 +3,7 @@ import React from 'react';
 interface CardContainerProps {
   color?: 'emerald' | 'amber' | 'rose' | 'violet';
   children: React.ReactNode;
+  className?: string;
 }
 
 const colorMap = {
@@ -12,9 +13,13 @@ const colorMap = {
   violet: 'border-violet-500',
 };
 
-export const CardContainer: React.FC<CardContainerProps> = ({ color = 'emerald', children }) => (
+export const CardContainer: React.FC<CardContainerProps> = ({
+  color = 'emerald',
+  children,
+  className,
+}) => (
   <div
-    className={`bg-card dark:bg-card-dark rounded-xl shadow-lg border-t-4 ${colorMap[color]} p-6 flex flex-col min-h-[320px]`}
+    className={`bg-card dark:bg-card-dark rounded-xl shadow-lg border-t-4 ${colorMap[color]} p-6 flex flex-col ${className ?? ''}`}
   >
     {children}
   </div>
