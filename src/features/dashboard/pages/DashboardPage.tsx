@@ -1,80 +1,99 @@
-import { SummaryCard } from '../components/SummaryCard';
-import { TransactionList } from '../../transactions/components/TransactionList';
 import { useQuery } from '@tanstack/react-query';
-import { Dashboard } from '../../../types';
-import { Card } from '@/components/ui/card';
+import { Dashboard } from '@/types';
+import { SummaryCard } from '@/components/dashboard/SummaryCard';
+import { TransactionList } from '@/components/transactions/TransactionList';
+
+async function fetchDashboardData(): Promise<Dashboard> {
+  // TODO: Implement real API call
+  return {
+    balance: 5000,
+    income: 8000,
+    expenses: 3000,
+    transactions: [
+      {
+        id: '1',
+        description: 'Salary',
+        amount: 5000,
+        type: 'INCOME',
+        category: {
+          id: '1',
+          name: 'Salary',
+          type: 'INCOME',
+          color: '#10B981',
+          icon: '💼'
+        },
+        date: new Date().toISOString(),
+        categoryId: '',
+        accountId: '',
+        account: {
+          id: '',
+          name: '',
+          balance: 0,
+          createdAt: '',
+          updatedAt: ''
+        },
+        createdAt: '',
+        updatedAt: ''
+      },
+      {
+        id: '2',
+        description: 'Rent',
+        amount: 1500,
+        type: 'EXPENSE',
+        category: {
+          id: '4',
+          name: 'Housing',
+          type: 'EXPENSE',
+          color: '#EF4444',
+          icon: '🏠'
+        },
+        date: new Date().toISOString(),
+        categoryId: '',
+        accountId: '',
+        account: {
+          id: '',
+          name: '',
+          balance: 0,
+          createdAt: '',
+          updatedAt: ''
+        },
+        createdAt: '',
+        updatedAt: ''
+      }
+    ]
+  };
+}
 
 export function DashboardPage() {
   const { data: dashboard, isLoading } = useQuery<Dashboard>({
     queryKey: ['dashboard'],
-    queryFn: async () => {
-      // TODO: Implementar chamada real à API
-      // Simulação de dados
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return {
-        saldo: 5000,
-        receitas: 10000,
-        despesas: 5000,
-        transacoes: [
-          {
-            id: '1',
-            descricao: 'Salário',
-            valor: 10000,
-            tipo: 'RECEITA',
-            categoria: 'Salário',
-            data: new Date().toISOString(),
-            usuarioId: '1',
-          },
-          {
-            id: '2',
-            descricao: 'Aluguel',
-            valor: 2000,
-            tipo: 'DESPESA',
-            categoria: 'Moradia',
-            data: new Date().toISOString(),
-            usuarioId: '1',
-          },
-        ],
-      };
-    },
+    queryFn: fetchDashboardData
   });
 
   if (isLoading) {
-    return (
-      <div className="flex h-96 items-center justify-center">
-        <div className="text-gray-400">
-          <div className="animate-spin h-8 w-8 border-4 border-gray-600 border-t-gray-400 rounded-full mb-4 mx-auto" />
-          <p>Carregando...</p>
-        </div>
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
   if (!dashboard) {
-    return null;
+    return <div>No data available</div>;
   }
 
   return (
-    <div className="space-y-8 p-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-100 mb-2">Dashboard</h1>
-        <p className="text-gray-400">Visão geral das suas finanças</p>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <SummaryCard title="Total Balance" value={dashboard.balance} type="balance" />
+        <SummaryCard title="Monthly Income" value={dashboard.income} type="income" />
+        <SummaryCard title="Monthly Expenses" value={dashboard.expenses} type="expense" />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <SummaryCard titulo="Saldo Total" valor={dashboard.saldo} tipo="saldo" />
-        <SummaryCard titulo="Receitas do Mês" valor={dashboard.receitas} tipo="receita" />
-        <SummaryCard titulo="Despesas do Mês" valor={dashboard.despesas} tipo="despesa" />
-      </div>
-
-      <Card className="bg-gray-800 border-gray-700">
-        <div className="p-6">
-          <h2 className="text-lg font-medium text-gray-100 mb-4">Últimas Transações</h2>
-          <div className="rounded-lg overflow-hidden">
-            <TransactionList transactions={dashboard.transacoes} />
-          </div>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-medium">Recent Transactions</h2>
         </div>
-      </Card>
+        <div className="p-4">
+          <TransactionList transactions={dashboard.transactions} />
+        </div>
+      </div>
     </div>
   );
 }

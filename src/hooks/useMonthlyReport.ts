@@ -1,135 +1,228 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useMemo, useState } from 'react';
 import { useStatementStore } from '@/stores/statement';
+import { getCategoriesByType } from '@/utils/categories';
+import { Transaction, Category } from '@/types';
 import { MonthlyReport } from '@/types/report';
-import { getCategoriesByType } from '@/constants/categories';
-import { parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
-export function useMonthlyReport() {
-  const { transactions } = useStatementStore();
-  const [date, setDate] = useState<Date>(new Date());
-  const [report, setReport] = useState<MonthlyReport | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+const COLORS = [
+  '#10B981', // Emerald
+  '#3B82F6', // Blue
+  '#8B5CF6', // Purple
+  '#EC4899', // Pink
+  '#F59E0B', // Amber
+  '#6366F1', // Indigo
+  '#EF4444', // Red
+];
 
-  const generateReport = useCallback(() => {
-    setIsLoading(true);
+export function useMonthlyReportMemo(transactions: Transaction[]): MonthlyReport {
+  return useMemo(() => {
+    const income = transactions
+      .filter(t => t.type === 'INCOME')
+      .reduce((acc, t) => acc + t.amount, 0);
 
-    try {
-      const month = date.getMonth();
-      const year = date.getFullYear();
-      const firstDay = startOfMonth(new Date(year, month));
-      const lastDay = endOfMonth(new Date(year, month));
+    const expenses = transactions
+      .filter(t => t.type === 'EXPENSE')
+      .reduce((acc, t) => acc + t.amount, 0);
 
-      // Filter current month transactions
-      const monthTransactions = transactions.filter(t => {
-        const transactionDate = parseISO(t.data);
-        return isWithinInterval(transactionDate, { start: firstDay, end: lastDay });
-      });
+    const incomeCategories = getCategoriesByType('INCOME').map((category: Category) => ({
+      name: category.name,
+      value: transactions
+        .filter(t => t.type === 'INCOME' && t.category.id === category.id)
+        .reduce((acc, t) => acc + t.amount, 0),
+    }));
 
-      // Filter previous month transactions for variation calculation
-      const previousMonth = startOfMonth(new Date(year, month - 1));
-      const lastDayPrevious = endOfMonth(new Date(year, month - 1));
-      const previousMonthTransactions = transactions.filter(t => {
-        const transactionDate = parseISO(t.data);
-        return isWithinInterval(transactionDate, { start: previousMonth, end: lastDayPrevious });
-      });
+    const expenseCategories = getCategoriesByType('EXPENSE').map((category: Category) => ({
+      name: category.name,
+      value: transactions
+        .filter(t => t.type === 'EXPENSE' && t.category.id === category.id)
+        .reduce((acc, t) => acc + t.amount, 0),
+    }));
 
-      // Group transactions by category
-      const groupByCategory = (type: 'RECEITA' | 'DESPESA') => {
-        const categories = getCategoriesByType(type);
-        const total = monthTransactions
-          .filter(t => t.tipo === type)
-          .reduce((acc, t) => acc + t.valor, 0);
-
-        return categories.map(category => {
-          const categoryTransactions = monthTransactions.filter(
-            t => t.tipo === type && t.categoria.id === category.id
-          );
-          const categoryTotal = categoryTransactions.reduce((acc, t) => acc + t.valor, 0);
-
-          return {
-            id: category.id,
-            name: category.nome,
-            icon: category.icone,
-            color: category.cor,
-            total: categoryTotal,
-            percentage: total > 0 ? (categoryTotal / total) * 100 : 0,
-            transactions: categoryTransactions.map(t => ({
-              id: t.id,
-              description: t.descricao,
-              amount: t.valor,
-              date: parseISO(t.data),
-            })),
-          };
-        });
-      };
-
-      // Calculate totals
-      const totalIncome = monthTransactions
-        .filter(t => t.tipo === 'RECEITA')
-        .reduce((acc, t) => acc + t.valor, 0);
-      const totalExpenses = monthTransactions
-        .filter(t => t.tipo === 'DESPESA')
-        .reduce((acc, t) => acc + t.valor, 0);
-
-      // Calculate previous month balance
-      const previousBalance =
-        previousMonthTransactions
-          .filter(t => t.tipo === 'RECEITA')
-          .reduce((acc, t) => acc + t.valor, 0) -
-        previousMonthTransactions
-          .filter(t => t.tipo === 'DESPESA')
-          .reduce((acc, t) => acc + t.valor, 0);
-
-      const currentBalance = totalIncome - totalExpenses;
-      const variation = currentBalance - previousBalance;
-      const percentageVariation = previousBalance !== 0 ? (variation / previousBalance) * 100 : 0;
-
-      const summary = {
+    const report: MonthlyReport = {
+      month: new Date().getMonth(),
+      year: new Date().getFullYear(),
+      incomeByCategory: incomeCategories.map((category, index) => ({
+        ...category,
+        color: COLORS[index % COLORS.length],
+        percentage: (category.value / income) * 100
+      })),
+      expensesByCategory: expenseCategories.map((category, index) => ({
+        ...category,
+        color: COLORS[index % COLORS.length],
+        percentage: (category.value / expenses) * 100
+      })),
+      historicalIncome: [],
+      historicalExpenses: [],
+      income: {
+        total: income,
+        categories: incomeCategories.map((category) => ({
+          ...category,
+          percentage: (category.value / income) * 100
+        }))
+      },
+      expenses: {
+        total: expenses,
+        categories: expenseCategories.map((category) => ({
+          ...category,
+          percentage: (category.value / expenses) * 100
+        }))
+      },
+      balance: {
+        current: income - expenses,
+        previous: 0,
+        variation: 0,
+        percentageVariation: 0
+      },
+      summary: {
         income: {
-          total: totalIncome,
-          categories: groupByCategory('RECEITA'),
+          total: income,
+          categories: incomeCategories.map((category) => ({
+            ...category,
+            percentage: (category.value / income) * 100
+          }))
         },
         expenses: {
-          total: totalExpenses,
-          categories: groupByCategory('DESPESA'),
+          total: expenses,
+          categories: expenseCategories.map((category) => ({
+            ...category,
+            percentage: (category.value / expenses) * 100
+          }))
+        },
+        balance: {
+          current: income - expenses,
+          previous: 0,
+          variation: 0,
+          percentageVariation: 0
+        }
+      }
+    };
+
+    return report;
+  }, [transactions]);
+}
+
+export function useMonthlyReport(month: number, year: number) {
+  const { transactions } = useStatementStore();
+  const [date, setDate] = useState(new Date(year, month));
+
+  const report = useMemo(() => {
+    const filteredTransactions = transactions.filter(
+      (transaction: Transaction) => {
+        const transactionDate = new Date(transaction.date);
+        return transactionDate.getMonth() === date.getMonth() && 
+               transactionDate.getFullYear() === date.getFullYear();
+      }
+    );
+
+    const income = filteredTransactions.filter((t: Transaction) => t.type === 'INCOME');
+    const expenses = filteredTransactions.filter((t: Transaction) => t.type === 'EXPENSE');
+
+    const incomeTotal = income.reduce((sum: number, t: Transaction) => sum + t.amount, 0);
+    const expensesTotal = expenses.reduce((sum: number, t: Transaction) => sum + t.amount, 0);
+
+    const incomeByCategory = income.reduce((acc: Record<string, number>, t: Transaction) => {
+      const category = t.category.name;
+      acc[category] = (acc[category] || 0) + t.amount;
+      return acc;
+    }, {});
+
+    const expensesByCategory = expenses.reduce((acc: Record<string, number>, t: Transaction) => {
+      const category = t.category.name;
+      acc[category] = (acc[category] || 0) + t.amount;
+      return acc;
+    }, {});
+
+    const currentBalance = incomeTotal - expensesTotal;
+    const previousBalance = 0; // TODO: Implement previous month calculation
+    const balanceVariation = currentBalance - previousBalance;
+    const percentageVariation = previousBalance !== 0 
+      ? (balanceVariation / Math.abs(previousBalance)) * 100 
+      : 0;
+
+    const incomeCategories = Object.entries(incomeByCategory).map(([name, value]) => ({
+      name,
+      value: value as number
+    }));
+
+    const expenseCategories = Object.entries(expensesByCategory).map(([name, value]) => ({
+      name,
+      value: value as number
+    }));
+
+    const report: MonthlyReport = {
+      month: date.getMonth(),
+      year: date.getFullYear(),
+      incomeByCategory: incomeCategories.map((category, index) => ({
+        ...category,
+        color: COLORS[index % COLORS.length],
+        percentage: (category.value / incomeTotal) * 100
+      })),
+      expensesByCategory: expenseCategories.map((category, index) => ({
+        ...category,
+        color: COLORS[index % COLORS.length],
+        percentage: (category.value / expensesTotal) * 100
+      })),
+      historicalIncome: [],
+      historicalExpenses: [],
+      income: {
+        total: incomeTotal,
+        categories: incomeCategories.map((category) => ({
+          ...category,
+          percentage: (category.value / incomeTotal) * 100
+        }))
+      },
+      expenses: {
+        total: expensesTotal,
+        categories: expenseCategories.map((category) => ({
+          ...category,
+          percentage: (category.value / expensesTotal) * 100
+        }))
+      },
+      balance: {
+        current: currentBalance,
+        previous: previousBalance,
+        variation: balanceVariation,
+        percentageVariation
+      },
+      summary: {
+        income: {
+          total: incomeTotal,
+          categories: incomeCategories.map((category) => ({
+            ...category,
+            percentage: (category.value / incomeTotal) * 100
+          }))
+        },
+        expenses: {
+          total: expensesTotal,
+          categories: expenseCategories.map((category) => ({
+            ...category,
+            percentage: (category.value / expensesTotal) * 100
+          }))
         },
         balance: {
           current: currentBalance,
           previous: previousBalance,
-          variation,
-          percentageVariation,
-        },
-      };
+          variation: balanceVariation,
+          percentageVariation
+        }
+      }
+    };
 
-      setReport({
-        month,
-        year,
-        summary,
-      });
-    } catch (error) {
-      console.error('Error generating report:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [date, transactions]);
+    return report;
+  }, [transactions, date]);
 
-  useEffect(() => {
-    generateReport();
-  }, [generateReport]);
+  const previousMonth = () => {
+    setDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1));
+  };
 
-  const previousMonth = useCallback(() => {
-    setDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
-  }, []);
-
-  const nextMonth = useCallback(() => {
-    setDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
-  }, []);
+  const nextMonth = () => {
+    setDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1));
+  };
 
   return {
-    date,
+    date: date,
     report,
-    isLoading,
     previousMonth,
-    nextMonth,
+    nextMonth
   };
 }

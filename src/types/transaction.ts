@@ -1,32 +1,37 @@
 export type TransactionType = 'INCOME' | 'EXPENSE';
 
 export interface Category {
+  transactions?: Transaction[];
+  percentage?: number;
   id: string;
   name: string;
   type: TransactionType;
   color?: string;
   icon?: string;
+  total?: number;
+  length?: number;
+}
+
+export interface Account {
+  id: string;
+  name: string;
+  balance: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Transaction {
   id: string;
-  type: TransactionType;
   description: string;
   amount: number;
+  type: TransactionType;
   date: string;
   categoryId: string;
   accountId: string;
   note?: string;
   attachments?: string[];
-  category: {
-    id: string;
-    name: string;
-    type: TransactionType;
-  };
-  account: {
-    id: string;
-    name: string;
-  };
+  category: Category;
+  account: Account;
   credit?: number;
 
 
@@ -34,11 +39,6 @@ export interface Transaction {
   balance?: number;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface Account {
-  id: string;
-  name: string;
 }
 
 export type TransactionInput = Omit<Transaction, 'id' | 'createdAt' | 'updatedAt' | 'category' | 'account' | 'credit' | 'debit' | 'balance'>;

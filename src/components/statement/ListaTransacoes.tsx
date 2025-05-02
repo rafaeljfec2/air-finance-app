@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Transacao } from '@/types/transacao';
+import { Transaction } from '@/types/transaction';
 import { Card } from '@/components/ui/card';
 import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline';
 
 interface ListaTransacoesProps {
-  transacoes: Transacao[];
-  onEditar?: (transacao: Transacao) => void;
+  transacoes: Transaction[];
+  onEditar?: (transacao: Transaction) => void;
   onRemover?: (id: string) => void;
 }
 
-export function ListaTransacoes({ transacoes, onEditar, onRemover }: ListaTransacoesProps) {
+export function ListaTransacoes({ transacoes, onEditar, onRemover }: Readonly<ListaTransacoesProps>) {
   const [transacaoSelecionada, setTransacaoSelecionada] = useState<string | null>(null);
 
   const formatarMoeda = (valor: number) => {
@@ -44,9 +44,9 @@ export function ListaTransacoes({ transacoes, onEditar, onRemover }: ListaTransa
                 <div className="flex items-center space-x-4">
                   <div
                     className="p-2 rounded-full"
-                    style={{ backgroundColor: transacao.categoria.cor + '20' }}
+                    style={{ backgroundColor: transacao.category.color + '20' }}
                   >
-                    {transacao.tipo === 'RECEITA' ? (
+                    {transacao.type === 'INCOME' ? (
                       <ArrowTrendingUpIcon className="h-6 w-6 text-green-500" />
                     ) : (
                       <ArrowTrendingDownIcon className="h-6 w-6 text-red-500" />
@@ -55,10 +55,10 @@ export function ListaTransacoes({ transacoes, onEditar, onRemover }: ListaTransa
 
                   <div>
                     <h4 className="font-medium text-gray-900 dark:text-white">
-                      {transacao.descricao}
+                      {transacao.description}
                     </h4>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {transacao.categoria.nome}
+                      {transacao.category.name}
                     </p>
                   </div>
                 </div>
@@ -68,26 +68,26 @@ export function ListaTransacoes({ transacoes, onEditar, onRemover }: ListaTransa
                     className={`
                     font-medium
                     ${
-                      transacao.tipo === 'RECEITA'
+                      transacao.type === 'INCOME'
                         ? 'text-green-600 dark:text-green-400'
                         : 'text-red-600 dark:text-red-400'
                     }
                   `}
                   >
-                    {transacao.tipo === 'RECEITA' ? '+' : '-'}
-                    {formatarMoeda(transacao.valor)}
+                    {transacao.type === 'INCOME' ? '+' : '-'}
+                    {formatarMoeda(transacao.amount)}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {formatarData(transacao.data)}
+                  {formatarData(new Date(transacao.date))}
                   </p>
                 </div>
               </div>
 
               {transacaoSelecionada === transacao.id && (
                 <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  {transacao.observacao && (
+                  {transacao.note && (
                     <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                      {transacao.observacao}
+                      {transacao.note}
                     </p>
                   )}
 

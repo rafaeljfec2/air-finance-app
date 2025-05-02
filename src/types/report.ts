@@ -1,37 +1,51 @@
 export interface ReportCategory {
-  id: string;
+  percentage: any;
   name: string;
-  icon: string;
-  color: string;
+  value: number;
+}
+
+export interface ReportSummary {
   total: number;
-  percentage: number;
-  transactions: Array<{
-    id: string;
-    description: string;
-    amount: number;
-    date: Date;
-  }>;
+  categories: ReportCategory[];
 }
 
-export interface MonthlySummary {
-  income: {
-    total: number;
-    categories: ReportCategory[];
-  };
-  expenses: {
-    total: number;
-    categories: ReportCategory[];
-  };
-  balance: {
-    current: number;
-    previous: number;
-    variation: number;
-    percentageVariation: number;
-  };
+export interface ReportBalance {
+  current: number;
+  previous: number;
+  variation: number;
+  percentageVariation: number;
 }
 
-export interface MonthlyReport {
+export interface Report {
   month: number;
   year: number;
-  summary: MonthlySummary;
+  incomeByCategory: Array<{
+    name: string;
+    value: number;
+    color: string;
+    percentage: number;
+  }>;
+  expensesByCategory: Array<{
+    name: string;
+    value: number;
+    color: string;
+    percentage: number;
+  }>;
+  historicalIncome: any[];
+  historicalExpenses: any[];
+  income: ReportSummary;
+  expenses: ReportSummary;
+  balance: ReportBalance;
+  summary: {
+    income: ReportSummary;
+    expenses: ReportSummary;
+    balance: {
+      current: number;
+      previous: number;
+      variation: number;
+      percentageVariation: number;
+    };
+  };
 }
+
+export type MonthlyReport = Report;

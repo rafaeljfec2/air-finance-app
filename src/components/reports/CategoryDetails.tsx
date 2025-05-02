@@ -5,7 +5,7 @@ interface CategoryDetailsProps {
   report: MonthlyReport;
 }
 
-export function CategoryDetails({ report }: CategoryDetailsProps) {
+export function CategoryDetails({ report }: Readonly<CategoryDetailsProps>) {
   const { income, expenses } = report.summary;
 
   return (
@@ -28,20 +28,17 @@ export function CategoryDetails({ report }: CategoryDetailsProps) {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Porcentagem
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Transações
-                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-800">
-              {income.categories.map(category => (
-                <tr key={category.id}>
+              {income.categories.map((category) => (
+                <tr key={category.name}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
                           <span className="text-green-600 dark:text-green-400 font-medium">
-                            {category.icon}
+                            {category.name[0]}
                           </span>
                         </div>
                       </div>
@@ -53,13 +50,10 @@ export function CategoryDetails({ report }: CategoryDetailsProps) {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 dark:text-green-400">
-                    {formatCurrency(category.total)}
+                    {formatCurrency(category.value)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {category.percentage.toFixed(1)}%
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {category.transactions.length}
                   </td>
                 </tr>
               ))}
@@ -86,20 +80,17 @@ export function CategoryDetails({ report }: CategoryDetailsProps) {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Porcentagem
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Transações
-                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-800">
               {expenses.categories.map(category => (
-                <tr key={category.id}>
+                <tr key={category.name}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
                           <span className="text-red-600 dark:text-red-400 font-medium">
-                            {category.icon}
+                            {category.name[0]}
                           </span>
                         </div>
                       </div>
@@ -111,13 +102,10 @@ export function CategoryDetails({ report }: CategoryDetailsProps) {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600 dark:text-red-400">
-                    {formatCurrency(category.total)}
+                    {formatCurrency(category.value)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {category.percentage.toFixed(1)}%
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {category.transactions.length}
                   </td>
                 </tr>
               ))}

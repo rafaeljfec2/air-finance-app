@@ -1,8 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { StatementFilters } from '@/components/statement/StatementFilters';
-import { TransactionList } from '@/components/statement/TransactionList';
 import { useStatementStore } from '@/stores/statement';
 import { Transaction } from '@/types/transaction';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -12,23 +10,13 @@ import {
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
   DocumentTextIcon,
-  PlusIcon
 } from '@heroicons/react/24/outline';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatters';
 import { TransactionGrid } from '@/components/transactions/TransactionGrid';
 
-type TransactionWithDetails = Transaction & {
-  categoria: {
-    id: string;
-    nome: string;
-    tipo: string;
-  };
-};
-
-export function Statement() {
-  const navigate = useNavigate();
+export function Statement() {  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showErrorDetails, setShowErrorDetails] = useState(false);
@@ -45,8 +33,7 @@ export function Statement() {
     isLoading,
     error,
     errorDetails,
-    loadTransactions,
-    removeTransaction,
+    loadTransactions,    
   } = useStatementStore();
 
   // Configurar pull-to-refresh
@@ -55,51 +42,48 @@ export function Statement() {
   });
 
   // Filtrar transações
-  const filteredTransactions = (transactions as TransactionWithDetails[]).filter(transaction => {
+  const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = searchTerm
-      ? transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        transaction.categoria.nome.toLowerCase().includes(searchTerm.toLowerCase())
+      ? transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        transaction.category.name.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
 
     const matchesCategory = selectedCategory
-      ? transaction.categoria.id === selectedCategory
+      ? transaction.category.id === selectedCategory
       : true;
 
     return matchesSearch && matchesCategory;
   });
 
   // Calcular saldo acumulado para cada transação
-  let saldoAcumulado = 0
+  let accumulatedBalance = 0;
   const transactionsWithBalance = filteredTransactions.map(transaction => {
-    const credito = transaction.tipo === 'RECEITA' ? transaction.valor : 0
-    const debito = transaction.tipo === 'DESPESA' ? transaction.valor : 0
-    saldoAcumulado += credito - debito
+    const credit = transaction.type === 'INCOME' ? transaction.amount : 0;
+    const debit = transaction.type === 'EXPENSE' ? transaction.amount : 0;
+    accumulatedBalance += credit - debit;
     return {
       ...transaction,
-      credito,
-      debito,
-      saldo: saldoAcumulado,
-      conta: {
-        id: transaction.contaId,
-        nome: 'Conta Principal' // TODO: Get from store
+      credit,
+      debit,
+      balance: accumulatedBalance,
+      account: {
+        id: transaction.accountId,
+        name: 'Main Account',
+        balance: 0,
+        createdAt: transaction.createdAt,
+        updatedAt: transaction.updatedAt
       },
-      observacao: transaction.observacao || '',
-      categoria: {
-        ...transaction.categoria,
-        tipo: transaction.tipo
+      note: transaction.note || '',
+      category: {
+        ...transaction.category,
+        type: transaction.type
       }
-    }
-  })
+    };
+  });
 
   const handleEdit = async (transaction: Transaction) => {
     // TODO: Implement edit modal
     console.log('Edit transaction:', transaction);
-  };
-
-  const handleRemove = async (id: string) => {
-    if (window.confirm('Tem certeza que deseja remover esta transação?')) {
-      await removeTransaction(id);
-    }
   };
 
   const handleSearch = useCallback((term: string) => {
@@ -121,13 +105,13 @@ export function Statement() {
           <div className="text-center max-w-md mx-auto p-4 sm:p-8">
             <ExclamationTriangleIcon className="h-12 w-12 sm:h-16 sm:w-16 text-red-500 dark:text-red-400 mx-auto mb-4 sm:mb-6" />
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
-              Ops! Algo deu errado
+              Oops! Something went wrong
             </h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">
               {error}
             </p>
             
-            {/* Detalhes técnicos do erro */}
+            {/* Technical error details */}
             <div className="mb-4 sm:mb-6">
               <button
                 onClick={() => setShowErrorDetails(!showErrorDetails)}
@@ -136,7 +120,7 @@ export function Statement() {
                 <ChevronDownIcon 
                   className={`h-4 w-4 sm:h-5 sm:w-5 mr-1 transition-transform ${showErrorDetails ? 'transform rotate-180' : ''}`}
                 />
-                Detalhes técnicos
+                Technical Details
               </button>
               
               {showErrorDetails && (
@@ -152,7 +136,7 @@ export function Statement() {
               onClick={() => loadTransactions()}
               className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm sm:text-base font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-800 transition-colors"
             >
-              Tentar novamente
+              Try Again
             </button>
           </div>
         </div>
@@ -169,10 +153,10 @@ export function Statement() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <DocumentTextIcon className="h-8 w-8 text-primary-400" />
-                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Extrato Financeiro</h1>
+                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Financial Statement</h1>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Visualize o histórico detalhado das suas movimentações
+                View your detailed transaction history
               </p>
             </div>
           </div>
@@ -182,7 +166,7 @@ export function Statement() {
             <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
               <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Total de Receitas</h3>
+                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Total Income</h3>
                   <ArrowTrendingUpIcon className="h-5 w-5 text-green-400" />
                 </div>
                 <p className="text-xl sm:text-2xl font-semibold text-green-400">
@@ -190,7 +174,7 @@ export function Statement() {
                 </p>
                 {previousIncome > 0 && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Mês anterior: {formatCurrency(previousIncome)}
+                    Previous month: {formatCurrency(previousIncome)}
                   </p>
                 )}
               </div>
@@ -199,7 +183,7 @@ export function Statement() {
             <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
               <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Total de Despesas</h3>
+                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Total Expenses</h3>
                   <ArrowTrendingDownIcon className="h-5 w-5 text-red-400" />
                 </div>
                 <p className="text-xl sm:text-2xl font-semibold text-red-400">
@@ -207,7 +191,7 @@ export function Statement() {
                 </p>
                 {previousExpenses > 0 && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Mês anterior: {formatCurrency(previousExpenses)}
+                    Previous month: {formatCurrency(previousExpenses)}
                   </p>
                 )}
               </div>
@@ -216,7 +200,7 @@ export function Statement() {
             <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
               <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Saldo do Período</h3>
+                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Available Balance</h3>
                   <div className={cn(
                     "h-5 w-5",
                     availableBalance >= 0 ? "text-green-400" : "text-red-400"
@@ -232,7 +216,7 @@ export function Statement() {
                 </p>
                 {previousBalance !== 0 && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Mês anterior: {formatCurrency(previousBalance)}
+                    Previous month: {formatCurrency(previousBalance)}
                   </p>
                 )}
               </div>

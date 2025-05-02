@@ -1,5 +1,5 @@
-import { formatCurrency, formatDateTime } from '../../../utils/formatters';
-import { Transaction } from '../../../types';
+import { Transaction } from '@/types';
+import { formatDateTime } from '@/utils/formatters';
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -15,62 +15,43 @@ export function TransactionList({ transactions }: TransactionListProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="bg-gray-50 dark:bg-gray-800">
-          <tr>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+    <div className="space-y-4">
+      {transactions.map((transaction) => (
+        <div
+          key={transaction.id}
+          className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg shadow"
+        >
+          <div className="flex items-center space-x-4">
+            <div
+              className={`w-2 h-2 rounded-full ${
+                transaction.type === 'INCOME' ? 'bg-green-500' : 'bg-red-500'
+              }`}
+            />
+            <div>
+              <p className="font-medium">{transaction.description}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {formatDateTime(transaction.date, 'dd/MM/yyyy HH:mm')}
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p
+              className={`font-semibold ${
+                transaction.type === 'INCOME' ? 'text-green-500' : 'text-red-500'
+              }`}
             >
-              Descrição
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-            >
-              Categoria
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-            >
-              Data
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-            >
-              Valor
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-          {transactions.map(transaction => (
-            <tr key={transaction.id}>
-              <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                {transaction.descricao}
-              </td>
-              <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                {transaction.categoria.nome}
-              </td>
-              <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                {formatDateTime(transaction.data)}
-              </td>
-              <td
-                className={`whitespace-nowrap px-6 py-4 text-right text-sm font-medium ${
-                  transaction.tipo === 'RECEITA'
-                    ? 'text-green-600 dark:text-green-400'
-                    : 'text-red-600 dark:text-red-400'
-                }`}
-              >
-                {transaction.tipo === 'RECEITA' ? '+' : '-'}
-                {formatCurrency(transaction.valor)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              {transaction.type === 'INCOME' ? '+' : '-'}
+              {transaction.amount.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              })}
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {transaction.category.name}
+            </p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

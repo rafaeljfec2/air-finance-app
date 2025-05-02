@@ -6,12 +6,18 @@ interface StatementFiltersProps {
   categories: Category[];
   onSearch: (term: string) => void;
   onFilterCategory: (categoryId: string | null) => void;
+  selectedCategory?: string | null;
 }
 
-export function StatementFilters({ categories, onSearch, onFilterCategory }: StatementFiltersProps) {
+export function StatementFilters({ 
+  categories, 
+  onSearch, 
+  onFilterCategory,
+  selectedCategory: externalSelectedCategory = null 
+}: StatementFiltersProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(externalSelectedCategory);
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
@@ -75,7 +81,7 @@ export function StatementFilters({ categories, onSearch, onFilterCategory }: Sta
                         : 'text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark'
                     }`}
                   >
-                    {category.nome}
+                    {category.name}
                   </button>
                 ))}
               </div>

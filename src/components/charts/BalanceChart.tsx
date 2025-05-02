@@ -31,7 +31,7 @@ interface CustomTooltipProps extends TooltipProps<number, string> {
   label?: string;
 }
 
-export function BalanceChart({ data }: BalanceChartProps) {
+export function BalanceChart({ data }: Readonly<BalanceChartProps>) {
   const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       return (
@@ -84,11 +84,15 @@ export function BalanceChart({ data }: BalanceChartProps) {
           tickFormatter={(value: string) => format(new Date(value), 'dd/MM', { locale: ptBR })}
           stroke="rgb(156, 163, 175)"
           fontSize={12}
+          axisLine={false}
+          tickLine={false}
         />
         <YAxis
           tickFormatter={(value: number) => formatCurrency(value)}
           stroke="rgb(156, 163, 175)"
           fontSize={12}
+          axisLine={false}
+          tickLine={false}
         />
         <Tooltip content={<CustomTooltip />} />
         <Area

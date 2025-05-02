@@ -27,17 +27,17 @@ describe('useTransactionForm', () => {
     const { result } = renderHook(() => useTransactionForm());
 
     expect(result.current.formData).toEqual({
-      descricao: '',
-      valor: '',
-      tipo: 'DESPESA',
-      categoria: {
+      description: '',
+      amount: '',
+      type: 'EXPENSE',
+      category: {
         id: '',
-        nome: '',
-        icone: '',
-        cor: '',
+        name: '',
+        icon: '',
+        color: '',
       },
-      data: expect.any(String),
-      observacao: '',
+      date: expect.any(String),
+      note: '',
     });
     expect(result.current.errors).toEqual({});
     expect(result.current.isSubmitting).toBe(false);
@@ -48,11 +48,11 @@ describe('useTransactionForm', () => {
     const { result } = renderHook(() => useTransactionForm());
 
     act(() => {
-      result.current.updateFormData('descricao', 'Teste');
+      result.current.updateFormData('description', 'Teste');
     });
 
-    expect(result.current.formData.descricao).toBe('Teste');
-    expect(result.current.errors.descricao).toBe('Descrição é obrigatória');
+    expect(result.current.formData.description).toBe('Teste');
+    expect(result.current.errors.description).toBe('Description is required');
   });
 
   it('deve validar campos obrigatórios em tempo real', () => {
@@ -60,27 +60,27 @@ describe('useTransactionForm', () => {
 
     // Campo vazio
     act(() => {
-      result.current.updateFormData('descricao', '');
+      result.current.updateFormData('description', '');
     });
-    expect(result.current.errors.descricao).toBe('Descrição é obrigatória');
+    expect(result.current.errors.description).toBe('Description is required');
 
     // Campo preenchido
     act(() => {
-      result.current.updateFormData('descricao', 'Teste');
+      result.current.updateFormData('description', 'Teste');
     });
-    expect(result.current.errors.descricao).toBeUndefined();
+    expect(result.current.errors.description).toBeUndefined();
 
     // Valor inválido
     act(() => {
-      result.current.updateFormData('valor', '0');
+      result.current.updateFormData('amount', '0');
     });
-    expect(result.current.errors.valor).toBe('Valor deve ser maior que zero');
+    expect(result.current.errors.amount).toBe('Amount must be greater than zero');
 
     // Valor válido
     act(() => {
-      result.current.updateFormData('valor', '100,00');
+      result.current.updateFormData('amount', '100,00');
     });
-    expect(result.current.errors.valor).toBeUndefined();
+    expect(result.current.errors.amount).toBeUndefined();
   });
 
   it('deve formatar o valor corretamente', () => {
@@ -96,15 +96,15 @@ describe('useTransactionForm', () => {
 
     // Preenche os campos obrigatórios
     act(() => {
-      result.current.updateFormData('descricao', 'Teste');
-      result.current.updateFormData('valor', 'R$ 100,00');
-      result.current.updateFormData('categoria', {
+      result.current.updateFormData('description', 'Teste');
+      result.current.updateFormData('amount', 'R$ 100,00');
+      result.current.updateFormData('category', {
         id: '1',
-        nome: 'Alimentação',
-        icone: '🍽️',
-        cor: '#60A5FA',
+        name: 'Alimentação',
+        icon: '🍽️',
+        color: '#60A5FA',
       });
-      result.current.updateFormData('data', '2024-01-01');
+      result.current.updateFormData('date', '2024-01-01');
     });
 
     // Submete o formulário
@@ -114,11 +114,11 @@ describe('useTransactionForm', () => {
 
     expect(mockAddTransaction).toHaveBeenCalledWith(
       expect.objectContaining({
-        descricao: 'Teste',
-        valor: 100,
-        tipo: 'DESPESA',
-        categoria: expect.objectContaining({ id: '1' }),
-        data: expect.any(Date),
+        description: 'Teste',
+        amount: 100,
+        type: 'EXPENSE',
+        category: expect.objectContaining({ id: '1' }),
+        date: expect.any(Date),
       })
     );
     expect(result.current.showSuccessTooltip).toBe(true);
@@ -134,15 +134,15 @@ describe('useTransactionForm', () => {
 
     // Preenche os campos obrigatórios
     act(() => {
-      result.current.updateFormData('descricao', 'Teste');
-      result.current.updateFormData('valor', 'R$ 100,00');
-      result.current.updateFormData('categoria', {
+      result.current.updateFormData('description', 'Teste');
+      result.current.updateFormData('amount', 'R$ 100,00');
+      result.current.updateFormData('category', {
         id: '1',
-        nome: 'Alimentação',
-        icone: '🍽️',
-        cor: '#60A5FA',
+        name: 'Alimentação',
+        icon: '🍽️',
+        color: '#60A5FA',
       });
-      result.current.updateFormData('data', '2024-01-01');
+      result.current.updateFormData('date', '2024-01-01');
     });
 
     // Submete o formulário

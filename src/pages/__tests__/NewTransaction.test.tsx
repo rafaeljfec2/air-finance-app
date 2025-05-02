@@ -1,41 +1,43 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { NewTransaction } from '../NewTransaction';
-import { useTransactionForm } from '@/hooks/useTransactionForm';
+import { NewTransaction } from '../transactions/new';
+import { useTransactionStore } from '@/stores/transaction';
 
-// Mock do hook useTransactionForm
-jest.mock('@/hooks/useTransactionForm', () => ({
-  useTransactionForm: jest.fn(),
+// Mock the transaction store
+jest.mock('@/stores/transaction', () => ({
+  useTransactionStore: jest.fn(),
 }));
 
 describe('NewTransaction', () => {
-  const mockHandleSubmit = jest.fn();
-  const mockHandleKeyDown = jest.fn();
-  const mockUpdateFormData = jest.fn();
-  const mockFormatValue = jest.fn();
+  const mockAddTransaction = jest.fn();
+  const mockCategories = [
+    {
+      id: 'cat1',
+      name: 'Food',
+      type: 'EXPENSE',
+      color: '#F44336',
+      icon: '🍽️'
+    },
+    {
+      id: 'cat2',
+      name: 'Salary',
+      type: 'INCOME',
+      color: '#4CAF50',
+      icon: '💰'
+    }
+  ];
+  const mockAccounts = [
+    {
+      id: 'acc1',
+      name: 'Main Account'
+    }
+  ];
 
   beforeEach(() => {
-    (useTransactionForm as jest.Mock).mockReturnValue({
-      formData: {
-        descricao: '',
-        valor: '',
-        tipo: 'DESPESA',
-        categoria: {
-          id: '',
-          nome: '',
-          icone: '',
-          cor: '',
-        },
-        data: '2024-01-01',
-        observacao: '',
-      },
-      errors: {},
-      isSubmitting: false,
-      showSuccessTooltip: false,
-      handleSubmit: mockHandleSubmit,
-      handleKeyDown: mockHandleKeyDown,
-      formatValue: mockFormatValue,
-      updateFormData: mockUpdateFormData,
+    (useTransactionStore as unknown as jest.Mock).mockReturnValue({
+      addTransaction: mockAddTransaction,
+      categories: mockCategories,
+      accounts: mockAccounts
     });
   });
 
@@ -43,158 +45,104 @@ describe('NewTransaction', () => {
     jest.clearAllMocks();
   });
 
-  it('deve renderizar o formulário corretamente', () => {
+  it('should render the form correctly', () => {
     render(
       <BrowserRouter>
         <NewTransaction />
       </BrowserRouter>
     );
 
-    expect(screen.getByText('Novo Lançamento')).toBeInTheDocument();
-    expect(screen.getByText('Tipo de Lançamento')).toBeInTheDocument();
-    expect(screen.getByText('Descrição')).toBeInTheDocument();
-    expect(screen.getByText('Valor')).toBeInTheDocument();
-    expect(screen.getByText('Categoria')).toBeInTheDocument();
-    expect(screen.getByText('Data')).toBeInTheDocument();
-    expect(screen.getByText('Observação')).toBeInTheDocument();
+    expect(screen.getByText('Nova Transação')).toBeInTheDocument();
+    expect(screen.getByText('Despesa')).toBeInTheDocument();
+    expect(screen.getByText('Receita')).toBeInTheDocument();
+    expect(screen.getByLabelText('Descrição')).toBeInTheDocument();
+    expect(screen.getByLabelText('Valor')).toBeInTheDocument();
+    expect(screen.getByLabelText('Categoria')).toBeInTheDocument();
+    expect(screen.getByLabelText('Conta')).toBeInTheDocument();
+    expect(screen.getByLabelText('Data')).toBeInTheDocument();
+    expect(screen.getByLabelText('Observação')).toBeInTheDocument();
   });
 
-  it('deve chamar updateFormData ao alterar campos', () => {
+  it('should handle form submission', async () => {
     render(
       <BrowserRouter>
         <NewTransaction />
       </BrowserRouter>
     );
 
-    const descricaoInput = screen.getByPlaceholderText('Ex: Compras no supermercado');
-    fireEvent.change(descricaoInput, { target: { value: 'Teste' } });
-    expect(mockUpdateFormData).toHaveBeenCalledWith('descricao', 'Teste');
-
-    const valorInput = screen.getByPlaceholderText('R$ 0,00');
-    fireEvent.change(valorInput, { target: { value: '100' } });
-    expect(mockFormatValue).toHaveBeenCalledWith('100');
-
-    const observacaoInput = screen.getByPlaceholderText('Observações adicionais (opcional)');
-    fireEvent.change(observacaoInput, { target: { value: 'Teste observação' } });
-    expect(mockUpdateFormData).toHaveBeenCalledWith('observacao', 'Teste observação');
-  });
-
-  it('deve chamar handleSubmit ao submeter o formulário', () => {
-    render(
-      <BrowserRouter>
-        <NewTransaction />
-      </BrowserRouter>
-    );
-
-    const form = screen.getByRole('form');
-    fireEvent.submit(form);
-    expect(mockHandleSubmit).toHaveBeenCalled();
-  });
-
-  it('deve mostrar mensagem de sucesso', async () => {
-    (useTransactionForm as jest.Mock).mockReturnValue({
-      formData: {
-        descricao: '',
-        valor: '',
-        tipo: 'DESPESA',
-        categoria: {
-          id: '',
-          nome: '',
-          icone: '',
-          cor: '',
-        },
-        data: '2024-01-01',
-        observacao: '',
-      },
-      errors: {},
-      isSubmitting: false,
-      showSuccessTooltip: true,
-      handleSubmit: mockHandleSubmit,
-      handleKeyDown: mockHandleKeyDown,
-      formatValue: mockFormatValue,
-      updateFormData: mockUpdateFormData,
+    // Fill in the form
+    fireEvent.change(screen.getByLabelText('Descrição'), {
+      target: { value: 'Test Transaction' }
+    });
+    fireEvent.change(screen.getByLabelText('Valor'), {
+      target: { value: '100' }
+    });
+    fireEvent.change(screen.getByLabelText('Categoria'), {
+      target: { value: 'cat1' }
+    });
+    fireEvent.change(screen.getByLabelText('Conta'), {
+      target: { value: 'acc1' }
+    });
+    fireEvent.change(screen.getByLabelText('Data'), {
+      target: { value: '2024-03-20' }
+    });
+    fireEvent.change(screen.getByLabelText('Observação'), {
+      target: { value: 'Test note' }
     });
 
+    // Submit the form
+    fireEvent.click(screen.getByText('Salvar Transação'));
+
+    expect(mockAddTransaction).toHaveBeenCalledWith({
+      type: 'EXPENSE',
+      description: 'Test Transaction',
+      amount: 100,
+      categoryId: 'cat1',
+      accountId: 'acc1',
+      date: '2024-03-20',
+      note: 'Test note'
+    });
+  });
+
+  it('should switch between expense and income types', () => {
     render(
       <BrowserRouter>
         <NewTransaction />
       </BrowserRouter>
     );
 
+    // Initially should show expense categories
+    const categorySelect = screen.getByLabelText('Categoria');
+    expect(categorySelect).toHaveTextContent('Food');
+    expect(categorySelect).not.toHaveTextContent('Salary');
+
+    // Switch to income
+    fireEvent.click(screen.getByText('Receita'));
+
+    // Should now show income categories
+    expect(categorySelect).toHaveTextContent('Salary');
+    expect(categorySelect).not.toHaveTextContent('Food');
+  });
+
+  it('should validate required fields', async () => {
+    render(
+      <BrowserRouter>
+        <NewTransaction />
+      </BrowserRouter>
+    );
+
+    // Submit without filling required fields
+    fireEvent.click(screen.getByText('Salvar Transação'));
+
+    // Check for HTML5 validation messages
     await waitFor(() => {
-      expect(screen.getByText('Transação salva com sucesso!')).toBeInTheDocument();
-    });
-  });
-
-  it('deve mostrar mensagens de erro', () => {
-    (useTransactionForm as jest.Mock).mockReturnValue({
-      formData: {
-        descricao: '',
-        valor: '',
-        tipo: 'DESPESA',
-        categoria: {
-          id: '',
-          nome: '',
-          icone: '',
-          cor: '',
-        },
-        data: '2024-01-01',
-        observacao: '',
-      },
-      errors: {
-        descricao: 'Descrição é obrigatória',
-        valor: 'Valor deve ser maior que zero',
-        categoria: 'Categoria é obrigatória',
-      },
-      isSubmitting: false,
-      showSuccessTooltip: false,
-      handleSubmit: mockHandleSubmit,
-      handleKeyDown: mockHandleKeyDown,
-      formatValue: mockFormatValue,
-      updateFormData: mockUpdateFormData,
+      expect(screen.getByLabelText('Descrição')).toBeInvalid();
+      expect(screen.getByLabelText('Valor')).toBeInvalid();
+      expect(screen.getByLabelText('Categoria')).toBeInvalid();
+      expect(screen.getByLabelText('Conta')).toBeInvalid();
+      expect(screen.getByLabelText('Data')).toBeInvalid();
     });
 
-    render(
-      <BrowserRouter>
-        <NewTransaction />
-      </BrowserRouter>
-    );
-
-    expect(screen.getByText('Descrição é obrigatória')).toBeInTheDocument();
-    expect(screen.getByText('Valor deve ser maior que zero')).toBeInTheDocument();
-    expect(screen.getByText('Categoria é obrigatória')).toBeInTheDocument();
-  });
-
-  it('deve mostrar estado de loading durante submissão', () => {
-    (useTransactionForm as jest.Mock).mockReturnValue({
-      formData: {
-        descricao: '',
-        valor: '',
-        tipo: 'DESPESA',
-        categoria: {
-          id: '',
-          nome: '',
-          icone: '',
-          cor: '',
-        },
-        data: '2024-01-01',
-        observacao: '',
-      },
-      errors: {},
-      isSubmitting: true,
-      showSuccessTooltip: false,
-      handleSubmit: mockHandleSubmit,
-      handleKeyDown: mockHandleKeyDown,
-      formatValue: mockFormatValue,
-      updateFormData: mockUpdateFormData,
-    });
-
-    render(
-      <BrowserRouter>
-        <NewTransaction />
-      </BrowserRouter>
-    );
-
-    expect(screen.getByText('Salvando...')).toBeInTheDocument();
+    expect(mockAddTransaction).not.toHaveBeenCalled();
   });
 });

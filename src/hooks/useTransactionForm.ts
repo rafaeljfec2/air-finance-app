@@ -1,22 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useStatementStore } from '@/stores/statement';
+import { useTransactionStore } from '@/stores/transaction';
 import { Transaction, TransactionType } from '@/types/transaction';
 import { formatCurrency } from '@/utils/formatters';
-import { Category } from '@/constants/categories';
 
 export const INITIAL_FORM_STATE = {
-  descricao: '',
-  valor: '',
-  tipo: 'DESPESA' as TransactionType,
-  categoria: {
+  description: '',
+  amount: '',
+  type: 'EXPENSE' as TransactionType,
+  category: {
     id: '',
-    nome: '',
-    icone: '',
-    cor: '',
+    name: '',
+    icon: '',
+    color: '',
   },
-  data: new Date().toISOString().split('T')[0],
-  observacao: '',
+  date: new Date().toISOString().split('T')[0],
+  note: '',
 };
 
 type FormErrors = Record<string, string>;
@@ -25,7 +24,7 @@ type FormField = keyof FormData;
 
 export function useTransactionForm() {
   const navigate = useNavigate();
-  const { addTransaction } = useStatementStore();
+  const { addTransaction } = useTransactionStore();
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,19 +34,19 @@ export function useTransactionForm() {
   const validateField = (field: FormField, value: FormData[FormField]) => {
     let error = '';
 
-    if (field === 'descricao' && typeof value === 'string') {
-      error = !value ? 'Descrição é obrigatória' : '';
-    } else if (field === 'valor' && typeof value === 'string') {
+    if (field === 'description' && typeof value === 'string') {
+      error = !value ? 'Description is required' : '';
+    } else if (field === 'amount' && typeof value === 'string') {
       if (!value) {
-        error = 'Valor é obrigatório';
+        error = 'Amount is required';
       } else {
         const numericValue = parseFloat(value.replace(/[^\d,.-]/g, '').replace(',', '.'));
-        error = numericValue <= 0 ? 'Valor deve ser maior que zero' : '';
+        error = numericValue <= 0 ? 'Amount must be greater than zero' : '';
       }
-    } else if (field === 'categoria' && typeof value === 'object') {
-      error = !value.id ? 'Categoria é obrigatória' : '';
-    } else if (field === 'data' && typeof value === 'string') {
-      error = !value ? 'Data é obrigatória' : '';
+    } else if (field === 'category' && typeof value === 'object') {
+      error = !value.id ? 'Category is required' : '';
+    } else if (field === 'date' && typeof value === 'string') {
+      error = !value ? 'Date is required' : '';
     }
 
     return error;
@@ -97,16 +96,19 @@ export function useTransactionForm() {
     setIsSubmitting(true);
 
     try {
-      const valor = parseFloat(formData.valor.replace(/[^\d,.-]/g, '').replace(',', '.'));
+      const valor = parseFloat(formData.amount.replace(/[^\d,.-]/g, '').replace(',', '.'));
 
       const transaction: Partial<Transaction> = {
-        descricao: formData.descricao,
-        valor,
-        tipo: formData.tipo,
-        categoria: formData.categoria as Category,
-        data: new Date(formData.data),
-        observacao: formData.observacao,
-        contaId: '1', // Mock - posteriormente virá da seleção de conta
+        description: formData.description,
+        amount: valor,
+        type: formData.type,
+        category: {
+          ...formData.category,
+          type: formData.type,
+        },
+        date: formData.date,
+        note: formData.note,
+        accountId: '1', // Mock - posteriormente virá da seleção de conta
       };
 
       await addTransaction(transaction as Transaction);
