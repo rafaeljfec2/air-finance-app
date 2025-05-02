@@ -13,6 +13,7 @@ import { Settings } from '@/pages/settings';
 import {LandingPage} from '@/pages/landing';
 import {SignUpPage} from '@/pages/signup';
 import ForgotPasswordPage from '@/pages/forgot-password';
+import AiClassificationPage from '@/pages/ai-classification';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -134,6 +135,11 @@ export const router = createBrowserRouter([
   {
     path: '/forgot-password',
     element: <ForgotPasswordPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/ai/classification',
+    element: <AiClassificationPage />,
     errorElement: <ErrorPage />,
   },
   {

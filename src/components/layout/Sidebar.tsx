@@ -7,6 +7,7 @@ import {
   Cog6ToothIcon,
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebar';
@@ -14,6 +15,7 @@ import { useSidebarStore } from '@/stores/sidebar';
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Transações', href: '/transactions', icon: ArrowsRightLeftIcon },
+  { name: 'Classificação IA', href: '/ai/classification', icon: SparklesIcon },
   { name: 'Extrato', href: '/statement', icon: DocumentTextIcon },
   { name: 'Relatórios', href: '/reports', icon: ChartBarIcon },
   { name: 'Configurações', href: '/settings', icon: Cog6ToothIcon },
