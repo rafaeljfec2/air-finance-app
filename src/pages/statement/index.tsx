@@ -71,7 +71,10 @@ export function Statement() {
       balance: accumulatedBalance,
       account: {
         id: transaction.accountId,
-        name: 'Main Account' // TODO: Get from store
+        name: 'Main Account',
+        balance: 0,
+        createdAt: transaction.createdAt,
+        updatedAt: transaction.updatedAt
       },
       note: transaction.note || '',
       category: {

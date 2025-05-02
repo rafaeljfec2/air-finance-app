@@ -1,9 +1,18 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useStatementStore } from '@/store/statement';
 import { getCategoriesByType } from '@/utils/categories';
-import { parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { Transaction, Category } from '@/types';
 import { MonthlyReport, ReportCategory } from '@/types/report';
+
+const COLORS = [
+  '#10B981', // Emerald
+  '#3B82F6', // Blue
+  '#8B5CF6', // Purple
+  '#EC4899', // Pink
+  '#F59E0B', // Amber
+  '#6366F1', // Indigo
+  '#EF4444', // Red
+];
 
 export function useMonthlyReportMemo(transactions: Transaction[]): MonthlyReport {
   return useMemo(() => {
@@ -51,14 +60,17 @@ export function useMonthlyReportMemo(transactions: Transaction[]): MonthlyReport
   }, [transactions]);
 }
 
-export function useMonthlyReport(month: number, year: number): MonthlyReport {
+export function useMonthlyReport(month: number, year: number) {
   const { transactions } = useStatementStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentDate, setCurrentDate] = useState(new Date(year, month));
 
-  return useMemo(() => {
+  const report = useMemo(() => {
     const filteredTransactions = transactions.filter(
       (transaction: Transaction) => {
         const date = new Date(transaction.date);
-        return date.getMonth() === month && date.getFullYear() === year;
+        return date.getMonth() === currentDate.getMonth() && 
+               date.getFullYear() === currentDate.getFullYear();
       }
     );
 
@@ -88,8 +100,22 @@ export function useMonthlyReport(month: number, year: number): MonthlyReport {
       : 0;
 
     return {
-      month,
-      year,
+      month: currentDate.getMonth(),
+      year: currentDate.getFullYear(),
+      incomeByCategory: Object.entries(incomeByCategory).map(([name, value], index) => ({
+        name,
+        value: value as number,
+        color: COLORS[index % COLORS.length],
+        percentage: (value as number / incomeTotal) * 100
+      })),
+      expensesByCategory: Object.entries(expensesByCategory).map(([name, value], index) => ({
+        name,
+        value: value as number,
+        color: COLORS[index % COLORS.length],
+        percentage: (value as number / expensesTotal) * 100
+      })),
+      historicalIncome: [], // TODO: Implement historical data
+      historicalExpenses: [], // TODO: Implement historical data
       income: {
         total: incomeTotal,
         categories: Object.entries(incomeByCategory).map(([name, value]): ReportCategory => ({
@@ -111,5 +137,21 @@ export function useMonthlyReport(month: number, year: number): MonthlyReport {
         percentageVariation
       }
     };
-  }, [transactions, month, year]);
+  }, [transactions, currentDate]);
+
+  const previousMonth = () => {
+    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1));
+  };
+
+  const nextMonth = () => {
+    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1));
+  };
+
+  return {
+    date: currentDate,
+    report,
+    isLoading,
+    previousMonth,
+    nextMonth
+  };
 }

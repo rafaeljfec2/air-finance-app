@@ -15,10 +15,12 @@ export interface ReportBalance {
   percentageVariation: number;
 }
 
-export interface MonthlyReport {
+export interface Report {
   month: number;
   year: number;
   income: ReportSummary;
   expenses: ReportSummary;
   balance: ReportBalance;
 }
+
+export type MonthlyReport = Report;

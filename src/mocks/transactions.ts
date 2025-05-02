@@ -1,4 +1,4 @@
-import { Transaction } from '@/components/transactions/TransactionGrid'
+import { Transaction } from '@/types'
 
 export const mockTransactions: Transaction[] = [
   {
@@ -11,7 +11,9 @@ export const mockTransactions: Transaction[] = [
     accountId: 'conta1',
     note: 'Compras do mês',
     category: { id: 'cat1', name: 'Alimentação', type: 'EXPENSE' },
-    account: { id: 'conta1', name: 'Conta Corrente' }
+    account: { id: 'conta1', name: 'Conta Corrente', balance: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '2',
@@ -23,7 +25,9 @@ export const mockTransactions: Transaction[] = [
     accountId: 'conta1',
     note: 'Salário mensal',
     category: { id: 'cat2', name: 'Salário', type: 'INCOME' },
-    account: { id: 'conta1', name: 'Conta Corrente' }
+    account: { id: 'conta1', name: 'Conta Corrente', balance: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '3',
@@ -35,7 +39,9 @@ export const mockTransactions: Transaction[] = [
     accountId: 'conta1',
     note: 'Aluguel do apartamento',
     category: { id: 'cat3', name: 'Moradia', type: 'EXPENSE' },
-    account: { id: 'conta1', name: 'Conta Corrente' }
+    account: { id: 'conta1', name: 'Conta Corrente', balance: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '4',
@@ -47,7 +53,9 @@ export const mockTransactions: Transaction[] = [
     accountId: 'conta1',
     note: 'Mensalidade',
     category: { id: 'cat4', name: 'Saúde', type: 'EXPENSE' },
-    account: { id: 'conta1', name: 'Conta Corrente' }
+    account: { id: 'conta1', name: 'Conta Corrente', balance: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '5',
@@ -59,7 +67,9 @@ export const mockTransactions: Transaction[] = [
     accountId: 'conta1',
     note: 'Projeto de desenvolvimento',
     category: { id: 'cat5', name: 'Freelance', type: 'INCOME' },
-    account: { id: 'conta1', name: 'Conta Corrente' }
+    account: { id: 'conta1', name: 'Conta Corrente', balance: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '6',
@@ -71,7 +81,9 @@ export const mockTransactions: Transaction[] = [
     accountId: 'conta1',
     note: 'Mensalidade',
     category: { id: 'cat6', name: 'Serviços', type: 'EXPENSE' },
-    account: { id: 'conta1', name: 'Conta Corrente' }
+    account: { id: 'conta1', name: 'Conta Corrente', balance: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '7',
@@ -83,7 +95,9 @@ export const mockTransactions: Transaction[] = [
     accountId: 'conta1',
     note: 'Posto Shell',
     category: { id: 'cat7', name: 'Transporte', type: 'EXPENSE' },
-    account: { id: 'conta1', name: 'Conta Corrente' }
+    account: { id: 'conta1', name: '  Conta Corrente', balance: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '8',
@@ -95,7 +109,9 @@ export const mockTransactions: Transaction[] = [
     accountId: 'conta2',
     note: 'Dividendos',
     category: { id: 'cat8', name: 'Investimentos', type: 'INCOME' },
-    account: { id: 'conta2', name: 'Poupança' }
+    account: { id: 'conta2', name: 'Poupança', balance: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '9',
@@ -107,7 +123,9 @@ export const mockTransactions: Transaction[] = [
     accountId: 'conta1',
     note: 'Conta de luz',
     category: { id: 'cat9', name: 'Serviços', type: 'EXPENSE' },
-    account: { id: 'conta1', name: 'Conta Corrente' }
+    account: { id: 'conta1', name: 'Conta Corrente', balance: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '10',
@@ -119,7 +137,9 @@ export const mockTransactions: Transaction[] = [
     accountId: 'conta1',
     note: 'Conta de água',
     category: { id: 'cat9', name: 'Serviços', type: 'EXPENSE' },
-    account: { id: 'conta1', name: 'Conta Corrente' }
+    account: { id: 'conta1', name: 'Conta Corrente', balance: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '11',
@@ -131,7 +151,9 @@ export const mockTransactions: Transaction[] = [
     accountId: 'conta3',
     note: 'Venda pelo Marketplace',
     category: { id: 'cat10', name: 'Outras Receitas', type: 'INCOME' },
-    account: { id: 'conta3', name: 'Investimentos' }
+    account: { id: 'conta3', name: 'Investimentos', balance: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '12',
@@ -143,7 +165,9 @@ export const mockTransactions: Transaction[] = [
     accountId: 'conta1',
     note: 'Presente para amigo',
     category: { id: 'cat11', name: 'Lazer', type: 'EXPENSE' },
-    account: { id: 'conta1', name: 'Conta Corrente' }
+    account: { id: 'conta1', name: 'Conta Corrente', balance: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    createdAt: '',
+    updatedAt: ''
   }
 ]
 

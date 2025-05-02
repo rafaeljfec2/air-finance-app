@@ -13,7 +13,11 @@ import { cn } from '@/lib/utils';
 type ReportSection = 'summary' | 'charts' | 'details';
 
 export function Reports() {
-  const { date, report, isLoading, previousMonth, nextMonth } = useMonthlyReport();
+  const currentDate = new Date();
+  const { date, report, isLoading, previousMonth, nextMonth } = useMonthlyReport(
+    currentDate.getMonth(),
+    currentDate.getFullYear()
+  );
   const [activeSection, setActiveSection] = useState<ReportSection>('summary');
 
   const sections: { id: ReportSection; label: string }[] = [
