@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react';
+import { dependents } from '@/constants/dependents';
 
 export function NewTransaction() {
   const navigate = useNavigate();
@@ -23,6 +24,8 @@ export function NewTransaction() {
     categoryId: '',
     accountId: '',
     note: '',
+    dependent: '',
+    installmentCount: 1,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -161,6 +164,29 @@ export function NewTransaction() {
               <div className="p-4 sm:p-6 space-y-4 bg-background dark:bg-background-dark">
                 <div>
                   <label
+                    htmlFor="accountId"
+                    className="block text-sm font-medium text-text dark:text-text-dark mb-1"
+                  >
+                    Conta
+                  </label>
+                  <Select
+                    id="accountId"
+                    name="accountId"
+                    value={formData.accountId}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Selecione uma conta</option>
+                    {accounts.map((account) => (
+                      <option key={account.id} value={account.id}>
+                        {account.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
+                <div>
+                  <label
                     htmlFor="categoryId"
                     className="block text-sm font-medium text-text dark:text-text-dark mb-1"
                   >
@@ -184,22 +210,45 @@ export function NewTransaction() {
 
                 <div>
                   <label
-                    htmlFor="accountId"
+                    htmlFor="dependent"
                     className="block text-sm font-medium text-text dark:text-text-dark mb-1"
                   >
-                    Conta
+                    Dependente
                   </label>
                   <Select
-                    id="accountId"
-                    name="accountId"
-                    value={formData.accountId}
+                    id="dependent"
+                    name="dependent"
+                    value={formData.dependent}
+                    onChange={handleChange}
+                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                  >
+                    <option value="">Selecione um dependente (opcional)</option>
+                    {dependents.map((dep) => (
+                      <option key={dep.id} value={dep.id}>
+                        {dep.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="installmentCount"
+                    className="block text-sm font-medium text-text dark:text-text-dark mb-1"
+                  >
+                    Quantidade de parcelas
+                  </label>
+                  <Select
+                    id="installmentCount"
+                    name="installmentCount"
+                    value={formData.installmentCount}
                     onChange={handleChange}
                     required
+                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                   >
-                    <option value="">Selecione uma conta</option>
-                    {accounts.map((account) => (
-                      <option key={account.id} value={account.id}>
-                        {account.name}
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
+                      <option key={num} value={num}>
+                        {num}x
                       </option>
                     ))}
                   </Select>

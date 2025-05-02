@@ -1,8 +1,8 @@
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
-import { 
-  ArrowRight, 
-  Shield, 
+import {
+  ArrowRight,
+  Shield,
   CheckCircle2,
   Users,
   Lock,
@@ -10,7 +10,7 @@ import {
   Bell,
   FileText,
   MessageSquare,
-  Headphones
+  Headphones,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -29,17 +29,23 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
           <Logo />
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-text/80 hover:text-brand-arrow transition-colors">Recursos</a>
-            <a href="#security" className="text-text/80 hover:text-brand-arrow transition-colors">Segurança</a>
-            <a href="#pricing" className="text-text/80 hover:text-brand-arrow transition-colors">Planos</a>
-            <Button 
+            <a href="#features" className="text-text/80 hover:text-brand-arrow transition-colors">
+              Recursos
+            </a>
+            <a href="#security" className="text-text/80 hover:text-brand-arrow transition-colors">
+              Segurança
+            </a>
+            <a href="#pricing" className="text-text/80 hover:text-brand-arrow transition-colors">
+              Planos
+            </a>
+            <Button
               variant="outline"
               className="border-brand-arrow text-brand-arrow bg-transparent hover:bg-brand-arrow/5 dark:hover:bg-brand-arrow/10 transition-colors px-6"
               onClick={() => navigate('/signup')}
             >
               Criar conta
             </Button>
-            <Button 
+            <Button
               variant="default"
               className="bg-brand-arrow hover:bg-brand-arrow/90 text-white px-6"
               onClick={() => navigate('/auth/login')}
@@ -51,7 +57,7 @@ export function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <motion.main 
+      <motion.main
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
@@ -61,22 +67,24 @@ export function LandingPage() {
         <div className="relative max-w-7xl mx-auto px-6 py-32">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-left">
-              <motion.h2 
+              <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="text-5xl md:text-7xl font-bold mb-6 text-brand-arrow leading-tight"
               >
-                Transforme sua vida<br />financeira com inteligência
+                Transforme sua vida
+                <br />
+                financeira com inteligência
               </motion.h2>
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
                 className="text-xl md:text-2xl mb-12 text-text/80"
               >
-                O AirFinance revoluciona a forma como você gerencia seu dinheiro, 
-                oferecendo insights poderosos e uma experiência única de controle financeiro.
+                O Airfinance revoluciona a forma como você gerencia seu dinheiro, oferecendo
+                insights poderosos e uma experiência única de controle financeiro.
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -84,14 +92,14 @@ export function LandingPage() {
                 transition={{ duration: 0.8, delay: 0.6 }}
                 className="flex flex-col sm:flex-row gap-4"
               >
-                <Button 
+                <Button
                   className="bg-brand-arrow hover:bg-brand-arrow/90 text-white px-8 py-6 text-lg inline-flex items-center gap-2"
                   onClick={() => navigate('/auth/login')}
                 >
                   Comece gratuitamente
                   <ArrowRight className="w-5 h-5" />
                 </Button>
-                <Button 
+                <Button
                   variant="outline"
                   className="border-brand-arrow text-brand-arrow hover:bg-brand-arrow/10 px-8 py-6 text-lg"
                 >
@@ -105,11 +113,7 @@ export function LandingPage() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="hidden md:block"
             >
-              <img 
-                src={heroImage} 
-                alt="Dashboard do AirFinance" 
-                className="w-full h-auto"
-              />
+              <img src={heroImage} alt="Dashboard do Airfinance" className="w-full h-auto" />
             </motion.div>
           </div>
         </div>
@@ -127,10 +131,10 @@ export function LandingPage() {
           >
             <h3 className="text-4xl font-bold mb-6 text-brand-arrow">Recursos que transformam</h3>
             <p className="text-xl text-text/80 max-w-3xl mx-auto">
-              Descubra como o AirFinance pode revolucionar sua gestão financeira
+              Descubra como o Airfinance pode revolucionar sua gestão financeira
             </p>
           </motion.div>
-          
+
           <div className="grid md:grid-cols-3 gap-12">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -140,13 +144,18 @@ export function LandingPage() {
               className="bg-background p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow"
             >
               <div className="mb-6">
-                <img 
-                  src={dashboardImage} 
-                  alt="Dashboard Inteligente" 
+                <img
+                  src={dashboardImage}
+                  alt="Dashboard Inteligente"
                   className="w-full h-auto mb-6"
                 />
-                <h3 className="text-2xl font-semibold mb-4 text-brand-arrow">Análise Inteligente</h3>
-                <p className="text-text/80 mb-6">Visualize seus gastos e receitas com gráficos interativos e insights personalizados.</p>
+                <h3 className="text-2xl font-semibold mb-4 text-brand-arrow">
+                  Análise Inteligente
+                </h3>
+                <p className="text-text/80 mb-6">
+                  Visualize seus gastos e receitas com gráficos interativos e insights
+                  personalizados.
+                </p>
                 <ul className="space-y-3">
                   <li className="flex items-center gap-3 text-text/80">
                     <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
@@ -172,13 +181,13 @@ export function LandingPage() {
               className="bg-background p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow"
             >
               <div className="mb-6">
-                <img 
-                  src={mobileImage} 
-                  alt="Aplicativo Móvel" 
-                  className="w-full h-auto mb-6"
-                />
-                <h3 className="text-2xl font-semibold mb-4 text-brand-arrow">Gestão Simplificada</h3>
-                <p className="text-text/80 mb-6">Controle suas finanças de forma intuitiva e eficiente.</p>
+                <img src={mobileImage} alt="Aplicativo Móvel" className="w-full h-auto mb-6" />
+                <h3 className="text-2xl font-semibold mb-4 text-brand-arrow">
+                  Gestão Simplificada
+                </h3>
+                <p className="text-text/80 mb-6">
+                  Controle suas finanças de forma intuitiva e eficiente.
+                </p>
                 <ul className="space-y-3">
                   <li className="flex items-center gap-3 text-text/80">
                     <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
@@ -204,13 +213,11 @@ export function LandingPage() {
               className="bg-background p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow"
             >
               <div className="mb-6">
-                <img 
-                  src={securityImage} 
-                  alt="Segurança" 
-                  className="w-full h-auto mb-6"
-                />
+                <img src={securityImage} alt="Segurança" className="w-full h-auto mb-6" />
                 <h3 className="text-2xl font-semibold mb-4 text-brand-arrow">Multiplataforma</h3>
-                <p className="text-text/80 mb-6">Acesse suas finanças de qualquer lugar, a qualquer momento.</p>
+                <p className="text-text/80 mb-6">
+                  Acesse suas finanças de qualquer lugar, a qualquer momento.
+                </p>
                 <ul className="space-y-3">
                   <li className="flex items-center gap-3 text-text/80">
                     <CheckCircle2 className="w-5 h-5 text-brand-arrow" />
@@ -244,9 +251,12 @@ export function LandingPage() {
             <div className="inline-flex p-4 rounded-xl bg-brand-arrow/10 mb-6">
               <Shield className="w-10 h-10 text-brand-arrow" />
             </div>
-            <h3 className="text-4xl font-bold mb-6 text-brand-arrow">Segurança em primeiro lugar</h3>
+            <h3 className="text-4xl font-bold mb-6 text-brand-arrow">
+              Segurança em primeiro lugar
+            </h3>
             <p className="text-xl text-text/80 max-w-3xl mx-auto">
-              Suas informações financeiras são protegidas com as mais avançadas tecnologias de segurança
+              Suas informações financeiras são protegidas com as mais avançadas tecnologias de
+              segurança
             </p>
           </motion.div>
 
@@ -266,7 +276,10 @@ export function LandingPage() {
                   </div>
                   <div>
                     <h5 className="font-medium mb-2">Criptografia de ponta a ponta</h5>
-                    <p className="text-text/80">Seus dados são criptografados desde o momento em que são inseridos até o armazenamento.</p>
+                    <p className="text-text/80">
+                      Seus dados são criptografados desde o momento em que são inseridos até o
+                      armazenamento.
+                    </p>
                   </div>
                 </li>
                 <li className="flex items-start gap-4">
@@ -275,7 +288,10 @@ export function LandingPage() {
                   </div>
                   <div>
                     <h5 className="font-medium mb-2">Backup automático</h5>
-                    <p className="text-text/80">Seus dados são automaticamente sincronizados e armazenados com segurança na nuvem.</p>
+                    <p className="text-text/80">
+                      Seus dados são automaticamente sincronizados e armazenados com segurança na
+                      nuvem.
+                    </p>
                   </div>
                 </li>
                 <li className="flex items-start gap-4">
@@ -284,7 +300,9 @@ export function LandingPage() {
                   </div>
                   <div>
                     <h5 className="font-medium mb-2">Monitoramento 24/7</h5>
-                    <p className="text-text/80">Sistema de monitoramento contínuo para garantir a segurança dos seus dados.</p>
+                    <p className="text-text/80">
+                      Sistema de monitoramento contínuo para garantir a segurança dos seus dados.
+                    </p>
                   </div>
                 </li>
               </ul>
@@ -297,7 +315,9 @@ export function LandingPage() {
               viewport={{ once: true }}
               className="bg-white p-8 rounded-2xl shadow-lg"
             >
-              <h4 className="text-2xl font-semibold mb-6 text-brand-arrow">Conformidade e Certificações</h4>
+              <h4 className="text-2xl font-semibold mb-6 text-brand-arrow">
+                Conformidade e Certificações
+              </h4>
               <ul className="space-y-6">
                 <li className="flex items-start gap-4">
                   <div className="p-2 rounded-lg bg-brand-arrow/10">
@@ -305,7 +325,9 @@ export function LandingPage() {
                   </div>
                   <div>
                     <h5 className="font-medium mb-2">LGPD Compliant</h5>
-                    <p className="text-text/80">Totalmente alinhado com a Lei Geral de Proteção de Dados.</p>
+                    <p className="text-text/80">
+                      Totalmente alinhado com a Lei Geral de Proteção de Dados.
+                    </p>
                   </div>
                 </li>
                 <li className="flex items-start gap-4">
@@ -314,7 +336,9 @@ export function LandingPage() {
                   </div>
                   <div>
                     <h5 className="font-medium mb-2">ISO 27001</h5>
-                    <p className="text-text/80">Certificação internacional de segurança da informação.</p>
+                    <p className="text-text/80">
+                      Certificação internacional de segurança da informação.
+                    </p>
                   </div>
                 </li>
                 <li className="flex items-start gap-4">
@@ -323,7 +347,9 @@ export function LandingPage() {
                   </div>
                   <div>
                     <h5 className="font-medium mb-2">Controle de Acesso</h5>
-                    <p className="text-text/80">Autenticação em duas etapas e controle granular de permissões.</p>
+                    <p className="text-text/80">
+                      Autenticação em duas etapas e controle granular de permissões.
+                    </p>
                   </div>
                 </li>
               </ul>
@@ -342,9 +368,12 @@ export function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h3 className="text-4xl font-bold mb-6 text-brand-arrow">Planos para todos os perfis</h3>
+            <h3 className="text-4xl font-bold mb-6 text-brand-arrow">
+              Planos para todos os perfis
+            </h3>
             <p className="text-xl text-text/80 max-w-3xl mx-auto">
-              Escolha o plano ideal para suas necessidades e comece a transformar sua vida financeira hoje
+              Escolha o plano ideal para suas necessidades e comece a transformar sua vida
+              financeira hoje
             </p>
           </motion.div>
 
@@ -500,36 +529,84 @@ export function LandingPage() {
             <div>
               <h5 className="font-semibold mb-6 text-brand-arrow">Produto</h5>
               <ul className="space-y-3">
-                <li><a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">Recursos</a></li>
-                <li><a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">Preços</a></li>
-                <li><a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">Segurança</a></li>
-                <li><a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">Integrações</a></li>
+                <li>
+                  <a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">
+                    Recursos
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">
+                    Preços
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">
+                    Segurança
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">
+                    Integrações
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h5 className="font-semibold mb-6 text-brand-arrow">Empresa</h5>
               <ul className="space-y-3">
-                <li><a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">Sobre nós</a></li>
-                <li><a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">Blog</a></li>
-                <li><a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">Carreiras</a></li>
-                <li><a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">Contato</a></li>
+                <li>
+                  <a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">
+                    Sobre nós
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">
+                    Blog
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">
+                    Carreiras
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">
+                    Contato
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h5 className="font-semibold mb-6 text-brand-arrow">Legal</h5>
               <ul className="space-y-3">
-                <li><a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">Privacidade</a></li>
-                <li><a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">Termos</a></li>
-                <li><a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">Cookies</a></li>
-                <li><a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">LGPD</a></li>
+                <li>
+                  <a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">
+                    Privacidade
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">
+                    Termos
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">
+                    Cookies
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-text/60 hover:text-brand-arrow transition-colors">
+                    LGPD
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-border text-center text-sm text-text/60">
-            <p>© {new Date().getFullYear()} AirFinance. Todos os direitos reservados.</p>
+            <p>© {new Date().getFullYear()} Airfinance. Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>
     </div>
   );
-} 
+}

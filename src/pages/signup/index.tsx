@@ -26,7 +26,8 @@ export function SignUpPage() {
     if (!form.name.trim()) newErrors.name = 'Nome é obrigatório';
     if (!form.email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) newErrors.email = 'E-mail inválido';
     if (form.password.length < 6) newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
-    if (form.password !== form.confirmPassword) newErrors.confirmPassword = 'As senhas não coincidem';
+    if (form.password !== form.confirmPassword)
+      newErrors.confirmPassword = 'As senhas não coincidem';
     return newErrors;
   }
 
@@ -57,45 +58,57 @@ export function SignUpPage() {
             <div className="flex flex-col items-center mb-8">
               <Logo className="mb-4 w-16 h-16" />
               <h2 className="text-2xl font-bold text-brand-arrow mb-2">Criar Conta</h2>
-              <p className="text-text/60 dark:text-text-dark/60 text-center">Preencha os campos para começar a usar o AirFinance</p>
+              <p className="text-text/60 dark:text-text-dark/60 text-center">
+                Preencha os campos para começar a usar o Airfinance
+              </p>
             </div>
             <form className="space-y-5" onSubmit={handleSubmit} autoComplete="off">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-1">Nome</label>
+                <label htmlFor="name" className="block text-sm font-medium mb-1">
+                  Nome
+                </label>
                 <Input
                   id="name"
                   type="text"
                   autoComplete="name"
                   value={form.name}
-                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   disabled={submitting}
                   className={errors.name ? 'border-red-500' : ''}
                   placeholder="Seu nome completo"
                 />
-                {errors.name && <span className="text-xs text-red-500 mt-1 block">{errors.name}</span>}
+                {errors.name && (
+                  <span className="text-xs text-red-500 mt-1 block">{errors.name}</span>
+                )}
               </div>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-1">E-mail</label>
+                <label htmlFor="email" className="block text-sm font-medium mb-1">
+                  E-mail
+                </label>
                 <Input
                   id="email"
                   type="email"
                   autoComplete="email"
                   value={form.email}
-                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                   disabled={submitting}
                   className={errors.email ? 'border-red-500' : ''}
                   placeholder="seu@email.com"
                 />
-                {errors.email && <span className="text-xs text-red-500 mt-1 block">{errors.email}</span>}
+                {errors.email && (
+                  <span className="text-xs text-red-500 mt-1 block">{errors.email}</span>
+                )}
               </div>
               <div className="relative">
-                <label htmlFor="password" className="block text-sm font-medium mb-1">Senha</label>
+                <label htmlFor="password" className="block text-sm font-medium mb-1">
+                  Senha
+                </label>
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   value={form.password}
-                  onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
                   disabled={submitting}
                   className={errors.password ? 'border-red-500' : ''}
                   placeholder="Crie uma senha"
@@ -104,21 +117,25 @@ export function SignUpPage() {
                   type="button"
                   tabIndex={-1}
                   className="absolute right-3 top-8 text-gray-400 hover:text-brand-arrow"
-                  onClick={() => setShowPassword(v => !v)}
+                  onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
-                {errors.password && <span className="text-xs text-red-500 mt-1 block">{errors.password}</span>}
+                {errors.password && (
+                  <span className="text-xs text-red-500 mt-1 block">{errors.password}</span>
+                )}
               </div>
               <div className="relative">
-                <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">Confirmar Senha</label>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
+                  Confirmar Senha
+                </label>
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   value={form.confirmPassword}
-                  onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
+                  onChange={(e) => setForm((f) => ({ ...f, confirmPassword: e.target.value }))}
                   disabled={submitting}
                   className={errors.confirmPassword ? 'border-red-500' : ''}
                   placeholder="Repita a senha"
@@ -127,12 +144,18 @@ export function SignUpPage() {
                   type="button"
                   tabIndex={-1}
                   className="absolute right-3 top-8 text-gray-400 hover:text-brand-arrow"
-                  onClick={() => setShowConfirmPassword(v => !v)}
+                  onClick={() => setShowConfirmPassword((v) => !v)}
                   aria-label={showConfirmPassword ? 'Ocultar senha' : 'Mostrar senha'}
                 >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
-                {errors.confirmPassword && <span className="text-xs text-red-500 mt-1 block">{errors.confirmPassword}</span>}
+                {errors.confirmPassword && (
+                  <span className="text-xs text-red-500 mt-1 block">{errors.confirmPassword}</span>
+                )}
               </div>
               <Button
                 type="submit"
@@ -162,4 +185,4 @@ export function SignUpPage() {
       </motion.div>
     </div>
   );
-} 
+}

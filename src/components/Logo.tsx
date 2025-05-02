@@ -1,9 +1,9 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 interface LogoProps {
-  className?: string
-  showSlogan?: boolean
-  variant?: 'default' | 'white'
+  className?: string;
+  showSlogan?: boolean;
+  variant?: 'default' | 'white';
 }
 
 export function Logo({ className, showSlogan = false, variant = 'default' }: LogoProps) {
@@ -18,10 +18,7 @@ export function Logo({ className, showSlogan = false, variant = 'default' }: Log
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className={cn(
-              'w-6 h-6',
-              variant === 'white' ? 'text-white' : 'text-brand-arrow'
-            )}
+            className={cn('w-6 h-6', variant === 'white' ? 'text-white' : 'text-brand-arrow')}
           >
             <path
               d="M5 19L19 5M19 5H9M19 5V15"
@@ -34,27 +31,27 @@ export function Logo({ className, showSlogan = false, variant = 'default' }: Log
         </div>
 
         {/* Texto "Finely" */}
-        <h1 
+        <h1
           className={cn(
             'text-2xl font-bold',
-            variant === 'white' ? 'text-white' : 'text-brand-arrow dark:text-brand-leaf'
+            variant === 'white' ? 'text-white' : 'text-brand-arrow dark:text-brand-leaf',
           )}
         >
-            AirFinance
+          Airfinance
         </h1>
       </div>
 
       {/* Slogan */}
       {showSlogan && (
-        <p 
+        <p
           className={cn(
             'text-sm mt-1',
-            variant === 'white' ? 'text-white/80' : 'text-brand-arrow/80 dark:text-brand-leaf/80'
+            variant === 'white' ? 'text-white/80' : 'text-brand-arrow/80 dark:text-brand-leaf/80',
           )}
         >
           Finanças simples, vida leve.
         </p>
       )}
     </div>
-  )
-} 
+  );
+}
