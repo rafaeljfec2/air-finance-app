@@ -34,7 +34,7 @@ export function LandingPage() {
             <a href="#pricing" className="text-text/80 hover:text-brand-arrow transition-colors">Planos</a>
             <Button 
               variant="outline"
-              className="border-brand-arrow text-brand-arrow hover:bg-brand-arrow/10 px-6"
+              className="border-brand-arrow text-brand-arrow bg-transparent hover:bg-brand-arrow/5 dark:hover:bg-brand-arrow/10 transition-colors px-6"
               onClick={() => navigate('/signup')}
             >
               Criar conta
