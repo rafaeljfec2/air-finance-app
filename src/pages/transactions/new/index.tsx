@@ -131,6 +131,7 @@ export function NewTransaction() {
                     onChange={handleChange}
                     placeholder="Ex: Supermercado, Salário, etc."
                     required
+                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                   />
                 </div>
 
@@ -151,6 +152,7 @@ export function NewTransaction() {
                     onChange={handleChange}
                     placeholder="0,00"
                     required
+                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                   />
                 </div>
               </div>
@@ -220,6 +222,7 @@ export function NewTransaction() {
                     value={formData.date}
                     onChange={handleChange}
                     required
+                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                   />
                 </div>
 
