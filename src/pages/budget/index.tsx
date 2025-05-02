@@ -40,10 +40,10 @@ export default function BudgetPage() {
     <ViewDefault>
       <div className="container mx-auto px-2 sm:px-6 py-10">
         <h1 className="text-3xl font-extrabold text-text dark:text-text-dark mb-10">Orçamento</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
           {/* Fluxo de Caixa */}
           <CardContainer color="emerald" className="min-h-[420px]">
-            <CardHeader icon={<Wallet size={28} />} title="Fluxo de Caixa">
+            <CardHeader icon={<Wallet size={24} />} title="Fluxo de Caixa">
               <MonthYearFilter
                 month={cashFlowFilter.month}
                 year={cashFlowFilter.year}
@@ -52,7 +52,7 @@ export default function BudgetPage() {
             </CardHeader>
             <CardTotal value={cashFlow?.finalBalance ?? 0} color="emerald" label="Saldo Final" />
             {cashFlow ? (
-              <div className="flex flex-col gap-4 mt-4">
+              <div className="flex flex-col gap-3 mt-3">
                 <CardStat label="Entradas" value={cashFlow.totalIncome} positive />
                 <CardStat label="Saídas" value={cashFlow.totalExpense} negative />
                 <div className="border-t border-border dark:border-border-dark my-2" />
@@ -69,7 +69,7 @@ export default function BudgetPage() {
 
           {/* Contas a Receber */}
           <CardContainer color="amber" className="min-h-[420px]">
-            <CardHeader icon={<TrendingUp size={28} />} title="Contas a Receber">
+            <CardHeader icon={<TrendingUp size={24} />} title="Contas a Receber">
               <MonthYearFilter
                 month={receivableFilter.month}
                 year={receivableFilter.year}
@@ -81,25 +81,25 @@ export default function BudgetPage() {
               color="amber"
               label="Total Receber"
             />
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-[11px]">
+            <div className="mt-3">
+              <table className="w-full text-[11px]">
                 <thead>
                   <tr>
-                    <th className="px-3 py-1.5 text-left text-gray-400">Descrição</th>
-                    <th className="px-3 py-1.5 text-right text-gray-400">Valor</th>
-                    <th className="px-3 py-1.5 text-center text-gray-400">Status</th>
+                    <th className="px-2 py-1.5 text-left text-gray-400 w-[45%]">Descrição</th>
+                    <th className="px-2 py-1.5 text-right text-gray-400 w-[30%]">Valor</th>
+                    <th className="px-2 py-1.5 text-center text-gray-400 w-[25%]">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
                   {receivables.map((r) => (
                     <tr key={r.id}>
-                      <td className="px-3 py-1.5 text-left text-text dark:text-text-dark truncate">
+                      <td className="px-2 py-1.5 text-left text-text dark:text-text-dark truncate">
                         {r.description}
                       </td>
-                      <td className="px-3 py-1.5 text-right font-medium whitespace-nowrap">
+                      <td className="px-2 py-1.5 text-right font-medium whitespace-nowrap">
                         R$ {r.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </td>
-                      <td className="px-3 py-1.5 text-center">
+                      <td className="px-2 py-1.5 text-center">
                         <BadgeStatus status={r.status === 'RECEIVED' ? 'success' : 'warning'}>
                           {r.status === 'RECEIVED' ? 'Recebido' : 'Pendente'}
                         </BadgeStatus>
@@ -113,7 +113,7 @@ export default function BudgetPage() {
 
           {/* Contas a Pagar */}
           <CardContainer color="rose" className="min-h-[420px]">
-            <CardHeader icon={<TrendingDown size={28} />} title="Contas a Pagar">
+            <CardHeader icon={<TrendingDown size={24} />} title="Contas a Pagar">
               <MonthYearFilter
                 month={payableFilter.month}
                 year={payableFilter.year}
@@ -125,25 +125,25 @@ export default function BudgetPage() {
               color="rose"
               label="Total Pagar"
             />
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-[11px]">
+            <div className="mt-3">
+              <table className="w-full text-[11px]">
                 <thead>
                   <tr>
-                    <th className="px-3 py-1.5 text-left text-gray-400">Descrição</th>
-                    <th className="px-3 py-1.5 text-right text-gray-400">Valor</th>
-                    <th className="px-3 py-1.5 text-center text-gray-400">Status</th>
+                    <th className="px-2 py-1.5 text-left text-gray-400 w-[45%]">Descrição</th>
+                    <th className="px-2 py-1.5 text-right text-gray-400 w-[30%]">Valor</th>
+                    <th className="px-2 py-1.5 text-center text-gray-400 w-[25%]">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
                   {payables.map((p) => (
                     <tr key={p.id}>
-                      <td className="px-3 py-1.5 text-left text-text dark:text-text-dark truncate">
+                      <td className="px-2 py-1.5 text-left text-text dark:text-text-dark truncate">
                         {p.description}
                       </td>
-                      <td className="px-3 py-1.5 text-right font-medium whitespace-nowrap">
+                      <td className="px-2 py-1.5 text-right font-medium whitespace-nowrap">
                         R$ {p.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </td>
-                      <td className="px-3 py-1.5 text-center">
+                      <td className="px-2 py-1.5 text-center">
                         <BadgeStatus status={p.status === 'PAID' ? 'success' : 'danger'}>
                           {p.status === 'PAID' ? 'Pago' : 'Pendente'}
                         </BadgeStatus>
@@ -157,7 +157,7 @@ export default function BudgetPage() {
 
           {/* Cartões de Crédito */}
           <CardContainer color="violet" className="min-h-[420px]">
-            <CardHeader icon={<CreditCard size={28} />} title="Cartões de Crédito">
+            <CardHeader icon={<CreditCard size={24} />} title="Cartões de Crédito">
               <MonthYearFilter
                 month={cardFilter.month}
                 year={cardFilter.year}
@@ -165,36 +165,36 @@ export default function BudgetPage() {
               />
             </CardHeader>
             <CardTotal value={activeBill?.total ?? 0} color="violet" label="Total Fatura" />
-            <div className="flex gap-2 mb-4 mt-4">
+            <div className="flex gap-1.5 mb-3 mt-3">
               {cards.map((card) => (
                 <button
                   key={card.id}
                   onClick={() => setActiveCardTab(card.id)}
-                  className={`px-3 py-1 rounded font-medium border transition-colors ${activeCardTab === card.id ? 'bg-primary-600 text-white dark:bg-primary-500' : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-500'}`}
+                  className={`px-2 py-1 rounded font-medium border transition-colors text-[11px] ${activeCardTab === card.id ? 'bg-primary-600 text-white dark:bg-primary-500' : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-500'}`}
                 >
                   {card.name}
                 </button>
               ))}
             </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-[11px]">
+            <div>
+              <table className="w-full text-[11px]">
                 <thead>
                   <tr>
-                    <th className="px-3 py-1.5 text-left text-gray-400">Descrição</th>
-                    <th className="px-3 py-1.5 text-right text-gray-400">Valor</th>
-                    <th className="px-3 py-1.5 text-center text-gray-400">Categoria</th>
+                    <th className="px-2 py-1.5 text-left text-gray-400 w-[45%]">Descrição</th>
+                    <th className="px-2 py-1.5 text-right text-gray-400 w-[30%]">Valor</th>
+                    <th className="px-2 py-1.5 text-center text-gray-400 w-[25%]">Categoria</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
                   {activeBill?.transactions.map((t) => (
                     <tr key={t.id}>
-                      <td className="px-3 py-1.5 text-left text-text dark:text-text-dark truncate">
+                      <td className="px-2 py-1.5 text-left text-text dark:text-text-dark truncate">
                         {t.description}
                       </td>
-                      <td className="px-3 py-1.5 text-right font-medium whitespace-nowrap">
+                      <td className="px-2 py-1.5 text-right font-medium whitespace-nowrap">
                         R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </td>
-                      <td className="px-3 py-1.5 text-center">
+                      <td className="px-2 py-1.5 text-center">
                         <BadgeStatus status={t.category === 'Parcelado' ? 'success' : 'default'}>
                           {t.category}
                         </BadgeStatus>
