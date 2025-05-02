@@ -77,18 +77,27 @@ export function TransactionGrid({
           return sortConfig.direction === 'asc'
             ? a.conta.nome.localeCompare(b.conta.nome)
             : b.conta.nome.localeCompare(a.conta.nome)
-        case 'credito':
+        case 'credito': {
+          const aValue = a.tipo === 'RECEITA' ? a.valor : 0
+          const bValue = b.tipo === 'RECEITA' ? b.valor : 0
           return sortConfig.direction === 'asc'
-            ? (a.credito ?? 0) - (b.credito ?? 0)
-            : (b.credito ?? 0) - (a.credito ?? 0)
-        case 'debito':
+            ? aValue - bValue
+            : bValue - aValue
+        }
+        case 'debito': {
+          const aValue = a.tipo === 'DESPESA' ? a.valor : 0
+          const bValue = b.tipo === 'DESPESA' ? b.valor : 0
           return sortConfig.direction === 'asc'
-            ? (a.debito ?? 0) - (b.debito ?? 0)
-            : (b.debito ?? 0) - (a.debito ?? 0)
-        case 'saldo':
+            ? aValue - bValue
+            : bValue - aValue
+        }
+        case 'saldo': {
+          const aValue = a.saldo ?? 0
+          const bValue = b.saldo ?? 0
           return sortConfig.direction === 'asc'
-            ? (a.saldo ?? 0) - (b.saldo ?? 0)
-            : (b.saldo ?? 0) - (a.saldo ?? 0)
+            ? aValue - bValue
+            : bValue - aValue
+        }
         default:
           return 0
       }
