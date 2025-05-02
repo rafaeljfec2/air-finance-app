@@ -63,7 +63,7 @@ const FilterMenu = ({ field, items, selectedValues, onFilter, onClose }: FilterM
   }
 
   return (
-    <div ref={menuRef} className="absolute z-50 mt-2 w-56 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5">
+    <div ref={menuRef} className="absolute z-50 mt-1 w-56 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5" style={{ minWidth: '200px' }}>
       <div className="p-2 border-b border-gray-200 dark:border-gray-700">
         <div className="flex justify-between items-center">
           <button
@@ -331,7 +331,7 @@ export function TransactionGrid({
     return (
       <th 
         className={cn(
-          "text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none",
+          "text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none relative",
           className
         )}
         role="columnheader"
@@ -364,7 +364,9 @@ export function TransactionGrid({
               filters.some(f => f.field === field) ? "text-primary-500" : "text-gray-400"
             )} />
           </button>
-          {activeFilter === field && (
+        </div>
+        {activeFilter === field && (
+          <div className="absolute left-0 right-0 top-full">
             <FilterMenu
               field={field}
               items={getFieldValues(transactions, field)}
@@ -372,8 +374,8 @@ export function TransactionGrid({
               onFilter={handleFilter}
               onClose={() => setActiveFilter(null)}
             />
-          )}
-        </div>
+          </div>
+        )}
       </th>
     )
   }
