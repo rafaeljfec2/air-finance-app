@@ -41,6 +41,7 @@ export interface CreditCardBill {
 export interface CreditCard {
   id: string;
   name: string;
+  brand: 'nubank' | 'itau';
   limit: number;
   bills: CreditCardBill[];
 }

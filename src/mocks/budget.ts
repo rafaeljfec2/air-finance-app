@@ -62,6 +62,7 @@ export const mockCreditCards: CreditCard[] = [
   {
     id: 'c1',
     name: 'Nubank',
+    brand: 'nubank',
     limit: 15000,
     bills: [
       {
@@ -288,8 +289,9 @@ export const mockCreditCards: CreditCard[] = [
   },
   {
     id: 'c2',
-    name: 'Itau',
-    limit: 10000,
+    name: 'Itaú',
+    brand: 'itau',
+    limit: 8000,
     bills: [
       {
         id: 'b2',

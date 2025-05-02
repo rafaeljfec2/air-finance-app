@@ -36,6 +36,35 @@ export default function BudgetPage() {
     (b) => b.month === `${cardFilter.year}-${cardFilter.month}`,
   );
 
+  // Adicionar componentes SVG inline para Nubank e Itau
+  const NubankIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M6.5 23V9.5C6.5 7.01472 8.51472 5 11 5C13.4853 5 15.5 7.01472 15.5 9.5V22.5C15.5 24.9853 17.5147 27 20 27C22.4853 27 24.5 24.9853 24.5 22.5V9"
+        stroke="#8A05BE"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+  const ItauIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="4" width="24" height="24" rx="6" fill="#FF6900" />
+      <text
+        x="16"
+        y="21"
+        textAnchor="middle"
+        fontSize="11"
+        fontWeight="bold"
+        fill="#002663"
+        fontFamily="Arial"
+      >
+        Itau
+      </text>
+    </svg>
+  );
+
   return (
     <ViewDefault>
       <div className="container mx-auto px-2 sm:px-6 py-10">
@@ -169,7 +198,7 @@ export default function BudgetPage() {
 
           {/* Cartões de Crédito */}
           <CardContainer color="violet" className="min-h-[420px]">
-            <CardHeader icon={<CreditCard size={24} />} title="Cartões de Crédito">
+            <CardHeader icon={<CreditCard size={20} />} title="Cartões de Crédito">
               <MonthYearFilter
                 month={cardFilter.month}
                 year={cardFilter.year}
@@ -184,7 +213,11 @@ export default function BudgetPage() {
                   onClick={() => setActiveCardTab(card.id)}
                   className={`px-2 py-1 rounded font-medium border transition-colors text-[11px] ${activeCardTab === card.id ? 'bg-primary-600 text-white dark:bg-primary-500' : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-500'}`}
                 >
-                  {card.name}
+                  <div className="flex items-center gap-1">
+                    {card.brand === 'nubank' && <NubankIcon />}
+                    {card.brand === 'itau' && <ItauIcon />}
+                    {card.name}
+                  </div>
                 </button>
               ))}
             </div>
