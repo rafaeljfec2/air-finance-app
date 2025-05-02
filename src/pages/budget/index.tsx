@@ -42,9 +42,9 @@ export default function BudgetPage() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="inline-flex items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900 p-2">
-              <Wallet className="h-6 w-6 text-primary-600 dark:text-primary-400" />
+              <Wallet className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-text dark:text-text-dark">
+            <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark">
               Dashboard Financeiro
             </h1>
           </div>
