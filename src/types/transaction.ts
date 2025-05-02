@@ -8,36 +8,31 @@ export interface Category {
   icon?: string;
 }
 
+export interface Account {
+  id: string;
+  name: string;
+  balance: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Transaction {
   id: string;
-  type: TransactionType;
   description: string;
   amount: number;
+  type: TransactionType;
   date: string;
   categoryId: string;
   accountId: string;
   note?: string;
   attachments?: string[];
-  category: {
-    color: string;
-    id: string;
-    name: string;
-    type: TransactionType;
-  };
-  account: {
-    id: string;
-    name: string;
-  };
+  category: Category;
+  account: Account;
   credit?: number;
   debit?: number;
   balance?: number;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface Account {
-  id: string;
-  name: string;
 }
 
 export type TransactionInput = Omit<Transaction, 'id' | 'createdAt' | 'updatedAt' | 'category' | 'account' | 'credit' | 'debit' | 'balance'>;

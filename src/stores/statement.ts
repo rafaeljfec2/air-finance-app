@@ -90,7 +90,10 @@ const mockTransactions: Transaction[] = [
     note: 'Regular salary payment',
     account: {
       id: '1',
-      name: 'Main Account'
+      name: 'Main Account',
+      balance: 0,
+      createdAt: '',
+      updatedAt: ''
     },
     createdAt: now,
     updatedAt: now
@@ -112,7 +115,10 @@ const mockTransactions: Transaction[] = [
     note: 'Web development project',
     account: {
       id: '1',
-      name: 'Main Account'
+      name: 'Main Account',
+      balance: 0,
+      createdAt: '',
+      updatedAt: ''
     },
     createdAt: now,
     updatedAt: now
@@ -134,7 +140,10 @@ const mockTransactions: Transaction[] = [
     note: 'Monthly rent',
     account: {
       id: '1',
-      name: 'Main Account'
+      name: 'Main Account',
+      balance: 0,
+      createdAt: '',
+      updatedAt: ''
     },
     createdAt: now,
     updatedAt: now
@@ -156,7 +165,10 @@ const mockTransactions: Transaction[] = [
     note: 'Weekly groceries',
     account: {
       id: '1',
-      name: 'Main Account'
+      name: 'Main Account',
+      balance: 0,
+      createdAt: '',
+      updatedAt: ''
     },
     createdAt: now,
     updatedAt: now

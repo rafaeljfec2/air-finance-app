@@ -1,47 +1,16 @@
-export interface Usuario {
+import { Transaction, Category, Account, TransactionType } from './transaction';
+
+export interface User {
   id: string;
-  nome: string;
+  name: string;
   email: string;
 }
 
-export interface Category {
-  id: string;
-  name: string;
-  type: 'INCOME' | 'EXPENSE';
-  color?: string;
-  icon?: string;
-}
-
-export interface Transacao {
-  id: string;
-  descricao: string;
-  valor: number;
-  tipo: 'RECEITA' | 'DESPESA';
-  categoria: Category;
-  data: string;
-  usuarioId: string;
-}
-
-export interface Transaction {
-  id: string;
-  description: string;
-  amount: number;
-  category: Category;
-  date: string;
-}
-
-export interface Categoria {
-  id: string;
-  nome: string;
-  tipo: 'RECEITA' | 'DESPESA';
-  usuarioId: string;
-}
-
 export interface Dashboard {
-  saldo: number;
-  receitas: number;
-  despesas: number;
-  transacoes: Transacao[];
+  balance: number;
+  income: number;
+  expenses: number;
+  transactions: Transaction[];
 }
 
 export interface MonthlyReport {
@@ -69,15 +38,19 @@ export interface MonthlyReport {
 }
 
 export interface AuthState {
-  usuario: Usuario | null;
+  user: User | null;
   token: string | null;
-  isAutenticado: boolean;
+  isAuthenticated: boolean;
 }
 
-export interface TransacaoFormData {
-  descricao: string;
-  valor: number;
-  tipo: 'RECEITA' | 'DESPESA';
-  categoria: string;
-  data: string;
+export interface TransactionFormData {
+  description: string;
+  amount: number;
+  type: TransactionType;
+  categoryId: string;
+  accountId: string;
+  date: string;
+  note?: string;
 }
+
+export type { Transaction, Category, Account, TransactionType };

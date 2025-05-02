@@ -1,135 +1,115 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useStatementStore } from '@/stores/statement';
-import { MonthlyReport } from '@/types/report';
-import { getCategoriesByType } from '@/constants/categories';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useStatementStore } from '@/store/statement';
+import { getCategoriesByType } from '@/utils/categories';
 import { parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+import { Transaction, Category } from '@/types';
+import { MonthlyReport, ReportCategory } from '@/types/report';
 
-export function useMonthlyReport() {
-  const { transactions } = useStatementStore();
-  const [date, setDate] = useState<Date>(new Date());
-  const [report, setReport] = useState<MonthlyReport | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export function useMonthlyReportMemo(transactions: Transaction[]): MonthlyReport {
+  return useMemo(() => {
+    const income = transactions
+      .filter(t => t.type === 'INCOME')
+      .reduce((acc, t) => acc + t.amount, 0);
 
-  const generateReport = useCallback(() => {
-    setIsLoading(true);
+    const expenses = transactions
+      .filter(t => t.type === 'EXPENSE')
+      .reduce((acc, t) => acc + t.amount, 0);
 
-    try {
-      const month = date.getMonth();
-      const year = date.getFullYear();
-      const firstDay = startOfMonth(new Date(year, month));
-      const lastDay = endOfMonth(new Date(year, month));
+    const incomeCategories = getCategoriesByType('INCOME').map((category: Category) => ({
+      name: category.name,
+      value: transactions
+        .filter(t => t.type === 'INCOME' && t.category.id === category.id)
+        .reduce((acc, t) => acc + t.amount, 0),
+    }));
 
-      // Filter current month transactions
-      const monthTransactions = transactions.filter(t => {
-        const transactionDate = parseISO(t.date);
-        return isWithinInterval(transactionDate, { start: firstDay, end: lastDay });
-      });
+    const expenseCategories = getCategoriesByType('EXPENSE').map((category: Category) => ({
+      name: category.name,
+      value: transactions
+        .filter(t => t.type === 'EXPENSE' && t.category.id === category.id)
+        .reduce((acc, t) => acc + t.amount, 0),
+    }));
 
-      // Filter previous month transactions for variation calculation
-      const previousMonth = startOfMonth(new Date(year, month - 1));
-      const lastDayPrevious = endOfMonth(new Date(year, month - 1));
-      const previousMonthTransactions = transactions.filter(t => {
-        const transactionDate = parseISO(t.date);
-        return isWithinInterval(transactionDate, { start: previousMonth, end: lastDayPrevious });
-      });
-
-      // Group transactions by category
-      const groupByCategory = (type: 'RECEITA' | 'DESPESA') => {
-        const categories = getCategoriesByType(type);
-        const total = monthTransactions
-          .filter(t => t.type === type)
-          .reduce((acc, t) => acc + t.amount, 0);
-
-        return categories.map(category => {
-          const categoryTransactions = monthTransactions.filter(
-            t => t.type === type && t.category.id === category.id
-          );
-          const categoryTotal = categoryTransactions.reduce((acc, t) => acc + t.amount, 0);
-
-          return {
-            id: category.id,
-            name: category.name,
-            icon: category.icon,
-            color: category.color,
-            total: categoryTotal,
-            percentage: total > 0 ? (categoryTotal / total) * 100 : 0,
-            transactions: categoryTransactions.map(t => ({
-              id: t.id,
-              description: t.description,
-              amount: t.amount,
-              date: parseISO(t.date),
-            })),
-          };
-        });
-      };
-
-      // Calculate totals
-      const totalIncome = monthTransactions
-        .filter(t => t.type === 'INCOME')
-        .reduce((acc, t) => acc + t.amount, 0);
-      const totalExpenses = monthTransactions
-        .filter(t => t.type === 'EXPENSE')
-        .reduce((acc, t) => acc + t.valor, 0);
-
-      // Calculate previous month balance
-      const previousBalance =
-        previousMonthTransactions
-          .filter(t => t.tipo === 'RECEITA')
-          .reduce((acc, t) => acc + t.valor, 0) -
-        previousMonthTransactions
-          .filter(t => t.tipo === 'DESPESA')
-          .reduce((acc, t) => acc + t.valor, 0);
-
-      const currentBalance = totalIncome - totalExpenses;
-      const variation = currentBalance - previousBalance;
-      const percentageVariation = previousBalance !== 0 ? (variation / previousBalance) * 100 : 0;
-
-      const summary = {
+    const report: MonthlyReport = {
+      summary: {
         income: {
-          total: totalIncome,
-          categories: groupByCategory('RECEITA'),
+          total: income,
+          categories: incomeCategories,
         },
         expenses: {
-          total: totalExpenses,
-          categories: groupByCategory('DESPESA'),
+          total: expenses,
+          categories: expenseCategories,
         },
         balance: {
-          current: currentBalance,
-          previous: previousBalance,
-          variation,
-          percentageVariation,
+          current: income - expenses,
+          previous: 0, // TODO: Implement previous month calculation
+          variation: 0, // TODO: Implement variation calculation
         },
-      };
+      },
+    };
 
-      setReport({
-        month,
-        year,
-        summary,
-      });
-    } catch (error) {
-      console.error('Error generating report:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [date, transactions]);
+    return report;
+  }, [transactions]);
+}
 
-  useEffect(() => {
-    generateReport();
-  }, [generateReport]);
+export function useMonthlyReport(month: number, year: number): MonthlyReport {
+  const { transactions } = useStatementStore();
 
-  const previousMonth = useCallback(() => {
-    setDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
-  }, []);
+  return useMemo(() => {
+    const filteredTransactions = transactions.filter(
+      (transaction: Transaction) => {
+        const date = new Date(transaction.date);
+        return date.getMonth() === month && date.getFullYear() === year;
+      }
+    );
 
-  const nextMonth = useCallback(() => {
-    setDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
-  }, []);
+    const income = filteredTransactions.filter((t: Transaction) => t.type === 'INCOME');
+    const expenses = filteredTransactions.filter((t: Transaction) => t.type === 'EXPENSE');
 
-  return {
-    date,
-    report,
-    isLoading,
-    previousMonth,
-    nextMonth,
-  };
+    const incomeTotal = income.reduce((sum: number, t: Transaction) => sum + t.amount, 0);
+    const expensesTotal = expenses.reduce((sum: number, t: Transaction) => sum + t.amount, 0);
+
+    const incomeByCategory = income.reduce((acc: Record<string, number>, t: Transaction) => {
+      const category = t.category.name;
+      acc[category] = (acc[category] || 0) + t.amount;
+      return acc;
+    }, {});
+
+    const expensesByCategory = expenses.reduce((acc: Record<string, number>, t: Transaction) => {
+      const category = t.category.name;
+      acc[category] = (acc[category] || 0) + t.amount;
+      return acc;
+    }, {});
+
+    const currentBalance = incomeTotal - expensesTotal;
+    const previousBalance = 0; // TODO: Implement previous month calculation
+    const balanceVariation = currentBalance - previousBalance;
+    const percentageVariation = previousBalance !== 0 
+      ? (balanceVariation / Math.abs(previousBalance)) * 100 
+      : 0;
+
+    return {
+      month,
+      year,
+      income: {
+        total: incomeTotal,
+        categories: Object.entries(incomeByCategory).map(([name, value]): ReportCategory => ({
+          name,
+          value: value as number
+        }))
+      },
+      expenses: {
+        total: expensesTotal,
+        categories: Object.entries(expensesByCategory).map(([name, value]): ReportCategory => ({
+          name,
+          value: value as number
+        }))
+      },
+      balance: {
+        current: currentBalance,
+        previous: previousBalance,
+        variation: balanceVariation,
+        percentageVariation
+      }
+    };
+  }, [transactions, month, year]);
 }

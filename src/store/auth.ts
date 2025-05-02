@@ -1,27 +1,27 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { AuthState } from "../types";
+import { AuthState, User } from "@/types";
 
 interface AuthStore extends AuthState {
-  login: (usuario: AuthState["usuario"], token: string) => void;
+  login: (user: User, token: string) => void;
   logout: () => void;
 }
 
 const initialState: AuthState = {
-  usuario: null,
+  user: null,
   token: null,
-  isAutenticado: false,
+  isAuthenticated: false,
 };
 
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       ...initialState,
-      login: (usuario, token) =>
+      login: (user: User, token: string) =>
         set({
-          usuario,
+          user,
           token,
-          isAutenticado: true,
+          isAuthenticated: true,
         }),
       logout: () => set(initialState),
     }),

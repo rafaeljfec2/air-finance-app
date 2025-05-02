@@ -19,9 +19,9 @@ const initialCategories: Category[] = [
 ];
 
 const initialAccounts: Account[] = [
-  { id: '1', name: 'Conta Corrente' },
-  { id: '2', name: 'Carteira' },
-  { id: '3', name: 'Investimentos' },
+  { id: '1', name: 'Conta Corrente', balance: 0, createdAt: '', updatedAt: '' },
+  { id: '2', name: 'Carteira', balance: 0, createdAt: '', updatedAt: '' },
+  { id: '3', name: 'Investimentos', balance: 0, createdAt: '', updatedAt: '' },
 ];
 
 export const useTransactionStore = create<TransactionStore>((set) => ({
@@ -50,7 +50,10 @@ export const useTransactionStore = create<TransactionStore>((set) => ({
         },
         account: {
           id: account.id,
-          name: account.name
+          name: account.name,
+          balance: account.balance,
+          createdAt: account.createdAt,
+          updatedAt: account.updatedAt
         },
         credit: transaction.type === 'INCOME' ? transaction.amount : 0,
         debit: transaction.type === 'EXPENSE' ? transaction.amount : 0,
@@ -91,7 +94,10 @@ export const useTransactionStore = create<TransactionStore>((set) => ({
         },
         account: {
           id: account.id,
-          name: account.name
+          name: account.name,
+          balance: account.balance,
+          createdAt: account.createdAt,
+          updatedAt: account.updatedAt
         },
         credit: transaction.type === 'INCOME' ? transaction.amount : existingTransaction.credit,
         debit: transaction.type === 'EXPENSE' ? transaction.amount : existingTransaction.debit

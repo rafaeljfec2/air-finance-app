@@ -31,7 +31,7 @@ export function LoginForm() {
       login(
         {
           id: '1',
-          nome: 'Usuário Teste',
+          name: 'Usuário Teste',
           email: data.email,
         },
         'fake-token'

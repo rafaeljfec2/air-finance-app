@@ -6,10 +6,8 @@ import { TransactionList } from '@/components/transactions/TransactionList';
 import { PullToRefresh } from '@/components/ui/pullToRefresh';
 import { StatementSummary } from '@/components/statement/StatementSummary';
 import { useQuery } from '@tanstack/react-query';
-import { Transaction, Category, TransactionType } from '@/types/transaction';
+import { Transaction } from '@/types/transaction';
 import { 
-  ArrowTrendingUpIcon, 
-  ArrowTrendingDownIcon,
   CalendarIcon,
   BanknotesIcon,
   ChartBarIcon,
@@ -50,7 +48,10 @@ const mockData: DashboardData = {
       accountId: '1',
       account: {
         id: '1',
-        name: 'Main Account'
+        name: 'Main Account',
+        balance: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -71,7 +72,10 @@ const mockData: DashboardData = {
       accountId: '1',
       account: {
         id: '1',
-        name: 'Main Account'
+        name: 'Main Account',
+        balance: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -92,7 +96,10 @@ const mockData: DashboardData = {
       accountId: '1',
       account: {
         id: '1',
-        name: 'Main Account'
+        name: 'Main Account',
+        balance: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
