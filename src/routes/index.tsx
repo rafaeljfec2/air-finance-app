@@ -15,6 +15,7 @@ import { SignUpPage } from '@/pages/signup';
 import ForgotPasswordPage from '@/pages/forgot-password';
 import AiClassificationPage from '@/pages/ai-classification';
 import ImportOfxPage from '@/pages/import-ofx';
+import Budget from '@/pages/budget';
 
 export const router = createBrowserRouter([
   {
@@ -49,6 +50,17 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <ImportOfxPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/budget',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <Budget />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
