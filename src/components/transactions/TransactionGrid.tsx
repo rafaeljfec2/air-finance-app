@@ -48,7 +48,7 @@ export function TransactionGrid({
   showActions = true,
   onActionClick,
   className
-}: TransactionGridProps) {
+}: Readonly<TransactionGridProps>) {
   const navigate = useNavigate()
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
