@@ -1,13 +1,31 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { StatementSummary } from '@/components/statement/StatementSummary';
-import { TransactionList } from '@/components/statement/TransactionList';
 import { StatementFilters } from '@/components/statement/StatementFilters';
+import { TransactionList } from '@/components/statement/TransactionList';
 import { useStatementStore } from '@/stores/statement';
 import { Transaction } from '@/types/transaction';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
-import { ExclamationTriangleIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { 
+  ExclamationTriangleIcon, 
+  ChevronDownIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
+  DocumentTextIcon,
+  PlusIcon
+} from '@heroicons/react/24/outline';
+import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/utils/formatters';
+import { TransactionGrid } from '@/components/transactions/TransactionGrid';
+
+type TransactionWithDetails = Transaction & {
+  categoria: {
+    id: string;
+    nome: string;
+    tipo: string;
+  };
+};
 
 export function Statement() {
   const navigate = useNavigate();
@@ -37,7 +55,7 @@ export function Statement() {
   });
 
   // Filtrar transações
-  const filteredTransactions = transactions.filter(transaction => {
+  const filteredTransactions = (transactions as TransactionWithDetails[]).filter(transaction => {
     const matchesSearch = searchTerm
       ? transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
         transaction.categoria.nome.toLowerCase().includes(searchTerm.toLowerCase())
@@ -49,6 +67,29 @@ export function Statement() {
 
     return matchesSearch && matchesCategory;
   });
+
+  // Calcular saldo acumulado para cada transação
+  let saldoAcumulado = 0
+  const transactionsWithBalance = filteredTransactions.map(transaction => {
+    const credito = transaction.tipo === 'RECEITA' ? transaction.valor : 0
+    const debito = transaction.tipo === 'DESPESA' ? transaction.valor : 0
+    saldoAcumulado += credito - debito
+    return {
+      ...transaction,
+      credito,
+      debito,
+      saldo: saldoAcumulado,
+      conta: {
+        id: transaction.contaId,
+        nome: 'Conta Principal' // TODO: Get from store
+      },
+      observacao: transaction.observacao || '',
+      categoria: {
+        ...transaction.categoria,
+        tipo: transaction.tipo
+      }
+    }
+  })
 
   const handleEdit = async (transaction: Transaction) => {
     // TODO: Implement edit modal
@@ -76,30 +117,30 @@ export function Statement() {
   if (error) {
     return (
       <ViewDefault>
-        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
-          <div className="text-center max-w-md mx-auto p-8">
-            <ExclamationTriangleIcon className="h-16 w-16 text-red-500 dark:text-red-400 mx-auto mb-6" />
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] px-4">
+          <div className="text-center max-w-md mx-auto p-4 sm:p-8">
+            <ExclamationTriangleIcon className="h-12 w-12 sm:h-16 sm:w-16 text-red-500 dark:text-red-400 mx-auto mb-4 sm:mb-6" />
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
               Ops! Algo deu errado
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">
               {error}
             </p>
             
             {/* Detalhes técnicos do erro */}
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               <button
                 onClick={() => setShowErrorDetails(!showErrorDetails)}
                 className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               >
                 <ChevronDownIcon 
-                  className={`h-5 w-5 mr-1 transition-transform ${showErrorDetails ? 'transform rotate-180' : ''}`}
+                  className={`h-4 w-4 sm:h-5 sm:w-5 mr-1 transition-transform ${showErrorDetails ? 'transform rotate-180' : ''}`}
                 />
                 Detalhes técnicos
               </button>
               
               {showErrorDetails && (
-                <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-left">
+                <div className="mt-4 p-3 sm:p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-left">
                   <pre className="text-xs text-gray-800 dark:text-gray-200 overflow-x-auto">
                     {JSON.stringify(errorDetails, null, 2)}
                   </pre>
@@ -109,7 +150,7 @@ export function Statement() {
 
             <button
               onClick={() => loadTransactions()}
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-800 transition-colors"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm sm:text-base font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-800 transition-colors"
             >
               Tentar novamente
             </button>
@@ -121,47 +162,100 @@ export function Statement() {
 
   return (
     <ViewDefault>
-      <div {...containerProps} className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            Extrato Financeiro
-          </h1>
-
-          <StatementSummary 
-            balance={availableBalance}
-            income={income}
-            expenses={expenses}
-            previousBalance={previousBalance}
-            previousIncome={previousIncome}
-            previousExpenses={previousExpenses}
-          />
-        </div>
-
-        <div className="space-y-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Transações</h2>
-
-            <button
-              onClick={() => navigate('/transactions/new')}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-            >
-              Nova Transação
-            </button>
+      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
+        <div className="container mx-auto px-4 py-6 sm:py-8">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <DocumentTextIcon className="h-8 w-8 text-primary-400" />
+                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Extrato Financeiro</h1>
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Visualize o histórico detalhado das suas movimentações
+              </p>
+            </div>
           </div>
 
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
+            <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Total de Receitas</h3>
+                  <ArrowTrendingUpIcon className="h-5 w-5 text-green-400" />
+                </div>
+                <p className="text-xl sm:text-2xl font-semibold text-green-400">
+                  {formatCurrency(income)}
+                </p>
+                {previousIncome > 0 && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Mês anterior: {formatCurrency(previousIncome)}
+                  </p>
+                )}
+              </div>
+            </Card>
+            
+            <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Total de Despesas</h3>
+                  <ArrowTrendingDownIcon className="h-5 w-5 text-red-400" />
+                </div>
+                <p className="text-xl sm:text-2xl font-semibold text-red-400">
+                  {formatCurrency(expenses)}
+                </p>
+                {previousExpenses > 0 && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Mês anterior: {formatCurrency(previousExpenses)}
+                  </p>
+                )}
+              </div>
+            </Card>
+
+            <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Saldo do Período</h3>
+                  <div className={cn(
+                    "h-5 w-5",
+                    availableBalance >= 0 ? "text-green-400" : "text-red-400"
+                  )}>
+                    {availableBalance >= 0 ? <ArrowTrendingUpIcon /> : <ArrowTrendingDownIcon />}
+                  </div>
+                </div>
+                <p className={cn(
+                  "text-xl sm:text-2xl font-semibold",
+                  availableBalance >= 0 ? "text-green-400" : "text-red-400"
+                )}>
+                  {formatCurrency(availableBalance)}
+                </p>
+                {previousBalance !== 0 && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Mês anterior: {formatCurrency(previousBalance)}
+                  </p>
+                )}
+              </div>
+            </Card>
+          </div>
+
+          {/* Filters */}
           <StatementFilters
-            categories={categories}
             onSearch={handleSearch}
             onFilterCategory={handleFilterCategory}
+            categories={categories}
+            selectedCategory={selectedCategory}
           />
 
-          <TransactionList
-            transactions={filteredTransactions}
-            onEdit={handleEdit}
-            onRemove={handleRemove}
-            onRefresh={loadTransactions}
-            isLoading={isLoading}
-          />
+          {/* Transactions List */}
+          <div {...containerProps}>
+            <TransactionGrid
+              transactions={transactionsWithBalance}
+              isLoading={isLoading}
+              showActions={true}
+              onActionClick={handleEdit}
+            />
+          </div>
         </div>
       </div>
     </ViewDefault>

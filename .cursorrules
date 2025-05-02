@@ -128,3 +128,25 @@ boas_praticas = [
   "Implementar autenticação segura (mesmo que mock) e controle de acesso básico",
   "Desabilitar logs sensíveis em produção"
 ]
+
+[convencao_arquivos]
+descricao = "Padronização de nomes de arquivos e diretórios conforme o tipo e função no projeto"
+
+[convencao_arquivos.padroes]
+"componentes" = "PascalCase — ex: UserCard.tsx"
+"hooks" = "camelCase começando com 'use' — ex: useAuth.ts"
+"servicos" = "camelCase — ex: userService.ts"
+"paginas" = "PascalCase — ex: Dashboard.tsx"
+"estilos" = "camelCase ou global — ex: userCard.module.css ou global.css"
+"contextos" = "camelCase — ex: authContext.tsx"
+"testes" = "Mesmo nome do alvo + .test — ex: UserCard.test.tsx"
+"tipos_interfaces" = "PascalCase — ex: UserTypes.ts"
+"constantes" = "camelCase — ex: appConstants.ts ou colors.ts"
+
+[convencao_arquivos.regras]
+evitar = [
+  "kebab-case para arquivos React",
+  "Nomes genéricos como index.ts fora de contexto",
+  "Arquivos misturando responsabilidades (ex: lógica e UI no mesmo arquivo)",
+  "Arquivos com nomes ambíguos ou sem clareza de propósito"
+]

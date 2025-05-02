@@ -2,6 +2,7 @@ import { SummaryCard } from '../components/SummaryCard';
 import { TransactionList } from '../../transactions/components/TransactionList';
 import { useQuery } from '@tanstack/react-query';
 import { Dashboard } from '../../../types';
+import { Card } from '@/components/ui/card';
 
 export function DashboardPage() {
   const { data: dashboard, isLoading } = useQuery<Dashboard>({
@@ -41,7 +42,10 @@ export function DashboardPage() {
   if (isLoading) {
     return (
       <div className="flex h-96 items-center justify-center">
-        <div className="text-gray-500 dark:text-gray-400">Carregando...</div>
+        <div className="text-gray-400">
+          <div className="animate-spin h-8 w-8 border-4 border-gray-600 border-t-gray-400 rounded-full mb-4 mx-auto" />
+          <p>Carregando...</p>
+        </div>
       </div>
     );
   }
@@ -51,19 +55,26 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <SummaryCard titulo="Saldo" valor={dashboard.saldo} tipo="saldo" />
-        <SummaryCard titulo="Receitas" valor={dashboard.receitas} tipo="receita" />
-        <SummaryCard titulo="Despesas" valor={dashboard.despesas} tipo="despesa" />
+    <div className="space-y-8 p-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-100 mb-2">Dashboard</h1>
+        <p className="text-gray-400">Visão geral das suas finanças</p>
       </div>
 
-      <div className="mt-8">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Últimas transações</h2>
-        <div className="mt-4">
-          <TransactionList transacoes={dashboard.transacoes} />
-        </div>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <SummaryCard titulo="Saldo Total" valor={dashboard.saldo} tipo="saldo" />
+        <SummaryCard titulo="Receitas do Mês" valor={dashboard.receitas} tipo="receita" />
+        <SummaryCard titulo="Despesas do Mês" valor={dashboard.despesas} tipo="despesa" />
       </div>
+
+      <Card className="bg-gray-800 border-gray-700">
+        <div className="p-6">
+          <h2 className="text-lg font-medium text-gray-100 mb-4">Últimas Transações</h2>
+          <div className="rounded-lg overflow-hidden">
+            <TransactionList transactions={dashboard.transacoes} />
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Chart, registerables } from 'chart.js';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/stores/useTheme';
 
 Chart.register(...registerables);
 
@@ -16,6 +17,7 @@ interface PieChartProps {
 export function PieChart({ data }: PieChartProps) {
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstance = useRef<Chart | null>(null);
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     if (chartRef.current) {
@@ -51,12 +53,30 @@ export function PieChart({ data }: PieChartProps) {
             legend: {
               position: 'bottom',
               labels: {
-                color: '#6B7280', // gray-500
+                color: isDarkMode ? '#F9FAFB' : '#111827', // text-dark : text
                 font: {
                   size: 12,
+                  family: "'Inter var', sans-serif",
                 },
+                padding: 16,
               },
             },
+            tooltip: {
+              backgroundColor: isDarkMode ? '#1F2937' : '#FFFFFF',
+              titleColor: isDarkMode ? '#F9FAFB' : '#111827',
+              bodyColor: isDarkMode ? '#F9FAFB' : '#111827',
+              borderColor: isDarkMode ? '#374151' : '#E5E7EB',
+              borderWidth: 1,
+              padding: 12,
+              boxPadding: 4,
+              usePointStyle: true,
+              callbacks: {
+                label: function(context) {
+                  const value = context.raw as number;
+                  return `R$ ${value.toLocaleString('pt-BR')}`;
+                }
+              }
+            }
           },
         },
       });
@@ -67,7 +87,7 @@ export function PieChart({ data }: PieChartProps) {
         chartInstance.current.destroy();
       }
     };
-  }, [data]);
+  }, [data, isDarkMode]);
 
   return (
     <div className="relative h-full">

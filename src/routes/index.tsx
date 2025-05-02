@@ -1,24 +1,37 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { Login } from '@/pages/auth/Login';
+import { createBrowserRouter } from 'react-router-dom';
+import { Login } from '@/pages/login';
 import { Dashboard } from '@/pages/dashboard/Dashboard';
-import { Statement } from '@/pages/Statement';
-import { NewTransaction } from '@/pages/NewTransaction';
-import { Transactions } from '@/pages/Transactions';
-import { Reports } from '@/pages/Reports';
+import { Statement } from '@/pages/statement';
+import { NewTransaction } from '@/pages/transactions/new';
+import { Transactions } from '@/pages/transactions';
+import { Reports } from '@/pages/reports';
+import { Profile } from '@/pages/profile';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { Settings } from '@/pages/settings';
+import {LandingPage} from '@/pages/landing';
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate to="/auth/login" replace />,
+    element: <LandingPage />,
     errorElement: <ErrorPage />,
   },
   {
     path: '/auth/login',
     element: <Login />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/profile',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
     errorElement: <ErrorPage />,
   },
   {

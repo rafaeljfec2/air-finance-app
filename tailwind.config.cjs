@@ -33,6 +33,22 @@ module.exports = {
           800: '#1e293b',
           900: '#0f172a',
         },
+        background: {
+          DEFAULT: '#ffffff',
+          dark: '#111827',
+        },
+        card: {
+          DEFAULT: '#ffffff',
+          dark: '#1f2937',
+        },
+        text: {
+          DEFAULT: '#111827',
+          dark: '#f9fafb',
+        },
+        border: {
+          DEFAULT: '#e5e7eb',
+          dark: '#374151',
+        },
       },
       fontFamily: {
         sans: ['Inter var', 'sans-serif'],
@@ -53,5 +69,7 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
 }; 

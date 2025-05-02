@@ -54,7 +54,7 @@ export function PullToRefresh({ children, onRefresh, isRefreshing }: PullToRefre
     <div className="relative">
       {isRefreshing && (
         <div className="absolute top-0 left-0 right-0 flex justify-center py-2">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-500" />
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-500 dark:border-primary-400" />
         </div>
       )}
       <div
