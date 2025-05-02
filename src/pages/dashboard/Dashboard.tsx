@@ -4,7 +4,6 @@ import { Card } from '@/components/ui/card';
 import { PieChart } from '@/components/charts/PieChart';
 import { TransactionList } from '@/components/transactions/TransactionList';
 import { PullToRefresh } from '@/components/ui/pullToRefresh';
-import { cn } from '@/lib/utils';
 import { StatementSummary } from '@/components/statement/StatementSummary';
 import { useQuery } from '@tanstack/react-query';
 import { Dashboard as DashboardType } from '@/types';
@@ -37,21 +36,21 @@ const mockData = {
       id: 1,
       description: 'Supermercado',
       amount: -150,
-      category: 'Alimentação',
+      category: { id: 'cat1', name: 'Alimentação', type: 'EXPENSE' },
       date: '2024-03-15',
     },
     {
       id: 2,
       description: 'Salário',
       amount: 5000,
-      category: 'Renda',
+      category: { id: 'cat2', name: 'Renda', type: 'INCOME' },
       date: '2024-03-10',
     },
     {
       id: 3,
       description: 'Aluguel',
       amount: -1200,
-      category: 'Moradia',
+      category: { id: 'cat3', name: 'Moradia', type: 'EXPENSE' },
       date: '2024-03-05',
     },
   ],
@@ -183,9 +182,9 @@ export function Dashboard() {
           {/* Resumo Financeiro */}
           {dashboardData && (
             <StatementSummary
-              balance={dashboardData.saldo}
-              income={dashboardData.receitas}
-              expenses={dashboardData.despesas}
+              balance={dashboardData.balance}
+              income={dashboardData.income}
+              expenses={dashboardData.expenses}
               previousBalance={mockData.balance * 0.8} // TODO: Implementar dados reais
               previousIncome={mockData.totalIncome * 0.9}
               previousExpenses={mockData.totalExpenses * 0.85}

@@ -2,23 +2,23 @@ import { TransactionType } from '@/types/transaction';
 
 export interface Category {
   id: string;
-  nome: string;
-  icone: string;
-  cor: string;
-  tipos: TransactionType[];
+  name: string;
+  icon: string;
+  color: string;
+  types: TransactionType[];
 }
 
 export const CATEGORIES: Category[] = [
-  { id: '1', nome: 'Alimentação', icone: '🍽️', cor: '#60A5FA', tipos: ['DESPESA'] },
-  { id: '2', nome: 'Transporte', icone: '🚗', cor: '#F87171', tipos: ['DESPESA'] },
-  { id: '3', nome: 'Moradia', icone: '🏠', cor: '#34D399', tipos: ['DESPESA'] },
-  { id: '4', nome: 'Saúde', icone: '⚕️', cor: '#A78BFA', tipos: ['DESPESA'] },
-  { id: '5', nome: 'Educação', icone: '📚', cor: '#FBBF24', tipos: ['DESPESA'] },
-  { id: '6', nome: 'Lazer', icone: '🎮', cor: '#EC4899', tipos: ['DESPESA'] },
-  { id: '7', nome: 'Salário', icone: '💰', cor: '#34D399', tipos: ['RECEITA'] },
-  { id: '8', nome: 'Investimentos', icone: '📈', cor: '#8B5CF6', tipos: ['RECEITA', 'DESPESA'] },
+  { id: '1', name: 'Alimentação', icon: '🍽️', color: '#60A5FA', types: ['EXPENSE'] },
+  { id: '2', name: 'Transporte', icon: '🚗', color: '#F87171', types: ['EXPENSE'] },
+  { id: '3', name: 'Moradia', icon: '🏠', color: '#34D399', types: ['EXPENSE'] },
+  { id: '4', name: 'Saúde', icon: '⚕️', color: '#A78BFA', types: ['EXPENSE'] },
+  { id: '5', name: 'Educação', icon: '📚', color: '#FBBF24', types: ['EXPENSE'] },
+  { id: '6', name: 'Lazer', icon: '🎮', color: '#EC4899', types: ['EXPENSE'] },
+  { id: '7', name: 'Salário', icon: '💰', color: '#34D399', types: ['INCOME'] },
+  { id: '8', name: 'Investimentos', icon: '📈', color: '#8B5CF6', types: ['INCOME', 'EXPENSE'] },
 ];
 
-export const getCategoriesByType = (tipo: TransactionType): Category[] => {
-  return CATEGORIES.filter(category => category.tipos.includes(tipo));
+export const getCategoriesByType = (type: TransactionType): Category[] => {
+  return CATEGORIES.filter(category => category.types.includes(type));
 };

@@ -15,114 +15,114 @@ import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react'
 const mockTransactions = [
   {
     id: '1',
-    tipo: 'DESPESA',
-    descricao: 'Supermercado',
-    valor: 250.50,
-    data: '2024-03-15',
-    categoriaId: 'cat1',
-    contaId: 'conta1',
-    observacao: 'Compras do mês',
-    categoria: { id: 'cat1', nome: 'Alimentação', tipo: 'DESPESA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
+    type: 'EXPENSE',
+    description: 'Supermercado',
+    amount: 250.50,
+    date: '2024-03-15',
+    categoryId: 'cat1',
+    accountId: 'conta1',
+    note: 'Compras do mês',
+    category: { id: 'cat1', name: 'Alimentação', type: 'EXPENSE' },
+    account: { id: 'conta1', name: 'Conta Corrente' }
   },
   {
     id: '2',
-    tipo: 'RECEITA',
-    descricao: 'Salário',
-    valor: 5000.00,
-    data: '2024-03-10',
-    categoriaId: 'cat2',
-    contaId: 'conta1',
-    observacao: 'Salário mensal',
-    categoria: { id: 'cat2', nome: 'Salário', tipo: 'RECEITA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
+    type: 'INCOME',
+    description: 'Salário',
+    amount: 5000.00,
+    date: '2024-03-10',
+    categoryId: 'cat2',
+    accountId: 'conta1',
+    note: 'Salário mensal',
+    category: { id: 'cat2', name: 'Salário', type: 'INCOME' },
+    account: { id: 'conta1', name: 'Conta Corrente' }
   },
   {
     id: '3',
-    tipo: 'DESPESA',
-    descricao: 'Aluguel',
-    valor: 1500.00,
-    data: '2024-03-05',
-    categoriaId: 'cat3',
-    contaId: 'conta1',
-    observacao: 'Aluguel do apartamento',
-    categoria: { id: 'cat3', nome: 'Moradia', tipo: 'DESPESA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
+    type: 'EXPENSE',
+    description: 'Aluguel',
+    amount: 1500.00,
+    date: '2024-03-05',
+    categoryId: 'cat3',
+    accountId: 'conta1',
+    note: 'Aluguel do apartamento',
+    category: { id: 'cat3', name: 'Moradia', type: 'EXPENSE' },
+    account: { id: 'conta1', name: 'Conta Corrente' }
   },
   {
     id: '4',
-    tipo: 'DESPESA',
-    descricao: 'Academia',
-    valor: 120.00,
-    data: '2024-03-01',
-    categoriaId: 'cat4',
-    contaId: 'conta1',
-    observacao: 'Mensalidade',
-    categoria: { id: 'cat4', nome: 'Saúde', tipo: 'DESPESA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
+    type: 'EXPENSE',
+    description: 'Academia',
+    amount: 120.00,
+    date: '2024-03-01',
+    categoryId: 'cat4',
+    accountId: 'conta1',
+    note: 'Mensalidade',
+    category: { id: 'cat4', name: 'Saúde', type: 'EXPENSE' },
+    account: { id: 'conta1', name: 'Conta Corrente' }
   },
   {
     id: '5',
-    tipo: 'RECEITA',
-    descricao: 'Freelance',
-    valor: 800.00,
-    data: '2024-03-20',
-    categoriaId: 'cat5',
-    contaId: 'conta1',
-    observacao: 'Projeto de desenvolvimento',
-    categoria: { id: 'cat5', nome: 'Freelance', tipo: 'RECEITA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
+    type: 'INCOME',
+    description: 'Freelance',
+    amount: 800.00,
+    date: '2024-03-20',
+    categoryId: 'cat5',
+    accountId: 'conta1',
+    note: 'Projeto de desenvolvimento',
+    category: { id: 'cat5', name: 'Freelance', type: 'INCOME' },
+    account: { id: 'conta1', name: 'Conta Corrente' }
   },
   {
     id: '6',
-    tipo: 'DESPESA',
-    descricao: 'Internet',
-    valor: 99.90,
-    data: '2024-03-15',
-    categoriaId: 'cat6',
-    contaId: 'conta1',
-    observacao: 'Mensalidade',
-    categoria: { id: 'cat6', nome: 'Serviços', tipo: 'DESPESA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
+    type: 'EXPENSE',
+    description: 'Internet',
+    amount: 99.90,
+    date: '2024-03-15',
+    categoryId: 'cat6',
+    accountId: 'conta1',
+    note: 'Mensalidade',
+    category: { id: 'cat6', name: 'Serviços', type: 'EXPENSE' },
+    account: { id: 'conta1', name: 'Conta Corrente' }
   },
   {
     id: '7',
-    tipo: 'DESPESA',
-    descricao: 'Combustível',
-    valor: 200.00,
-    data: '2024-03-18',
-    categoriaId: 'cat7',
-    contaId: 'conta1',
-    observacao: 'Posto Shell',
-    categoria: { id: 'cat7', nome: 'Transporte', tipo: 'DESPESA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
+    type: 'EXPENSE',
+    description: 'Combustível',
+    amount: 200.00,
+    date: '2024-03-18',
+    categoryId: 'cat7',
+    accountId: 'conta1',
+    note: 'Posto Shell',
+    category: { id: 'cat7', name: 'Transporte', type: 'EXPENSE' },
+    account: { id: 'conta1', name: 'Conta Corrente' }
   },
   {
     id: '8',
-    tipo: 'RECEITA',
-    descricao: 'Investimentos',
-    valor: 150.00,
-    data: '2024-03-25',
-    categoriaId: 'cat8',
-    contaId: 'conta1',
-    observacao: 'Dividendos',
-    categoria: { id: 'cat8', nome: 'Investimentos', tipo: 'RECEITA' },
-    conta: { id: 'conta1', nome: 'Conta Corrente' }
+    type: 'INCOME',
+    description: 'Investimentos',
+    amount: 150.00,
+    date: '2024-03-25',
+    categoryId: 'cat8',
+    accountId: 'conta1',
+    note: 'Dividendos',
+    category: { id: 'cat8', name: 'Investimentos', type: 'INCOME' },
+    account: { id: 'conta1', name: 'Conta Corrente' }
   }
 ]
 
 export function NewTransaction() {
   const navigate = useNavigate()
   const { addTransaction, categories, accounts } = useTransactionStore()
-  const [transactionType, setTransactionType] = useState<'RECEITA' | 'DESPESA'>('DESPESA')
+  const [transactionType, setTransactionType] = useState<'INCOME' | 'EXPENSE'>('EXPENSE')
   const [formData, setFormData] = useState<TransactionInput>({
-    tipo: 'DESPESA',
-    descricao: '',
-    valor: 0,
-    data: new Date().toISOString().split('T')[0],
-    categoriaId: '',
-    contaId: '',
-    observacao: '',
+    type: 'EXPENSE',
+    description: '',
+    amount: 0,
+    date: new Date().toISOString().split('T')[0],
+    categoryId: '',
+    accountId: '',
+    note: '',
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -135,11 +135,11 @@ export function NewTransaction() {
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'valor' ? parseFloat(value) : value,
+      [name]: name === 'amount' ? parseFloat(value) : value,
     }))
   }
 
-  const filteredCategories = categories.filter((category: Category) => category.tipo === transactionType)
+  const filteredCategories = categories.filter((category: Category) => category.type === transactionType)
 
   return (
     <ViewDefault>
@@ -171,12 +171,12 @@ export function NewTransaction() {
                   <button
                     type="button"
                     onClick={() => {
-                      setTransactionType('DESPESA')
-                      setFormData(prev => ({ ...prev, tipo: 'DESPESA' }))
+                      setTransactionType('EXPENSE')
+                      setFormData(prev => ({ ...prev, type: 'EXPENSE' }))
                     }}
                     className={cn(
                       'p-3 rounded-lg border flex items-center justify-center gap-2 transition-all',
-                      transactionType === 'DESPESA'
+                      transactionType === 'EXPENSE'
                         ? 'bg-red-500/10 border-red-500/50 text-red-500 dark:text-red-400'
                         : 'border-border dark:border-border-dark text-text/60 dark:text-text-dark/60 hover:border-text/30 dark:hover:border-text-dark/30'
                     )}
@@ -187,12 +187,12 @@ export function NewTransaction() {
                   <button
                     type="button"
                     onClick={() => {
-                      setTransactionType('RECEITA')
-                      setFormData(prev => ({ ...prev, tipo: 'RECEITA' }))
+                      setTransactionType('INCOME')
+                      setFormData(prev => ({ ...prev, type: 'INCOME' }))
                     }}
                     className={cn(
                       'p-3 rounded-lg border flex items-center justify-center gap-2 transition-all',
-                      transactionType === 'RECEITA'
+                      transactionType === 'INCOME'
                         ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-500 dark:text-emerald-400'
                         : 'border-border dark:border-border-dark text-text/60 dark:text-text-dark/60 hover:border-text/30 dark:hover:border-text-dark/30'
                     )}
@@ -215,8 +215,8 @@ export function NewTransaction() {
                     </div>
                     <Input
                       type="number"
-                      name="valor"
-                      value={formData.valor}
+                      name="amount"
+                      value={formData.amount}
                       onChange={handleChange}
                       step="0.01"
                       min="0"
@@ -233,8 +233,8 @@ export function NewTransaction() {
                   </label>
                   <Input
                     type="date"
-                    name="data"
-                    value={formData.data}
+                    name="date"
+                    value={formData.date}
                     onChange={handleChange}
                     required
                     className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf h-10"
@@ -243,11 +243,11 @@ export function NewTransaction() {
 
                 <div>
                   <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
-                    Categoria
+                    Category
                   </label>
                   <Select
-                    name="categoriaId"
-                    value={formData.categoriaId}
+                    name="categoryId"
+                    value={formData.categoryId}
                     onChange={handleChange}
                     required
                     className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf h-10"
@@ -255,7 +255,7 @@ export function NewTransaction() {
                     <option value="">Selecione uma categoria</option>
                     {filteredCategories.map((category: Category) => (
                       <option key={category.id} value={category.id}>
-                        {category.nome}
+                        {category.name}
                       </option>
                     ))}
                   </Select>
@@ -263,11 +263,11 @@ export function NewTransaction() {
 
                 <div>
                   <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
-                    Conta
+                    Account
                   </label>
                   <Select
-                    name="contaId"
-                    value={formData.contaId}
+                    name="accountId"
+                    value={formData.accountId}
                     onChange={handleChange}
                     required
                     className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf h-10"
@@ -275,7 +275,7 @@ export function NewTransaction() {
                     <option value="">Selecione uma conta</option>
                     {accounts.map((account: Account) => (
                       <option key={account.id} value={account.id}>
-                        {account.nome}
+                        {account.name}
                       </option>
                     ))}
                   </Select>
@@ -283,12 +283,12 @@ export function NewTransaction() {
 
                 <div>
                   <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
-                    Descrição
+                    Description
                   </label>
                   <Input
                     type="text"
-                    name="descricao"
-                    value={formData.descricao}
+                    name="description"
+                    value={formData.description}
                     onChange={handleChange}
                     required
                     className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf h-10"
@@ -298,11 +298,11 @@ export function NewTransaction() {
 
                 <div>
                   <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
-                    Observações
+                    Notes
                   </label>
                   <Textarea
-                    name="observacao"
-                    value={formData.observacao}
+                    name="note"
+                    value={formData.note}
                     onChange={handleChange}
                     rows={3}
                     className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf"
@@ -316,7 +316,7 @@ export function NewTransaction() {
                     type="submit"
                     className={cn(
                       'transition-all text-sm h-11 px-8 text-white',
-                      transactionType === 'DESPESA'
+                      transactionType === 'EXPENSE'
                         ? 'bg-red-500 hover:bg-red-600 dark:bg-red-500/90 dark:hover:bg-red-500'
                         : 'bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-500/90 dark:hover:bg-emerald-500'
                     )}

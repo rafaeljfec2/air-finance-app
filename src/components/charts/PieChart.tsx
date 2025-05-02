@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { Chart, registerables } from 'chart.js';
-import { cn } from '@/lib/utils';
 import { useTheme } from '@/stores/useTheme';
 
 Chart.register(...registerables);
@@ -14,7 +13,7 @@ interface PieChartProps {
   data: PieChartData[];
 }
 
-export function PieChart({ data }: PieChartProps) {
+export function PieChart({ data }: Readonly<PieChartProps>) {
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstance = useRef<Chart | null>(null);
   const { isDarkMode } = useTheme();

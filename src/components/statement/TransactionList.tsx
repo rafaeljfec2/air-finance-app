@@ -16,7 +16,7 @@ export function TransactionList({
   onRemove, 
   onRefresh,
   isLoading = false 
-}: TransactionListProps) {
+}: Readonly<TransactionListProps>) {
   if (transactions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 px-4">
@@ -89,35 +89,35 @@ export function TransactionList({
                   <td className="whitespace-nowrap px-6 py-4">
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-900 dark:text-white">
-                        {transaction.descricao}
+                        {transaction.description}
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {transaction.categoria.nome}
+                        {transaction.category.name}
                       </span>
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                    {transaction.categoria.nome}
+                    {transaction.category.name}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <div className="flex flex-col">
                       <span className="text-sm text-gray-900 dark:text-white">
-                        {formatDateTime(transaction.data, 'dd/MM/yyyy')}
+                        {formatDateTime(transaction.date, 'dd/MM/yyyy')}
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {formatDateTime(transaction.data, 'HH:mm')}
+                        {formatDateTime(transaction.date, 'HH:mm')}
                       </span>
                     </div>
                   </td>
                   <td
                     className={`whitespace-nowrap px-6 py-4 text-right text-sm font-medium ${
-                      transaction.tipo === 'RECEITA'
+                      transaction.type === 'INCOME'
                         ? 'text-green-600 dark:text-green-400'
                         : 'text-red-600 dark:text-red-400'
                     }`}
                   >
-                    {transaction.tipo === 'RECEITA' ? '+' : '-'}
-                    {formatCurrency(transaction.valor)}
+                    {transaction.type === 'INCOME' ? '+' : '-'}
+                    {formatCurrency(transaction.amount)}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                     <button

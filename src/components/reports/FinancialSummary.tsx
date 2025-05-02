@@ -1,13 +1,12 @@
 import { MonthlyReport } from '@/types/report';
 import { formatCurrency } from '@/utils/formatters';
-import { Card } from '@/components/Card';
 import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
 
 interface FinancialSummaryProps {
   report: MonthlyReport;
 }
 
-export function FinancialSummary({ report }: FinancialSummaryProps) {
+export function FinancialSummary({ report }: Readonly<FinancialSummaryProps>) {
   const { income, expenses } = report.summary;
 
   return (

@@ -5,58 +5,76 @@ import { Transaction, Category } from '@/types/transaction';
 const mockCategories: Category[] = [
   {
     id: '1',
-    nome: 'Salário',
-    tipo: 'RECEITA',
-    icone: 'money',
-    cor: '#34D399',
+    name: 'Salário',
+    type: 'INCOME',
+    icon: 'money',
+    color: '#34D399',
   },
   {
     id: '2',
-    nome: 'Moradia',
-    tipo: 'DESPESA',
-    icone: 'home',
-    cor: '#F87171',
+    name: 'Moradia',
+    type: 'EXPENSE',
+    icon: 'home',
+    color: '#F87171',
   },
   {
     id: '3',
-    nome: 'Alimentação',
-    tipo: 'DESPESA',
-    icone: 'shopping-cart',
-    cor: '#60A5FA',
+    name: 'Alimentação',
+    type: 'EXPENSE',
+    icon: 'shopping-cart',
+    color: '#60A5FA',
   },
 ];
 
 const mockTransactions: Transaction[] = [
   {
     id: '1',
-    descricao: 'Salário',
-    valor: 5000,
-    data: '2024-03-01T00:00:00.000Z',
-    tipo: 'RECEITA',
-    categoria: mockCategories[0],
+    description: 'Salário',
+    amount: 5000,
+    date: '2024-03-01T00:00:00.000Z',
+    type: 'INCOME',
+    category: mockCategories[0],
     createdAt: '2024-03-01T00:00:00.000Z',
     updatedAt: '2024-03-01T00:00:00.000Z',
+    categoryId: '',
+    accountId: '',
+    account: {
+      id: '',
+      name: ''
+    }
   },
   {
     id: '2',
-    descricao: 'Aluguel',
-    valor: 1500,
-    data: '2024-03-05T00:00:00.000Z',
-    tipo: 'DESPESA',
-    categoria: mockCategories[1],
-    observacao: 'Aluguel do mês de março',
+    description: 'Aluguel',
+    amount: 1500,
+    date: '2024-03-05T00:00:00.000Z',
+    type: 'EXPENSE',
+    category: mockCategories[1],
+    note: 'Aluguel do mês de março',
     createdAt: '2024-03-05T00:00:00.000Z',
     updatedAt: '2024-03-05T00:00:00.000Z',
+    categoryId: '',
+    accountId: '',
+    account: {
+      id: '',
+      name: ''
+    }
   },
   {
     id: '3',
-    descricao: 'Supermercado',
-    valor: 800,
-    data: '2024-03-10T00:00:00.000Z',
-    tipo: 'DESPESA',
-    categoria: mockCategories[2],
+    description: 'Supermercado',
+    amount: 800,
+    date: '2024-03-10T00:00:00.000Z',
+    type: 'EXPENSE',
+    category: mockCategories[2],
     createdAt: '2024-03-10T00:00:00.000Z',
     updatedAt: '2024-03-10T00:00:00.000Z',
+    categoryId: '',
+    accountId: '',
+    account: {
+      id: '',
+      name: ''
+    }
   },
 ];
 
@@ -64,23 +82,35 @@ const mockTransactions: Transaction[] = [
 const mockPreviousTransactions: Transaction[] = [
   {
     id: '4',
-    descricao: 'Salário',
-    valor: 4800,
-    data: '2024-02-01T00:00:00.000Z',
-    tipo: 'RECEITA',
-    categoria: mockCategories[0],
+    description: 'Salário',
+    amount: 4800,
+    date: '2024-02-01T00:00:00.000Z',
+    type: 'INCOME',
+    category: mockCategories[0],
     createdAt: '2024-02-01T00:00:00.000Z',
     updatedAt: '2024-02-01T00:00:00.000Z',
+    categoryId: '',
+    accountId: '',
+    account: {
+      id: '',
+      name: ''
+    }
   },
   {
     id: '5',
-    descricao: 'Aluguel',
-    valor: 1500,
-    data: '2024-02-05T00:00:00.000Z',
-    tipo: 'DESPESA',
-    categoria: mockCategories[1],
+    description: 'Aluguel',
+    amount: 1500,
+    date: '2024-02-05T00:00:00.000Z',
+    type: 'EXPENSE',
+    category: mockCategories[1],
     createdAt: '2024-02-05T00:00:00.000Z',
     updatedAt: '2024-02-05T00:00:00.000Z',
+    categoryId: '',
+    accountId: '',
+    account: {
+      id: '',
+      name: ''
+    }
   },
 ];
 
@@ -136,12 +166,12 @@ export const useStatementStore = create<StatementState>((set, get) => ({
 
       // Calcular totais do mês atual
       const income = transactions
-        .filter(t => t.tipo === 'RECEITA')
-        .reduce((sum, t) => sum + t.valor, 0);
+        .filter(t => t.type === 'INCOME')
+        .reduce((sum, t) => sum + t.amount, 0)  ;
 
       const expenses = transactions
-        .filter(t => t.tipo === 'DESPESA')
-        .reduce((sum, t) => sum + t.valor, 0);
+        .filter(t => t.type === 'EXPENSE')
+        .reduce((sum, t) => sum + t.amount, 0);
 
       const availableBalance = income - expenses;
 
@@ -150,12 +180,12 @@ export const useStatementStore = create<StatementState>((set, get) => ({
 
       // Calcular totais do mês anterior
       const previousIncome = previousTransactions
-        .filter(t => t.tipo === 'RECEITA')
-        .reduce((sum, t) => sum + t.valor, 0);
+        .filter(t => t.type === 'INCOME')
+        .reduce((sum, t) => sum + t.amount, 0);
 
       const previousExpenses = previousTransactions
-        .filter(t => t.tipo === 'DESPESA')
-        .reduce((sum, t) => sum + t.valor, 0);
+        .filter(t => t.type === 'EXPENSE')
+        .reduce((sum, t) => sum + t.amount, 0);
 
       const previousBalance = previousIncome - previousExpenses;
 
@@ -203,12 +233,12 @@ export const useStatementStore = create<StatementState>((set, get) => ({
       const newTransactions = [...transactions, newTransaction];
 
       const income = newTransactions.reduce(
-        (total, t) => (t.tipo === 'RECEITA' ? total + t.valor : total),
+        (total, t) => (t.type === 'INCOME' ? total + t.amount : total),
         0
       );
 
       const expenses = newTransactions.reduce(
-        (total, t) => (t.tipo === 'DESPESA' ? total + t.valor : total),
+        (total, t) => (t.type === 'EXPENSE' ? total + t.amount : total),
         0
       );
 
@@ -245,12 +275,12 @@ export const useStatementStore = create<StatementState>((set, get) => ({
 
       // Recalcular totais
       const income = updatedTransactions
-        .filter(t => t.tipo === 'RECEITA')
-        .reduce((sum, t) => sum + t.valor, 0);
+        .filter(t => t.type === 'INCOME')
+        .reduce((sum, t) => sum + t.amount, 0);
 
       const expenses = updatedTransactions
-        .filter(t => t.tipo === 'DESPESA')
-        .reduce((sum, t) => sum + t.valor, 0);
+        .filter(t => t.type === 'EXPENSE')
+        .reduce((sum, t) => sum + t.amount, 0);
 
       const availableBalance = income - expenses;
 
@@ -295,12 +325,12 @@ export const useStatementStore = create<StatementState>((set, get) => ({
       );
 
       const income = newTransactions.reduce(
-        (total, t) => (t.tipo === 'RECEITA' ? total + t.valor : total),
+        (total, t) => (t.type === 'INCOME' ? total + t.amount : total),
         0
       );
 
       const expenses = newTransactions.reduce(
-        (total, t) => (t.tipo === 'DESPESA' ? total + t.valor : total),
+        (total, t) => (t.type === 'EXPENSE' ? total + t.amount : total),
         0
       );
 

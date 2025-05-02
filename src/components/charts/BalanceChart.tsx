@@ -31,7 +31,7 @@ interface CustomTooltipProps extends TooltipProps<number, string> {
   label?: string;
 }
 
-export function BalanceChart({ data }: BalanceChartProps) {
+export function BalanceChart({ data }: Readonly<BalanceChartProps>) {
   const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       return (

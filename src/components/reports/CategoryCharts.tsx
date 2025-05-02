@@ -88,7 +88,7 @@ export function CategoryCharts() {
   const expensesData = mockData.expenses;
 
   const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
-    if (active && payload && payload.length) {
+    if (active && payload?.length) {
       const data = payload[0].payload;
       return (
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
@@ -109,7 +109,7 @@ export function CategoryCharts() {
     return null;
   };
 
-  const renderChart = (data: ChartData[], historicalData: HistoricalData[], title: string, type: 'income' | 'expense') => {
+  const renderChart = (data: ChartData[], historicalData: HistoricalData[], _title: string, type: 'income' | 'expense') => {
     const chartMargin = { top: 20, right: 30, left: 20, bottom: 5 };
 
     switch (chartType) {
@@ -129,7 +129,7 @@ export function CategoryCharts() {
                 >
                   {data.map((entry, index) => (
                     <Cell 
-                      key={`cell-${index}`} 
+                      key={`cell-${entry.name}`} 
                       fill={COLORS[index % COLORS.length]}
                     />
                   ))}

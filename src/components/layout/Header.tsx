@@ -45,7 +45,7 @@ export function Header() {
 
           {/* Notificações */}
           <Menu as="div" className="relative">
-            {({ open }) => (
+            {() => (
               <>
                 <Menu.Button className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                   <span className="sr-only">Ver notificações</span>
@@ -108,7 +108,7 @@ export function Header() {
 
           {/* Menu do Usuário */}
           <Menu as="div" className="relative">
-            {({ open }) => (
+            {() => (
               <>
                 <Menu.Button className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                   <span className="sr-only">Abrir menu do usuário</span>

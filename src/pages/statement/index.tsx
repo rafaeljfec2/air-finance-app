@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { StatementFilters } from '@/components/statement/StatementFilters';
-import { TransactionList } from '@/components/statement/TransactionList';
 import { useStatementStore } from '@/stores/statement';
 import { Transaction } from '@/types/transaction';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -12,7 +11,6 @@ import {
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
   DocumentTextIcon,
-  PlusIcon
 } from '@heroicons/react/24/outline';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -57,12 +55,12 @@ export function Statement() {
   // Filtrar transações
   const filteredTransactions = (transactions as TransactionWithDetails[]).filter(transaction => {
     const matchesSearch = searchTerm
-      ? transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        transaction.categoria.nome.toLowerCase().includes(searchTerm.toLowerCase())
+      ? transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        transaction.category.name.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
 
     const matchesCategory = selectedCategory
-      ? transaction.categoria.id === selectedCategory
+      ? transaction.category.id === selectedCategory
       : true;
 
     return matchesSearch && matchesCategory;
@@ -71,22 +69,22 @@ export function Statement() {
   // Calcular saldo acumulado para cada transação
   let saldoAcumulado = 0
   const transactionsWithBalance = filteredTransactions.map(transaction => {
-    const credito = transaction.tipo === 'RECEITA' ? transaction.valor : 0
-    const debito = transaction.tipo === 'DESPESA' ? transaction.valor : 0
+    const credito = transaction.type === 'INCOME' ? transaction.amount : 0
+    const debito = transaction.type === 'EXPENSE' ? transaction.amount : 0
     saldoAcumulado += credito - debito
     return {
       ...transaction,
       credito,
       debito,
       saldo: saldoAcumulado,
-      conta: {
-        id: transaction.contaId,
-        nome: 'Conta Principal' // TODO: Get from store
+      account: {
+        id: transaction.accountId,
+        name: 'Conta Principal' // TODO: Get from store
       },
-      observacao: transaction.observacao || '',
+      note: transaction.note || '',
       categoria: {
-        ...transaction.categoria,
-        tipo: transaction.tipo
+        ...transaction.category,
+        type: transaction.type
       }
     }
   })

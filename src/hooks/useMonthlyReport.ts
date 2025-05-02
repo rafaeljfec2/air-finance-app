@@ -21,7 +21,7 @@ export function useMonthlyReport() {
 
       // Filter current month transactions
       const monthTransactions = transactions.filter(t => {
-        const transactionDate = parseISO(t.data);
+        const transactionDate = parseISO(t.date);
         return isWithinInterval(transactionDate, { start: firstDay, end: lastDay });
       });
 
@@ -29,7 +29,7 @@ export function useMonthlyReport() {
       const previousMonth = startOfMonth(new Date(year, month - 1));
       const lastDayPrevious = endOfMonth(new Date(year, month - 1));
       const previousMonthTransactions = transactions.filter(t => {
-        const transactionDate = parseISO(t.data);
+        const transactionDate = parseISO(t.date);
         return isWithinInterval(transactionDate, { start: previousMonth, end: lastDayPrevious });
       });
 
@@ -37,27 +37,27 @@ export function useMonthlyReport() {
       const groupByCategory = (type: 'RECEITA' | 'DESPESA') => {
         const categories = getCategoriesByType(type);
         const total = monthTransactions
-          .filter(t => t.tipo === type)
-          .reduce((acc, t) => acc + t.valor, 0);
+          .filter(t => t.type === type)
+          .reduce((acc, t) => acc + t.amount, 0);
 
         return categories.map(category => {
           const categoryTransactions = monthTransactions.filter(
-            t => t.tipo === type && t.categoria.id === category.id
+            t => t.type === type && t.category.id === category.id
           );
-          const categoryTotal = categoryTransactions.reduce((acc, t) => acc + t.valor, 0);
+          const categoryTotal = categoryTransactions.reduce((acc, t) => acc + t.amount, 0);
 
           return {
             id: category.id,
-            name: category.nome,
-            icon: category.icone,
-            color: category.cor,
+            name: category.name,
+            icon: category.icon,
+            color: category.color,
             total: categoryTotal,
             percentage: total > 0 ? (categoryTotal / total) * 100 : 0,
             transactions: categoryTransactions.map(t => ({
               id: t.id,
-              description: t.descricao,
-              amount: t.valor,
-              date: parseISO(t.data),
+              description: t.description,
+              amount: t.amount,
+              date: parseISO(t.date),
             })),
           };
         });
@@ -65,10 +65,10 @@ export function useMonthlyReport() {
 
       // Calculate totals
       const totalIncome = monthTransactions
-        .filter(t => t.tipo === 'RECEITA')
-        .reduce((acc, t) => acc + t.valor, 0);
+        .filter(t => t.type === 'INCOME')
+        .reduce((acc, t) => acc + t.amount, 0);
       const totalExpenses = monthTransactions
-        .filter(t => t.tipo === 'DESPESA')
+        .filter(t => t.type === 'EXPENSE')
         .reduce((acc, t) => acc + t.valor, 0);
 
       // Calculate previous month balance

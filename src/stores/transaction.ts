@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { Transaction, Category, Account, TransactionInput } from '@/types/transaction';
 
 interface TransactionStore {
@@ -12,17 +11,17 @@ interface TransactionStore {
 }
 
 const initialCategories: Category[] = [
-  { id: '1', nome: 'Salário', tipo: 'RECEITA' },
-  { id: '2', nome: 'Alimentação', tipo: 'DESPESA' },
-  { id: '3', nome: 'Transporte', tipo: 'DESPESA' },
-  { id: '4', nome: 'Lazer', tipo: 'DESPESA' },
-  { id: '5', nome: 'Investimentos', tipo: 'RECEITA' },
+  { id: '1', name: 'Salário', type: 'INCOME' },
+  { id: '2', name: 'Alimentação', type: 'EXPENSE' },
+  { id: '3', name: 'Transporte', type: 'EXPENSE' },
+  { id: '4', name: 'Lazer', type: 'EXPENSE' },
+  { id: '5', name: 'Investimentos', type: 'INCOME' },
 ];
 
 const initialAccounts: Account[] = [
-  { id: '1', nome: 'Conta Corrente' },
-  { id: '2', nome: 'Carteira' },
-  { id: '3', nome: 'Investimentos' },
+  { id: '1', name: 'Conta Corrente' },
+  { id: '2', name: 'Carteira' },
+  { id: '3', name: 'Investimentos' },
 ];
 
 export const useTransactionStore = create<TransactionStore>((set) => ({

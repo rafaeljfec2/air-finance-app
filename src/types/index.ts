@@ -9,16 +9,22 @@ export interface Transacao {
   descricao: string;
   valor: number;
   tipo: 'RECEITA' | 'DESPESA';
-  categoria: string;
+  categoria: Category;
   data: string;
   usuarioId: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  type: 'INCOME' | 'EXPENSE';
 }
 
 export interface Transaction {
   id: string;
   description: string;
   amount: number;
-  category: string;
+  category: Category;
   date: string;
 }
 

@@ -5,22 +5,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Card } from '@/components/ui/card'
-import { formatCurrency, formatDate } from '@/utils/formatters'
 import {
   Receipt,
   Search,
   Plus,
-  ArrowUpCircle,
-  ArrowDownCircle,
   Calendar,
   Filter,
   Download,
-  MoreHorizontal,
-  ChevronRight,
-  Loader2
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { TransactionGrid, Transaction } from '@/components/transactions/TransactionGrid'
+import { TransactionGrid } from '@/components/transactions/TransactionGrid'
 import { mockTransactions } from '@/mocks/transactions'
 
 export function Transactions() {
