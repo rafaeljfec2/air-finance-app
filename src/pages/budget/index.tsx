@@ -39,7 +39,19 @@ export default function BudgetPage() {
   return (
     <ViewDefault>
       <div className="container mx-auto px-2 sm:px-6 py-10">
-        <h1 className="text-3xl font-extrabold text-text dark:text-text-dark mb-10">Orçamento</h1>
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="inline-flex items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900 p-2">
+              <Wallet className="h-6 w-6 text-primary-600 dark:text-primary-400" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-text dark:text-text-dark">
+              Dashboard Financeiro
+            </h1>
+          </div>
+          <p className="text-sm text-gray-500 dark:text-gray-400 ml-11">
+            Visão geral do seu orçamento, fluxo de caixa e contas a pagar/receber
+          </p>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
           {/* Fluxo de Caixa */}
           <CardContainer color="emerald" className="min-h-[420px]">
