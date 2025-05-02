@@ -118,35 +118,10 @@ export function TransactionGrid({
     }
   })
 
-  // Agrupar transações por dia
-  const groupedTransactions = transactionsWithBalance.reduce((acc, transaction) => {
-    const date = format(new Date(transaction.data), 'yyyy-MM-dd')
-    if (!acc[date]) {
-      acc[date] = {
-        transactions: [],
-        totalCredito: 0,
-        totalDebito: 0,
-        saldoFinal: 0
-      }
-    }
-    // Aplicar ordenação nas transações do grupo
-    const sortedTransactions = sortTransactions([...acc[date].transactions, transaction]) as typeof transactionsWithBalance
-    acc[date].transactions = sortedTransactions
-    acc[date].totalCredito += transaction.credito || 0
-    acc[date].totalDebito += transaction.debito || 0
-    acc[date].saldoFinal = transaction.saldo || 0
-    return acc
-  }, {} as Record<string, {
-    transactions: typeof transactionsWithBalance
-    totalCredito: number
-    totalDebito: number
-    saldoFinal: number
-  }>)
-
   // Lógica de paginação
   const sortedDates = useMemo(() => {
-    return Object.keys(groupedTransactions).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
-  }, [groupedTransactions])
+    return Object.keys(transactionsWithBalance).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+  }, [transactionsWithBalance])
 
   const totalPages = Math.ceil(sortedDates.length / itemsPerPageSelected)
   const startIndex = (currentPage - 1) * itemsPerPageSelected
@@ -243,245 +218,146 @@ export function TransactionGrid({
           <>
             {/* Desktop Table View */}
             <div className="hidden md:block">
-              {currentDates.slice(0, visibleItems).map(date => {
-                const group = groupedTransactions[date]
-                return (
-                  <div key={date} className="mb-4 bg-background/50 dark:bg-background-dark/50 rounded-lg overflow-hidden">
-                    {/* Cabeçalho do Grupo */}
-                    <div className="bg-background dark:bg-background-dark border-b border-border dark:border-border-dark py-2 px-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-base font-semibold text-text dark:text-text-dark">
-                            {format(new Date(date), "EEEE", { locale: ptBR })}
-                          </h3>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {format(new Date(date), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Movimentação do dia</p>
-                          <div className="flex items-center gap-3">
-                            <div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Entradas</p>
-                              <p className="text-sm font-medium text-emerald-400">
-                                {formatCurrency(group.totalCredito)}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Saídas</p>
-                              <p className="text-sm font-medium text-red-400">
-                                {formatCurrency(group.totalDebito)}
-                              </p>
-                            </div>
-                            <div className="pl-3 border-l border-border dark:border-border-dark">
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Saldo do dia</p>
-                              <p className={cn(
-                                "text-sm font-semibold",
-                                group.saldoFinal >= 0 ? "text-emerald-400" : "text-red-400"
-                              )}>
-                                {formatCurrency(group.saldoFinal)}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Tabela de Transações */}
-                    <div className="w-full">
-                      <table className="w-full table-fixed">
-                        <colgroup>
-                          <col className="w-[6%] sm:w-[8%]" /> {/* Hora */}
-                          <col className="w-[12%] sm:w-[15%]" /> {/* Categoria */}
-                          <col className="w-[20%] sm:w-[25%]" /> {/* Descrição */}
-                          <col className="w-[12%] sm:w-[15%]" /> {/* Conta */}
-                          <col className="w-[12%]" /> {/* Crédito */}
-                          <col className="w-[12%]" /> {/* Débito */}
-                          <col className="w-[12%]" /> {/* Saldo */}
-                          {showActions && <col className="w-[1%]" />} {/* Ações */}
-                        </colgroup>
-                        <thead>
-                          <tr className="bg-background/30 dark:bg-background-dark/30">
-                            <SortableHeader field="hora">Hora</SortableHeader>
-                            <SortableHeader field="categoria">Categoria</SortableHeader>
-                            <SortableHeader field="descricao">Descrição</SortableHeader>
-                            <SortableHeader field="conta">Conta</SortableHeader>
-                            <SortableHeader field="credito" className="text-right pr-8">Crédito</SortableHeader>
-                            <SortableHeader field="debito" className="text-right pr-8">Débito</SortableHeader>
-                            <SortableHeader field="saldo" className="text-right pr-8">Saldo</SortableHeader>
-                            {showActions && <th className="w-10"></th>}
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
-                          {group.transactions.map((transaction) => (
-                            <tr
-                              key={transaction.id}
-                              className="hover:bg-background/70 dark:hover:bg-background-dark/70 transition-colors"
+              <div className="w-full">
+                <table className="w-full table-fixed">
+                  <colgroup>
+                    <col className="w-[6%] sm:w-[8%]" /> {/* Hora */}
+                    <col className="w-[12%] sm:w-[15%]" /> {/* Categoria */}
+                    <col className="w-[20%] sm:w-[25%]" /> {/* Descrição */}
+                    <col className="w-[12%] sm:w-[15%]" /> {/* Conta */}
+                    <col className="w-[12%]" /> {/* Crédito */}
+                    <col className="w-[12%]" /> {/* Débito */}
+                    <col className="w-[12%]" /> {/* Saldo */}
+                    {showActions && <col className="w-[1%]" />} {/* Ações */}
+                  </colgroup>
+                  <thead>
+                    <tr className="bg-background/30 dark:bg-background-dark/30">
+                      <SortableHeader field="hora">Data/Hora</SortableHeader>
+                      <SortableHeader field="categoria">Categoria</SortableHeader>
+                      <SortableHeader field="descricao">Descrição</SortableHeader>
+                      <SortableHeader field="conta">Conta</SortableHeader>
+                      <SortableHeader field="credito" className="text-right pr-8">Crédito</SortableHeader>
+                      <SortableHeader field="debito" className="text-right pr-8">Débito</SortableHeader>
+                      <SortableHeader field="saldo" className="text-right pr-8">Saldo</SortableHeader>
+                      {showActions && <th className="w-10"></th>}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
+                    {sortTransactions(transactionsWithBalance).slice((currentPage - 1) * itemsPerPageSelected, currentPage * itemsPerPageSelected).map((transaction) => (
+                      <tr
+                        key={transaction.id}
+                        className="hover:bg-background/70 dark:hover:bg-background-dark/70 transition-colors"
+                      >
+                        <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                          {format(new Date(transaction.data), 'dd/MM HH:mm')}
+                        </td>
+                        <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
+                          <Tooltip content={transaction.categoria.nome}>
+                            <span className="block overflow-hidden text-ellipsis">
+                              {transaction.categoria.nome}
+                            </span>
+                          </Tooltip>
+                        </td>
+                        <td className="py-2 px-4 text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis">
+                          <Tooltip content={transaction.descricao}>
+                            <span className="block overflow-hidden text-ellipsis">
+                              {transaction.descricao}
+                            </span>
+                          </Tooltip>
+                        </td>
+                        <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
+                          <Tooltip content={transaction.conta.nome}>
+                            <span className="block overflow-hidden text-ellipsis">
+                              {transaction.conta.nome}
+                            </span>
+                          </Tooltip>
+                        </td>
+                        <td className="py-2 px-4 text-xs font-medium text-right text-emerald-400 whitespace-nowrap pr-8">
+                          {transaction.credito ? formatCurrency(transaction.credito) : '-'}
+                        </td>
+                        <td className="py-2 px-4 text-xs font-medium text-right text-red-400 whitespace-nowrap pr-8">
+                          {transaction.debito ? formatCurrency(transaction.debito) : '-'}
+                        </td>
+                        <td className={cn(
+                          "py-2 px-4 text-xs font-medium text-right whitespace-nowrap pr-8",
+                          transaction.saldo >= 0 ? "text-emerald-400" : "text-red-400"
+                        )}>
+                          {formatCurrency(transaction.saldo)}
+                        </td>
+                        {showActions && (
+                          <td className="py-2 px-4 w-10">
+                            <button
+                              onClick={() => handleActionClick(transaction)}
+                              className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark"
+                              aria-label="Mais ações"
                             >
-                              <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                                {format(new Date(transaction.data), 'HH:mm')}
-                              </td>
-                              <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
-                                <Tooltip content={transaction.categoria.nome}>
-                                  <span className="block overflow-hidden text-ellipsis">
-                                    {transaction.categoria.nome}
-                                  </span>
-                                </Tooltip>
-                              </td>
-                              <td className="py-2 px-4 text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis">
-                                <Tooltip content={transaction.descricao}>
-                                  <span className="block overflow-hidden text-ellipsis">
-                                    {transaction.descricao}
-                                  </span>
-                                </Tooltip>
-                              </td>
-                              <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
-                                <Tooltip content={transaction.conta.nome}>
-                                  <span className="block overflow-hidden text-ellipsis">
-                                    {transaction.conta.nome}
-                                  </span>
-                                </Tooltip>
-                              </td>
-                              <td className="py-2 px-4 text-xs font-medium text-right text-emerald-400 whitespace-nowrap pr-8">
-                                {transaction.credito ? formatCurrency(transaction.credito) : '-'}
-                              </td>
-                              <td className="py-2 px-4 text-xs font-medium text-right text-red-400 whitespace-nowrap pr-8">
-                                {transaction.debito ? formatCurrency(transaction.debito) : '-'}
-                              </td>
-                              <td className={cn(
-                                "py-2 px-4 text-xs font-medium text-right whitespace-nowrap pr-8",
-                                transaction.saldo >= 0 ? "text-emerald-400" : "text-red-400"
-                              )}>
-                                {formatCurrency(transaction.saldo)}
-                              </td>
-                              {showActions && (
-                                <td className="py-2 px-4 w-10">
-                                  <button
-                                    onClick={() => handleActionClick(transaction)}
-                                    className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark"
-                                    aria-label="Mais ações"
-                                  >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </button>
-                                </td>
-                              )}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )
-              })}
-              {visibleItems < currentDates.length && (
-                <div
-                  ref={loadMoreRef}
-                  className="flex items-center justify-center py-4"
-                >
-                  <Loader2 className="h-6 w-6 text-primary-500 animate-spin" />
-                </div>
-              )}
+                              <MoreHorizontal className="h-4 w-4" />
+                            </button>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* Mobile Card View */}
-            <div className="md:hidden space-y-4">
-              {currentDates.slice(0, visibleItems).map(date => {
-                const group = groupedTransactions[date]
-                return (
-                  <div key={date} className="space-y-3">
-                    {/* Cabeçalho do Grupo Mobile */}
-                    <div className="bg-background dark:bg-background-dark rounded-lg p-3">
-                      <div className="mb-2">
-                        <h3 className="text-base font-semibold text-text dark:text-text-dark">
-                          {format(new Date(date), "EEEE", { locale: ptBR })}
-                        </h3>
+            <div className="md:hidden space-y-2">
+              {sortTransactions(transactionsWithBalance).slice((currentPage - 1) * itemsPerPageSelected, currentPage * itemsPerPageSelected).map((transaction) => (
+                <div
+                  key={transaction.id}
+                  className="bg-card dark:bg-card-dark rounded-lg p-3 hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors"
+                  onClick={() => handleActionClick(transaction)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-text dark:text-text-dark">{transaction.descricao}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {format(new Date(date), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                          {format(new Date(transaction.data), 'dd/MM HH:mm')}
+                        </p>
+                        <span className="text-gray-400">•</span>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {transaction.categoria.nome}
+                        </p>
+                        <span className="text-gray-400">•</span>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {transaction.conta.nome}
                         </p>
                       </div>
-                      
-                      <div className="grid grid-cols-3 gap-3 p-2 bg-background/50 dark:bg-background-dark/50 rounded-lg">
-                        <div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Entradas</p>
-                          <p className="text-xs font-medium text-emerald-400">
-                            {formatCurrency(group.totalCredito)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Saídas</p>
-                          <p className="text-xs font-medium text-red-400">
-                            {formatCurrency(group.totalDebito)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Saldo</p>
-                          <p className={cn(
-                            "text-xs font-medium",
-                            group.saldoFinal >= 0 ? "text-emerald-400" : "text-red-400"
-                          )}>
-                            {formatCurrency(group.saldoFinal)}
-                          </p>
-                        </div>
-                      </div>
                     </div>
-
-                    {/* Lista de Transações Mobile */}
-                    {group.transactions.map((transaction) => (
-                      <div
-                        key={transaction.id}
-                        className="bg-card dark:bg-card-dark rounded-lg p-3 hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors"
-                        onClick={() => handleActionClick(transaction)}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className="text-sm font-medium text-text dark:text-text-dark">{transaction.descricao}</p>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {format(new Date(transaction.data), 'HH:mm')}
-                              </p>
-                              <span className="text-gray-400">•</span>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {transaction.categoria.nome}
-                              </p>
-                              <span className="text-gray-400">•</span>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {transaction.conta.nome}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            {transaction.credito > 0 && (
-                              <p className="text-sm font-medium text-emerald-400">
-                                +{formatCurrency(transaction.credito)}
-                              </p>
-                            )}
-                            {transaction.debito > 0 && (
-                              <p className="text-sm font-medium text-red-400">
-                                -{formatCurrency(transaction.debito)}
-                              </p>
-                            )}
-                            <p className={cn(
-                              "text-xs mt-0.5",
-                              transaction.saldo >= 0 ? "text-emerald-400" : "text-red-400"
-                            )}>
-                              {formatCurrency(transaction.saldo)}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                    <div className="text-right">
+                      {transaction.credito > 0 && (
+                        <p className="text-sm font-medium text-emerald-400">
+                          {formatCurrency(transaction.credito)}
+                        </p>
+                      )}
+                      {transaction.debito > 0 && (
+                        <p className="text-sm font-medium text-red-400">
+                          {formatCurrency(transaction.debito)}
+                        </p>
+                      )}
+                      <p className={cn(
+                        "text-xs mt-0.5",
+                        transaction.saldo >= 0 ? "text-emerald-400" : "text-red-400"
+                      )}>
+                        {formatCurrency(transaction.saldo)}
+                      </p>
+                    </div>
                   </div>
-                )
-              })}
-              {visibleItems < currentDates.length && (
-                <div
-                  ref={loadMoreRef}
-                  className="flex items-center justify-center py-4"
-                >
-                  <Loader2 className="h-6 w-6 text-primary-500 animate-spin" />
                 </div>
-              )}
+              ))}
             </div>
+
+            {visibleItems < currentDates.length && (
+              <div
+                ref={loadMoreRef}
+                className="flex items-center justify-center py-4"
+              >
+                <Loader2 className="h-6 w-6 text-primary-500 animate-spin" />
+              </div>
+            )}
 
             {/* Paginação */}
             <div className="mt-4 flex items-center justify-between border-t border-border dark:border-border-dark pt-4">
