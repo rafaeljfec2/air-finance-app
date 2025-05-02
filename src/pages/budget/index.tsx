@@ -207,19 +207,35 @@ export default function BudgetPage() {
             </CardHeader>
             <CardTotal value={activeBill?.total ?? 0} color="violet" label="Total Fatura" />
             <div className="flex gap-1.5 mb-3 mt-3">
-              {cards.map((card) => (
-                <button
-                  key={card.id}
-                  onClick={() => setActiveCardTab(card.id)}
-                  className={`px-2 py-1 rounded font-medium border transition-colors text-[11px] ${activeCardTab === card.id ? 'bg-primary-600 text-white dark:bg-primary-500' : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-500'}`}
-                >
-                  <div className="flex items-center gap-1">
-                    {card.brand === 'nubank' && <NubankIcon />}
-                    {card.brand === 'itau' && <ItauIcon />}
-                    {card.name}
-                  </div>
-                </button>
-              ))}
+              {cards.map((card) => {
+                const isActive = activeCardTab === card.id;
+                let activeClass = '';
+                if (isActive) {
+                  if (card.brand === 'nubank') {
+                    activeClass = 'bg-[#8A05BE] text-white border-[#8A05BE]';
+                  } else if (card.brand === 'itau') {
+                    activeClass = 'bg-[#FF6900] text-white border-[#FF6900]';
+                  } else {
+                    activeClass = 'bg-primary-600 text-white dark:bg-primary-500';
+                  }
+                } else {
+                  activeClass =
+                    'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-500';
+                }
+                return (
+                  <button
+                    key={card.id}
+                    onClick={() => setActiveCardTab(card.id)}
+                    className={`px-2 py-1 rounded font-medium border transition-colors text-[11px] ${activeClass}`}
+                  >
+                    <div className="flex items-center gap-1">
+                      {card.brand === 'nubank' && <NubankIcon />}
+                      {card.brand === 'itau' && <ItauIcon />}
+                      {card.name}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
             <div>
               <table className="w-full text-[11px]">
