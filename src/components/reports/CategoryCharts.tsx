@@ -17,7 +17,6 @@ import { ChartBarIcon, ChartPieIcon, ArrowTrendingUpIcon } from '@heroicons/reac
 import { formatCurrency } from '@/utils/formatters';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Report } from '@/types/report';
 
 interface ChartData {
   name: string;

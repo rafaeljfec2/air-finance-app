@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
-import { useStatementStore } from '@/store/statement';
+import { useStatementStore } from '@/stores/statement';
 import { getCategoriesByType } from '@/utils/categories';
 import { Transaction, Category } from '@/types';
-import { MonthlyReport, ReportCategory } from '@/types/report';
+import { MonthlyReport } from '@/types/report';
 
 const COLORS = [
   '#10B981', // Emerald
@@ -39,21 +39,62 @@ export function useMonthlyReportMemo(transactions: Transaction[]): MonthlyReport
     }));
 
     const report: MonthlyReport = {
+      month: new Date().getMonth(),
+      year: new Date().getFullYear(),
+      incomeByCategory: incomeCategories.map((category, index) => ({
+        ...category,
+        color: COLORS[index % COLORS.length],
+        percentage: (category.value / income) * 100
+      })),
+      expensesByCategory: expenseCategories.map((category, index) => ({
+        ...category,
+        color: COLORS[index % COLORS.length],
+        percentage: (category.value / expenses) * 100
+      })),
+      historicalIncome: [],
+      historicalExpenses: [],
+      income: {
+        total: income,
+        categories: incomeCategories.map((category) => ({
+          ...category,
+          percentage: (category.value / income) * 100
+        }))
+      },
+      expenses: {
+        total: expenses,
+        categories: expenseCategories.map((category) => ({
+          ...category,
+          percentage: (category.value / expenses) * 100
+        }))
+      },
+      balance: {
+        current: income - expenses,
+        previous: 0,
+        variation: 0,
+        percentageVariation: 0
+      },
       summary: {
         income: {
           total: income,
-          categories: incomeCategories,
+          categories: incomeCategories.map((category) => ({
+            ...category,
+            percentage: (category.value / income) * 100
+          }))
         },
         expenses: {
           total: expenses,
-          categories: expenseCategories,
+          categories: expenseCategories.map((category) => ({
+            ...category,
+            percentage: (category.value / expenses) * 100
+          }))
         },
         balance: {
           current: income - expenses,
-          previous: 0, // TODO: Implement previous month calculation
-          variation: 0, // TODO: Implement variation calculation
-        },
-      },
+          previous: 0,
+          variation: 0,
+          percentageVariation: 0
+        }
+      }
     };
 
     return report;
@@ -62,15 +103,14 @@ export function useMonthlyReportMemo(transactions: Transaction[]): MonthlyReport
 
 export function useMonthlyReport(month: number, year: number) {
   const { transactions } = useStatementStore();
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentDate, setCurrentDate] = useState(new Date(year, month));
+  const [date, setDate] = useState(new Date(year, month));
 
   const report = useMemo(() => {
     const filteredTransactions = transactions.filter(
       (transaction: Transaction) => {
-        const date = new Date(transaction.date);
-        return date.getMonth() === currentDate.getMonth() && 
-               date.getFullYear() === currentDate.getFullYear();
+        const transactionDate = new Date(transaction.date);
+        return transactionDate.getMonth() === date.getMonth() && 
+               transactionDate.getFullYear() === date.getFullYear();
       }
     );
 
@@ -99,35 +139,43 @@ export function useMonthlyReport(month: number, year: number) {
       ? (balanceVariation / Math.abs(previousBalance)) * 100 
       : 0;
 
-    return {
-      month: currentDate.getMonth(),
-      year: currentDate.getFullYear(),
-      incomeByCategory: Object.entries(incomeByCategory).map(([name, value], index) => ({
-        name,
-        value: value as number,
+    const incomeCategories = Object.entries(incomeByCategory).map(([name, value]) => ({
+      name,
+      value: value as number
+    }));
+
+    const expenseCategories = Object.entries(expensesByCategory).map(([name, value]) => ({
+      name,
+      value: value as number
+    }));
+
+    const report: MonthlyReport = {
+      month: date.getMonth(),
+      year: date.getFullYear(),
+      incomeByCategory: incomeCategories.map((category, index) => ({
+        ...category,
         color: COLORS[index % COLORS.length],
-        percentage: (value as number / incomeTotal) * 100
+        percentage: (category.value / incomeTotal) * 100
       })),
-      expensesByCategory: Object.entries(expensesByCategory).map(([name, value], index) => ({
-        name,
-        value: value as number,
+      expensesByCategory: expenseCategories.map((category, index) => ({
+        ...category,
         color: COLORS[index % COLORS.length],
-        percentage: (value as number / expensesTotal) * 100
+        percentage: (category.value / expensesTotal) * 100
       })),
-      historicalIncome: [], // TODO: Implement historical data
-      historicalExpenses: [], // TODO: Implement historical data
+      historicalIncome: [],
+      historicalExpenses: [],
       income: {
         total: incomeTotal,
-        categories: Object.entries(incomeByCategory).map(([name, value]): ReportCategory => ({
-          name,
-          value: value as number
+        categories: incomeCategories.map((category) => ({
+          ...category,
+          percentage: (category.value / incomeTotal) * 100
         }))
       },
       expenses: {
         total: expensesTotal,
-        categories: Object.entries(expensesByCategory).map(([name, value]): ReportCategory => ({
-          name,
-          value: value as number
+        categories: expenseCategories.map((category) => ({
+          ...category,
+          percentage: (category.value / expensesTotal) * 100
         }))
       },
       balance: {
@@ -135,22 +183,45 @@ export function useMonthlyReport(month: number, year: number) {
         previous: previousBalance,
         variation: balanceVariation,
         percentageVariation
+      },
+      summary: {
+        income: {
+          total: incomeTotal,
+          categories: incomeCategories.map((category) => ({
+            ...category,
+            percentage: (category.value / incomeTotal) * 100
+          }))
+        },
+        expenses: {
+          total: expensesTotal,
+          categories: expenseCategories.map((category) => ({
+            ...category,
+            percentage: (category.value / expensesTotal) * 100
+          }))
+        },
+        balance: {
+          current: currentBalance,
+          previous: previousBalance,
+          variation: balanceVariation,
+          percentageVariation
+        }
       }
     };
-  }, [transactions, currentDate]);
+
+    return report;
+  }, [transactions, date]);
 
   const previousMonth = () => {
-    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1));
+    setDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1));
   };
 
   const nextMonth = () => {
-    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1));
+    setDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1));
   };
 
   return {
-    date: currentDate,
+    date: date,
     report,
-    isLoading,
     previousMonth,
     nextMonth
   };

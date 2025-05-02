@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useStatementStore } from '@/stores/statement';
+import { useTransactionStore } from '@/stores/transaction';
 import { Transaction, TransactionType } from '@/types/transaction';
 import { formatCurrency } from '@/utils/formatters';
-import { Category } from '@/constants/categories';
 
 export const INITIAL_FORM_STATE = {
   description: '',
@@ -25,7 +24,7 @@ type FormField = keyof FormData;
 
 export function useTransactionForm() {
   const navigate = useNavigate();
-  const { addTransaction } = useStatementStore();
+  const { addTransaction } = useTransactionStore();
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);

@@ -14,7 +14,7 @@ type ReportSection = 'summary' | 'charts' | 'details';
 
 export function Reports() {
   const currentDate = new Date();
-  const { date, report, isLoading, previousMonth, nextMonth } = useMonthlyReport(
+  const { date, report,  previousMonth, nextMonth } = useMonthlyReport(
     currentDate.getMonth(),
     currentDate.getFullYear()
   );
@@ -25,18 +25,6 @@ export function Reports() {
     { id: 'charts', label: 'Gráficos' },
     { id: 'details', label: 'Detalhes' },
   ];
-
-  if (isLoading || !report) {
-    return (
-      <ViewDefault>
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </div>
-      </ViewDefault>
-    );
-  }
 
   return (
     <ViewDefault>

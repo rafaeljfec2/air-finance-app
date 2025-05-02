@@ -34,7 +34,7 @@ describe('NewTransaction', () => {
   ];
 
   beforeEach(() => {
-    (useTransactionStore as jest.Mock).mockReturnValue({
+    (useTransactionStore as unknown as jest.Mock).mockReturnValue({
       addTransaction: mockAddTransaction,
       categories: mockCategories,
       accounts: mockAccounts

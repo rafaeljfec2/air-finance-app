@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { StatementFilters } from '@/components/statement/StatementFilters';
 import { useStatementStore } from '@/stores/statement';
@@ -17,8 +16,7 @@ import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatters';
 import { TransactionGrid } from '@/components/transactions/TransactionGrid';
 
-export function Statement() {
-  const navigate = useNavigate();
+export function Statement() {  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showErrorDetails, setShowErrorDetails] = useState(false);
@@ -35,8 +33,7 @@ export function Statement() {
     isLoading,
     error,
     errorDetails,
-    loadTransactions,
-    removeTransaction,
+    loadTransactions,    
   } = useStatementStore();
 
   // Configurar pull-to-refresh
@@ -87,12 +84,6 @@ export function Statement() {
   const handleEdit = async (transaction: Transaction) => {
     // TODO: Implement edit modal
     console.log('Edit transaction:', transaction);
-  };
-
-  const handleRemove = async (id: string) => {
-    if (window.confirm('Are you sure you want to remove this transaction?')) {
-      await removeTransaction(id);
-    }
   };
 
   const handleSearch = useCallback((term: string) => {

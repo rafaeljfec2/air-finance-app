@@ -1,11 +1,15 @@
 export type TransactionType = 'INCOME' | 'EXPENSE';
 
 export interface Category {
+  transactions?: Transaction[];
+  percentage?: number;
   id: string;
   name: string;
   type: TransactionType;
   color?: string;
   icon?: string;
+  total?: number;
+  length?: number;
 }
 
 export interface Account {
