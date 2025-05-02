@@ -459,8 +459,6 @@ export function TransactionGrid({
   })
   const [activeFilter, setActiveFilter] = useState<SortField | null>(null)
   const [filters, setFilters] = useState<FilterValue[]>([])
-  const [visibleItems, setVisibleItems] = useState<number>(10)
-  const loadMoreRef = useRef<HTMLDivElement>(null)
 
   const handleFilterClick = useCallback((field: SortField) => {
     setActiveFilter(activeFilter === field ? null : field)
@@ -611,29 +609,6 @@ export function TransactionGrid({
   const startIndex = (currentPage - 1) * itemsPerPageSelected
   const endIndex = startIndex + itemsPerPageSelected
   const paginatedTransactions = sortedAndFilteredTransactions.slice(startIndex, endIndex)
-
-  // Função para carregar mais itens quando o usuário rola até o final
-  const loadMore = useCallback(() => {
-    setVisibleItems(prev => Math.min(prev + 10, sortedAndFilteredTransactions.length))
-  }, [sortedAndFilteredTransactions.length])
-
-  // Configurar o IntersectionObserver para detectar quando o usuário chega ao final da lista
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMore()
-        }
-      },
-      { threshold: 0.1 }
-    )
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [loadMore])
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -807,15 +782,6 @@ export function TransactionGrid({
                 />
               ))}
             </div>
-
-            {visibleItems < sortedAndFilteredTransactions.length && (
-              <div
-                ref={loadMoreRef}
-                className="flex items-center justify-center py-4"
-              >
-                <Loader2 className="h-6 w-6 text-primary-500 animate-spin" />
-              </div>
-            )}
 
             {/* Paginação */}
             <div className="mt-4 flex items-center justify-between border-t border-border dark:border-border-dark pt-4">
