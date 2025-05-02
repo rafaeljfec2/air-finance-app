@@ -245,7 +245,7 @@ export function Dashboard() {
 
       <Modal open={showCategoriesModal} onClose={() => setShowCategoriesModal(false)} title="Despesas por Categoria">
         <div className="space-y-4">
-          {mockCategoryData.map((cat, idx) => (
+          {mockCategoryData.map((cat) => (
             <div key={cat.name} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="inline-block w-3 h-3 rounded-full" style={{ background: cat.color }} />
@@ -265,7 +265,7 @@ export function Dashboard() {
 
       <Modal open={showGoalsModal} onClose={() => setShowGoalsModal(false)} title="Metas Financeiras">
         <div className="space-y-6">
-          {mockGoals.map((goal, idx) => (
+          {mockGoals.map((goal) => (
             <div key={goal.name} className="mb-2">
               <div className="flex items-center justify-between mb-1">
                 <span className="font-medium text-purple-600 dark:text-purple-400">{goal.name}</span>
@@ -415,7 +415,9 @@ export function Dashboard() {
                         Ver detalhes
                       </Button>
                     </div>
-                    <BalanceChart data={mockBalanceHistory} />
+                    <div className="h-56 w-full">
+                      <BalanceChart data={mockBalanceHistory} />
+                    </div>
                   </div>
                 </Card>
 
