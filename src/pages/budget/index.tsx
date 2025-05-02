@@ -2,17 +2,15 @@ import { useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { MonthYearFilter } from '@/components/budget/MonthYearFilter';
 import { mockCashFlows, mockReceivables, mockPayables, mockCreditCards } from '@/mocks/budget';
+import { Wallet, TrendingUp, TrendingDown, CreditCard } from 'lucide-react';
 import {
-  Wallet,
-  TrendingUp,
-  TrendingDown,
-  CreditCard,
-  BadgeCheck,
-  Clock,
-  XCircle,
-  ArrowRight,
-} from 'lucide-react';
-import { CardContainer, CardHeader, CardStat, BadgeStatus, CardEmpty } from '@/components/budget';
+  CardContainer,
+  CardHeader,
+  CardStat,
+  BadgeStatus,
+  CardEmpty,
+  CardTotal,
+} from '@/components/budget';
 
 export default function BudgetPage() {
   // Estados de filtro para cada card
@@ -52,6 +50,7 @@ export default function BudgetPage() {
                 onChange={(month, year) => setCashFlowFilter({ month, year })}
               />
             </CardHeader>
+            <CardTotal value={cashFlow?.finalBalance ?? 0} color="emerald" label="Saldo Final" />
             {cashFlow ? (
               <div className="flex flex-col gap-4 mt-4">
                 <CardStat label="Entradas" value={cashFlow.totalIncome} positive />
@@ -77,6 +76,11 @@ export default function BudgetPage() {
                 onChange={(month, year) => setReceivableFilter({ month, year })}
               />
             </CardHeader>
+            <CardTotal
+              value={receivables.reduce((acc, r) => acc + r.value, 0)}
+              color="amber"
+              label="Total Receber"
+            />
             {receivables.length > 0 ? (
               <ul className="mt-4 divide-y divide-border dark:divide-border-dark">
                 {receivables.map((r, i) => (
@@ -95,15 +99,6 @@ export default function BudgetPage() {
                     </span>
                   </li>
                 ))}
-                <li className="flex justify-between items-center py-2 font-bold border-t border-border dark:border-border-dark mt-2">
-                  <span>Total Receber</span>
-                  <span>
-                    R${' '}
-                    {receivables
-                      .reduce((acc, r) => acc + r.value, 0)
-                      .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </span>
-                </li>
               </ul>
             ) : (
               <CardEmpty />
@@ -119,6 +114,11 @@ export default function BudgetPage() {
                 onChange={(month, year) => setPayableFilter({ month, year })}
               />
             </CardHeader>
+            <CardTotal
+              value={payables.reduce((acc, p) => acc + p.value, 0)}
+              color="rose"
+              label="Total Pagar"
+            />
             {payables.length > 0 ? (
               <ul className="mt-4 divide-y divide-border dark:divide-border-dark">
                 {payables.map((p, i) => (
@@ -137,15 +137,6 @@ export default function BudgetPage() {
                     </span>
                   </li>
                 ))}
-                <li className="flex justify-between items-center py-2 font-bold border-t border-border dark:border-border-dark mt-2">
-                  <span>Total Pagar</span>
-                  <span>
-                    R${' '}
-                    {payables
-                      .reduce((acc, p) => acc + p.value, 0)
-                      .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </span>
-                </li>
               </ul>
             ) : (
               <CardEmpty />
@@ -161,6 +152,7 @@ export default function BudgetPage() {
                 onChange={(month, year) => setCardFilter({ month, year })}
               />
             </CardHeader>
+            <CardTotal value={activeBill?.total ?? 0} color="violet" label="Total Fatura" />
             <div className="flex gap-2 mb-4 mt-4">
               {cards.map((card) => (
                 <button
@@ -221,12 +213,6 @@ export default function BudgetPage() {
                       </span>
                     </li>
                   ))}
-                  <li className="flex justify-between items-center py-2 font-bold border-t border-border dark:border-border-dark mt-2">
-                    <span>Total Fatura</span>
-                    <span>
-                      R$ {activeBill.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </span>
-                  </li>
                 </ul>
               </div>
             ) : (
