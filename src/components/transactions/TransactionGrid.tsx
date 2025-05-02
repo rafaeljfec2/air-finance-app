@@ -1,11 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import { Card } from '@/components/ui/card'
-import { formatCurrency, formatDate } from '@/utils/formatters'
-import { MoreHorizontal, ChevronRight, Loader2, ChevronLeft, ChevronRightIcon, ChevronsLeft, ChevronsRight, ArrowUpDown, Filter } from 'lucide-react'
+import { formatCurrency } from '@/utils/formatters'
+import { MoreHorizontal, ChevronRight, Loader2, ChevronLeft, ChevronsLeft, ChevronsRight, ArrowUpDown, Filter } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback, memo } from 'react'
 import { Tooltip } from '@/components/ui/tooltip'
 
 type SortField = 'hora' | 'categoria' | 'descricao' | 'conta' | 'credito' | 'debito' | 'saldo'
@@ -22,11 +21,12 @@ interface FilterMenuProps {
   selectedValues: Set<string>
   onFilter: (field: SortField, values: Set<string>) => void
   onClose: () => void
+  position?: { top: number; left: number }
 }
 
-const FilterMenu = ({ field, items, selectedValues, onFilter, onClose }: FilterMenuProps) => {
+const FilterMenu = ({ field, items, selectedValues, onFilter, onClose, position }: FilterMenuProps) => {
   const [selected, setSelected] = useState<Set<string>>(selectedValues)
-  const uniqueValues = useMemo(() => Array.from(new Set(items)).sort(), [items])
+  const [searchTerm, setSearchTerm] = useState('')
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -36,9 +36,29 @@ const FilterMenu = ({ field, items, selectedValues, onFilter, onClose }: FilterM
       }
     }
 
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleEscape)
+    }
   }, [onClose])
+
+  const uniqueValues = useMemo(() => {
+    const values = Array.from(new Set(items)).sort()
+    if (searchTerm) {
+      return values.filter(value => 
+        value.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+    return values
+  }, [items, searchTerm])
 
   const handleSelectAll = () => {
     const newSelected = new Set(uniqueValues)
@@ -62,84 +82,100 @@ const FilterMenu = ({ field, items, selectedValues, onFilter, onClose }: FilterM
     onFilter(field, newSelected)
   }
 
+  const style = position ? {
+    position: 'fixed' as const,
+    top: `${position.top}px`,
+    left: `${position.left}px`,
+  } : {}
+
   return (
     <div 
       ref={menuRef} 
-      className="absolute z-50 mt-1 w-56 rounded-md bg-white dark:bg-gray-900 shadow-lg ring-1 ring-black/5 dark:ring-white/10 dark:border dark:border-gray-800"
-      style={{ minWidth: '200px' }}
+      className="z-50 w-56 rounded-md bg-white dark:bg-gray-900 shadow-lg ring-1 ring-black/5 dark:ring-white/10 dark:border dark:border-gray-800"
+      style={{ minWidth: '200px', ...style }}
+      role="dialog"
+      aria-label={`Filtrar por ${field}`}
     >
+      <div className="p-2 border-b border-gray-200 dark:border-gray-800">
+        <input
+          type="text"
+          placeholder="Buscar..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full px-2 py-1 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
+          aria-label="Buscar valores"
+        />
+      </div>
       <div className="p-2 border-b border-gray-200 dark:border-gray-800">
         <div className="flex justify-between items-center">
           <button
-            onClick={() => {
-              const newSelected = new Set(uniqueValues)
-              setSelected(newSelected)
-              onFilter(field, newSelected)
-            }}
+            onClick={handleSelectAll}
             className="text-xs text-primary-500 hover:text-primary-400 dark:text-primary-400 dark:hover:text-primary-300"
+            aria-label="Selecionar todos os valores"
           >
             Selecionar todos
           </button>
           <button
-            onClick={() => {
-              setSelected(new Set())
-              onFilter(field, new Set())
-            }}
+            onClick={handleClearAll}
             className="text-xs text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
+            aria-label="Limpar seleção"
           >
             Limpar
           </button>
         </div>
       </div>
       <div className="p-2 max-h-60 overflow-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
-        {uniqueValues.map((value) => (
-          <label key={value} className="flex items-center px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-800/80 rounded cursor-pointer">
-            <input
-              type="checkbox"
-              className="form-checkbox h-4 w-4 text-primary-500 dark:text-primary-400 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800"
-              checked={selected.has(value)}
-              onChange={() => {
-                const newSelected = new Set(selected)
-                if (newSelected.has(value)) {
-                  newSelected.delete(value)
-                } else {
-                  newSelected.add(value)
-                }
-                setSelected(newSelected)
-                onFilter(field, newSelected)
-              }}
-            />
-            <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">
-              {value}
-            </span>
-          </label>
-        ))}
+        {uniqueValues.length === 0 ? (
+          <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-2">
+            Nenhum resultado encontrado
+          </p>
+        ) : (
+          uniqueValues.map((value) => (
+            <label 
+              key={value} 
+              className="flex items-center px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-800/80 rounded cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                className="form-checkbox h-4 w-4 text-primary-500 dark:text-primary-400 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800"
+                checked={selected.has(value)}
+                onChange={() => handleCheckboxChange(value)}
+                aria-label={`Filtrar por ${value}`}
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">
+                {value}
+              </span>
+            </label>
+          ))
+        )}
       </div>
     </div>
   )
 }
 
+const MemoizedFilterMenu = memo(FilterMenu)
+
 export type Transaction = {
   id: string
-  tipo: 'RECEITA' | 'DESPESA'
-  descricao: string
-  valor: number
-  data: string
-  categoriaId: string
-  contaId: string
-  observacao: string
-  categoria: {
+  type: 'INCOME' | 'EXPENSE'
+  description: string
+  amount: number
+  date: string
+  categoryId: string
+  accountId: string
+  note: string
+  category: {
     id: string
-    nome: string
-    tipo: string
+    name: string
+    type: string
   }
-  conta: {
+  account: {
     id: string
-    nome: string
+    name: string
   }
-  credito?: number
-  debito?: number
-  saldo?: number
+  credit?: number
+  debit?: number
+  balance?: number
 }
 
 interface TransactionGridProps {
@@ -148,6 +184,262 @@ interface TransactionGridProps {
   showActions?: boolean
   onActionClick?: (transaction: Transaction) => void
   className?: string
+}
+
+const TableRow = memo(({ 
+  transaction, 
+  showActions, 
+  onActionClick 
+}: { 
+  transaction: Transaction
+  showActions: boolean
+  onActionClick: (transaction: Transaction) => void
+}) => {
+  const formatDate = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr)
+      if (isNaN(date.getTime())) {
+        return '-'
+      }
+      return format(date, 'dd/MM/yyyy HH:mm')
+    } catch (error) {
+      console.error('Error formatting date:', error)
+      return '-'
+    }
+  }
+
+  return (
+    <tr
+      className="hover:bg-background/70 dark:hover:bg-background-dark/70 transition-colors"
+    >
+      <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+        {formatDate(transaction.date)}
+      </td>
+      <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
+        <Tooltip content={transaction.category?.name || 'Sem categoria'}>
+          <span className="block overflow-hidden text-ellipsis">
+            {transaction.category?.name || 'Sem categoria'}
+          </span>
+        </Tooltip>
+      </td>
+      <td className="py-2 px-4 text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis">
+        <Tooltip content={transaction.description || 'Sem descrição'}>
+          <span className="block overflow-hidden text-ellipsis">
+            {transaction.description || 'Sem descrição'}
+          </span>
+        </Tooltip>
+      </td>
+      <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
+        <Tooltip content={transaction.account?.name || 'Sem conta'}>
+          <span className="block overflow-hidden text-ellipsis">
+            {transaction.account?.name || 'Sem conta'}
+          </span>
+        </Tooltip>
+      </td>
+      <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-emerald-400 whitespace-nowrap">
+        {transaction.credit ? formatCurrency(transaction.credit) : '-'}
+      </td>
+      <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-red-400 whitespace-nowrap">
+        {transaction.debit ? formatCurrency(transaction.debit) : '-'}
+      </td>
+      <td className={cn(
+        "py-2 pl-0 pr-8 text-xs font-medium text-right whitespace-nowrap",
+        (transaction.balance ?? 0) >= 0 ? "text-emerald-400" : "text-red-400"
+      )}>
+        {formatCurrency(transaction.balance ?? 0)}
+      </td>
+      {showActions && (
+        <td className="py-2 px-4 w-10">
+          <button
+            onClick={() => onActionClick(transaction)}
+            className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark"
+            aria-label="Mais ações"
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
+        </td>
+      )}
+    </tr>
+  )
+})
+
+TableRow.displayName = 'TableRow'
+
+const MobileCard = memo(({ 
+  transaction, 
+  showActions, 
+  onActionClick 
+}: { 
+  transaction: Transaction
+  showActions: boolean
+  onActionClick: (transaction: Transaction) => void
+}) => {
+  const formatDate = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr)
+      if (isNaN(date.getTime())) {
+        return '-'
+      }
+      return format(date, 'dd/MM HH:mm')
+    } catch (error) {
+      console.error('Error formatting date:', error)
+      return '-'
+    }
+  }
+
+  return (
+    <div
+      className="bg-card dark:bg-card-dark rounded-lg p-4 hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors"
+      onClick={() => onActionClick(transaction)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onActionClick(transaction)
+        }
+      }}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+              {formatDate(transaction.date)}
+            </span>
+            <span className="text-gray-400">•</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+              {transaction.category?.name || 'Sem categoria'}
+            </span>
+          </div>
+          <h3 className="text-sm font-medium text-text dark:text-text-dark mb-1 truncate">
+            {transaction.description}
+          </h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+            {transaction.account?.name || 'Sem conta'}
+          </p>
+        </div>
+        <div className="text-right flex flex-col items-end justify-between h-full">
+          {transaction.type === 'INCOME' ? (
+            <span className="text-sm font-medium text-emerald-400">
+              +{formatCurrency(transaction.amount)}
+            </span>
+          ) : (
+            <span className="text-sm font-medium text-red-400">
+              -{formatCurrency(transaction.amount)}
+            </span>
+          )}
+          <span className={cn(
+            "text-xs mt-1",
+            (transaction.balance ?? 0) >= 0 ? "text-emerald-400" : "text-red-400"
+          )}>
+            {formatCurrency(transaction.balance ?? 0)}
+          </span>
+        </div>
+      </div>
+      {showActions && (
+        <div className="mt-3 pt-3 border-t border-border/50 dark:border-border-dark/50 flex items-center justify-end">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onActionClick(transaction)
+            }}
+            className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark p-2 -m-2"
+            aria-label="Mais ações"
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+    </div>
+  )
+})
+
+MobileCard.displayName = 'MobileCard'
+
+interface SortableHeaderProps {
+  field: SortField
+  children: React.ReactNode
+  className?: string
+  sortConfig: { field: SortField; direction: SortDirection }
+  filters: FilterValue[]
+  activeFilter: SortField | null
+  onSort: (field: SortField) => void
+  onFilterClick: (field: SortField) => void
+  onFilter: (field: SortField, values: Set<string>) => void
+  onCloseFilter: () => void
+  getFieldValues: (transactions: Transaction[], field: SortField) => string[]
+  transactions: Transaction[]
+}
+
+const SortableHeader: React.FC<SortableHeaderProps> = ({ 
+  field, 
+  children, 
+  className,
+  sortConfig,
+  filters,
+  activeFilter,
+  onSort,
+  onFilterClick,
+  onFilter,
+  onCloseFilter,
+  getFieldValues,
+  transactions
+}) => {
+  const getAriaSort = () => {
+    if (sortConfig.field !== field) return 'none'
+    return sortConfig.direction === 'asc' ? 'ascending' : 'descending'
+  }
+
+  return (
+    <th 
+      className={cn(
+        "text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none relative",
+        className
+      )}
+      role="columnheader"
+      aria-sort={getAriaSort()}
+      onClick={() => onSort(field)}
+    >
+      <div className="flex items-center justify-between">
+        <div
+          className={cn(
+            "flex items-center gap-1",
+            field === 'credito' || field === 'debito' || field === 'saldo' ? "justify-end w-full" : "justify-start"
+          )}
+        >
+          {children}
+          <ArrowUpDown className={cn(
+            "h-3 w-3 transition-all",
+            sortConfig.field === field ? "opacity-100" : "opacity-0 group-hover:opacity-50",
+            sortConfig.field === field && sortConfig.direction === 'asc' && "rotate-180"
+          )} />
+        </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onFilterClick(field)
+          }}
+          className="ml-2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+        >
+          <Filter className={cn(
+            "h-3 w-3",
+            filters.some(f => f.field === field) ? "text-primary-500" : "text-gray-400"
+          )} />
+        </button>
+      </div>
+      {activeFilter === field && (
+        <div className="absolute left-0 right-0 top-full">
+          <MemoizedFilterMenu
+            field={field}
+            items={getFieldValues(transactions, field)}
+            selectedValues={filters.find(f => f.field === field)?.values ?? new Set()}
+            onFilter={onFilter}
+            onClose={onCloseFilter}
+          />
+        </div>
+      )}
+    </th>
+  )
 }
 
 export function TransactionGrid({
@@ -167,18 +459,22 @@ export function TransactionGrid({
   })
   const [activeFilter, setActiveFilter] = useState<SortField | null>(null)
   const [filters, setFilters] = useState<FilterValue[]>([])
+  const [visibleItems, setVisibleItems] = useState<number>(10)
+  const loadMoreRef = useRef<HTMLDivElement>(null)
 
-  const handleFilterClick = (field: SortField) => {
+  const handleFilterClick = useCallback((field: SortField) => {
     setActiveFilter(activeFilter === field ? null : field)
-  }
+  }, [activeFilter])
 
-  const handleFilter = (field: SortField, values: Set<string>) => {
-    const newFilters = filters.filter(f => f.field !== field)
-    if (values.size > 0) {
-      newFilters.push({ field, values })
-    }
-    setFilters(newFilters)
-  }
+  const handleFilter = useCallback((field: SortField, values: Set<string>) => {
+    setFilters(prev => {
+      const newFilters = prev.filter(f => f.field !== field)
+      if (values.size > 0) {
+        newFilters.push({ field, values })
+      }
+      return newFilters
+    })
+  }, [])
 
   const getFilteredTransactions = useCallback((transactions: Transaction[]) => {
     return transactions.filter(transaction => {
@@ -191,20 +487,30 @@ export function TransactionGrid({
 
   const getFieldValue = (transaction: Transaction, field: SortField): string | number => {
     switch (field) {
-      case 'hora':
-        return format(new Date(transaction.data), 'dd/MM HH:mm')
+      case 'hora': {
+        try {
+          const date = new Date(transaction.date)
+          if (isNaN(date.getTime())) {
+            return '-'
+          }
+          return format(date, 'dd/MM HH:mm')
+        } catch (error) {
+          console.error('Error formatting date:', error)
+          return '-'
+        }
+      }
       case 'categoria':
-        return transaction.categoria.nome
+        return transaction.category?.name || 'Sem categoria'
       case 'descricao':
-        return transaction.descricao
+        return transaction.description || 'Sem descrição'
       case 'conta':
-        return transaction.conta.nome
+        return transaction.account?.name || 'Sem conta'
       case 'credito':
-        return transaction.tipo === 'RECEITA' ? transaction.valor : 0
+        return transaction.type === 'INCOME' ? transaction.amount : 0
       case 'debito':
-        return transaction.tipo === 'DESPESA' ? transaction.valor : 0
+        return transaction.type === 'EXPENSE' ? transaction.amount : 0
       case 'saldo':
-        return transaction.saldo ?? 0
+        return transaction.balance ?? 0
       default:
         return ''
     }
@@ -218,39 +524,50 @@ export function TransactionGrid({
   const sortTransactions = (transactions: Transaction[]) => {
     return [...transactions].sort((a, b) => {
       switch (sortConfig.field) {
-        case 'hora':
-          return sortConfig.direction === 'asc'
-            ? new Date(a.data).getTime() - new Date(b.data).getTime()
-            : new Date(b.data).getTime() - new Date(a.data).getTime()
+        case 'hora': {
+          try {
+            const dateA = new Date(a.date).getTime()
+            const dateB = new Date(b.date).getTime()
+            if (isNaN(dateA) || isNaN(dateB)) {
+              return 0
+            }
+            return sortConfig.direction === 'asc'
+              ? dateA - dateB
+              : dateB - dateA
+          } catch (error) {
+            console.error('Error sorting dates:', error)
+            return 0
+          }
+        }
         case 'categoria':
           return sortConfig.direction === 'asc'
-            ? a.categoria.nome.localeCompare(b.categoria.nome)
-            : b.categoria.nome.localeCompare(a.categoria.nome)
+            ? a.category?.name.localeCompare(b.category?.name)
+            : b.category?.name.localeCompare(a.category?.name)
         case 'descricao':
           return sortConfig.direction === 'asc'
-            ? a.descricao.localeCompare(b.descricao)
-            : b.descricao.localeCompare(a.descricao)
+            ? a.description.localeCompare(b.description)
+            : b.description.localeCompare(a.description)
         case 'conta':
           return sortConfig.direction === 'asc'
-            ? a.conta.nome.localeCompare(b.conta.nome)
-            : b.conta.nome.localeCompare(a.conta.nome)
+            ? a.account?.name.localeCompare(b.account?.name)
+            : b.account?.name.localeCompare(a.account?.name)
         case 'credito': {
-          const aValue = a.tipo === 'RECEITA' ? a.valor : 0
-          const bValue = b.tipo === 'RECEITA' ? b.valor : 0
+          const aValue = a.type === 'INCOME' ? a.amount : 0
+          const bValue = b.type === 'INCOME' ? b.amount : 0
           return sortConfig.direction === 'asc'
             ? aValue - bValue
             : bValue - aValue
         }
         case 'debito': {
-          const aValue = a.tipo === 'DESPESA' ? a.valor : 0
-          const bValue = b.tipo === 'DESPESA' ? b.valor : 0
+          const aValue = a.type === 'EXPENSE' ? a.amount : 0
+          const bValue = b.type === 'EXPENSE' ? b.amount : 0
           return sortConfig.direction === 'asc'
             ? aValue - bValue
             : bValue - aValue
         }
         case 'saldo': {
-          const aValue = a.saldo ?? 0
-          const bValue = b.saldo ?? 0
+          const aValue = a.balance ?? 0
+          const bValue = b.balance ?? 0
           return sortConfig.direction === 'asc'
             ? aValue - bValue
             : bValue - aValue
@@ -270,36 +587,35 @@ export function TransactionGrid({
   }
 
   // Calcular saldo acumulado para cada transação
-  let saldoAcumulado = 0
+  let accumulatedBalance = 0
   const transactionsWithBalance = transactions.map(transaction => {
-    const credito = transaction.tipo === 'RECEITA' ? transaction.valor : 0
-    const debito = transaction.tipo === 'DESPESA' ? transaction.valor : 0
-    saldoAcumulado += credito - debito
+    const credit = transaction.type === 'INCOME' ? transaction.amount : 0
+    const debit = transaction.type === 'EXPENSE' ? transaction.amount : 0
+    accumulatedBalance += credit - debit
     return {
       ...transaction,
-      credito,
-      debito,
-      saldo: saldoAcumulado
+      credit,
+      debit,
+      balance: accumulatedBalance
     }
   })
 
-  // Lógica de paginação
-  const sortedDates = useMemo(() => {
-    return Object.keys(transactionsWithBalance).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
-  }, [transactionsWithBalance])
+  // Aplicar filtros e ordenação
+  const sortedAndFilteredTransactions = useMemo(() => {
+    const filtered = getFilteredTransactions(transactionsWithBalance)
+    return sortTransactions(filtered)
+  }, [transactionsWithBalance, sortConfig, filters])
 
-  const totalPages = Math.ceil(sortedDates.length / itemsPerPageSelected)
+  // Lógica de paginação
+  const totalPages = Math.ceil(sortedAndFilteredTransactions.length / itemsPerPageSelected)
   const startIndex = (currentPage - 1) * itemsPerPageSelected
   const endIndex = startIndex + itemsPerPageSelected
-  const currentDates = sortedDates.slice(startIndex, endIndex)
+  const paginatedTransactions = sortedAndFilteredTransactions.slice(startIndex, endIndex)
 
-  const [visibleItems, setVisibleItems] = useState<number>(10)
-  const loadMoreRef = useRef<HTMLDivElement>(null)
-
-  // Função para carregar mais itens quando o usuário rolar até o final
+  // Função para carregar mais itens quando o usuário rola até o final
   const loadMore = useCallback(() => {
-    setVisibleItems(prev => Math.min(prev + 10, currentDates.length))
-  }, [currentDates.length])
+    setVisibleItems(prev => Math.min(prev + 10, sortedAndFilteredTransactions.length))
+  }, [sortedAndFilteredTransactions.length])
 
   // Configurar o IntersectionObserver para detectar quando o usuário chega ao final da lista
   useEffect(() => {
@@ -329,78 +645,13 @@ export function TransactionGrid({
     setCurrentPage(1)
   }
 
-  const handleActionClick = (transaction: Transaction) => {
+  const handleActionClick = useCallback((transaction: Transaction) => {
     if (onActionClick) {
       onActionClick(transaction)
     } else {
       navigate(`/transactions/edit/${transaction.id}`)
     }
-  }
-
-  // Componente de cabeçalho ordenável
-  const SortableHeader = ({ field, children, className }: { 
-    field: SortField
-    children: React.ReactNode
-    className?: string 
-  }) => {
-    const getAriaSort = () => {
-      if (sortConfig.field !== field) return 'none'
-      return sortConfig.direction === 'asc' ? 'ascending' : 'descending'
-    }
-
-    return (
-      <th 
-        className={cn(
-          "text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none relative",
-          className
-        )}
-        role="columnheader"
-        aria-sort={getAriaSort()}
-      >
-        <div className="flex items-center justify-between">
-          <div
-            className={cn(
-              "flex items-center gap-1",
-              field === 'credito' || field === 'debito' || field === 'saldo' ? "justify-end w-full" : "justify-start"
-            )}
-            onClick={() => toggleSort(field)}
-          >
-            {children}
-            <ArrowUpDown className={cn(
-              "h-3 w-3 transition-all",
-              sortConfig.field === field ? "opacity-100" : "opacity-0 group-hover:opacity-50",
-              sortConfig.field === field && sortConfig.direction === 'asc' && "rotate-180"
-            )} />
-          </div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              handleFilterClick(field)
-            }}
-            className="ml-2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-          >
-            <Filter className={cn(
-              "h-3 w-3",
-              filters.some(f => f.field === field) ? "text-primary-500" : "text-gray-400"
-            )} />
-          </button>
-        </div>
-        {activeFilter === field && (
-          <div className="absolute left-0 right-0 top-full">
-            <FilterMenu
-              field={field}
-              items={getFieldValues(transactions, field)}
-              selectedValues={filters.find(f => f.field === field)?.values ?? new Set()}
-              onFilter={handleFilter}
-              onClose={() => setActiveFilter(null)}
-            />
-          </div>
-        )}
-      </th>
-    )
-  }
-
-  const filteredTransactions = useMemo(() => getFilteredTransactions(transactions), [transactions, getFilteredTransactions])
+  }, [onActionClick, navigate])
 
   return (
     <Card className={cn("bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm", className)}>
@@ -427,70 +678,118 @@ export function TransactionGrid({
                   </colgroup>
                   <thead>
                     <tr className="bg-background/30 dark:bg-background-dark/30">
-                      <SortableHeader field="hora">Data/Hora</SortableHeader>
-                      <SortableHeader field="categoria">Categoria</SortableHeader>
-                      <SortableHeader field="descricao">Descrição</SortableHeader>
-                      <SortableHeader field="conta">Conta</SortableHeader>
-                      <SortableHeader field="credito" className="text-right pl-0 pr-8">Crédito</SortableHeader>
-                      <SortableHeader field="debito" className="text-right pl-0 pr-8">Débito</SortableHeader>
-                      <SortableHeader field="saldo" className="text-right pl-0 pr-8">Saldo</SortableHeader>
+                      <SortableHeader 
+                        field="hora"
+                        sortConfig={sortConfig}
+                        filters={filters}
+                        activeFilter={activeFilter}
+                        onSort={toggleSort}
+                        onFilterClick={handleFilterClick}
+                        onFilter={handleFilter}
+                        onCloseFilter={() => setActiveFilter(null)}
+                        getFieldValues={getFieldValues}
+                        transactions={transactions}
+                      >
+                        Data/Hora
+                      </SortableHeader>
+                      <SortableHeader 
+                        field="categoria"
+                        sortConfig={sortConfig}
+                        filters={filters}
+                        activeFilter={activeFilter}
+                        onSort={toggleSort}
+                        onFilterClick={handleFilterClick}
+                        onFilter={handleFilter}
+                        onCloseFilter={() => setActiveFilter(null)}
+                        getFieldValues={getFieldValues}
+                        transactions={transactions}
+                      >
+                        Categoria
+                      </SortableHeader>
+                      <SortableHeader 
+                        field="descricao"
+                        sortConfig={sortConfig}
+                        filters={filters}
+                        activeFilter={activeFilter}
+                        onSort={toggleSort}
+                        onFilterClick={handleFilterClick}
+                        onFilter={handleFilter}
+                        onCloseFilter={() => setActiveFilter(null)}
+                        getFieldValues={getFieldValues}
+                        transactions={transactions}
+                      >
+                        Descrição
+                      </SortableHeader>
+                      <SortableHeader 
+                        field="conta"
+                        sortConfig={sortConfig}
+                        filters={filters}
+                        activeFilter={activeFilter}
+                        onSort={toggleSort}
+                        onFilterClick={handleFilterClick}
+                        onFilter={handleFilter}
+                        onCloseFilter={() => setActiveFilter(null)}
+                        getFieldValues={getFieldValues}
+                        transactions={transactions}
+                      >
+                        Conta
+                      </SortableHeader>
+                      <SortableHeader 
+                        field="credito"
+                        className="text-right pl-0 pr-8"
+                        sortConfig={sortConfig}
+                        filters={filters}
+                        activeFilter={activeFilter}
+                        onSort={toggleSort}
+                        onFilterClick={handleFilterClick}
+                        onFilter={handleFilter}
+                        onCloseFilter={() => setActiveFilter(null)}
+                        getFieldValues={getFieldValues}
+                        transactions={transactions}
+                      >
+                        Crédito
+                      </SortableHeader>
+                      <SortableHeader 
+                        field="debito"
+                        className="text-right pl-0 pr-8"
+                        sortConfig={sortConfig}
+                        filters={filters}
+                        activeFilter={activeFilter}
+                        onSort={toggleSort}
+                        onFilterClick={handleFilterClick}
+                        onFilter={handleFilter}
+                        onCloseFilter={() => setActiveFilter(null)}
+                        getFieldValues={getFieldValues}
+                        transactions={transactions}
+                      >
+                        Débito
+                      </SortableHeader>
+                      <SortableHeader 
+                        field="saldo"
+                        className="text-right pl-0 pr-8"
+                        sortConfig={sortConfig}
+                        filters={filters}
+                        activeFilter={activeFilter}
+                        onSort={toggleSort}
+                        onFilterClick={handleFilterClick}
+                        onFilter={handleFilter}
+                        onCloseFilter={() => setActiveFilter(null)}
+                        getFieldValues={getFieldValues}
+                        transactions={transactions}
+                      >
+                        Saldo
+                      </SortableHeader>
                       {showActions && <th className="w-10"></th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
-                    {sortTransactions(filteredTransactions).slice((currentPage - 1) * itemsPerPageSelected, currentPage * itemsPerPageSelected).map((transaction) => (
-                      <tr
+                    {paginatedTransactions.map((transaction) => (
+                      <TableRow
                         key={transaction.id}
-                        className="hover:bg-background/70 dark:hover:bg-background-dark/70 transition-colors"
-                      >
-                        <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                          {format(new Date(transaction.data), 'dd/MM HH:mm')}
-                        </td>
-                        <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
-                          <Tooltip content={transaction.categoria.nome}>
-                            <span className="block overflow-hidden text-ellipsis">
-                              {transaction.categoria.nome}
-                            </span>
-                          </Tooltip>
-                        </td>
-                        <td className="py-2 px-4 text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis">
-                          <Tooltip content={transaction.descricao}>
-                            <span className="block overflow-hidden text-ellipsis">
-                              {transaction.descricao}
-                            </span>
-                          </Tooltip>
-                        </td>
-                        <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
-                          <Tooltip content={transaction.conta.nome}>
-                            <span className="block overflow-hidden text-ellipsis">
-                              {transaction.conta.nome}
-                            </span>
-                          </Tooltip>
-                        </td>
-                        <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-emerald-400 whitespace-nowrap">
-                          {transaction.credito ? formatCurrency(transaction.credito) : '-'}
-                        </td>
-                        <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-red-400 whitespace-nowrap">
-                          {transaction.debito ? formatCurrency(transaction.debito) : '-'}
-                        </td>
-                        <td className={cn(
-                          "py-2 pl-0 pr-8 text-xs font-medium text-right whitespace-nowrap",
-                          (transaction.saldo ?? 0) >= 0 ? "text-emerald-400" : "text-red-400"
-                        )}>
-                          {formatCurrency(transaction.saldo ?? 0)}
-                        </td>
-                        {showActions && (
-                          <td className="py-2 px-4 w-10">
-                            <button
-                              onClick={() => handleActionClick(transaction)}
-                              className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark"
-                              aria-label="Mais ações"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </button>
-                          </td>
-                        )}
-                      </tr>
+                        transaction={transaction}
+                        showActions={showActions}
+                        onActionClick={handleActionClick}
+                      />
                     ))}
                   </tbody>
                 </table>
@@ -499,53 +798,17 @@ export function TransactionGrid({
 
             {/* Mobile Card View */}
             <div className="md:hidden space-y-2">
-              {sortTransactions(filteredTransactions).slice((currentPage - 1) * itemsPerPageSelected, currentPage * itemsPerPageSelected).map((transaction) => (
-                <div
+              {paginatedTransactions.map((transaction) => (
+                <MobileCard
                   key={transaction.id}
-                  className="bg-card dark:bg-card-dark rounded-lg p-3 hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors"
-                  onClick={() => handleActionClick(transaction)}
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-text dark:text-text-dark">{transaction.descricao}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {format(new Date(transaction.data), 'dd/MM HH:mm')}
-                        </p>
-                        <span className="text-gray-400">•</span>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {transaction.categoria.nome}
-                        </p>
-                        <span className="text-gray-400">•</span>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {transaction.conta.nome}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      {transaction.credito && transaction.credito > 0 && (
-                        <p className="text-sm font-medium text-emerald-400">
-                          {formatCurrency(transaction.credito)}
-                        </p>
-                      )}
-                      {transaction.debito && transaction.debito > 0 && (
-                        <p className="text-sm font-medium text-red-400">
-                          {formatCurrency(transaction.debito)}
-                        </p>
-                      )}
-                      <p className={cn(
-                        "text-xs mt-0.5",
-                        (transaction.saldo ?? 0) >= 0 ? "text-emerald-400" : "text-red-400"
-                      )}>
-                        {formatCurrency(transaction.saldo ?? 0)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                  transaction={transaction}
+                  showActions={showActions}
+                  onActionClick={handleActionClick}
+                />
               ))}
             </div>
 
-            {visibleItems < currentDates.length && (
+            {visibleItems < sortedAndFilteredTransactions.length && (
               <div
                 ref={loadMoreRef}
                 className="flex items-center justify-center py-4"
@@ -568,7 +831,7 @@ export function TransactionGrid({
                   <option value={50}>50 por página</option>
                 </select>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Mostrando {startIndex + 1} a {Math.min(endIndex, sortedDates.length)} de {sortedDates.length}
+                  Mostrando {startIndex + 1} a {Math.min(endIndex, sortedAndFilteredTransactions.length)} de {sortedAndFilteredTransactions.length}
                 </p>
               </div>
               <div className="flex items-center gap-1">

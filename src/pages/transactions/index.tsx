@@ -40,24 +40,26 @@ export function Transactions() {
   }, [])
 
   const filteredTransactions = mockTransactions
-    .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .filter((transaction) => {
-      const matchesSearch = transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesType = selectedType === 'all' || transaction.tipo === selectedType
+      const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesType = selectedType === 'all' || 
+        (selectedType === 'RECEITA' && transaction.type === 'INCOME') ||
+        (selectedType === 'DESPESA' && transaction.type === 'EXPENSE')
       return matchesSearch && matchesType
     })
 
   // Calcular saldo acumulado para cada transação
   let saldoAcumulado = 0
   const transactionsWithBalance = filteredTransactions.map(transaction => {
-    const credito = transaction.tipo === 'RECEITA' ? transaction.valor : 0
-    const debito = transaction.tipo === 'DESPESA' ? transaction.valor : 0
-    saldoAcumulado += credito - debito
+    const credit = transaction.type === 'INCOME' ? transaction.amount : 0
+    const debit = transaction.type === 'EXPENSE' ? transaction.amount : 0
+    saldoAcumulado += credit - debit
     return {
       ...transaction,
-      credito,
-      debito,
-      saldo: saldoAcumulado
+      credit,
+      debit,
+      balance: saldoAcumulado
     }
   })
 
