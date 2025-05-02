@@ -13,28 +13,21 @@ import {
 } from '@/components/budget';
 
 export default function BudgetPage() {
-  // Estados de filtro para cada card
-  const [cashFlowFilter, setCashFlowFilter] = useState({ month: '05', year: '2024' });
-  const [receivableFilter, setReceivableFilter] = useState({ month: '05', year: '2024' });
-  const [payableFilter, setPayableFilter] = useState({ month: '05', year: '2024' });
-  const [cardFilter, setCardFilter] = useState({ month: '05', year: '2024' });
+  // Estado único para filtro central
+  const [filter, setFilter] = useState({ month: '05', year: '2024' });
   const [activeCardTab, setActiveCardTab] = useState(mockCreditCards[0]?.id || '');
 
-  // Helpers para filtrar mocks
-  const cashFlow = mockCashFlows.find(
-    (c) => c.month === `${cashFlowFilter.year}-${cashFlowFilter.month}`,
-  );
+  // Helpers para filtrar mocks usando o filtro central
+  const cashFlow = mockCashFlows.find((c) => c.month === `${filter.year}-${filter.month}`);
   const receivables = mockReceivables.filter((r) =>
-    r.dueDate.startsWith(`${receivableFilter.year}-${receivableFilter.month}`),
+    r.dueDate.startsWith(`${filter.year}-${filter.month}`),
   );
   const payables = mockPayables.filter((p) =>
-    p.dueDate.startsWith(`${payableFilter.year}-${payableFilter.month}`),
+    p.dueDate.startsWith(`${filter.year}-${filter.month}`),
   );
   const cards = mockCreditCards;
   const activeCard = cards.find((c) => c.id === activeCardTab);
-  const activeBill = activeCard?.bills.find(
-    (b) => b.month === `${cardFilter.year}-${cardFilter.month}`,
-  );
+  const activeBill = activeCard?.bills.find((b) => b.month === `${filter.year}-${filter.month}`);
 
   // Adicionar componentes SVG inline para Nubank e Itau
   const NubankIcon = () => (
@@ -81,16 +74,18 @@ export default function BudgetPage() {
             Visão geral do seu orçamento, fluxo de caixa e contas a pagar/receber
           </p>
         </div>
+        {/* Filtro centralizado */}
+        <div className="flex justify-center mb-8">
+          <MonthYearFilter
+            month={filter.month}
+            year={filter.year}
+            onChange={(month, year) => setFilter({ month, year })}
+          />
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
           {/* Fluxo de Caixa */}
           <CardContainer color="emerald" className="min-h-[420px]">
-            <CardHeader icon={<Wallet size={24} />} title="Fluxo de Caixa">
-              <MonthYearFilter
-                month={cashFlowFilter.month}
-                year={cashFlowFilter.year}
-                onChange={(month, year) => setCashFlowFilter({ month, year })}
-              />
-            </CardHeader>
+            <CardHeader icon={<Wallet size={24} />} title="Fluxo de Caixa" />
             <CardTotal value={cashFlow?.finalBalance ?? 0} color="emerald" label="Saldo Final" />
             {cashFlow ? (
               <div className="flex flex-col gap-3 mt-3">
@@ -110,13 +105,7 @@ export default function BudgetPage() {
 
           {/* Contas a Receber */}
           <CardContainer color="amber" className="min-h-[420px]">
-            <CardHeader icon={<TrendingUp size={24} />} title="Contas a Receber">
-              <MonthYearFilter
-                month={receivableFilter.month}
-                year={receivableFilter.year}
-                onChange={(month, year) => setReceivableFilter({ month, year })}
-              />
-            </CardHeader>
+            <CardHeader icon={<TrendingUp size={24} />} title="Contas a Receber" />
             <CardTotal
               value={receivables.reduce((acc, r) => acc + r.value, 0)}
               color="amber"
@@ -154,13 +143,7 @@ export default function BudgetPage() {
 
           {/* Contas a Pagar */}
           <CardContainer color="rose" className="min-h-[420px]">
-            <CardHeader icon={<TrendingDown size={24} />} title="Contas a Pagar">
-              <MonthYearFilter
-                month={payableFilter.month}
-                year={payableFilter.year}
-                onChange={(month, year) => setPayableFilter({ month, year })}
-              />
-            </CardHeader>
+            <CardHeader icon={<TrendingDown size={24} />} title="Contas a Pagar" />
             <CardTotal
               value={payables.reduce((acc, p) => acc + p.value, 0)}
               color="rose"
@@ -198,13 +181,7 @@ export default function BudgetPage() {
 
           {/* Cartões de Crédito */}
           <CardContainer color="violet" className="min-h-[420px]">
-            <CardHeader icon={<CreditCard size={20} />} title="Cartões de Crédito">
-              <MonthYearFilter
-                month={cardFilter.month}
-                year={cardFilter.year}
-                onChange={(month, year) => setCardFilter({ month, year })}
-              />
-            </CardHeader>
+            <CardHeader icon={<CreditCard size={20} />} title="Cartões de Crédito" />
             <CardTotal value={activeBill?.total ?? 0} color="violet" label="Total Fatura" />
             <div className="flex gap-1.5 mb-3 mt-3">
               {cards.map((card) => {
