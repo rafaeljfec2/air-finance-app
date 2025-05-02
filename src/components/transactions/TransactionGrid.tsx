@@ -1,10 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import { Card } from '@/components/ui/card'
-import { formatCurrency, formatDate } from '@/utils/formatters'
-import { MoreHorizontal, ChevronRight, Loader2, ChevronLeft, ChevronRightIcon, ChevronsLeft, ChevronsRight, ArrowUpDown } from 'lucide-react'
+import { formatCurrency } from '@/utils/formatters'
+import { MoreHorizontal, ChevronRight, Loader2, ChevronLeft, ChevronsLeft, ChevronsRight, ArrowUpDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { Tooltip } from '@/components/ui/tooltip'
 
@@ -193,7 +192,10 @@ export function TransactionGrid({
           : 'none'
       }
     >
-      <div className="flex items-center gap-1">
+      <div className={cn(
+        "flex items-center gap-1",
+        field === 'credito' || field === 'debito' || field === 'saldo' ? "justify-end" : "justify-start"
+      )}>
         {children}
         <ArrowUpDown className={cn(
           "h-3 w-3 transition-all",
@@ -228,7 +230,6 @@ export function TransactionGrid({
                     <col className="w-[12%] text-right" /> {/* Crédito */}
                     <col className="w-[12%] text-right" /> {/* Débito */}
                     <col className="w-[12%] text-right" /> {/* Saldo */}
-                    {showActions && <col className="w-[1%]" />} {/* Ações */}
                   </colgroup>
                   <thead>
                     <tr className="bg-background/30 dark:bg-background-dark/30">
@@ -236,9 +237,9 @@ export function TransactionGrid({
                       <SortableHeader field="categoria">Categoria</SortableHeader>
                       <SortableHeader field="descricao">Descrição</SortableHeader>
                       <SortableHeader field="conta">Conta</SortableHeader>
-                      <SortableHeader field="credito" className="text-right pr-6">Crédito</SortableHeader>
-                      <SortableHeader field="debito" className="text-right pr-6">Débito</SortableHeader>
-                      <SortableHeader field="saldo" className="text-right pr-6">Saldo</SortableHeader>
+                      <SortableHeader field="credito" className="text-right pl-0 pr-8">Crédito</SortableHeader>
+                      <SortableHeader field="debito" className="text-right pl-0 pr-8">Débito</SortableHeader>
+                      <SortableHeader field="saldo" className="text-right pl-0 pr-8">Saldo</SortableHeader>
                       {showActions && <th className="w-10"></th>}
                     </tr>
                   </thead>
@@ -272,14 +273,14 @@ export function TransactionGrid({
                             </span>
                           </Tooltip>
                         </td>
-                        <td className="py-2 pr-6 text-xs font-medium text-right text-emerald-400 whitespace-nowrap">
+                        <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-emerald-400 whitespace-nowrap">
                           {transaction.credito ? formatCurrency(transaction.credito) : '-'}
                         </td>
-                        <td className="py-2 pr-6 text-xs font-medium text-right text-red-400 whitespace-nowrap">
+                        <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-red-400 whitespace-nowrap">
                           {transaction.debito ? formatCurrency(transaction.debito) : '-'}
                         </td>
                         <td className={cn(
-                          "py-2 pr-6 text-xs font-medium text-right whitespace-nowrap",
+                          "py-2 pl-0 pr-8 text-xs font-medium text-right whitespace-nowrap",
                           (transaction.saldo ?? 0) >= 0 ? "text-emerald-400" : "text-red-400"
                         )}>
                           {formatCurrency(transaction.saldo ?? 0)}
