@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { Button } from '@/components/ui/button';
+import { Button             } from '@/components/ui/button';
 import { CloudArrowUpIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 
 // Função mock para parsear OFX (agora também extrai cabeçalho)
