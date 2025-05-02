@@ -12,6 +12,7 @@ import { ErrorPage } from '@/components/error/ErrorPage';
 import { Settings } from '@/pages/settings';
 import {LandingPage} from '@/pages/landing';
 import {SignUpPage} from '@/pages/signup';
+import ForgotPasswordPage from '@/pages/forgot-password';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -129,6 +130,11 @@ export const router = createBrowserRouter([
   {
     path: '/support',
     element: <div>Ajuda e suporte</div>,
+  },
+  {
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: '*',

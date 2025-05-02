@@ -164,6 +164,7 @@ export function Login() {
                   <button
                     type="button"
                     className="text-sm font-medium text-brand-arrow hover:text-brand-arrow/80 dark:text-brand-leaf dark:hover:text-brand-leaf/80"
+                    onClick={() => navigate('/forgot-password')}
                   >
                     Esqueceu a senha?
                   </button>
