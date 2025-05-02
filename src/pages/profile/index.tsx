@@ -122,8 +122,6 @@ export function Profile() {
                       <div className="relative flex items-center justify-center">
                         <img
                           src={avatar}
-                          alt={`Foto de perfil de ${formData.name}`}
-                          aria-label="Foto de perfil"
                           className="w-32 h-32 rounded-full object-cover border-4 border-border dark:border-border-dark"
                         />
                         <label
