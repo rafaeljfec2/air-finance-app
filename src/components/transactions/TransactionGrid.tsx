@@ -1,14 +1,103 @@
 import { useNavigate } from 'react-router-dom'
 import { Card } from '@/components/ui/card'
-import { formatCurrency } from '@/utils/formatters'
-import { MoreHorizontal, ChevronRight, Loader2, ChevronLeft, ChevronsLeft, ChevronsRight, ArrowUpDown } from 'lucide-react'
+import { formatCurrency, formatDate } from '@/utils/formatters'
+import { MoreHorizontal, ChevronRight, Loader2, ChevronLeft, ChevronRightIcon, ChevronsLeft, ChevronsRight, ArrowUpDown, Filter } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { Tooltip } from '@/components/ui/tooltip'
 
 type SortField = 'hora' | 'categoria' | 'descricao' | 'conta' | 'credito' | 'debito' | 'saldo'
 type SortDirection = 'asc' | 'desc'
+
+type FilterValue = {
+  field: SortField
+  values: Set<string>
+}
+
+interface FilterMenuProps {
+  field: SortField
+  items: string[]
+  selectedValues: Set<string>
+  onFilter: (field: SortField, values: Set<string>) => void
+  onClose: () => void
+}
+
+const FilterMenu = ({ field, items, selectedValues, onFilter, onClose }: FilterMenuProps) => {
+  const [selected, setSelected] = useState<Set<string>>(selectedValues)
+  const uniqueValues = useMemo(() => Array.from(new Set(items)).sort(), [items])
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onClose()
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [onClose])
+
+  const handleSelectAll = () => {
+    const newSelected = new Set(uniqueValues)
+    setSelected(newSelected)
+    onFilter(field, newSelected)
+  }
+
+  const handleClearAll = () => {
+    setSelected(new Set())
+    onFilter(field, new Set())
+  }
+
+  const handleCheckboxChange = (value: string) => {
+    const newSelected = new Set(selected)
+    if (newSelected.has(value)) {
+      newSelected.delete(value)
+    } else {
+      newSelected.add(value)
+    }
+    setSelected(newSelected)
+    onFilter(field, newSelected)
+  }
+
+  return (
+    <div ref={menuRef} className="absolute z-50 mt-2 w-56 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5">
+      <div className="p-2 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex justify-between items-center">
+          <button
+            onClick={handleSelectAll}
+            className="text-xs text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
+          >
+            Selecionar todos
+          </button>
+          <button
+            onClick={handleClearAll}
+            className="text-xs text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
+          >
+            Limpar
+          </button>
+        </div>
+      </div>
+      <div className="p-2 max-h-60 overflow-auto">
+        {uniqueValues.map((value) => (
+          <label key={value} className="flex items-center px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer">
+            <input
+              type="checkbox"
+              className="form-checkbox h-4 w-4 text-primary-500"
+              checked={selected.has(value)}
+              onChange={() => handleCheckboxChange(value)}
+            />
+            <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+              {value}
+            </span>
+          </label>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export type Transaction = {
   id: string
@@ -56,6 +145,54 @@ export function TransactionGrid({
     field: 'hora',
     direction: 'desc'
   })
+  const [activeFilter, setActiveFilter] = useState<SortField | null>(null)
+  const [filters, setFilters] = useState<FilterValue[]>([])
+
+  const handleFilterClick = (field: SortField) => {
+    setActiveFilter(activeFilter === field ? null : field)
+  }
+
+  const handleFilter = (field: SortField, values: Set<string>) => {
+    const newFilters = filters.filter(f => f.field !== field)
+    if (values.size > 0) {
+      newFilters.push({ field, values })
+    }
+    setFilters(newFilters)
+  }
+
+  const getFilteredTransactions = useCallback((transactions: Transaction[]) => {
+    return transactions.filter(transaction => {
+      return filters.every(filter => {
+        const value = getFieldValue(transaction, filter.field)
+        return filter.values.has(value.toString())
+      })
+    })
+  }, [filters])
+
+  const getFieldValue = (transaction: Transaction, field: SortField): string | number => {
+    switch (field) {
+      case 'hora':
+        return format(new Date(transaction.data), 'dd/MM HH:mm')
+      case 'categoria':
+        return transaction.categoria.nome
+      case 'descricao':
+        return transaction.descricao
+      case 'conta':
+        return transaction.conta.nome
+      case 'credito':
+        return transaction.tipo === 'RECEITA' ? transaction.valor : 0
+      case 'debito':
+        return transaction.tipo === 'DESPESA' ? transaction.valor : 0
+      case 'saldo':
+        return transaction.saldo ?? 0
+      default:
+        return ''
+    }
+  }
+
+  const getFieldValues = (transactions: Transaction[], field: SortField): string[] => {
+    return transactions.map(t => getFieldValue(t, field).toString())
+  }
 
   // Função para ordenar transações
   const sortTransactions = (transactions: Transaction[]) => {
@@ -193,7 +330,6 @@ export function TransactionGrid({
 
     return (
       <th 
-        onClick={() => toggleSort(field)}
         className={cn(
           "text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none",
           className
@@ -201,20 +337,48 @@ export function TransactionGrid({
         role="columnheader"
         aria-sort={getAriaSort()}
       >
-        <div className={cn(
-          "flex items-center gap-1",
-          field === 'credito' || field === 'debito' || field === 'saldo' ? "justify-end" : "justify-start"
-        )}>
-          {children}
-          <ArrowUpDown className={cn(
-            "h-3 w-3 transition-all",
-            sortConfig.field === field ? "opacity-100" : "opacity-0 group-hover:opacity-50",
-            sortConfig.field === field && sortConfig.direction === 'asc' && "rotate-180"
-          )} />
+        <div className="flex items-center justify-between">
+          <div
+            className={cn(
+              "flex items-center gap-1",
+              field === 'credito' || field === 'debito' || field === 'saldo' ? "justify-end w-full" : "justify-start"
+            )}
+            onClick={() => toggleSort(field)}
+          >
+            {children}
+            <ArrowUpDown className={cn(
+              "h-3 w-3 transition-all",
+              sortConfig.field === field ? "opacity-100" : "opacity-0 group-hover:opacity-50",
+              sortConfig.field === field && sortConfig.direction === 'asc' && "rotate-180"
+            )} />
+          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              handleFilterClick(field)
+            }}
+            className="ml-2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+          >
+            <Filter className={cn(
+              "h-3 w-3",
+              filters.some(f => f.field === field) ? "text-primary-500" : "text-gray-400"
+            )} />
+          </button>
+          {activeFilter === field && (
+            <FilterMenu
+              field={field}
+              items={getFieldValues(transactions, field)}
+              selectedValues={filters.find(f => f.field === field)?.values ?? new Set()}
+              onFilter={handleFilter}
+              onClose={() => setActiveFilter(null)}
+            />
+          )}
         </div>
       </th>
     )
   }
+
+  const filteredTransactions = useMemo(() => getFilteredTransactions(transactions), [transactions, getFilteredTransactions])
 
   return (
     <Card className={cn("bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm", className)}>
@@ -252,7 +416,7 @@ export function TransactionGrid({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
-                    {sortTransactions(transactionsWithBalance).slice((currentPage - 1) * itemsPerPageSelected, currentPage * itemsPerPageSelected).map((transaction) => (
+                    {sortTransactions(filteredTransactions).slice((currentPage - 1) * itemsPerPageSelected, currentPage * itemsPerPageSelected).map((transaction) => (
                       <tr
                         key={transaction.id}
                         className="hover:bg-background/70 dark:hover:bg-background-dark/70 transition-colors"
@@ -313,7 +477,7 @@ export function TransactionGrid({
 
             {/* Mobile Card View */}
             <div className="md:hidden space-y-2">
-              {sortTransactions(transactionsWithBalance).slice((currentPage - 1) * itemsPerPageSelected, currentPage * itemsPerPageSelected).map((transaction) => (
+              {sortTransactions(filteredTransactions).slice((currentPage - 1) * itemsPerPageSelected, currentPage * itemsPerPageSelected).map((transaction) => (
                 <div
                   key={transaction.id}
                   className="bg-card dark:bg-card-dark rounded-lg p-3 hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors"
