@@ -6,8 +6,9 @@ import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+import { Tooltip } from '@/components/ui/tooltip'
 
-type SortField = 'hora' | 'categoria' | 'descricao' | 'conta' | 'valor' | 'saldo'
+type SortField = 'hora' | 'categoria' | 'descricao' | 'conta' | 'credito' | 'debito' | 'saldo'
 type SortDirection = 'asc' | 'desc'
 
 export type Transaction = {
@@ -77,10 +78,14 @@ export function TransactionGrid({
           return sortConfig.direction === 'asc'
             ? a.conta.nome.localeCompare(b.conta.nome)
             : b.conta.nome.localeCompare(a.conta.nome)
-        case 'valor':
+        case 'credito':
           return sortConfig.direction === 'asc'
-            ? a.valor - b.valor
-            : b.valor - a.valor
+            ? (a.credito || 0) - (b.credito || 0)
+            : (b.credito || 0) - (a.credito || 0)
+        case 'debito':
+          return sortConfig.direction === 'asc'
+            ? (a.debito || 0) - (b.debito || 0)
+            : (b.debito || 0) - (a.debito || 0)
         case 'saldo':
           return sortConfig.direction === 'asc'
             ? (a.saldo || 0) - (b.saldo || 0)
@@ -193,16 +198,34 @@ export function TransactionGrid({
   }
 
   // Componente de cabeçalho ordenável
-  const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
+  const SortableHeader = ({ field, children, className }: { 
+    field: SortField
+    children: React.ReactNode
+    className?: string 
+  }) => (
     <th 
       onClick={() => toggleSort(field)}
-      className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group"
+      className={cn(
+        "text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none",
+        className
+      )}
+      role="columnheader"
+      aria-sort={
+        sortConfig.field === field 
+          ? sortConfig.direction === 'asc' 
+            ? 'ascending' 
+            : 'descending'
+          : 'none'
+      }
     >
       <div className="flex items-center gap-1">
         {children}
         <ArrowUpDown className={cn(
-          "h-3 w-3 transition-opacity",
-          sortConfig.field === field ? "opacity-100" : "opacity-0 group-hover:opacity-50"
+          "h-3 w-3 transition-all",
+          sortConfig.field === field 
+            ? "opacity-100" 
+            : "opacity-0 group-hover:opacity-50",
+          sortConfig.field === field && sortConfig.direction === 'asc' && "rotate-180"
         )} />
       </div>
     </th>
@@ -265,16 +288,27 @@ export function TransactionGrid({
                     </div>
 
                     {/* Tabela de Transações */}
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
+                    <div className="w-full">
+                      <table className="w-full table-fixed">
+                        <colgroup>
+                          <col className="w-[6%] sm:w-[8%]" /> {/* Hora */}
+                          <col className="w-[12%] sm:w-[15%]" /> {/* Categoria */}
+                          <col className="w-[20%] sm:w-[25%]" /> {/* Descrição */}
+                          <col className="w-[12%] sm:w-[15%]" /> {/* Conta */}
+                          <col className="w-[12%]" /> {/* Crédito */}
+                          <col className="w-[12%]" /> {/* Débito */}
+                          <col className="w-[12%]" /> {/* Saldo */}
+                          {showActions && <col className="w-[1%]" />} {/* Ações */}
+                        </colgroup>
                         <thead>
                           <tr className="bg-background/30 dark:bg-background-dark/30">
                             <SortableHeader field="hora">Hora</SortableHeader>
                             <SortableHeader field="categoria">Categoria</SortableHeader>
                             <SortableHeader field="descricao">Descrição</SortableHeader>
                             <SortableHeader field="conta">Conta</SortableHeader>
-                            <SortableHeader field="valor">Valor</SortableHeader>
-                            <SortableHeader field="saldo">Saldo</SortableHeader>
+                            <SortableHeader field="credito" className="text-right pr-8">Crédito</SortableHeader>
+                            <SortableHeader field="debito" className="text-right pr-8">Débito</SortableHeader>
+                            <SortableHeader field="saldo" className="text-right pr-8">Saldo</SortableHeader>
                             {showActions && <th className="w-10"></th>}
                           </tr>
                         </thead>
@@ -284,36 +318,48 @@ export function TransactionGrid({
                               key={transaction.id}
                               className="hover:bg-background/70 dark:hover:bg-background-dark/70 transition-colors"
                             >
-                              <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400">
+                              <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                                 {format(new Date(transaction.data), 'HH:mm')}
                               </td>
-                              <td className="py-2 px-4 text-xs text-text dark:text-text-dark">
-                                {transaction.categoria.nome}
+                              <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
+                                <Tooltip content={transaction.categoria.nome}>
+                                  <span className="block overflow-hidden text-ellipsis">
+                                    {transaction.categoria.nome}
+                                  </span>
+                                </Tooltip>
                               </td>
-                              <td className="py-2 px-4 text-xs font-medium text-text dark:text-text-dark">
-                                {transaction.descricao}
+                              <td className="py-2 px-4 text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis">
+                                <Tooltip content={transaction.descricao}>
+                                  <span className="block overflow-hidden text-ellipsis">
+                                    {transaction.descricao}
+                                  </span>
+                                </Tooltip>
                               </td>
-                              <td className="py-2 px-4 text-xs text-text dark:text-text-dark">
-                                {transaction.conta.nome}
+                              <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
+                                <Tooltip content={transaction.conta.nome}>
+                                  <span className="block overflow-hidden text-ellipsis">
+                                    {transaction.conta.nome}
+                                  </span>
+                                </Tooltip>
+                              </td>
+                              <td className="py-2 px-4 text-xs font-medium text-right text-emerald-400 whitespace-nowrap pr-8">
+                                {transaction.credito ? formatCurrency(transaction.credito) : '-'}
+                              </td>
+                              <td className="py-2 px-4 text-xs font-medium text-right text-red-400 whitespace-nowrap pr-8">
+                                {transaction.debito ? formatCurrency(transaction.debito) : '-'}
                               </td>
                               <td className={cn(
-                                "py-2 px-4 text-xs font-medium text-right",
-                                transaction.tipo === 'RECEITA' ? "text-emerald-400" : "text-red-400"
-                              )}>
-                                {transaction.tipo === 'RECEITA' ? '+' : '-'}
-                                {formatCurrency(transaction.valor)}
-                              </td>
-                              <td className={cn(
-                                "py-2 px-4 text-xs font-medium text-right",
+                                "py-2 px-4 text-xs font-medium text-right whitespace-nowrap pr-8",
                                 transaction.saldo >= 0 ? "text-emerald-400" : "text-red-400"
                               )}>
                                 {formatCurrency(transaction.saldo)}
                               </td>
                               {showActions && (
-                                <td className="py-2 px-4">
+                                <td className="py-2 px-4 w-10">
                                   <button
                                     onClick={() => handleActionClick(transaction)}
                                     className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark"
+                                    aria-label="Mais ações"
                                   >
                                     <MoreHorizontal className="h-4 w-4" />
                                   </button>
@@ -397,18 +443,25 @@ export function TransactionGrid({
                               <p className="text-xs text-gray-500 dark:text-gray-400">
                                 {transaction.categoria.nome}
                               </p>
+                              <span className="text-gray-400">•</span>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {transaction.conta.nome}
+                              </p>
                             </div>
                           </div>
                           <div className="text-right">
+                            {transaction.credito > 0 && (
+                              <p className="text-sm font-medium text-emerald-400">
+                                +{formatCurrency(transaction.credito)}
+                              </p>
+                            )}
+                            {transaction.debito > 0 && (
+                              <p className="text-sm font-medium text-red-400">
+                                -{formatCurrency(transaction.debito)}
+                              </p>
+                            )}
                             <p className={cn(
-                              "text-sm font-medium",
-                              transaction.tipo === 'RECEITA' ? "text-emerald-400" : "text-red-400"
-                            )}>
-                              {transaction.tipo === 'RECEITA' ? '+' : '-'}
-                              {formatCurrency(transaction.valor)}
-                            </p>
-                            <p className={cn(
-                              "text-xs",
+                              "text-xs mt-0.5",
                               transaction.saldo >= 0 ? "text-emerald-400" : "text-red-400"
                             )}>
                               {formatCurrency(transaction.saldo)}
@@ -457,6 +510,7 @@ export function TransactionGrid({
                       ? "text-gray-400 dark:text-gray-600 cursor-not-allowed"
                       : "text-gray-500 dark:text-gray-400 hover:bg-background/50 dark:hover:bg-background-dark/50"
                   )}
+                  aria-label="Primeira página"
                 >
                   <ChevronsLeft className="h-4 w-4" />
                 </button>
@@ -469,10 +523,11 @@ export function TransactionGrid({
                       ? "text-gray-400 dark:text-gray-600 cursor-not-allowed"
                       : "text-gray-500 dark:text-gray-400 hover:bg-background/50 dark:hover:bg-background-dark/50"
                   )}
+                  aria-label="Página anterior"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <span className="text-xs font-medium text-text dark:text-text-dark px-2">
+                <span className="text-xs font-medium text-text dark:text-text-dark px-2" role="status">
                   Página {currentPage} de {totalPages}
                 </span>
                 <button
@@ -484,6 +539,7 @@ export function TransactionGrid({
                       ? "text-gray-400 dark:text-gray-600 cursor-not-allowed"
                       : "text-gray-500 dark:text-gray-400 hover:bg-background/50 dark:hover:bg-background-dark/50"
                   )}
+                  aria-label="Próxima página"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </button>
@@ -496,6 +552,7 @@ export function TransactionGrid({
                       ? "text-gray-400 dark:text-gray-600 cursor-not-allowed"
                       : "text-gray-500 dark:text-gray-400 hover:bg-background/50 dark:hover:bg-background-dark/50"
                   )}
+                  aria-label="Última página"
                 >
                   <ChevronsRight className="h-4 w-4" />
                 </button>
