@@ -10,11 +10,11 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { Settings } from '@/pages/settings';
-import {LandingPage} from '@/pages/landing';
-import {SignUpPage} from '@/pages/signup';
+import { LandingPage } from '@/pages/landing';
+import { SignUpPage } from '@/pages/signup';
 import ForgotPasswordPage from '@/pages/forgot-password';
 import AiClassificationPage from '@/pages/ai-classification';
-import ImportOfxPage from '@/pages/import-ofx'; 
+import ImportOfxPage from '@/pages/import-ofx';
 
 export const router = createBrowserRouter([
   {

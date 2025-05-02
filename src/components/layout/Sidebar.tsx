@@ -37,11 +37,13 @@ export function Sidebar() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
   return (
-    <div className={cn(
-      'h-full bg-card dark:bg-card-dark border-r border-border dark:border-border-dark',
-      'transition-all duration-300 ease-in-out',
-      isCollapsed ? 'w-16' : 'w-64'
-    )}>
+    <div
+      className={cn(
+        'h-full bg-card dark:bg-card-dark border-r border-border dark:border-border-dark',
+        'transition-all duration-300 ease-in-out',
+        isCollapsed ? 'w-16' : 'w-64',
+      )}
+    >
       <div className="flex flex-col h-full">
         {/* Navigation */}
         <nav className="flex-1 space-y-1 px-2 py-4">
@@ -50,7 +52,9 @@ export function Sidebar() {
               // Menu com submenus
               const isOpen = openMenu === item.name;
               // Destacar se algum filho está ativo
-              const isAnyChildActive = item.children.some(child => location.pathname === child.href);
+              const isAnyChildActive = item.children.some(
+                (child) => location.pathname === child.href,
+              );
               return (
                 <div key={item.name}>
                   <button
@@ -60,7 +64,7 @@ export function Sidebar() {
                       isAnyChildActive
                         ? 'bg-primary-500/10 text-primary-500'
                         : 'text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark',
-                      isCollapsed ? 'justify-center' : 'justify-start'
+                      isCollapsed ? 'justify-center' : 'justify-start',
                     )}
                   >
                     <item.icon
@@ -68,14 +72,19 @@ export function Sidebar() {
                         'flex-shrink-0 h-6 w-6',
                         isAnyChildActive
                           ? 'text-primary-500'
-                          : 'text-text dark:text-text-dark group-hover:text-primary-500'
+                          : 'text-text dark:text-text-dark group-hover:text-primary-500',
                       )}
                       aria-hidden="true"
                     />
                     {!isCollapsed && (
                       <>
                         <span className="ml-3 flex-1 text-left">{item.name}</span>
-                        <ArrowDownIcon className={cn('h-4 w-4 ml-auto transition-transform', isOpen ? 'rotate-180' : '')} />
+                        <ArrowDownIcon
+                          className={cn(
+                            'h-4 w-4 ml-auto transition-transform',
+                            isOpen ? 'rotate-180' : '',
+                          )}
+                        />
                       </>
                     )}
                   </button>
@@ -92,7 +101,7 @@ export function Sidebar() {
                               'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors',
                               isActive
                                 ? 'bg-primary-500/10 text-primary-500'
-                                : 'text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark'
+                                : 'text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark',
                             )}
                           >
                             <child.icon className="h-5 w-5 mr-2" />
@@ -116,7 +125,7 @@ export function Sidebar() {
                   isActive
                     ? 'bg-primary-500/10 text-primary-500'
                     : 'text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark',
-                  isCollapsed ? 'justify-center' : 'justify-start'
+                  isCollapsed ? 'justify-center' : 'justify-start',
                 )}
               >
                 <item.icon
@@ -124,13 +133,11 @@ export function Sidebar() {
                     'flex-shrink-0 h-6 w-6',
                     isActive
                       ? 'text-primary-500'
-                      : 'text-text dark:text-text-dark group-hover:text-primary-500'
+                      : 'text-text dark:text-text-dark group-hover:text-primary-500',
                   )}
                   aria-hidden="true"
                 />
-                {!isCollapsed && (
-                  <span className="ml-3">{item.name}</span>
-                )}
+                {!isCollapsed && <span className="ml-3">{item.name}</span>}
               </Link>
             );
           })}
@@ -143,7 +150,7 @@ export function Sidebar() {
             className={cn(
               'flex items-center justify-center w-full p-2 text-sm font-medium rounded-md',
               'text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark',
-              'transition-colors duration-200'
+              'transition-colors duration-200',
             )}
           >
             {isCollapsed ? (
