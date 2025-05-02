@@ -1,124 +1,5 @@
 import { create } from 'zustand';
-import { Transaction, Category } from '@/types/transaction';
-
-// Mock data for development
-const mockCategories: Category[] = [
-  {
-    id: '1',
-    name: 'Salário',
-    type: 'INCOME',
-    icon: 'money',
-    color: '#34D399',
-  },
-  {
-    id: '2',
-    name: 'Moradia',
-    type: 'EXPENSE',
-    icon: 'home',
-    color: '#F87171',
-  },
-  {
-    id: '3',
-    name: 'Alimentação',
-    type: 'EXPENSE',
-    icon: 'shopping-cart',
-    color: '#60A5FA',
-  },
-];
-
-const mockTransactions: Transaction[] = [
-  {
-    id: '1',
-    description: 'Salário',
-    amount: 5000,
-    date: '2024-03-01T00:00:00.000Z',
-    type: 'INCOME',
-    category: mockCategories[0],
-    createdAt: '2024-03-01T00:00:00.000Z',
-    updatedAt: '2024-03-01T00:00:00.000Z',
-    categoryId: '',
-    accountId: '',
-    account: {
-      id: '',
-      name: ''
-    }
-  },
-  {
-    id: '2',
-    description: 'Aluguel',
-    amount: 1500,
-    date: '2024-03-05T00:00:00.000Z',
-    type: 'EXPENSE',
-    category: mockCategories[1],
-    note: 'Aluguel do mês de março',
-    createdAt: '2024-03-05T00:00:00.000Z',
-    updatedAt: '2024-03-05T00:00:00.000Z',
-    categoryId: '',
-    accountId: '',
-    account: {
-      id: '',
-      name: ''
-    }
-  },
-  {
-    id: '3',
-    description: 'Supermercado',
-    amount: 800,
-    date: '2024-03-10T00:00:00.000Z',
-    type: 'EXPENSE',
-    category: mockCategories[2],
-    createdAt: '2024-03-10T00:00:00.000Z',
-    updatedAt: '2024-03-10T00:00:00.000Z',
-    categoryId: '',
-    accountId: '',
-    account: {
-      id: '',
-      name: ''
-    }
-  },
-];
-
-// Mock data do mês anterior para comparação
-const mockPreviousTransactions: Transaction[] = [
-  {
-    id: '4',
-    description: 'Salário',
-    amount: 4800,
-    date: '2024-02-01T00:00:00.000Z',
-    type: 'INCOME',
-    category: mockCategories[0],
-    createdAt: '2024-02-01T00:00:00.000Z',
-    updatedAt: '2024-02-01T00:00:00.000Z',
-    categoryId: '',
-    accountId: '',
-    account: {
-      id: '',
-      name: ''
-    }
-  },
-  {
-    id: '5',
-    description: 'Aluguel',
-    amount: 1500,
-    date: '2024-02-05T00:00:00.000Z',
-    type: 'EXPENSE',
-    category: mockCategories[1],
-    createdAt: '2024-02-05T00:00:00.000Z',
-    updatedAt: '2024-02-05T00:00:00.000Z',
-    categoryId: '',
-    accountId: '',
-    account: {
-      id: '',
-      name: ''
-    }
-  },
-];
-
-interface ErrorDetails {
-  message: string;
-  name: string;
-  stack?: string;
-}
+import { Transaction, Category, TransactionType } from '@/types/transaction';
 
 interface StatementState {
   transactions: Transaction[];
@@ -131,16 +12,158 @@ interface StatementState {
   previousExpenses: number;
   isLoading: boolean;
   error: string | null;
-  errorDetails: ErrorDetails | null;
-
-  // Actions
+  errorDetails: any;
   loadTransactions: () => Promise<void>;
-  addTransaction: (transaction: Transaction) => Promise<void>;
   removeTransaction: (id: string) => Promise<void>;
-  updateTransaction: (id: string, transaction: Partial<Transaction>) => Promise<void>;
 }
 
-export const useStatementStore = create<StatementState>((set, get) => ({
+// Mock data for testing
+const mockCategories: Category[] = [
+  {
+    id: '1',
+    name: 'Salary',
+    type: 'INCOME' as TransactionType,
+    color: '#10B981',
+    icon: '💼'
+  },
+  {
+    id: '2',
+    name: 'Freelance',
+    type: 'INCOME' as TransactionType,
+    color: '#3B82F6',
+    icon: '💻'
+  },
+  {
+    id: '3',
+    name: 'Investments',
+    type: 'INCOME' as TransactionType,
+    color: '#8B5CF6',
+    icon: '📈'
+  },
+  {
+    id: '4',
+    name: 'Housing',
+    type: 'EXPENSE' as TransactionType,
+    color: '#EF4444',
+    icon: '🏠'
+  },
+  {
+    id: '5',
+    name: 'Food',
+    type: 'EXPENSE' as TransactionType,
+    color: '#F59E0B',
+    icon: '🍽️'
+  },
+  {
+    id: '6',
+    name: 'Transport',
+    type: 'EXPENSE' as TransactionType,
+    color: '#6366F1',
+    icon: '🚗'
+  },
+  {
+    id: '7',
+    name: 'Leisure',
+    type: 'EXPENSE' as TransactionType,
+    color: '#EC4899',
+    icon: '🎮'
+  }
+];
+
+const now = new Date().toISOString();
+
+const mockTransactions: Transaction[] = [
+  {
+    id: '1',
+    description: 'Monthly Salary',
+    amount: 5000,
+    type: 'INCOME' as TransactionType,
+    category: {
+      id: mockCategories[0].id,
+      name: mockCategories[0].name,
+      type: mockCategories[0].type,
+      color: mockCategories[0].color || '#10B981'
+    },
+    date: now,
+    categoryId: mockCategories[0].id,
+    accountId: '1',
+    note: 'Regular salary payment',
+    account: {
+      id: '1',
+      name: 'Main Account'
+    },
+    createdAt: now,
+    updatedAt: now
+  },
+  {
+    id: '2',
+    description: 'Freelance Project',
+    amount: 1500,
+    type: 'INCOME' as TransactionType,
+    category: {
+      id: mockCategories[1].id,
+      name: mockCategories[1].name,
+      type: mockCategories[1].type,
+      color: mockCategories[1].color || '#3B82F6'
+    },
+    date: now,
+    categoryId: mockCategories[1].id,
+    accountId: '1',
+    note: 'Web development project',
+    account: {
+      id: '1',
+      name: 'Main Account'
+    },
+    createdAt: now,
+    updatedAt: now
+  },
+  {
+    id: '3',
+    description: 'Rent Payment',
+    amount: 1200,
+    type: 'EXPENSE' as TransactionType,
+    category: {
+      id: mockCategories[3].id,
+      name: mockCategories[3].name,
+      type: mockCategories[3].type,
+      color: mockCategories[3].color || '#EF4444'
+    },
+    date: now,
+    categoryId: mockCategories[3].id,
+    accountId: '1',
+    note: 'Monthly rent',
+    account: {
+      id: '1',
+      name: 'Main Account'
+    },
+    createdAt: now,
+    updatedAt: now
+  },
+  {
+    id: '4',
+    description: 'Groceries',
+    amount: 300,
+    type: 'EXPENSE' as TransactionType,
+    category: {
+      id: mockCategories[4].id,
+      name: mockCategories[4].name,
+      type: mockCategories[4].type,
+      color: mockCategories[4].color || '#F59E0B'
+    },
+    date: now,
+    categoryId: mockCategories[4].id,
+    accountId: '1',
+    note: 'Weekly groceries',
+    account: {
+      id: '1',
+      name: 'Main Account'
+    },
+    createdAt: now,
+    updatedAt: now
+  }
+];
+
+export const useStatementStore = create<StatementState>((set) => ({
   transactions: [],
   categories: [],
   availableBalance: 0,
@@ -156,202 +179,58 @@ export const useStatementStore = create<StatementState>((set, get) => ({
   loadTransactions: async () => {
     try {
       set({ isLoading: true, error: null, errorDetails: null });
-
-      // Simulando delay da API
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Usar dados mockados
-      const transactions = mockTransactions;
-      const categories = mockCategories;
-
-      // Calcular totais do mês atual
-      const income = transactions
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Calculate totals
+      const income = mockTransactions
         .filter(t => t.type === 'INCOME')
-        .reduce((sum, t) => sum + t.amount, 0)  ;
-
-      const expenses = transactions
+        .reduce((sum, t) => sum + t.amount, 0);
+      
+      const expenses = mockTransactions
         .filter(t => t.type === 'EXPENSE')
         .reduce((sum, t) => sum + t.amount, 0);
-
+      
       const availableBalance = income - expenses;
-
-      // Usar dados mockados do mês anterior
-      const previousTransactions = mockPreviousTransactions;
-
-      // Calcular totais do mês anterior
-      const previousIncome = previousTransactions
-        .filter(t => t.type === 'INCOME')
-        .reduce((sum, t) => sum + t.amount, 0);
-
-      const previousExpenses = previousTransactions
-        .filter(t => t.type === 'EXPENSE')
-        .reduce((sum, t) => sum + t.amount, 0);
-
-      const previousBalance = previousIncome - previousExpenses;
-
+      
       set({
-        transactions,
-        categories,
+        transactions: mockTransactions,
+        categories: mockCategories,
+        income,
+        expenses,
         availableBalance,
-        income,
-        expenses,
-        previousBalance,
-        previousIncome,
-        previousExpenses,
-        isLoading: false,
+        previousBalance: 4000, // Mock previous month data
+        previousIncome: 4500,
+        previousExpenses: 1000,
+        isLoading: false
       });
-    } catch (err) {
-      console.error('Erro ao carregar transações:', err);
+    } catch (error) {
       set({
-        error: 'Erro ao carregar transações. Tente novamente.',
-        errorDetails: {
-          message: err instanceof Error ? err.message : 'Erro desconhecido',
-          name: err instanceof Error ? err.name : 'UnknownError',
-          stack: err instanceof Error ? err.stack : undefined
-        },
-        isLoading: false,
+        error: 'Failed to load transactions',
+        errorDetails: error,
+        isLoading: false
       });
     }
   },
 
-  addTransaction: async transaction => {
+  removeTransaction: async (id: string) => {
     try {
       set({ isLoading: true, error: null, errorDetails: null });
-
-      // Simulando delay da API
+      
+      // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 500));
-
-      const now = new Date().toISOString();
-      const newTransaction = {
-        ...transaction,
-        id: String(Date.now()),
-        createdAt: now,
-        updatedAt: now,
-      };
-
-      const { transactions } = get();
-      const newTransactions = [...transactions, newTransaction];
-
-      const income = newTransactions.reduce(
-        (total, t) => (t.type === 'INCOME' ? total + t.amount : total),
-        0
-      );
-
-      const expenses = newTransactions.reduce(
-        (total, t) => (t.type === 'EXPENSE' ? total + t.amount : total),
-        0
-      );
-
+      
+      set(state => ({
+        transactions: state.transactions.filter(t => t.id !== id),
+        isLoading: false
+      }));
+    } catch (error) {
       set({
-        transactions: newTransactions,
-        income,
-        expenses,
-        availableBalance: income - expenses,
-        isLoading: false,
-      });
-    } catch (err) {
-      console.error('Erro ao adicionar transação:', err);
-      set({
-        error: 'Erro ao adicionar transação. Tente novamente.',
-        errorDetails: {
-          message: err instanceof Error ? err.message : 'Erro desconhecido',
-          name: err instanceof Error ? err.name : 'UnknownError',
-          stack: err instanceof Error ? err.stack : undefined
-        },
-        isLoading: false,
+        error: 'Failed to remove transaction',
+        errorDetails: error,
+        isLoading: false
       });
     }
-  },
-
-  removeTransaction: async id => {
-    try {
-      set({ isLoading: true, error: null, errorDetails: null });
-
-      // Simulando delay da API
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      const { transactions } = get();
-      const updatedTransactions = transactions.filter(t => t.id !== id);
-
-      // Recalcular totais
-      const income = updatedTransactions
-        .filter(t => t.type === 'INCOME')
-        .reduce((sum, t) => sum + t.amount, 0);
-
-      const expenses = updatedTransactions
-        .filter(t => t.type === 'EXPENSE')
-        .reduce((sum, t) => sum + t.amount, 0);
-
-      const availableBalance = income - expenses;
-
-      set({
-        transactions: updatedTransactions,
-        availableBalance,
-        income,
-        expenses,
-        isLoading: false,
-      });
-    } catch (err) {
-      console.error('Erro ao remover transação:', err);
-      set({
-        error: 'Erro ao remover transação. Tente novamente.',
-        errorDetails: {
-          message: err instanceof Error ? err.message : 'Erro desconhecido',
-          name: err instanceof Error ? err.name : 'UnknownError',
-          stack: err instanceof Error ? err.stack : undefined
-        },
-        isLoading: false,
-      });
-    }
-  },
-
-  updateTransaction: async (id, transaction) => {
-    try {
-      set({ isLoading: true, error: null, errorDetails: null });
-
-      // Simulando delay da API
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      const { transactions } = get();
-      const now = new Date().toISOString();
-      const newTransactions = transactions.map(t =>
-        t.id === id
-          ? {
-              ...t,
-              ...transaction,
-              updatedAt: now,
-            }
-          : t
-      );
-
-      const income = newTransactions.reduce(
-        (total, t) => (t.type === 'INCOME' ? total + t.amount : total),
-        0
-      );
-
-      const expenses = newTransactions.reduce(
-        (total, t) => (t.type === 'EXPENSE' ? total + t.amount : total),
-        0
-      );
-
-      set({
-        transactions: newTransactions,
-        income,
-        expenses,
-        availableBalance: income - expenses,
-        isLoading: false,
-      });
-    } catch (err) {
-      console.error('Erro ao atualizar transação:', err);
-      set({
-        error: 'Erro ao atualizar transação. Tente novamente.',
-        errorDetails: {
-          message: err instanceof Error ? err.message : 'Erro desconhecido',
-          name: err instanceof Error ? err.name : 'UnknownError',
-          stack: err instanceof Error ? err.stack : undefined
-        },
-        isLoading: false,
-      });
-    }
-  },
+  }
 }));

@@ -6,7 +6,7 @@ import { TransactionList } from '@/components/transactions/TransactionList';
 import { PullToRefresh } from '@/components/ui/pullToRefresh';
 import { StatementSummary } from '@/components/statement/StatementSummary';
 import { useQuery } from '@tanstack/react-query';
-import { Dashboard as DashboardType } from '@/types';
+import { Transaction, Category, TransactionType } from '@/types/transaction';
 import { 
   ArrowTrendingUpIcon, 
   ArrowTrendingDownIcon,
@@ -21,42 +21,86 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { BalanceChart } from '@/components/charts/BalanceChart';
 
-// Dados mockados para exemplo (manter temporariamente)
-const mockData = {
-  totalIncome: 5000,
-  totalExpenses: 3000,
+interface DashboardData {
+  balance: number;
+  income: number;
+  expenses: number;
+  transactions: Transaction[];
+}
+
+// Mock data for example (keep temporarily)
+const mockData: DashboardData = {
+  income: 5000,
+  expenses: 3000,
   balance: 2000,
-  expensesByCategory: [
-    { name: 'Alimentação', value: 1000 },
-    { name: 'Transporte', value: 800 },
-    { name: 'Moradia', value: 1200 },
-  ],
-  recentTransactions: [
+  transactions: [
     {
-      id: 1,
+      id: '1',
       description: 'Supermercado',
-      amount: -150,
-      category: { id: 'cat1', name: 'Alimentação', type: 'EXPENSE' },
-      date: '2024-03-15',
+      amount: 150,
+      type: 'EXPENSE',
+      category: {
+        id: 'cat1',
+        name: 'Alimentação',
+        type: 'EXPENSE',
+        color: '#F44336'
+      },
+      date: new Date().toISOString(),
+      categoryId: 'cat1',
+      accountId: '1',
+      account: {
+        id: '1',
+        name: 'Main Account'
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
-      id: 2,
+      id: '2',
       description: 'Salário',
       amount: 5000,
-      category: { id: 'cat2', name: 'Renda', type: 'INCOME' },
-      date: '2024-03-10',
+      type: 'INCOME',
+      category: {
+        id: 'cat2',
+        name: 'Renda',
+        type: 'INCOME',
+        color: '#4CAF50'
+      },
+      date: new Date().toISOString(),
+      categoryId: 'cat2',
+      accountId: '1',
+      account: {
+        id: '1',
+        name: 'Main Account'
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
-      id: 3,
+      id: '3',
       description: 'Aluguel',
-      amount: -1200,
-      category: { id: 'cat3', name: 'Moradia', type: 'EXPENSE' },
-      date: '2024-03-05',
+      amount: 1200,
+      type: 'EXPENSE',
+      category: {
+        id: 'cat3',
+        name: 'Moradia',
+        type: 'EXPENSE',
+        color: '#2196F3'
+      },
+      date: new Date().toISOString(),
+      categoryId: 'cat3',
+      accountId: '1',
+      account: {
+        id: '1',
+        name: 'Main Account'
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
-  ],
+  ]
 };
 
-// Adicionar dados mockados para o gráfico
+// Mock data for the chart
 const mockBalanceHistory = [
   { date: '2024-03-01', balance: 1500 },
   { date: '2024-03-05', balance: 2300 },
@@ -74,31 +118,18 @@ export function Dashboard() {
   const [timeRange, setTimeRange] = useState<TimeRange>('month');
   const [selectedView, setSelectedView] = useState<'overview' | 'details'>('overview');
 
-  const { data: dashboardData, isLoading } = useQuery<DashboardType>({
+  const { data: dashboardData, isLoading } = useQuery<DashboardData>({
     queryKey: ['dashboard', timeRange],
     queryFn: async () => {
-      // TODO: Implementar chamada real à API
+      // TODO: Implement real API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      return {
-        saldo: mockData.balance,
-        receitas: mockData.totalIncome,
-        despesas: mockData.totalExpenses,
-        transacoes: mockData.recentTransactions.map(t => ({
-          id: t.id.toString(),
-          descricao: t.description,
-          valor: t.amount,
-          tipo: t.amount > 0 ? 'RECEITA' : 'DESPESA',
-          categoria: t.category,
-          data: t.date,
-          usuarioId: '1'
-        }))
-      };
+      return mockData;
     },
   });
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    // TODO: Implementar atualização dos dados
+    // TODO: Implement data refresh
     await new Promise(resolve => setTimeout(resolve, 1000));
     setIsRefreshing(false);
   };
@@ -123,7 +154,7 @@ export function Dashboard() {
     <ViewDefault>
       <PullToRefresh onRefresh={handleRefresh} isRefreshing={isRefreshing}>
         <div className="space-y-6 p-6">
-          {/* Header com Data e Filtros */}
+          {/* Header with Date and Filters */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-primary-100 dark:bg-primary-900/20 rounded-lg">
@@ -141,7 +172,7 @@ export function Dashboard() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              {/* Seletor de Período */}
+              {/* Period Selector */}
               <Tabs 
                 value={timeRange} 
                 onValueChange={(value: string) => setTimeRange(value as TimeRange)} 
@@ -155,7 +186,7 @@ export function Dashboard() {
                 </TabsList>
               </Tabs>
 
-              {/* Alternador de Visualização */}
+              {/* View Switcher */}
               <div className="flex gap-2">
                 <Button
                   variant={selectedView === 'overview' ? 'default' : 'outline'}
@@ -179,64 +210,59 @@ export function Dashboard() {
             </div>
           </div>
 
-          {/* Resumo Financeiro */}
+          {/* Financial Summary */}
           {dashboardData && (
             <StatementSummary
               balance={dashboardData.balance}
               income={dashboardData.income}
               expenses={dashboardData.expenses}
-              previousBalance={mockData.balance * 0.8} // TODO: Implementar dados reais
-              previousIncome={mockData.totalIncome * 0.9}
-              previousExpenses={mockData.totalExpenses * 0.85}
+              previousBalance={mockData.balance * 0.8} // TODO: Implement real data
+              previousIncome={mockData.income * 0.9}
+              previousExpenses={mockData.expenses * 0.85}
             />
           )}
 
           {selectedView === 'overview' ? (
-            /* Visão Geral - Gráficos */
+            /* Overview - Charts */
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="border-border dark:border-border-dark">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-medium text-text dark:text-text-dark">
+                      Saldo
+                    </h3>
+                  </div>
+                  <BalanceChart data={mockBalanceHistory} />
+                </div>
+              </Card>
+
               <Card className="border-border dark:border-border-dark">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-medium text-text dark:text-text-dark">
                       Despesas por Categoria
                     </h3>
-                    <ArrowTrendingDownIcon className="h-5 w-5 text-red-400" />
                   </div>
-                  <div className="h-80">
-                    <PieChart data={mockData.expensesByCategory} />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="border-border dark:border-border-dark">
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-medium text-text dark:text-text-dark">
-                      Evolução do Saldo
-                    </h3>
-                    <ArrowTrendingUpIcon className="h-5 w-5 text-green-400" />
-                  </div>
-                  <div className="h-80">
-                    <BalanceChart data={mockBalanceHistory} />
-                  </div>
+                  <PieChart
+                    data={dashboardData?.transactions
+                      .filter(t => t.type === 'EXPENSE')
+                      .map(t => ({
+                        name: t.category.name,
+                        value: t.amount,
+                        color: t.category.color || '#000000'
+                      })) || []}
+                  />
                 </div>
               </Card>
             </div>
           ) : (
-            /* Visão Detalhada - Lista de Transações */
+            /* Details - Transaction List */
             <Card className="border-border dark:border-border-dark">
               <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-medium text-text dark:text-text-dark">
-                    Últimas Transações
-                  </h3>
-                  <Button variant="outline" size="sm">
-                    Ver Todas
-                  </Button>
-                </div>
-                {dashboardData && (
-                  <TransactionList transactions={dashboardData.transacoes} />
-                )}
+                <h3 className="text-lg font-medium text-text dark:text-text-dark mb-4">
+                  Transações Recentes
+                </h3>
+                <TransactionList transactions={dashboardData?.transactions || []} />
               </div>
             </Card>
           )}

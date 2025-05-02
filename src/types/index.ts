@@ -4,6 +4,14 @@ export interface Usuario {
   email: string;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  type: 'INCOME' | 'EXPENSE';
+  color?: string;
+  icon?: string;
+}
+
 export interface Transacao {
   id: string;
   descricao: string;
@@ -12,12 +20,6 @@ export interface Transacao {
   categoria: Category;
   data: string;
   usuarioId: string;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  type: 'INCOME' | 'EXPENSE';
 }
 
 export interface Transaction {
@@ -31,7 +33,7 @@ export interface Transaction {
 export interface Categoria {
   id: string;
   nome: string;
-  tipo: "RECEITA" | "DESPESA";
+  tipo: 'RECEITA' | 'DESPESA';
   usuarioId: string;
 }
 
@@ -75,7 +77,7 @@ export interface AuthState {
 export interface TransacaoFormData {
   descricao: string;
   valor: number;
-  tipo: "RECEITA" | "DESPESA";
+  tipo: 'RECEITA' | 'DESPESA';
   categoria: string;
   data: string;
 }

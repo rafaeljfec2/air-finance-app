@@ -19,6 +19,7 @@ export interface Transaction {
   note?: string;
   attachments?: string[];
   category: {
+    color: string;
     id: string;
     name: string;
     type: TransactionType;

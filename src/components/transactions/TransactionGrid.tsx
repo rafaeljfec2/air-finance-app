@@ -6,8 +6,9 @@ import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { useState, useMemo, useEffect, useRef, useCallback, memo } from 'react'
 import { Tooltip } from '@/components/ui/tooltip'
+import { Transaction as TransactionType } from '@/types/transaction'
 
-type SortField = 'hora' | 'categoria' | 'descricao' | 'conta' | 'credito' | 'debito' | 'saldo'
+type SortField = 'date' | 'category' | 'description' | 'account' | 'credit' | 'debit' | 'balance'
 type SortDirection = 'asc' | 'desc'
 
 type FilterValue = {
@@ -155,34 +156,11 @@ const FilterMenu = ({ field, items, selectedValues, onFilter, onClose, position 
 
 const MemoizedFilterMenu = memo(FilterMenu)
 
-export type Transaction = {
-  id: string
-  type: 'INCOME' | 'EXPENSE'
-  description: string
-  amount: number
-  date: string
-  categoryId: string
-  accountId: string
-  note: string
-  category: {
-    id: string
-    name: string
-    type: string
-  }
-  account: {
-    id: string
-    name: string
-  }
-  credit?: number
-  debit?: number
-  balance?: number
-}
-
 interface TransactionGridProps {
-  transactions: Transaction[]
+  transactions: TransactionType[]
   isLoading?: boolean
   showActions?: boolean
-  onActionClick?: (transaction: Transaction) => void
+  onActionClick?: (transaction: TransactionType) => void
   className?: string
 }
 
@@ -191,9 +169,9 @@ const TableRow = memo(({
   showActions, 
   onActionClick 
 }: { 
-  transaction: Transaction
+  transaction: TransactionType
   showActions: boolean
-  onActionClick: (transaction: Transaction) => void
+  onActionClick: (transaction: TransactionType) => void
 }) => {
   const formatDate = (dateStr: string) => {
     try {
@@ -209,9 +187,7 @@ const TableRow = memo(({
   }
 
   return (
-    <tr
-      className="hover:bg-background/70 dark:hover:bg-background-dark/70 transition-colors"
-    >
+    <tr className="hover:bg-background/70 dark:hover:bg-background-dark/70 transition-colors">
       <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
         {formatDate(transaction.date)}
       </td>
@@ -237,10 +213,10 @@ const TableRow = memo(({
         </Tooltip>
       </td>
       <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-emerald-400 whitespace-nowrap">
-        {transaction.credit ? formatCurrency(transaction.credit) : '-'}
+        {transaction.type === 'INCOME' ? formatCurrency(transaction.amount) : '-'}
       </td>
       <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-red-400 whitespace-nowrap">
-        {transaction.debit ? formatCurrency(transaction.debit) : '-'}
+        {transaction.type === 'EXPENSE' ? formatCurrency(transaction.amount) : '-'}
       </td>
       <td className={cn(
         "py-2 pl-0 pr-8 text-xs font-medium text-right whitespace-nowrap",
@@ -270,9 +246,9 @@ const MobileCard = memo(({
   showActions, 
   onActionClick 
 }: { 
-  transaction: Transaction
+  transaction: TransactionType
   showActions: boolean
-  onActionClick: (transaction: Transaction) => void
+  onActionClick: (transaction: TransactionType) => void
 }) => {
   const formatDate = (dateStr: string) => {
     try {
@@ -367,8 +343,8 @@ interface SortableHeaderProps {
   onFilterClick: (field: SortField) => void
   onFilter: (field: SortField, values: Set<string>) => void
   onCloseFilter: () => void
-  getFieldValues: (transactions: Transaction[], field: SortField) => string[]
-  transactions: Transaction[]
+  getFieldValues: (transactions: TransactionType[], field: SortField) => string[]
+  transactions: TransactionType[]
 }
 
 const SortableHeader: React.FC<SortableHeaderProps> = ({ 
@@ -404,7 +380,7 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
         <div
           className={cn(
             "flex items-center gap-1",
-            field === 'credito' || field === 'debito' || field === 'saldo' ? "justify-end w-full" : "justify-start"
+            field === 'credit' || field === 'debit' || field === 'balance' ? "justify-end w-full" : "justify-start"
           )}
         >
           {children}
@@ -454,7 +430,7 @@ export function TransactionGrid({
   const itemsPerPage = 10
   const [itemsPerPageSelected, setItemsPerPageSelected] = useState(itemsPerPage)
   const [sortConfig, setSortConfig] = useState<{ field: SortField; direction: SortDirection }>({
-    field: 'hora',
+    field: 'date',
     direction: 'desc'
   })
   const [activeFilter, setActiveFilter] = useState<SortField | null>(null)
@@ -474,7 +450,7 @@ export function TransactionGrid({
     })
   }, [])
 
-  const getFilteredTransactions = useCallback((transactions: Transaction[]) => {
+  const getFilteredTransactions = useCallback((transactions: TransactionType[]) => {
     return transactions.filter(transaction => {
       return filters.every(filter => {
         const value = getFieldValue(transaction, filter.field)
@@ -483,9 +459,9 @@ export function TransactionGrid({
     })
   }, [filters])
 
-  const getFieldValue = (transaction: Transaction, field: SortField): string | number => {
+  const getFieldValue = (transaction: TransactionType, field: SortField): string | number => {
     switch (field) {
-      case 'hora': {
+      case 'date': {
         try {
           const date = new Date(transaction.date)
           if (isNaN(date.getTime())) {
@@ -497,32 +473,32 @@ export function TransactionGrid({
           return '-'
         }
       }
-      case 'categoria':
+      case 'category':
         return transaction.category?.name || 'Sem categoria'
-      case 'descricao':
+      case 'description':
         return transaction.description || 'Sem descrição'
-      case 'conta':
+      case 'account':
         return transaction.account?.name || 'Sem conta'
-      case 'credito':
+      case 'credit':
         return transaction.type === 'INCOME' ? transaction.amount : 0
-      case 'debito':
+      case 'debit':
         return transaction.type === 'EXPENSE' ? transaction.amount : 0
-      case 'saldo':
+      case 'balance':
         return transaction.balance ?? 0
       default:
         return ''
     }
   }
 
-  const getFieldValues = (transactions: Transaction[], field: SortField): string[] => {
+  const getFieldValues = (transactions: TransactionType[], field: SortField): string[] => {
     return transactions.map(t => getFieldValue(t, field).toString())
   }
 
   // Função para ordenar transações
-  const sortTransactions = (transactions: Transaction[]) => {
+  const sortTransactions = (transactions: TransactionType[]) => {
     return [...transactions].sort((a, b) => {
       switch (sortConfig.field) {
-        case 'hora': {
+        case 'date': {
           try {
             const dateA = new Date(a.date).getTime()
             const dateB = new Date(b.date).getTime()
@@ -537,33 +513,33 @@ export function TransactionGrid({
             return 0
           }
         }
-        case 'categoria':
+        case 'category':
           return sortConfig.direction === 'asc'
             ? a.category?.name.localeCompare(b.category?.name)
             : b.category?.name.localeCompare(a.category?.name)
-        case 'descricao':
+        case 'description':
           return sortConfig.direction === 'asc'
             ? a.description.localeCompare(b.description)
             : b.description.localeCompare(a.description)
-        case 'conta':
+        case 'account':
           return sortConfig.direction === 'asc'
             ? a.account?.name.localeCompare(b.account?.name)
             : b.account?.name.localeCompare(a.account?.name)
-        case 'credito': {
+        case 'credit': {
           const aValue = a.type === 'INCOME' ? a.amount : 0
           const bValue = b.type === 'INCOME' ? b.amount : 0
           return sortConfig.direction === 'asc'
             ? aValue - bValue
             : bValue - aValue
         }
-        case 'debito': {
+        case 'debit': {
           const aValue = a.type === 'EXPENSE' ? a.amount : 0
           const bValue = b.type === 'EXPENSE' ? b.amount : 0
           return sortConfig.direction === 'asc'
             ? aValue - bValue
             : bValue - aValue
         }
-        case 'saldo': {
+        case 'balance': {
           const aValue = a.balance ?? 0
           const bValue = b.balance ?? 0
           return sortConfig.direction === 'asc'
@@ -620,7 +596,7 @@ export function TransactionGrid({
     setCurrentPage(1)
   }
 
-  const handleActionClick = useCallback((transaction: Transaction) => {
+  const handleActionClick = useCallback((transaction: TransactionType) => {
     if (onActionClick) {
       onActionClick(transaction)
     } else {
@@ -654,7 +630,7 @@ export function TransactionGrid({
                   <thead>
                     <tr className="bg-background/30 dark:bg-background-dark/30">
                       <SortableHeader 
-                        field="hora"
+                        field="date"
                         sortConfig={sortConfig}
                         filters={filters}
                         activeFilter={activeFilter}
@@ -668,7 +644,7 @@ export function TransactionGrid({
                         Data/Hora
                       </SortableHeader>
                       <SortableHeader 
-                        field="categoria"
+                        field="category"
                         sortConfig={sortConfig}
                         filters={filters}
                         activeFilter={activeFilter}
@@ -682,7 +658,7 @@ export function TransactionGrid({
                         Categoria
                       </SortableHeader>
                       <SortableHeader 
-                        field="descricao"
+                        field="description"
                         sortConfig={sortConfig}
                         filters={filters}
                         activeFilter={activeFilter}
@@ -696,7 +672,7 @@ export function TransactionGrid({
                         Descrição
                       </SortableHeader>
                       <SortableHeader 
-                        field="conta"
+                        field="account"
                         sortConfig={sortConfig}
                         filters={filters}
                         activeFilter={activeFilter}
@@ -710,7 +686,7 @@ export function TransactionGrid({
                         Conta
                       </SortableHeader>
                       <SortableHeader 
-                        field="credito"
+                        field="credit"
                         className="text-right pl-0 pr-8"
                         sortConfig={sortConfig}
                         filters={filters}
@@ -725,7 +701,7 @@ export function TransactionGrid({
                         Crédito
                       </SortableHeader>
                       <SortableHeader 
-                        field="debito"
+                        field="debit"
                         className="text-right pl-0 pr-8"
                         sortConfig={sortConfig}
                         filters={filters}
@@ -740,7 +716,7 @@ export function TransactionGrid({
                         Débito
                       </SortableHeader>
                       <SortableHeader 
-                        field="saldo"
+                        field="balance"
                         className="text-right pl-0 pr-8"
                         sortConfig={sortConfig}
                         filters={filters}
