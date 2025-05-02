@@ -143,28 +143,28 @@ export function NewTransaction() {
 
   return (
     <ViewDefault>
-      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900">
+      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
         {/* Header Fixo */}
-        <div className="sticky top-0 z-10 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
+        <div className="sticky top-0 z-10 bg-background/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-border dark:border-border-dark">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center">
               <button
                 onClick={() => navigate('/transactions')}
-                className="p-2 -ml-2 hover:bg-gray-800 rounded-lg transition-colors"
+                className="p-2 -ml-2 hover:bg-card dark:hover:bg-card-dark rounded-lg transition-colors"
               >
-                <ChevronLeft className="h-5 w-5 text-gray-400" />
+                <ChevronLeft className="h-5 w-5 text-text dark:text-text-dark" />
               </button>
               <div className="ml-3">
-                <h1 className="text-lg font-semibold text-gray-100">Novo Lançamento</h1>
-                <p className="text-xs text-gray-400">Preencha os dados da transação</p>
+                <h1 className="text-lg font-semibold text-text dark:text-text-dark">Novo Lançamento</h1>
+                <p className="text-sm text-text/60 dark:text-text-dark/60">Preencha os dados da transação</p>
               </div>
             </div>
           </div>
         </div>
 
         <div className="container mx-auto px-4 py-6">
-          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm w-full sm:max-w-[60%] sm:mx-auto">
-            <form id="transaction-form" onSubmit={handleSubmit} className="divide-y divide-gray-700/50">
+          <Card className="bg-card/50 dark:bg-card-dark/50 border-border dark:border-border-dark backdrop-blur-sm w-full sm:max-w-[60%] sm:mx-auto">
+            <form id="transaction-form" onSubmit={handleSubmit} className="divide-y divide-border dark:divide-border-dark">
               {/* Tipo de Transação */}
               <div className="p-4 sm:p-6">
                 <div className="grid grid-cols-2 gap-3">
@@ -177,8 +177,8 @@ export function NewTransaction() {
                     className={cn(
                       'p-3 rounded-lg border flex items-center justify-center gap-2 transition-all',
                       transactionType === 'DESPESA'
-                        ? 'bg-red-500/10 border-red-500/50 text-red-400'
-                        : 'border-gray-600 text-gray-400 hover:border-gray-500'
+                        ? 'bg-red-500/10 border-red-500/50 text-red-500 dark:text-red-400'
+                        : 'border-border dark:border-border-dark text-text/60 dark:text-text-dark/60 hover:border-text/30 dark:hover:border-text-dark/30'
                     )}
                   >
                     <ArrowDownCircle className="h-4 w-4" />
@@ -193,8 +193,8 @@ export function NewTransaction() {
                     className={cn(
                       'p-3 rounded-lg border flex items-center justify-center gap-2 transition-all',
                       transactionType === 'RECEITA'
-                        ? 'bg-green-500/10 border-green-500/50 text-green-400'
-                        : 'border-gray-600 text-gray-400 hover:border-gray-500'
+                        ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-500 dark:text-emerald-400'
+                        : 'border-border dark:border-border-dark text-text/60 dark:text-text-dark/60 hover:border-text/30 dark:hover:border-text-dark/30'
                     )}
                   >
                     <ArrowUpCircle className="h-4 w-4" />
@@ -206,12 +206,12 @@ export function NewTransaction() {
               {/* Campos Principais */}
               <div className="space-y-4 p-4 sm:p-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                  <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                     Valor
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-gray-400">R$</span>
+                      <span className="text-text/60 dark:text-text-dark/60">R$</span>
                     </div>
                     <Input
                       type="number"
@@ -221,14 +221,14 @@ export function NewTransaction() {
                       step="0.01"
                       min="0"
                       required
-                      className="pl-10 bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500 h-10"
+                      className="pl-10 bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf h-10"
                       placeholder="0,00"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                  <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                     Data
                   </label>
                   <Input
@@ -237,12 +237,12 @@ export function NewTransaction() {
                     value={formData.data}
                     onChange={handleChange}
                     required
-                    className="bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500 h-10"
+                    className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf h-10"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                  <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                     Categoria
                   </label>
                   <Select
@@ -250,7 +250,7 @@ export function NewTransaction() {
                     value={formData.categoriaId}
                     onChange={handleChange}
                     required
-                    className="bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500 h-10"
+                    className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf h-10"
                   >
                     <option value="">Selecione uma categoria</option>
                     {filteredCategories.map((category: Category) => (
@@ -262,7 +262,7 @@ export function NewTransaction() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                  <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                     Conta
                   </label>
                   <Select
@@ -270,7 +270,7 @@ export function NewTransaction() {
                     value={formData.contaId}
                     onChange={handleChange}
                     required
-                    className="bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500 h-10"
+                    className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf h-10"
                   >
                     <option value="">Selecione uma conta</option>
                     {accounts.map((account: Account) => (
@@ -282,7 +282,7 @@ export function NewTransaction() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                  <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                     Descrição
                   </label>
                   <Input
@@ -291,13 +291,13 @@ export function NewTransaction() {
                     value={formData.descricao}
                     onChange={handleChange}
                     required
-                    className="bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500 h-10"
+                    className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf h-10"
                     placeholder="Digite uma descrição clara para a transação"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                  <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                     Observações
                   </label>
                   <Textarea
@@ -305,7 +305,7 @@ export function NewTransaction() {
                     value={formData.observacao}
                     onChange={handleChange}
                     rows={3}
-                    className="bg-gray-700/50 border-gray-600 text-gray-100 focus:border-gray-500"
+                    className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf"
                     placeholder="Adicione informações complementares sobre a transação (opcional)"
                   />
                 </div>
@@ -315,10 +315,10 @@ export function NewTransaction() {
                   <Button 
                     type="submit"
                     className={cn(
-                      'transition-all text-sm h-11 px-8',
+                      'transition-all text-sm h-11 px-8 text-white',
                       transactionType === 'DESPESA'
-                        ? 'bg-red-500 hover:bg-red-600 text-white'
-                        : 'bg-green-500 hover:bg-green-600 text-white'
+                        ? 'bg-red-500 hover:bg-red-600 dark:bg-red-500/90 dark:hover:bg-red-500'
+                        : 'bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-500/90 dark:hover:bg-emerald-500'
                     )}
                   >
                     Salvar
