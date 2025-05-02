@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BadgeCheck, Edit2, X, Check, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -14,6 +13,16 @@ const mockCategories = [
   'Moradia',
   'Outros',
 ];
+
+const categoryColors: Record<string, string> = {
+  'Alimentação': 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
+  'Transporte': 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
+  'Saúde': 'bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300',
+  'Lazer': 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
+  'Educação': 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
+  'Moradia': 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300',
+  'Outros': 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+};
 
 const mockTransactions = [
   {
@@ -90,74 +99,69 @@ export default function AiClassificationPage() {
                 Revise as transações recentes e confirme, edite ou recuse a sugestão de categoria feita pela IA. Sua escolha ajuda a IA a ficar cada vez mais precisa!
             </p>
             </div>
-            <Card className="p-0 overflow-hidden">
-            <div className="divide-y divide-border dark:divide-border-dark">
+            <div className="space-y-6">
                 {transactions.map(tx => (
                 <div
                     key={tx.id}
                     className={cn(
-                    'flex flex-col md:flex-row md:items-center gap-4 px-4 py-3 relative group transition-colors',
-                    'hover:bg-gray-50 dark:hover:bg-gray-900/40',
-                    'border-l-4',
-                    tx.status === 'accepted' ? 'border-green-500' : tx.status === 'edited' ? 'border-blue-500' : tx.status === 'rejected' ? 'border-red-500' : 'border-transparent'
+                    'relative bg-white dark:bg-gray-900 shadow-md rounded-xl p-5 flex flex-col gap-2 mb-2 transition-all',
+                    'border border-border dark:border-border-dark',
+                    tx.status === 'accepted' ? 'ring-2 ring-green-400' : tx.status === 'edited' ? 'ring-2 ring-blue-400' : tx.status === 'rejected' ? 'ring-2 ring-red-400' : ''
                     )}
                 >
-                    <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-base text-gray-900 dark:text-white truncate">{tx.description}</span>
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-brand-arrow/5 text-brand-arrow border border-brand-arrow/20">
-                        <BadgeCheck className="w-4 h-4 mr-1" /> Sugestão IA
+                    {/* Feedback visual */}
+                    {feedback?.id === tx.id && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-500 text-white px-4 py-1 rounded-full text-xs font-semibold shadow animate-bounce z-10">
+                        {feedback.message}
+                    </div>
+                    )}
+                    {/* Header */}
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                        <span className="font-bold text-lg text-gray-900 dark:text-white">{tx.description}</span>
+                        <span className="bg-brand-arrow/10 text-brand-arrow px-2 py-0.5 rounded-full text-xs flex items-center gap-1 border border-brand-arrow/20">
+                        <BadgeCheck className="w-4 h-4" /> Sugestão IA
                         </span>
                     </div>
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
-                        <span>{new Date(tx.date).toLocaleDateString('pt-BR')}</span>
-                        <span className={cn('font-semibold', tx.amount < 0 ? 'text-red-500' : 'text-green-500')}>{tx.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                        <span className="flex items-center gap-1">
-                        Categoria:
-                        {editingId === tx.id ? (
-                            <select
-                            className="ml-1 rounded-md border border-border dark:border-border-dark bg-background dark:bg-background-dark px-2 py-1 text-sm"
-                            value={tx.userCategory || tx.iaCategory}
-                            onChange={e => handleEdit(tx.id, e.target.value)}
-                            >
-                            {mockCategories.map(cat => (
-                                <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                            </select>
-                        ) : (
-                            <span className={cn('ml-1 px-2 py-0.5 rounded bg-brand-arrow/10 text-brand-arrow font-medium', tx.status === 'edited' && 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300')}>{tx.userCategory || tx.iaCategory}</span>
-                        )}
-                        </span>
+                    <span className={cn('text-lg font-semibold', tx.amount < 0 ? 'text-red-500' : 'text-green-500')}>{tx.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                     </div>
+                    {/* Detalhes */}
+                    <div className="flex flex-wrap items-center gap-3">
+                    <span className={cn('px-2 py-0.5 rounded-full text-xs font-medium', categoryColors[tx.userCategory || tx.iaCategory] || categoryColors['Outros'])}>
+                        {tx.userCategory || tx.iaCategory}
+                    </span>
+                    <span className="text-xs text-gray-500">{new Date(tx.date).toLocaleDateString('pt-BR')}</span>
                     </div>
-                    <div className="flex gap-2 md:flex-col md:gap-2 items-center md:items-end min-w-[180px]">
+                    {/* Ações */}
+                    <div className="flex gap-2 mt-2 flex-wrap">
                     {tx.status === 'pending' && (
                         <>
-                        <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700 text-white shadow-sm" onClick={() => handleAccept(tx.id)} title="Aceitar sugestão">
-                            <Check className="w-4 h-4 mr-1" /> Aceitar
+                        <Button size="sm" variant="ghost" className="bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800 rounded px-3 py-1 text-xs font-medium flex items-center gap-1 shadow-none" onClick={() => handleAccept(tx.id)} title="Aceitar sugestão">
+                            <Check className="w-4 h-4" /> Aceitar
                         </Button>
-                        <Button size="sm" variant="outline" className="border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 shadow-sm" onClick={() => setEditingId(tx.id)} title="Editar categoria">
-                            <Edit2 className="w-4 h-4 mr-1" /> Editar
+                        <Button size="sm" variant="ghost" className="bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800 rounded px-3 py-1 text-xs font-medium flex items-center gap-1 shadow-none" onClick={() => setEditingId(tx.id)} title="Editar categoria">
+                            <Edit2 className="w-4 h-4" /> Editar
                         </Button>
-                        <Button size="sm" variant="outline" className="border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 shadow-sm" onClick={() => handleReject(tx.id)} title="Recusar sugestão">
-                            <X className="w-4 h-4 mr-1" /> Recusar
+                        <Button size="sm" variant="ghost" className="bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800 rounded px-3 py-1 text-xs font-medium flex items-center gap-1 shadow-none" onClick={() => handleReject(tx.id)} title="Recusar sugestão">
+                            <X className="w-4 h-4" /> Recusar
                         </Button>
                         </>
                     )}
-                    {tx.status === 'accepted' && feedback?.id === tx.id && (
-                        <span className="text-green-600 text-xs font-medium flex items-center gap-1 animate-pulse"><Check className="w-4 h-4" /> {feedback.message}</span>
-                    )}
-                    {tx.status === 'edited' && feedback?.id === tx.id && (
-                        <span className="text-blue-600 text-xs font-medium flex items-center gap-1 animate-pulse"><Edit2 className="w-4 h-4" /> {feedback.message}</span>
-                    )}
-                    {tx.status === 'rejected' && feedback?.id === tx.id && (
-                        <span className="text-red-600 text-xs font-medium flex items-center gap-1 animate-pulse"><X className="w-4 h-4" /> {feedback.message}</span>
+                    {editingId === tx.id && tx.status === 'pending' && (
+                        <select
+                        className="ml-1 rounded-md border border-border dark:border-border-dark bg-background dark:bg-background-dark px-2 py-1 text-sm"
+                        value={tx.userCategory || tx.iaCategory}
+                        onChange={e => handleEdit(tx.id, e.target.value)}
+                        >
+                        {mockCategories.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                        </select>
                     )}
                     </div>
                 </div>
                 ))}
             </div>
-            </Card>
         </div>
         </div>
     </ViewDefault>                
