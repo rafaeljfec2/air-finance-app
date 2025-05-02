@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { MonthYearFilter } from '@/components/budget/MonthYearFilter';
+import { MonthNavigator } from '@/components/budget/MonthNavigator';
 import { mockCashFlows, mockReceivables, mockPayables, mockCreditCards } from '@/mocks/budget';
 import { Wallet, TrendingUp, TrendingDown, CreditCard } from 'lucide-react';
 import {
@@ -76,7 +76,7 @@ export default function BudgetPage() {
         </div>
         {/* Filtro centralizado */}
         <div className="flex justify-center mb-8">
-          <MonthYearFilter
+          <MonthNavigator
             month={filter.month}
             year={filter.year}
             onChange={(month, year) => setFilter({ month, year })}
