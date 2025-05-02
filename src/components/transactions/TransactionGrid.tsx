@@ -185,37 +185,36 @@ export function TransactionGrid({
     field: SortField
     children: React.ReactNode
     className?: string 
-  }) => (
-    <th 
-      onClick={() => toggleSort(field)}
-      className={cn(
-        "text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none",
-        className
-      )}
-      role="columnheader"
-      aria-sort={
-        sortConfig.field === field 
-          ? sortConfig.direction === 'asc' 
-            ? 'ascending' 
-            : 'descending'
-          : 'none'
-      }
-    >
-      <div className={cn(
-        "flex items-center gap-1",
-        field === 'credito' || field === 'debito' || field === 'saldo' ? "justify-end" : "justify-start"
-      )}>
-        {children}
-        <ArrowUpDown className={cn(
-          "h-3 w-3 transition-all",
-          sortConfig.field === field 
-            ? "opacity-100" 
-            : "opacity-0 group-hover:opacity-50",
-          sortConfig.field === field && sortConfig.direction === 'asc' && "rotate-180"
-        )} />
-      </div>
-    </th>
-  )
+  }) => {
+    const getAriaSort = () => {
+      if (sortConfig.field !== field) return 'none'
+      return sortConfig.direction === 'asc' ? 'ascending' : 'descending'
+    }
+
+    return (
+      <th 
+        onClick={() => toggleSort(field)}
+        className={cn(
+          "text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none",
+          className
+        )}
+        role="columnheader"
+        aria-sort={getAriaSort()}
+      >
+        <div className={cn(
+          "flex items-center gap-1",
+          field === 'credito' || field === 'debito' || field === 'saldo' ? "justify-end" : "justify-start"
+        )}>
+          {children}
+          <ArrowUpDown className={cn(
+            "h-3 w-3 transition-all",
+            sortConfig.field === field ? "opacity-100" : "opacity-0 group-hover:opacity-50",
+            sortConfig.field === field && sortConfig.direction === 'asc' && "rotate-180"
+          )} />
+        </div>
+      </th>
+    )
+  }
 
   return (
     <Card className={cn("bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm", className)}>
