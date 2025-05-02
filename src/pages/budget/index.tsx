@@ -2,6 +2,17 @@ import { useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { MonthYearFilter } from '@/components/budget/MonthYearFilter';
 import { mockCashFlows, mockReceivables, mockPayables, mockCreditCards } from '@/mocks/budget';
+import {
+  Wallet,
+  TrendingUp,
+  TrendingDown,
+  CreditCard,
+  BadgeCheck,
+  Clock,
+  XCircle,
+  ArrowRight,
+} from 'lucide-react';
+import { CardContainer, CardHeader, CardStat, BadgeStatus, CardEmpty } from '@/components/budget';
 
 export default function BudgetPage() {
   // Estados de filtro para cada card
@@ -33,145 +44,124 @@ export default function BudgetPage() {
         <h1 className="text-2xl font-bold text-text dark:text-text-dark mb-8">Orçamento</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {/* Fluxo de Caixa */}
-          <div className="bg-card dark:bg-card-dark rounded-lg shadow p-6 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-text dark:text-text-dark">
-                Fluxo de Caixa
-              </h2>
+          <CardContainer color="emerald">
+            <CardHeader icon={<Wallet size={28} />} title="Fluxo de Caixa">
               <MonthYearFilter
                 month={cashFlowFilter.month}
                 year={cashFlowFilter.year}
                 onChange={(month, year) => setCashFlowFilter({ month, year })}
               />
-            </div>
+            </CardHeader>
             {cashFlow ? (
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Saldo Inicial</span>
-                  <span className="font-medium">
-                    R${' '}
-                    {cashFlow.initialBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
-                  <span>Entradas</span>
-                  <span>
-                    + R${' '}
-                    {cashFlow.totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm text-red-600 dark:text-red-400">
-                  <span>Saídas</span>
-                  <span>
-                    - R${' '}
-                    {cashFlow.totalExpense.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm font-bold mt-2">
-                  <span>Saldo Final</span>
-                  <span
-                    className={
-                      cashFlow.finalBalance >= 0
-                        ? 'text-green-600 dark:text-green-400'
-                        : 'text-red-600 dark:text-red-400'
-                    }
-                  >
-                    R$ {cashFlow.finalBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
+              <div className="flex flex-col gap-4 mt-4">
+                <CardStat label="Entradas" value={cashFlow.totalIncome} positive />
+                <CardStat label="Saídas" value={cashFlow.totalExpense} negative />
+                <div className="border-t border-border dark:border-border-dark my-2" />
+                <CardStat
+                  label="Saldo Final"
+                  value={cashFlow.finalBalance}
+                  highlight={cashFlow.finalBalance >= 0}
+                />
               </div>
             ) : (
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                Sem dados para o período.
-              </div>
+              <CardEmpty />
             )}
-          </div>
+          </CardContainer>
 
           {/* Contas a Receber */}
-          <div className="bg-card dark:bg-card-dark rounded-lg shadow p-6 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-text dark:text-text-dark">
-                Contas a Receber
-              </h2>
+          <CardContainer color="amber">
+            <CardHeader icon={<TrendingUp size={28} />} title="Contas a Receber">
               <MonthYearFilter
                 month={receivableFilter.month}
                 year={receivableFilter.year}
                 onChange={(month, year) => setReceivableFilter({ month, year })}
               />
-            </div>
-            <div className="space-y-2 flex-1">
-              {receivables.length > 0 ? (
-                receivables.map((r) => (
-                  <div key={r.id} className="flex justify-between text-sm items-center">
+            </CardHeader>
+            {receivables.length > 0 ? (
+              <ul className="mt-4 divide-y divide-border dark:divide-border-dark">
+                {receivables.map((r, i) => (
+                  <li
+                    key={r.id}
+                    className={`flex justify-between items-center py-2 ${i % 2 === 0 ? 'bg-background/50 dark:bg-background-dark/50' : ''}`}
+                  >
                     <span>{r.description}</span>
-                    <span
-                      className={
-                        r.status === 'RECEIVED'
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-yellow-600 dark:text-yellow-400'
-                      }
-                    >
-                      R$ {r.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    <span className="flex items-center gap-2">
+                      <BadgeStatus status={r.status === 'RECEIVED' ? 'success' : 'warning'}>
+                        {r.status === 'RECEIVED' ? 'Recebido' : 'Pendente'}
+                      </BadgeStatus>
+                      <span className="font-semibold">
+                        R$ {r.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </span>
                     </span>
-                  </div>
-                ))
-              ) : (
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Sem dados para o período.
-                </div>
-              )}
-            </div>
-          </div>
+                  </li>
+                ))}
+                <li className="flex justify-between items-center py-2 font-bold border-t border-border dark:border-border-dark mt-2">
+                  <span>Total Receber</span>
+                  <span>
+                    R${' '}
+                    {receivables
+                      .reduce((acc, r) => acc + r.value, 0)
+                      .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </span>
+                </li>
+              </ul>
+            ) : (
+              <CardEmpty />
+            )}
+          </CardContainer>
 
           {/* Contas a Pagar */}
-          <div className="bg-card dark:bg-card-dark rounded-lg shadow p-6 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-text dark:text-text-dark">
-                Contas a Pagar
-              </h2>
+          <CardContainer color="rose">
+            <CardHeader icon={<TrendingDown size={28} />} title="Contas a Pagar">
               <MonthYearFilter
                 month={payableFilter.month}
                 year={payableFilter.year}
                 onChange={(month, year) => setPayableFilter({ month, year })}
               />
-            </div>
-            <div className="space-y-2 flex-1">
-              {payables.length > 0 ? (
-                payables.map((p) => (
-                  <div key={p.id} className="flex justify-between text-sm items-center">
+            </CardHeader>
+            {payables.length > 0 ? (
+              <ul className="mt-4 divide-y divide-border dark:divide-border-dark">
+                {payables.map((p, i) => (
+                  <li
+                    key={p.id}
+                    className={`flex justify-between items-center py-2 ${i % 2 === 0 ? 'bg-background/50 dark:bg-background-dark/50' : ''}`}
+                  >
                     <span>{p.description}</span>
-                    <span
-                      className={
-                        p.status === 'PAID'
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }
-                    >
-                      R$ {p.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    <span className="flex items-center gap-2">
+                      <BadgeStatus status={p.status === 'PAID' ? 'success' : 'danger'}>
+                        {p.status === 'PAID' ? 'Pago' : 'Pendente'}
+                      </BadgeStatus>
+                      <span className="font-semibold">
+                        R$ {p.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </span>
                     </span>
-                  </div>
-                ))
-              ) : (
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Sem dados para o período.
-                </div>
-              )}
-            </div>
-          </div>
+                  </li>
+                ))}
+                <li className="flex justify-between items-center py-2 font-bold border-t border-border dark:border-border-dark mt-2">
+                  <span>Total Pagar</span>
+                  <span>
+                    R${' '}
+                    {payables
+                      .reduce((acc, p) => acc + p.value, 0)
+                      .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </span>
+                </li>
+              </ul>
+            ) : (
+              <CardEmpty />
+            )}
+          </CardContainer>
 
           {/* Cartões de Crédito */}
-          <div className="bg-card dark:bg-card-dark rounded-lg shadow p-6 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-text dark:text-text-dark">
-                Cartões de Crédito
-              </h2>
+          <CardContainer color="violet">
+            <CardHeader icon={<CreditCard size={28} />} title="Cartões de Crédito">
               <MonthYearFilter
                 month={cardFilter.month}
                 year={cardFilter.year}
                 onChange={(month, year) => setCardFilter({ month, year })}
               />
-            </div>
-            <div className="flex gap-2 mb-4">
+            </CardHeader>
+            <div className="flex gap-2 mb-4 mt-4">
               {cards.map((card) => (
                 <button
                   key={card.id}
@@ -183,20 +173,14 @@ export default function BudgetPage() {
               ))}
             </div>
             {activeBill ? (
-              <div className="space-y-2 flex-1">
-                <div className="flex justify-between text-sm">
-                  <span>Fatura</span>
-                  <span
-                    className={
-                      activeBill.status === 'PAID'
-                        ? 'text-green-600 dark:text-green-400'
-                        : 'text-yellow-600 dark:text-yellow-400'
-                    }
-                  >
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold">Fatura</span>
+                  <span className="text-lg font-bold">
                     R$ {activeBill.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                   <span>Vencimento: {activeBill.dueDate}</span>
                   <span>
                     Status:{' '}
@@ -207,30 +191,48 @@ export default function BudgetPage() {
                         : 'Aberta'}
                   </span>
                 </div>
-                <div className="mt-2">
-                  <div className="text-xs font-semibold mb-1">Transações</div>
-                  {activeBill.transactions.length > 0 ? (
-                    <ul className="space-y-1">
-                      {activeBill.transactions.map((t) => (
-                        <li key={t.id} className="flex justify-between text-xs">
-                          <span>{t.description}</span>
-                          <span>
-                            R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Sem transações.</div>
-                  )}
+                {/* Barra de progresso de uso do limite */}
+                <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded mt-2 mb-2">
+                  <div
+                    className="h-2 rounded bg-primary-500 transition-all"
+                    style={{
+                      width: `${Math.min(100, Math.round((activeBill.total / (activeCard?.limit || 1)) * 100))}%`,
+                    }}
+                  />
                 </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Limite: R${' '}
+                  {activeCard?.limit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </div>
+                <ul className="divide-y divide-border dark:divide-border-dark">
+                  {activeBill.transactions.map((t, i) => (
+                    <li
+                      key={t.id}
+                      className={`flex justify-between items-center py-2 ${i % 2 === 0 ? 'bg-background/50 dark:bg-background-dark/50' : ''}`}
+                    >
+                      <span>{t.description}</span>
+                      <span className="flex items-center gap-2">
+                        <BadgeStatus status={t.category === 'Parcelado' ? 'success' : 'default'}>
+                          {t.category}
+                        </BadgeStatus>
+                        <span className="font-semibold">
+                          R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </span>
+                      </span>
+                    </li>
+                  ))}
+                  <li className="flex justify-between items-center py-2 font-bold border-t border-border dark:border-border-dark mt-2">
+                    <span>Total Fatura</span>
+                    <span>
+                      R$ {activeBill.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
+                  </li>
+                </ul>
               </div>
             ) : (
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                Sem fatura para o período.
-              </div>
+              <CardEmpty />
             )}
-          </div>
+          </CardContainer>
         </div>
       </div>
     </ViewDefault>
