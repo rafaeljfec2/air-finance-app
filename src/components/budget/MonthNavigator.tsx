@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const months = [
   'janeiro',
@@ -42,23 +43,25 @@ export const MonthNavigator: React.FC<MonthNavigatorProps> = ({ month, year, onC
     onChange((newMonth + 1).toString().padStart(2, '0'), newYear.toString());
   };
   return (
-    <div className="flex items-center justify-center gap-4 select-none">
+    <div className="flex items-center justify-center gap-4 select-none bg-card dark:bg-card-dark rounded-xl shadow-md px-4 py-2 border border-border dark:border-border-dark">
       <button
         onClick={handlePrev}
-        className="rounded bg-background dark:bg-background-dark border border-border dark:border-border-dark p-2 hover:bg-primary-900/10 transition-colors"
+        className="rounded-full bg-background dark:bg-background-dark border border-border dark:border-border-dark p-2 hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors active:scale-95"
         aria-label="Mês anterior"
+        type="button"
       >
-        <span className="text-xl">←</span>
+        <ChevronLeft className="h-5 w-5 text-text dark:text-text-dark" />
       </button>
-      <span className="text-lg sm:text-xl font-semibold text-text dark:text-text-dark min-w-[120px] text-center">
+      <span className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark min-w-[140px] text-center drop-shadow-sm">
         {months[monthIndex]} de {year}
       </span>
       <button
         onClick={handleNext}
-        className="rounded bg-background dark:bg-background-dark border border-border dark:border-border-dark p-2 hover:bg-primary-900/10 transition-colors"
+        className="rounded-full bg-background dark:bg-background-dark border border-border dark:border-border-dark p-2 hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors active:scale-95"
         aria-label="Próximo mês"
+        type="button"
       >
-        <span className="text-xl">→</span>
+        <ChevronRight className="h-5 w-5 text-text dark:text-text-dark" />
       </button>
     </div>
   );
