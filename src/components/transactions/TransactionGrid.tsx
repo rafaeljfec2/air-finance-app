@@ -63,33 +63,53 @@ const FilterMenu = ({ field, items, selectedValues, onFilter, onClose }: FilterM
   }
 
   return (
-    <div ref={menuRef} className="absolute z-50 mt-1 w-56 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5" style={{ minWidth: '200px' }}>
-      <div className="p-2 border-b border-gray-200 dark:border-gray-700">
+    <div 
+      ref={menuRef} 
+      className="absolute z-50 mt-1 w-56 rounded-md bg-white dark:bg-gray-900 shadow-lg ring-1 ring-black/5 dark:ring-white/10 dark:border dark:border-gray-800"
+      style={{ minWidth: '200px' }}
+    >
+      <div className="p-2 border-b border-gray-200 dark:border-gray-800">
         <div className="flex justify-between items-center">
           <button
-            onClick={handleSelectAll}
-            className="text-xs text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
+            onClick={() => {
+              const newSelected = new Set(uniqueValues)
+              setSelected(newSelected)
+              onFilter(field, newSelected)
+            }}
+            className="text-xs text-primary-500 hover:text-primary-400 dark:text-primary-400 dark:hover:text-primary-300"
           >
             Selecionar todos
           </button>
           <button
-            onClick={handleClearAll}
-            className="text-xs text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
+            onClick={() => {
+              setSelected(new Set())
+              onFilter(field, new Set())
+            }}
+            className="text-xs text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
           >
             Limpar
           </button>
         </div>
       </div>
-      <div className="p-2 max-h-60 overflow-auto">
+      <div className="p-2 max-h-60 overflow-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
         {uniqueValues.map((value) => (
-          <label key={value} className="flex items-center px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer">
+          <label key={value} className="flex items-center px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-800/80 rounded cursor-pointer">
             <input
               type="checkbox"
-              className="form-checkbox h-4 w-4 text-primary-500"
+              className="form-checkbox h-4 w-4 text-primary-500 dark:text-primary-400 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800"
               checked={selected.has(value)}
-              onChange={() => handleCheckboxChange(value)}
+              onChange={() => {
+                const newSelected = new Set(selected)
+                if (newSelected.has(value)) {
+                  newSelected.delete(value)
+                } else {
+                  newSelected.add(value)
+                }
+                setSelected(newSelected)
+                onFilter(field, newSelected)
+              }}
             />
-            <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+            <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">
               {value}
             </span>
           </label>
