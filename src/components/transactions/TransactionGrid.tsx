@@ -80,16 +80,16 @@ export function TransactionGrid({
             : b.conta.nome.localeCompare(a.conta.nome)
         case 'credito':
           return sortConfig.direction === 'asc'
-            ? (a.credito || 0) - (b.credito || 0)
-            : (b.credito || 0) - (a.credito || 0)
+            ? (a.credito ?? 0) - (b.credito ?? 0)
+            : (b.credito ?? 0) - (a.credito ?? 0)
         case 'debito':
           return sortConfig.direction === 'asc'
-            ? (a.debito || 0) - (b.debito || 0)
-            : (b.debito || 0) - (a.debito || 0)
+            ? (a.debito ?? 0) - (b.debito ?? 0)
+            : (b.debito ?? 0) - (a.debito ?? 0)
         case 'saldo':
           return sortConfig.direction === 'asc'
-            ? (a.saldo || 0) - (b.saldo || 0)
-            : (b.saldo || 0) - (a.saldo || 0)
+            ? (a.saldo ?? 0) - (b.saldo ?? 0)
+            : (b.saldo ?? 0) - (a.saldo ?? 0)
         default:
           return 0
       }
@@ -225,9 +225,9 @@ export function TransactionGrid({
                     <col className="w-[12%] sm:w-[15%]" /> {/* Categoria */}
                     <col className="w-[20%] sm:w-[25%]" /> {/* Descrição */}
                     <col className="w-[12%] sm:w-[15%]" /> {/* Conta */}
-                    <col className="w-[12%]" /> {/* Crédito */}
-                    <col className="w-[12%]" /> {/* Débito */}
-                    <col className="w-[12%]" /> {/* Saldo */}
+                    <col className="w-[12%] text-right" /> {/* Crédito */}
+                    <col className="w-[12%] text-right" /> {/* Débito */}
+                    <col className="w-[12%] text-right" /> {/* Saldo */}
                     {showActions && <col className="w-[1%]" />} {/* Ações */}
                   </colgroup>
                   <thead>
@@ -236,9 +236,9 @@ export function TransactionGrid({
                       <SortableHeader field="categoria">Categoria</SortableHeader>
                       <SortableHeader field="descricao">Descrição</SortableHeader>
                       <SortableHeader field="conta">Conta</SortableHeader>
-                      <SortableHeader field="credito" className="text-right pr-8">Crédito</SortableHeader>
-                      <SortableHeader field="debito" className="text-right pr-8">Débito</SortableHeader>
-                      <SortableHeader field="saldo" className="text-right pr-8">Saldo</SortableHeader>
+                      <SortableHeader field="credito" className="text-right pr-6">Crédito</SortableHeader>
+                      <SortableHeader field="debito" className="text-right pr-6">Débito</SortableHeader>
+                      <SortableHeader field="saldo" className="text-right pr-6">Saldo</SortableHeader>
                       {showActions && <th className="w-10"></th>}
                     </tr>
                   </thead>
@@ -272,17 +272,17 @@ export function TransactionGrid({
                             </span>
                           </Tooltip>
                         </td>
-                        <td className="py-2 px-4 text-xs font-medium text-right text-emerald-400 whitespace-nowrap pr-8">
+                        <td className="py-2 pr-6 text-xs font-medium text-right text-emerald-400 whitespace-nowrap">
                           {transaction.credito ? formatCurrency(transaction.credito) : '-'}
                         </td>
-                        <td className="py-2 px-4 text-xs font-medium text-right text-red-400 whitespace-nowrap pr-8">
+                        <td className="py-2 pr-6 text-xs font-medium text-right text-red-400 whitespace-nowrap">
                           {transaction.debito ? formatCurrency(transaction.debito) : '-'}
                         </td>
                         <td className={cn(
-                          "py-2 px-4 text-xs font-medium text-right whitespace-nowrap pr-8",
-                          transaction.saldo >= 0 ? "text-emerald-400" : "text-red-400"
+                          "py-2 pr-6 text-xs font-medium text-right whitespace-nowrap",
+                          (transaction.saldo ?? 0) >= 0 ? "text-emerald-400" : "text-red-400"
                         )}>
-                          {formatCurrency(transaction.saldo)}
+                          {formatCurrency(transaction.saldo ?? 0)}
                         </td>
                         {showActions && (
                           <td className="py-2 px-4 w-10">
@@ -328,21 +328,21 @@ export function TransactionGrid({
                       </div>
                     </div>
                     <div className="text-right">
-                      {transaction.credito > 0 && (
+                      {transaction.credito && transaction.credito > 0 && (
                         <p className="text-sm font-medium text-emerald-400">
                           {formatCurrency(transaction.credito)}
                         </p>
                       )}
-                      {transaction.debito > 0 && (
+                      {transaction.debito && transaction.debito > 0 && (
                         <p className="text-sm font-medium text-red-400">
                           {formatCurrency(transaction.debito)}
                         </p>
                       )}
                       <p className={cn(
                         "text-xs mt-0.5",
-                        transaction.saldo >= 0 ? "text-emerald-400" : "text-red-400"
+                        (transaction.saldo ?? 0) >= 0 ? "text-emerald-400" : "text-red-400"
                       )}>
-                        {formatCurrency(transaction.saldo)}
+                        {formatCurrency(transaction.saldo ?? 0)}
                       </p>
                     </div>
                   </div>
