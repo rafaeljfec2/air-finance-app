@@ -81,28 +81,34 @@ export default function BudgetPage() {
               color="amber"
               label="Total Receber"
             />
-            {receivables.length > 0 ? (
-              <ul className="mt-4 divide-y divide-border dark:divide-border-dark">
-                {receivables.map((r, i) => (
-                  <li
-                    key={r.id}
-                    className={`flex justify-between items-center py-2 ${i % 2 === 0 ? 'bg-background/50 dark:bg-background-dark/50' : ''}`}
-                  >
-                    <span>{r.description}</span>
-                    <span className="flex items-center gap-2">
-                      <BadgeStatus status={r.status === 'RECEIVED' ? 'success' : 'warning'}>
-                        {r.status === 'RECEIVED' ? 'Recebido' : 'Pendente'}
-                      </BadgeStatus>
-                      <span className="font-semibold">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-[11px]">
+                <thead>
+                  <tr>
+                    <th className="px-3 py-1.5 text-left text-gray-400">Descrição</th>
+                    <th className="px-3 py-1.5 text-right text-gray-400">Valor</th>
+                    <th className="px-3 py-1.5 text-center text-gray-400">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
+                  {receivables.map((r) => (
+                    <tr key={r.id}>
+                      <td className="px-3 py-1.5 text-left text-text dark:text-text-dark truncate">
+                        {r.description}
+                      </td>
+                      <td className="px-3 py-1.5 text-right font-medium whitespace-nowrap">
                         R$ {r.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <CardEmpty />
-            )}
+                      </td>
+                      <td className="px-3 py-1.5 text-center">
+                        <BadgeStatus status={r.status === 'RECEIVED' ? 'success' : 'warning'}>
+                          {r.status === 'RECEIVED' ? 'Recebido' : 'Pendente'}
+                        </BadgeStatus>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </CardContainer>
 
           {/* Contas a Pagar */}
@@ -119,28 +125,34 @@ export default function BudgetPage() {
               color="rose"
               label="Total Pagar"
             />
-            {payables.length > 0 ? (
-              <ul className="mt-4 divide-y divide-border dark:divide-border-dark">
-                {payables.map((p, i) => (
-                  <li
-                    key={p.id}
-                    className={`flex justify-between items-center py-2 ${i % 2 === 0 ? 'bg-background/50 dark:bg-background-dark/50' : ''}`}
-                  >
-                    <span>{p.description}</span>
-                    <span className="flex items-center gap-2">
-                      <BadgeStatus status={p.status === 'PAID' ? 'success' : 'danger'}>
-                        {p.status === 'PAID' ? 'Pago' : 'Pendente'}
-                      </BadgeStatus>
-                      <span className="font-semibold">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-[11px]">
+                <thead>
+                  <tr>
+                    <th className="px-3 py-1.5 text-left text-gray-400">Descrição</th>
+                    <th className="px-3 py-1.5 text-right text-gray-400">Valor</th>
+                    <th className="px-3 py-1.5 text-center text-gray-400">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
+                  {payables.map((p) => (
+                    <tr key={p.id}>
+                      <td className="px-3 py-1.5 text-left text-text dark:text-text-dark truncate">
+                        {p.description}
+                      </td>
+                      <td className="px-3 py-1.5 text-right font-medium whitespace-nowrap">
                         R$ {p.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <CardEmpty />
-            )}
+                      </td>
+                      <td className="px-3 py-1.5 text-center">
+                        <BadgeStatus status={p.status === 'PAID' ? 'success' : 'danger'}>
+                          {p.status === 'PAID' ? 'Pago' : 'Pendente'}
+                        </BadgeStatus>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </CardContainer>
 
           {/* Cartões de Crédito */}
@@ -164,60 +176,34 @@ export default function BudgetPage() {
                 </button>
               ))}
             </div>
-            {activeBill ? (
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-semibold">Fatura</span>
-                  <span className="text-lg font-bold">
-                    R$ {activeBill.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                  <span>Vencimento: {activeBill.dueDate}</span>
-                  <span>
-                    Status:{' '}
-                    {activeBill.status === 'PAID'
-                      ? 'Paga'
-                      : activeBill.status === 'CLOSED'
-                        ? 'Fechada'
-                        : 'Aberta'}
-                  </span>
-                </div>
-                {/* Barra de progresso de uso do limite */}
-                <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded mt-2 mb-2">
-                  <div
-                    className="h-2 rounded bg-primary-500 transition-all"
-                    style={{
-                      width: `${Math.min(100, Math.round((activeBill.total / (activeCard?.limit || 1)) * 100))}%`,
-                    }}
-                  />
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                  Limite: R${' '}
-                  {activeCard?.limit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </div>
-                <ul className="divide-y divide-border dark:divide-border-dark">
-                  {activeBill.transactions.map((t, i) => (
-                    <li
-                      key={t.id}
-                      className={`flex justify-between items-center py-2 ${i % 2 === 0 ? 'bg-background/50 dark:bg-background-dark/50' : ''}`}
-                    >
-                      <span>{t.description}</span>
-                      <span className="flex items-center gap-2">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-[11px]">
+                <thead>
+                  <tr>
+                    <th className="px-3 py-1.5 text-left text-gray-400">Descrição</th>
+                    <th className="px-3 py-1.5 text-right text-gray-400">Valor</th>
+                    <th className="px-3 py-1.5 text-center text-gray-400">Categoria</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
+                  {activeBill?.transactions.map((t) => (
+                    <tr key={t.id}>
+                      <td className="px-3 py-1.5 text-left text-text dark:text-text-dark truncate">
+                        {t.description}
+                      </td>
+                      <td className="px-3 py-1.5 text-right font-medium whitespace-nowrap">
+                        R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </td>
+                      <td className="px-3 py-1.5 text-center">
                         <BadgeStatus status={t.category === 'Parcelado' ? 'success' : 'default'}>
                           {t.category}
                         </BadgeStatus>
-                        <span className="font-semibold">
-                          R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </span>
-                      </span>
-                    </li>
+                      </td>
+                    </tr>
                   ))}
-                </ul>
-              </div>
-            ) : (
-              <CardEmpty />
-            )}
+                </tbody>
+              </table>
+            </div>
           </CardContainer>
         </div>
       </div>
