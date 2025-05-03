@@ -25,7 +25,7 @@ const accountTypes = [
 ];
 
 export default function AccountsPage() {
-  const { accounts, loading, addAccount, updateAccount, deleteAccount } = useAccounts();
+  const { accounts, addAccount, updateAccount, deleteAccount } = useAccounts();
   const [form, setForm] = useState<Account>({
     id: '',
     name: '',
