@@ -12,8 +12,6 @@ import { useCompanyContext } from '@/contexts/companyContext';
 import { FlagIcon } from '@heroicons/react/24/outline';
 import { formatCurrency } from '@/utils/formatters';
 import { Goal } from '@/types/goal';
-import { formatDate } from '@/utils/date';
-import { Progress } from '@/components/ui/progress';
 
 export function GoalsPage() {
   const { companyId } = useCompanyContext() as { companyId: string };

@@ -1,31 +1,65 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  login,
+  register,
+  logout,
+  getCurrentUser,
+  requestPasswordRecovery,
+  User,
+  LoginData,
+  RegisterData,
+  PasswordRecoveryData,
+} from '../services/authService';
+import { setToken, removeToken } from '../utils/auth';
 
-interface AuthState {
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-}
+export const useAuth = () => {
+  const queryClient = useQueryClient();
 
-export const useAuth = create<AuthState>()(
-  persist(
-    set => ({
-      isAuthenticated: false,
-      login: async (email: string, password: string) => {
-        console.log('Tentando fazer login...');
-        // TODO: Implementar chamada à API de autenticação
-        console.log('Login:', { email, password });
-        set({ isAuthenticated: true });
-        console.log('Login realizado com sucesso!');
-      },
-      logout: () => {
-        console.log('Fazendo logout...');
-        set({ isAuthenticated: false });
-        console.log('Logout realizado com sucesso!');
-      },
-    }),
-    {
-      name: 'auth-storage',
-    }
-  )
-);
+  const { data: user, isLoading: isLoadingUser } = useQuery<User>({
+    queryKey: ['user'],
+    queryFn: getCurrentUser,
+    retry: false,
+  });
+
+  const loginMutation = useMutation({
+    mutationFn: login,
+    onSuccess: (data) => {
+      setToken(data.token);
+      queryClient.setQueryData(['user'], data.user);
+    },
+  });
+
+  const registerMutation = useMutation({
+    mutationFn: register,
+    onSuccess: (data) => {
+      setToken(data.token);
+      queryClient.setQueryData(['user'], data.user);
+    },
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      removeToken();
+      queryClient.removeQueries({ queryKey: ['user'] });
+    },
+  });
+
+  const passwordRecoveryMutation = useMutation({
+    mutationFn: requestPasswordRecovery,
+  });
+
+  return {
+    user,
+    isLoadingUser,
+    isAuthenticated: !!user,
+    login: loginMutation.mutate,
+    register: registerMutation.mutate,
+    logout: logoutMutation.mutate,
+    requestPasswordRecovery: passwordRecoveryMutation.mutate,
+    isLoggingIn: loginMutation.isPending,
+    isRegistering: registerMutation.isPending,
+    isLoggingOut: logoutMutation.isPending,
+    isRecoveringPassword: passwordRecoveryMutation.isPending,
+  };
+};

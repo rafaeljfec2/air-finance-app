@@ -3,6 +3,7 @@ import { router } from '@/routes';
 import { ThemeProvider } from './components/ThemeProvider';
 import { Toaster } from 'sonner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { CompanyProvider } from '@/contexts/companyContext';
 
 // Criando uma instância do QueryClient
@@ -32,6 +33,7 @@ export function App() {
               },
             }}
           />
+          <ReactQueryDevtools initialIsOpen={false} />
         </ThemeProvider>
       </CompanyProvider>
     </QueryClientProvider>

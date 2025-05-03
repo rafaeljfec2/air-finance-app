@@ -20,7 +20,7 @@ async function fetchDashboardData(): Promise<Dashboard> {
           name: 'Salary',
           type: 'INCOME',
           color: '#10B981',
-          icon: '💼'
+          icon: '💼',
         },
         date: new Date().toISOString(),
         categoryId: '',
@@ -30,10 +30,11 @@ async function fetchDashboardData(): Promise<Dashboard> {
           name: '',
           balance: 0,
           createdAt: '',
-          updatedAt: ''
+          updatedAt: '',
         },
         createdAt: '',
-        updatedAt: ''
+        updatedAt: '',
+        companyId: '',
       },
       {
         id: '2',
@@ -45,7 +46,7 @@ async function fetchDashboardData(): Promise<Dashboard> {
           name: 'Housing',
           type: 'EXPENSE',
           color: '#EF4444',
-          icon: '🏠'
+          icon: '🏠',
         },
         date: new Date().toISOString(),
         categoryId: '',
@@ -55,19 +56,20 @@ async function fetchDashboardData(): Promise<Dashboard> {
           name: '',
           balance: 0,
           createdAt: '',
-          updatedAt: ''
+          updatedAt: '',
         },
         createdAt: '',
-        updatedAt: ''
-      }
-    ]
+        updatedAt: '',
+        companyId: '',
+      },
+    ],
   };
 }
 
 export function DashboardPage() {
   const { data: dashboard, isLoading } = useQuery<Dashboard>({
     queryKey: ['dashboard'],
-    queryFn: fetchDashboardData
+    queryFn: fetchDashboardData,
   });
 
   if (isLoading) {

@@ -24,50 +24,50 @@ const mockCategories: Category[] = [
     name: 'Salary',
     type: 'INCOME' as TransactionType,
     color: '#10B981',
-    icon: '💼'
+    icon: '💼',
   },
   {
     id: '2',
     name: 'Freelance',
     type: 'INCOME' as TransactionType,
     color: '#3B82F6',
-    icon: '💻'
+    icon: '💻',
   },
   {
     id: '3',
     name: 'Investments',
     type: 'INCOME' as TransactionType,
     color: '#8B5CF6',
-    icon: '📈'
+    icon: '📈',
   },
   {
     id: '4',
     name: 'Housing',
     type: 'EXPENSE' as TransactionType,
     color: '#EF4444',
-    icon: '🏠'
+    icon: '🏠',
   },
   {
     id: '5',
     name: 'Food',
     type: 'EXPENSE' as TransactionType,
     color: '#F59E0B',
-    icon: '🍽️'
+    icon: '🍽️',
   },
   {
     id: '6',
     name: 'Transport',
     type: 'EXPENSE' as TransactionType,
     color: '#6366F1',
-    icon: '🚗'
+    icon: '🚗',
   },
   {
     id: '7',
     name: 'Leisure',
     type: 'EXPENSE' as TransactionType,
     color: '#EC4899',
-    icon: '🎮'
-  }
+    icon: '🎮',
+  },
 ];
 
 const now = new Date().toISOString();
@@ -82,7 +82,7 @@ const mockTransactions: Transaction[] = [
       id: mockCategories[0].id,
       name: mockCategories[0].name,
       type: mockCategories[0].type,
-      color: mockCategories[0].color || '#10B981'
+      color: mockCategories[0].color || '#10B981',
     },
     date: now,
     categoryId: mockCategories[0].id,
@@ -93,10 +93,11 @@ const mockTransactions: Transaction[] = [
       name: 'Main Account',
       balance: 0,
       createdAt: '',
-      updatedAt: ''
+      updatedAt: '',
     },
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
+    companyId: '',
   },
   {
     id: '2',
@@ -107,7 +108,7 @@ const mockTransactions: Transaction[] = [
       id: mockCategories[1].id,
       name: mockCategories[1].name,
       type: mockCategories[1].type,
-      color: mockCategories[1].color || '#3B82F6'
+      color: mockCategories[1].color || '#3B82F6',
     },
     date: now,
     categoryId: mockCategories[1].id,
@@ -118,10 +119,11 @@ const mockTransactions: Transaction[] = [
       name: 'Main Account',
       balance: 0,
       createdAt: '',
-      updatedAt: ''
+      updatedAt: '',
     },
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
+    companyId: '',
   },
   {
     id: '3',
@@ -132,7 +134,7 @@ const mockTransactions: Transaction[] = [
       id: mockCategories[3].id,
       name: mockCategories[3].name,
       type: mockCategories[3].type,
-      color: mockCategories[3].color || '#EF4444'
+      color: mockCategories[3].color || '#EF4444',
     },
     date: now,
     categoryId: mockCategories[3].id,
@@ -143,10 +145,11 @@ const mockTransactions: Transaction[] = [
       name: 'Main Account',
       balance: 0,
       createdAt: '',
-      updatedAt: ''
+      updatedAt: '',
     },
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
+    companyId: '',
   },
   {
     id: '4',
@@ -157,7 +160,7 @@ const mockTransactions: Transaction[] = [
       id: mockCategories[4].id,
       name: mockCategories[4].name,
       type: mockCategories[4].type,
-      color: mockCategories[4].color || '#F59E0B'
+      color: mockCategories[4].color || '#F59E0B',
     },
     date: now,
     categoryId: mockCategories[4].id,
@@ -168,11 +171,12 @@ const mockTransactions: Transaction[] = [
       name: 'Main Account',
       balance: 0,
       createdAt: '',
-      updatedAt: ''
+      updatedAt: '',
     },
     createdAt: now,
-    updatedAt: now
-  }
+    updatedAt: now,
+    companyId: '',
+  },
 ];
 
 export const useStatementStore = create<StatementState>((set) => ({
@@ -191,21 +195,21 @@ export const useStatementStore = create<StatementState>((set) => ({
   loadTransactions: async () => {
     try {
       set({ isLoading: true, error: null, errorDetails: null });
-      
+
       // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Calculate totals
       const income = mockTransactions
-        .filter(t => t.type === 'INCOME')
+        .filter((t) => t.type === 'INCOME')
         .reduce((sum, t) => sum + t.amount, 0);
-      
+
       const expenses = mockTransactions
-        .filter(t => t.type === 'EXPENSE')
+        .filter((t) => t.type === 'EXPENSE')
         .reduce((sum, t) => sum + t.amount, 0);
-      
+
       const availableBalance = income - expenses;
-      
+
       set({
         transactions: mockTransactions,
         categories: mockCategories,
@@ -215,13 +219,13 @@ export const useStatementStore = create<StatementState>((set) => ({
         previousBalance: 4000, // Mock previous month data
         previousIncome: 4500,
         previousExpenses: 1000,
-        isLoading: false
+        isLoading: false,
       });
     } catch (error) {
       set({
         error: 'Failed to load transactions',
         errorDetails: error,
-        isLoading: false
+        isLoading: false,
       });
     }
   },
@@ -229,20 +233,20 @@ export const useStatementStore = create<StatementState>((set) => ({
   removeTransaction: async (id: string) => {
     try {
       set({ isLoading: true, error: null, errorDetails: null });
-      
+
       // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      set(state => ({
-        transactions: state.transactions.filter(t => t.id !== id),
-        isLoading: false
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      set((state) => ({
+        transactions: state.transactions.filter((t) => t.id !== id),
+        isLoading: false,
       }));
     } catch (error) {
       set({
         error: 'Failed to remove transaction',
         errorDetails: error,
-        isLoading: false
+        isLoading: false,
       });
     }
-  }
+  },
 }));
