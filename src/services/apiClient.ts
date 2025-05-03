@@ -18,7 +18,11 @@ apiClient.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       await authUtils.clearAuth();
-      window.location.href = '/login';
+      // Rotas públicas
+      const publicRoutes = ['/login', '/register', '/signup', '/forgot-password', '/new-password'];
+      if (!publicRoutes.includes(window.location.pathname)) {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   },

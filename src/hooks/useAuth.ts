@@ -5,6 +5,7 @@ import {
   logout,
   getCurrentUser,
   requestPasswordRecovery,
+  resetPassword,
   User,
 } from '../services/authService';
 import { authUtils } from '../utils/auth';
@@ -54,6 +55,10 @@ export const useAuth = () => {
     mutationFn: requestPasswordRecovery,
   });
 
+  const resetPasswordMutation = useMutation({
+    mutationFn: resetPassword,
+  });
+
   return {
     user,
     isLoadingUser,
@@ -62,9 +67,11 @@ export const useAuth = () => {
     register: registerMutation.mutate,
     logout: logoutMutation.mutate,
     requestPasswordRecovery: passwordRecoveryMutation.mutate,
+    resetPassword: resetPasswordMutation.mutate,
     isLoggingIn: loginMutation.isPending,
     isRegistering: registerMutation.isPending,
     isLoggingOut: logoutMutation.isPending,
     isRecoveringPassword: passwordRecoveryMutation.isPending,
+    isResettingPassword: resetPasswordMutation.isPending,
   };
 };

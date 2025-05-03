@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { Login } from '@/pages/login';
 import { SignUpPage } from '@/pages/signup';
 import { ForgotPasswordPage } from '@/pages/forgot-password';
+import { NewPasswordPage } from '@/pages/new-password';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Dashboard } from '@/pages/dashboard/Dashboard';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
@@ -41,6 +42,10 @@ export const router = createBrowserRouter([
   {
     path: '/forgot-password',
     element: <ForgotPasswordPage />,
+  },
+  {
+    path: '/new-password',
+    element: <NewPasswordPage />,
   },
   // Reset de senha: adicionar quando o caminho correto for confirmado
   // {

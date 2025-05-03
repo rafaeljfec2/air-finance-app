@@ -32,10 +32,22 @@ export const PasswordRecoverySchema = z.object({
   email: z.string().email(),
 });
 
+export const ResetPasswordSchema = z
+  .object({
+    token: z.string(),
+    password: z.string().min(6),
+    confirmPassword: z.string().min(6),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'As senhas não coincidem',
+    path: ['confirmPassword'],
+  });
+
 export type User = z.infer<typeof UserSchema>;
 export type LoginData = z.infer<typeof LoginSchema>;
 export type RegisterData = z.infer<typeof RegisterSchema>;
 export type PasswordRecoveryData = z.infer<typeof PasswordRecoverySchema>;
+export type ResetPasswordData = z.infer<typeof ResetPasswordSchema>;
 
 // Novo tipo de resposta
 export interface AuthResponse {
@@ -75,6 +87,16 @@ export const requestPasswordRecovery = async (data: PasswordRecoveryData): Promi
   } catch (error) {
     console.error('Erro ao solicitar recuperação de senha:', error);
     throw new Error('Falha ao solicitar recuperação de senha');
+  }
+};
+
+export const resetPassword = async (data: ResetPasswordData): Promise<void> => {
+  try {
+    const validatedData = ResetPasswordSchema.parse(data);
+    await apiClient.post('/auth/reset-password', validatedData);
+  } catch (error) {
+    console.error('Erro ao resetar senha:', error);
+    throw new Error('Falha ao resetar senha');
   }
 };
 

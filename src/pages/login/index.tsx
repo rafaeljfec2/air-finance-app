@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Eye, EyeOff, Lock, Mail, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
 import { Logo } from '@/components/Logo';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
@@ -13,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoggingIn, isAuthenticated, loginError } = useAuth();
+  const { login, isLoggingIn, isAuthenticated } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
