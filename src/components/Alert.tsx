@@ -1,6 +1,4 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import { useTheme } from '@/stores/useTheme';
 
 interface AlertProps {
   type?: 'success' | 'error' | 'warning' | 'info';
@@ -8,8 +6,6 @@ interface AlertProps {
 }
 
 export const Alert: React.FC<AlertProps> = ({ type = 'info', message }) => {
-  const { isDarkMode } = useTheme();
-
   const getTypeClasses = () => {
     switch (type) {
       case 'success':
@@ -43,8 +39,8 @@ export const Alert: React.FC<AlertProps> = ({ type = 'info', message }) => {
   const classes = getTypeClasses();
 
   return (
-    <View className={`p-4 rounded-lg ${classes.bg} ${classes.border} border-l-4 mb-4`}>
-      <Text className={`text-sm ${classes.text}`}>{message}</Text>
-    </View>
+    <div className={`p-4 rounded-lg ${classes.bg} ${classes.border} border-l-4 mb-4`}>
+      <p className={`text-sm ${classes.text}`}>{message}</p>
+    </div>
   );
 };

@@ -40,6 +40,9 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         phone: '(11) 99999-0001',
         address: 'Rua Exemplo, 123',
         notes: 'Empresa mockada para testes.',
+        userId: '1',
+        createdAt: '2020-01-01',
+        updatedAt: '2020-01-01',
       },
       {
         id: '2',
@@ -51,6 +54,9 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         phone: '(21) 98888-0002',
         address: 'Avenida Teste, 456',
         notes: 'Segunda empresa mockada.',
+        userId: '1',
+        createdAt: '2021-05-10',
+        updatedAt: '2021-05-10',
       },
     ]);
     store.setCompanyId('1');

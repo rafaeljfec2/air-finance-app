@@ -14,7 +14,7 @@ import {
 export function useAuth() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { setUser, setToken, clearAuth } = useAuthStore();
+  const { updateAuthState, clearAuth } = useAuthStore();
 
   const { data: user, isLoading: isLoadingUser } = useQuery<User>({
     queryKey: ['currentUser'],
@@ -24,8 +24,7 @@ export function useAuth() {
   });
 
   const handleAuthSuccess = (data: AuthResponse) => {
-    setUser(data.user);
-    setToken(data.token);
+    updateAuthState(data.user, data.token);
     queryClient.setQueryData(['currentUser'], data.user);
     navigate('/dashboard');
   };

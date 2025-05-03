@@ -6,6 +6,7 @@ interface AuthStore extends AuthState {
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   clearAuth: () => void;
+  updateAuthState: (user: User | null, token: string | null) => void;
 }
 
 const initialState: AuthState = {
@@ -28,6 +29,12 @@ export const useAuthStore = create<AuthStore>()(
           token,
           isAuthenticated: !!state.user && !!token,
         })),
+      updateAuthState: (user, token) =>
+        set({
+          user,
+          token,
+          isAuthenticated: !!user && !!token,
+        }),
       clearAuth: () => set(initialState),
     }),
     {

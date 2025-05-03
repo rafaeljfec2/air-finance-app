@@ -1,8 +1,7 @@
-import React from 'react';
-import { TextInput, TextInputProps, View, Text } from 'react-native';
+import React, { InputHTMLAttributes } from 'react';
 import { useTheme } from '@/stores/useTheme';
 
-interface FormInputProps extends Omit<TextInputProps, 'style'> {
+interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className'> {
   error?: string;
   label?: string;
 }
@@ -11,22 +10,22 @@ export const FormInput: React.FC<FormInputProps> = ({ error, label, ...props }) 
   const { isDarkMode } = useTheme();
 
   return (
-    <View className="mb-4">
+    <div className="mb-4">
       {label && (
-        <Text className={`text-sm mb-1 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+        <label className={`block text-sm mb-1 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
           {label}
-        </Text>
+        </label>
       )}
-      <TextInput
+      <input
         className={`
-          h-12 rounded-lg px-4
+          w-full h-12 rounded-lg px-4
           ${isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}
           ${error ? 'border-red-500' : 'border-gray-300'}
-          border
+          border focus:outline-none focus:ring-2 focus:ring-primary-500
         `}
         {...props}
       />
-      {error && <Text className="text-xs text-red-500 mt-1">{error}</Text>}
-    </View>
+      {error && <span className="text-xs text-red-500 mt-1 block">{error}</span>}
+    </div>
   );
 };
