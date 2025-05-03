@@ -14,6 +14,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { FormField } from '@/components/ui/FormField';
 import { useAccounts, Account } from '@/hooks/useAccounts';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 
 const accountTypes = [
   { value: 'corrente', label: 'Corrente', icon: BanknotesIcon },
@@ -231,25 +232,22 @@ export default function AccountsPage() {
             </ul>
           </Card>
         </div>
-        {/* Modal de confirmação de exclusão */}
-        {showConfirmDelete && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="bg-card dark:bg-card-dark rounded-lg p-6 shadow-xl w-full max-w-sm">
-              <h3 className="text-lg font-semibold mb-2">Confirmar exclusão</h3>
-              <p className="text-sm mb-4">
-                Tem certeza que deseja excluir esta conta? Esta ação não poderá ser desfeita.
-              </p>
-              <div className="flex gap-2 justify-end">
-                <Button color="secondary" onClick={cancelDelete}>
-                  Cancelar
-                </Button>
-                <Button color="danger" onClick={confirmDelete}>
-                  Excluir
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ConfirmModal
+          open={showConfirmDelete}
+          title="Confirmar exclusão"
+          description={
+            <>
+              Tem certeza que deseja excluir esta conta?
+              <br />
+              Esta ação não poderá ser desfeita.
+            </>
+          }
+          confirmLabel="Excluir"
+          cancelLabel="Cancelar"
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+          danger
+        />
       </div>
     </ViewDefault>
   );
