@@ -4,11 +4,14 @@ import { z } from 'zod';
 // Validation schemas
 export const CategorySchema = z.object({
   id: z.string(),
-  name: z.string().min(2),
-  icon: z.string(),
-  color: z.string(),
-  type: z.enum(['income', 'expense']),
+  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  type: z.enum(['income', 'expense'], {
+    errorMap: () => ({ message: 'Tipo de categoria inválido' }),
+  }),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida'),
+  icon: z.string().min(1, 'Ícone é obrigatório'),
   userId: z.string(),
+  companyId: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -31,6 +34,16 @@ export const getCategories = async (): Promise<Category[]> => {
   } catch (error) {
     console.error('Erro ao buscar categorias:', error);
     throw new Error('Falha ao buscar categorias');
+  }
+};
+
+export const getCategoryById = async (id: string): Promise<Category> => {
+  try {
+    const response = await apiClient.get<Category>(`/categories/${id}`);
+    return CategorySchema.parse(response.data);
+  } catch (error) {
+    console.error('Erro ao buscar categoria:', error);
+    throw new Error('Falha ao buscar categoria');
   }
 };
 

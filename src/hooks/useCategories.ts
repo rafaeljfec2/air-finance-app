@@ -1,11 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getCategories,
+  getCategoryById,
   createCategory,
   updateCategory,
   deleteCategory,
-  Category,
-  CreateCategory,
+  type Category,
+  type CreateCategory,
 } from '../services/categoryService';
 
 export const useCategories = () => {
@@ -20,6 +21,14 @@ export const useCategories = () => {
     queryFn: getCategories,
   });
 
+  const getCategory = (id: string) => {
+    return useQuery<Category>({
+      queryKey: ['category', id],
+      queryFn: () => getCategoryById(id),
+      enabled: !!id,
+    });
+  };
+
   const createMutation = useMutation({
     mutationFn: createCategory,
     onSuccess: () => {
@@ -30,15 +39,17 @@ export const useCategories = () => {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateCategory> }) =>
       updateCategory(id, data),
-    onSuccess: () => {
+    onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['category', id] });
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteCategory,
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.removeQueries({ queryKey: ['category', id] });
     },
   });
 
@@ -46,11 +57,15 @@ export const useCategories = () => {
     categories,
     isLoading,
     error,
+    getCategory,
     createCategory: createMutation.mutate,
     updateCategory: updateMutation.mutate,
     deleteCategory: deleteMutation.mutate,
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
+    createError: createMutation.error,
+    updateError: updateMutation.error,
+    deleteError: deleteMutation.error,
   };
 };
