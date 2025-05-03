@@ -5,9 +5,14 @@ interface TransactionStore {
   transactions: Transaction[];
   categories: Category[];
   accounts: Account[];
-  addTransaction: (transaction: TransactionInput) => void;
-  removeTransaction: (id: string) => void;
-  updateTransaction: (id: string, transaction: Partial<TransactionInput>) => void;
+  addTransaction: (transaction: TransactionInput, companyId: string) => void;
+  removeTransaction: (id: string, companyId: string) => void;
+  updateTransaction: (
+    id: string,
+    transaction: Partial<TransactionInput>,
+    companyId: string,
+  ) => void;
+  getTransactionsByCompany: (companyId: string) => Transaction[];
 }
 
 const initialCategories: Category[] = [
@@ -24,14 +29,14 @@ const initialAccounts: Account[] = [
   { id: '3', name: 'Investimentos', balance: 0, createdAt: '', updatedAt: '' },
 ];
 
-export const useTransactionStore = create<TransactionStore>((set) => ({
+export const useTransactionStore = create<TransactionStore>((set, get) => ({
   transactions: [],
   categories: initialCategories,
   accounts: initialAccounts,
-  addTransaction: (transaction) =>
+  addTransaction: (transaction, companyId) =>
     set((state) => {
-      const category = state.categories.find(c => c.id === transaction.categoryId);
-      const account = state.accounts.find(a => a.id === transaction.accountId);
+      const category = state.categories.find((c) => c.id === transaction.categoryId);
+      const account = state.accounts.find((a) => a.id === transaction.accountId);
 
       if (!category || !account) {
         throw new Error('Category or account not found');
@@ -42,41 +47,48 @@ export const useTransactionStore = create<TransactionStore>((set) => ({
         id: Date.now().toString(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        companyId,
         category: {
           id: category.id,
           name: category.name,
           type: category.type,
-          color: category.color || '#000000'
+          color: category.color || '#000000',
         },
         account: {
           id: account.id,
           name: account.name,
           balance: account.balance,
           createdAt: account.createdAt,
-          updatedAt: account.updatedAt
+          updatedAt: account.updatedAt,
         },
         credit: transaction.type === 'INCOME' ? transaction.amount : 0,
         debit: transaction.type === 'EXPENSE' ? transaction.amount : 0,
-        balance: 0 // Will be calculated by the dashboard
+        balance: 0, // Will be calculated by the dashboard
       };
 
       return {
         transactions: [...state.transactions, newTransaction],
       };
     }),
-  removeTransaction: (id) =>
+  removeTransaction: (id, companyId) =>
     set((state) => ({
-      transactions: state.transactions.filter((t) => t.id !== id),
+      transactions: state.transactions.filter((t) => t.id !== id || t.companyId !== companyId),
     })),
-  updateTransaction: (id, transaction) =>
+  updateTransaction: (id, transaction, companyId) =>
     set((state) => {
-      const existingTransaction = state.transactions.find(t => t.id === id);
+      const existingTransaction = state.transactions.find(
+        (t) => t.id === id && t.companyId === companyId,
+      );
       if (!existingTransaction) {
         return state;
       }
 
-      const category = state.categories.find(c => c.id === (transaction.categoryId || existingTransaction.categoryId));
-      const account = state.accounts.find(a => a.id === (transaction.accountId || existingTransaction.accountId));
+      const category = state.categories.find(
+        (c) => c.id === (transaction.categoryId || existingTransaction.categoryId),
+      );
+      const account = state.accounts.find(
+        (a) => a.id === (transaction.accountId || existingTransaction.accountId),
+      );
 
       if (!category || !account) {
         throw new Error('Category or account not found');
@@ -90,23 +102,26 @@ export const useTransactionStore = create<TransactionStore>((set) => ({
           id: category.id,
           name: category.name,
           type: category.type,
-          color: category.color || '#000000'
+          color: category.color || '#000000',
         },
         account: {
           id: account.id,
           name: account.name,
           balance: account.balance,
           createdAt: account.createdAt,
-          updatedAt: account.updatedAt
+          updatedAt: account.updatedAt,
         },
         credit: transaction.type === 'INCOME' ? transaction.amount : existingTransaction.credit,
-        debit: transaction.type === 'EXPENSE' ? transaction.amount : existingTransaction.debit
+        debit: transaction.type === 'EXPENSE' ? transaction.amount : existingTransaction.debit,
       };
 
       return {
         transactions: state.transactions.map((t) =>
-          t.id === id ? updatedTransaction : t
+          t.id === id && t.companyId === companyId ? updatedTransaction : t,
         ),
       };
     }),
-})); 
+  getTransactionsByCompany: (companyId) => {
+    return get().transactions.filter((t) => t.companyId === companyId);
+  },
+}));

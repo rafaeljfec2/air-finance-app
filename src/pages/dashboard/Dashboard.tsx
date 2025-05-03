@@ -6,7 +6,7 @@ import { TransactionList } from '@/components/transactions/TransactionList';
 import { PullToRefresh } from '@/components/ui/pullToRefresh';
 import { useQuery } from '@tanstack/react-query';
 import { Transaction } from '@/types/transaction';
-import { 
+import {
   CalendarIcon,
   BanknotesIcon,
   ChartBarIcon,
@@ -20,7 +20,7 @@ import {
   ArrowDownIcon,
   CurrencyDollarIcon,
   CreditCardIcon,
-  BuildingOfficeIcon
+  BuildingOfficeIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -29,6 +29,8 @@ import { ptBR } from 'date-fns/locale';
 import { BalanceChart } from '@/components/charts/BalanceChart';
 import { formatCurrency } from '@/utils/formatters';
 import { Modal } from '@/components/ui/Modal';
+import { useCompanyContext } from '@/contexts/companyContext';
+import { useTransactionStore } from '@/stores/transaction';
 
 interface DashboardData {
   balance: number;
@@ -52,7 +54,7 @@ const mockData: DashboardData = {
         id: 'cat1',
         name: 'Alimentação',
         type: 'EXPENSE',
-        color: '#F44336'
+        color: '#F44336',
       },
       date: new Date().toISOString(),
       categoryId: 'cat1',
@@ -62,10 +64,10 @@ const mockData: DashboardData = {
         name: 'Main Account',
         balance: 0,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       },
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     },
     {
       id: '2',
@@ -76,7 +78,7 @@ const mockData: DashboardData = {
         id: 'cat2',
         name: 'Renda',
         type: 'INCOME',
-        color: '#4CAF50'
+        color: '#4CAF50',
       },
       date: new Date().toISOString(),
       categoryId: 'cat2',
@@ -86,10 +88,10 @@ const mockData: DashboardData = {
         name: 'Main Account',
         balance: 0,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       },
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     },
     {
       id: '3',
@@ -100,7 +102,7 @@ const mockData: DashboardData = {
         id: 'cat3',
         name: 'Moradia',
         type: 'EXPENSE',
-        color: '#2196F3'
+        color: '#2196F3',
       },
       date: new Date().toISOString(),
       categoryId: 'cat3',
@@ -110,12 +112,12 @@ const mockData: DashboardData = {
         name: 'Main Account',
         balance: 0,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       },
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     },
-  ]
+  ],
 };
 
 // Mock data for the chart
@@ -143,13 +145,13 @@ const mockMonthlyComparison = {
   current: {
     income: 5000,
     expenses: 3000,
-    savings: 2000
+    savings: 2000,
   },
   previous: {
     income: 4500,
     expenses: 2800,
-    savings: 1700
-  }
+    savings: 1700,
+  },
 };
 
 type TimeRange = 'day' | 'week' | 'month' | 'year';
@@ -166,15 +168,19 @@ export function Dashboard() {
     queryKey: ['dashboard', timeRange],
     queryFn: async () => {
       // TODO: Implement real API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       return mockData;
     },
   });
 
+  const { companyId } = useCompanyContext() as { companyId: string };
+  const getTransactionsByCompany = useTransactionStore((s) => s.getTransactionsByCompany);
+  const transactions = getTransactionsByCompany(companyId);
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     // TODO: Implement data refresh
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsRefreshing(false);
   };
 
@@ -205,15 +211,40 @@ export function Dashboard() {
 
   // Mock metas para o modal de metas
   const mockGoals = [
-    { name: 'Reserva de Emergência', description: 'Guardar 6 meses de despesas', progress: 75, target: 12000, current: 9000, due: '2024-12-31' },
-    { name: 'Viagem', description: 'Viagem internacional', progress: 40, target: 8000, current: 3200, due: '2025-06-01' },
-    { name: 'Comprar Carro', description: 'Entrada para carro novo', progress: 60, target: 20000, current: 12000, due: '2025-09-30' },
+    {
+      name: 'Reserva de Emergência',
+      description: 'Guardar 6 meses de despesas',
+      progress: 75,
+      target: 12000,
+      current: 9000,
+      due: '2024-12-31',
+    },
+    {
+      name: 'Viagem',
+      description: 'Viagem internacional',
+      progress: 40,
+      target: 8000,
+      current: 3200,
+      due: '2025-06-01',
+    },
+    {
+      name: 'Comprar Carro',
+      description: 'Entrada para carro novo',
+      progress: 60,
+      target: 20000,
+      current: 12000,
+      due: '2025-09-30',
+    },
   ];
 
   return (
     <ViewDefault>
       {/* Modais */}
-      <Modal open={showDetailsModal} onClose={() => setShowDetailsModal(false)} title="Evolução do Saldo">
+      <Modal
+        open={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        title="Evolução do Saldo"
+      >
         <div className="mb-4">
           <BalanceChart data={mockBalanceHistory} />
         </div>
@@ -232,7 +263,11 @@ export function Dashboard() {
                 <tr key={idx} className="border-b border-gray-200 dark:border-gray-700">
                   <td className="py-2 pr-4">{format(new Date(mov.date), 'dd/MM/yyyy')}</td>
                   <td className="py-2 pr-4">{mov.description}</td>
-                  <td className={mov.value >= 0 ? 'text-green-500 py-2 pr-4' : 'text-red-500 py-2 pr-4'}>
+                  <td
+                    className={
+                      mov.value >= 0 ? 'text-green-500 py-2 pr-4' : 'text-red-500 py-2 pr-4'
+                    }
+                  >
                     {formatCurrency(mov.value)}
                   </td>
                   <td className="py-2">{mov.type === 'INCOME' ? 'Receita' : 'Despesa'}</td>
@@ -243,36 +278,59 @@ export function Dashboard() {
         </div>
       </Modal>
 
-      <Modal open={showCategoriesModal} onClose={() => setShowCategoriesModal(false)} title="Despesas por Categoria">
+      <Modal
+        open={showCategoriesModal}
+        onClose={() => setShowCategoriesModal(false)}
+        title="Despesas por Categoria"
+      >
         <div className="space-y-4">
           {mockCategoryData.map((cat) => (
             <div key={cat.name} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-full" style={{ background: cat.color }} />
+                <span
+                  className="inline-block w-3 h-3 rounded-full"
+                  style={{ background: cat.color }}
+                />
                 <span className="font-medium">{cat.name}</span>
               </div>
               <div className="flex-1 mx-2">
                 <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full">
-                  <div className="h-2 rounded-full" style={{ width: `${(cat.value / 4300) * 100}%`, background: cat.color }}></div>
+                  <div
+                    className="h-2 rounded-full"
+                    style={{ width: `${(cat.value / 4300) * 100}%`, background: cat.color }}
+                  ></div>
                 </div>
               </div>
-              <span className="font-medium text-gray-700 dark:text-gray-200">{formatCurrency(cat.value)}</span>
-              <span className="ml-2 text-xs text-gray-500">{((cat.value / 4300) * 100).toFixed(1)}%</span>
+              <span className="font-medium text-gray-700 dark:text-gray-200">
+                {formatCurrency(cat.value)}
+              </span>
+              <span className="ml-2 text-xs text-gray-500">
+                {((cat.value / 4300) * 100).toFixed(1)}%
+              </span>
             </div>
           ))}
         </div>
       </Modal>
 
-      <Modal open={showGoalsModal} onClose={() => setShowGoalsModal(false)} title="Metas Financeiras">
+      <Modal
+        open={showGoalsModal}
+        onClose={() => setShowGoalsModal(false)}
+        title="Metas Financeiras"
+      >
         <div className="space-y-6">
           {mockGoals.map((goal) => (
             <div key={goal.name} className="mb-2">
               <div className="flex items-center justify-between mb-1">
-                <span className="font-medium text-purple-600 dark:text-purple-400">{goal.name}</span>
+                <span className="font-medium text-purple-600 dark:text-purple-400">
+                  {goal.name}
+                </span>
                 <span className="text-xs text-gray-500">{goal.progress}%</span>
               </div>
               <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full mb-1">
-                <div className="h-2 rounded-full bg-purple-500" style={{ width: `${goal.progress}%` }}></div>
+                <div
+                  className="h-2 rounded-full bg-purple-500"
+                  style={{ width: `${goal.progress}%` }}
+                ></div>
               </div>
               <div className="flex justify-between text-xs text-gray-500">
                 <span>{goal.description}</span>
@@ -306,9 +364,9 @@ export function Dashboard() {
 
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               {/* Period Selector */}
-              <Tabs 
-                value={timeRange} 
-                onValueChange={(value: string) => setTimeRange(value as TimeRange)} 
+              <Tabs
+                value={timeRange}
+                onValueChange={(value: string) => setTimeRange(value as TimeRange)}
                 className="w-full sm:w-auto"
               >
                 <TabsList className="grid grid-cols-4 w-full sm:w-[400px]">
@@ -348,7 +406,9 @@ export function Dashboard() {
             <Card className="bg-white dark:bg-gray-800 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Saldo Total</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Saldo Total
+                  </p>
                   <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-1">
                     {formatCurrency(dashboardData?.balance || 0)}
                   </p>
@@ -439,7 +499,13 @@ export function Dashboard() {
                             {formatCurrency(mockMonthlyComparison.current.income)}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {((mockMonthlyComparison.current.income / mockMonthlyComparison.previous.income - 1) * 100).toFixed(1)}% vs mês anterior
+                            {(
+                              (mockMonthlyComparison.current.income /
+                                mockMonthlyComparison.previous.income -
+                                1) *
+                              100
+                            ).toFixed(1)}
+                            % vs mês anterior
                           </p>
                         </div>
                       </div>
@@ -453,7 +519,13 @@ export function Dashboard() {
                             {formatCurrency(mockMonthlyComparison.current.expenses)}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {((mockMonthlyComparison.current.expenses / mockMonthlyComparison.previous.expenses - 1) * 100).toFixed(1)}% vs mês anterior
+                            {(
+                              (mockMonthlyComparison.current.expenses /
+                                mockMonthlyComparison.previous.expenses -
+                                1) *
+                              100
+                            ).toFixed(1)}
+                            % vs mês anterior
                           </p>
                         </div>
                       </div>
@@ -467,7 +539,13 @@ export function Dashboard() {
                             {formatCurrency(mockMonthlyComparison.current.savings)}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {((mockMonthlyComparison.current.savings / mockMonthlyComparison.previous.savings - 1) * 100).toFixed(1)}% vs mês anterior
+                            {(
+                              (mockMonthlyComparison.current.savings /
+                                mockMonthlyComparison.previous.savings -
+                                1) *
+                              100
+                            ).toFixed(1)}
+                            % vs mês anterior
                           </p>
                         </div>
                       </div>
@@ -484,7 +562,11 @@ export function Dashboard() {
                       <h3 className="text-lg font-medium text-text dark:text-text-dark">
                         Distribuição de Despesas
                       </h3>
-                      <Button variant="outline" size="sm" onClick={() => setShowCategoriesModal(true)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowCategoriesModal(true)}
+                      >
                         Ver categorias
                       </Button>
                     </div>
@@ -511,7 +593,10 @@ export function Dashboard() {
                         <div className="text-right">
                           <p className="text-sm font-medium">75%</p>
                           <div className="w-32 h-2 bg-gray-200 rounded-full">
-                            <div className="h-2 bg-purple-500 rounded-full" style={{ width: '75%' }}></div>
+                            <div
+                              className="h-2 bg-purple-500 rounded-full"
+                              style={{ width: '75%' }}
+                            ></div>
                           </div>
                         </div>
                       </div>
@@ -523,7 +608,10 @@ export function Dashboard() {
                         <div className="text-right">
                           <p className="text-sm font-medium">45%</p>
                           <div className="w-32 h-2 bg-gray-200 rounded-full">
-                            <div className="h-2 bg-orange-500 rounded-full" style={{ width: '45%' }}></div>
+                            <div
+                              className="h-2 bg-orange-500 rounded-full"
+                              style={{ width: '45%' }}
+                            ></div>
                           </div>
                         </div>
                       </div>
@@ -544,7 +632,7 @@ export function Dashboard() {
                     Ver todas
                   </Button>
                 </div>
-                <TransactionList transactions={dashboardData?.transactions || []} />
+                <TransactionList transactions={transactions} />
               </div>
             </Card>
           )}

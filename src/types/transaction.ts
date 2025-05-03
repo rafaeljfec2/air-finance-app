@@ -39,6 +39,7 @@ export interface Transaction {
   updatedAt: string;
   dependent?: string;
   installmentCount?: number;
+  companyId: string;
 }
 
 export type TransactionInput = Omit<
