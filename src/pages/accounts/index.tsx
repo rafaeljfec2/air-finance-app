@@ -15,6 +15,7 @@ import {
 import { FormField } from '@/components/ui/FormField';
 import { useAccounts, Account } from '@/hooks/useAccounts';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { useCompanyContext } from '@/contexts/companyContext';
 
 const accountTypes = [
   { value: 'corrente', label: 'Corrente', icon: BanknotesIcon },
@@ -25,7 +26,8 @@ const accountTypes = [
 ];
 
 export function AccountsPage() {
-  const { accounts, addAccount, updateAccount, deleteAccount } = useAccounts();
+  const { companyId } = useCompanyContext() as { companyId: string };
+  const { accounts, addAccount, updateAccount, deleteAccount } = useAccounts(companyId);
   const [form, setForm] = useState<Account>({
     id: '',
     name: '',
@@ -33,11 +35,16 @@ export function AccountsPage() {
     initialBalance: '',
     color: '#8A05BE',
     icon: 'BanknotesIcon',
+    companyId: companyId || '',
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [errors, setErrors] = useState<any>({});
+
+  React.useEffect(() => {
+    setForm((prev) => ({ ...prev, companyId: companyId || '' }));
+  }, [companyId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -57,6 +64,7 @@ export function AccountsPage() {
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (!form.initialBalance || isNaN(Number(form.initialBalance)))
       errs.initialBalance = 'Saldo inicial obrigatório';
+    if (!form.companyId) errs.companyId = 'Selecione uma empresa.';
     return errs;
   };
 
@@ -70,7 +78,7 @@ export function AccountsPage() {
       await updateAccount(editingId, accountData);
       setEditingId(null);
     } else {
-      await addAccount(accountData);
+      await addAccount({ ...accountData, companyId });
     }
     setForm({
       id: '',
@@ -79,6 +87,7 @@ export function AccountsPage() {
       initialBalance: '',
       color: '#8A05BE',
       icon: 'BanknotesIcon',
+      companyId: companyId || '',
     });
     setErrors({});
   };
@@ -177,6 +186,7 @@ export function AccountsPage() {
                         initialBalance: '',
                         color: '#8A05BE',
                         icon: 'BanknotesIcon',
+                        companyId: companyId || '',
                       });
                       setEditingId(null);
                     }}

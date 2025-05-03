@@ -7,11 +7,12 @@ export type Account = {
   initialBalance: string;
   color: string;
   icon: string;
+  companyId: string;
 };
 
 const MOCKED_ACCOUNTS: Account[] = [];
 
-export function useAccounts() {
+export function useAccounts(companyId?: string) {
   const [accounts, setAccounts] = useState<Account[]>(MOCKED_ACCOUNTS);
   const [loading, setLoading] = useState(false);
 
@@ -44,8 +45,11 @@ export function useAccounts() {
     setLoading(false);
   };
 
+  // Filtrar contas pela empresa ativa, se fornecida
+  const filteredAccounts = companyId ? accounts.filter((a) => a.companyId === companyId) : accounts;
+
   return {
-    accounts,
+    accounts: filteredAccounts,
     loading,
     fetchAccounts,
     addAccount,

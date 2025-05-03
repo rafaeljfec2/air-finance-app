@@ -6,6 +6,7 @@ export type Category = {
   type: 'receita' | 'despesa';
   color: string;
   icon: string;
+  companyId: string;
 };
 
 const MOCKED_CATEGORIES: Category[] = [
@@ -15,6 +16,7 @@ const MOCKED_CATEGORIES: Category[] = [
     type: 'despesa',
     color: '#F44336',
     icon: 'ShoppingCartIcon',
+    companyId: '',
   },
   {
     id: '2',
@@ -22,6 +24,7 @@ const MOCKED_CATEGORIES: Category[] = [
     type: 'despesa',
     color: '#1976D2',
     icon: 'WalletIcon',
+    companyId: '',
   },
   {
     id: '3',
@@ -29,6 +32,7 @@ const MOCKED_CATEGORIES: Category[] = [
     type: 'despesa',
     color: '#8A05BE',
     icon: 'GiftIcon',
+    companyId: '',
   },
   {
     id: '4',
@@ -36,6 +40,7 @@ const MOCKED_CATEGORIES: Category[] = [
     type: 'receita',
     color: '#009688',
     icon: 'ArrowTrendingUpIcon',
+    companyId: '',
   },
   {
     id: '5',
@@ -43,10 +48,11 @@ const MOCKED_CATEGORIES: Category[] = [
     type: 'receita',
     color: '#FFC107',
     icon: 'TagIcon',
+    companyId: '',
   },
 ];
 
-export function useCategories() {
+export function useCategories(companyId?: string) {
   const [categories, setCategories] = useState<Category[]>(MOCKED_CATEGORIES);
   const [loading, setLoading] = useState(false);
 
@@ -78,8 +84,13 @@ export function useCategories() {
     setLoading(false);
   };
 
+  // Filtrar categorias pela empresa ativa, se fornecida
+  const filteredCategories = companyId
+    ? categories.filter((c) => c.companyId === companyId)
+    : categories;
+
   return {
-    categories,
+    categories: filteredCategories,
     loading,
     fetchCategories,
     addCategory,

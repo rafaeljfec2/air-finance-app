@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/stores/useTheme';
 import { Logo } from '@/components/Logo';
+import { CompanySelector } from './CompanySelector';
 
 export function Header() {
   const navigate = useNavigate();
@@ -34,13 +35,20 @@ export function Header() {
 
         {/* Ações do Header */}
         <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
+          {/* Company Selector */}
+          <CompanySelector />
+
           {/* Botão de Tema */}
           <button
             onClick={toggleTheme}
             className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             aria-label={isDarkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
           >
-            {isDarkMode ? <SunIcon className="h-4 w-4 sm:h-5 sm:w-5" /> : <MoonIcon className="h-4 w-4 sm:h-5 sm:w-5" />}
+            {isDarkMode ? (
+              <SunIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+            ) : (
+              <MoonIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+            )}
           </button>
 
           {/* Notificações */}
@@ -78,7 +86,7 @@ export function Header() {
                               href="#"
                               className={cn(
                                 active ? 'bg-background dark:bg-background-dark' : '',
-                                'block px-4 py-2 text-sm text-text dark:text-text-dark'
+                                'block px-4 py-2 text-sm text-text dark:text-text-dark',
                               )}
                             >
                               Nova transação registrada
@@ -91,7 +99,7 @@ export function Header() {
                               href="#"
                               className={cn(
                                 active ? 'bg-background dark:bg-background-dark' : '',
-                                'block px-4 py-2 text-sm text-text dark:text-text-dark'
+                                'block px-4 py-2 text-sm text-text dark:text-text-dark',
                               )}
                             >
                               Lembrete de fatura
@@ -132,7 +140,7 @@ export function Header() {
                             onClick={() => navigate('/profile')}
                             className={cn(
                               active ? 'bg-background dark:bg-background-dark' : '',
-                              'flex w-full items-center px-4 py-2 text-sm text-text dark:text-text-dark'
+                              'flex w-full items-center px-4 py-2 text-sm text-text dark:text-text-dark',
                             )}
                           >
                             <UserCircleIcon className="mr-3 h-5 w-5" />
@@ -146,7 +154,7 @@ export function Header() {
                             onClick={() => navigate('/settings')}
                             className={cn(
                               active ? 'bg-background dark:bg-background-dark' : '',
-                              'flex w-full items-center px-4 py-2 text-sm text-text dark:text-text-dark'
+                              'flex w-full items-center px-4 py-2 text-sm text-text dark:text-text-dark',
                             )}
                           >
                             <Cog6ToothIcon className="mr-3 h-5 w-5" />
@@ -161,7 +169,7 @@ export function Header() {
                               onClick={handleLogout}
                               className={cn(
                                 active ? 'bg-background dark:bg-background-dark' : '',
-                                'flex w-full items-center px-4 py-2 text-sm text-text dark:text-text-dark'
+                                'flex w-full items-center px-4 py-2 text-sm text-text dark:text-text-dark',
                               )}
                             >
                               <ArrowRightOnRectangleIcon className="mr-3 h-5 w-5" />

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/FormField';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useCategories, Category } from '@/hooks/useCategories';
+import { useCompanyContext } from '@/contexts/companyContext';
 import {
   TagIcon,
   ArrowTrendingUpIcon,
@@ -30,18 +31,24 @@ const iconOptions = [
 ];
 
 export function CategoriesPage() {
-  const { categories, addCategory, updateCategory, deleteCategory } = useCategories();
+  const { companyId } = useCompanyContext() as { companyId: string };
+  const { categories, addCategory, updateCategory, deleteCategory } = useCategories(companyId);
   const [form, setForm] = useState<Category>({
     id: '',
     name: '',
     type: 'despesa',
     color: '#8A05BE',
     icon: 'TagIcon',
+    companyId: companyId || '',
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [errors, setErrors] = useState<any>({});
+
+  React.useEffect(() => {
+    setForm((prev) => ({ ...prev, companyId: companyId || '' }));
+  }, [companyId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -59,6 +66,7 @@ export function CategoriesPage() {
   const validate = () => {
     const errs: any = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
+    if (!form.companyId) errs.companyId = 'Selecione uma empresa.';
     return errs;
   };
 
@@ -72,9 +80,16 @@ export function CategoriesPage() {
       await updateCategory(editingId, categoryData);
       setEditingId(null);
     } else {
-      await addCategory(categoryData);
+      await addCategory({ ...categoryData, companyId });
     }
-    setForm({ id: '', name: '', type: 'despesa', color: '#8A05BE', icon: 'TagIcon' });
+    setForm({
+      id: '',
+      name: '',
+      type: 'despesa',
+      color: '#8A05BE',
+      icon: 'TagIcon',
+      companyId: companyId || '',
+    });
     setErrors({});
   };
 
@@ -149,6 +164,7 @@ export function CategoriesPage() {
                         type: 'despesa',
                         color: '#8A05BE',
                         icon: 'TagIcon',
+                        companyId: companyId || '',
                       });
                       setEditingId(null);
                     }}

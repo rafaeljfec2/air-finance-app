@@ -6,12 +6,7 @@ import { Select } from '@/components/ui/select';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Button } from '@/components/ui/button';
-import {
-  CreditCardIcon,
-  BanknotesIcon,
-  BuildingLibraryIcon,
-  CurrencyDollarIcon,
-} from '@heroicons/react/24/outline';
+import { CreditCardIcon, BanknotesIcon, BuildingLibraryIcon } from '@heroicons/react/24/outline';
 import { FormField } from '@/components/ui/FormField';
 import { useCreditCards, CreditCard } from '@/hooks/useCreditCards';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';

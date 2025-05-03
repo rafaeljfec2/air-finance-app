@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -6,26 +6,27 @@ import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/FormField';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { useGoals, Goal } from '@/hooks/useGoals';
+import { useGoals } from '@/hooks/useGoals';
 import { useCategories } from '@/hooks/useCategories';
+import { useCompanyContext } from '@/contexts/companyContext';
 import { FlagIcon } from '@heroicons/react/24/outline';
-
-function formatCurrency(value: string | number) {
-  const number =
-    typeof value === 'number' ? value : Number(value.replace(/[^\d,.-]/g, '').replace(',', '.'));
-  if (isNaN(number)) return '';
-  return number.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
+import { formatCurrency } from '@/utils/formatters';
+import { Goal } from '@/types/goal';
+import { formatDate } from '@/utils/date';
+import { Progress } from '@/components/ui/progress';
 
 export function GoalsPage() {
-  const { goals, addGoal, updateGoal, deleteGoal } = useGoals();
+  const { companyId } = useCompanyContext() as { companyId: string };
+  const { goals, loading, error, addGoal, updateGoal, deleteGoal } = useGoals();
   const { categories } = useCategories();
-  const [form, setForm] = useState<Goal>({
-    id: '',
+  const [form, setForm] = useState<Omit<Goal, 'id' | 'createdAt' | 'updatedAt'>>({
     name: '',
-    targetValue: 0,
-    dueDate: '',
-    categoryId: '',
+    description: '',
+    targetAmount: 0,
+    currentAmount: 0,
+    deadline: '',
+    status: 'active',
+    companyId: companyId || '',
   });
   const [targetValueInput, setTargetValueInput] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -33,26 +34,30 @@ export function GoalsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [errors, setErrors] = useState<any>({});
 
+  useEffect(() => {
+    setForm((prev) => ({ ...prev, companyId: companyId || '' }));
+  }, [companyId]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    if (name === 'targetValue') {
+    if (name === 'targetAmount') {
       // Permitir apenas números, vírgula e ponto
       const raw = value.replace(/[^\d,\.]/g, '');
       setTargetValueInput(raw);
-      setForm((prev) => ({ ...prev, targetValue: parseFloat(raw.replace(',', '.')) || 0 }));
+      setForm((prev) => ({ ...prev, targetAmount: parseFloat(raw.replace(',', '.')) || 0 }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const handleTargetValueBlur = () => {
-    setTargetValueInput(form.targetValue ? formatCurrency(form.targetValue) : '');
+    setTargetValueInput(form.targetAmount ? formatCurrency(form.targetAmount) : '');
   };
 
   React.useEffect(() => {
     if (editingId) {
-      setTargetValueInput(form.targetValue ? formatCurrency(form.targetValue) : '');
-    } else if (!form.targetValue) {
+      setTargetValueInput(form.targetAmount ? formatCurrency(form.targetAmount) : '');
+    } else if (!form.targetAmount) {
       setTargetValueInput('');
     }
   }, [editingId]);
@@ -60,10 +65,9 @@ export function GoalsPage() {
   const validate = () => {
     const errs: any = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
-    if (!form.targetValue || Number(form.targetValue) <= 0)
-      errs.targetValue = 'Valor alvo inválido';
-    if (!form.dueDate) errs.dueDate = 'Data limite obrigatória';
-    if (!form.categoryId) errs.categoryId = 'Categoria obrigatória';
+    if (form.targetAmount <= 0) errs.targetAmount = 'Valor alvo deve ser maior que zero';
+    if (!form.deadline) errs.deadline = 'Data limite obrigatória';
+    if (!form.companyId) errs.companyId = 'Selecione uma empresa';
     return errs;
   };
 
@@ -72,23 +76,35 @@ export function GoalsPage() {
     const errs = validate();
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
-    const { id, ...goalData } = form;
-    if (editingId) {
-      await updateGoal(editingId, goalData);
-      setEditingId(null);
-    } else {
-      await addGoal(goalData);
+
+    try {
+      if (editingId) {
+        await updateGoal(editingId, form);
+        setEditingId(null);
+      } else {
+        await addGoal(form);
+      }
+      setForm({
+        name: '',
+        description: '',
+        targetAmount: 0,
+        currentAmount: 0,
+        deadline: '',
+        status: 'active',
+        companyId: companyId || '',
+      });
+      setTargetValueInput('');
+      setErrors({});
+    } catch (err) {
+      console.error('Erro ao salvar meta:', err);
     }
-    setForm({ id: '', name: '', targetValue: 0, dueDate: '', categoryId: '' });
-    setTargetValueInput('');
-    setErrors({});
   };
 
   const handleEdit = (id: string) => {
     const goal = goals.find((g) => g.id === id);
     if (goal) {
       setForm(goal);
-      setTargetValueInput(goal.targetValue ? formatCurrency(goal.targetValue) : '');
+      setTargetValueInput(goal.targetAmount ? formatCurrency(goal.targetAmount) : '');
       setEditingId(id);
     }
   };
@@ -107,6 +123,10 @@ export function GoalsPage() {
   const cancelDelete = () => {
     setShowConfirmDelete(false);
     setDeleteId(null);
+  };
+
+  const calculateProgress = (current: number, target: number) => {
+    return Math.min(Math.round((current / target) * 100), 100);
   };
 
   return (
@@ -191,6 +211,7 @@ export function GoalsPage() {
               )}
               {goals.map((goal) => {
                 const category = categories.find((c) => c.id === goal.categoryId);
+                const progress = calculateProgress(goal.currentAmount, goal.targetAmount);
                 return (
                   <li key={goal.id} className="flex items-center justify-between py-3">
                     <div className="flex items-center gap-3">
