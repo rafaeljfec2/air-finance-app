@@ -37,14 +37,19 @@ export type LoginData = z.infer<typeof LoginSchema>;
 export type RegisterData = z.infer<typeof RegisterSchema>;
 export type PasswordRecoveryData = z.infer<typeof PasswordRecoverySchema>;
 
+// Novo tipo de resposta
+export interface AuthResponse {
+  user: User;
+  token: string;
+  refreshToken?: string;
+  expiresIn?: number;
+}
+
 // Service functions
-export const login = async (data: LoginData): Promise<{ user: User; token: string }> => {
+export const login = async (data: LoginData): Promise<AuthResponse> => {
   try {
     const validatedData = LoginSchema.parse(data);
-    const response = await apiClient.post<{ user: User; token: string }>(
-      '/auth/login',
-      validatedData,
-    );
+    const response = await apiClient.post<AuthResponse>('/auth/login', validatedData);
     return response.data;
   } catch (error) {
     console.error('Erro ao fazer login:', error);
@@ -52,13 +57,10 @@ export const login = async (data: LoginData): Promise<{ user: User; token: strin
   }
 };
 
-export const register = async (data: RegisterData): Promise<{ user: User; token: string }> => {
+export const register = async (data: RegisterData): Promise<AuthResponse> => {
   try {
     const validatedData = RegisterSchema.parse(data);
-    const response = await apiClient.post<{ user: User; token: string }>(
-      '/auth/register',
-      validatedData,
-    );
+    const response = await apiClient.post<AuthResponse>('/auth/register', validatedData);
     return response.data;
   } catch (error) {
     console.error('Erro ao registrar:', error);
