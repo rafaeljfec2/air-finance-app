@@ -1,0 +1,321 @@
+import React, { useState } from 'react';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { FormField } from '@/components/ui/FormField';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { useCompanies, Company } from '@/hooks/useCompanies';
+import { BuildingOfficeIcon } from '@heroicons/react/24/outline';
+
+const typeOptions = [
+  { value: 'matriz', label: 'Matriz' },
+  { value: 'filial', label: 'Filial' },
+  { value: 'holding', label: 'Holding' },
+  { value: 'prestadora', label: 'Prestadora' },
+  { value: 'outra', label: 'Outra' },
+];
+
+function formatCNPJ(value: string) {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1/$2')
+    .replace(/(\d{4})(\d)/, '$1-$2')
+    .slice(0, 18);
+}
+
+function formatPhone(value: string) {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '($1) $2')
+    .replace(/(\d{5})(\d)/, '$1-$2')
+    .slice(0, 15);
+}
+
+function validateCNPJ(cnpj: string) {
+  cnpj = cnpj.replace(/\D/g, '');
+  if (cnpj.length !== 14) return false;
+  // Validação simplificada
+  return true;
+}
+
+export function CompaniesPage() {
+  const { companies, addCompany, updateCompany, deleteCompany } = useCompanies();
+  const [form, setForm] = useState<Company>({
+    id: '',
+    name: '',
+    cnpj: '',
+    type: '',
+    foundationDate: '',
+    email: '',
+    phone: '',
+    address: '',
+    notes: '',
+  });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [errors, setErrors] = useState<any>({});
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    if (name === 'cnpj') {
+      setForm((prev) => ({ ...prev, cnpj: formatCNPJ(value) }));
+    } else if (name === 'phone') {
+      setForm((prev) => ({ ...prev, phone: formatPhone(value) }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const validate = () => {
+    const errs: any = {};
+    if (!form.name.trim()) errs.name = 'Nome obrigatório';
+    if (!form.cnpj || !validateCNPJ(form.cnpj)) errs.cnpj = 'CNPJ inválido';
+    if (!form.type) errs.type = 'Tipo obrigatório';
+    if (!form.foundationDate) errs.foundationDate = 'Data de fundação obrigatória';
+    if (form.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email))
+      errs.email = 'E-mail inválido';
+    if (form.phone && form.phone.replace(/\D/g, '').length < 10) errs.phone = 'Telefone inválido';
+    return errs;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errs = validate();
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) return;
+    const { id, ...companyData } = form;
+    if (editingId) {
+      await updateCompany(editingId, companyData);
+      setEditingId(null);
+    } else {
+      await addCompany(companyData);
+    }
+    setForm({
+      id: '',
+      name: '',
+      cnpj: '',
+      type: '',
+      foundationDate: '',
+      email: '',
+      phone: '',
+      address: '',
+      notes: '',
+    });
+    setErrors({});
+  };
+
+  const handleEdit = (id: string) => {
+    const company = companies.find((c) => c.id === id);
+    if (company) {
+      setForm(company);
+      setEditingId(id);
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    setShowConfirmDelete(true);
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteId) await deleteCompany(deleteId);
+    setShowConfirmDelete(false);
+    setDeleteId(null);
+  };
+
+  const cancelDelete = () => {
+    setShowConfirmDelete(false);
+    setDeleteId(null);
+  };
+
+  return (
+    <ViewDefault>
+      <div className="container mx-auto px-2 sm:px-6 py-10">
+        <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark mb-6 flex items-center gap-2">
+          <BuildingOfficeIcon className="h-6 w-6 text-primary-500" /> Empresas
+        </h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Formulário */}
+          <Card className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <FormField label="Nome da empresa" error={errors.name}>
+                <Input
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="Ex: Minha Empresa Ltda."
+                  required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                />
+              </FormField>
+              <FormField label="CNPJ" error={errors.cnpj}>
+                <Input
+                  name="cnpj"
+                  value={form.cnpj}
+                  onChange={handleChange}
+                  placeholder="00.000.000/0000-00"
+                  required
+                  maxLength={18}
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                />
+              </FormField>
+              <FormField label="Tipo" error={errors.type}>
+                <Select name="type" value={form.type} onChange={handleChange} required>
+                  <option value="">Selecione...</option>
+                  {typeOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </Select>
+              </FormField>
+              <FormField label="Data de fundação" error={errors.foundationDate}>
+                <Input
+                  name="foundationDate"
+                  type="date"
+                  value={form.foundationDate}
+                  onChange={handleChange}
+                  required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                />
+              </FormField>
+              <FormField label="E-mail de contato" error={errors.email}>
+                <Input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="contato@empresa.com"
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                />
+              </FormField>
+              <FormField label="Telefone" error={errors.phone}>
+                <Input
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  placeholder="(00) 00000-0000"
+                  maxLength={15}
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                />
+              </FormField>
+              <FormField label="Endereço">
+                <Input
+                  name="address"
+                  value={form.address}
+                  onChange={handleChange}
+                  placeholder="Rua, número, bairro, cidade, UF"
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                />
+              </FormField>
+              <FormField label="Observações">
+                <textarea
+                  name="notes"
+                  value={form.notes}
+                  onChange={handleChange}
+                  placeholder="Observações adicionais"
+                  rows={2}
+                  className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors rounded-md resize-none"
+                />
+              </FormField>
+              <div className="flex gap-2 mt-4">
+                <Button type="submit" color="primary">
+                  {editingId ? 'Salvar Alterações' : 'Adicionar Empresa'}
+                </Button>
+                {editingId && (
+                  <Button
+                    type="button"
+                    color="secondary"
+                    onClick={() => {
+                      setForm({
+                        id: '',
+                        name: '',
+                        cnpj: '',
+                        type: '',
+                        foundationDate: '',
+                        email: '',
+                        phone: '',
+                        address: '',
+                        notes: '',
+                      });
+                      setEditingId(null);
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                )}
+              </div>
+            </form>
+          </Card>
+          {/* Listagem */}
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold mb-4">Minhas Empresas</h2>
+            <ul className="divide-y divide-border dark:divide-border-dark">
+              {companies.length === 0 && (
+                <li className="text-gray-400 text-sm">Nenhuma empresa cadastrada.</li>
+              )}
+              {companies.map((company) => (
+                <li key={company.id} className="flex items-center justify-between py-3">
+                  <div>
+                    <div className="font-medium text-text dark:text-text-dark">{company.name}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      CNPJ: {company.cnpj} • Tipo:{' '}
+                      {typeOptions.find((t) => t.value === company.type)?.label || '-'}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      Fundação:{' '}
+                      {company.foundationDate
+                        ? new Date(company.foundationDate).toLocaleDateString('pt-BR')
+                        : '-'}
+                      {company.email && ` • E-mail: ${company.email}`}
+                      {company.phone && ` • Tel: ${company.phone}`}
+                    </div>
+                    {company.address && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        Endereço: {company.address}
+                      </div>
+                    )}
+                    {company.notes && (
+                      <div className="text-xs text-gray-400 italic">Obs: {company.notes}</div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button size="sm" color="secondary" onClick={() => handleEdit(company.id)}>
+                      Editar
+                    </Button>
+                    <Button size="sm" color="danger" onClick={() => handleDelete(company.id)}>
+                      Excluir
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </div>
+        <ConfirmModal
+          open={showConfirmDelete}
+          title="Confirmar exclusão"
+          description={
+            <>
+              Tem certeza que deseja excluir esta empresa?
+              <br />
+              Esta ação não poderá ser desfeita.
+            </>
+          }
+          confirmLabel="Excluir"
+          cancelLabel="Cancelar"
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+          danger
+        />
+      </div>
+    </ViewDefault>
+  );
+}

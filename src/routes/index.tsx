@@ -22,6 +22,7 @@ import { DependentsPage } from '@/pages/dependents';
 import { CreditCardsPage } from '@/pages/credit-cards';
 import { GoalsPage } from '@/pages/goals';
 import { IncomeSourcesPage } from '@/pages/income-sources';
+import { CompaniesPage } from '@/pages/companies';
 
 export const router = createBrowserRouter([
   {
@@ -233,6 +234,17 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <IncomeSourcesPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/companies',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <CompaniesPage />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
