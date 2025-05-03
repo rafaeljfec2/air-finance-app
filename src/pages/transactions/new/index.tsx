@@ -11,10 +11,12 @@ import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react';
 import { dependents } from '@/constants/dependents';
+import { useCompanyContext } from '@/contexts/companyContext';
 
 export function NewTransaction() {
   const navigate = useNavigate();
   const { addTransaction, categories, accounts } = useTransactionStore();
+  const { companyId } = useCompanyContext() as { companyId: string };
   const [transactionType, setTransactionType] = useState<TransactionType>('EXPENSE');
   const [formData, setFormData] = useState<TransactionInput>({
     type: 'EXPENSE',
@@ -26,11 +28,16 @@ export function NewTransaction() {
     note: '',
     dependent: '',
     installmentCount: 1,
+    companyId: companyId || '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    addTransaction(formData);
+    if (!companyId) {
+      alert('Nenhuma empresa selecionada.');
+      return;
+    }
+    addTransaction(formData, companyId);
     navigate('/transactions');
   };
 

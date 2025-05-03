@@ -7,7 +7,8 @@ import { Select } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { Receipt, Search, Plus, Calendar, Filter, Download } from 'lucide-react';
 import { TransactionGrid } from '@/components/transactions/TransactionGrid';
-import { mockTransactions } from '@/mocks/transactions';
+import { useTransactionStore } from '@/stores/transaction';
+import { useCompanyContext } from '@/contexts/companyContext';
 
 export function Transactions() {
   const navigate = useNavigate();
@@ -15,6 +16,10 @@ export function Transactions() {
   const [selectedPeriod, setSelectedPeriod] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
+
+  const { companyId } = useCompanyContext() as { companyId: string };
+  const getTransactionsByCompany = useTransactionStore((s) => s.getTransactionsByCompany);
+  const allTransactions = getTransactionsByCompany(companyId);
 
   // Simular loading
   useEffect(() => {
@@ -25,7 +30,7 @@ export function Transactions() {
     return () => clearTimeout(timer);
   }, []);
 
-  const filteredTransactions = mockTransactions
+  const filteredTransactions = allTransactions
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .filter((transaction) => {
       const matchesSearch = transaction.description
