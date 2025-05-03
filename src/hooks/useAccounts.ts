@@ -1,59 +1,78 @@
-import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  getAccounts,
+  getAccountById,
+  createAccount,
+  updateAccount,
+  deleteAccount,
+  getAccountBalance,
+  Account,
+  CreateAccount,
+} from '../services/accountService';
 
-export type Account = {
-  id: string;
-  name: string;
-  type: string;
-  initialBalance: string;
-  color: string;
-  icon: string;
-  companyId: string;
-};
+export const useAccounts = () => {
+  const queryClient = useQueryClient();
 
-const MOCKED_ACCOUNTS: Account[] = [];
+  const {
+    data: accounts,
+    isLoading,
+    error,
+  } = useQuery<Account[]>({
+    queryKey: ['accounts'],
+    queryFn: getAccounts,
+  });
 
-export function useAccounts(companyId?: string) {
-  const [accounts, setAccounts] = useState<Account[]>(MOCKED_ACCOUNTS);
-  const [loading, setLoading] = useState(false);
-
-  // Simular fetch do backend
-  const fetchAccounts = async () => {
-    setLoading(true);
-    // Aqui entraria a chamada real de API futuramente
-    await new Promise((res) => setTimeout(res, 300));
-    setLoading(false);
+  const getAccount = (id: string) => {
+    return useQuery<Account>({
+      queryKey: ['account', id],
+      queryFn: () => getAccountById(id),
+      enabled: !!id,
+    });
   };
 
-  const addAccount = async (account: Omit<Account, 'id'>) => {
-    setLoading(true);
-    await new Promise((res) => setTimeout(res, 200));
-    setAccounts((prev) => [...prev, { ...account, id: Date.now().toString() }]);
-    setLoading(false);
+  const getBalance = (id: string) => {
+    return useQuery<number>({
+      queryKey: ['account-balance', id],
+      queryFn: () => getAccountBalance(id),
+      enabled: !!id,
+    });
   };
 
-  const updateAccount = async (id: string, account: Omit<Account, 'id'>) => {
-    setLoading(true);
-    await new Promise((res) => setTimeout(res, 200));
-    setAccounts((prev) => prev.map((a) => (a.id === id ? { ...account, id } : a)));
-    setLoading(false);
-  };
+  const createMutation = useMutation({
+    mutationFn: createAccount,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+    },
+  });
 
-  const deleteAccount = async (id: string) => {
-    setLoading(true);
-    await new Promise((res) => setTimeout(res, 200));
-    setAccounts((prev) => prev.filter((a) => a.id !== id));
-    setLoading(false);
-  };
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateAccount> }) =>
+      updateAccount(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['account', id] });
+    },
+  });
 
-  // Filtrar contas pela empresa ativa, se fornecida
-  const filteredAccounts = companyId ? accounts.filter((a) => a.companyId === companyId) : accounts;
+  const deleteMutation = useMutation({
+    mutationFn: deleteAccount,
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.removeQueries({ queryKey: ['account', id] });
+    },
+  });
 
   return {
-    accounts: filteredAccounts,
-    loading,
-    fetchAccounts,
-    addAccount,
-    updateAccount,
-    deleteAccount,
+    accounts,
+    isLoading,
+    error,
+    getAccount,
+    getBalance,
+    createAccount: createMutation.mutate,
+    updateAccount: updateMutation.mutate,
+    deleteAccount: deleteMutation.mutate,
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
   };
-}
+};
