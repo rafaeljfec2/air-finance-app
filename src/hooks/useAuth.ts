@@ -20,24 +20,32 @@ export const useAuth = () => {
 
   const loginMutation = useMutation({
     mutationFn: login,
-    onSuccess: (data) => {
-      authUtils.setToken(data.token);
+    onSuccess: async (data) => {
+      await authUtils.setToken(data.token);
+      if (data.refreshToken) {
+        await authUtils.setRefreshToken(data.refreshToken);
+      }
+      await authUtils.setUser(data.user);
       queryClient.setQueryData(['user'], data.user);
     },
   });
 
   const registerMutation = useMutation({
     mutationFn: register,
-    onSuccess: (data) => {
-      authUtils.setToken(data.token);
+    onSuccess: async (data) => {
+      await authUtils.setToken(data.token);
+      if (data.refreshToken) {
+        await authUtils.setRefreshToken(data.refreshToken);
+      }
+      await authUtils.setUser(data.user);
       queryClient.setQueryData(['user'], data.user);
     },
   });
 
   const logoutMutation = useMutation({
     mutationFn: logout,
-    onSuccess: () => {
-      authUtils.removeToken();
+    onSuccess: async () => {
+      await authUtils.clearAuth();
       queryClient.removeQueries({ queryKey: ['user'] });
     },
   });
