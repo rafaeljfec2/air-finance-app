@@ -21,6 +21,7 @@ import { CategoriesPage } from '@/pages/categories';
 import { DependentsPage } from '@/pages/dependents';
 import { CreditCardsPage } from '@/pages/credit-cards';
 import { GoalsPage } from '@/pages/goals';
+import { IncomeSourcesPage } from '@/pages/income-sources';
 
 export const router = createBrowserRouter([
   {
@@ -221,6 +222,17 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <GoalsPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/income-sources',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <IncomeSourcesPage />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
