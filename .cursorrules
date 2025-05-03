@@ -127,6 +127,11 @@ boas_praticas = [
   "Evitar o uso de bibliotecas sem manutenção ou sem histórico confiável",
   "Implementar autenticação segura (mesmo que mock) e controle de acesso básico",
   "Desabilitar logs sensíveis em produção"
+  "O cadastro de transações já está bem completo e serve de referência para UX e componentes reutilizáveis.",
+  "Os cadastros de contas, categorias e dependentes são essenciais para personalização e controle financeiro.",
+  "Recomendo criar cada cadastro como uma página dedicada em src/pages/{entidade}/new e um CRUD em src/pages/ {entidade}.",
+  "Aproveite componentes de formulário já existentes (Input, Select, Card, etc) para manter padrão visual.",
+  "Considere centralizar ícones e cores para entidades, facilitando a identificação visual no app."
 ]
 
 [convencao_arquivos]

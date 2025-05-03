@@ -10,6 +10,12 @@ import {
   SparklesIcon,
   WalletIcon,
   ArrowDownIcon,
+  BanknotesIcon,
+  TagIcon,
+  UserGroupIcon,
+  CreditCardIcon,
+  FlagIcon,
+  CurrencyDollarIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebar';
@@ -26,6 +32,18 @@ const navigation = [
       { name: 'Extrato', href: '/statement', icon: DocumentTextIcon },
       { name: 'Relatórios', href: '/reports', icon: ChartBarIcon },
       { name: 'Importar OFX', href: '/import-ofx', icon: DocumentTextIcon },
+    ],
+  },
+  {
+    name: 'Cadastros',
+    icon: Cog6ToothIcon,
+    children: [
+      { name: 'Contas Bancárias', href: '/accounts', icon: BanknotesIcon },
+      { name: 'Categorias', href: '/categories', icon: TagIcon },
+      { name: 'Dependentes', href: '/dependents', icon: UserGroupIcon },
+      { name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCardIcon },
+      { name: 'Objetivos/Metas', href: '/goals', icon: FlagIcon },
+      { name: 'Fontes de Receitas', href: '/income-sources', icon: CurrencyDollarIcon },
     ],
   },
   { name: 'Classificação IA', href: '/ai/classification', icon: SparklesIcon },
