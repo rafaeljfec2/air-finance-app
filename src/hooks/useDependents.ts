@@ -1,37 +1,71 @@
-import { useState } from 'react';
-
-export type Dependent = {
-  id: string;
-  name: string;
-  relation: string;
-  color: string;
-  icon: string;
-};
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  getDependents,
+  getDependentById,
+  createDependent,
+  updateDependent,
+  deleteDependent,
+  type Dependent,
+  type CreateDependent,
+} from '../services/dependentService';
 
 export const useDependents = () => {
-  const [dependents, setDependents] = useState<Dependent[]>([]);
+  const queryClient = useQueryClient();
 
-  const addDependent = async (dependent: Omit<Dependent, 'id'>) => {
-    const newDependent = {
-      ...dependent,
-      id: Math.random().toString(36).substr(2, 9),
-    };
-    setDependents((prev) => [...prev, newDependent]);
-    return newDependent;
+  const {
+    data: dependents,
+    isLoading,
+    error,
+  } = useQuery<Dependent[]>({
+    queryKey: ['dependents'],
+    queryFn: getDependents,
+  });
+
+  const getDependent = (id: string) => {
+    return useQuery<Dependent>({
+      queryKey: ['dependent', id],
+      queryFn: () => getDependentById(id),
+      enabled: !!id,
+    });
   };
 
-  const updateDependent = async (id: string, dependent: Omit<Dependent, 'id'>) => {
-    setDependents((prev) => prev.map((d) => (d.id === id ? { ...dependent, id } : d)));
-  };
+  const createMutation = useMutation({
+    mutationFn: createDependent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dependents'] });
+    },
+  });
 
-  const deleteDependent = async (id: string) => {
-    setDependents((prev) => prev.filter((d) => d.id !== id));
-  };
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateDependent> }) =>
+      updateDependent(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['dependents'] });
+      queryClient.invalidateQueries({ queryKey: ['dependent', id] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteDependent,
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['dependents'] });
+      queryClient.removeQueries({ queryKey: ['dependent', id] });
+    },
+  });
 
   return {
     dependents,
-    addDependent,
-    updateDependent,
-    deleteDependent,
+    isLoading,
+    error,
+    getDependent,
+    createDependent: createMutation.mutate,
+    updateDependent: updateMutation.mutate,
+    deleteDependent: deleteMutation.mutate,
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
+    createError: createMutation.error,
+    updateError: updateMutation.error,
+    deleteError: deleteMutation.error,
   };
 };
