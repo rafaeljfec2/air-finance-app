@@ -1,41 +1,72 @@
-import { useState } from 'react';
-
-export type Company = {
-  id: string;
-  name: string;
-  cnpj: string;
-  type: string;
-  foundationDate: string;
-  email: string;
-  phone: string;
-  address: string;
-  notes?: string;
-};
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  getCompanies,
+  getCompanyById,
+  createCompany,
+  updateCompany,
+  deleteCompany,
+  type Company,
+  type CreateCompany,
+} from '../services/companyService';
 
 export const useCompanies = () => {
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const queryClient = useQueryClient();
 
-  const addCompany = async (company: Omit<Company, 'id'>) => {
-    const newCompany = {
-      ...company,
-      id: Math.random().toString(36).substr(2, 9),
-    };
-    setCompanies((prev) => [...prev, newCompany]);
-    return newCompany;
-  };
+  // Queries
+  const {
+    data: companies,
+    isLoading,
+    error,
+  } = useQuery<Company[]>({
+    queryKey: ['companies'],
+    queryFn: getCompanies,
+  });
 
-  const updateCompany = async (id: string, company: Omit<Company, 'id'>) => {
-    setCompanies((prev) => prev.map((c) => (c.id === id ? { ...company, id } : c)));
-  };
+  const getCompany = (id: string) =>
+    useQuery<Company>({
+      queryKey: ['companies', id],
+      queryFn: () => getCompanyById(id),
+      enabled: !!id,
+    });
 
-  const deleteCompany = async (id: string) => {
-    setCompanies((prev) => prev.filter((c) => c.id !== id));
-  };
+  // Mutations
+  const createCompanyMutation = useMutation({
+    mutationFn: createCompany,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+    },
+  });
+
+  const updateCompanyMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateCompany> }) =>
+      updateCompany(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      queryClient.invalidateQueries({ queryKey: ['companies', id] });
+    },
+  });
+
+  const deleteCompanyMutation = useMutation({
+    mutationFn: deleteCompany,
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      queryClient.removeQueries({ queryKey: ['companies', id] });
+    },
+  });
 
   return {
     companies,
-    addCompany,
-    updateCompany,
-    deleteCompany,
+    isLoading,
+    error,
+    getCompany,
+    createCompany: createCompanyMutation.mutate,
+    updateCompany: updateCompanyMutation.mutate,
+    deleteCompany: deleteCompanyMutation.mutate,
+    isCreating: createCompanyMutation.isPending,
+    isUpdating: updateCompanyMutation.isPending,
+    isDeleting: deleteCompanyMutation.isPending,
+    createError: createCompanyMutation.error,
+    updateError: updateCompanyMutation.error,
+    deleteError: deleteCompanyMutation.error,
   };
 };

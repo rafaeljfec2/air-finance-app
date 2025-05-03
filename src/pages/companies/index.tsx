@@ -6,8 +6,10 @@ import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/FormField';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { useCompanies, Company } from '@/hooks/useCompanies';
+import { useCompanies } from '@/hooks/useCompanies';
 import { BuildingOfficeIcon } from '@heroicons/react/24/outline';
+import { formatDate } from '@/utils/date';
+import { CreateCompany } from '@/services/companyService';
 
 const typeOptions = [
   { value: 'matriz', label: 'Matriz' },
@@ -15,7 +17,9 @@ const typeOptions = [
   { value: 'holding', label: 'Holding' },
   { value: 'prestadora', label: 'Prestadora' },
   { value: 'outra', label: 'Outra' },
-];
+] as const;
+
+type CompanyType = (typeof typeOptions)[number]['value'];
 
 function formatCNPJ(value: string) {
   return value
@@ -36,25 +40,57 @@ function formatPhone(value: string) {
 }
 
 function validateCNPJ(cnpj: string) {
-  cnpj = cnpj.replace(/\D/g, '');
+  cnpj = cnpj.replace(/[^\d]/g, '');
   if (cnpj.length !== 14) return false;
-  // Validação simplificada
+  if (/^(\d)\1+$/.test(cnpj)) return false;
+
+  let sum = 0;
+  let weight = 2;
+  for (let i = 11; i >= 0; i--) {
+    sum += parseInt(cnpj.charAt(i)) * weight;
+    weight = weight === 9 ? 2 : weight + 1;
+  }
+  let digit = 11 - (sum % 11);
+  if (digit > 9) digit = 0;
+  if (digit !== parseInt(cnpj.charAt(12))) return false;
+
+  sum = 0;
+  weight = 2;
+  for (let i = 12; i >= 0; i--) {
+    sum += parseInt(cnpj.charAt(i)) * weight;
+    weight = weight === 9 ? 2 : weight + 1;
+  }
+  digit = 11 - (sum % 11);
+  if (digit > 9) digit = 0;
+  if (digit !== parseInt(cnpj.charAt(13))) return false;
+
   return true;
 }
 
 export function CompaniesPage() {
-  const { companies, addCompany, updateCompany, deleteCompany } = useCompanies();
-  const [form, setForm] = useState<Company>({
-    id: '',
+  const {
+    companies,
+    isLoading,
+    error,
+    createCompany,
+    updateCompany,
+    deleteCompany,
+    isCreating,
+    isUpdating,
+    isDeleting,
+  } = useCompanies();
+
+  const [form, setForm] = useState<CreateCompany>({
     name: '',
     cnpj: '',
-    type: '',
+    type: 'matriz',
     foundationDate: '',
     email: '',
     phone: '',
     address: '',
     notes: '',
   });
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -68,6 +104,8 @@ export function CompaniesPage() {
       setForm((prev) => ({ ...prev, cnpj: formatCNPJ(value) }));
     } else if (name === 'phone') {
       setForm((prev) => ({ ...prev, phone: formatPhone(value) }));
+    } else if (name === 'type') {
+      setForm((prev) => ({ ...prev, type: value as CompanyType }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
@@ -90,31 +128,43 @@ export function CompaniesPage() {
     const errs = validate();
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
-    const { id, ...companyData } = form;
-    if (editingId) {
-      await updateCompany(editingId, companyData);
-      setEditingId(null);
-    } else {
-      await addCompany(companyData);
+
+    try {
+      if (editingId) {
+        await updateCompany({ id: editingId, data: form });
+        setEditingId(null);
+      } else {
+        await createCompany(form);
+      }
+      setForm({
+        name: '',
+        cnpj: '',
+        type: 'matriz',
+        foundationDate: '',
+        email: '',
+        phone: '',
+        address: '',
+        notes: '',
+      });
+      setErrors({});
+    } catch (error) {
+      console.error('Erro ao salvar empresa:', error);
     }
-    setForm({
-      id: '',
-      name: '',
-      cnpj: '',
-      type: '',
-      foundationDate: '',
-      email: '',
-      phone: '',
-      address: '',
-      notes: '',
-    });
-    setErrors({});
   };
 
   const handleEdit = (id: string) => {
-    const company = companies.find((c) => c.id === id);
+    const company = companies?.find((c) => c.id === id);
     if (company) {
-      setForm(company);
+      setForm({
+        name: company.name,
+        cnpj: company.cnpj,
+        type: company.type,
+        foundationDate: company.foundationDate.split('T')[0],
+        email: company.email || '',
+        phone: company.phone || '',
+        address: company.address || '',
+        notes: company.notes || '',
+      });
       setEditingId(id);
     }
   };
@@ -125,7 +175,13 @@ export function CompaniesPage() {
   };
 
   const confirmDelete = async () => {
-    if (deleteId) await deleteCompany(deleteId);
+    if (deleteId) {
+      try {
+        await deleteCompany(deleteId);
+      } catch (error) {
+        console.error('Erro ao deletar empresa:', error);
+      }
+    }
     setShowConfirmDelete(false);
     setDeleteId(null);
   };
@@ -134,6 +190,32 @@ export function CompaniesPage() {
     setShowConfirmDelete(false);
     setDeleteId(null);
   };
+
+  if (isLoading) {
+    return (
+      <ViewDefault>
+        <div className="container mx-auto px-2 sm:px-6 py-10">
+          <div className="animate-pulse">
+            <div className="h-8 w-48 bg-gray-200 rounded mb-6"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="h-96 bg-gray-200 rounded"></div>
+              <div className="h-96 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </ViewDefault>
+    );
+  }
+
+  if (error) {
+    return (
+      <ViewDefault>
+        <div className="container mx-auto px-2 sm:px-6 py-10">
+          <div className="text-red-500">Erro ao carregar empresas: {error.message}</div>
+        </div>
+      </ViewDefault>
+    );
+  }
 
   return (
     <ViewDefault>
@@ -226,7 +308,7 @@ export function CompaniesPage() {
                 />
               </FormField>
               <div className="flex gap-2 mt-4">
-                <Button type="submit" color="primary">
+                <Button type="submit" color="primary" disabled={isCreating || isUpdating}>
                   {editingId ? 'Salvar Alterações' : 'Adicionar Empresa'}
                 </Button>
                 {editingId && (
@@ -235,10 +317,9 @@ export function CompaniesPage() {
                     color="secondary"
                     onClick={() => {
                       setForm({
-                        id: '',
                         name: '',
                         cnpj: '',
-                        type: '',
+                        type: 'matriz',
                         foundationDate: '',
                         email: '',
                         phone: '',
@@ -258,10 +339,10 @@ export function CompaniesPage() {
           <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">Minhas Empresas</h2>
             <ul className="divide-y divide-border dark:divide-border-dark">
-              {companies.length === 0 && (
+              {companies?.length === 0 && (
                 <li className="text-gray-400 text-sm">Nenhuma empresa cadastrada.</li>
               )}
-              {companies.map((company) => (
+              {companies?.map((company) => (
                 <li key={company.id} className="flex items-center justify-between py-3">
                   <div>
                     <div className="font-medium text-text dark:text-text-dark">{company.name}</div>
@@ -270,10 +351,7 @@ export function CompaniesPage() {
                       {typeOptions.find((t) => t.value === company.type)?.label || '-'}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      Fundação:{' '}
-                      {company.foundationDate
-                        ? new Date(company.foundationDate).toLocaleDateString('pt-BR')
-                        : '-'}
+                      Fundação: {formatDate(company.foundationDate)}
                       {company.email && ` • E-mail: ${company.email}`}
                       {company.phone && ` • Tel: ${company.phone}`}
                     </div>
@@ -286,11 +364,21 @@ export function CompaniesPage() {
                       <div className="text-xs text-gray-400 italic">Obs: {company.notes}</div>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button size="sm" color="secondary" onClick={() => handleEdit(company.id)}>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      color="secondary"
+                      onClick={() => handleEdit(company.id)}
+                      disabled={isUpdating}
+                    >
                       Editar
                     </Button>
-                    <Button size="sm" color="danger" onClick={() => handleDelete(company.id)}>
+                    <Button
+                      size="sm"
+                      color="danger"
+                      onClick={() => handleDelete(company.id)}
+                      disabled={isDeleting}
+                    >
                       Excluir
                     </Button>
                   </div>
@@ -299,23 +387,17 @@ export function CompaniesPage() {
             </ul>
           </Card>
         </div>
-        <ConfirmModal
-          open={showConfirmDelete}
-          title="Confirmar exclusão"
-          description={
-            <>
-              Tem certeza que deseja excluir esta empresa?
-              <br />
-              Esta ação não poderá ser desfeita.
-            </>
-          }
-          confirmLabel="Excluir"
-          cancelLabel="Cancelar"
-          onConfirm={confirmDelete}
-          onCancel={cancelDelete}
-          danger
-        />
       </div>
+      <ConfirmModal
+        open={showConfirmDelete}
+        title="Confirmar exclusão"
+        description="Tem certeza que deseja excluir esta empresa? Esta ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        cancelLabel="Cancelar"
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        danger
+      />
     </ViewDefault>
   );
 }
