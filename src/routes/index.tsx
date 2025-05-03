@@ -1,8 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
-import { LoginPage } from '../features/auth/pages/LoginPage';
-import { RegisterPage } from '../features/auth/pages/RegisterPage';
-import { PasswordRecoveryPage } from '../features/auth/pages/PasswordRecoveryPage';
-import { ResetPasswordPage } from '../features/auth/pages/ResetPasswordPage';
+import { Login } from '@/pages/login';
+import { SignUpPage } from '@/pages/signup';
+import { ForgotPasswordPage } from '@/pages/forgot-password';
 import { ProtectedRoute } from '../features/auth/components/ProtectedRoute';
 import { Dashboard } from '../pages/dashboard/Dashboard';
 import { ErrorBoundary } from '../components/error/ErrorBoundary';
@@ -14,8 +13,6 @@ import { Reports } from '@/pages/reports';
 import { Profile } from '@/pages/profile';
 import { Settings } from '@/pages/settings';
 import { LandingPage } from '@/pages/landing';
-import { SignUpPage } from '@/pages/signup';
-import { ForgotPasswordPage } from '@/pages/forgot-password';
 import { AiClassificationPage } from '@/pages/ai-classification';
 import { ImportOfxPage } from '@/pages/import-ofx';
 import { BudgetPage } from '@/pages/budget';
@@ -35,20 +32,21 @@ export const router = createBrowserRouter([
   },
   {
     path: '/login',
-    element: <LoginPage />,
+    element: <Login />,
   },
   {
     path: '/register',
-    element: <RegisterPage />,
+    element: <SignUpPage />,
   },
   {
-    path: '/password-recovery',
-    element: <PasswordRecoveryPage />,
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />,
   },
-  {
-    path: '/reset-password/:token',
-    element: <ResetPasswordPage />,
-  },
+  // Reset de senha: adicionar quando o caminho correto for confirmado
+  // {
+  //   path: '/reset-password/:token',
+  //   element: <ResetPassword />,
+  // },
   {
     path: '/dashboard',
     element: (
@@ -208,11 +206,6 @@ export const router = createBrowserRouter([
   {
     path: '/support',
     element: <div>Ajuda e suporte</div>,
-  },
-  {
-    path: '/forgot-password',
-    element: <ForgotPasswordPage />,
-    errorElement: <ErrorPage />,
   },
   {
     path: '/ai/classification',
