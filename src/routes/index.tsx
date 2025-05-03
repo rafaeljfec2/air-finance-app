@@ -23,6 +23,7 @@ import { CreditCardsPage } from '@/pages/credit-cards';
 import { GoalsPage } from '@/pages/goals';
 import { IncomeSourcesPage } from '@/pages/income-sources';
 import { CompaniesPage } from '@/pages/companies';
+import { UsersPage } from '@/pages/users';
 
 export const router = createBrowserRouter([
   {
@@ -245,6 +246,17 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <CompaniesPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/users',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <UsersPage />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
