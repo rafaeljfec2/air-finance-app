@@ -4,13 +4,18 @@ import { z } from 'zod';
 // Validation schemas
 export const AccountSchema = z.object({
   id: z.string(),
-  name: z.string().min(2),
-  type: z.enum(['checking', 'savings', 'investment']),
-  balance: z.number(),
-  institution: z.string(),
-  agency: z.string(),
-  accountNumber: z.string(),
+  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  type: z.enum(['checking', 'savings', 'investment', 'credit_card', 'digital_wallet'], {
+    errorMap: () => ({ message: 'Tipo de conta inválido' }),
+  }),
+  balance: z.number().default(0),
+  institution: z.string().min(2, 'Instituição deve ter pelo menos 2 caracteres'),
+  agency: z.string().min(4, 'Agência deve ter pelo menos 4 dígitos'),
+  accountNumber: z.string().min(5, 'Número da conta deve ter pelo menos 5 dígitos'),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida'),
+  icon: z.string().min(1, 'Ícone é obrigatório'),
   userId: z.string(),
+  companyId: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });

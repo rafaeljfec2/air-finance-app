@@ -6,8 +6,8 @@ import {
   updateAccount,
   deleteAccount,
   getAccountBalance,
-  Account,
-  CreateAccount,
+  type Account,
+  type CreateAccount,
 } from '../services/accountService';
 
 export const useAccounts = () => {
@@ -51,6 +51,7 @@ export const useAccounts = () => {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account', id] });
+      queryClient.invalidateQueries({ queryKey: ['account-balance', id] });
     },
   });
 
@@ -59,6 +60,7 @@ export const useAccounts = () => {
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.removeQueries({ queryKey: ['account', id] });
+      queryClient.removeQueries({ queryKey: ['account-balance', id] });
     },
   });
 
@@ -74,5 +76,8 @@ export const useAccounts = () => {
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
+    createError: createMutation.error,
+    updateError: updateMutation.error,
+    deleteError: deleteMutation.error,
   };
 };
