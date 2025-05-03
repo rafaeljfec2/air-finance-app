@@ -19,6 +19,7 @@ import { BudgetPage } from '@/pages/budget';
 import { AccountsPage } from '@/pages/accounts';
 import { CategoriesPage } from '@/pages/categories';
 import { DependentsPage } from '@/pages/dependents';
+import { CreditCardsPage } from '@/pages/credit-cards';
 
 export const router = createBrowserRouter([
   {
@@ -200,6 +201,17 @@ export const router = createBrowserRouter([
   {
     path: '/ai/classification',
     element: <AiClassificationPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/credit-cards',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <CreditCardsPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
     errorElement: <ErrorPage />,
   },
   {

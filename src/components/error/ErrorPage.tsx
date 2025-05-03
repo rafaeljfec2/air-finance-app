@@ -1,13 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { ExclamationTriangleIcon, ArrowPathIcon, HomeIcon } from '@heroicons/react/24/outline';
 import { Logo } from '@/components/Logo';
-
+import { ViewDefault } from '@/layouts/ViewDefault';
 interface ErrorPageProps {
   error?: Error | null;
   code?: number;
 }
 
-export function ErrorPage({ error, code = 404 }: ErrorPageProps) {
+export function ErrorPage({ error, code = 404 }: Readonly<ErrorPageProps>) {
   const navigate = useNavigate();
 
   const errorMessages: Record<number, { title: string; message: string }> = {
@@ -27,55 +27,57 @@ export function ErrorPage({ error, code = 404 }: ErrorPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-background-dark flex items-center justify-center p-4">
-      <div className="max-w-md w-full text-center">
-        {/* Logo */}
-        <Logo className="mx-auto mb-8" />
+    <ViewDefault>
+      <div className="min-h-screen bg-background dark:bg-background-dark flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center">
+          {/* Logo */}
+          <Logo className="mx-auto mb-8" />
 
-        {/* Ícone de Erro */}
-        <div className="mx-auto h-24 w-24 text-yellow-500 mb-8">
-          <ExclamationTriangleIcon />
-        </div>
-
-        {/* Código do Erro */}
-        <h1 className="text-6xl font-bold text-text dark:text-text-dark mb-4">{code}</h1>
-
-        {/* Título do Erro */}
-        <h2 className="text-2xl font-semibold text-text dark:text-text-dark mb-4">
-          {errorInfo.title}
-        </h2>
-
-        {/* Mensagem de Erro */}
-        <p className="text-gray-600 dark:text-gray-400 mb-8">{errorInfo.message}</p>
-
-        {/* Detalhes Técnicos (apenas em desenvolvimento) */}
-        {process.env.NODE_ENV === 'development' && error && (
-          <div className="mb-8 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
-            <p className="text-sm font-mono text-red-600 dark:text-red-400 break-all">
-              {error.message}
-            </p>
+          {/* Ícone de Erro */}
+          <div className="mx-auto h-24 w-24 text-yellow-500 mb-8">
+            <ExclamationTriangleIcon />
           </div>
-        )}
 
-        {/* Ações */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900 w-full sm:w-auto"
-          >
-            <HomeIcon className="h-5 w-5 mr-2" />
-            Voltar ao início
-          </button>
+          {/* Código do Erro */}
+          <h1 className="text-6xl font-bold text-text dark:text-text-dark mb-4">{code}</h1>
 
-          <button
-            onClick={() => window.location.reload()}
-            className="flex items-center justify-center px-4 py-2 text-sm font-medium text-text dark:text-text-dark bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900 w-full sm:w-auto"
-          >
-            <ArrowPathIcon className="h-5 w-5 mr-2" />
-            Tentar novamente
-          </button>
+          {/* Título do Erro */}
+          <h2 className="text-2xl font-semibold text-text dark:text-text-dark mb-4">
+            {errorInfo.title}
+          </h2>
+
+          {/* Mensagem de Erro */}
+          <p className="text-gray-600 dark:text-gray-400 mb-8">{errorInfo.message}</p>
+
+          {/* Detalhes Técnicos (apenas em desenvolvimento) */}
+          {process.env.NODE_ENV === 'development' && error && (
+            <div className="mb-8 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+              <p className="text-sm font-mono text-red-600 dark:text-red-400 break-all">
+                {error.message}
+              </p>
+            </div>
+          )}
+
+          {/* Ações */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900 w-full sm:w-auto"
+            >
+              <HomeIcon className="h-5 w-5 mr-2" />
+              Voltar ao início
+            </button>
+
+            <button
+              onClick={() => window.location.reload()}
+              className="flex items-center justify-center px-4 py-2 text-sm font-medium text-text dark:text-text-dark bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900 w-full sm:w-auto"
+            >
+              <ArrowPathIcon className="h-5 w-5 mr-2" />
+              Tentar novamente
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </ViewDefault>
   );
 }
