@@ -16,11 +16,23 @@ import ForgotPasswordPage from '@/pages/forgot-password';
 import AiClassificationPage from '@/pages/ai-classification';
 import ImportOfxPage from '@/pages/import-ofx';
 import Budget from '@/pages/budget';
+import Accounts from '@/pages/accounts';
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/accounts',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <Accounts />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
     errorElement: <ErrorPage />,
   },
   {
