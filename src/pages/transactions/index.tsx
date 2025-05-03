@@ -1,60 +1,56 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ViewDefault } from '@/layouts/ViewDefault'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
-import { Card } from '@/components/ui/card'
-import {
-  Receipt,
-  Search,
-  Plus,
-  Calendar,
-  Filter,
-  Download,
-} from 'lucide-react'
-import { TransactionGrid } from '@/components/transactions/TransactionGrid'
-import { mockTransactions } from '@/mocks/transactions'
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
+import { Card } from '@/components/ui/card';
+import { Receipt, Search, Plus, Calendar, Filter, Download } from 'lucide-react';
+import { TransactionGrid } from '@/components/transactions/TransactionGrid';
+import { mockTransactions } from '@/mocks/transactions';
 
 export function Transactions() {
-  const navigate = useNavigate()
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedPeriod, setSelectedPeriod] = useState('all')
-  const [selectedType, setSelectedType] = useState('all')
-  const [isLoading, setIsLoading] = useState(true)
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPeriod, setSelectedPeriod] = useState('all');
+  const [selectedType, setSelectedType] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
 
   // Simular loading
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1500)
+      setIsLoading(false);
+    }, 1500);
 
-    return () => clearTimeout(timer)
-  }, [])
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredTransactions = mockTransactions
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .filter((transaction) => {
-      const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesType = selectedType === 'all' || 
+      const matchesSearch = transaction.description
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const matchesType =
+        selectedType === 'all' ||
         (selectedType === 'RECEITA' && transaction.type === 'INCOME') ||
-        (selectedType === 'DESPESA' && transaction.type === 'EXPENSE')
-      return matchesSearch && matchesType
-    })
+        (selectedType === 'DESPESA' && transaction.type === 'EXPENSE');
+      return matchesSearch && matchesType;
+    });
 
   // Calcular saldo acumulado para cada transação
-  let saldoAcumulado = 0
-  const transactionsWithBalance = filteredTransactions.map(transaction => {
-    const credit = transaction.type === 'INCOME' ? transaction.amount : 0
-    const debit = transaction.type === 'EXPENSE' ? transaction.amount : 0
-    saldoAcumulado += credit - debit
+  let saldoAcumulado = 0;
+  const transactionsWithBalance = filteredTransactions.map((transaction) => {
+    const credit = transaction.type === 'INCOME' ? transaction.amount : 0;
+    const debit = transaction.type === 'EXPENSE' ? transaction.amount : 0;
+    saldoAcumulado += credit - debit;
     return {
       ...transaction,
       credit,
       debit,
-      balance: saldoAcumulado
-    }
-  })
+      balance: saldoAcumulado,
+    };
+  });
 
   return (
     <ViewDefault>
@@ -65,10 +61,10 @@ export function Transactions() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <Receipt className="h-8 w-8 text-primary-400" />
-                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Transações</h1>
+                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Fluxo de Caixa</h1>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Gerencie todas as suas transações financeiras
+                Gerencie seu fluxo de caixa
               </p>
             </div>
             <Button
@@ -121,8 +117,8 @@ export function Transactions() {
                 </div>
                 <Button
                   onClick={() => {
-                    setIsLoading(true)
-                    setTimeout(() => setIsLoading(false), 1000)
+                    setIsLoading(true);
+                    setTimeout(() => setIsLoading(false), 1000);
                   }}
                   className="bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
                 >
@@ -150,5 +146,5 @@ export function Transactions() {
         </div>
       </div>
     </ViewDefault>
-  )
-} 
+  );
+}

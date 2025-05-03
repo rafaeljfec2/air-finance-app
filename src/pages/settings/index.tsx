@@ -6,7 +6,7 @@ import { Settings as SettingsIcon } from 'lucide-react';
 
 export function Settings() {
   const navigate = useNavigate();
-  const { 
+  const {
     theme,
     toggleTheme,
     notifications,
@@ -17,7 +17,7 @@ export function Settings() {
     toggleBiometrics,
     closingDay,
     setClosingDay,
-    appVersion
+    appVersion,
   } = useSettings();
 
   return (
@@ -40,16 +40,18 @@ export function Settings() {
           {/* Personalização */}
           <section className="bg-card dark:bg-card-dark rounded-lg shadow mb-8">
             <div className="px-4 py-5 sm:px-6">
-              <h2 className="text-lg font-medium text-text dark:text-text-dark">
-                Personalização
-              </h2>
+              <h2 className="text-lg font-medium text-text dark:text-text-dark">Personalização</h2>
             </div>
             <div className="border-t border-border dark:border-border-dark">
               <div className="divide-y divide-border dark:divide-border-dark">
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="SunIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
+                      <Icon
+                        name="SunIcon"
+                        className="text-gray-500 dark:text-gray-400 mr-3"
+                        size={20}
+                      />
                       <div>
                         <p className="text-sm font-medium text-text dark:text-text-dark">Tema</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -74,9 +76,15 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="BellIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
+                      <Icon
+                        name="BellIcon"
+                        className="text-gray-500 dark:text-gray-400 mr-3"
+                        size={20}
+                      />
                       <div>
-                        <p className="text-sm font-medium text-text dark:text-text-dark">Notificações</p>
+                        <p className="text-sm font-medium text-text dark:text-text-dark">
+                          Notificações
+                        </p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           {notifications ? 'Ativadas' : 'Desativadas'}
                         </p>
@@ -99,7 +107,11 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="CurrencyDollarIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
+                      <Icon
+                        name="CurrencyDollarIcon"
+                        className="text-gray-500 dark:text-gray-400 mr-3"
+                        size={20}
+                      />
                       <div>
                         <p className="text-sm font-medium text-text dark:text-text-dark">Moeda</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">{currency}</p>
@@ -129,9 +141,15 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="FingerPrintIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
+                      <Icon
+                        name="FingerPrintIcon"
+                        className="text-gray-500 dark:text-gray-400 mr-3"
+                        size={20}
+                      />
                       <div>
-                        <p className="text-sm font-medium text-text dark:text-text-dark">Segurança</p>
+                        <p className="text-sm font-medium text-text dark:text-text-dark">
+                          Segurança
+                        </p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           {biometrics ? 'Biometria ativada' : 'Biometria desativada'}
                         </p>
@@ -154,9 +172,15 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="ArrowDownTrayIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
+                      <Icon
+                        name="ArrowDownTrayIcon"
+                        className="text-gray-500 dark:text-gray-400 mr-3"
+                        size={20}
+                      />
                       <div>
-                        <p className="text-sm font-medium text-text dark:text-text-dark">Exportar dados</p>
+                        <p className="text-sm font-medium text-text dark:text-text-dark">
+                          Exportar dados
+                        </p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           Baixar suas informações
                         </p>
@@ -177,53 +201,99 @@ export function Settings() {
           {/* Gerenciamento */}
           <section className="bg-card dark:bg-card-dark rounded-lg shadow mb-8">
             <div className="px-4 py-5 sm:px-6">
-              <h2 className="text-lg font-medium text-text dark:text-text-dark">
-                Gerenciamento
-              </h2>
+              <h2 className="text-lg font-medium text-text dark:text-text-dark">Gerenciamento</h2>
             </div>
             <div className="border-t border-border dark:border-border-dark">
               <div className="divide-y divide-border dark:divide-border-dark">
-                <div className="px-4 py-5 sm:px-6 hover:bg-background dark:hover:bg-background-dark cursor-pointer"
-                  onClick={() => navigate('/settings/categories')}>
+                <div
+                  className="px-4 py-5 sm:px-6 hover:bg-background dark:hover:bg-background-dark cursor-pointer"
+                  onClick={() => navigate('/settings/categories')}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="TagIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
-                      <p className="text-sm font-medium text-text dark:text-text-dark">Categorias</p>
+                      <Icon
+                        name="TagIcon"
+                        className="text-gray-500 dark:text-gray-400 mr-3"
+                        size={20}
+                      />
+                      <p className="text-sm font-medium text-text dark:text-text-dark">
+                        Categorias
+                      </p>
                     </div>
-                    <Icon name="ChevronRightIcon" className="text-gray-500 dark:text-gray-400" size={20} />
+                    <Icon
+                      name="ChevronRightIcon"
+                      className="text-gray-500 dark:text-gray-400"
+                      size={20}
+                    />
                   </div>
                 </div>
 
-                <div className="px-4 py-5 sm:px-6 hover:bg-background dark:hover:bg-background-dark cursor-pointer"
-                  onClick={() => navigate('/settings/accounts')}>
+                <div
+                  className="px-4 py-5 sm:px-6 hover:bg-background dark:hover:bg-background-dark cursor-pointer"
+                  onClick={() => navigate('/settings/accounts')}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="CreditCardIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
-                      <p className="text-sm font-medium text-text dark:text-text-dark">Contas bancárias</p>
+                      <Icon
+                        name="CreditCardIcon"
+                        className="text-gray-500 dark:text-gray-400 mr-3"
+                        size={20}
+                      />
+                      <p className="text-sm font-medium text-text dark:text-text-dark">
+                        Contas bancárias
+                      </p>
                     </div>
-                    <Icon name="ChevronRightIcon" className="text-gray-500 dark:text-gray-400" size={20} />
+                    <Icon
+                      name="ChevronRightIcon"
+                      className="text-gray-500 dark:text-gray-400"
+                      size={20}
+                    />
                   </div>
                 </div>
 
-                <div className="px-4 py-5 sm:px-6 hover:bg-background dark:hover:bg-background-dark cursor-pointer"
-                  onClick={() => navigate('/settings/cards')}>
+                <div
+                  className="px-4 py-5 sm:px-6 hover:bg-background dark:hover:bg-background-dark cursor-pointer"
+                  onClick={() => navigate('/settings/cards')}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="CreditCardIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
-                      <p className="text-sm font-medium text-text dark:text-text-dark">Cartões de crédito</p>
+                      <Icon
+                        name="CreditCardIcon"
+                        className="text-gray-500 dark:text-gray-400 mr-3"
+                        size={20}
+                      />
+                      <p className="text-sm font-medium text-text dark:text-text-dark">
+                        Cartões de crédito
+                      </p>
                     </div>
-                    <Icon name="ChevronRightIcon" className="text-gray-500 dark:text-gray-400" size={20} />
+                    <Icon
+                      name="ChevronRightIcon"
+                      className="text-gray-500 dark:text-gray-400"
+                      size={20}
+                    />
                   </div>
                 </div>
 
-                <div className="px-4 py-5 sm:px-6 hover:bg-background dark:hover:bg-background-dark cursor-pointer"
-                  onClick={() => navigate('/settings/goals')}>
+                <div
+                  className="px-4 py-5 sm:px-6 hover:bg-background dark:hover:bg-background-dark cursor-pointer"
+                  onClick={() => navigate('/settings/goals')}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="FlagIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
-                      <p className="text-sm font-medium text-text dark:text-text-dark">Metas financeiras</p>
+                      <Icon
+                        name="FlagIcon"
+                        className="text-gray-500 dark:text-gray-400 mr-3"
+                        size={20}
+                      />
+                      <p className="text-sm font-medium text-text dark:text-text-dark">
+                        Metas financeiras
+                      </p>
                     </div>
-                    <Icon name="ChevronRightIcon" className="text-gray-500 dark:text-gray-400" size={20} />
+                    <Icon
+                      name="ChevronRightIcon"
+                      className="text-gray-500 dark:text-gray-400"
+                      size={20}
+                    />
                   </div>
                 </div>
               </div>
@@ -242,9 +312,15 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon name="CalendarIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
+                      <Icon
+                        name="CalendarIcon"
+                        className="text-gray-500 dark:text-gray-400 mr-3"
+                        size={20}
+                      />
                       <div>
-                        <p className="text-sm font-medium text-text dark:text-text-dark">Dia de fechamento</p>
+                        <p className="text-sm font-medium text-text dark:text-text-dark">
+                          Dia de fechamento
+                        </p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           Dia {closingDay} de cada mês
                         </p>
@@ -265,20 +341,83 @@ export function Settings() {
           {/* Sobre */}
           <section className="bg-card dark:bg-card-dark rounded-lg shadow">
             <div className="px-4 py-5 sm:px-6">
-              <h2 className="text-lg font-medium text-text dark:text-text-dark">
-                Sobre
-              </h2>
+              <h2 className="text-lg font-medium text-text dark:text-text-dark">Sobre</h2>
             </div>
             <div className="border-t border-border dark:border-border-dark">
               <div className="px-4 py-5 sm:px-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <Icon name="InformationCircleIcon" className="text-gray-500 dark:text-gray-400 mr-3" size={20} />
+                    <Icon
+                      name="InformationCircleIcon"
+                      className="text-gray-500 dark:text-gray-400 mr-3"
+                      size={20}
+                    />
                     <div>
-                      <p className="text-sm font-medium text-text dark:text-text-dark">Versão do aplicativo</p>
+                      <p className="text-sm font-medium text-text dark:text-text-dark">
+                        Versão do aplicativo
+                      </p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">{appVersion}</p>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Integrações */}
+          <section className="bg-card dark:bg-card-dark rounded-lg shadow mt-8">
+            <div className="px-4 py-5 sm:px-6">
+              <h2 className="text-lg font-medium text-text dark:text-text-dark">Integrações</h2>
+            </div>
+            <div className="border-t border-border dark:border-border-dark">
+              <div className="divide-y divide-border dark:divide-border-dark">
+                <div className="px-4 py-5 sm:px-6">
+                  <form
+                    className="flex flex-col gap-4 max-w-md"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      // TODO: Implementar lógica de salvamento seguro
+                    }}
+                  >
+                    <label
+                      className="text-sm font-medium text-text dark:text-text-dark"
+                      htmlFor="chatgpt-api-key"
+                    >
+                      API Key do ChatGPT
+                    </label>
+                    <input
+                      id="chatgpt-api-key"
+                      name="chatgptApiKey"
+                      type="password"
+                      autoComplete="off"
+                      className="input input-bordered w-full"
+                      placeholder="Insira sua chave da OpenAI"
+                      // TODO: value, onChange, state
+                    />
+                    <label
+                      className="text-sm font-medium text-text dark:text-text-dark"
+                      htmlFor="chatgpt-endpoint"
+                    >
+                      Endpoint (opcional)
+                    </label>
+                    <input
+                      id="chatgpt-endpoint"
+                      name="chatgptEndpoint"
+                      type="text"
+                      autoComplete="off"
+                      className="input input-bordered w-full"
+                      placeholder="https://api.openai.com/v1/chat/completions"
+                      // TODO: value, onChange, state
+                    />
+                    <button type="submit" className="btn btn-primary mt-2">
+                      Salvar configurações
+                    </button>
+                    {/* TODO: Adicionar feedback visual de sucesso/erro */}
+                  </form>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Sua chave será usada apenas para conectar ao ChatGPT. Nunca compartilhe sua
+                    chave com terceiros.
+                  </p>
                 </div>
               </div>
             </div>
@@ -287,4 +426,4 @@ export function Settings() {
       </div>
     </ViewDefault>
   );
-} 
+}

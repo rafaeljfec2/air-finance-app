@@ -10,13 +10,40 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { Settings } from '@/pages/settings';
-import {LandingPage} from '@/pages/landing';
-import {SignUpPage} from '@/pages/signup';
+import { LandingPage } from '@/pages/landing';
+import { SignUpPage } from '@/pages/signup';
 import ForgotPasswordPage from '@/pages/forgot-password';
+import AiClassificationPage from '@/pages/ai-classification';
+import ImportOfxPage from '@/pages/import-ofx';
+import Budget from '@/pages/budget';
+import Accounts from '@/pages/accounts';
+import Categories from '@/pages/categories';
+
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/categories',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <Categories />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/accounts',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <Accounts />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
     errorElement: <ErrorPage />,
   },
   {
@@ -35,6 +62,28 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <Profile />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/import-ofx',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <ImportOfxPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/budget',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <Budget />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
@@ -134,6 +183,11 @@ export const router = createBrowserRouter([
   {
     path: '/forgot-password',
     element: <ForgotPasswordPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/ai/classification',
+    element: <AiClassificationPage />,
     errorElement: <ErrorPage />,
   },
   {

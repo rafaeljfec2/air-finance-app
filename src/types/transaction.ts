@@ -39,9 +39,14 @@ export interface Transaction {
   balance?: number;
   createdAt: string;
   updatedAt: string;
+  dependent?: string;
+  installmentCount?: number;
 }
 
-export type TransactionInput = Omit<Transaction, 'id' | 'createdAt' | 'updatedAt' | 'category' | 'account' | 'credit' | 'debit' | 'balance'>;
+export type TransactionInput = Omit<
+  Transaction,
+  'id' | 'createdAt' | 'updatedAt' | 'category' | 'account' | 'credit' | 'debit' | 'balance'
+>;
 
 export interface TransactionFilters {
   type?: TransactionType;
