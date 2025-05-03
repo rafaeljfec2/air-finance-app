@@ -22,8 +22,6 @@ const bankTypes = [
   { value: 'outro', label: 'Outro', icon: BuildingLibraryIcon },
 ] as const;
 
-type BankType = (typeof bankTypes)[number]['value'];
-
 const dueDates = Array.from({ length: 31 }, (_, i) => ({
   value: i + 1,
   label: `${i + 1}${i + 1 === 1 ? 'º' : 'º'} dia`,

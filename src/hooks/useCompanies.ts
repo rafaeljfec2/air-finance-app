@@ -9,6 +9,8 @@ import {
   type CreateCompany,
 } from '../services/companyService';
 
+export type { Company };
+
 export const useCompanies = () => {
   const queryClient = useQueryClient();
 

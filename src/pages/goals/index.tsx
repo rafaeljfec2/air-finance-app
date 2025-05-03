@@ -271,7 +271,6 @@ export function GoalsPage() {
                 const progress = calculateProgress(goal.currentAmount, goal.targetAmount);
                 const { data: progressData } = getProgress(goal.id);
                 const daysUntilDeadline = progressData?.daysUntilDeadline || 0;
-                const remainingAmount = progressData?.remainingAmount || 0;
 
                 return (
                   <li key={goal.id} className="py-4">

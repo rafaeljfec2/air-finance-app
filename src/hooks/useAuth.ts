@@ -7,7 +7,7 @@ import {
   requestPasswordRecovery,
   User,
 } from '../services/authService';
-import { setToken, removeToken } from '../utils/auth';
+import { authUtils } from '../utils/auth';
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
@@ -21,7 +21,7 @@ export const useAuth = () => {
   const loginMutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      setToken(data.token);
+      authUtils.setToken(data.token);
       queryClient.setQueryData(['user'], data.user);
     },
   });
@@ -29,7 +29,7 @@ export const useAuth = () => {
   const registerMutation = useMutation({
     mutationFn: register,
     onSuccess: (data) => {
-      setToken(data.token);
+      authUtils.setToken(data.token);
       queryClient.setQueryData(['user'], data.user);
     },
   });
@@ -37,7 +37,7 @@ export const useAuth = () => {
   const logoutMutation = useMutation({
     mutationFn: logout,
     onSuccess: () => {
-      removeToken();
+      authUtils.removeToken();
       queryClient.removeQueries({ queryKey: ['user'] });
     },
   });
