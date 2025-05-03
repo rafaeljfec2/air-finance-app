@@ -1,8 +1,8 @@
 import { RouterProvider } from 'react-router-dom';
-import { router } from '@/routes';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { router } from './routes';
 import { ThemeProvider } from './components/ThemeProvider';
 import { Toaster } from 'sonner';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { CompanyProvider } from '@/contexts/companyContext';
 
@@ -10,9 +10,8 @@ import { CompanyProvider } from '@/contexts/companyContext';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: false,
       refetchOnWindowFocus: false,
-      staleTime: 1000 * 60 * 5, // 5 minutos
     },
   },
 });

@@ -1,14 +1,18 @@
 import { createBrowserRouter } from 'react-router-dom';
-import { Login } from '@/pages/login';
-import { Dashboard } from '@/pages/dashboard/Dashboard';
+import { LoginPage } from '../features/auth/pages/LoginPage';
+import { RegisterPage } from '../features/auth/pages/RegisterPage';
+import { PasswordRecoveryPage } from '../features/auth/pages/PasswordRecoveryPage';
+import { ResetPasswordPage } from '../features/auth/pages/ResetPasswordPage';
+import { ProtectedRoute } from '../features/auth/components/ProtectedRoute';
+import { Dashboard } from '../pages/dashboard/Dashboard';
+import { ErrorBoundary } from '../components/error/ErrorBoundary';
+import { ErrorPage } from '../components/error/ErrorPage';
+import { DashboardPage } from '@/pages/DashboardPage';
 import { Statement } from '@/pages/statement';
 import { NewTransaction } from '@/pages/transactions/new';
 import { Transactions } from '@/pages/transactions';
 import { Reports } from '@/pages/reports';
 import { Profile } from '@/pages/profile';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { ErrorBoundary } from '@/components/error/ErrorBoundary';
-import { ErrorPage } from '@/components/error/ErrorPage';
 import { Settings } from '@/pages/settings';
 import { LandingPage } from '@/pages/landing';
 import { SignUpPage } from '@/pages/signup';
@@ -29,7 +33,43 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingPage />,
+  },
+  {
+    path: '/dashboard',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
     errorElement: <ErrorPage />,
+  },
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
+    path: '/register',
+    element: <RegisterPage />,
+  },
+  {
+    path: '/password-recovery',
+    element: <PasswordRecoveryPage />,
+  },
+  {
+    path: '/reset-password/:token',
+    element: <ResetPasswordPage />,
+  },
+  {
+    path: '/dashboard',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <DashboardPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
   },
   {
     path: '/dependents',
@@ -69,11 +109,6 @@ export const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
-    path: '/auth/login',
-    element: <Login />,
-    errorElement: <ErrorPage />,
-  },
-  {
     path: '/profile',
     element: (
       <ErrorBoundary>
@@ -101,17 +136,6 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <BudgetPage />
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/dashboard',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Dashboard />
         </ProtectedRoute>
       </ErrorBoundary>
     ),

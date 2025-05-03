@@ -1,51 +1,25 @@
 import axios from 'axios';
-import { getToken } from '@/utils/auth';
+import { authUtils } from '../utils/auth';
 
-const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+export const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
-// Request interceptor
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = getToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
+apiClient.interceptors.request.use(async (config) => {
+  const token = await authUtils.getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-// Response interceptor
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response) {
-      // Handle specific error status codes
-      switch (error.response.status) {
-        case 401:
-          // Handle unauthorized access
-          break;
-        case 403:
-          // Handle forbidden access
-          break;
-        case 404:
-          // Handle not found
-          break;
-        default:
-          // Handle other errors
-          break;
-      }
+  async (error) => {
+    if (error.response?.status === 401) {
+      await authUtils.clearAuth();
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   },
 );
-
-export default apiClient;
