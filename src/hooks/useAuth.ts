@@ -6,9 +6,6 @@ import {
   getCurrentUser,
   requestPasswordRecovery,
   User,
-  LoginData,
-  RegisterData,
-  PasswordRecoveryData,
 } from '../services/authService';
 import { setToken, removeToken } from '../utils/auth';
 

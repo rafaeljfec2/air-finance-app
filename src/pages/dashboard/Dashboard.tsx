@@ -68,6 +68,7 @@ const mockData: DashboardData = {
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      companyId: '1',
     },
     {
       id: '2',
@@ -92,6 +93,7 @@ const mockData: DashboardData = {
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      companyId: '1',
     },
     {
       id: '3',
@@ -116,6 +118,7 @@ const mockData: DashboardData = {
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      companyId: '1',
     },
   ],
 };

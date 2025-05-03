@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import apiClient from './apiClient';
+import { apiClient } from './apiClient';
 
 export const DependentSchema = z.object({
   id: z.string(),

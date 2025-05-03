@@ -7,7 +7,6 @@ import { ProtectedRoute } from '../features/auth/components/ProtectedRoute';
 import { Dashboard } from '../pages/dashboard/Dashboard';
 import { ErrorBoundary } from '../components/error/ErrorBoundary';
 import { ErrorPage } from '../components/error/ErrorPage';
-import { DashboardPage } from '@/pages/DashboardPage';
 import { Statement } from '@/pages/statement';
 import { NewTransaction } from '@/pages/transactions/new';
 import { Transactions } from '@/pages/transactions';
@@ -35,17 +34,6 @@ export const router = createBrowserRouter([
     element: <LandingPage />,
   },
   {
-    path: '/dashboard',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Dashboard />
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
     path: '/login',
     element: <LoginPage />,
   },
@@ -66,7 +54,7 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-          <DashboardPage />
+          <Dashboard />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
