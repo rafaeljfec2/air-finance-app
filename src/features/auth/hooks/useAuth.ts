@@ -10,34 +10,67 @@ import {
   VerifyEmailData,
   AuthResponse,
   User,
+  AuthError,
 } from '../types/auth.types';
+import { useEffect, useState } from 'react';
+
+const REFRESH_TOKEN_INTERVAL = 5 * 60 * 1000; // 5 minutos em milissegundos
 
 export function useAuth() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { updateAuthState, clearAuth } = useAuthStore();
+  const { setUser, setToken, clearAuth, token, refreshToken } = useAuthStore();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { data: user, isLoading: isLoadingUser } = useQuery<User>({
     queryKey: ['currentUser'],
     queryFn: authService.getCurrentUser,
+    enabled: !!token,
     retry: false,
-    staleTime: 1000 * 60 * 5, // 5 minutos
   });
 
   const handleAuthSuccess = (data: AuthResponse) => {
-    updateAuthState(data.user, data.token);
+    setUser(data.user);
+    setToken(data.accessToken, data.refreshToken);
     queryClient.setQueryData(['currentUser'], data.user);
     navigate('/dashboard');
   };
 
   const loginMutation = useMutation<AuthResponse, Error, LoginData>({
-    mutationFn: authService.login,
+    mutationFn: async (data: LoginData) => {
+      if (authService.isAccountLocked(data.email)) {
+        const remainingTime = authService.getRemainingLockoutTime(data.email);
+        throw new Error(
+          `Conta bloqueada. Tente novamente em ${Math.ceil(remainingTime / 60000)} minutos.`,
+        );
+      }
+
+      try {
+        const response = await authService.login(data);
+        authService.resetLoginAttempts(data.email);
+        return response;
+      } catch (error) {
+        authService.incrementLoginAttempts(data.email);
+        throw error;
+      }
+    },
     onSuccess: handleAuthSuccess,
   });
 
   const registerMutation = useMutation<AuthResponse, Error, RegisterData>({
     mutationFn: authService.register,
     onSuccess: handleAuthSuccess,
+  });
+
+  const refreshTokenMutation = useMutation({
+    mutationFn: authService.refreshToken,
+    onSuccess: (data) => {
+      setToken(data.accessToken, data.refreshToken);
+    },
+    onError: () => {
+      clearAuth();
+      navigate('/login');
+    },
   });
 
   const passwordRecoveryMutation = useMutation<void, Error, PasswordRecoveryData>({
@@ -70,6 +103,25 @@ export function useAuth() {
     mutationFn: authService.resendVerificationEmail,
   });
 
+  useEffect(() => {
+    if (!token || !refreshToken) return;
+
+    const refreshTokenInterval = setInterval(async () => {
+      if (isRefreshing) return;
+
+      try {
+        setIsRefreshing(true);
+        await refreshTokenMutation.mutateAsync(refreshToken);
+      } catch (error) {
+        console.error('Erro ao atualizar token:', error);
+      } finally {
+        setIsRefreshing(false);
+      }
+    }, REFRESH_TOKEN_INTERVAL);
+
+    return () => clearInterval(refreshTokenInterval);
+  }, [token, refreshToken, isRefreshing]);
+
   const logout = async () => {
     try {
       await authService.logout();
@@ -84,26 +136,25 @@ export function useAuth() {
   return {
     user,
     isLoadingUser,
-    isAuthenticated: !!user,
-    login: (data: LoginData) => loginMutation.mutate(data),
+    isAuthenticated: !!token,
+    login: loginMutation.mutate,
     isLoggingIn: loginMutation.isPending,
-    loginError: loginMutation.error,
-    register: (data: RegisterData) => registerMutation.mutate(data),
+    loginError: loginMutation.error as AuthError,
+    register: registerMutation.mutate,
     isRegistering: registerMutation.isPending,
-    registerError: registerMutation.error,
-    requestPasswordRecovery: (data: PasswordRecoveryData) => passwordRecoveryMutation.mutate(data),
+    registerError: registerMutation.error as AuthError,
+    requestPasswordRecovery: passwordRecoveryMutation.mutate,
     isRequestingPasswordRecovery: passwordRecoveryMutation.isPending,
-    passwordRecoveryError: passwordRecoveryMutation.error,
-    resetPassword: (data: ResetPasswordData, token: string) =>
-      resetPasswordMutation.mutate({ data, token }),
+    passwordRecoveryError: passwordRecoveryMutation.error as AuthError,
+    resetPassword: resetPasswordMutation.mutate,
     isResettingPassword: resetPasswordMutation.isPending,
-    resetPasswordError: resetPasswordMutation.error,
-    verifyEmail: (data: VerifyEmailData) => verifyEmailMutation.mutate(data),
+    resetPasswordError: resetPasswordMutation.error as AuthError,
+    verifyEmail: verifyEmailMutation.mutate,
     isVerifyingEmail: verifyEmailMutation.isPending,
-    verifyEmailError: verifyEmailMutation.error,
-    resendVerificationEmail: (email: string) => resendVerificationEmailMutation.mutate(email),
+    verifyEmailError: verifyEmailMutation.error as AuthError,
+    resendVerificationEmail: resendVerificationEmailMutation.mutate,
     isResendingVerificationEmail: resendVerificationEmailMutation.isPending,
-    resendVerificationEmailError: resendVerificationEmailMutation.error,
+    resendVerificationEmailError: resendVerificationEmailMutation.error as AuthError,
     logout,
   };
 }
