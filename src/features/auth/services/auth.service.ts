@@ -1,40 +1,46 @@
-import { apiClient } from '@/services/apiClient';
+import { api } from '@/services/api';
 import {
   LoginData,
   RegisterData,
+  AuthResponse,
   PasswordRecoveryData,
   ResetPasswordData,
-  AuthResponse,
-  User,
+  VerifyEmailData,
 } from '../types/auth.types';
 
-class AuthService {
-  async login(data: LoginData): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>('/auth/login', data);
+export const authService = {
+  login: async (data: LoginData): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/auth/login', data);
     return response.data;
-  }
+  },
 
-  async register(data: RegisterData): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>('/auth/register', data);
+  register: async (data: RegisterData): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/auth/register', data);
     return response.data;
-  }
+  },
 
-  async requestPasswordRecovery(data: PasswordRecoveryData): Promise<void> {
-    await apiClient.post('/auth/password-recovery', data);
-  }
+  logout: async (): Promise<void> => {
+    await api.post('/auth/logout');
+  },
 
-  async resetPassword(data: ResetPasswordData, token: string): Promise<void> {
-    await apiClient.post(`/auth/reset-password?token=${token}`, data);
-  }
+  getCurrentUser: async (): Promise<AuthResponse['user']> => {
+    const response = await api.get<AuthResponse>('/auth/me');
+    return response.data.user;
+  },
 
-  async logout(): Promise<void> {
-    await apiClient.post('/auth/logout');
-  }
+  requestPasswordRecovery: async (data: PasswordRecoveryData): Promise<void> => {
+    await api.post('/auth/forgot-password', data);
+  },
 
-  async getCurrentUser(): Promise<User> {
-    const response = await apiClient.get<User>('/auth/me');
-    return response.data;
-  }
-}
+  resetPassword: async (data: ResetPasswordData, token: string): Promise<void> => {
+    await api.post(`/auth/reset-password/${token}`, data);
+  },
 
-export const authService = new AuthService();
+  verifyEmail: async (data: VerifyEmailData): Promise<void> => {
+    await api.post('/auth/verify-email', data);
+  },
+
+  resendVerificationEmail: async (email: string): Promise<void> => {
+    await api.post('/auth/resend-verification-email', { email });
+  },
+};

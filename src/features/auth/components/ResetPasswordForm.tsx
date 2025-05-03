@@ -1,56 +1,83 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ResetPasswordData, resetPasswordSchema } from '../types/auth.types';
+import React, { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { FormInput } from '@/components/FormInput';
+import { FormButton } from '@/components/FormButton';
+import { Alert } from '@/components/Alert';
 import { useAuth } from '../hooks/useAuth';
-import { FormInput } from '../../../components/FormInput';
-import { FormButton } from '../../../components/FormButton';
-import { Alert } from '../../../components/Alert';
-import { useParams } from 'react-router-dom';
+import { ResetPasswordData } from '../types/auth.types';
 
-export function ResetPasswordForm() {
+export const ResetPasswordForm: React.FC = () => {
+  const navigate = useNavigate();
   const { token } = useParams<{ token: string }>();
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const { resetPassword, isResettingPassword, resetPasswordError } = useAuth();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ResetPasswordData>({
-    resolver: zodResolver(resetPasswordSchema),
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
 
-  const onSubmit = (data: ResetPasswordData) => {
-    if (!token) {
+    if (password !== confirmPassword) {
+      setError('As senhas não coincidem');
       return;
     }
-    resetPassword(data, token);
+
+    if (!token) {
+      setError('Token inválido');
+      return;
+    }
+
+    try {
+      const data: ResetPasswordData = { password, confirmPassword };
+      await resetPassword(data, token);
+      navigate('/login?reset=success');
+    } catch (err) {
+      setError('Erro ao redefinir senha. Por favor, tente novamente.');
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && <Alert type="error" message={error} />}
       {resetPasswordError && <Alert type="error" message={resetPasswordError.message} />}
 
       <FormInput
         label="Nova Senha"
         type="password"
-        error={errors.password?.message}
-        {...register('password')}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        placeholder="Digite sua nova senha"
       />
 
       <FormInput
         label="Confirmar Nova Senha"
         type="password"
-        error={errors.confirmPassword?.message}
-        {...register('confirmPassword')}
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        required
+        placeholder="Confirme sua nova senha"
       />
 
       <FormButton
         type="submit"
         isLoading={isResettingPassword}
-        disabled={isResettingPassword || !token}
+        disabled={isResettingPassword}
+        fullWidth
       >
-        Resetar Senha
+        Redefinir Senha
       </FormButton>
+
+      <div className="text-center mt-4">
+        <button
+          type="button"
+          onClick={() => navigate('/login')}
+          className="text-primary-600 hover:text-primary-700 text-sm"
+        >
+          Voltar para o login
+        </button>
+      </div>
     </form>
   );
-}
+};

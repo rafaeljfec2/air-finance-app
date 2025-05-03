@@ -7,6 +7,7 @@ import {
   RegisterData,
   PasswordRecoveryData,
   ResetPasswordData,
+  VerifyEmailData,
   AuthResponse,
   User,
 } from '../types/auth.types';
@@ -57,6 +58,18 @@ export function useAuth() {
     },
   });
 
+  const verifyEmailMutation = useMutation<void, Error, VerifyEmailData>({
+    mutationFn: authService.verifyEmail,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      navigate('/dashboard?email=verified');
+    },
+  });
+
+  const resendVerificationEmailMutation = useMutation<void, Error, string>({
+    mutationFn: authService.resendVerificationEmail,
+  });
+
   const logout = async () => {
     try {
       await authService.logout();
@@ -85,6 +98,12 @@ export function useAuth() {
       resetPasswordMutation.mutate({ data, token }),
     isResettingPassword: resetPasswordMutation.isPending,
     resetPasswordError: resetPasswordMutation.error,
+    verifyEmail: (data: VerifyEmailData) => verifyEmailMutation.mutate(data),
+    isVerifyingEmail: verifyEmailMutation.isPending,
+    verifyEmailError: verifyEmailMutation.error,
+    resendVerificationEmail: (email: string) => resendVerificationEmailMutation.mutate(email),
+    isResendingVerificationEmail: resendVerificationEmailMutation.isPending,
+    resendVerificationEmailError: resendVerificationEmailMutation.error,
     logout,
   };
 }

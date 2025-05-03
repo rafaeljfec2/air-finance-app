@@ -4,6 +4,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  emailVerified: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -50,4 +51,13 @@ export type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
 export interface AuthResponse {
   user: User;
   token: string;
+}
+
+export interface VerifyEmailData {
+  token: string;
+}
+
+export interface AuthError {
+  message: string;
+  field?: string;
 }
