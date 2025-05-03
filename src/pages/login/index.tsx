@@ -1,55 +1,49 @@
-import { useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card } from '@/components/ui/card'
-import { Eye, EyeOff, Lock, Mail, ChevronLeft } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useAuthStore } from '@/stores/auth'
-import { toast } from 'sonner'
-import { Logo } from '@/components/Logo'
-import { motion } from 'framer-motion'
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { Eye, EyeOff, Lock, Mail, ChevronLeft } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { Logo } from '@/components/Logo';
+import { motion } from 'framer-motion';
+import { useAuth } from '@/hooks/useAuth';
 
 export function Login() {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const login = useAuthStore(state => state.login)
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login, isLoggingIn, isAuthenticated } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    rememberMe: false
-  })
+    rememberMe: false,
+  });
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-
-    try {
-      const success = await login(formData.email, formData.password)
-      
-      if (success) {
-        const from = location.state?.from?.pathname || '/dashboard'
-        navigate(from)
-        toast.success('Login realizado com sucesso!')
-      } else {
-        toast.error('Senha deve ter pelo menos 6 caracteres')
-      }
-    } catch (error) {
-      console.error('Erro ao fazer login:', error)
-      toast.error('Erro ao fazer login. Tente novamente.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    login({
+      email: formData.email,
+      password: formData.password,
+    });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
-    setFormData(prev => ({
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }))
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  // Redireciona se já estiver autenticado
+  if (isAuthenticated) {
+    const from = location.state?.from?.pathname || '/dashboard';
+    navigate(from);
+    return null;
   }
 
   return (
@@ -170,16 +164,19 @@ export function Login() {
                   </button>
                 </div>
 
+                {/* Feedback de erro */}
+                {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+
                 {/* Botão de Login */}
                 <Button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoggingIn}
                   className={cn(
-                    "w-full h-11 bg-brand-arrow hover:bg-brand-arrow/90 dark:bg-brand-leaf dark:hover:bg-brand-leaf/90 text-white transition-colors",
-                    isLoading && "opacity-70 cursor-not-allowed"
+                    'w-full h-11 bg-brand-arrow hover:bg-brand-arrow/90 dark:bg-brand-leaf dark:hover:bg-brand-leaf/90 text-white transition-colors',
+                    isLoggingIn && 'opacity-70 cursor-not-allowed',
                   )}
                 >
-                  {isLoading ? (
+                  {isLoggingIn ? (
                     <div className="flex items-center justify-center">
                       <svg
                         className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
@@ -242,5 +239,5 @@ export function Login() {
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}
