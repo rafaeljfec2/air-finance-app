@@ -13,7 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoggingIn, isAuthenticated } = useAuth();
+  const { login, isLoggingIn, isAuthenticated, loginError } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -25,10 +25,18 @@ export function Login() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    login({
-      email: formData.email,
-      password: formData.password,
-    });
+    login(
+      {
+        email: formData.email,
+        password: formData.password,
+      },
+      {
+        onError: (err: any) => {
+          const backendMsg = err?.response?.data?.message;
+          setError(backendMsg || err?.message || 'Erro ao fazer login');
+        },
+      },
+    );
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

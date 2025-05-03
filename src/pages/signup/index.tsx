@@ -52,7 +52,8 @@ export function SignUpPage() {
           setTimeout(() => navigate('/login'), 1500);
         },
         onError: (err: any) => {
-          setError(err?.message || 'Erro ao criar conta');
+          const backendMsg = err?.response?.data?.message;
+          setError(backendMsg || err?.message || 'Erro ao criar conta');
         },
       },
     );
