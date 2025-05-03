@@ -8,7 +8,43 @@ export type Category = {
   icon: string;
 };
 
-const MOCKED_CATEGORIES: Category[] = [];
+const MOCKED_CATEGORIES: Category[] = [
+  {
+    id: '1',
+    name: 'Alimentação',
+    type: 'despesa',
+    color: '#F44336',
+    icon: 'ShoppingCartIcon',
+  },
+  {
+    id: '2',
+    name: 'Transporte',
+    type: 'despesa',
+    color: '#1976D2',
+    icon: 'WalletIcon',
+  },
+  {
+    id: '3',
+    name: 'Lazer',
+    type: 'despesa',
+    color: '#8A05BE',
+    icon: 'GiftIcon',
+  },
+  {
+    id: '4',
+    name: 'Salário',
+    type: 'receita',
+    color: '#009688',
+    icon: 'ArrowTrendingUpIcon',
+  },
+  {
+    id: '5',
+    name: 'Freelance',
+    type: 'receita',
+    color: '#FFC107',
+    icon: 'TagIcon',
+  },
+];
 
 export function useCategories() {
   const [categories, setCategories] = useState<Category[]>(MOCKED_CATEGORIES);
