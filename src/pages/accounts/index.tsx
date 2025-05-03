@@ -13,6 +13,7 @@ import {
   BuildingLibraryIcon,
 } from '@heroicons/react/24/outline';
 import { FormField } from '@/components/ui/FormField';
+import { useAccounts, Account } from '@/hooks/useAccounts';
 
 const accountTypes = [
   { value: 'corrente', label: 'Corrente', icon: BanknotesIcon },
@@ -22,20 +23,9 @@ const accountTypes = [
   { value: 'outro', label: 'Outro', icon: BuildingLibraryIcon },
 ];
 
-type Account = {
-  id: string;
-  name: string;
-  type: string;
-  initialBalance: string;
-  color: string;
-  icon: string;
-};
-
-const defaultAccounts: Account[] = [];
-
 export default function AccountsPage() {
-  const [accounts, setAccounts] = useState(defaultAccounts);
-  const [form, setForm] = useState({
+  const { accounts, loading, addAccount, updateAccount, deleteAccount } = useAccounts();
+  const [form, setForm] = useState<Account>({
     id: '',
     name: '',
     type: 'corrente',
@@ -69,18 +59,17 @@ export default function AccountsPage() {
     return errs;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs = validate();
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
+    const { id, ...accountData } = form;
     if (editingId) {
-      setAccounts((prev) =>
-        prev.map((acc) => (acc.id === editingId ? { ...form, id: editingId } : acc)),
-      );
+      await updateAccount(editingId, accountData);
       setEditingId(null);
     } else {
-      setAccounts((prev) => [...prev, { ...form, id: Date.now().toString() }]);
+      await addAccount(accountData);
     }
     setForm({
       id: '',
@@ -106,8 +95,8 @@ export default function AccountsPage() {
     setDeleteId(id);
   };
 
-  const confirmDelete = () => {
-    setAccounts((prev) => prev.filter((a) => a.id !== deleteId));
+  const confirmDelete = async () => {
+    if (deleteId) await deleteAccount(deleteId);
     setShowConfirmDelete(false);
     setDeleteId(null);
   };
@@ -134,6 +123,7 @@ export default function AccountsPage() {
                   onChange={handleChange}
                   placeholder="Ex: Nubank, Itaú, Carteira..."
                   required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
               <FormField label="Tipo">
@@ -154,6 +144,7 @@ export default function AccountsPage() {
                   onChange={handleChange}
                   placeholder="0,00"
                   required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
               <FormField label="Cor">
