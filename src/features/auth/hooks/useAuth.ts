@@ -7,6 +7,8 @@ import {
   RegisterData,
   PasswordRecoveryData,
   ResetPasswordData,
+  AuthResponse,
+  User,
 } from '../types/auth.types';
 
 export function useAuth() {
@@ -14,40 +16,46 @@ export function useAuth() {
   const queryClient = useQueryClient();
   const { setUser, setToken, clearAuth } = useAuthStore();
 
-  const { data: user, isLoading: isLoadingUser } = useQuery({
+  const { data: user, isLoading: isLoadingUser } = useQuery<User>({
     queryKey: ['currentUser'],
     queryFn: authService.getCurrentUser,
     retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutos
   });
 
-  const loginMutation = useMutation({
+  const handleAuthSuccess = (data: AuthResponse) => {
+    setUser(data.user);
+    setToken(data.token);
+    queryClient.setQueryData(['currentUser'], data.user);
+    navigate('/dashboard');
+  };
+
+  const loginMutation = useMutation<AuthResponse, Error, LoginData>({
     mutationFn: authService.login,
-    onSuccess: ({ user, token }) => {
-      setUser(user);
-      setToken(token);
-      queryClient.setQueryData(['currentUser'], user);
-      navigate('/dashboard');
-    },
+    onSuccess: handleAuthSuccess,
   });
 
-  const registerMutation = useMutation({
+  const registerMutation = useMutation<AuthResponse, Error, RegisterData>({
     mutationFn: authService.register,
-    onSuccess: ({ user, token }) => {
-      setUser(user);
-      setToken(token);
-      queryClient.setQueryData(['currentUser'], user);
-      navigate('/dashboard');
+    onSuccess: handleAuthSuccess,
+  });
+
+  const passwordRecoveryMutation = useMutation<void, Error, PasswordRecoveryData>({
+    mutationFn: authService.requestPasswordRecovery,
+    onSuccess: () => {
+      navigate('/login?recovery=success');
     },
   });
 
-  const passwordRecoveryMutation = useMutation({
-    mutationFn: authService.requestPasswordRecovery,
-  });
-
-  const resetPasswordMutation = useMutation({
-    mutationFn: ({ data, token }: { data: ResetPasswordData; token: string }) =>
-      authService.resetPassword(data, token),
+  const resetPasswordMutation = useMutation<
+    void,
+    Error,
+    { data: ResetPasswordData; token: string }
+  >({
+    mutationFn: ({ data, token }) => authService.resetPassword(data, token),
+    onSuccess: () => {
+      navigate('/login?reset=success');
+    },
   });
 
   const logout = async () => {
