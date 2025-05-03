@@ -12,7 +12,7 @@ import {
   CardTotal,
 } from '@/components/budget';
 
-export default function BudgetPage() {
+export function BudgetPage() {
   // Estado único para filtro central
   const [filter, setFilter] = useState({ month: '05', year: '2024' });
   const [activeCardTab, setActiveCardTab] = useState(mockCreditCards[0]?.id || '');

@@ -6,33 +6,27 @@ import { Select } from '@/components/ui/select';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Button } from '@/components/ui/button';
-import {
-  BanknotesIcon,
-  CreditCardIcon,
-  WalletIcon,
-  BuildingLibraryIcon,
-} from '@heroicons/react/24/outline';
+import { UserGroupIcon, UserIcon, HeartIcon } from '@heroicons/react/24/outline';
 import { FormField } from '@/components/ui/FormField';
-import { useAccounts, Account } from '@/hooks/useAccounts';
+import { useDependents, Dependent } from '@/hooks/useDependents';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 
-const accountTypes = [
-  { value: 'corrente', label: 'Corrente', icon: BanknotesIcon },
-  { value: 'poupanca', label: 'Poupança', icon: WalletIcon },
-  { value: 'cartao', label: 'Cartão', icon: CreditCardIcon },
-  { value: 'carteira', label: 'Carteira', icon: WalletIcon },
-  { value: 'outro', label: 'Outro', icon: BuildingLibraryIcon },
+const relationTypes = [
+  { value: 'filho', label: 'Filho(a)', icon: UserIcon },
+  { value: 'conjuge', label: 'Cônjuge', icon: HeartIcon },
+  { value: 'pai', label: 'Pai', icon: UserIcon },
+  { value: 'mae', label: 'Mãe', icon: UserIcon },
+  { value: 'outro', label: 'Outro', icon: UserIcon },
 ];
 
-export function AccountsPage() {
-  const { accounts, addAccount, updateAccount, deleteAccount } = useAccounts();
-  const [form, setForm] = useState<Account>({
+export function DependentsPage() {
+  const { dependents, addDependent, updateDependent, deleteDependent } = useDependents();
+  const [form, setForm] = useState<Dependent>({
     id: '',
     name: '',
-    type: 'corrente',
-    initialBalance: '',
+    relation: 'filho',
     color: '#8A05BE',
-    icon: 'BanknotesIcon',
+    icon: 'UserIcon',
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -55,8 +49,7 @@ export function AccountsPage() {
   const validate = () => {
     const errs: any = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
-    if (!form.initialBalance || isNaN(Number(form.initialBalance)))
-      errs.initialBalance = 'Saldo inicial obrigatório';
+    if (!form.relation) errs.relation = 'Relação obrigatória';
     return errs;
   };
 
@@ -65,28 +58,27 @@ export function AccountsPage() {
     const errs = validate();
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
-    const { id, ...accountData } = form;
+    const { id, ...dependentData } = form;
     if (editingId) {
-      await updateAccount(editingId, accountData);
+      await updateDependent(editingId, dependentData);
       setEditingId(null);
     } else {
-      await addAccount(accountData);
+      await addDependent(dependentData);
     }
     setForm({
       id: '',
       name: '',
-      type: 'corrente',
-      initialBalance: '',
+      relation: 'filho',
       color: '#8A05BE',
-      icon: 'BanknotesIcon',
+      icon: 'UserIcon',
     });
     setErrors({});
   };
 
   const handleEdit = (id: string) => {
-    const acc = accounts.find((a) => a.id === id);
-    if (acc) {
-      setForm(acc);
+    const dep = dependents.find((d) => d.id === id);
+    if (dep) {
+      setForm(dep);
       setEditingId(id);
     }
   };
@@ -97,7 +89,7 @@ export function AccountsPage() {
   };
 
   const confirmDelete = async () => {
-    if (deleteId) await deleteAccount(deleteId);
+    if (deleteId) await deleteDependent(deleteId);
     setShowConfirmDelete(false);
     setDeleteId(null);
   };
@@ -111,42 +103,30 @@ export function AccountsPage() {
     <ViewDefault>
       <div className="container mx-auto px-2 sm:px-6 py-10">
         <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark mb-6 flex items-center gap-2">
-          <BanknotesIcon className="h-6 w-6 text-primary-500" /> Contas Bancárias
+          <UserGroupIcon className="h-6 w-6 text-primary-500" /> Dependentes
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Formulário */}
           <Card className="p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
-              <FormField label="Nome da conta" error={errors.name}>
+              <FormField label="Nome" error={errors.name}>
                 <Input
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  placeholder="Ex: Nubank, Itaú, Carteira..."
+                  placeholder="Nome do dependente"
                   required
                   className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
-              <FormField label="Tipo">
-                <Select name="type" value={form.type} onChange={handleChange} required>
-                  {accountTypes.map((t) => (
+              <FormField label="Relação" error={errors.relation}>
+                <Select name="relation" value={form.relation} onChange={handleChange} required>
+                  {relationTypes.map((t) => (
                     <option key={t.value} value={t.value}>
                       {t.label}
                     </option>
                   ))}
                 </Select>
-              </FormField>
-              <FormField label="Saldo inicial" error={errors.initialBalance}>
-                <Input
-                  name="initialBalance"
-                  type="number"
-                  min="0"
-                  value={form.initialBalance}
-                  onChange={handleChange}
-                  placeholder="0,00"
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
               </FormField>
               <FormField label="Cor">
                 <ColorPicker value={form.color} onChange={handleColorChange} />
@@ -155,7 +135,7 @@ export function AccountsPage() {
                 <IconPicker
                   value={form.icon}
                   onChange={handleIconChange}
-                  options={accountTypes.map((t) => ({
+                  options={relationTypes.map((t) => ({
                     value: t.icon.displayName || t.icon.name || t.value,
                     icon: t.icon,
                   }))}
@@ -163,7 +143,7 @@ export function AccountsPage() {
               </FormField>
               <div className="flex gap-2 mt-4">
                 <Button type="submit" color="primary">
-                  {editingId ? 'Salvar Alterações' : 'Adicionar Conta'}
+                  {editingId ? 'Salvar Alterações' : 'Adicionar Dependente'}
                 </Button>
                 {editingId && (
                   <Button
@@ -173,10 +153,9 @@ export function AccountsPage() {
                       setForm({
                         id: '',
                         name: '',
-                        type: 'corrente',
-                        initialBalance: '',
+                        relation: 'filho',
                         color: '#8A05BE',
-                        icon: 'BanknotesIcon',
+                        icon: 'UserIcon',
                       });
                       setEditingId(null);
                     }}
@@ -189,40 +168,34 @@ export function AccountsPage() {
           </Card>
           {/* Listagem */}
           <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Minhas Contas</h2>
+            <h2 className="text-lg font-semibold mb-4">Meus Dependentes</h2>
             <ul className="divide-y divide-border dark:divide-border-dark">
-              {accounts.length === 0 && (
-                <li className="text-gray-400 text-sm">Nenhuma conta cadastrada.</li>
+              {dependents.length === 0 && (
+                <li className="text-gray-400 text-sm">Nenhum dependente cadastrado.</li>
               )}
-              {accounts.map((acc) => {
-                const Icon = accountTypes.find((t) => t.value === acc.type)?.icon || BanknotesIcon;
+              {dependents.map((dep) => {
+                const Icon = relationTypes.find((t) => t.value === dep.relation)?.icon || UserIcon;
                 return (
-                  <li key={acc.id} className="flex items-center justify-between py-3">
+                  <li key={dep.id} className="flex items-center justify-between py-3">
                     <div className="flex items-center gap-3">
                       <span
                         className="inline-flex items-center justify-center rounded-full"
-                        style={{ background: acc.color, width: 32, height: 32 }}
+                        style={{ background: dep.color, width: 32, height: 32 }}
                       >
                         <Icon className="h-5 w-5 text-white" />
                       </span>
                       <div>
-                        <div className="font-medium text-text dark:text-text-dark">{acc.name}</div>
+                        <div className="font-medium text-text dark:text-text-dark">{dep.name}</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {accountTypes.find((t) => t.value === acc.type)?.label}
+                          {relationTypes.find((t) => t.value === dep.relation)?.label}
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-sm text-text dark:text-text-dark">
-                        R${' '}
-                        {Number(acc.initialBalance).toLocaleString('pt-BR', {
-                          minimumFractionDigits: 2,
-                        })}
-                      </span>
-                      <Button size="sm" color="secondary" onClick={() => handleEdit(acc.id)}>
+                      <Button size="sm" color="secondary" onClick={() => handleEdit(dep.id)}>
                         Editar
                       </Button>
-                      <Button size="sm" color="danger" onClick={() => handleDelete(acc.id)}>
+                      <Button size="sm" color="danger" onClick={() => handleDelete(dep.id)}>
                         Excluir
                       </Button>
                     </div>
@@ -237,7 +210,7 @@ export function AccountsPage() {
           title="Confirmar exclusão"
           description={
             <>
-              Tem certeza que deseja excluir esta conta?
+              Tem certeza que deseja excluir este dependente?
               <br />
               Esta ação não poderá ser desfeita.
             </>

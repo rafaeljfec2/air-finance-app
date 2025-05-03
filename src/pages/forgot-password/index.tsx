@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { Mail, CheckCircle2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
-export default function ForgotPasswordPage() {
+export function ForgotPasswordPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
@@ -52,7 +52,9 @@ export default function ForgotPasswordPage() {
             </div>
             <form className="space-y-5" onSubmit={handleSubmit} autoComplete="off">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-1">E-mail</label>
+                <label htmlFor="email" className="block text-sm font-medium mb-1">
+                  E-mail
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Mail className="h-5 w-5 text-brand-arrow dark:text-brand-leaf" />
@@ -62,7 +64,7 @@ export default function ForgotPasswordPage() {
                     type="email"
                     autoComplete="email"
                     value={email}
-                    onChange={e => setEmail(e.target.value)}
+                    onChange={(e) => setEmail(e.target.value)}
                     disabled={submitting || success}
                     className={error ? 'border-red-500 pl-10' : 'pl-10'}
                     placeholder="seu@email.com"
@@ -98,4 +100,4 @@ export default function ForgotPasswordPage() {
       </motion.div>
     </div>
   );
-} 
+}

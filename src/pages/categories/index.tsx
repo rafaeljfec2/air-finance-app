@@ -29,7 +29,7 @@ const iconOptions = [
   { value: 'BuildingLibraryIcon', icon: BuildingLibraryIcon },
 ];
 
-export default function CategoriesPage() {
+export function CategoriesPage() {
   const { categories, addCategory, updateCategory, deleteCategory } = useCategories();
   const [form, setForm] = useState<Category>({
     id: '',

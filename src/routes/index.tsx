@@ -12,12 +12,13 @@ import { ErrorPage } from '@/components/error/ErrorPage';
 import { Settings } from '@/pages/settings';
 import { LandingPage } from '@/pages/landing';
 import { SignUpPage } from '@/pages/signup';
-import ForgotPasswordPage from '@/pages/forgot-password';
-import AiClassificationPage from '@/pages/ai-classification';
-import ImportOfxPage from '@/pages/import-ofx';
-import Budget from '@/pages/budget';
-import Accounts from '@/pages/accounts';
-import Categories from '@/pages/categories';
+import { ForgotPasswordPage } from '@/pages/forgot-password';
+import { AiClassificationPage } from '@/pages/ai-classification';
+import { ImportOfxPage } from '@/pages/import-ofx';
+import { BudgetPage } from '@/pages/budget';
+import { AccountsPage } from '@/pages/accounts';
+import { CategoriesPage } from '@/pages/categories';
+import { DependentsPage } from '@/pages/dependents';
 
 export const router = createBrowserRouter([
   {
@@ -26,11 +27,22 @@ export const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
+    path: '/dependents',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <DependentsPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
     path: '/categories',
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-          <Categories />
+          <CategoriesPage />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
@@ -40,7 +52,7 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-          <Accounts />
+          <AccountsPage />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
@@ -83,7 +95,7 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-          <Budget />
+          <BudgetPage />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
