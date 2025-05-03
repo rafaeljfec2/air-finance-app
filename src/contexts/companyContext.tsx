@@ -3,12 +3,16 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Company } from '@/hooks/useCompanies';
 
-type CompanyState = {
+interface CompanyState {
   companyId: string;
   setCompanyId: (id: string) => void;
   companies: Company[];
   setCompanies: (companies: Company[]) => void;
-};
+}
+
+interface CompanyContextValue extends CompanyState {
+  selectedCompany: Company | null;
+}
 
 const useCompanyStore = create<CompanyState>()(
   persist(
@@ -22,7 +26,7 @@ const useCompanyStore = create<CompanyState>()(
   ),
 );
 
-const CompanyContext = createContext<ReturnType<typeof useCompanyStore> | null>(null);
+const CompanyContext = createContext<CompanyContextValue | null>(null);
 
 export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const store = useCompanyStore();
@@ -62,7 +66,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     store.setCompanyId('1');
   }
 
-  return <CompanyContext.Provider value={store}>{children}</CompanyContext.Provider>;
+  const selectedCompany = store.companies.find((company) => company.id === store.companyId) || null;
+
+  const value: CompanyContextValue = {
+    ...store,
+    selectedCompany,
+  };
+
+  return <CompanyContext.Provider value={value}>{children}</CompanyContext.Provider>;
 };
 
 export const useCompanyContext = () => {

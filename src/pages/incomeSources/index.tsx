@@ -58,7 +58,7 @@ export function IncomeSourcesPage() {
 
     try {
       if (editingId) {
-        await updateIncomeSource(editingId, form);
+        updateIncomeSource({ id: editingId, data: form });
         setEditingId(null);
       } else {
         await addIncomeSource(form);

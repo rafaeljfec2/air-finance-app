@@ -24,7 +24,7 @@ import { CategoriesPage } from '@/pages/categories';
 import { DependentsPage } from '@/pages/dependents';
 import { CreditCardsPage } from '@/pages/credit-cards';
 import { GoalsPage } from '@/pages/goals';
-import { IncomeSourcesPage } from '@/pages/income-sources';
+import { IncomeSourcesPage } from '@/pages/incomeSources';
 import { CompaniesPage } from '@/pages/companies';
 import { UsersPage } from '@/pages/users';
 

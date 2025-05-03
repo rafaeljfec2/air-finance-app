@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ReactNode } from 'react';
 import {
   getIncomeSources,
   getIncomeSourceById,
@@ -14,16 +15,16 @@ export const useIncomeSources = () => {
   const queryClient = useQueryClient();
 
   const {
-    data: incomeSources,
-    isLoading,
+    data: incomeSources = [],
+    isLoading: loading,
     error,
-  } = useQuery<IncomeSource[]>({
+  } = useQuery<IncomeSource[], ReactNode>({
     queryKey: ['income-sources'],
     queryFn: getIncomeSources,
   });
 
   const getIncomeSource = (id: string) => {
-    return useQuery<IncomeSource>({
+    return useQuery<IncomeSource, ReactNode>({
       queryKey: ['income-source', id],
       queryFn: () => getIncomeSourceById(id),
       enabled: !!id,
@@ -31,23 +32,26 @@ export const useIncomeSources = () => {
   };
 
   const getProjection = (id: string) => {
-    return useQuery({
+    return useQuery<any, ReactNode>({
       queryKey: ['income-source-projection', id],
       queryFn: () => getIncomeSourceProjection(id),
       enabled: !!id,
     });
   };
 
-  const createMutation = useMutation({
+  const createMutation = useMutation<IncomeSource, ReactNode, CreateIncomeSource>({
     mutationFn: createIncomeSource,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['income-sources'] });
     },
   });
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<CreateIncomeSource> }) =>
-      updateIncomeSource(id, data),
+  const updateMutation = useMutation<
+    IncomeSource,
+    ReactNode,
+    { id: string; data: CreateIncomeSource }
+  >({
+    mutationFn: ({ id, data }) => updateIncomeSource(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['income-sources'] });
       queryClient.invalidateQueries({ queryKey: ['income-source', id] });
@@ -55,7 +59,7 @@ export const useIncomeSources = () => {
     },
   });
 
-  const deleteMutation = useMutation({
+  const deleteMutation = useMutation<void, ReactNode, string>({
     mutationFn: deleteIncomeSource,
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['income-sources'] });
@@ -66,11 +70,11 @@ export const useIncomeSources = () => {
 
   return {
     incomeSources,
-    isLoading,
+    loading,
     error,
     getIncomeSource,
     getProjection,
-    createIncomeSource: createMutation.mutate,
+    addIncomeSource: createMutation.mutate,
     updateIncomeSource: updateMutation.mutate,
     deleteIncomeSource: deleteMutation.mutate,
     isCreating: createMutation.isPending,

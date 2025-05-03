@@ -2,6 +2,7 @@ import React, { ButtonHTMLAttributes } from 'react';
 
 interface FormButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
   loading?: boolean;
+  isLoading?: boolean;
   variant?: 'primary' | 'secondary' | 'danger';
   fullWidth?: boolean;
 }
@@ -9,11 +10,14 @@ interface FormButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 
 export const FormButton: React.FC<FormButtonProps> = ({
   children,
   loading,
+  isLoading,
   disabled,
   variant = 'primary',
   fullWidth,
   ...props
 }) => {
+  const isButtonLoading = loading || isLoading;
+
   const getVariantClasses = () => {
     switch (variant) {
       case 'primary':
@@ -29,17 +33,17 @@ export const FormButton: React.FC<FormButtonProps> = ({
 
   return (
     <button
-      disabled={disabled || loading}
+      disabled={disabled || isButtonLoading}
       className={`
         h-12 rounded-lg px-4 flex items-center justify-center
         ${getVariantClasses()}
-        ${disabled || loading ? 'opacity-60 cursor-not-allowed' : 'opacity-100'}
+        ${disabled || isButtonLoading ? 'opacity-60 cursor-not-allowed' : 'opacity-100'}
         ${fullWidth ? 'w-full' : 'w-auto'}
         transition-colors duration-200
       `}
       {...props}
     >
-      {loading ? (
+      {isButtonLoading ? (
         <svg
           className="animate-spin h-5 w-5 text-white"
           xmlns="http://www.w3.org/2000/svg"
