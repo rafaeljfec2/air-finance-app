@@ -6,8 +6,8 @@ import {
   updateCreditCard,
   deleteCreditCard,
   getCreditCardStatement,
-  CreditCard,
-  CreateCreditCard,
+  type CreditCard,
+  type CreateCreditCard,
 } from '../services/creditCardService';
 
 export const useCreditCards = () => {
@@ -74,5 +74,8 @@ export const useCreditCards = () => {
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
+    createError: createMutation.error,
+    updateError: updateMutation.error,
+    deleteError: deleteMutation.error,
   };
 };

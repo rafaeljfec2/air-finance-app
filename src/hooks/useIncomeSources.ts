@@ -1,104 +1,83 @@
-import { useState, useEffect } from 'react';
-import { IncomeSource } from '@/types/incomeSource';
-import { useCompanyContext } from '@/contexts/companyContext';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  getIncomeSources,
+  getIncomeSourceById,
+  createIncomeSource,
+  updateIncomeSource,
+  deleteIncomeSource,
+  getIncomeSourceProjection,
+  type IncomeSource,
+  type CreateIncomeSource,
+} from '../services/incomeSourceService';
 
-export function useIncomeSources() {
-  const { companyId } = useCompanyContext() as { companyId: string };
-  const [incomeSources, setIncomeSources] = useState<IncomeSource[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export const useIncomeSources = () => {
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!companyId) return;
-    loadIncomeSources();
-  }, [companyId]);
+  const {
+    data: incomeSources,
+    isLoading,
+    error,
+  } = useQuery<IncomeSource[]>({
+    queryKey: ['income-sources'],
+    queryFn: getIncomeSources,
+  });
 
-  const loadIncomeSources = async () => {
-    try {
-      setLoading(true);
-      // TODO: Replace with actual API call
-      const mockIncomeSources: IncomeSource[] = [
-        {
-          id: '1',
-          name: 'Salário',
-          description: 'Salário mensal',
-          type: 'fixed',
-          amount: 5000,
-          frequency: 'monthly',
-          startDate: '2024-01-01',
-          status: 'active',
-          companyId,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          name: 'Freelance',
-          description: 'Trabalhos freelancer',
-          type: 'variable',
-          amount: 2000,
-          frequency: 'monthly',
-          startDate: '2024-01-01',
-          status: 'active',
-          companyId,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ];
-      setIncomeSources(mockIncomeSources.filter((source) => source.companyId === companyId));
-    } catch (err) {
-      setError('Erro ao carregar fontes de receita');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+  const getIncomeSource = (id: string) => {
+    return useQuery<IncomeSource>({
+      queryKey: ['income-source', id],
+      queryFn: () => getIncomeSourceById(id),
+      enabled: !!id,
+    });
   };
 
-  const addIncomeSource = async (source: Omit<IncomeSource, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      const newSource: IncomeSource = {
-        ...source,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      setIncomeSources((prev) => [...prev, newSource]);
-      return newSource;
-    } catch (err) {
-      setError('Erro ao adicionar fonte de receita');
-      throw err;
-    }
+  const getProjection = (id: string) => {
+    return useQuery({
+      queryKey: ['income-source-projection', id],
+      queryFn: () => getIncomeSourceProjection(id),
+      enabled: !!id,
+    });
   };
 
-  const updateIncomeSource = async (id: string, source: Partial<IncomeSource>) => {
-    try {
-      setIncomeSources((prev) =>
-        prev.map((s) =>
-          s.id === id ? { ...s, ...source, updatedAt: new Date().toISOString() } : s,
-        ),
-      );
-    } catch (err) {
-      setError('Erro ao atualizar fonte de receita');
-      throw err;
-    }
-  };
+  const createMutation = useMutation({
+    mutationFn: createIncomeSource,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['income-sources'] });
+    },
+  });
 
-  const deleteIncomeSource = async (id: string) => {
-    try {
-      setIncomeSources((prev) => prev.filter((s) => s.id !== id));
-    } catch (err) {
-      setError('Erro ao excluir fonte de receita');
-      throw err;
-    }
-  };
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateIncomeSource> }) =>
+      updateIncomeSource(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['income-sources'] });
+      queryClient.invalidateQueries({ queryKey: ['income-source', id] });
+      queryClient.invalidateQueries({ queryKey: ['income-source-projection', id] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteIncomeSource,
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['income-sources'] });
+      queryClient.removeQueries({ queryKey: ['income-source', id] });
+      queryClient.removeQueries({ queryKey: ['income-source-projection', id] });
+    },
+  });
 
   return {
     incomeSources,
-    loading,
+    isLoading,
     error,
-    addIncomeSource,
-    updateIncomeSource,
-    deleteIncomeSource,
-    loadIncomeSources,
+    getIncomeSource,
+    getProjection,
+    createIncomeSource: createMutation.mutate,
+    updateIncomeSource: updateMutation.mutate,
+    deleteIncomeSource: deleteMutation.mutate,
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
+    createError: createMutation.error,
+    updateError: updateMutation.error,
+    deleteError: deleteMutation.error,
   };
-}
+};

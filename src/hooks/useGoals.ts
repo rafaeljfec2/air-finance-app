@@ -1,88 +1,82 @@
-import { useState, useEffect } from 'react';
-import { Goal } from '@/types/goal';
-import { useCompanyContext } from '@/contexts/companyContext';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  getGoals,
+  getGoalById,
+  createGoal,
+  updateGoal,
+  deleteGoal,
+  getGoalProgress,
+  type Goal,
+  type CreateGoal,
+} from '../services/goalService';
 
-export function useGoals() {
-  const { companyId } = useCompanyContext();
-  const [goals, setGoals] = useState<Goal[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export const useGoals = () => {
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!companyId) return;
-    loadGoals();
-  }, [companyId]);
+  const {
+    data: goals,
+    isLoading,
+    error,
+  } = useQuery<Goal[]>({
+    queryKey: ['goals'],
+    queryFn: getGoals,
+  });
 
-  const loadGoals = async () => {
-    try {
-      setLoading(true);
-      // TODO: Replace with actual API call
-      const mockGoals: Goal[] = [
-        {
-          id: '1',
-          name: 'Viagem para Europa',
-          description: 'Economizar para viagem de 15 dias',
-          targetAmount: 15000,
-          currentAmount: 5000,
-          deadline: '2024-12-31',
-          status: 'active',
-          companyId,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ];
-      setGoals(mockGoals.filter((goal) => goal.companyId === companyId));
-    } catch (err) {
-      setError('Erro ao carregar metas');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+  const getGoal = (id: string) => {
+    return useQuery<Goal>({
+      queryKey: ['goal', id],
+      queryFn: () => getGoalById(id),
+      enabled: !!id,
+    });
   };
 
-  const addGoal = async (goal: Omit<Goal, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      const newGoal: Goal = {
-        ...goal,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      setGoals((prev) => [...prev, newGoal]);
-      return newGoal;
-    } catch (err) {
-      setError('Erro ao adicionar meta');
-      throw err;
-    }
+  const getProgress = (id: string) => {
+    return useQuery({
+      queryKey: ['goal-progress', id],
+      queryFn: () => getGoalProgress(id),
+      enabled: !!id,
+    });
   };
 
-  const updateGoal = async (id: string, goal: Partial<Goal>) => {
-    try {
-      setGoals((prev) =>
-        prev.map((g) => (g.id === id ? { ...g, ...goal, updatedAt: new Date().toISOString() } : g)),
-      );
-    } catch (err) {
-      setError('Erro ao atualizar meta');
-      throw err;
-    }
-  };
+  const createMutation = useMutation({
+    mutationFn: createGoal,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
+    },
+  });
 
-  const deleteGoal = async (id: string) => {
-    try {
-      setGoals((prev) => prev.filter((g) => g.id !== id));
-    } catch (err) {
-      setError('Erro ao excluir meta');
-      throw err;
-    }
-  };
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateGoal> }) => updateGoal(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
+      queryClient.invalidateQueries({ queryKey: ['goal', id] });
+      queryClient.invalidateQueries({ queryKey: ['goal-progress', id] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteGoal,
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
+      queryClient.removeQueries({ queryKey: ['goal', id] });
+      queryClient.removeQueries({ queryKey: ['goal-progress', id] });
+    },
+  });
 
   return {
     goals,
-    loading,
+    isLoading,
     error,
-    addGoal,
-    updateGoal,
-    deleteGoal,
-    loadGoals,
+    getGoal,
+    getProgress,
+    createGoal: createMutation.mutate,
+    updateGoal: updateMutation.mutate,
+    deleteGoal: deleteMutation.mutate,
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
+    createError: createMutation.error,
+    updateError: updateMutation.error,
+    deleteError: deleteMutation.error,
   };
-}
+};

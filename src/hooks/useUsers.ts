@@ -1,96 +1,70 @@
-import { useState, useEffect } from 'react';
-import { User } from '@/types/user';
-import { useCompanyContext } from '@/contexts/companyContext';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+  type User,
+  type CreateUser,
+} from '../services/userService';
 
-export function useUsers() {
-  const { companyId } = useCompanyContext();
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export const useUsers = () => {
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!companyId) return;
-    loadUsers();
-  }, [companyId]);
+  const {
+    data: users,
+    isLoading,
+    error,
+  } = useQuery<User[]>({
+    queryKey: ['users'],
+    queryFn: getUsers,
+  });
 
-  const loadUsers = async () => {
-    try {
-      setLoading(true);
-      // TODO: Replace with actual API call
-      const mockUsers: User[] = [
-        {
-          id: '1',
-          name: 'Administrador',
-          email: 'admin@empresa.com',
-          role: 'admin',
-          status: 'active',
-          companyId,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          name: 'Usuário Teste',
-          email: 'usuario@empresa.com',
-          role: 'user',
-          status: 'active',
-          companyId,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ];
-      setUsers(mockUsers.filter((user) => user.companyId === companyId));
-    } catch (err) {
-      setError('Erro ao carregar usuários');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+  const getUser = (id: string) => {
+    return useQuery<User>({
+      queryKey: ['user', id],
+      queryFn: () => getUserById(id),
+      enabled: !!id,
+    });
   };
 
-  const addUser = async (user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      const newUser: User = {
-        ...user,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      setUsers((prev) => [...prev, newUser]);
-      return newUser;
-    } catch (err) {
-      setError('Erro ao adicionar usuário');
-      throw err;
-    }
-  };
+  const createMutation = useMutation({
+    mutationFn: createUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
 
-  const updateUser = async (id: string, user: Partial<User>) => {
-    try {
-      setUsers((prev) =>
-        prev.map((u) => (u.id === id ? { ...u, ...user, updatedAt: new Date().toISOString() } : u)),
-      );
-    } catch (err) {
-      setError('Erro ao atualizar usuário');
-      throw err;
-    }
-  };
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateUser> }) => updateUser(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['user', id] });
+    },
+  });
 
-  const deleteUser = async (id: string) => {
-    try {
-      setUsers((prev) => prev.filter((u) => u.id !== id));
-    } catch (err) {
-      setError('Erro ao excluir usuário');
-      throw err;
-    }
-  };
+  const deleteMutation = useMutation({
+    mutationFn: deleteUser,
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.removeQueries({ queryKey: ['user', id] });
+    },
+  });
 
   return {
     users,
-    loading,
+    isLoading,
     error,
-    addUser,
-    updateUser,
-    deleteUser,
-    loadUsers,
+    getUser,
+    createUser: createMutation.mutate,
+    updateUser: updateMutation.mutate,
+    deleteUser: deleteMutation.mutate,
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
+    createError: createMutation.error,
+    updateError: updateMutation.error,
+    deleteError: deleteMutation.error,
   };
-}
+};

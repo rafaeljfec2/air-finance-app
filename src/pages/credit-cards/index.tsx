@@ -8,8 +8,9 @@ import { IconPicker } from '@/components/ui/icon-picker';
 import { Button } from '@/components/ui/button';
 import { CreditCardIcon, BanknotesIcon, BuildingLibraryIcon } from '@heroicons/react/24/outline';
 import { FormField } from '@/components/ui/FormField';
-import { useCreditCards, CreditCard } from '@/hooks/useCreditCards';
+import { useCreditCards } from '@/hooks/useCreditCards';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { useCompanyContext } from '@/contexts/companyContext';
 
 const bankTypes = [
   { value: 'nubank', label: 'Nubank', icon: CreditCardIcon },
@@ -19,7 +20,9 @@ const bankTypes = [
   { value: 'bb', label: 'Banco do Brasil', icon: BanknotesIcon },
   { value: 'caixa', label: 'Caixa Econômica', icon: BanknotesIcon },
   { value: 'outro', label: 'Outro', icon: BuildingLibraryIcon },
-];
+] as const;
+
+type BankType = (typeof bankTypes)[number]['value'];
 
 const dueDates = Array.from({ length: 31 }, (_, i) => ({
   value: i + 1,
@@ -27,16 +30,33 @@ const dueDates = Array.from({ length: 31 }, (_, i) => ({
 }));
 
 export function CreditCardsPage() {
-  const { creditCards, addCreditCard, updateCreditCard, deleteCreditCard } = useCreditCards();
-  const [form, setForm] = useState<CreditCard>({
-    id: '',
+  const { companyId } = useCompanyContext() as { companyId: string };
+  const {
+    creditCards,
+    isLoading,
+    error,
+    createCreditCard,
+    updateCreditCard,
+    deleteCreditCard,
+    isCreating,
+    isUpdating,
+    isDeleting,
+  } = useCreditCards();
+
+  const [form, setForm] = useState({
     name: '',
-    bank: 'nubank',
+    number: '',
+    holderName: '',
+    expirationDate: '',
+    cvv: '',
     limit: 0,
-    dueDate: 10,
+    closingDay: 10,
+    dueDay: 10,
     color: '#8A05BE',
     icon: 'CreditCardIcon',
+    companyId: companyId || '',
   });
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -58,10 +78,12 @@ export function CreditCardsPage() {
   const validate = () => {
     const errs: any = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
-    if (!form.bank) errs.bank = 'Banco obrigatório';
+    if (!form.number.trim()) errs.number = 'Número do cartão obrigatório';
+    if (!form.holderName.trim()) errs.holderName = 'Nome do titular obrigatório';
+    if (!form.expirationDate) errs.expirationDate = 'Data de validade obrigatória';
+    if (!form.cvv) errs.cvv = 'CVV obrigatório';
     if (!form.limit || form.limit <= 0) errs.limit = 'Limite inválido';
-    if (!form.dueDate || form.dueDate < 1 || form.dueDate > 31)
-      errs.dueDate = 'Dia de vencimento inválido';
+    if (!form.companyId) errs.companyId = 'Selecione uma empresa';
     return errs;
   };
 
@@ -70,29 +92,49 @@ export function CreditCardsPage() {
     const errs = validate();
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
-    const { id, ...creditCardData } = form;
-    if (editingId) {
-      await updateCreditCard(editingId, creditCardData);
-      setEditingId(null);
-    } else {
-      await addCreditCard(creditCardData);
+
+    try {
+      if (editingId) {
+        await updateCreditCard({ id: editingId, data: form });
+        setEditingId(null);
+      } else {
+        await createCreditCard(form);
+      }
+      setForm({
+        name: '',
+        number: '',
+        holderName: '',
+        expirationDate: '',
+        cvv: '',
+        limit: 0,
+        closingDay: 10,
+        dueDay: 10,
+        color: '#8A05BE',
+        icon: 'CreditCardIcon',
+        companyId: companyId || '',
+      });
+      setErrors({});
+    } catch (error) {
+      console.error('Erro ao salvar cartão:', error);
     }
-    setForm({
-      id: '',
-      name: '',
-      bank: 'nubank',
-      limit: 0,
-      dueDate: 10,
-      color: '#8A05BE',
-      icon: 'CreditCardIcon',
-    });
-    setErrors({});
   };
 
   const handleEdit = (id: string) => {
-    const card = creditCards.find((c) => c.id === id);
+    const card = creditCards?.find((c) => c.id === id);
     if (card) {
-      setForm(card);
+      setForm({
+        name: card.name,
+        number: card.number,
+        holderName: card.holderName,
+        expirationDate: card.expirationDate,
+        cvv: card.cvv,
+        limit: card.limit,
+        closingDay: card.closingDay,
+        dueDay: card.dueDay,
+        color: card.color,
+        icon: card.icon,
+        companyId: card.companyId,
+      });
       setEditingId(id);
     }
   };
@@ -103,7 +145,13 @@ export function CreditCardsPage() {
   };
 
   const confirmDelete = async () => {
-    if (deleteId) await deleteCreditCard(deleteId);
+    if (deleteId) {
+      try {
+        await deleteCreditCard(deleteId);
+      } catch (error) {
+        console.error('Erro ao deletar cartão:', error);
+      }
+    }
     setShowConfirmDelete(false);
     setDeleteId(null);
   };
@@ -112,6 +160,32 @@ export function CreditCardsPage() {
     setShowConfirmDelete(false);
     setDeleteId(null);
   };
+
+  if (isLoading) {
+    return (
+      <ViewDefault>
+        <div className="container mx-auto px-2 sm:px-6 py-10">
+          <div className="animate-pulse">
+            <div className="h-8 w-48 bg-gray-200 rounded mb-6"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="h-96 bg-gray-200 rounded"></div>
+              <div className="h-96 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </ViewDefault>
+    );
+  }
+
+  if (error) {
+    return (
+      <ViewDefault>
+        <div className="container mx-auto px-2 sm:px-6 py-10">
+          <div className="text-red-500">Erro ao carregar cartões: {error.message}</div>
+        </div>
+      </ViewDefault>
+    );
+  }
 
   return (
     <ViewDefault>
@@ -123,47 +197,88 @@ export function CreditCardsPage() {
           {/* Formulário */}
           <Card className="p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
-              <FormField label="Nome do cartão" error={errors.name}>
+              <FormField label="Nome" error={errors.name}>
                 <Input
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  placeholder="Ex: Nubank Ultravioleta, Itaú Platinum..."
+                  placeholder="Nome do cartão"
                   required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
-              <FormField label="Banco" error={errors.bank}>
-                <Select name="bank" value={form.bank} onChange={handleChange} required>
-                  {bankTypes.map((t) => (
-                    <option key={t.value} value={t.value}>
-                      {t.label}
-                    </option>
-                  ))}
-                </Select>
+              <FormField label="Número do cartão" error={errors.number}>
+                <Input
+                  name="number"
+                  value={form.number}
+                  onChange={handleChange}
+                  placeholder="0000 0000 0000 0000"
+                  required
+                />
               </FormField>
+              <FormField label="Nome do titular" error={errors.holderName}>
+                <Input
+                  name="holderName"
+                  value={form.holderName}
+                  onChange={handleChange}
+                  placeholder="Nome como está no cartão"
+                  required
+                />
+              </FormField>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField label="Validade" error={errors.expirationDate}>
+                  <Input
+                    name="expirationDate"
+                    value={form.expirationDate}
+                    onChange={handleChange}
+                    placeholder="MM/AA"
+                    required
+                  />
+                </FormField>
+                <FormField label="CVV" error={errors.cvv}>
+                  <Input
+                    name="cvv"
+                    value={form.cvv}
+                    onChange={handleChange}
+                    placeholder="000"
+                    required
+                  />
+                </FormField>
+              </div>
               <FormField label="Limite" error={errors.limit}>
                 <Input
                   name="limit"
                   type="number"
-                  min="0"
-                  step="0.01"
                   value={form.limit}
                   onChange={handleChange}
-                  placeholder="0,00"
+                  placeholder="R$ 0,00"
                   required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
-              <FormField label="Dia do vencimento" error={errors.dueDate}>
-                <Select name="dueDate" value={form.dueDate} onChange={handleChange} required>
-                  {dueDates.map((d) => (
-                    <option key={d.value} value={d.value}>
-                      {d.label}
-                    </option>
-                  ))}
-                </Select>
-              </FormField>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField label="Dia de fechamento" error={errors.closingDay}>
+                  <Select
+                    name="closingDay"
+                    value={form.closingDay}
+                    onChange={handleChange}
+                    required
+                  >
+                    {dueDates.map((d) => (
+                      <option key={d.value} value={d.value}>
+                        {d.label}
+                      </option>
+                    ))}
+                  </Select>
+                </FormField>
+                <FormField label="Dia de vencimento" error={errors.dueDay}>
+                  <Select name="dueDay" value={form.dueDay} onChange={handleChange} required>
+                    {dueDates.map((d) => (
+                      <option key={d.value} value={d.value}>
+                        {d.label}
+                      </option>
+                    ))}
+                  </Select>
+                </FormField>
+              </div>
               <FormField label="Cor">
                 <ColorPicker value={form.color} onChange={handleColorChange} />
               </FormField>
@@ -178,7 +293,7 @@ export function CreditCardsPage() {
                 />
               </FormField>
               <div className="flex gap-2 mt-4">
-                <Button type="submit" color="primary">
+                <Button type="submit" color="primary" disabled={isCreating || isUpdating}>
                   {editingId ? 'Salvar Alterações' : 'Adicionar Cartão'}
                 </Button>
                 {editingId && (
@@ -187,13 +302,17 @@ export function CreditCardsPage() {
                     color="secondary"
                     onClick={() => {
                       setForm({
-                        id: '',
                         name: '',
-                        bank: 'nubank',
+                        number: '',
+                        holderName: '',
+                        expirationDate: '',
+                        cvv: '',
                         limit: 0,
-                        dueDate: 10,
+                        closingDay: 10,
+                        dueDay: 10,
                         color: '#8A05BE',
                         icon: 'CreditCardIcon',
+                        companyId: companyId || '',
                       });
                       setEditingId(null);
                     }}
@@ -208,25 +327,27 @@ export function CreditCardsPage() {
           <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">Meus Cartões</h2>
             <ul className="divide-y divide-border dark:divide-border-dark">
-              {creditCards.length === 0 && (
+              {creditCards?.length === 0 && (
                 <li className="text-gray-400 text-sm">Nenhum cartão cadastrado.</li>
               )}
-              {creditCards.map((card) => {
-                const Icon = bankTypes.find((t) => t.value === card.bank)?.icon || CreditCardIcon;
+              {creditCards?.map((card) => {
+                const Icon =
+                  bankTypes.find((t) => t.icon.displayName === card.icon)?.icon || CreditCardIcon;
                 return (
                   <li key={card.id} className="flex items-center justify-between py-3">
                     <div className="flex items-center gap-3">
-                      <span
-                        className="inline-flex items-center justify-center rounded-full"
-                        style={{ background: card.color, width: 32, height: 32 }}
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: card.color }}
                       >
                         <Icon className="h-5 w-5 text-white" />
-                      </span>
+                      </div>
                       <div>
                         <div className="font-medium text-text dark:text-text-dark">{card.name}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {bankTypes.find((t) => t.value === card.bank)?.label} • Vencimento:{' '}
-                          {card.dueDate}º dia
+                        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                          <Icon className="h-3 w-3" />
+                          {bankTypes.find((t) => t.icon.displayName === card.icon)?.label} •
+                          Vencimento: {card.dueDay}º dia
                         </div>
                         <div className="text-sm font-semibold text-text dark:text-text-dark">
                           Limite: R${' '}
@@ -236,11 +357,21 @@ export function CreditCardsPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button size="sm" color="secondary" onClick={() => handleEdit(card.id)}>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        color="secondary"
+                        onClick={() => handleEdit(card.id)}
+                        disabled={isUpdating}
+                      >
                         Editar
                       </Button>
-                      <Button size="sm" color="danger" onClick={() => handleDelete(card.id)}>
+                      <Button
+                        size="sm"
+                        color="danger"
+                        onClick={() => handleDelete(card.id)}
+                        disabled={isDeleting}
+                      >
                         Excluir
                       </Button>
                     </div>
@@ -250,23 +381,17 @@ export function CreditCardsPage() {
             </ul>
           </Card>
         </div>
-        <ConfirmModal
-          open={showConfirmDelete}
-          title="Confirmar exclusão"
-          description={
-            <>
-              Tem certeza que deseja excluir este cartão?
-              <br />
-              Esta ação não poderá ser desfeita.
-            </>
-          }
-          confirmLabel="Excluir"
-          cancelLabel="Cancelar"
-          onConfirm={confirmDelete}
-          onCancel={cancelDelete}
-          danger
-        />
       </div>
+      <ConfirmModal
+        open={showConfirmDelete}
+        title="Confirmar exclusão"
+        description="Tem certeza que deseja excluir este cartão? Esta ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        cancelLabel="Cancelar"
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        danger
+      />
     </ViewDefault>
   );
 }
