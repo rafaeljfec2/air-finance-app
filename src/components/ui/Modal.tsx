@@ -9,7 +9,7 @@ interface ModalProps {
   className?: string;
 }
 
-export function Modal({ open, onClose, title, children, className }: ModalProps) {
+export function Modal({ open, onClose, title, children, className }: Readonly<ModalProps>) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Fechar ao pressionar ESC
@@ -45,7 +45,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
         tabIndex={-1}
         className={cn(
           'relative z-10 w-full max-w-lg mx-auto rounded-xl bg-white dark:bg-gray-900 shadow-xl p-6 focus:outline-none',
-          className
+          className,
         )}
         role="dialog"
         aria-modal="true"
@@ -58,7 +58,13 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
           aria-label="Fechar"
         >
           <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <path
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
         {title && (
@@ -68,4 +74,4 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
       </div>
     </div>
   );
-} 
+}

@@ -17,12 +17,23 @@ import AiClassificationPage from '@/pages/ai-classification';
 import ImportOfxPage from '@/pages/import-ofx';
 import Budget from '@/pages/budget';
 import Accounts from '@/pages/accounts';
+import Categories from '@/pages/categories';
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingPage />,
     errorElement: <ErrorPage />,
+  },
+  {
+    path: '/categories',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <Categories />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
   },
   {
     path: '/accounts',
