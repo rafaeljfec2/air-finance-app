@@ -50,7 +50,7 @@ export function NewPasswordPage() {
     }
 
     try {
-      await resetPassword({
+      await resetPassword.mutateAsync({
         token: token || '',
         password: form.password,
         confirmPassword: form.confirmPassword,

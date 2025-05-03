@@ -67,7 +67,7 @@ export const useAuth = () => {
     register: registerMutation.mutate,
     logout: logoutMutation.mutate,
     requestPasswordRecovery: passwordRecoveryMutation.mutate,
-    resetPassword: resetPasswordMutation.mutate,
+    resetPassword: resetPasswordMutation,
     isLoggingIn: loginMutation.isPending,
     isRegistering: registerMutation.isPending,
     isLoggingOut: logoutMutation.isPending,
