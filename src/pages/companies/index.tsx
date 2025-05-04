@@ -327,25 +327,23 @@ export function CompaniesPage() {
               <div className="flex gap-2 mt-4">
                 <Button
                   type="submit"
-                  className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors shadow-md"
+                  size="sm"
+                  className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                   disabled={isCreating || isUpdating}
                 >
                   {editingId ? 'Salvar Alterações' : 'Adicionar Empresa'}
                 </Button>
-                {editingId && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="text-gray-500 border-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
-                    onClick={() => {
-                      setForm(initialFormState);
-                      setEditingId(null);
-                    }}
-                  >
-                    Cancelar
-                  </Button>
-                )}
+                <Button
+                  type="button"
+                  size="sm"
+                  className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
+                  onClick={() => {
+                    setForm(initialFormState);
+                    setEditingId(null);
+                  }}
+                >
+                  Cancelar
+                </Button>
               </div>
             </form>
           </Card>
@@ -381,8 +379,7 @@ export function CompaniesPage() {
                   <div className="flex justify-end gap-2">
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="text-primary-500 border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900"
+                      className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                       onClick={() => handleEdit(company.id)}
                       disabled={isUpdating}
                     >
@@ -390,8 +387,7 @@ export function CompaniesPage() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="text-red-600 border-red-600 hover:bg-red-50 dark:hover:bg-red-900"
+                      className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                       onClick={() => handleDelete(company.id)}
                       disabled={isDeleting}
                     >
