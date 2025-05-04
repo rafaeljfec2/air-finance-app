@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/FormField';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { useCategories, Category } from '@/hooks/useCategories';
+import { useCategories } from '@/hooks/useCategories';
 import {
   TagIcon,
   ArrowTrendingUpIcon,
@@ -18,6 +18,7 @@ import {
   GiftIcon,
   BuildingLibraryIcon,
 } from '@heroicons/react/24/outline';
+import { useCompanyStore } from '@/store/company';
 
 const iconOptions = [
   { value: 'TagIcon', icon: TagIcon },
@@ -27,21 +28,46 @@ const iconOptions = [
   { value: 'ShoppingCartIcon', icon: ShoppingCartIcon },
   { value: 'GiftIcon', icon: GiftIcon },
   { value: 'BuildingLibraryIcon', icon: BuildingLibraryIcon },
-];
+] as const;
 
-export default function CategoriesPage() {
-  const { categories, addCategory, updateCategory, deleteCategory } = useCategories();
-  const [form, setForm] = useState<Category>({
-    id: '',
+const categoryTypes = [
+  { value: 'income', label: 'Receita', icon: ArrowTrendingUpIcon },
+  { value: 'expense', label: 'Despesa', icon: ArrowTrendingDownIcon },
+] as const;
+
+type CategoryType = (typeof categoryTypes)[number]['value'];
+
+export function CategoriesPage() {
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id || '';
+  const {
+    categories,
+    isLoading,
+    error,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+    isCreating,
+    isUpdating,
+    isDeleting,
+  } = useCategories(companyId);
+
+  const [form, setForm] = useState({
     name: '',
-    type: 'despesa',
+    type: 'expense' as CategoryType,
     color: '#8A05BE',
     icon: 'TagIcon',
+    companyId,
   });
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [errors, setErrors] = useState<any>({});
+
+  React.useEffect(() => {
+    setForm((prev) => ({ ...prev, companyId }));
+  }, [companyId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -59,6 +85,8 @@ export default function CategoriesPage() {
   const validate = () => {
     const errs: any = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
+    if (!form.type) errs.type = 'Tipo obrigatório';
+    if (!form.companyId) errs.companyId = 'Selecione uma empresa';
     return errs;
   };
 
@@ -67,21 +95,37 @@ export default function CategoriesPage() {
     const errs = validate();
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
-    const { id, ...categoryData } = form;
-    if (editingId) {
-      await updateCategory(editingId, categoryData);
-      setEditingId(null);
-    } else {
-      await addCategory(categoryData);
+
+    try {
+      if (editingId) {
+        await updateCategory({ id: editingId, data: form });
+        setEditingId(null);
+      } else {
+        await createCategory(form);
+      }
+      setForm({
+        name: '',
+        type: 'expense',
+        color: '#8A05BE',
+        icon: 'TagIcon',
+        companyId,
+      });
+      setErrors({});
+    } catch (error) {
+      console.error('Erro ao salvar categoria:', error);
     }
-    setForm({ id: '', name: '', type: 'despesa', color: '#8A05BE', icon: 'TagIcon' });
-    setErrors({});
   };
 
   const handleEdit = (id: string) => {
-    const cat = categories.find((c) => c.id === id);
-    if (cat) {
-      setForm(cat);
+    const category = categories?.find((c) => c.id === id);
+    if (category) {
+      setForm({
+        name: category.name,
+        type: category.type as CategoryType,
+        color: category.color,
+        icon: category.icon,
+        companyId: category.companyId,
+      });
       setEditingId(id);
     }
   };
@@ -92,7 +136,13 @@ export default function CategoriesPage() {
   };
 
   const confirmDelete = async () => {
-    if (deleteId) await deleteCategory(deleteId);
+    if (deleteId) {
+      try {
+        await deleteCategory(deleteId);
+      } catch (error) {
+        console.error('Erro ao deletar categoria:', error);
+      }
+    }
     setShowConfirmDelete(false);
     setDeleteId(null);
   };
@@ -101,6 +151,32 @@ export default function CategoriesPage() {
     setShowConfirmDelete(false);
     setDeleteId(null);
   };
+
+  if (isLoading) {
+    return (
+      <ViewDefault>
+        <div className="container mx-auto px-2 sm:px-6 py-10">
+          <div className="animate-pulse">
+            <div className="h-8 w-48 bg-gray-200 rounded mb-6"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="h-96 bg-gray-200 rounded"></div>
+              <div className="h-96 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </ViewDefault>
+    );
+  }
+
+  if (error) {
+    return (
+      <ViewDefault>
+        <div className="container mx-auto px-2 sm:px-6 py-10">
+          <div className="text-red-500">Erro ao carregar categorias: {error.message}</div>
+        </div>
+      </ViewDefault>
+    );
+  }
 
   return (
     <ViewDefault>
@@ -117,38 +193,64 @@ export default function CategoriesPage() {
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  placeholder="Ex: Alimentação, Salário, Lazer..."
+                  placeholder="Ex: Alimentação"
                   required
                   className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
-              <FormField label="Tipo">
-                <Select name="type" value={form.type} onChange={handleChange} required>
-                  <option value="despesa">Despesa</option>
-                  <option value="receita">Receita</option>
+              <FormField label="Tipo" error={errors.type}>
+                <Select
+                  value={form.type}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, type: value as CategoryType }))
+                  }
+                >
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                    {categoryTypes.find((t) => t.value === form.type)?.label || 'Selecione...'}
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                    {categoryTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </FormField>
               <FormField label="Cor">
                 <ColorPicker value={form.color} onChange={handleColorChange} />
               </FormField>
               <FormField label="Ícone">
-                <IconPicker value={form.icon} onChange={handleIconChange} options={iconOptions} />
+                <IconPicker
+                  value={form.icon}
+                  onChange={handleIconChange}
+                  options={iconOptions.map((t) => ({
+                    value: t.icon.displayName || t.icon.name || t.value,
+                    icon: t.icon,
+                  }))}
+                />
               </FormField>
               <div className="flex gap-2 mt-4">
-                <Button type="submit" color="primary">
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
+                  disabled={isCreating || isUpdating}
+                >
                   {editingId ? 'Salvar Alterações' : 'Adicionar Categoria'}
                 </Button>
                 {editingId && (
                   <Button
                     type="button"
-                    color="secondary"
+                    size="sm"
+                    className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                     onClick={() => {
                       setForm({
-                        id: '',
                         name: '',
-                        type: 'despesa',
+                        type: 'expense',
                         color: '#8A05BE',
                         icon: 'TagIcon',
+                        companyId,
                       });
                       setEditingId(null);
                     }}
@@ -163,32 +265,47 @@ export default function CategoriesPage() {
           <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">Minhas Categorias</h2>
             <ul className="divide-y divide-border dark:divide-border-dark">
-              {categories.length === 0 && (
+              {categories?.length === 0 && (
                 <li className="text-gray-400 text-sm">Nenhuma categoria cadastrada.</li>
               )}
-              {categories.map((cat) => {
-                const Icon = iconOptions.find((t) => t.value === cat.icon)?.icon || TagIcon;
+              {categories?.map((category) => {
+                const Icon = iconOptions.find((t) => t.value === category.icon)?.icon || TagIcon;
+                const TypeIcon =
+                  categoryTypes.find((t) => t.value === category.type)?.icon || TagIcon;
                 return (
-                  <li key={cat.id} className="flex items-center justify-between py-3">
+                  <li key={category.id} className="flex items-center justify-between py-3">
                     <div className="flex items-center gap-3">
-                      <span
-                        className="inline-flex items-center justify-center rounded-full"
-                        style={{ background: cat.color, width: 32, height: 32 }}
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: category.color }}
                       >
                         <Icon className="h-5 w-5 text-white" />
-                      </span>
+                      </div>
                       <div>
-                        <div className="font-medium text-text dark:text-text-dark">{cat.name}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {cat.type === 'receita' ? 'Receita' : 'Despesa'}
+                        <div className="font-medium text-text dark:text-text-dark">
+                          {category.name}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                          <TypeIcon className="h-3 w-3" />
+                          {categoryTypes.find((t) => t.value === category.type)?.label}
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button size="sm" color="secondary" onClick={() => handleEdit(cat.id)}>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
+                        onClick={() => handleEdit(category.id)}
+                        disabled={isUpdating}
+                      >
                         Editar
                       </Button>
-                      <Button size="sm" color="danger" onClick={() => handleDelete(cat.id)}>
+                      <Button
+                        size="sm"
+                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
+                        onClick={() => handleDelete(category.id)}
+                        disabled={isDeleting}
+                      >
                         Excluir
                       </Button>
                     </div>
@@ -198,23 +315,17 @@ export default function CategoriesPage() {
             </ul>
           </Card>
         </div>
-        <ConfirmModal
-          open={showConfirmDelete}
-          title="Confirmar exclusão"
-          description={
-            <>
-              Tem certeza que deseja excluir esta categoria?
-              <br />
-              Esta ação não poderá ser desfeita.
-            </>
-          }
-          confirmLabel="Excluir"
-          cancelLabel="Cancelar"
-          onConfirm={confirmDelete}
-          onCancel={cancelDelete}
-          danger
-        />
       </div>
+      <ConfirmModal
+        open={showConfirmDelete}
+        title="Confirmar exclusão"
+        description="Tem certeza que deseja excluir esta categoria? Esta ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        cancelLabel="Cancelar"
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        danger
+      />
     </ViewDefault>
   );
 }

@@ -1,89 +1,72 @@
-import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  getCategories,
+  getCategoryById,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  type Category,
+  type CreateCategory,
+} from '../services/categoryService';
 
-export type Category = {
-  id: string;
-  name: string;
-  type: 'receita' | 'despesa';
-  color: string;
-  icon: string;
-};
+export const useCategories = (companyId: string) => {
+  const queryClient = useQueryClient();
 
-const MOCKED_CATEGORIES: Category[] = [
-  {
-    id: '1',
-    name: 'Alimentação',
-    type: 'despesa',
-    color: '#F44336',
-    icon: 'ShoppingCartIcon',
-  },
-  {
-    id: '2',
-    name: 'Transporte',
-    type: 'despesa',
-    color: '#1976D2',
-    icon: 'WalletIcon',
-  },
-  {
-    id: '3',
-    name: 'Lazer',
-    type: 'despesa',
-    color: '#8A05BE',
-    icon: 'GiftIcon',
-  },
-  {
-    id: '4',
-    name: 'Salário',
-    type: 'receita',
-    color: '#009688',
-    icon: 'ArrowTrendingUpIcon',
-  },
-  {
-    id: '5',
-    name: 'Freelance',
-    type: 'receita',
-    color: '#FFC107',
-    icon: 'TagIcon',
-  },
-];
+  const {
+    data: categories,
+    isLoading,
+    error,
+  } = useQuery<Category[]>({
+    queryKey: ['categories', companyId],
+    queryFn: () => getCategories(companyId),
+    enabled: !!companyId,
+  });
 
-export function useCategories() {
-  const [categories, setCategories] = useState<Category[]>(MOCKED_CATEGORIES);
-  const [loading, setLoading] = useState(false);
-
-  // Simular fetch do backend
-  const fetchCategories = async () => {
-    setLoading(true);
-    await new Promise((res) => setTimeout(res, 300));
-    setLoading(false);
+  const getCategory = (id: string) => {
+    return useQuery<Category>({
+      queryKey: ['category', companyId, id],
+      queryFn: () => getCategoryById(companyId, id),
+      enabled: !!id && !!companyId,
+    });
   };
 
-  const addCategory = async (category: Omit<Category, 'id'>) => {
-    setLoading(true);
-    await new Promise((res) => setTimeout(res, 200));
-    setCategories((prev) => [...prev, { ...category, id: Date.now().toString() }]);
-    setLoading(false);
-  };
+  const createMutation = useMutation({
+    mutationFn: (data: CreateCategory) => createCategory(companyId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories', companyId] });
+    },
+  });
 
-  const updateCategory = async (id: string, category: Omit<Category, 'id'>) => {
-    setLoading(true);
-    await new Promise((res) => setTimeout(res, 200));
-    setCategories((prev) => prev.map((c) => (c.id === id ? { ...category, id } : c)));
-    setLoading(false);
-  };
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateCategory> }) =>
+      updateCategory(companyId, id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['categories', companyId] });
+      queryClient.invalidateQueries({ queryKey: ['category', companyId, id] });
+    },
+  });
 
-  const deleteCategory = async (id: string) => {
-    setLoading(true);
-    await new Promise((res) => setTimeout(res, 200));
-    setCategories((prev) => prev.filter((c) => c.id !== id));
-    setLoading(false);
-  };
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteCategory(companyId, id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['categories', companyId] });
+      queryClient.removeQueries({ queryKey: ['category', companyId, id] });
+    },
+  });
 
   return {
     categories,
-    loading,
-    fetchCategories,
-    addCategory,
-    updateCategory,
-    deleteCategory,
+    isLoading,
+    error,
+    getCategory,
+    createCategory: createMutation.mutate,
+    updateCategory: updateMutation.mutate,
+    deleteCategory: deleteMutation.mutate,
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
+    createError: createMutation.error,
+    updateError: updateMutation.error,
+    deleteError: deleteMutation.error,
   };
-}
+};

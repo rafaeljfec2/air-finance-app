@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTransactionStore } from '@/stores/transaction';
 import { Transaction, TransactionType } from '@/types/transaction';
 import { formatCurrency } from '@/utils/formatters';
+import { useCompanyContext } from '@/contexts/companyContext';
 
 export const INITIAL_FORM_STATE = {
   description: '',
@@ -25,6 +26,7 @@ type FormField = keyof FormData;
 export function useTransactionForm() {
   const navigate = useNavigate();
   const { addTransaction } = useTransactionStore();
+  const { companyId } = useCompanyContext() as { companyId: string };
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,7 +75,7 @@ export function useTransactionForm() {
     const newErrors: FormErrors = { ...errors };
     let hasChanges = false;
 
-    touchedFields.forEach(field => {
+    touchedFields.forEach((field) => {
       const error = validateField(field, formData[field]);
       if (error !== errors[field]) {
         newErrors[field] = error;
@@ -90,6 +92,10 @@ export function useTransactionForm() {
     e.preventDefault();
 
     if (!validateForm()) {
+      return;
+    }
+    if (!companyId) {
+      setErrors({ submit: 'Nenhuma empresa selecionada.' });
       return;
     }
 
@@ -111,7 +117,7 @@ export function useTransactionForm() {
         accountId: '1', // Mock - posteriormente virá da seleção de conta
       };
 
-      await addTransaction(transaction as Transaction);
+      await addTransaction(transaction as Transaction, companyId);
       setShowSuccessTooltip(true);
       setTimeout(() => {
         navigate('/statement');
@@ -137,8 +143,8 @@ export function useTransactionForm() {
   };
 
   const updateFormData = (field: FormField, value: FormData[FormField]) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    setTouchedFields(prev => new Set(prev).add(field));
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setTouchedFields((prev) => new Set(prev).add(field));
   };
 
   return {

@@ -34,13 +34,13 @@ export interface Transaction {
   account: Account;
   credit?: number;
 
-
   debit?: number;
   balance?: number;
   createdAt: string;
   updatedAt: string;
   dependent?: string;
   installmentCount?: number;
+  companyId: string;
 }
 
 export type TransactionInput = Omit<

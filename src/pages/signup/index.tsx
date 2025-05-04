@@ -6,9 +6,11 @@ import { Logo } from '@/components/Logo';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { useAuth } from '@/hooks/useAuth';
 
 export function SignUpPage() {
   const navigate = useNavigate();
+  const { register, isRegistering } = useAuth();
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -18,8 +20,8 @@ export function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function validate() {
     const newErrors: { [key: string]: string } = {};
@@ -31,18 +33,30 @@ export function SignUpPage() {
     return newErrors;
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
     const validation = validate();
     setErrors(validation);
     if (Object.keys(validation).length > 0) return;
-    setSubmitting(true);
-    // Simula requisição
-    setTimeout(() => {
-      setSubmitting(false);
-      setSuccess(true);
-      setTimeout(() => navigate('/auth/login'), 1500);
-    }, 1200);
+    register(
+      {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        confirmPassword: form.confirmPassword,
+      },
+      {
+        onSuccess: () => {
+          setSuccess(true);
+          setTimeout(() => navigate('/login'), 1500);
+        },
+        onError: (err: any) => {
+          const backendMsg = err?.response?.data?.message;
+          setError(backendMsg || err?.message || 'Erro ao criar conta');
+        },
+      },
+    );
   }
 
   return (
@@ -73,8 +87,8 @@ export function SignUpPage() {
                   autoComplete="name"
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  disabled={submitting}
-                  className={errors.name ? 'border-red-500' : ''}
+                  disabled={isRegistering}
+                  className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.name ? 'border-red-500' : ''}`}
                   placeholder="Seu nome completo"
                 />
                 {errors.name && (
@@ -91,8 +105,8 @@ export function SignUpPage() {
                   autoComplete="email"
                   value={form.email}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  disabled={submitting}
-                  className={errors.email ? 'border-red-500' : ''}
+                  disabled={isRegistering}
+                  className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.email ? 'border-red-500' : ''}`}
                   placeholder="seu@email.com"
                 />
                 {errors.email && (
@@ -109,8 +123,8 @@ export function SignUpPage() {
                   autoComplete="new-password"
                   value={form.password}
                   onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  disabled={submitting}
-                  className={errors.password ? 'border-red-500' : ''}
+                  disabled={isRegistering}
+                  className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.password ? 'border-red-500' : ''}`}
                   placeholder="Crie uma senha"
                 />
                 <button
@@ -136,8 +150,8 @@ export function SignUpPage() {
                   autoComplete="new-password"
                   value={form.confirmPassword}
                   onChange={(e) => setForm((f) => ({ ...f, confirmPassword: e.target.value }))}
-                  disabled={submitting}
-                  className={errors.confirmPassword ? 'border-red-500' : ''}
+                  disabled={isRegistering}
+                  className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.confirmPassword ? 'border-red-500' : ''}`}
                   placeholder="Repita a senha"
                 />
                 <button
@@ -157,12 +171,13 @@ export function SignUpPage() {
                   <span className="text-xs text-red-500 mt-1 block">{errors.confirmPassword}</span>
                 )}
               </div>
+              {error && <div className="text-red-500 text-sm text-center">{error}</div>}
               <Button
                 type="submit"
                 className="w-full bg-brand-arrow hover:bg-brand-arrow/90 text-white py-3 text-lg mt-2"
-                disabled={submitting}
+                disabled={isRegistering}
               >
-                {submitting ? 'Criando conta...' : 'Criar conta'}
+                {isRegistering ? 'Criando conta...' : 'Criar conta'}
               </Button>
               {success && (
                 <div className="flex items-center gap-2 text-green-600 mt-2 justify-center">
@@ -175,7 +190,7 @@ export function SignUpPage() {
               <button
                 type="button"
                 className="text-brand-arrow hover:underline font-medium"
-                onClick={() => navigate('/auth/login')}
+                onClick={() => navigate('/login')}
               >
                 Entrar
               </button>

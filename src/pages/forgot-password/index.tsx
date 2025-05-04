@@ -6,13 +6,15 @@ import { Logo } from '@/components/Logo';
 import { motion } from 'framer-motion';
 import { Mail, CheckCircle2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { useAuth } from '@/hooks/useAuth';
 
-export default function ForgotPasswordPage() {
+export function ForgotPasswordPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { requestPasswordRecovery, isRecoveringPassword } = useAuth();
 
   function validateEmail(value: string) {
     return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value);
@@ -26,11 +28,14 @@ export default function ForgotPasswordPage() {
       return;
     }
     setSubmitting(true);
-    // Simula requisição
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      await requestPasswordRecovery({ email });
       setSuccess(true);
-    }, 1200);
+    } catch (err) {
+      setError('Erro ao enviar instruções. Tente novamente.');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -52,7 +57,9 @@ export default function ForgotPasswordPage() {
             </div>
             <form className="space-y-5" onSubmit={handleSubmit} autoComplete="off">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-1">E-mail</label>
+                <label htmlFor="email" className="block text-sm font-medium mb-1">
+                  E-mail
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Mail className="h-5 w-5 text-brand-arrow dark:text-brand-leaf" />
@@ -62,9 +69,9 @@ export default function ForgotPasswordPage() {
                     type="email"
                     autoComplete="email"
                     value={email}
-                    onChange={e => setEmail(e.target.value)}
+                    onChange={(e) => setEmail(e.target.value)}
                     disabled={submitting || success}
-                    className={error ? 'border-red-500 pl-10' : 'pl-10'}
+                    className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors pl-10 ${error ? 'border-red-500' : ''}`}
                     placeholder="seu@email.com"
                   />
                 </div>
@@ -73,9 +80,9 @@ export default function ForgotPasswordPage() {
               <Button
                 type="submit"
                 className="w-full bg-brand-arrow hover:bg-brand-arrow/90 text-white py-3 text-lg mt-2"
-                disabled={submitting || success}
+                disabled={submitting || isRecoveringPassword || success}
               >
-                {submitting ? 'Enviando...' : 'Enviar instruções'}
+                {submitting || isRecoveringPassword ? 'Enviando...' : 'Enviar instruções'}
               </Button>
               {success && (
                 <div className="flex items-center gap-2 text-green-600 mt-2 justify-center">
@@ -88,7 +95,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="button"
                 className="text-brand-arrow hover:underline font-medium"
-                onClick={() => navigate('/auth/login')}
+                onClick={() => navigate('/login')}
               >
                 Voltar para o login
               </button>
@@ -98,4 +105,4 @@ export default function ForgotPasswordPage() {
       </motion.div>
     </div>
   );
-} 
+}

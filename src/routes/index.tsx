@@ -1,28 +1,75 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { Login } from '@/pages/login';
+import { SignUpPage } from '@/pages/signup';
+import { ForgotPasswordPage } from '@/pages/forgot-password';
+import { NewPasswordPage } from '@/pages/new-password';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Dashboard } from '@/pages/dashboard/Dashboard';
+import { ErrorBoundary } from '@/components/error/ErrorBoundary';
+import { ErrorPage } from '@/components/error/ErrorPage';
 import { Statement } from '@/pages/statement';
 import { NewTransaction } from '@/pages/transactions/new';
 import { Transactions } from '@/pages/transactions';
 import { Reports } from '@/pages/reports';
 import { Profile } from '@/pages/profile';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { ErrorBoundary } from '@/components/error/ErrorBoundary';
-import { ErrorPage } from '@/components/error/ErrorPage';
 import { Settings } from '@/pages/settings';
 import { LandingPage } from '@/pages/landing';
-import { SignUpPage } from '@/pages/signup';
-import ForgotPasswordPage from '@/pages/forgot-password';
-import AiClassificationPage from '@/pages/ai-classification';
-import ImportOfxPage from '@/pages/import-ofx';
-import Budget from '@/pages/budget';
-import Accounts from '@/pages/accounts';
-import Categories from '@/pages/categories';
+import { AiClassificationPage } from '@/pages/ai-classification';
+import { ImportOfxPage } from '@/pages/import-ofx';
+import { BudgetPage } from '@/pages/budget';
+import { AccountsPage } from '@/pages/accounts';
+import { CategoriesPage } from '@/pages/categories';
+import { DependentsPage } from '@/pages/dependents';
+import { CreditCardsPage } from '@/pages/credit-cards';
+import { GoalsPage } from '@/pages/goals';
+import { IncomeSourcesPage } from '@/pages/incomeSources';
+import { CompaniesPage } from '@/pages/companies';
+import { UsersPage } from '@/pages/users';
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingPage />,
+  },
+  {
+    path: '/login',
+    element: <Login />,
+  },
+  {
+    path: '/register',
+    element: <SignUpPage />,
+  },
+  {
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: '/new-password',
+    element: <NewPasswordPage />,
+  },
+  {
+    path: '/reset-password/:token',
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: '/dashboard',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/dependents',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <DependentsPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
     errorElement: <ErrorPage />,
   },
   {
@@ -30,7 +77,7 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-          <Categories />
+          <CategoriesPage />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
@@ -40,7 +87,7 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-          <Accounts />
+          <AccountsPage />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
@@ -49,11 +96,6 @@ export const router = createBrowserRouter([
   {
     path: '/signup',
     element: <SignUpPage />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/auth/login',
-    element: <Login />,
     errorElement: <ErrorPage />,
   },
   {
@@ -83,18 +125,7 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-          <Budget />
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/dashboard',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Dashboard />
+          <BudgetPage />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
@@ -181,8 +212,63 @@ export const router = createBrowserRouter([
     element: <div>Ajuda e suporte</div>,
   },
   {
-    path: '/forgot-password',
-    element: <ForgotPasswordPage />,
+    path: '/ai/classification',
+    element: <AiClassificationPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/credit-cards',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <CreditCardsPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/goals',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <GoalsPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/income-sources',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <IncomeSourcesPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/companies',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <CompaniesPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/users',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <UsersPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
     errorElement: <ErrorPage />,
   },
   {

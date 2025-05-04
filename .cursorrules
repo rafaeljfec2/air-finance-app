@@ -155,3 +155,6 @@ evitar = [
   "Arquivos misturando responsabilidades (ex: lógica e UI no mesmo arquivo)",
   "Arquivos com nomes ambíguos ou sem clareza de propósito"
 ]
+[mensagem_commit]
+padrao = "sugira uma mensagem de commit para o usuário sempre em inglês"
+acoes = ["quando usuário digitar commit, sugerir uma mensagem de commit para o usuário em inglês"]

@@ -48,7 +48,7 @@ export function LandingPage() {
             <Button
               variant="default"
               className="bg-brand-arrow hover:bg-brand-arrow/90 text-white px-6"
-              onClick={() => navigate('/auth/login')}
+              onClick={() => navigate('/login')}
             >
               Entrar
             </Button>
@@ -94,7 +94,7 @@ export function LandingPage() {
               >
                 <Button
                   className="bg-brand-arrow hover:bg-brand-arrow/90 text-white px-8 py-6 text-lg inline-flex items-center gap-2"
-                  onClick={() => navigate('/auth/login')}
+                  onClick={() => navigate('/login')}
                 >
                   Comece gratuitamente
                   <ArrowRight className="w-5 h-5" />

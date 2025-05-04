@@ -63,7 +63,7 @@ const mockTransactions = [
   },
 ];
 
-export default function AiClassificationPage() {
+export function AiClassificationPage() {
   const [transactions, setTransactions] = useState(mockTransactions);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ id: string; message: string } | null>(null);

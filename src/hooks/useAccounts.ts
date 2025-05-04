@@ -1,55 +1,91 @@
-import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  getAccounts,
+  getAccountById,
+  createAccount,
+  updateAccount,
+  deleteAccount,
+  getAccountBalance,
+  type Account,
+  type CreateAccount,
+} from '../services/accountService';
+import { useCompanyStore } from '@/store/company';
 
-export type Account = {
-  id: string;
-  name: string;
-  type: string;
-  initialBalance: string;
-  color: string;
-  icon: string;
-};
+export const useAccounts = () => {
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id;
+  const queryClient = useQueryClient();
 
-const MOCKED_ACCOUNTS: Account[] = [];
+  const {
+    data: accounts,
+    isLoading,
+    error,
+  } = useQuery<Account[]>({
+    queryKey: ['accounts', companyId],
+    queryFn: () => (companyId ? getAccounts(companyId) : Promise.resolve([])),
+    enabled: !!companyId,
+  });
 
-export function useAccounts() {
-  const [accounts, setAccounts] = useState<Account[]>(MOCKED_ACCOUNTS);
-  const [loading, setLoading] = useState(false);
-
-  // Simular fetch do backend
-  const fetchAccounts = async () => {
-    setLoading(true);
-    // Aqui entraria a chamada real de API futuramente
-    await new Promise((res) => setTimeout(res, 300));
-    setLoading(false);
+  const getAccount = (id: string) => {
+    return useQuery<Account>({
+      queryKey: ['account', companyId, id],
+      queryFn: () =>
+        companyId && id ? getAccountById(companyId, id) : Promise.reject('No companyId or id'),
+      enabled: !!companyId && !!id,
+    });
   };
 
-  const addAccount = async (account: Omit<Account, 'id'>) => {
-    setLoading(true);
-    await new Promise((res) => setTimeout(res, 200));
-    setAccounts((prev) => [...prev, { ...account, id: Date.now().toString() }]);
-    setLoading(false);
+  const getBalance = (id: string) => {
+    return useQuery<number>({
+      queryKey: ['account-balance', companyId, id],
+      queryFn: () =>
+        companyId && id ? getAccountBalance(id) : Promise.reject('No companyId or id'),
+      enabled: !!companyId && !!id,
+    });
   };
 
-  const updateAccount = async (id: string, account: Omit<Account, 'id'>) => {
-    setLoading(true);
-    await new Promise((res) => setTimeout(res, 200));
-    setAccounts((prev) => prev.map((a) => (a.id === id ? { ...account, id } : a)));
-    setLoading(false);
-  };
+  const createMutation = useMutation({
+    mutationFn: (data: CreateAccount) =>
+      companyId ? createAccount(companyId, data) : Promise.reject('No companyId'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+    },
+  });
 
-  const deleteAccount = async (id: string) => {
-    setLoading(true);
-    await new Promise((res) => setTimeout(res, 200));
-    setAccounts((prev) => prev.filter((a) => a.id !== id));
-    setLoading(false);
-  };
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateAccount> }) =>
+      companyId && id ? updateAccount(companyId, id, data) : Promise.reject('No companyId or id'),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+      queryClient.invalidateQueries({ queryKey: ['account', companyId, id] });
+      queryClient.invalidateQueries({ queryKey: ['account-balance', companyId, id] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) =>
+      companyId && id ? deleteAccount(companyId, id) : Promise.reject('No companyId or id'),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+      queryClient.removeQueries({ queryKey: ['account', companyId, id] });
+      queryClient.removeQueries({ queryKey: ['account-balance', companyId, id] });
+    },
+  });
 
   return {
     accounts,
-    loading,
-    fetchAccounts,
-    addAccount,
-    updateAccount,
-    deleteAccount,
+    isLoading,
+    error,
+    getAccount,
+    getBalance,
+    createAccount: createMutation.mutate,
+    updateAccount: updateMutation.mutate,
+    deleteAccount: deleteMutation.mutate,
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
+    createError: createMutation.error,
+    updateError: updateMutation.error,
+    deleteError: deleteMutation.error,
   };
-}
+};
