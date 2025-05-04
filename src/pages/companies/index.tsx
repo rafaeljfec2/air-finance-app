@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/FormField';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -10,6 +10,8 @@ import { useCompanies } from '@/hooks/useCompanies';
 import { BuildingOfficeIcon } from '@heroicons/react/24/outline';
 import { formatDate } from '@/utils/date';
 import { CreateCompany } from '@/services/companyService';
+import { PlusCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const typeOptions = [
   { value: 'matriz', label: 'Matriz' },
@@ -191,6 +193,8 @@ export function CompaniesPage() {
     setDeleteId(null);
   };
 
+  const navigate = useNavigate();
+
   if (isLoading) {
     return (
       <ViewDefault>
@@ -249,13 +253,28 @@ export function CompaniesPage() {
                 />
               </FormField>
               <FormField label="Tipo" error={errors.type}>
-                <Select name="type" value={form.type} onChange={handleChange} required>
-                  <option value="">Selecione...</option>
-                  {typeOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
+                <Select
+                  value={form.type}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, type: value as CompanyType }))
+                  }
+                >
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                    <span>
+                      {typeOptions.find((t) => t.value === form.type)?.label || 'Selecione...'}
+                    </span>
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                    {typeOptions.map((opt) => (
+                      <SelectItem
+                        key={opt.value}
+                        value={opt.value}
+                        className="hover:bg-primary-100 dark:hover:bg-primary-900 focus:bg-primary-100 dark:focus:bg-primary-900"
+                      >
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </FormField>
               <FormField label="Data de fundação" error={errors.foundationDate}>
@@ -308,7 +327,11 @@ export function CompaniesPage() {
                 />
               </FormField>
               <div className="flex gap-2 mt-4">
-                <Button type="submit" color="primary" disabled={isCreating || isUpdating}>
+                <Button
+                  type="submit"
+                  className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors shadow-md"
+                  disabled={isCreating || isUpdating}
+                >
                   {editingId ? 'Salvar Alterações' : 'Adicionar Empresa'}
                 </Button>
                 {editingId && (

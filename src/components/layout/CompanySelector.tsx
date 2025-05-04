@@ -6,8 +6,12 @@ import { useQuery } from '@tanstack/react-query';
 import { companyService } from '@/services/company';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Loading } from '@/components/Loading';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const CompanySelector = () => {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const { activeCompany, changeActiveCompany } = useActiveCompany();
   const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +29,17 @@ export const CompanySelector = () => {
   }
 
   if (!companies?.length) {
-    return <div className="text-sm text-gray-500">Nenhuma empresa cadastrada</div>;
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        className="flex items-center gap-2"
+        onClick={() => navigate('/companies/new')}
+      >
+        <PlusCircle className="h-4 w-4" />
+        <span>Cadastrar Empresa</span>
+      </Button>
+    );
   }
 
   const handleCompanyChange = (companyId: string) => {
