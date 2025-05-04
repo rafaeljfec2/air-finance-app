@@ -269,14 +269,16 @@ export function AccountsPage() {
               <div className="flex gap-2 mt-4">
                 <Button
                   type="submit"
-                  className="h-10 px-6 bg-primary-600 text-white rounded hover:bg-primary-700"
+                  size="sm"
+                  className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                 >
                   {editingId ? 'Salvar Alterações' : 'Adicionar Conta'}
                 </Button>
                 {editingId && (
                   <Button
                     type="button"
-                    className="h-10 px-6 bg-secondary-600 text-white rounded hover:bg-secondary-700"
+                    size="sm"
+                    className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                     onClick={() => {
                       setForm({
                         name: '',
@@ -331,7 +333,7 @@ export function AccountsPage() {
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        color="secondary"
+                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                         onClick={() => handleEdit(account.id)}
                         disabled={isUpdating}
                       >
@@ -339,7 +341,7 @@ export function AccountsPage() {
                       </Button>
                       <Button
                         size="sm"
-                        color="danger"
+                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                         onClick={() => handleDelete(account.id)}
                         disabled={isDeleting}
                       >
