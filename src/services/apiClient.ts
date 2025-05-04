@@ -18,13 +18,16 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      // Tentar refresh automático
       const originalRequest = error.config;
-      const refreshToken = authUtils.getRefreshToken();
-      // Evita loop infinito
-      if (!originalRequest._retry && refreshToken) {
+      if (originalRequest.url?.includes('/refresh-token')) {
+        authUtils.clearAuth();
+        window.location.href = '/login';
+        return Promise.reject(error);
+      }
+      if (!originalRequest._retry && typeof authUtils.getRefreshToken() === 'string') {
         originalRequest._retry = true;
         try {
+          const refreshToken = authUtils.getRefreshToken() as string;
           const data = await refreshTokenService(refreshToken);
           authUtils.setToken(data.token, !!localStorage.getItem('@Auth:token'));
           if (data.refreshToken) {
@@ -34,15 +37,13 @@ apiClient.interceptors.response.use(
             );
           }
           authUtils.setUser(data.user, !!localStorage.getItem('@Auth:user'));
-          // Atualiza header e repete request
           originalRequest.headers.Authorization = `Bearer ${data.token}`;
           return apiClient(originalRequest);
         } catch (refreshError) {
-          // Se falhar, segue fluxo padrão de logout
+          console.warn('Token refresh failed', refreshError);
         }
       }
       authUtils.clearAuth();
-      // Rotas públicas
       const publicRoutes = [
         '/login',
         '/register',

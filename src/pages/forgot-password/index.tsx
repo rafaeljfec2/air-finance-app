@@ -71,7 +71,7 @@ export function ForgotPasswordPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={submitting || success}
-                    className={error ? 'border-red-500 pl-10' : 'pl-10'}
+                    className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors pl-10 ${error ? 'border-red-500' : ''}`}
                     placeholder="seu@email.com"
                   />
                 </div>

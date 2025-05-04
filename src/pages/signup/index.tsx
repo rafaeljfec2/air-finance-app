@@ -88,7 +88,7 @@ export function SignUpPage() {
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   disabled={isRegistering}
-                  className={errors.name ? 'border-red-500' : ''}
+                  className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.name ? 'border-red-500' : ''}`}
                   placeholder="Seu nome completo"
                 />
                 {errors.name && (
@@ -106,7 +106,7 @@ export function SignUpPage() {
                   value={form.email}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                   disabled={isRegistering}
-                  className={errors.email ? 'border-red-500' : ''}
+                  className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.email ? 'border-red-500' : ''}`}
                   placeholder="seu@email.com"
                 />
                 {errors.email && (
@@ -124,7 +124,7 @@ export function SignUpPage() {
                   value={form.password}
                   onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
                   disabled={isRegistering}
-                  className={errors.password ? 'border-red-500' : ''}
+                  className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.password ? 'border-red-500' : ''}`}
                   placeholder="Crie uma senha"
                 />
                 <button
@@ -151,7 +151,7 @@ export function SignUpPage() {
                   value={form.confirmPassword}
                   onChange={(e) => setForm((f) => ({ ...f, confirmPassword: e.target.value }))}
                   disabled={isRegistering}
-                  className={errors.confirmPassword ? 'border-red-500' : ''}
+                  className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.confirmPassword ? 'border-red-500' : ''}`}
                   placeholder="Repita a senha"
                 />
                 <button
