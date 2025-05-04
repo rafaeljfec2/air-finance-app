@@ -50,7 +50,11 @@ export const getCompanyById = async (id: string): Promise<Company> => {
 
 export const createCompany = async (data: CreateCompany): Promise<Company> => {
   try {
-    const validatedData = CreateCompanySchema.parse(data);
+    const dataToValidate = {
+      ...data,
+      foundationDate: data.foundationDate ? new Date(data.foundationDate).toISOString() : '',
+    };
+    const validatedData = CreateCompanySchema.parse(dataToValidate);
     const response = await apiClient.post<Company>('/companies', validatedData);
     return CompanySchema.parse(response.data);
   } catch (error) {
@@ -61,7 +65,11 @@ export const createCompany = async (data: CreateCompany): Promise<Company> => {
 
 export const updateCompany = async (id: string, data: Partial<CreateCompany>): Promise<Company> => {
   try {
-    const validatedData = CreateCompanySchema.partial().parse(data);
+    const dataToValidate = {
+      ...data,
+      foundationDate: data.foundationDate ? new Date(data.foundationDate).toISOString() : '',
+    };
+    const validatedData = CreateCompanySchema.partial().parse(dataToValidate);
     const response = await apiClient.put<Company>(`/companies/${id}`, validatedData);
     return CompanySchema.parse(response.data);
   } catch (error) {
