@@ -6,12 +6,9 @@ import { useQuery } from '@tanstack/react-query';
 import { companyService } from '@/services/company';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Loading } from '@/components/Loading';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { ChevronDown } from 'lucide-react';
 
 export const CompanySelector = () => {
-  const navigate = useNavigate();
   const { user } = useAuthStore();
   const { activeCompany, changeActiveCompany } = useActiveCompany();
   const [isOpen, setIsOpen] = useState(false);
@@ -29,17 +26,7 @@ export const CompanySelector = () => {
   }
 
   if (!companies?.length) {
-    return (
-      <Button
-        variant="outline"
-        size="sm"
-        className="flex items-center gap-2"
-        onClick={() => navigate('/companies/new')}
-      >
-        <PlusCircle className="h-4 w-4" />
-        <span>Cadastrar Empresa</span>
-      </Button>
-    );
+    return <div className="text-sm text-gray-500">Nenhuma empresa cadastrada</div>;
   }
 
   const handleCompanyChange = (companyId: string) => {
@@ -48,22 +35,30 @@ export const CompanySelector = () => {
   };
 
   return (
-    <div className="relative w-[200px]">
-      <Select value={activeCompany?.id || ''} onValueChange={handleCompanyChange}>
-        <SelectTrigger>
-          <span className="truncate">{activeCompany?.name || 'Selecione uma empresa'}</span>
-        </SelectTrigger>
-        <SelectContent>
-          {companies.map((company: Company) => (
-            <SelectItem key={company.id} value={company.id}>
-              <div className="flex flex-col">
-                <span className="font-medium">{company.name}</span>
-                <span className="text-xs text-gray-500">{company.cnpj}</span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Select value={activeCompany?.id || ''} onValueChange={handleCompanyChange}>
+      <SelectTrigger className="min-w-[220px] h-12 px-4 bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-md flex items-center justify-between shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+        <div className="flex flex-col items-start flex-1">
+          <span className="font-bold text-text dark:text-text-dark leading-tight">
+            {activeCompany?.name || 'Selecione uma empresa'}
+          </span>
+          {activeCompany?.cnpj && (
+            <span className="text-xs text-gray-500 dark:text-gray-400">{activeCompany.cnpj}</span>
+          )}
+        </div>
+        <ChevronDown className="ml-2 h-5 w-5 text-gray-400" />
+      </SelectTrigger>
+      <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-md shadow-lg p-1">
+        {companies.map((company: Company) => (
+          <SelectItem
+            key={company.id}
+            value={company.id}
+            className="flex flex-col px-4 py-2 rounded hover:bg-primary-50 dark:hover:bg-primary-900 focus:bg-primary-100 dark:focus:bg-primary-900"
+          >
+            <span className="font-medium">{company.name}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{company.cnpj}</span>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 };
