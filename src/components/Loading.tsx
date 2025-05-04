@@ -1,5 +1,3 @@
-import React from 'react';
-import { useTheme } from '@/stores/useTheme';
 import { cn } from '@/lib/utils';
 
 interface LoadingProps {
@@ -8,8 +6,6 @@ interface LoadingProps {
 }
 
 export const Loading = ({ size = 'small', className }: LoadingProps) => {
-  const { isDarkMode } = useTheme();
-
   return (
     <div
       className={cn(

@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Company } from '@/types/company';
 import { useActiveCompany } from '@/hooks/useActiveCompany';
 import { useAuthStore } from '@/store/auth';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { companyService } from '@/services/company';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Loading } from '@/components/Loading';
@@ -12,8 +12,6 @@ import { cn } from '@/lib/utils';
 export const CompanySelector = () => {
   const { user } = useAuthStore();
   const { activeCompany, changeActiveCompany } = useActiveCompany();
-  const [isOpen, setIsOpen] = useState(false);
-  const queryClient = useQueryClient();
 
   const {
     data: companies,

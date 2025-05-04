@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useCompanyContext } from '@/contexts/companyContext';
 import { formatCurrency } from '@/utils/format';
+import { useCompanyStore } from '@/store/company';
 
 const accountTypes = [
   { value: 'checking', label: 'Conta Corrente', icon: BanknotesIcon },
@@ -41,6 +42,7 @@ export function AccountsPage() {
     isUpdating,
     isDeleting,
   } = useAccounts();
+  const { activeCompany } = useCompanyStore();
 
   const [form, setForm] = useState({
     name: '',
@@ -50,13 +52,20 @@ export function AccountsPage() {
     accountNumber: '',
     color: '#8A05BE',
     icon: 'BanknotesIcon',
-    companyId: companyId || '',
+    companyId: activeCompany?.id || '',
   });
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [errors, setErrors] = useState<any>({});
+
+  useEffect(() => {
+    setForm((prev) => ({
+      ...prev,
+      companyId: activeCompany?.id || '',
+    }));
+  }, [activeCompany]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -102,7 +111,7 @@ export function AccountsPage() {
         accountNumber: '',
         color: '#8A05BE',
         icon: 'BanknotesIcon',
-        companyId: companyId || '',
+        companyId: activeCompany?.id || '',
       });
       setErrors({});
     } catch (error) {
@@ -196,13 +205,22 @@ export function AccountsPage() {
                 />
               </FormField>
               <FormField label="Tipo de conta" error={errors.type}>
-                <Select name="type" value={form.type} onChange={handleChange} required>
-                  <option value="">Selecione...</option>
-                  {accountTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
+                <Select
+                  value={form.type}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, type: value as AccountType }))
+                  }
+                >
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                    {accountTypes.find((t) => t.value === form.type)?.label || 'Selecione...'}
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                    {accountTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </FormField>
               <FormField label="Instituição" error={errors.institution}>
@@ -249,13 +267,16 @@ export function AccountsPage() {
                 />
               </FormField>
               <div className="flex gap-2 mt-4">
-                <Button type="submit" color="primary" disabled={isCreating || isUpdating}>
+                <Button
+                  type="submit"
+                  className="h-10 px-6 bg-primary-600 text-white rounded hover:bg-primary-700"
+                >
                   {editingId ? 'Salvar Alterações' : 'Adicionar Conta'}
                 </Button>
                 {editingId && (
                   <Button
                     type="button"
-                    color="secondary"
+                    className="h-10 px-6 bg-secondary-600 text-white rounded hover:bg-secondary-700"
                     onClick={() => {
                       setForm({
                         name: '',
@@ -265,7 +286,7 @@ export function AccountsPage() {
                         accountNumber: '',
                         color: '#8A05BE',
                         icon: 'BanknotesIcon',
-                        companyId: companyId || '',
+                        companyId: activeCompany?.id || '',
                       });
                       setEditingId(null);
                     }}

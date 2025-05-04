@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
