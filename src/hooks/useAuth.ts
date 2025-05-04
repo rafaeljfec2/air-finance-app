@@ -10,6 +10,7 @@ import {
   User,
 } from '../services/authService';
 import { authUtils } from '../utils/auth';
+import { useAuthStore } from '@/store/auth';
 
 export interface LoginOptions {
   rememberMe?: boolean;
@@ -18,6 +19,7 @@ export interface LoginOptions {
 export const useAuth = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { setUser, setToken } = useAuthStore();
 
   const { data: user, isLoading: isLoadingUser } = useQuery<User>({
     queryKey: ['user'],
@@ -35,6 +37,8 @@ export const useAuth = () => {
       }
       authUtils.setUser(data.user, !!rememberMe);
       queryClient.setQueryData(['user'], data.user);
+      setUser(data.user);
+      setToken(data.token);
       return data;
     },
   });

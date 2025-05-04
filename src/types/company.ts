@@ -8,7 +8,7 @@ export interface Company {
   phone?: string;
   address?: string;
   notes?: string;
-  userId: string;
+  userIds: string[];
   createdAt: string;
   updatedAt: string;
 }

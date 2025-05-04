@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Company } from '@/types/company';
 import { useActiveCompany } from '@/hooks/useActiveCompany';
 import { useAuthStore } from '@/store/auth';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { companyService } from '@/services/company';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Loading } from '@/components/Loading';
@@ -12,12 +12,32 @@ export const CompanySelector = () => {
   const { user } = useAuthStore();
   const { activeCompany, changeActiveCompany } = useActiveCompany();
   const [isOpen, setIsOpen] = useState(false);
+  const queryClient = useQueryClient();
 
-  const { data: companies, isLoading } = useQuery({
+  const {
+    data: companies,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['companies', user?.id],
     queryFn: () => companyService.getUserCompanies(),
     enabled: !!user,
   });
+
+  // Garante que a query de empresas seja executada após login
+  useEffect(() => {
+    if (user) {
+      refetch();
+    }
+  }, [user, refetch]);
+
+  // LOGS DE DEPURAÇÃO
+  console.log('CompanySelector montado');
+  console.log('User:', user);
+  console.log('Companies:', companies);
+  console.log('isLoading:', isLoading);
+  console.log('error:', error);
 
   if (!user) return null;
 
