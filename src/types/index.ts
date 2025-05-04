@@ -54,3 +54,5 @@ export interface TransactionFormData {
 }
 
 export type { Transaction, Category, Account, TransactionType };
+
+export * from './company';

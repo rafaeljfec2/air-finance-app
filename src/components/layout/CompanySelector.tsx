@@ -1,42 +1,55 @@
-import React from 'react';
-import { useCompanyContext } from '@/contexts/companyContext';
-import { BuildingOfficeIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
-import { Company } from '@/hooks/useCompanies';
+import { useState } from 'react';
+import { Company } from '@/types/company';
+import { useActiveCompany } from '@/hooks/useActiveCompany';
+import { useAuthStore } from '@/store/auth';
+import { useQuery } from '@tanstack/react-query';
+import { companyService } from '@/services/company';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
+import { Loading } from '@/components/Loading';
 
-export const CompanySelector: React.FC = () => {
-  const { companies, companyId, setCompanyId } = useCompanyContext() as {
-    companies: Company[];
-    companyId: string;
-    setCompanyId: (id: string) => void;
-  };
+export const CompanySelector = () => {
+  const { user } = useAuthStore();
+  const { activeCompany, changeActiveCompany } = useActiveCompany();
+  const [isOpen, setIsOpen] = useState(false);
 
-  if (!companies || companies.length === 0) return null;
-  if (companies.length === 1) {
-    // Se só tem uma empresa, já seleciona e não mostra o seletor
-    if (companyId !== companies[0].id) setCompanyId(companies[0].id);
-    return (
-      <div className="flex items-center gap-2 px-3 py-1 rounded bg-card dark:bg-card-dark border border-border dark:border-border-dark">
-        <BuildingOfficeIcon className="h-5 w-5 text-primary-500" />
-        <span className="text-sm">{companies[0].name}</span>
-      </div>
-    );
+  const { data: companies, isLoading } = useQuery({
+    queryKey: ['companies', user?.id],
+    queryFn: () => companyService.getUserCompanies(),
+    enabled: !!user,
+  });
+
+  if (!user) return null;
+
+  if (isLoading) {
+    return <Loading size="small" />;
   }
 
+  if (!companies?.length) {
+    return <div className="text-sm text-gray-500">Nenhuma empresa cadastrada</div>;
+  }
+
+  const handleCompanyChange = (companyId: string) => {
+    const selectedCompany = companies.find((company: Company) => company.id === companyId);
+    changeActiveCompany(selectedCompany || null);
+  };
+
   return (
-    <div className="relative">
-      <select
-        className="appearance-none bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded px-3 py-1 pr-8 text-sm text-text dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary-500"
-        value={companyId}
-        onChange={(e) => setCompanyId(e.target.value)}
-      >
-        <option value="">Selecione a empresa...</option>
-        {companies.map((c: Company) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
-      <ChevronDownIcon className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+    <div className="relative w-[200px]">
+      <Select value={activeCompany?.id || ''} onValueChange={handleCompanyChange}>
+        <SelectTrigger>
+          <span className="truncate">{activeCompany?.name || 'Selecione uma empresa'}</span>
+        </SelectTrigger>
+        <SelectContent>
+          {companies.map((company: Company) => (
+            <SelectItem key={company.id} value={company.id}>
+              <div className="flex flex-col">
+                <span className="font-medium">{company.name}</span>
+                <span className="text-xs text-gray-500">{company.cnpj}</span>
+              </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 };

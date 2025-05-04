@@ -157,3 +157,4 @@ evitar = [
 ]
 [mensagem_commit]
 padrao = "sugira uma mensagem de commit para o usuário sempre em inglês"
+acoes = ["quando usuário digitar commit, sugerir uma mensagem de commit para o usuário em inglês"]
