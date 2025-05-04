@@ -37,7 +37,7 @@ export const getAccounts = async (companyId: string): Promise<Account[]> => {
     return AccountSchema.array().parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar contas:', error);
-    throw new Error('Falha ao buscar contas');
+    throw new Error('Falha ao buscar contas' + error);
   }
 };
 

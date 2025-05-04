@@ -17,8 +17,15 @@ export const useActiveCompany = () => {
       // Log para depuração
       console.log('user.id:', user?.id, typeof user?.id);
       console.log('company.userIds:', company?.userIds, company?.userIds?.map(String));
-      console.log('Comparação:', company?.userIds?.map(String).includes(String(user?.id)));
-      if (company && (!company.userIds || !company.userIds.map(String).includes(String(user.id)))) {
+      console.log(
+        'Comparação:',
+        company?.userIds?.map((id) => String(id).trim()).includes(String(user?.id).trim()),
+      );
+      if (
+        company &&
+        (!company.userIds ||
+          !company.userIds.map((id) => String(id).trim()).includes(String(user.id).trim()))
+      ) {
         console.error('Tentativa de selecionar empresa não pertencente ao usuário');
         return;
       }

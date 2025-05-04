@@ -173,6 +173,28 @@ export function AccountsPage() {
   }
 
   if (error) {
+    // Trata erro 404 como "empresa não existe"
+    const isCompanyNotFound = error?.response?.status === 404 || error?.message?.includes('404');
+    if (isCompanyNotFound) {
+      return (
+        <ViewDefault>
+          <div className="container mx-auto px-2 sm:px-6 py-10 flex flex-col items-center justify-center min-h-[40vh]">
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded shadow-md max-w-lg w-full text-center">
+              <h2 className="text-lg font-semibold mb-2">Nenhuma empresa encontrada</h2>
+              <p className="mb-4">
+                Para cadastrar contas bancárias, você precisa criar uma empresa primeiro.
+              </p>
+              <Button
+                className="bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded"
+                onClick={() => (window.location.href = '/companies/new')}
+              >
+                Criar empresa
+              </Button>
+            </div>
+          </div>
+        </ViewDefault>
+      );
+    }
     return (
       <ViewDefault>
         <div className="container mx-auto px-2 sm:px-6 py-10">

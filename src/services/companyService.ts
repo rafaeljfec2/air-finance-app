@@ -5,7 +5,7 @@ import { z } from 'zod';
 export const CompanySchema = z.object({
   id: z.string(),
   name: z.string().min(2),
-  cnpj: z.string().regex(/^[0-9]{2}\.[0-9]{3}\.[0-9]{3}\/\d{4}\-\d{2}$/),
+  cnpj: z.string(),
   type: z.enum(['matriz', 'filial', 'holding', 'prestadora', 'outra']),
   foundationDate: z.string().datetime(),
   email: z.string().email().optional(),
