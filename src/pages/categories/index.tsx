@@ -19,6 +19,7 @@ import {
   BuildingLibraryIcon,
 } from '@heroicons/react/24/outline';
 import { useCompanyStore } from '@/store/company';
+import { Loading } from '@/components/Loading';
 
 const iconOptions = [
   { value: 'TagIcon', icon: TagIcon },
@@ -156,13 +157,7 @@ export function CategoriesPage() {
     return (
       <ViewDefault>
         <div className="container mx-auto px-2 sm:px-6 py-10">
-          <div className="animate-pulse">
-            <div className="h-8 w-48 bg-gray-200 rounded mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="h-96 bg-gray-200 rounded"></div>
-              <div className="h-96 bg-gray-200 rounded"></div>
-            </div>
-          </div>
+          <Loading size="large">Carregando categorias, por favor aguarde...</Loading>
         </div>
       </ViewDefault>
     );
