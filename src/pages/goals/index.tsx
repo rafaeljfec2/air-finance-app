@@ -8,7 +8,7 @@ import { FormField } from '@/components/ui/FormField';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useGoals } from '@/hooks/useGoals';
 import { useCategories } from '@/hooks/useCategories';
-import { useCompanyContext } from '@/contexts/companyContext';
+import { useCompanyStore } from '@/store/company';
 import { FlagIcon } from '@heroicons/react/24/outline';
 import { formatCurrency } from '@/utils/formatters';
 import { Progress } from '@/components/ui/progress';
@@ -17,7 +17,6 @@ import { ptBR } from 'date-fns/locale';
 import { CreateGoal } from '@/services/goalService';
 
 export function GoalsPage() {
-  const { companyId } = useCompanyContext() as { companyId: string };
   const {
     goals,
     isLoading,
@@ -30,7 +29,9 @@ export function GoalsPage() {
     isUpdating,
     isDeleting,
   } = useGoals();
-  const { categories } = useCategories();
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id || '';
+  const { categories } = useCategories(companyId);
 
   const [form, setForm] = useState<CreateGoal>({
     name: '',
@@ -40,7 +41,7 @@ export function GoalsPage() {
     deadline: '',
     status: 'active',
     categoryId: '',
-    companyId: companyId || '',
+    companyId,
   });
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -88,7 +89,7 @@ export function GoalsPage() {
         deadline: '',
         status: 'active',
         categoryId: '',
-        companyId: companyId || '',
+        companyId,
       });
       setErrors({});
     } catch (error) {
@@ -261,7 +262,7 @@ export function GoalsPage() {
                         deadline: '',
                         status: 'active',
                         categoryId: '',
-                        companyId: companyId || '',
+                        companyId,
                       });
                       setEditingId(null);
                     }}

@@ -177,11 +177,10 @@ export function NewTransaction() {
                     Conta
                   </label>
                   <Select
-                    id="accountId"
-                    name="accountId"
                     value={formData.accountId}
-                    onChange={handleChange}
-                    required
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, accountId: value }))
+                    }
                   >
                     <option value="">Selecione uma conta</option>
                     {accounts.map((account) => (
@@ -200,11 +199,10 @@ export function NewTransaction() {
                     Categoria
                   </label>
                   <Select
-                    id="categoryId"
-                    name="categoryId"
                     value={formData.categoryId}
-                    onChange={handleChange}
-                    required
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, categoryId: value }))
+                    }
                   >
                     <option value="">Selecione uma categoria</option>
                     {filteredCategories.map((category) => (
@@ -223,11 +221,10 @@ export function NewTransaction() {
                     Dependente
                   </label>
                   <Select
-                    id="dependent"
-                    name="dependent"
                     value={formData.dependent}
-                    onChange={handleChange}
-                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, dependent: value }))
+                    }
                   >
                     <option value="">Selecione um dependente (opcional)</option>
                     {dependents.map((dep) => (
@@ -246,12 +243,10 @@ export function NewTransaction() {
                     Quantidade de parcelas
                   </label>
                   <Select
-                    id="installmentCount"
-                    name="installmentCount"
-                    value={formData.installmentCount}
-                    onChange={handleChange}
-                    required
-                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                    value={String(formData.installmentCount)}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, installmentCount: Number(value) }))
+                    }
                   >
                     {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
                       <option key={num} value={num}>

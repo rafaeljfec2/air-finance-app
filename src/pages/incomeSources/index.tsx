@@ -167,7 +167,12 @@ export function IncomeSourcesPage() {
               </FormField>
 
               <FormField label="Tipo" error={errors.type}>
-                <Select name="type" value={form.type} onChange={handleChange} required>
+                <Select
+                  value={form.type}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, type: value as IncomeSource['type'] }))
+                  }
+                >
                   <option value="fixed">Fixa</option>
                   <option value="variable">Variável</option>
                   <option value="passive">Passiva</option>
@@ -188,7 +193,12 @@ export function IncomeSourcesPage() {
               </FormField>
 
               <FormField label="Frequência" error={errors.frequency}>
-                <Select name="frequency" value={form.frequency} onChange={handleChange} required>
+                <Select
+                  value={form.frequency}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, frequency: value as IncomeSource['frequency'] }))
+                  }
+                >
                   <option value="daily">Diária</option>
                   <option value="weekly">Semanal</option>
                   <option value="monthly">Mensal</option>
@@ -211,7 +221,12 @@ export function IncomeSourcesPage() {
               </FormField>
 
               <FormField label="Status" error={errors.status}>
-                <Select name="status" value={form.status} onChange={handleChange} required>
+                <Select
+                  value={form.status}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, status: value as IncomeSource['status'] }))
+                  }
+                >
                   <option value="active">Ativa</option>
                   <option value="inactive">Inativa</option>
                 </Select>

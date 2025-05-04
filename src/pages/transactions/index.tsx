@@ -97,11 +97,7 @@ export function Transactions() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                  <Select
-                    value={selectedPeriod}
-                    onChange={(e) => setSelectedPeriod(e.target.value)}
-                    className="w-full bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                  >
+                  <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
                     <option value="all">Todos os períodos</option>
                     <option value="current">Mês atual</option>
                     <option value="last">Mês anterior</option>
@@ -110,11 +106,7 @@ export function Transactions() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                  <Select
-                    value={selectedType}
-                    onChange={(e) => setSelectedType(e.target.value)}
-                    className="w-full bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                  >
+                  <Select value={selectedType} onValueChange={setSelectedType}>
                     <option value="all">Todos os tipos</option>
                     <option value="RECEITA">Receitas</option>
                     <option value="DESPESA">Despesas</option>

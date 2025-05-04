@@ -9,7 +9,6 @@ import { useCompanies } from '@/hooks/useCompanies';
 import { BuildingOfficeIcon } from '@heroicons/react/24/outline';
 import { formatDate } from '@/utils/date';
 import { CreateCompany } from '@/services/companyService';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { FormCard } from '@/components/ui/FormCard';
 import { DetailsCard } from '@/components/ui/DetailsCard';
@@ -191,8 +190,6 @@ export function CompaniesPage() {
     setShowConfirmDelete(false);
     setDeleteId(null);
   };
-
-  const navigate = useNavigate();
 
   if (isLoading) {
     return (
