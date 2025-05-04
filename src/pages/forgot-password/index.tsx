@@ -6,6 +6,7 @@ import { Logo } from '@/components/Logo';
 import { motion } from 'framer-motion';
 import { Mail, CheckCircle2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { useAuth } from '@/hooks/useAuth';
 
 export function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ export function ForgotPasswordPage() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { requestPasswordRecovery, isRecoveringPassword } = useAuth();
 
   function validateEmail(value: string) {
     return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value);
@@ -26,11 +28,14 @@ export function ForgotPasswordPage() {
       return;
     }
     setSubmitting(true);
-    // Simula requisição
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      await requestPasswordRecovery({ email });
       setSuccess(true);
-    }, 1200);
+    } catch (err) {
+      setError('Erro ao enviar instruções. Tente novamente.');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -75,9 +80,9 @@ export function ForgotPasswordPage() {
               <Button
                 type="submit"
                 className="w-full bg-brand-arrow hover:bg-brand-arrow/90 text-white py-3 text-lg mt-2"
-                disabled={submitting || success}
+                disabled={submitting || isRecoveringPassword || success}
               >
-                {submitting ? 'Enviando...' : 'Enviar instruções'}
+                {submitting || isRecoveringPassword ? 'Enviando...' : 'Enviar instruções'}
               </Button>
               {success && (
                 <div className="flex items-center gap-2 text-green-600 mt-2 justify-center">

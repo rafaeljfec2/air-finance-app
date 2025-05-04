@@ -28,6 +28,7 @@ export function Login() {
       {
         email: formData.email,
         password: formData.password,
+        rememberMe: formData.rememberMe,
       },
       {
         onError: (err: any) => {

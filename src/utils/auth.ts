@@ -4,45 +4,54 @@ const TOKEN_KEY = '@Auth:token';
 const REFRESH_TOKEN_KEY = '@Auth:refreshToken';
 const USER_KEY = '@Auth:user';
 
+function getStorage(persistent: boolean) {
+  return persistent ? localStorage : sessionStorage;
+}
+
 export const authUtils = {
-  async setToken(token: string): Promise<void> {
-    await AsyncStorage.setItem(TOKEN_KEY, token);
+  setToken(token: string, persistent = false): void {
+    getStorage(persistent).setItem(TOKEN_KEY, token);
   },
 
-  async getToken(): Promise<string | null> {
-    return await AsyncStorage.getItem(TOKEN_KEY);
+  getToken(): string | null {
+    return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
   },
 
-  async removeToken(): Promise<void> {
-    await AsyncStorage.removeItem(TOKEN_KEY);
+  removeToken(): void {
+    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
   },
 
-  async setRefreshToken(refreshToken: string): Promise<void> {
-    await AsyncStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  setRefreshToken(refreshToken: string, persistent = false): void {
+    getStorage(persistent).setItem(REFRESH_TOKEN_KEY, refreshToken);
   },
 
-  async getRefreshToken(): Promise<string | null> {
-    return await AsyncStorage.getItem(REFRESH_TOKEN_KEY);
+  getRefreshToken(): string | null {
+    return localStorage.getItem(REFRESH_TOKEN_KEY) || sessionStorage.getItem(REFRESH_TOKEN_KEY);
   },
 
-  async removeRefreshToken(): Promise<void> {
-    await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
+  removeRefreshToken(): void {
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    sessionStorage.removeItem(REFRESH_TOKEN_KEY);
   },
 
-  async setUser(user: any): Promise<void> {
-    await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
+  setUser(user: any, persistent = false): void {
+    getStorage(persistent).setItem(USER_KEY, JSON.stringify(user));
   },
 
-  async getUser(): Promise<any | null> {
-    const user = await AsyncStorage.getItem(USER_KEY);
+  getUser(): any | null {
+    const user = localStorage.getItem(USER_KEY) || sessionStorage.getItem(USER_KEY);
     return user ? JSON.parse(user) : null;
   },
 
-  async removeUser(): Promise<void> {
-    await AsyncStorage.removeItem(USER_KEY);
+  removeUser(): void {
+    localStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(USER_KEY);
   },
 
-  async clearAuth(): Promise<void> {
-    await Promise.all([this.removeToken(), this.removeRefreshToken(), this.removeUser()]);
+  clearAuth(): void {
+    this.removeToken();
+    this.removeRefreshToken();
+    this.removeUser();
   },
 };

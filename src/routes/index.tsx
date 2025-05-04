@@ -47,11 +47,10 @@ export const router = createBrowserRouter([
     path: '/new-password',
     element: <NewPasswordPage />,
   },
-  // Reset de senha: adicionar quando o caminho correto for confirmado
-  // {
-  //   path: '/reset-password/:token',
-  //   element: <ResetPassword />,
-  // },
+  {
+    path: '/reset-password/:token',
+    element: <ForgotPasswordPage />,
+  },
   {
     path: '/dashboard',
     element: (

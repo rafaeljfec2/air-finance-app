@@ -83,7 +83,7 @@ export const register = async (data: RegisterData): Promise<AuthResponse> => {
 export const requestPasswordRecovery = async (data: PasswordRecoveryData): Promise<void> => {
   try {
     const validatedData = PasswordRecoverySchema.parse(data);
-    await apiClient.post('/auth/password-recovery', validatedData);
+    await apiClient.post('/auth/forgot-password', validatedData);
   } catch (error) {
     console.error('Erro ao solicitar recuperação de senha:', error);
     throw new Error('Falha ao solicitar recuperação de senha');
@@ -116,5 +116,18 @@ export const getCurrentUser = async (): Promise<User> => {
   } catch (error) {
     console.error('Erro ao obter usuário atual:', error);
     throw new Error('Falha ao obter usuário atual');
+  }
+};
+
+// Refresh Token
+export const refreshToken = async (refreshTokenValue: string): Promise<AuthResponse> => {
+  try {
+    const response = await apiClient.post<AuthResponse>('/auth/refresh-token', {
+      refreshToken: refreshTokenValue,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao renovar token:', error);
+    throw new Error('Falha ao renovar token');
   }
 };

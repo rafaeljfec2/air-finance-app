@@ -22,7 +22,7 @@ export function Header() {
 
   const handleLogout = () => {
     logout();
-    navigate('/auth/login');
+    navigate('/login');
   };
 
   return (

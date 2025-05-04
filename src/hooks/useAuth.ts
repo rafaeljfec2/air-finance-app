@@ -10,6 +10,10 @@ import {
 } from '../services/authService';
 import { authUtils } from '../utils/auth';
 
+export interface LoginOptions {
+  rememberMe?: boolean;
+}
+
 export const useAuth = () => {
   const queryClient = useQueryClient();
 
@@ -20,14 +24,16 @@ export const useAuth = () => {
   });
 
   const loginMutation = useMutation({
-    mutationFn: login,
-    onSuccess: async (data) => {
-      await authUtils.setToken(data.token);
+    mutationFn: async (variables: any & LoginOptions) => {
+      const { rememberMe, ...loginData } = variables;
+      const data = await login(loginData);
+      authUtils.setToken(data.token, !!rememberMe);
       if (data.refreshToken) {
-        await authUtils.setRefreshToken(data.refreshToken);
+        authUtils.setRefreshToken(data.refreshToken, !!rememberMe);
       }
-      await authUtils.setUser(data.user);
+      authUtils.setUser(data.user, !!rememberMe);
       queryClient.setQueryData(['user'], data.user);
+      return data;
     },
   });
 
