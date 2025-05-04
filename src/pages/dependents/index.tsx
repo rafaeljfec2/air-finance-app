@@ -179,7 +179,14 @@ export function DependentsPage() {
                 />
               </FormField>
               <FormField label="Relação" error={errors.relation}>
-                <Select name="relation" value={form.relation} onChange={handleChange} required>
+                <Select
+                  name="relation"
+                  value={form.relation}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, relation: value as RelationType }))
+                  }
+                  required
+                >
                   {relationTypes.map((type) => (
                     <option key={type.value} value={type.value}>
                       {type.label}
@@ -201,13 +208,19 @@ export function DependentsPage() {
                 />
               </FormField>
               <div className="flex gap-2 mt-4">
-                <Button type="submit" color="primary" disabled={isCreating || isUpdating}>
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
+                  disabled={isCreating || isUpdating}
+                >
                   {editingId ? 'Salvar Alterações' : 'Adicionar Dependente'}
                 </Button>
                 {editingId && (
                   <Button
                     type="button"
-                    color="secondary"
+                    size="sm"
+                    className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                     onClick={() => {
                       setForm({
                         name: '',
@@ -257,7 +270,7 @@ export function DependentsPage() {
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        color="secondary"
+                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                         onClick={() => handleEdit(dependent.id)}
                         disabled={isUpdating}
                       >
@@ -265,7 +278,7 @@ export function DependentsPage() {
                       </Button>
                       <Button
                         size="sm"
-                        color="danger"
+                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                         onClick={() => handleDelete(dependent.id)}
                         disabled={isDeleting}
                       >

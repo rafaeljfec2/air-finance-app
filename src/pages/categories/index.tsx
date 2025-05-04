@@ -217,13 +217,19 @@ export function CategoriesPage() {
                 />
               </FormField>
               <div className="flex gap-2 mt-4">
-                <Button type="submit" color="primary" disabled={isCreating || isUpdating}>
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
+                  disabled={isCreating || isUpdating}
+                >
                   {editingId ? 'Salvar Alterações' : 'Adicionar Categoria'}
                 </Button>
                 {editingId && (
                   <Button
                     type="button"
-                    color="secondary"
+                    size="sm"
+                    className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                     onClick={() => {
                       setForm({
                         name: '',
@@ -274,7 +280,7 @@ export function CategoriesPage() {
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        color="secondary"
+                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                         onClick={() => handleEdit(category.id)}
                         disabled={isUpdating}
                       >
@@ -282,7 +288,7 @@ export function CategoriesPage() {
                       </Button>
                       <Button
                         size="sm"
-                        color="danger"
+                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                         onClick={() => handleDelete(category.id)}
                         disabled={isDeleting}
                       >

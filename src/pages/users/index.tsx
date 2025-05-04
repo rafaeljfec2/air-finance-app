@@ -172,27 +172,47 @@ export function UsersPage() {
               </FormField>
 
               <FormField label="Função" error={errors.role}>
-                <Select name="role" value={form.role} onChange={handleChange} required>
+                <Select
+                  name="role"
+                  value={form.role}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, role: value as 'user' | 'admin' }))
+                  }
+                  required
+                >
                   <option value="admin">Administrador</option>
                   <option value="user">Usuário</option>
                 </Select>
               </FormField>
 
               <FormField label="Status" error={errors.status}>
-                <Select name="status" value={form.status} onChange={handleChange} required>
+                <Select
+                  name="status"
+                  value={form.status}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, status: value as 'active' | 'inactive' }))
+                  }
+                  required
+                >
                   <option value="active">Ativo</option>
                   <option value="inactive">Inativo</option>
                 </Select>
               </FormField>
 
               <div className="flex gap-2 mt-4">
-                <Button type="submit" color="primary" disabled={isCreating || isUpdating}>
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
+                  disabled={isCreating || isUpdating}
+                >
                   {editingId ? 'Salvar Alterações' : 'Adicionar Usuário'}
                 </Button>
                 {editingId && (
                   <Button
                     type="button"
-                    color="secondary"
+                    size="sm"
+                    className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                     onClick={() => {
                       setForm({
                         name: '',
@@ -242,7 +262,7 @@ export function UsersPage() {
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        color="secondary"
+                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                         onClick={() => handleEdit(user.id)}
                         disabled={isUpdating}
                       >
@@ -250,7 +270,7 @@ export function UsersPage() {
                       </Button>
                       <Button
                         size="sm"
-                        color="danger"
+                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                         onClick={() => handleDelete(user.id)}
                         disabled={isDeleting}
                       >

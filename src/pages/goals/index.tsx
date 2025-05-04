@@ -222,7 +222,11 @@ export function GoalsPage() {
                 />
               </FormField>
               <FormField label="Categoria" error={errors.categoryId}>
-                <Select name="categoryId" value={form.categoryId} onChange={handleChange}>
+                <Select
+                  name="categoryId"
+                  value={form.categoryId}
+                  onValueChange={(value) => setForm((prev) => ({ ...prev, categoryId: value }))}
+                >
                   <option value="">Selecione...</option>
                   {categories?.map((cat) => (
                     <option key={cat.id} value={cat.id}>
@@ -232,13 +236,19 @@ export function GoalsPage() {
                 </Select>
               </FormField>
               <div className="flex gap-2 mt-4">
-                <Button type="submit" color="primary" disabled={isCreating || isUpdating}>
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
+                  disabled={isCreating || isUpdating}
+                >
                   {editingId ? 'Salvar Alterações' : 'Adicionar Meta'}
                 </Button>
                 {editingId && (
                   <Button
                     type="button"
-                    color="secondary"
+                    size="sm"
+                    className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                     onClick={() => {
                       setForm({
                         name: '',
@@ -321,7 +331,7 @@ export function GoalsPage() {
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          color="secondary"
+                          className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                           onClick={() => handleEdit(goal.id)}
                           disabled={isUpdating}
                         >
@@ -329,7 +339,7 @@ export function GoalsPage() {
                         </Button>
                         <Button
                           size="sm"
-                          color="danger"
+                          className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                           onClick={() => handleDelete(goal.id)}
                           disabled={isDeleting}
                         >
