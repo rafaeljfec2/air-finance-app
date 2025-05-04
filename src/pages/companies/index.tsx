@@ -12,6 +12,8 @@ import { formatDate } from '@/utils/date';
 import { CreateCompany } from '@/services/companyService';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { FormCard } from '@/components/ui/FormCard';
+import { DetailsCard } from '@/components/ui/DetailsCard';
 
 const typeOptions = [
   { value: 'matriz', label: 'Matriz' },
@@ -227,7 +229,7 @@ export function CompaniesPage() {
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Formulário */}
-          <Card className="p-6">
+          <FormCard title="Empresas">
             <form onSubmit={handleSubmit} className="space-y-4">
               <FormField label="Nome da empresa" error={errors.name}>
                 <Input
@@ -333,23 +335,24 @@ export function CompaniesPage() {
                 >
                   {editingId ? 'Salvar Alterações' : 'Adicionar Empresa'}
                 </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-                  onClick={() => {
-                    setForm(initialFormState);
-                    setEditingId(null);
-                  }}
-                >
-                  Cancelar
-                </Button>
+                {editingId && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
+                    onClick={() => {
+                      setForm(initialFormState);
+                      setEditingId(null);
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                )}
               </div>
             </form>
-          </Card>
+          </FormCard>
           {/* Listagem */}
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Minhas Empresas</h2>
+          <DetailsCard title="Minhas Empresas">
             <ul className="divide-y divide-border dark:divide-border-dark">
               {companies?.length === 0 && (
                 <li className="text-gray-400 text-sm">Nenhuma empresa cadastrada.</li>
@@ -397,7 +400,7 @@ export function CompaniesPage() {
                 </li>
               ))}
             </ul>
-          </Card>
+          </DetailsCard>
         </div>
       </div>
       <ConfirmModal
