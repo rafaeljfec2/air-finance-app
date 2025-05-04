@@ -5,21 +5,20 @@ import { z } from 'zod';
 export const CompanySchema = z.object({
   id: z.string(),
   name: z.string().min(2),
-  cnpj: z.string().regex(/^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$/),
+  cnpj: z.string().regex(/^[0-9]{2}\.[0-9]{3}\.[0-9]{3}\/\d{4}\-\d{2}$/),
   type: z.enum(['matriz', 'filial', 'holding', 'prestadora', 'outra']),
   foundationDate: z.string().datetime(),
   email: z.string().email().optional(),
   phone: z.string().min(10).optional(),
   address: z.string().optional(),
   notes: z.string().optional(),
-  userId: z.string(),
+  userIds: z.array(z.string()),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
 
 export const CreateCompanySchema = CompanySchema.omit({
   id: true,
-  userId: true,
   createdAt: true,
   updatedAt: true,
 });

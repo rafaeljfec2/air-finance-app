@@ -1,9 +1,9 @@
-import { api } from '@/services/api';
+import { apiClient } from '@/services/apiClient';
 import { Company } from '@/types';
 
 export const companyService = {
   getUserCompanies: async (): Promise<Company[]> => {
-    const response = await api.get<Company[]>('/users/me/companies');
+    const response = await apiClient.get<Company[]>('/users/me/companies');
     return response.data;
   },
 };

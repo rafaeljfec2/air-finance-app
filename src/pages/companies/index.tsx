@@ -10,8 +10,8 @@ import { useCompanies } from '@/hooks/useCompanies';
 import { BuildingOfficeIcon } from '@heroicons/react/24/outline';
 import { formatDate } from '@/utils/date';
 import { CreateCompany } from '@/services/companyService';
-import { PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const typeOptions = [
   { value: 'matriz', label: 'Matriz' },
@@ -21,7 +21,7 @@ const typeOptions = [
   { value: 'outra', label: 'Outra' },
 ] as const;
 
-type CompanyType = (typeof typeOptions)[number]['value'];
+type CompanyType = 'matriz' | 'filial' | 'holding' | 'prestadora' | 'outra';
 
 function formatCNPJ(value: string) {
   return value
@@ -82,17 +82,19 @@ export function CompaniesPage() {
     isDeleting,
   } = useCompanies();
 
-  const [form, setForm] = useState<CreateCompany>({
+  const initialFormState = {
     name: '',
     cnpj: '',
-    type: 'matriz',
+    type: 'matriz' as CompanyType,
     foundationDate: '',
+    userIds: [] as string[],
     email: '',
     phone: '',
     address: '',
     notes: '',
-  });
+  };
 
+  const [form, setForm] = useState<CreateCompany>(initialFormState);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -136,18 +138,13 @@ export function CompaniesPage() {
         await updateCompany({ id: editingId, data: form });
         setEditingId(null);
       } else {
-        await createCompany(form);
+        await createCompany(form, {
+          onSuccess: () => {
+            toast.success('Empresa cadastrada com sucesso!');
+          },
+        });
       }
-      setForm({
-        name: '',
-        cnpj: '',
-        type: 'matriz',
-        foundationDate: '',
-        email: '',
-        phone: '',
-        address: '',
-        notes: '',
-      });
+      setForm(initialFormState);
       setErrors({});
     } catch (error) {
       console.error('Erro ao salvar empresa:', error);
@@ -166,6 +163,7 @@ export function CompaniesPage() {
         phone: company.phone || '',
         address: company.address || '',
         notes: company.notes || '',
+        userIds: company.userIds,
       });
       setEditingId(id);
     }
@@ -337,18 +335,11 @@ export function CompaniesPage() {
                 {editingId && (
                   <Button
                     type="button"
-                    color="secondary"
+                    variant="outline"
+                    size="sm"
+                    className="text-gray-500 border-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                     onClick={() => {
-                      setForm({
-                        name: '',
-                        cnpj: '',
-                        type: 'matriz',
-                        foundationDate: '',
-                        email: '',
-                        phone: '',
-                        address: '',
-                        notes: '',
-                      });
+                      setForm(initialFormState);
                       setEditingId(null);
                     }}
                   >
@@ -387,10 +378,11 @@ export function CompaniesPage() {
                       <div className="text-xs text-gray-400 italic">Obs: {company.notes}</div>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex justify-end gap-2">
                     <Button
                       size="sm"
-                      color="secondary"
+                      variant="outline"
+                      className="text-primary-500 border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900"
                       onClick={() => handleEdit(company.id)}
                       disabled={isUpdating}
                     >
@@ -398,7 +390,8 @@ export function CompaniesPage() {
                     </Button>
                     <Button
                       size="sm"
-                      color="danger"
+                      variant="outline"
+                      className="text-red-600 border-red-600 hover:bg-red-50 dark:hover:bg-red-900"
                       onClick={() => handleDelete(company.id)}
                       disabled={isDeleting}
                     >
