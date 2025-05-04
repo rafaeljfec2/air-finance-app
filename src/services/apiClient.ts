@@ -6,8 +6,8 @@ export const apiClient = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/v1`,
 });
 
-apiClient.interceptors.request.use(async (config) => {
-  const token = await authUtils.getToken();
+apiClient.interceptors.request.use((config) => {
+  const token = authUtils.getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

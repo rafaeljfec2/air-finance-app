@@ -95,7 +95,7 @@ export function ForgotPasswordPage() {
               <button
                 type="button"
                 className="text-brand-arrow hover:underline font-medium"
-                onClick={() => navigate('/auth/login')}
+                onClick={() => navigate('/login')}
               >
                 Voltar para o login
               </button>
