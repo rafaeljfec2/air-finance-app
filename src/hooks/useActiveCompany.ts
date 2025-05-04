@@ -14,18 +14,13 @@ export const useActiveCompany = () => {
         return;
       }
 
-      // Log para depuração
+      // Flatten para garantir array plano de strings
+      const userIdsFlat = (company?.userIds || []).flat().map((id) => String(id).trim());
       console.log('user.id:', user?.id, typeof user?.id);
-      console.log('company.userIds:', company?.userIds, company?.userIds?.map(String));
-      console.log(
-        'Comparação:',
-        company?.userIds?.map((id) => String(id).trim()).includes(String(user?.id).trim()),
-      );
-      if (
-        company &&
-        (!company.userIds ||
-          !company.userIds.map((id) => String(id).trim()).includes(String(user.id).trim()))
-      ) {
+      console.log('company.userIds (flat):', userIdsFlat);
+      console.log('Comparação:', userIdsFlat.includes(String(user?.id).trim()));
+
+      if (company && !userIdsFlat.includes(String(user.id).trim())) {
         console.error('Tentativa de selecionar empresa não pertencente ao usuário');
         return;
       }
