@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Button } from '@/components/ui/button';
@@ -180,18 +180,21 @@ export function DependentsPage() {
               </FormField>
               <FormField label="Relação" error={errors.relation}>
                 <Select
-                  name="relation"
                   value={form.relation}
                   onValueChange={(value) =>
                     setForm((prev) => ({ ...prev, relation: value as RelationType }))
                   }
-                  required
                 >
-                  {relationTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                    {relationTypes.find((t) => t.value === form.relation)?.label || 'Selecione...'}
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                    {relationTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </FormField>
               <FormField label="Cor">

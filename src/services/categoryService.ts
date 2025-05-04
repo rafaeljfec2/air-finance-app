@@ -10,7 +10,6 @@ export const CategorySchema = z.object({
   }),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida'),
   icon: z.string().min(1, 'Ícone é obrigatório'),
-  userId: z.string(),
   companyId: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -18,7 +17,7 @@ export const CategorySchema = z.object({
 
 export const CreateCategorySchema = CategorySchema.omit({
   id: true,
-  userId: true,
+  companyId: true,
   createdAt: true,
   updatedAt: true,
 });
@@ -27,9 +26,9 @@ export type Category = z.infer<typeof CategorySchema>;
 export type CreateCategory = z.infer<typeof CreateCategorySchema>;
 
 // Service functions
-export const getCategories = async (): Promise<Category[]> => {
+export const getCategories = async (companyId: string): Promise<Category[]> => {
   try {
-    const response = await apiClient.get<Category[]>('/categories');
+    const response = await apiClient.get<Category[]>(`/companies/${companyId}/categories`);
     return CategorySchema.array().parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar categorias:', error);
@@ -37,9 +36,9 @@ export const getCategories = async (): Promise<Category[]> => {
   }
 };
 
-export const getCategoryById = async (id: string): Promise<Category> => {
+export const getCategoryById = async (companyId: string, id: string): Promise<Category> => {
   try {
-    const response = await apiClient.get<Category>(`/categories/${id}`);
+    const response = await apiClient.get<Category>(`/companies/${companyId}/categories/${id}`);
     return CategorySchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar categoria:', error);
@@ -47,10 +46,16 @@ export const getCategoryById = async (id: string): Promise<Category> => {
   }
 };
 
-export const createCategory = async (data: CreateCategory): Promise<Category> => {
+export const createCategory = async (
+  companyId: string,
+  data: CreateCategory,
+): Promise<Category> => {
   try {
     const validatedData = CreateCategorySchema.parse(data);
-    const response = await apiClient.post<Category>('/categories', validatedData);
+    const response = await apiClient.post<Category>(`/companies/${companyId}/categories`, {
+      ...validatedData,
+      companyId,
+    });
     return CategorySchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao criar categoria:', error);
@@ -59,12 +64,16 @@ export const createCategory = async (data: CreateCategory): Promise<Category> =>
 };
 
 export const updateCategory = async (
+  companyId: string,
   id: string,
   data: Partial<CreateCategory>,
 ): Promise<Category> => {
   try {
     const validatedData = CreateCategorySchema.partial().parse(data);
-    const response = await apiClient.put<Category>(`/categories/${id}`, validatedData);
+    const response = await apiClient.put<Category>(
+      `/companies/${companyId}/categories/${id}`,
+      validatedData,
+    );
     return CategorySchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao atualizar categoria:', error);
@@ -72,9 +81,9 @@ export const updateCategory = async (
   }
 };
 
-export const deleteCategory = async (id: string): Promise<void> => {
+export const deleteCategory = async (companyId: string, id: string): Promise<void> => {
   try {
-    await apiClient.delete(`/categories/${id}`);
+    await apiClient.delete(`/companies/${companyId}/categories/${id}`);
   } catch (error) {
     console.error('Erro ao deletar categoria:', error);
     throw new Error('Falha ao deletar categoria');

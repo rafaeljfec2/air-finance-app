@@ -30,7 +30,6 @@ const accountTypes = [
 type AccountType = (typeof accountTypes)[number]['value'];
 
 export function AccountsPage() {
-  const { companyId } = useCompanyContext() as { companyId: string };
   const {
     accounts,
     isLoading,
@@ -38,7 +37,6 @@ export function AccountsPage() {
     createAccount,
     updateAccount,
     deleteAccount,
-    isCreating,
     isUpdating,
     isDeleting,
   } = useAccounts();

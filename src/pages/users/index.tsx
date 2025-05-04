@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/FormField';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -173,29 +173,35 @@ export function UsersPage() {
 
               <FormField label="Função" error={errors.role}>
                 <Select
-                  name="role"
                   value={form.role}
                   onValueChange={(value) =>
                     setForm((prev) => ({ ...prev, role: value as 'user' | 'admin' }))
                   }
-                  required
                 >
-                  <option value="admin">Administrador</option>
-                  <option value="user">Usuário</option>
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                    {form.role === 'admin' ? 'Administrador' : 'Usuário'}
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                    <SelectItem value="admin">Administrador</SelectItem>
+                    <SelectItem value="user">Usuário</SelectItem>
+                  </SelectContent>
                 </Select>
               </FormField>
 
               <FormField label="Status" error={errors.status}>
                 <Select
-                  name="status"
                   value={form.status}
                   onValueChange={(value) =>
                     setForm((prev) => ({ ...prev, status: value as 'active' | 'inactive' }))
                   }
-                  required
                 >
-                  <option value="active">Ativo</option>
-                  <option value="inactive">Inativo</option>
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                    {form.status === 'active' ? 'Ativo' : 'Inativo'}
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                    <SelectItem value="active">Ativo</SelectItem>
+                    <SelectItem value="inactive">Inativo</SelectItem>
+                  </SelectContent>
                 </Select>
               </FormField>
 

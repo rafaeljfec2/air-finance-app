@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/FormField';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useCategories } from '@/hooks/useCategories';
-import { useCompanyContext } from '@/contexts/companyContext';
 import {
   TagIcon,
   ArrowTrendingUpIcon,
@@ -19,6 +18,7 @@ import {
   GiftIcon,
   BuildingLibraryIcon,
 } from '@heroicons/react/24/outline';
+import { useCompanyStore } from '@/store/company';
 
 const iconOptions = [
   { value: 'TagIcon', icon: TagIcon },
@@ -38,7 +38,8 @@ const categoryTypes = [
 type CategoryType = (typeof categoryTypes)[number]['value'];
 
 export function CategoriesPage() {
-  const { companyId } = useCompanyContext() as { companyId: string };
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id || '';
   const {
     categories,
     isLoading,
@@ -49,20 +50,24 @@ export function CategoriesPage() {
     isCreating,
     isUpdating,
     isDeleting,
-  } = useCategories();
+  } = useCategories(companyId);
 
   const [form, setForm] = useState({
     name: '',
     type: 'expense' as CategoryType,
     color: '#8A05BE',
     icon: 'TagIcon',
-    companyId: companyId || '',
+    companyId,
   });
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [errors, setErrors] = useState<any>({});
+
+  React.useEffect(() => {
+    setForm((prev) => ({ ...prev, companyId }));
+  }, [companyId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -103,7 +108,7 @@ export function CategoriesPage() {
         type: 'expense',
         color: '#8A05BE',
         icon: 'TagIcon',
-        companyId: companyId || '',
+        companyId,
       });
       setErrors({});
     } catch (error) {
@@ -194,13 +199,22 @@ export function CategoriesPage() {
                 />
               </FormField>
               <FormField label="Tipo" error={errors.type}>
-                <Select name="type" value={form.type} onChange={handleChange} required>
-                  <option value="">Selecione...</option>
-                  {categoryTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
+                <Select
+                  value={form.type}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, type: value as CategoryType }))
+                  }
+                >
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                    {categoryTypes.find((t) => t.value === form.type)?.label || 'Selecione...'}
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                    {categoryTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </FormField>
               <FormField label="Cor">
@@ -236,7 +250,7 @@ export function CategoriesPage() {
                         type: 'expense',
                         color: '#8A05BE',
                         icon: 'TagIcon',
-                        companyId: companyId || '',
+                        companyId,
                       });
                       setEditingId(null);
                     }}

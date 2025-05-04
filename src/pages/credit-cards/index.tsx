@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Button } from '@/components/ui/button';
@@ -252,31 +252,42 @@ export function CreditCardsPage() {
                   required
                 />
               </FormField>
-              <div className="grid grid-cols-2 gap-4">
-                <FormField label="Dia de fechamento" error={errors.closingDay}>
-                  <Select
-                    name="closingDay"
-                    value={form.closingDay}
-                    onChange={handleChange}
-                    required
-                  >
+              <FormField label="Dia de fechamento" error={errors.closingDay}>
+                <Select
+                  value={String(form.closingDay)}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, closingDay: Number(value) }))
+                  }
+                >
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                    {dueDates.find((d) => d.value === form.closingDay)?.label || 'Selecione...'}
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
                     {dueDates.map((d) => (
-                      <option key={d.value} value={d.value}>
+                      <SelectItem key={d.value} value={String(d.value)}>
                         {d.label}
-                      </option>
+                      </SelectItem>
                     ))}
-                  </Select>
-                </FormField>
-                <FormField label="Dia de vencimento" error={errors.dueDay}>
-                  <Select name="dueDay" value={form.dueDay} onChange={handleChange} required>
+                  </SelectContent>
+                </Select>
+              </FormField>
+              <FormField label="Dia de vencimento" error={errors.dueDay}>
+                <Select
+                  value={String(form.dueDay)}
+                  onValueChange={(value) => setForm((prev) => ({ ...prev, dueDay: Number(value) }))}
+                >
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                    {dueDates.find((d) => d.value === form.dueDay)?.label || 'Selecione...'}
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
                     {dueDates.map((d) => (
-                      <option key={d.value} value={d.value}>
+                      <SelectItem key={d.value} value={String(d.value)}>
                         {d.label}
-                      </option>
+                      </SelectItem>
                     ))}
-                  </Select>
-                </FormField>
-              </div>
+                  </SelectContent>
+                </Select>
+              </FormField>
               <FormField label="Cor">
                 <ColorPicker value={form.color} onChange={handleColorChange} />
               </FormField>

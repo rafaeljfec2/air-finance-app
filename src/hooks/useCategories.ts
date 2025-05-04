@@ -9,7 +9,7 @@ import {
   type CreateCategory,
 } from '../services/categoryService';
 
-export const useCategories = () => {
+export const useCategories = (companyId: string) => {
   const queryClient = useQueryClient();
 
   const {
@@ -17,39 +17,40 @@ export const useCategories = () => {
     isLoading,
     error,
   } = useQuery<Category[]>({
-    queryKey: ['categories'],
-    queryFn: getCategories,
+    queryKey: ['categories', companyId],
+    queryFn: () => getCategories(companyId),
+    enabled: !!companyId,
   });
 
   const getCategory = (id: string) => {
     return useQuery<Category>({
-      queryKey: ['category', id],
-      queryFn: () => getCategoryById(id),
-      enabled: !!id,
+      queryKey: ['category', companyId, id],
+      queryFn: () => getCategoryById(companyId, id),
+      enabled: !!id && !!companyId,
     });
   };
 
   const createMutation = useMutation({
-    mutationFn: createCategory,
+    mutationFn: (data: CreateCategory) => createCategory(companyId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['categories', companyId] });
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateCategory> }) =>
-      updateCategory(id, data),
+      updateCategory(companyId, id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
-      queryClient.invalidateQueries({ queryKey: ['category', id] });
+      queryClient.invalidateQueries({ queryKey: ['categories', companyId] });
+      queryClient.invalidateQueries({ queryKey: ['category', companyId, id] });
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteCategory,
+    mutationFn: (id: string) => deleteCategory(companyId, id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
-      queryClient.removeQueries({ queryKey: ['category', id] });
+      queryClient.invalidateQueries({ queryKey: ['categories', companyId] });
+      queryClient.removeQueries({ queryKey: ['category', companyId, id] });
     },
   });
 

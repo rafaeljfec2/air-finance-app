@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/FormField';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -223,16 +223,19 @@ export function GoalsPage() {
               </FormField>
               <FormField label="Categoria" error={errors.categoryId}>
                 <Select
-                  name="categoryId"
                   value={form.categoryId}
                   onValueChange={(value) => setForm((prev) => ({ ...prev, categoryId: value }))}
                 >
-                  <option value="">Selecione...</option>
-                  {categories?.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                    {categories?.find((cat) => cat.id === form.categoryId)?.name || 'Selecione...'}
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                    {categories?.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </FormField>
               <div className="flex gap-2 mt-4">
