@@ -1,5 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 const TOKEN_KEY = '@Auth:token';
 const REFRESH_TOKEN_KEY = '@Auth:refreshToken';
 const USER_KEY = '@Auth:user';

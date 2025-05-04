@@ -32,9 +32,9 @@ export type Account = z.infer<typeof AccountSchema>;
 export type CreateAccount = z.infer<typeof CreateAccountSchema>;
 
 // Service functions
-export const getAccounts = async (): Promise<Account[]> => {
+export const getAccounts = async (companyId: string): Promise<Account[]> => {
   try {
-    const response = await apiClient.get<Account[]>('/accounts');
+    const response = await apiClient.get<Account[]>(`/companies/${companyId}/accounts`);
     return AccountSchema.array().parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar contas:', error);
@@ -42,9 +42,9 @@ export const getAccounts = async (): Promise<Account[]> => {
   }
 };
 
-export const getAccountById = async (id: string): Promise<Account> => {
+export const getAccountById = async (companyId: string, id: string): Promise<Account> => {
   try {
-    const response = await apiClient.get<Account>(`/accounts/${id}`);
+    const response = await apiClient.get<Account>(`/companies/${companyId}/accounts/${id}`);
     return AccountSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar conta:', error);
@@ -52,10 +52,13 @@ export const getAccountById = async (id: string): Promise<Account> => {
   }
 };
 
-export const createAccount = async (data: CreateAccount): Promise<Account> => {
+export const createAccount = async (companyId: string, data: CreateAccount): Promise<Account> => {
   try {
     const validatedData = CreateAccountSchema.parse(data);
-    const response = await apiClient.post<Account>('/accounts', validatedData);
+    const response = await apiClient.post<Account>(
+      `/companies/${companyId}/accounts`,
+      validatedData,
+    );
     return AccountSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao criar conta:', error);
@@ -63,10 +66,17 @@ export const createAccount = async (data: CreateAccount): Promise<Account> => {
   }
 };
 
-export const updateAccount = async (id: string, data: Partial<CreateAccount>): Promise<Account> => {
+export const updateAccount = async (
+  companyId: string,
+  id: string,
+  data: Partial<CreateAccount>,
+): Promise<Account> => {
   try {
     const validatedData = CreateAccountSchema.partial().parse(data);
-    const response = await apiClient.put<Account>(`/accounts/${id}`, validatedData);
+    const response = await apiClient.patch<Account>(
+      `/companies/${companyId}/accounts/${id}`,
+      validatedData,
+    );
     return AccountSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao atualizar conta:', error);
@@ -74,9 +84,9 @@ export const updateAccount = async (id: string, data: Partial<CreateAccount>): P
   }
 };
 
-export const deleteAccount = async (id: string): Promise<void> => {
+export const deleteAccount = async (companyId: string, id: string): Promise<void> => {
   try {
-    await apiClient.delete(`/accounts/${id}`);
+    await apiClient.delete(`/companies/${companyId}/accounts/${id}`);
   } catch (error) {
     console.error('Erro ao deletar conta:', error);
     throw new Error('Falha ao deletar conta');

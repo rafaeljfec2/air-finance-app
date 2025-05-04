@@ -9,8 +9,11 @@ import {
   type Account,
   type CreateAccount,
 } from '../services/accountService';
+import { useCompanyStore } from '@/store/company';
 
 export const useAccounts = () => {
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id;
   const queryClient = useQueryClient();
 
   const {
@@ -18,49 +21,54 @@ export const useAccounts = () => {
     isLoading,
     error,
   } = useQuery<Account[]>({
-    queryKey: ['accounts'],
-    queryFn: getAccounts,
+    queryKey: ['accounts', companyId],
+    queryFn: () => (companyId ? getAccounts(companyId) : Promise.resolve([])),
+    enabled: !!companyId,
   });
 
   const getAccount = (id: string) => {
     return useQuery<Account>({
-      queryKey: ['account', id],
-      queryFn: () => getAccountById(id),
-      enabled: !!id,
+      queryKey: ['account', companyId, id],
+      queryFn: () =>
+        companyId && id ? getAccountById(companyId, id) : Promise.reject('No companyId or id'),
+      enabled: !!companyId && !!id,
     });
   };
 
   const getBalance = (id: string) => {
     return useQuery<number>({
-      queryKey: ['account-balance', id],
-      queryFn: () => getAccountBalance(id),
-      enabled: !!id,
+      queryKey: ['account-balance', companyId, id],
+      queryFn: () =>
+        companyId && id ? getAccountBalance(id) : Promise.reject('No companyId or id'),
+      enabled: !!companyId && !!id,
     });
   };
 
   const createMutation = useMutation({
-    mutationFn: createAccount,
+    mutationFn: (data: CreateAccount) =>
+      companyId ? createAccount(companyId, data) : Promise.reject('No companyId'),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateAccount> }) =>
-      updateAccount(id, data),
+      companyId && id ? updateAccount(companyId, id, data) : Promise.reject('No companyId or id'),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
-      queryClient.invalidateQueries({ queryKey: ['account', id] });
-      queryClient.invalidateQueries({ queryKey: ['account-balance', id] });
+      queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+      queryClient.invalidateQueries({ queryKey: ['account', companyId, id] });
+      queryClient.invalidateQueries({ queryKey: ['account-balance', companyId, id] });
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteAccount,
+    mutationFn: (id: string) =>
+      companyId && id ? deleteAccount(companyId, id) : Promise.reject('No companyId or id'),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
-      queryClient.removeQueries({ queryKey: ['account', id] });
-      queryClient.removeQueries({ queryKey: ['account-balance', id] });
+      queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+      queryClient.removeQueries({ queryKey: ['account', companyId, id] });
+      queryClient.removeQueries({ queryKey: ['account-balance', companyId, id] });
     },
   });
 
