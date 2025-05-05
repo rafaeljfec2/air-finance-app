@@ -88,7 +88,8 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const { isCollapsed, toggleCollapse } = useSidebarStore();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
-  // Mobile: off-canvas
+  console.log('Sidebar render - isOpen:', isOpen);
+
   return (
     <>
       {/* Overlay mobile */}
@@ -103,7 +104,8 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed z-50 inset-y-0 left-0 h-full bg-card dark:bg-card-dark border-r border-border dark:border-border-dark transition-transform duration-300 ease-in-out',
+          'fixed z-50 inset-y-0 left-0 h-full bg-card dark:bg-card-dark border-r border-border dark:border-border-dark',
+          'transition-all duration-300 ease-in-out transform',
           isCollapsed ? 'w-16' : 'w-64',
           isOpen ? 'translate-x-0' : '-translate-x-full',
           'lg:static lg:translate-x-0 lg:z-0',
@@ -121,12 +123,14 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         </button>
         <div className="flex flex-col h-full pt-2">
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 px-2 py-4">
+          <nav className="flex-1 space-y-1 px-2 py-4 overflow-y-auto">
             {navigation.map((group, idx) => (
               <div key={group.section} className={cn('mb-2', idx !== 0 && 'mt-6')}>
-                <div className="text-[11px] font-semibold text-gray-500 tracking-widest uppercase mb-1 pl-2">
-                  {group.section}
-                </div>
+                {!isCollapsed && (
+                  <div className="text-[11px] font-semibold text-gray-500 tracking-widest uppercase mb-1 pl-2">
+                    {group.section}
+                  </div>
+                )}
                 {group.items.map((item) => {
                   if (item.children) {
                     const isOpen = openMenu === item.name;
@@ -224,7 +228,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           </nav>
 
           {/* Toggle button */}
-          <div className="p-4">
+          <div className="p-4 border-t border-border dark:border-border-dark">
             <button
               onClick={toggleCollapse}
               className={cn(

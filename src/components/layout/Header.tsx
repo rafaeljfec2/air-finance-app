@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
 import {
@@ -27,12 +27,15 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
   };
 
   return (
-    <header className="bg-card dark:bg-card-dark border-b border-border dark:border-border-dark shadow-sm z-10 relative">
+    <header className="bg-card dark:bg-card-dark border-b border-border dark:border-border-dark shadow-sm z-20 relative">
       <div className="h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Botão hambúrguer mobile */}
         <button
           className="lg:hidden mr-2 p-2 rounded-md text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary-500"
-          onClick={onOpenSidebar}
+          onClick={() => {
+            console.log('Abrir sidebar');
+            onOpenSidebar?.();
+          }}
           aria-label="Abrir menu"
         >
           <Bars3Icon className="h-6 w-6" />
@@ -45,7 +48,9 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
         {/* Ações do Header */}
         <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
           {/* Company Selector */}
-          <CompanySelector />
+          <div className="hidden lg:block">
+            <CompanySelector />
+          </div>
 
           {/* Botão de Tema */}
           <button
@@ -91,28 +96,26 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
                       <div className="border-t border-border dark:border-border-dark">
                         <Menu.Item>
                           {({ active }) => (
-                            <a
-                              href="#"
+                            <button
                               className={cn(
                                 active ? 'bg-background dark:bg-background-dark' : '',
-                                'block px-4 py-2 text-sm text-text dark:text-text-dark',
+                                'block w-full text-left px-4 py-2 text-sm text-text dark:text-text-dark',
                               )}
                             >
                               Nova transação registrada
-                            </a>
+                            </button>
                           )}
                         </Menu.Item>
                         <Menu.Item>
                           {({ active }) => (
-                            <a
-                              href="#"
+                            <button
                               className={cn(
                                 active ? 'bg-background dark:bg-background-dark' : '',
-                                'block px-4 py-2 text-sm text-text dark:text-text-dark',
+                                'block w-full text-left px-4 py-2 text-sm text-text dark:text-text-dark',
                               )}
                             >
                               Lembrete de fatura
-                            </a>
+                            </button>
                           )}
                         </Menu.Item>
                       </div>
