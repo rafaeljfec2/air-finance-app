@@ -97,8 +97,8 @@ export function AiClassificationPage() {
 
   return (
     <ViewDefault>
-      <div className="container mx-auto px-2 sm:px-6">
-        <div className="h-fit bg-gradient-to-br from-background to-white dark:from-background-dark dark:to-gray-900 px-4 flex flex-col items-center">
+      <div className="container mx-auto w-full px-0 sm:px-0 overflow-x-hidden">
+        <div className="h-fit w-full bg-gradient-to-br from-background to-white dark:from-background-dark dark:to-gray-900 overflow-x-hidden flex flex-col items-center">
           <div className="w-full max-w-3xl space-y-8">
             <div className="text-center mb-6">
               <h1 className="text-3xl font-bold text-brand-arrow mb-2 flex items-center justify-center gap-2">
