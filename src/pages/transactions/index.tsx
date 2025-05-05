@@ -77,7 +77,7 @@ export function Transactions() {
               className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
             >
               <Plus className="h-5 w-5" />
-              Nova Transação
+              Novo lançamento
             </Button>
           </div>
 

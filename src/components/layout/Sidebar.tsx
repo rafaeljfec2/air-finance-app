@@ -20,6 +20,7 @@ import {
   ArrowDownIcon,
   XMarkIcon,
   BellIcon,
+  ArrowUpIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebar';
@@ -43,9 +44,13 @@ const navigation = [
         icon: ArrowsRightLeftIcon,
         children: [
           { name: 'Fluxo de Caixa', href: '/transactions', icon: ArrowsRightLeftIcon },
-          { name: 'Relatórios', href: '/reports', icon: ChartBarIcon },
-          { name: 'Nova Transação', href: '/transactions/new', icon: PlusIcon },
+          { name: 'Novo lançamento', href: '/transactions/new', icon: PlusIcon },
           { name: 'Importar Ofx', href: '/import-ofx', icon: ImportIcon },
+          { name: 'Contas a Pagar', href: '/payables', icon: ArrowDownIcon },
+          { name: 'Contas a Receber', href: '/receivables', icon: ArrowUpIcon },
+          { name: 'Fechamento Mensal', href: '/monthly-closing', icon: CalendarIcon },
+          { name: 'Resultado Anual', href: '/annual-result', icon: ChartBarIcon },
+          { name: 'Relatórios', href: '/reports-finance', icon: ChartBarIcon },
         ],
       },
       { name: 'Budget', href: '/budget', icon: WalletIcon },

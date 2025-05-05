@@ -70,7 +70,7 @@ export function NewTransaction() {
               </button>
               <div className="ml-3">
                 <h1 className="text-lg font-semibold text-text dark:text-text-dark">
-                  Nova Transação
+                  Novo lançamento
                 </h1>
                 <p className="text-sm text-text/60 dark:text-text-dark/60">
                   Preencha os dados da transação

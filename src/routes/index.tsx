@@ -25,6 +25,10 @@ import { GoalsPage } from '@/pages/goals';
 import { IncomeSourcesPage } from '@/pages/incomeSources';
 import { CompaniesPage } from '@/pages/companies';
 import { UsersPage } from '@/pages/users';
+import { Payables } from '@/pages/payables';
+import { Receivables } from '@/pages/receivables';
+import { MonthlyClosing } from '@/pages/monthly-closing';
+import { AnnualResult } from '@/pages/annual-result';
 
 export const router = createBrowserRouter([
   {
@@ -274,6 +278,50 @@ export const router = createBrowserRouter([
   {
     path: '/ai/classification',
     element: <AiClassificationPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/payables',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <Payables />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/receivables',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <Receivables />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/monthly-closing',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <MonthlyClosing />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/annual-result',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <AnnualResult />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
     errorElement: <ErrorPage />,
   },
   {
