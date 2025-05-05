@@ -9,7 +9,6 @@ import {
   Cog6ToothIcon,
   TagIcon,
   BanknotesIcon,
-  UserGroupIcon,
   CreditCardIcon,
   FlagIcon,
   CurrencyDollarIcon,
@@ -70,7 +69,7 @@ const navigation = [
           { name: 'Empresas', href: '/companies', icon: BuildingOfficeIcon },
           { name: 'Contas Bancárias', href: '/accounts', icon: BanknotesIcon },
           { name: 'Categorias', href: '/categories', icon: TagIcon },
-          { name: 'Dependentes', href: '/dependents', icon: UserGroupIcon },
+          /* { name: 'Dependentes', href: '/dependents', icon: UserGroupIcon }, */
           { name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCardIcon },
           { name: 'Metas', href: '/goals', icon: FlagIcon },
           { name: 'Fontes de Receitas', href: '/income-sources', icon: CurrencyDollarIcon },

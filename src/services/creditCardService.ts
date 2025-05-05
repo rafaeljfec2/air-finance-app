@@ -39,7 +39,7 @@ export const getCreditCards = async (): Promise<CreditCard[]> => {
     return CreditCardSchema.array().parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar cartões de crédito:', error);
-    throw new Error('Falha ao buscar cartões de crédito');
+    throw new Error('Falha ao buscar cartões de crédito ' + error);
   }
 };
 
@@ -49,7 +49,7 @@ export const getCreditCardById = async (id: string): Promise<CreditCard> => {
     return CreditCardSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar cartão de crédito:', error);
-    throw new Error('Falha ao buscar cartão de crédito');
+    throw new Error('Falha ao buscar cartões de crédito ' + error);
   }
 };
 
