@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { Receipt, Search, Plus, Calendar, Filter, Download } from 'lucide-react';
 import { TransactionGrid } from '@/components/transactions/TransactionGrid';
@@ -98,18 +98,32 @@ export function Transactions() {
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                   <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-                    <option value="all">Todos os períodos</option>
-                    <option value="current">Mês atual</option>
-                    <option value="last">Mês anterior</option>
-                    <option value="custom">Personalizado</option>
+                    <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
+                      {selectedPeriod === '' ? (
+                        <span className="text-muted-foreground">Selecione o período</span>
+                      ) : null}
+                    </SelectTrigger>
+                    <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
+                      <SelectItem value="all">Todos os períodos</SelectItem>
+                      <SelectItem value="current">Mês atual</SelectItem>
+                      <SelectItem value="last">Mês anterior</SelectItem>
+                      <SelectItem value="custom">Personalizado</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <div className="flex items-center gap-2">
                   <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                   <Select value={selectedType} onValueChange={setSelectedType}>
-                    <option value="all">Todos os tipos</option>
-                    <option value="RECEITA">Receitas</option>
-                    <option value="DESPESA">Despesas</option>
+                    <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
+                      {selectedType === '' ? (
+                        <span className="text-muted-foreground">Selecione o tipo</span>
+                      ) : null}
+                    </SelectTrigger>
+                    <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
+                      <SelectItem value="all">Todos os tipos</SelectItem>
+                      <SelectItem value="RECEITA">Receitas</SelectItem>
+                      <SelectItem value="DESPESA">Despesas</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <Button
