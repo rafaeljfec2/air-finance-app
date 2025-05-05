@@ -93,7 +93,7 @@ export function BudgetPage() {
 
   return (
     <ViewDefault>
-      <div className="container mx-auto px-2 sm:px-6 py-10">
+      <div className="container mx-auto px-2 sm:px-6 pt-0 pb-10">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="inline-flex items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900 p-2">

@@ -347,7 +347,7 @@ export function Dashboard() {
       </Modal>
 
       <PullToRefresh onRefresh={handleRefresh} isRefreshing={isRefreshing}>
-        <div className="space-y-6 p-6">
+        <div className="space-y-6 pt-0 pb-6 px-6">
           {/* Header with Date and Filters */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
             <div className="flex items-center gap-3">

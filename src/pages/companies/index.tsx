@@ -214,8 +214,8 @@ export function CompaniesPage() {
 
   return (
     <ViewDefault>
-      <div className="container mx-auto px-2 sm:px-6 py-10">
-        <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark mb-6 flex items-center gap-2">
+      <div className="container mx-auto px-2 sm:px-6 pt-0 pb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark mb-4 flex items-center gap-2">
           <BuildingOfficeIcon className="h-6 w-6 text-primary-500" /> Empresas
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
