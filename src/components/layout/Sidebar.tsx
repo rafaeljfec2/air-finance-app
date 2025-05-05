@@ -19,10 +19,12 @@ import {
   ChevronDoubleRightIcon,
   ArrowDownIcon,
   XMarkIcon,
+  BellIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebar';
 import { useState } from 'react';
+import { PencilIcon, SaveIcon } from 'lucide-react';
 
 const navigation = [
   {
@@ -56,7 +58,7 @@ const navigation = [
     items: [
       {
         name: 'Cadastros',
-        icon: Cog6ToothIcon,
+        icon: SaveIcon,
         children: [
           { name: 'Empresas', href: '/companies', icon: BuildingOfficeIcon },
           { name: 'Contas Bancárias', href: '/accounts', icon: BanknotesIcon },
@@ -73,8 +75,8 @@ const navigation = [
         icon: Cog6ToothIcon,
         children: [
           { name: 'Usuário', href: '/profile', icon: UserIcon },
-          { name: 'Preferências', href: '/settings/preferences', icon: Cog6ToothIcon },
-          { name: 'Notificações', href: '/settings/notifications', icon: Cog6ToothIcon },
+          { name: 'Preferências', href: '/settings/preferences', icon: PencilIcon },
+          { name: 'Notificações', href: '/settings/notifications', icon: BellIcon },
         ],
       },
     ],
