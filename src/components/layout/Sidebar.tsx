@@ -39,7 +39,10 @@ const navigation = [
       {
         name: 'Financeiro',
         icon: ArrowsRightLeftIcon,
-        children: [{ name: 'Transações', href: '/transactions', icon: ArrowsRightLeftIcon }],
+        children: [
+          { name: 'Fluxo de Caixa', href: '/transactions', icon: ArrowsRightLeftIcon },
+          { name: 'Relatórios', href: '/reports', icon: ChartBarIcon },
+        ],
       },
       { name: 'Budget', href: '/budget', icon: WalletIcon },
     ],
