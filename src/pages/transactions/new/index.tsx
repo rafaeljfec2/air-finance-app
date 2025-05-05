@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTransactionStore } from '@/stores/transaction';
 import { TransactionInput, Category, TransactionType } from '@/types/transaction';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -182,12 +182,24 @@ export function NewTransaction() {
                       setFormData((prev) => ({ ...prev, accountId: value }))
                     }
                   >
-                    <option value="">Selecione uma conta</option>
-                    {accounts.map((account) => (
-                      <option key={account.id} value={account.id}>
-                        {account.name}
-                      </option>
-                    ))}
+                    <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                      <div className="px-3 py-2">
+                        {formData.accountId
+                          ? accounts.find((acc) => acc.id === formData.accountId)?.name
+                          : 'Selecione uma conta'}
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
+                      {accounts.map((account) => (
+                        <SelectItem
+                          key={account.id}
+                          value={account.id}
+                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
+                        >
+                          {account.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
                 </div>
 
@@ -204,12 +216,24 @@ export function NewTransaction() {
                       setFormData((prev) => ({ ...prev, categoryId: value }))
                     }
                   >
-                    <option value="">Selecione uma categoria</option>
-                    {filteredCategories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
+                    <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                      <div className="px-3 py-2">
+                        {formData.categoryId
+                          ? filteredCategories.find((cat) => cat.id === formData.categoryId)?.name
+                          : 'Selecione uma categoria'}
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
+                      {filteredCategories.map((category) => (
+                        <SelectItem
+                          key={category.id}
+                          value={category.id}
+                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
+                        >
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
                 </div>
 
@@ -221,17 +245,35 @@ export function NewTransaction() {
                     Dependente
                   </label>
                   <Select
-                    value={formData.dependent}
+                    value={formData.dependent || 'none'}
                     onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, dependent: value }))
+                      setFormData((prev) => ({ ...prev, dependent: value === 'none' ? '' : value }))
                     }
                   >
-                    <option value="">Selecione um dependente (opcional)</option>
-                    {dependents.map((dep) => (
-                      <option key={dep.id} value={dep.id}>
-                        {dep.name}
-                      </option>
-                    ))}
+                    <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                      <div className="px-3 py-2">
+                        {formData.dependent
+                          ? dependents.find((dep) => dep.id === formData.dependent)?.name
+                          : 'Selecione um dependente (opcional)'}
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
+                      <SelectItem
+                        value="none"
+                        className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
+                      >
+                        Nenhum
+                      </SelectItem>
+                      {dependents.map((dep) => (
+                        <SelectItem
+                          key={dep.id}
+                          value={dep.id}
+                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
+                        >
+                          {dep.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
                 </div>
 
@@ -248,11 +290,20 @@ export function NewTransaction() {
                       setFormData((prev) => ({ ...prev, installmentCount: Number(value) }))
                     }
                   >
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
-                      <option key={num} value={num}>
-                        {num}x
-                      </option>
-                    ))}
+                    <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                      <div className="px-3 py-2">{formData.installmentCount}x</div>
+                    </SelectTrigger>
+                    <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
+                      {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
+                        <SelectItem
+                          key={num}
+                          value={String(num)}
+                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
+                        >
+                          {num}x
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
                 </div>
               </div>
