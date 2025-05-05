@@ -1,14 +1,13 @@
-
-import { useState } from 'react'
-import { ViewDefault } from '@/layouts/ViewDefault'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
-import { useAuthStore } from '@/stores/auth'
-import { useTheme } from '@/stores/useTheme'
-import { toast } from 'sonner'
+import { useState } from 'react';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { useAuthStore } from '@/stores/auth';
+import { useTheme } from '@/stores/useTheme';
+import { toast } from '@/components/ui/toast';
 import {
   User,
   Mail,
@@ -21,16 +20,16 @@ import {
   Moon,
   Sun,
   Globe,
-  DollarSign
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
+  DollarSign,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function Profile() {
-  const { user } = useAuthStore()
-  const { isDarkMode, setTheme } = useTheme()
-  const [isEditing, setIsEditing] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [avatar, setAvatar] = useState('/avatars/default.png')
+  const { user } = useAuthStore();
+  const { isDarkMode, setTheme } = useTheme();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [avatar, setAvatar] = useState('/avatars/default.png');
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -40,58 +39,64 @@ export function Profile() {
     notifications: {
       email: true,
       push: true,
-      updates: false
+      updates: false,
     },
     preferences: {
       currency: 'BRL',
-      language: 'pt-BR'
-    }
-  })
+      language: 'pt-BR',
+    },
+  });
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setAvatar(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+        setAvatar(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
-    }))
-  }
+      [name]: value,
+    }));
+  };
 
   const handleNotificationChange = (key: keyof typeof formData.notifications) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       notifications: {
         ...prev.notifications,
-        [key]: !prev.notifications[key]
-      }
-    }))
-  }
+        [key]: !prev.notifications[key],
+      },
+    }));
+  };
 
   const handleSave = async () => {
-    setIsSaving(true)
+    setIsSaving(true);
     try {
       // Simular salvamento
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setIsEditing(false)
-      toast.success('Perfil atualizado com sucesso!')
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setIsEditing(false);
+      toast({
+        title: 'Sucesso',
+        description: 'Perfil atualizado com sucesso!',
+        type: 'success',
+      });
     } catch (error) {
-      toast.error('Erro ao atualizar perfil')
+      toast({
+        title: 'Erro',
+        description: 'Erro ao atualizar perfil',
+        type: 'error',
+      });
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   return (
     <ViewDefault>
@@ -257,8 +262,8 @@ export function Profile() {
                           onClick={handleSave}
                           disabled={isSaving}
                           className={cn(
-                            "bg-primary-500 hover:bg-primary-600 text-white",
-                            isSaving && "opacity-70 cursor-not-allowed"
+                            'bg-primary-500 hover:bg-primary-600 text-white',
+                            isSaving && 'opacity-70 cursor-not-allowed',
                           )}
                         >
                           {isSaving ? 'Salvando...' : 'Salvar'}
@@ -334,9 +339,7 @@ export function Profile() {
                       </div>
                       <Switch
                         checked={formData.notifications.email}
-                        onCheckedChange={() =>
-                          handleNotificationChange('email')
-                        }
+                        onCheckedChange={() => handleNotificationChange('email')}
                       />
                     </div>
 
@@ -351,9 +354,7 @@ export function Profile() {
                       </div>
                       <Switch
                         checked={formData.notifications.push}
-                        onCheckedChange={() =>
-                          handleNotificationChange('push')
-                        }
+                        onCheckedChange={() => handleNotificationChange('push')}
                       />
                     </div>
 
@@ -368,9 +369,7 @@ export function Profile() {
                       </div>
                       <Switch
                         checked={formData.notifications.updates}
-                        onCheckedChange={() =>
-                          handleNotificationChange('updates')
-                        }
+                        onCheckedChange={() => handleNotificationChange('updates')}
                       />
                     </div>
                   </div>
@@ -396,10 +395,10 @@ export function Profile() {
                         <Button
                           variant="outline"
                           className={cn(
-                            "border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark",
+                            'border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark',
                             isDarkMode
-                              ? "bg-card dark:bg-card-dark text-primary-400"
-                              : "text-gray-500 dark:text-gray-400"
+                              ? 'bg-card dark:bg-card-dark text-primary-400'
+                              : 'text-gray-500 dark:text-gray-400',
                           )}
                           onClick={() => setTheme(true)}
                         >
@@ -409,10 +408,10 @@ export function Profile() {
                         <Button
                           variant="outline"
                           className={cn(
-                            "border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark",
+                            'border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark',
                             !isDarkMode
-                              ? "bg-card dark:bg-card-dark text-primary-400"
-                              : "text-gray-500 dark:text-gray-400"
+                              ? 'bg-card dark:bg-card-dark text-primary-400'
+                              : 'text-gray-500 dark:text-gray-400',
                           )}
                           onClick={() => setTheme(false)}
                         >
@@ -433,12 +432,12 @@ export function Profile() {
                         <select
                           value={formData.preferences.language}
                           onChange={(e) =>
-                            setFormData(prev => ({
+                            setFormData((prev) => ({
                               ...prev,
                               preferences: {
                                 ...prev.preferences,
-                                language: e.target.value
-                              }
+                                language: e.target.value,
+                              },
                             }))
                           }
                           className="w-full pl-10 pr-4 py-2 bg-background dark:bg-background-dark border border-border dark:border-border-dark rounded-lg text-text dark:text-text-dark focus:border-primary-500"
@@ -461,12 +460,12 @@ export function Profile() {
                         <select
                           value={formData.preferences.currency}
                           onChange={(e) =>
-                            setFormData(prev => ({
+                            setFormData((prev) => ({
                               ...prev,
                               preferences: {
                                 ...prev.preferences,
-                                currency: e.target.value
-                              }
+                                currency: e.target.value,
+                              },
                             }))
                           }
                           className="w-full pl-10 pr-4 py-2 bg-background dark:bg-background-dark border border-border dark:border-border-dark rounded-lg text-text dark:text-text-dark focus:border-primary-500"
@@ -485,5 +484,5 @@ export function Profile() {
         </div>
       </div>
     </ViewDefault>
-  )
-} 
+  );
+}

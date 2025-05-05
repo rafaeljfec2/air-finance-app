@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff, Lock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
 
 export function NewPasswordPage() {
@@ -55,12 +55,19 @@ export function NewPasswordPage() {
         password: form.password,
         confirmPassword: form.confirmPassword,
       });
-
-      toast.success('Senha alterada com sucesso!');
+      toast({
+        title: 'Sucesso',
+        description: 'Senha alterada com sucesso!',
+        type: 'success',
+      });
       navigate('/login');
     } catch (error: any) {
       const message = error?.response?.data?.message ?? 'Erro ao alterar senha';
-      toast.error(message);
+      toast({
+        title: 'Erro',
+        description: message,
+        type: 'error',
+      });
     }
   }
 

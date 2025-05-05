@@ -9,7 +9,7 @@ import { useCompanies } from '@/hooks/useCompanies';
 import { BuildingOfficeIcon } from '@heroicons/react/24/outline';
 import { formatDate } from '@/utils/date';
 import { CreateCompany } from '@/services/companyService';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { FormCard } from '@/components/ui/FormCard';
 import { DetailsCard } from '@/components/ui/DetailsCard';
 import { Loading } from '@/components/Loading';
@@ -136,12 +136,21 @@ export function CompaniesPage() {
 
     try {
       if (editingId) {
-        await updateCompany({ id: editingId, data: form });
+        updateCompany({ id: editingId, data: form });
         setEditingId(null);
+        toast({
+          title: 'Sucesso',
+          description: 'Empresa atualizada com sucesso!',
+          type: 'success',
+        });
       } else {
-        await createCompany(form, {
+        createCompany(form, {
           onSuccess: () => {
-            toast.success('Empresa cadastrada com sucesso!');
+            toast({
+              title: 'Sucesso',
+              description: 'Empresa cadastrada com sucesso!',
+              type: 'success',
+            });
           },
         });
       }
@@ -149,6 +158,11 @@ export function CompaniesPage() {
       setErrors({});
     } catch (error) {
       console.error('Erro ao salvar empresa:', error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao salvar empresa: ' + error,
+        type: 'error',
+      });
     }
   };
 
