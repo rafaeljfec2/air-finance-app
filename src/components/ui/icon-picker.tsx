@@ -34,10 +34,8 @@ export function IconPicker({
             <button
               key={opt.value}
               type="button"
-              className={`w-9 h-9 rounded-full border-2 flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 bg-background dark:bg-background-dark ${
-                isSelected
-                  ? 'border-primary-500 ring-2 ring-primary-500'
-                  : 'border-border dark:border-border-dark'
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 bg-background dark:bg-background-dark ${
+                isSelected ? 'ring-2 ring-primary-500' : ''
               }`}
               aria-label={`Selecionar ícone ${opt.value}`}
               onClick={() => onChange(opt.value)}

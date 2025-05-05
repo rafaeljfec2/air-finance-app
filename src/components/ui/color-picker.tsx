@@ -34,10 +34,8 @@ export function ColorPicker({
           <button
             key={color}
             type="button"
-            className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-              value === color
-                ? 'border-primary-500 ring-2 ring-primary-500'
-                : 'border-border dark:border-border-dark'
+            className={`w-7 h-7 rounded-full flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+              value === color ? 'ring-2 ring-primary-500' : ''
             }`}
             style={{ background: color }}
             aria-label={`Selecionar cor ${color}`}
@@ -50,7 +48,7 @@ export function ColorPicker({
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-7 h-7 rounded-full border border-border dark:border-border-dark cursor-pointer p-0"
+          className="w-7 h-7 rounded-full cursor-pointer p-0 focus:outline-none focus:ring-2 focus:ring-primary-500"
           aria-label="Selecionar cor personalizada"
           style={{ background: 'none' }}
         />

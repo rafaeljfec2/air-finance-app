@@ -221,48 +221,7 @@ export function CreditCardsPage() {
                   className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
-              <FormField label="Número do cartão" error={errors.number}>
-                <Input
-                  name="number"
-                  value={form.number}
-                  onChange={handleChange}
-                  placeholder="0000 0000 0000 0000"
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
-              </FormField>
-              <FormField label="Nome do titular" error={errors.holderName}>
-                <Input
-                  name="holderName"
-                  value={form.holderName}
-                  onChange={handleChange}
-                  placeholder="Nome como está no cartão"
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
-              </FormField>
-              <div className="grid grid-cols-2 gap-4">
-                <FormField label="Validade" error={errors.expirationDate}>
-                  <Input
-                    name="expirationDate"
-                    value={form.expirationDate}
-                    onChange={handleChange}
-                    placeholder="MM/AA"
-                    required
-                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                  />
-                </FormField>
-                <FormField label="CVV" error={errors.cvv}>
-                  <Input
-                    name="cvv"
-                    value={form.cvv}
-                    onChange={handleChange}
-                    placeholder="000"
-                    required
-                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                  />
-                </FormField>
-              </div>
+
               <FormField label="Limite" error={errors.limit}>
                 <Input
                   name="limit"
@@ -284,7 +243,7 @@ export function CreditCardsPage() {
                   <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
                     {dueDates.find((d) => d.value === form.closingDay)?.label || 'Selecione...'}
                   </SelectTrigger>
-                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark max-h-60 overflow-y-auto">
                     {dueDates.map((d) => (
                       <SelectItem
                         key={d.value}
@@ -305,7 +264,7 @@ export function CreditCardsPage() {
                   <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
                     {dueDates.find((d) => d.value === form.dueDay)?.label || 'Selecione...'}
                   </SelectTrigger>
-                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark max-h-60 overflow-y-auto">
                     {dueDates.map((d) => (
                       <SelectItem
                         key={d.value}
