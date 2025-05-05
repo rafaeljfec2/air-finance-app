@@ -11,6 +11,7 @@ import { FormField } from '@/components/ui/FormField';
 import { useCreditCards } from '@/hooks/useCreditCards';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useCompanyContext } from '@/contexts/companyContext';
+import { toast } from '@/components/ui/toast';
 
 const bankTypes = [
   { value: 'nubank', label: 'Nubank', icon: CreditCardIcon },
@@ -112,7 +113,12 @@ export function CreditCardsPage() {
         companyId: companyId || '',
       });
       setErrors({});
-    } catch (error) {
+    } catch (error: any) {
+      toast({
+        title: 'Erro',
+        description: `Erro ao salvar cartão: ${error.message || 'Erro desconhecido.'}`,
+        type: 'error',
+      });
       console.error('Erro ao salvar cartão:', error);
     }
   };
@@ -146,7 +152,12 @@ export function CreditCardsPage() {
     if (deleteId) {
       try {
         await deleteCreditCard(deleteId);
-      } catch (error) {
+      } catch (error: any) {
+        toast({
+          title: 'Erro',
+          description: `Erro ao deletar cartão: ${error.message || 'Erro desconhecido.'}`,
+          type: 'error',
+        });
         console.error('Erro ao deletar cartão:', error);
       }
     }
@@ -176,6 +187,11 @@ export function CreditCardsPage() {
   }
 
   if (error) {
+    toast({
+      title: 'Erro',
+      description: `Erro ao carregar cartões: ${error.message || 'Erro desconhecido.'}`,
+      type: 'error',
+    });
     return (
       <ViewDefault>
         <div className="container mx-auto px-2 sm:px-6 py-10">
