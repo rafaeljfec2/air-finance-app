@@ -24,7 +24,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebar';
 import { useState } from 'react';
-import { PencilIcon, SaveIcon } from 'lucide-react';
+import { ImportIcon, PencilIcon, PlusIcon, SaveIcon } from 'lucide-react';
 
 const navigation = [
   {
@@ -44,6 +44,8 @@ const navigation = [
         children: [
           { name: 'Fluxo de Caixa', href: '/transactions', icon: ArrowsRightLeftIcon },
           { name: 'Relatórios', href: '/reports', icon: ChartBarIcon },
+          { name: 'Nova Transação', href: '/transactions/new', icon: PlusIcon },
+          { name: 'Importar Ofx', href: '/import-ofx', icon: ImportIcon },
         ],
       },
       { name: 'Budget', href: '/budget', icon: WalletIcon },
