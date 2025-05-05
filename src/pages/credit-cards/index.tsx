@@ -173,7 +173,7 @@ export function CreditCardsPage() {
   if (isLoading) {
     return (
       <ViewDefault>
-        <div className="container mx-auto px-2 sm:px-6 py-10">
+        <div className="container mx-auto">
           <div className="animate-pulse">
             <div className="h-8 w-48 bg-gray-200 rounded mb-6"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -194,7 +194,7 @@ export function CreditCardsPage() {
     });
     return (
       <ViewDefault>
-        <div className="container mx-auto px-2 sm:px-6 py-10">
+        <div className="container mx-auto">
           <div className="text-red-500">Erro ao carregar cartões: {error.message}</div>
         </div>
       </ViewDefault>
@@ -203,7 +203,7 @@ export function CreditCardsPage() {
 
   return (
     <ViewDefault>
-      <div className="container mx-auto px-2 sm:px-6 py-10">
+      <div className="container mx-auto">
         <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark mb-6 flex items-center gap-2">
           <CreditCardIcon className="h-6 w-6 text-primary-500" /> Cartões de Crédito
         </h1>
@@ -218,6 +218,7 @@ export function CreditCardsPage() {
                   onChange={handleChange}
                   placeholder="Nome do cartão"
                   required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
               <FormField label="Número do cartão" error={errors.number}>
@@ -227,6 +228,7 @@ export function CreditCardsPage() {
                   onChange={handleChange}
                   placeholder="0000 0000 0000 0000"
                   required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
               <FormField label="Nome do titular" error={errors.holderName}>
@@ -236,6 +238,7 @@ export function CreditCardsPage() {
                   onChange={handleChange}
                   placeholder="Nome como está no cartão"
                   required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
               <div className="grid grid-cols-2 gap-4">
@@ -246,6 +249,7 @@ export function CreditCardsPage() {
                     onChange={handleChange}
                     placeholder="MM/AA"
                     required
+                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                   />
                 </FormField>
                 <FormField label="CVV" error={errors.cvv}>
@@ -255,6 +259,7 @@ export function CreditCardsPage() {
                     onChange={handleChange}
                     placeholder="000"
                     required
+                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                   />
                 </FormField>
               </div>
@@ -266,6 +271,7 @@ export function CreditCardsPage() {
                   onChange={handleChange}
                   placeholder="R$ 0,00"
                   required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
               <FormField label="Dia de fechamento" error={errors.closingDay}>
@@ -275,12 +281,16 @@ export function CreditCardsPage() {
                     setForm((prev) => ({ ...prev, closingDay: Number(value) }))
                   }
                 >
-                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
                     {dueDates.find((d) => d.value === form.closingDay)?.label || 'Selecione...'}
                   </SelectTrigger>
                   <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
                     {dueDates.map((d) => (
-                      <SelectItem key={d.value} value={String(d.value)}>
+                      <SelectItem
+                        key={d.value}
+                        value={String(d.value)}
+                        className="hover:bg-primary-100 dark:hover:bg-primary-900 focus:bg-primary-100 dark:focus:bg-primary-900"
+                      >
                         {d.label}
                       </SelectItem>
                     ))}
@@ -292,12 +302,16 @@ export function CreditCardsPage() {
                   value={String(form.dueDay)}
                   onValueChange={(value) => setForm((prev) => ({ ...prev, dueDay: Number(value) }))}
                 >
-                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
                     {dueDates.find((d) => d.value === form.dueDay)?.label || 'Selecione...'}
                   </SelectTrigger>
                   <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
                     {dueDates.map((d) => (
-                      <SelectItem key={d.value} value={String(d.value)}>
+                      <SelectItem
+                        key={d.value}
+                        value={String(d.value)}
+                        className="hover:bg-primary-100 dark:hover:bg-primary-900 focus:bg-primary-100 dark:focus:bg-primary-900"
+                      >
                         {d.label}
                       </SelectItem>
                     ))}
@@ -305,7 +319,11 @@ export function CreditCardsPage() {
                 </Select>
               </FormField>
               <FormField label="Cor">
-                <ColorPicker value={form.color} onChange={handleColorChange} />
+                <ColorPicker
+                  value={form.color}
+                  onChange={handleColorChange}
+                  className="bg-card dark:bg-card-dark border border-border dark:border-border-dark transition-colors"
+                />
               </FormField>
               <FormField label="Ícone">
                 <IconPicker
@@ -315,6 +333,7 @@ export function CreditCardsPage() {
                     value: t.icon.displayName || t.icon.name || t.value,
                     icon: t.icon,
                   }))}
+                  className="bg-card dark:bg-card-dark border border-border dark:border-border-dark transition-colors"
                 />
               </FormField>
               <div className="flex gap-2 mt-4">
