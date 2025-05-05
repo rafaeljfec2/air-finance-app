@@ -39,7 +39,7 @@ export function CreditCardsPage() {
     isCreating,
     isUpdating,
     isDeleting,
-  } = useCreditCards();
+  } = useCreditCards(companyId);
 
   const [form, setForm] = useState({
     name: '',

@@ -33,9 +33,9 @@ export type CreditCard = z.infer<typeof CreditCardSchema>;
 export type CreateCreditCard = z.infer<typeof CreateCreditCardSchema>;
 
 // Service functions
-export const getCreditCards = async (): Promise<CreditCard[]> => {
+export const getCreditCards = async (companyId: string): Promise<CreditCard[]> => {
   try {
-    const response = await apiClient.get<CreditCard[]>('/credit-cards');
+    const response = await apiClient.get<CreditCard[]>(`/companies/${companyId}/credit-cards`);
     return CreditCardSchema.array().parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar cartões de crédito:', error);
@@ -43,9 +43,9 @@ export const getCreditCards = async (): Promise<CreditCard[]> => {
   }
 };
 
-export const getCreditCardById = async (id: string): Promise<CreditCard> => {
+export const getCreditCardById = async (companyId: string, id: string): Promise<CreditCard> => {
   try {
-    const response = await apiClient.get<CreditCard>(`/credit-cards/${id}`);
+    const response = await apiClient.get<CreditCard>(`/companies/${companyId}/credit-cards/${id}`);
     return CreditCardSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar cartão de crédito:', error);
@@ -53,10 +53,16 @@ export const getCreditCardById = async (id: string): Promise<CreditCard> => {
   }
 };
 
-export const createCreditCard = async (data: CreateCreditCard): Promise<CreditCard> => {
+export const createCreditCard = async (
+  companyId: string,
+  data: CreateCreditCard,
+): Promise<CreditCard> => {
   try {
     const validatedData = CreateCreditCardSchema.parse(data);
-    const response = await apiClient.post<CreditCard>('/credit-cards', validatedData);
+    const response = await apiClient.post<CreditCard>(
+      `/companies/${companyId}/credit-cards`,
+      validatedData,
+    );
     return CreditCardSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao criar cartão de crédito:', error);
@@ -65,12 +71,16 @@ export const createCreditCard = async (data: CreateCreditCard): Promise<CreditCa
 };
 
 export const updateCreditCard = async (
+  companyId: string,
   id: string,
   data: Partial<CreateCreditCard>,
 ): Promise<CreditCard> => {
   try {
     const validatedData = CreateCreditCardSchema.partial().parse(data);
-    const response = await apiClient.put<CreditCard>(`/credit-cards/${id}`, validatedData);
+    const response = await apiClient.put<CreditCard>(
+      `/companies/${companyId}/credit-cards/${id}`,
+      validatedData,
+    );
     return CreditCardSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao atualizar cartão de crédito:', error);
@@ -78,9 +88,9 @@ export const updateCreditCard = async (
   }
 };
 
-export const deleteCreditCard = async (id: string): Promise<void> => {
+export const deleteCreditCard = async (companyId: string, id: string): Promise<void> => {
   try {
-    await apiClient.delete(`/credit-cards/${id}`);
+    await apiClient.delete(`/companies/${companyId}/credit-cards/${id}`);
   } catch (error) {
     console.error('Erro ao deletar cartão de crédito:', error);
     throw new Error('Falha ao deletar cartão de crédito');
@@ -110,5 +120,22 @@ export const getCreditCardStatement = async (
   } catch (error) {
     console.error('Erro ao buscar fatura do cartão:', error);
     throw new Error('Falha ao buscar fatura do cartão');
+  }
+};
+
+export const updateCreditCardStatus = async (
+  companyId: string,
+  id: string,
+  status: string,
+): Promise<CreditCard> => {
+  try {
+    const response = await apiClient.patch<CreditCard>(
+      `/companies/${companyId}/credit-cards/${id}/status`,
+      { status },
+    );
+    return CreditCardSchema.parse(response.data);
+  } catch (error) {
+    console.error('Erro ao atualizar status do cartão:', error);
+    throw new Error('Falha ao atualizar status do cartão');
   }
 };

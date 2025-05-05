@@ -10,7 +10,7 @@ import {
   type CreateCreditCard,
 } from '../services/creditCardService';
 
-export const useCreditCards = () => {
+export const useCreditCards = (companyId: string) => {
   const queryClient = useQueryClient();
 
   const {
@@ -18,15 +18,16 @@ export const useCreditCards = () => {
     isLoading,
     error,
   } = useQuery<CreditCard[]>({
-    queryKey: ['credit-cards'],
-    queryFn: getCreditCards,
+    queryKey: ['credit-cards', companyId],
+    queryFn: () => getCreditCards(companyId),
+    enabled: !!companyId,
   });
 
   const getCreditCard = (id: string) => {
     return useQuery<CreditCard>({
-      queryKey: ['credit-card', id],
-      queryFn: () => getCreditCardById(id),
-      enabled: !!id,
+      queryKey: ['credit-card', companyId, id],
+      queryFn: () => getCreditCardById(companyId, id),
+      enabled: !!id && !!companyId,
     });
   };
 
@@ -39,26 +40,35 @@ export const useCreditCards = () => {
   };
 
   const createMutation = useMutation({
-    mutationFn: createCreditCard,
+    mutationFn: (data: CreateCreditCard) => createCreditCard(companyId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['credit-cards'] });
+      queryClient.invalidateQueries({ queryKey: ['credit-cards', companyId] });
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateCreditCard> }) =>
-      updateCreditCard(id, data),
+      updateCreditCard(companyId, id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['credit-cards'] });
-      queryClient.invalidateQueries({ queryKey: ['credit-card', id] });
+      queryClient.invalidateQueries({ queryKey: ['credit-cards', companyId] });
+      queryClient.invalidateQueries({ queryKey: ['credit-card', companyId, id] });
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteCreditCard,
+    mutationFn: (id: string) => deleteCreditCard(companyId, id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['credit-cards'] });
-      queryClient.removeQueries({ queryKey: ['credit-card', id] });
+      queryClient.invalidateQueries({ queryKey: ['credit-cards', companyId] });
+      queryClient.removeQueries({ queryKey: ['credit-card', companyId, id] });
+    },
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      updateCreditCardStatus(companyId, id, status),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['credit-cards', companyId] });
+      queryClient.invalidateQueries({ queryKey: ['credit-card', companyId, id] });
     },
   });
 
@@ -68,9 +78,10 @@ export const useCreditCards = () => {
     error,
     getCreditCard,
     getStatement,
-    createCreditCard: createMutation.mutate,
-    updateCreditCard: updateMutation.mutate,
-    deleteCreditCard: deleteMutation.mutate,
+    createCreditCard: createMutation.mutateAsync,
+    updateCreditCard: updateMutation.mutateAsync,
+    deleteCreditCard: deleteMutation.mutateAsync,
+    updateCreditCardStatus: updateStatusMutation.mutateAsync,
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
