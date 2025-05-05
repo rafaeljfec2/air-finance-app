@@ -8,6 +8,7 @@ import {
   SunIcon,
   MoonIcon,
   Cog6ToothIcon,
+  Bars3Icon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -15,7 +16,7 @@ import { useTheme } from '@/stores/useTheme';
 import { Logo } from '@/components/Logo';
 import { CompanySelector } from './CompanySelector';
 
-export function Header() {
+export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
@@ -28,6 +29,14 @@ export function Header() {
   return (
     <header className="bg-card dark:bg-card-dark border-b border-border dark:border-border-dark shadow-sm z-10 relative">
       <div className="h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        {/* Botão hambúrguer mobile */}
+        <button
+          className="lg:hidden mr-2 p-2 rounded-md text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary-500"
+          onClick={onOpenSidebar}
+          aria-label="Abrir menu"
+        >
+          <Bars3Icon className="h-6 w-6" />
+        </button>
         {/* Logo */}
         <div className="flex-shrink-0">
           <Logo />
