@@ -5,32 +5,26 @@ import { z } from 'zod';
 export const CreditCardSchema = z.object({
   id: z.string(),
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  number: z.string().min(16, 'Número do cartão inválido').max(19, 'Número do cartão inválido'),
-  holderName: z.string().min(3, 'Nome do titular deve ter pelo menos 3 caracteres'),
-  expirationDate: z.string().regex(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Data de validade inválida'),
-  cvv: z.string().min(3, 'CVV inválido').max(4, 'CVV inválido'),
   limit: z.number().min(0, 'Limite deve ser maior que zero'),
-  availableLimit: z.number().min(0, 'Limite disponível inválido'),
   closingDay: z.number().min(1, 'Dia de fechamento inválido').max(31, 'Dia de fechamento inválido'),
   dueDay: z.number().min(1, 'Dia de vencimento inválido').max(31, 'Dia de vencimento inválido'),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida'),
   icon: z.string().min(1, 'Ícone é obrigatório'),
-  userId: z.string(),
   companyId: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
 
-export const CreateCreditCardSchema = CreditCardSchema.omit({
-  id: true,
-  userId: true,
-  createdAt: true,
-  updatedAt: true,
-  availableLimit: true,
-});
-
 export type CreditCard = z.infer<typeof CreditCardSchema>;
-export type CreateCreditCard = z.infer<typeof CreateCreditCardSchema>;
+export type CreateCreditCardPayload = {
+  name: string;
+  limit: number;
+  closingDay: number;
+  dueDay: number;
+  color: string;
+  icon: string;
+  companyId: string;
+};
 
 // Service functions
 export const getCreditCards = async (companyId: string): Promise<CreditCard[]> => {
@@ -55,14 +49,10 @@ export const getCreditCardById = async (companyId: string, id: string): Promise<
 
 export const createCreditCard = async (
   companyId: string,
-  data: CreateCreditCard,
+  data: CreateCreditCardPayload,
 ): Promise<CreditCard> => {
   try {
-    const validatedData = CreateCreditCardSchema.parse(data);
-    const response = await apiClient.post<CreditCard>(
-      `/companies/${companyId}/credit-cards`,
-      validatedData,
-    );
+    const response = await apiClient.post<CreditCard>(`/companies/${companyId}/credit-cards`, data);
     return CreditCardSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao criar cartão de crédito:', error);
@@ -73,10 +63,10 @@ export const createCreditCard = async (
 export const updateCreditCard = async (
   companyId: string,
   id: string,
-  data: Partial<CreateCreditCard>,
+  data: Partial<CreateCreditCardPayload>,
 ): Promise<CreditCard> => {
   try {
-    const validatedData = CreateCreditCardSchema.partial().parse(data);
+    const validatedData = CreditCardSchema.partial().parse(data);
     const response = await apiClient.put<CreditCard>(
       `/companies/${companyId}/credit-cards/${id}`,
       validatedData,

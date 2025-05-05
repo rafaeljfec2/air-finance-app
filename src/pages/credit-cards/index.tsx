@@ -12,6 +12,8 @@ import { useCreditCards } from '@/hooks/useCreditCards';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useCompanyContext } from '@/contexts/companyContext';
 import { toast } from '@/components/ui/toast';
+import { type CreateCreditCardPayload } from '@/services/creditCardService';
+import { useCompanyStore } from '@/store/company';
 
 const bankTypes = [
   { value: 'nubank', label: 'Nubank', icon: CreditCardIcon },
@@ -29,7 +31,8 @@ const dueDates = Array.from({ length: 31 }, (_, i) => ({
 }));
 
 export function CreditCardsPage() {
-  const { companyId } = useCompanyContext() as { companyId: string };
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id || '';
   const {
     creditCards,
     isLoading,
@@ -42,28 +45,30 @@ export function CreditCardsPage() {
     isDeleting,
   } = useCreditCards(companyId);
 
-  const [form, setForm] = useState({
+  const initialFormState = {
     name: '',
-    number: '',
-    holderName: '',
-    expirationDate: '',
-    cvv: '',
     limit: 0,
     closingDay: 10,
     dueDay: 10,
     color: '#8A05BE',
     icon: 'CreditCardIcon',
     companyId: companyId || '',
-  });
+  };
+  const [form, setForm] = useState<CreateCreditCardPayload>(initialFormState);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [errors, setErrors] = useState<any>({});
 
+  console.log('isCreating', isCreating, 'isUpdating', isUpdating);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => ({
+      ...prev,
+      [name]: name === 'limit' ? Number(value) : value,
+    }));
   };
 
   const handleColorChange = (color: string) => {
@@ -75,12 +80,8 @@ export function CreditCardsPage() {
   };
 
   const validate = () => {
-    const errs: any = {};
+    const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
-    if (!form.number.trim()) errs.number = 'Número do cartão obrigatório';
-    if (!form.holderName.trim()) errs.holderName = 'Nome do titular obrigatório';
-    if (!form.expirationDate) errs.expirationDate = 'Data de validade obrigatória';
-    if (!form.cvv) errs.cvv = 'CVV obrigatório';
     if (!form.limit || form.limit <= 0) errs.limit = 'Limite inválido';
     if (!form.companyId) errs.companyId = 'Selecione uma empresa';
     return errs;
@@ -88,38 +89,37 @@ export function CreditCardsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('submit', form);
     const errs = validate();
     setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
+    if (Object.keys(errs).length > 0) {
+      toast({
+        title: 'Erro',
+        description: 'Preencha todos os campos obrigatórios: ' + Object.values(errs).join(', '),
+        type: 'error',
+      });
+      return;
+    }
 
     try {
+      console.log('Dados enviados para criação:', form);
       if (editingId) {
         await updateCreditCard({ id: editingId, data: form });
         setEditingId(null);
       } else {
         await createCreditCard(form);
       }
-      setForm({
-        name: '',
-        number: '',
-        holderName: '',
-        expirationDate: '',
-        cvv: '',
-        limit: 0,
-        closingDay: 10,
-        dueDay: 10,
-        color: '#8A05BE',
-        icon: 'CreditCardIcon',
-        companyId: companyId || '',
-      });
+      setForm(initialFormState);
       setErrors({});
-    } catch (error: any) {
-      toast({
-        title: 'Erro',
-        description: `Erro ao salvar cartão: ${error.message || 'Erro desconhecido.'}`,
-        type: 'error',
-      });
-      console.error('Erro ao salvar cartão:', error);
+    } catch (error) {
+      if (error instanceof Error) {
+        toast({
+          title: 'Erro',
+          description: `Erro ao salvar cartão: ${error.message || 'Erro desconhecido.'}`,
+          type: 'error',
+        });
+        console.error('Erro ao salvar cartão:', error);
+      }
     }
   };
 
@@ -128,10 +128,6 @@ export function CreditCardsPage() {
     if (card) {
       setForm({
         name: card.name,
-        number: card.number,
-        holderName: card.holderName,
-        expirationDate: card.expirationDate,
-        cvv: card.cvv,
         limit: card.limit,
         closingDay: card.closingDay,
         dueDay: card.dueDay,
@@ -152,13 +148,15 @@ export function CreditCardsPage() {
     if (deleteId) {
       try {
         await deleteCreditCard(deleteId);
-      } catch (error: any) {
-        toast({
-          title: 'Erro',
-          description: `Erro ao deletar cartão: ${error.message || 'Erro desconhecido.'}`,
-          type: 'error',
-        });
-        console.error('Erro ao deletar cartão:', error);
+      } catch (error) {
+        if (error instanceof Error) {
+          toast({
+            title: 'Erro',
+            description: `Erro ao deletar cartão: ${error.message || 'Erro desconhecido.'}`,
+            type: 'error',
+          });
+          console.error('Erro ao deletar cartão:', error);
+        }
       }
     }
     setShowConfirmDelete(false);
@@ -310,19 +308,7 @@ export function CreditCardsPage() {
                     size="sm"
                     className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
                     onClick={() => {
-                      setForm({
-                        name: '',
-                        number: '',
-                        holderName: '',
-                        expirationDate: '',
-                        cvv: '',
-                        limit: 0,
-                        closingDay: 10,
-                        dueDay: 10,
-                        color: '#8A05BE',
-                        icon: 'CreditCardIcon',
-                        companyId: companyId || '',
-                      });
+                      setForm(initialFormState);
                       setEditingId(null);
                     }}
                   >

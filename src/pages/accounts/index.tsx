@@ -97,10 +97,10 @@ export function AccountsPage() {
 
     try {
       if (editingId) {
-        await updateAccount({ id: editingId, data: form });
+        updateAccount({ id: editingId, data: form });
         setEditingId(null);
       } else {
-        await createAccount(form);
+        createAccount(form);
       }
       setForm({
         name: '',

@@ -6,8 +6,9 @@ import {
   updateCreditCard,
   deleteCreditCard,
   getCreditCardStatement,
+  updateCreditCardStatus,
   type CreditCard,
-  type CreateCreditCard,
+  CreateCreditCardPayload,
 } from '../services/creditCardService';
 
 export const useCreditCards = (companyId: string) => {
@@ -23,31 +24,31 @@ export const useCreditCards = (companyId: string) => {
     enabled: !!companyId,
   });
 
-  const getCreditCard = (id: string) => {
+  function useGetCreditCard(id: string) {
     return useQuery<CreditCard>({
       queryKey: ['credit-card', companyId, id],
       queryFn: () => getCreditCardById(companyId, id),
       enabled: !!id && !!companyId,
     });
-  };
+  }
 
-  const getStatement = (id: string, month: number, year: number) => {
+  function useGetStatement(id: string, month: number, year: number) {
     return useQuery({
-      queryKey: ['credit-card-statement', id, month, year],
+      queryKey: ['credit-card-statement', companyId, id, month, year],
       queryFn: () => getCreditCardStatement(id, month, year),
-      enabled: !!id,
+      enabled: !!id && !!companyId,
     });
-  };
+  }
 
   const createMutation = useMutation({
-    mutationFn: (data: CreateCreditCard) => createCreditCard(companyId, data),
+    mutationFn: (data: CreateCreditCardPayload) => createCreditCard(companyId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credit-cards', companyId] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<CreateCreditCard> }) =>
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateCreditCardPayload> }) =>
       updateCreditCard(companyId, id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['credit-cards', companyId] });
@@ -76,8 +77,8 @@ export const useCreditCards = (companyId: string) => {
     creditCards,
     isLoading,
     error,
-    getCreditCard,
-    getStatement,
+    useGetCreditCard,
+    useGetStatement,
     createCreditCard: createMutation.mutateAsync,
     updateCreditCard: updateMutation.mutateAsync,
     deleteCreditCard: deleteMutation.mutateAsync,
