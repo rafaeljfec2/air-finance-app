@@ -98,7 +98,30 @@ interface SidebarProps {
 export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const location = useLocation();
   const { isCollapsed, toggleCollapse } = useSidebarStore();
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [openMenu, setOpenMenu] = useState<string | null>(() => {
+    // Encontra o menu pai do item ativo
+    for (const group of navigation) {
+      for (const item of group.items) {
+        if (item.children) {
+          const isAnyChildActive = item.children.some((child) => location.pathname === child.href);
+          if (isAnyChildActive) {
+            return item.name;
+          }
+        }
+      }
+    }
+    return null;
+  });
+
+  const handleMenuClick = (itemName: string) => {
+    // Se o menu clicado já está aberto, fecha ele
+    if (openMenu === itemName) {
+      setOpenMenu(null);
+      return;
+    }
+    // Se clicou em outro menu, fecha o anterior e abre o novo
+    setOpenMenu(itemName);
+  };
 
   console.log('Sidebar render - isOpen:', isOpen);
 
@@ -152,7 +175,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                     return (
                       <div key={item.name}>
                         <button
-                          onClick={() => setOpenMenu(isOpen ? null : item.name)}
+                          onClick={() => handleMenuClick(item.name)}
                           className={cn(
                             'group flex items-center px-2 py-2 text-base font-medium rounded-md transition-colors w-full',
                             isAnyChildActive
@@ -183,26 +206,33 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                           )}
                         </button>
                         {/* Submenu */}
-                        {!isCollapsed && isOpen && (
-                          <div className="ml-8 mt-1 space-y-1">
-                            {item.children.map((child) => {
-                              const isActive = location.pathname === child.href;
-                              return (
-                                <Link
-                                  key={child.name}
-                                  to={child.href}
-                                  className={cn(
-                                    'group flex items-center px-2 py-2 text-base font-medium rounded-md transition-colors',
-                                    isActive
-                                      ? 'bg-primary-500/10 text-primary-500'
-                                      : 'text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark',
-                                  )}
-                                >
-                                  <child.icon className="h-5 w-5 mr-2" />
-                                  {child.name}
-                                </Link>
-                              );
-                            })}
+                        {!isCollapsed && (
+                          <div
+                            className={cn(
+                              'ml-8 mt-1 space-y-1 overflow-hidden transition-all duration-300 ease-in-out',
+                              isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0',
+                            )}
+                          >
+                            <div className="py-1">
+                              {item.children.map((child) => {
+                                const isActive = location.pathname === child.href;
+                                return (
+                                  <Link
+                                    key={child.name}
+                                    to={child.href}
+                                    className={cn(
+                                      'group flex items-center px-2 py-2 text-base font-medium rounded-md transition-colors',
+                                      isActive
+                                        ? 'bg-primary-500/10 text-primary-500'
+                                        : 'text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark',
+                                    )}
+                                  >
+                                    <child.icon className="h-5 w-5 mr-2" />
+                                    {child.name}
+                                  </Link>
+                                );
+                              })}
+                            </div>
                           </div>
                         )}
                       </div>

@@ -29,6 +29,9 @@ import { Payables } from '@/pages/payables';
 import { Receivables } from '@/pages/receivables';
 import { MonthlyClosing } from '@/pages/monthly-closing';
 import { AnnualResult } from '@/pages/annual-result';
+import { PlannerPage } from '@/pages/planner';
+import { PreferencesPage } from '@/pages/settings/preferences';
+import { NotificationsPage } from '@/pages/settings/notifications';
 
 export const router = createBrowserRouter([
   {
@@ -319,6 +322,39 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <AnnualResult />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/planner',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <PlannerPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/settings/preferences',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <PreferencesPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/settings/notifications',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <NotificationsPage />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
