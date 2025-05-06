@@ -1,9 +1,10 @@
-import { apiClient } from './apiClient';
 import { z } from 'zod';
+import { apiClient } from './apiClient';
 
 // Validation schemas
 export const UserSchema = z.object({
   id: z.string(),
+  companyId: z.string(),
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   email: z.string().email('E-mail inválido'),
   role: z.enum(['admin', 'user'], {
@@ -12,7 +13,14 @@ export const UserSchema = z.object({
   status: z.enum(['active', 'inactive'], {
     errorMap: () => ({ message: 'Status inválido' }),
   }),
-  companyId: z.string(),
+  telephone: z.string(),
+  location: z.string(),
+  biography: z.string(),
+  emailNotification: z.boolean(),
+  pushNotification: z.boolean(),
+  systemUpdate: z.boolean(),
+  language: z.string(),
+  currency: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
