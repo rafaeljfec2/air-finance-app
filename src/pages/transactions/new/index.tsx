@@ -63,7 +63,7 @@ export function NewTransaction() {
       <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
         {/* Fixed Header */}
         <div className="sticky top-0 z-10 bg-background/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-border dark:border-border-dark">
-          <div className="container mx-auto px-4 py-4">
+          <div className="container mx-auto">
             <div className="flex items-center">
               <button
                 onClick={() => navigate('/transactions')}
@@ -75,7 +75,7 @@ export function NewTransaction() {
                 <h1 className="text-lg font-semibold text-text dark:text-text-dark">
                   Novo lançamento
                 </h1>
-                <p className="text-sm text-text/60 dark:text-text-dark/60">
+                <p className="text-sm text-text/60 dark:text-text-dark/60 mb-4">
                   Preencha os dados da transação
                 </p>
               </div>
