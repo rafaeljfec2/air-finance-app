@@ -11,7 +11,7 @@ import {
   type CreateIncomeSource,
 } from '../services/incomeSourceService';
 
-export const useIncomeSources = () => {
+export const useIncomeSources = (companyId: string) => {
   const queryClient = useQueryClient();
 
   const {
@@ -19,30 +19,30 @@ export const useIncomeSources = () => {
     isLoading: loading,
     error,
   } = useQuery<IncomeSource[], ReactNode>({
-    queryKey: ['income-sources'],
-    queryFn: getIncomeSources,
+    queryKey: ['income-sources', companyId],
+    queryFn: () => getIncomeSources(companyId),
   });
 
   const getIncomeSource = (id: string) => {
     return useQuery<IncomeSource, ReactNode>({
-      queryKey: ['income-source', id],
-      queryFn: () => getIncomeSourceById(id),
+      queryKey: ['income-source', companyId, id],
+      queryFn: () => getIncomeSourceById(companyId, id),
       enabled: !!id,
     });
   };
 
   const getProjection = (id: string) => {
     return useQuery<any, ReactNode>({
-      queryKey: ['income-source-projection', id],
-      queryFn: () => getIncomeSourceProjection(id),
+      queryKey: ['income-source-projection', companyId, id],
+      queryFn: () => getIncomeSourceProjection(companyId, id),
       enabled: !!id,
     });
   };
 
   const createMutation = useMutation<IncomeSource, ReactNode, CreateIncomeSource>({
-    mutationFn: createIncomeSource,
+    mutationFn: (data) => createIncomeSource(companyId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['income-sources'] });
+      queryClient.invalidateQueries({ queryKey: ['income-sources', companyId] });
     },
   });
 
@@ -51,20 +51,20 @@ export const useIncomeSources = () => {
     ReactNode,
     { id: string; data: CreateIncomeSource }
   >({
-    mutationFn: ({ id, data }) => updateIncomeSource(id, data),
+    mutationFn: ({ id, data }) => updateIncomeSource(companyId, id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['income-sources'] });
-      queryClient.invalidateQueries({ queryKey: ['income-source', id] });
-      queryClient.invalidateQueries({ queryKey: ['income-source-projection', id] });
+      queryClient.invalidateQueries({ queryKey: ['income-sources', companyId] });
+      queryClient.invalidateQueries({ queryKey: ['income-source', companyId, id] });
+      queryClient.invalidateQueries({ queryKey: ['income-source-projection', companyId, id] });
     },
   });
 
   const deleteMutation = useMutation<void, ReactNode, string>({
-    mutationFn: deleteIncomeSource,
+    mutationFn: (id) => deleteIncomeSource(companyId, id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['income-sources'] });
-      queryClient.removeQueries({ queryKey: ['income-source', id] });
-      queryClient.removeQueries({ queryKey: ['income-source-projection', id] });
+      queryClient.invalidateQueries({ queryKey: ['income-sources', companyId] });
+      queryClient.removeQueries({ queryKey: ['income-source', companyId, id] });
+      queryClient.removeQueries({ queryKey: ['income-source-projection', companyId, id] });
     },
   });
 

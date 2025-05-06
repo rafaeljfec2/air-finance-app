@@ -36,19 +36,21 @@ export type IncomeSource = z.infer<typeof IncomeSourceSchema>;
 export type CreateIncomeSource = z.infer<typeof CreateIncomeSourceSchema>;
 
 // Service functions
-export const getIncomeSources = async (): Promise<IncomeSource[]> => {
+export const getIncomeSources = async (companyId: string): Promise<IncomeSource[]> => {
   try {
-    const response = await apiClient.get<IncomeSource[]>('/income-sources');
+    const response = await apiClient.get<IncomeSource[]>(`/companies/${companyId}/income-sources`);
     return IncomeSourceSchema.array().parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar fontes de receita:', error);
-    throw new Error('Falha ao buscar fontes de receita');
+    throw new Error('Falha ao buscar fontes de receita: ' + error);
   }
 };
 
-export const getIncomeSourceById = async (id: string): Promise<IncomeSource> => {
+export const getIncomeSourceById = async (companyId: string, id: string): Promise<IncomeSource> => {
   try {
-    const response = await apiClient.get<IncomeSource>(`/income-sources/${id}`);
+    const response = await apiClient.get<IncomeSource>(
+      `/companies/${companyId}/income-sources/${id}`,
+    );
     return IncomeSourceSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar fonte de receita:', error);
@@ -56,10 +58,16 @@ export const getIncomeSourceById = async (id: string): Promise<IncomeSource> => 
   }
 };
 
-export const createIncomeSource = async (data: CreateIncomeSource): Promise<IncomeSource> => {
+export const createIncomeSource = async (
+  companyId: string,
+  data: CreateIncomeSource,
+): Promise<IncomeSource> => {
   try {
     const validatedData = CreateIncomeSourceSchema.parse(data);
-    const response = await apiClient.post<IncomeSource>('/income-sources', validatedData);
+    const response = await apiClient.post<IncomeSource>(
+      `/companies/${companyId}/income-sources`,
+      validatedData,
+    );
     return IncomeSourceSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao criar fonte de receita:', error);
@@ -68,12 +76,16 @@ export const createIncomeSource = async (data: CreateIncomeSource): Promise<Inco
 };
 
 export const updateIncomeSource = async (
+  companyId: string,
   id: string,
   data: Partial<CreateIncomeSource>,
 ): Promise<IncomeSource> => {
   try {
     const validatedData = CreateIncomeSourceSchema.partial().parse(data);
-    const response = await apiClient.put<IncomeSource>(`/income-sources/${id}`, validatedData);
+    const response = await apiClient.put<IncomeSource>(
+      `/companies/${companyId}/income-sources/${id}`,
+      validatedData,
+    );
     return IncomeSourceSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao atualizar fonte de receita:', error);
@@ -81,9 +93,9 @@ export const updateIncomeSource = async (
   }
 };
 
-export const deleteIncomeSource = async (id: string): Promise<void> => {
+export const deleteIncomeSource = async (companyId: string, id: string): Promise<void> => {
   try {
-    await apiClient.delete(`/income-sources/${id}`);
+    await apiClient.delete(`/companies/${companyId}/income-sources/${id}`);
   } catch (error) {
     console.error('Erro ao deletar fonte de receita:', error);
     throw new Error('Falha ao deletar fonte de receita');
@@ -91,6 +103,7 @@ export const deleteIncomeSource = async (id: string): Promise<void> => {
 };
 
 export const getIncomeSourceProjection = async (
+  companyId: string,
   id: string,
 ): Promise<{
   projectedAmount: number;
@@ -98,7 +111,7 @@ export const getIncomeSourceProjection = async (
   daysUntilNextPayment: number;
 }> => {
   try {
-    const response = await apiClient.get(`/income-sources/${id}/projection`);
+    const response = await apiClient.get(`/companies/${companyId}/income-sources/${id}/projection`);
     return response.data;
   } catch (error) {
     console.error('Erro ao buscar projeção da fonte de receita:', error);

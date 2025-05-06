@@ -10,13 +10,109 @@ import { useGoals } from '@/hooks/useGoals';
 import { useCategories } from '@/hooks/useCategories';
 import { useCompanyStore } from '@/store/company';
 import { FlagIcon } from '@heroicons/react/24/outline';
-import { formatCurrency } from '@/utils/formatters';
+import { formatCurrency, parseCurrency, formatCurrencyInput } from '@/utils/formatters';
 import { Progress } from '@/components/ui/progress';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CreateGoal } from '@/services/goalService';
+import { CreateGoal, Goal } from '@/services/goalService';
+import { Category } from '@/services/categoryService';
+
+interface FormErrors {
+  name?: string;
+  description?: string;
+  targetAmount?: string;
+  currentAmount?: string;
+  deadline?: string;
+  categoryId?: string;
+  companyId?: string;
+}
+
+const calculateProgress = (current: number, target: number) => {
+  return Math.min(Math.round((current / target) * 100), 100);
+};
+
+interface GoalItemProps {
+  goal: Goal;
+  category?: Category;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  isUpdating: boolean;
+  isDeleting: boolean;
+}
+
+const GoalItem = ({ goal, category, onEdit, onDelete, isUpdating, isDeleting }: GoalItemProps) => {
+  const { data: progressData } = useGoals(goal.companyId).getProgress(goal.id);
+  const progress = calculateProgress(goal.currentAmount, goal.targetAmount);
+  const daysUntilDeadline = progressData?.daysUntilDeadline || 0;
+
+  return (
+    <li key={goal.id} className="py-4">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-3">
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: category?.color || '#6B7280' }}
+          >
+            {category?.icon ? (
+              <span className="text-white">{category.icon}</span>
+            ) : (
+              <FlagIcon className="h-5 w-5 text-white" />
+            )}
+          </div>
+          <div className="flex-1">
+            <div className="font-medium text-text dark:text-text-dark">{goal.name}</div>
+            {goal.description && (
+              <div className="text-sm text-gray-500 dark:text-gray-400">{goal.description}</div>
+            )}
+            <div className="mt-2">
+              <Progress value={progress} className="h-2" />
+              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <span>{progress}% concluído</span>
+                <span>
+                  {formatCurrency(goal.currentAmount)} / {formatCurrency(goal.targetAmount)}
+                </span>
+              </div>
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {category?.name && <span className="mr-2">{category.name} • </span>}
+              <span>
+                {format(new Date(goal.deadline), "dd 'de' MMMM 'de' yyyy", {
+                  locale: ptBR,
+                })}
+              </span>
+              {daysUntilDeadline > 0 && (
+                <span className="ml-2">• {daysUntilDeadline} dias restantes</span>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
+            onClick={() => onEdit(goal.id)}
+            disabled={isUpdating}
+          >
+            Editar
+          </Button>
+          <Button
+            size="sm"
+            className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
+            onClick={() => onDelete(goal.id)}
+            disabled={isDeleting}
+          >
+            Excluir
+          </Button>
+        </div>
+      </div>
+    </li>
+  );
+};
 
 export function GoalsPage() {
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id || '';
+
   const {
     goals,
     isLoading,
@@ -24,13 +120,11 @@ export function GoalsPage() {
     createGoal,
     updateGoal,
     deleteGoal,
-    getProgress,
     isCreating,
     isUpdating,
     isDeleting,
-  } = useGoals();
-  const { activeCompany } = useCompanyStore();
-  const companyId = activeCompany?.id || '';
+  } = useGoals(companyId);
+
   const { categories } = useCategories(companyId);
 
   const [form, setForm] = useState<CreateGoal>({
@@ -47,20 +141,20 @@ export function GoalsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (name === 'targetAmount' || name === 'currentAmount') {
-      const numericValue = parseFloat(value.replace(/[^\d]/g, '')) / 100;
-      setForm((prev) => ({ ...prev, [name]: numericValue }));
+      const formattedValue = formatCurrencyInput(value);
+      setForm((prev) => ({ ...prev, [name]: parseCurrency(formattedValue) }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const validate = () => {
-    const errs: any = {};
+    const errs: FormErrors = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (form.targetAmount <= 0) errs.targetAmount = 'Valor alvo deve ser maior que zero';
     if (!form.deadline) errs.deadline = 'Data limite obrigatória';
@@ -136,10 +230,6 @@ export function GoalsPage() {
     setDeleteId(null);
   };
 
-  const calculateProgress = (current: number, target: number) => {
-    return Math.min(Math.round((current / target) * 100), 100);
-  };
-
   if (isLoading) {
     return (
       <ViewDefault>
@@ -183,6 +273,7 @@ export function GoalsPage() {
                   onChange={handleChange}
                   placeholder="Ex: Viagem, Reserva de emergência..."
                   required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
               <FormField label="Descrição" error={errors.description}>
@@ -191,26 +282,27 @@ export function GoalsPage() {
                   value={form.description}
                   onChange={handleChange}
                   placeholder="Descreva sua meta..."
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
               <FormField label="Valor alvo" error={errors.targetAmount}>
                 <Input
                   name="targetAmount"
-                  type="number"
-                  value={form.targetAmount}
+                  value={formatCurrency(form.targetAmount)}
                   onChange={handleChange}
                   placeholder="R$ 0,00"
                   required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
               <FormField label="Valor atual" error={errors.currentAmount}>
                 <Input
                   name="currentAmount"
-                  type="number"
-                  value={form.currentAmount}
+                  value={formatCurrency(form.currentAmount)}
                   onChange={handleChange}
                   placeholder="R$ 0,00"
                   required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
               <FormField label="Data limite" error={errors.deadline}>
@@ -220,6 +312,7 @@ export function GoalsPage() {
                   value={form.deadline}
                   onChange={handleChange}
                   required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
               <FormField label="Categoria" error={errors.categoryId}>
@@ -227,10 +320,10 @@ export function GoalsPage() {
                   value={form.categoryId}
                   onValueChange={(value) => setForm((prev) => ({ ...prev, categoryId: value }))}
                 >
-                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors">
                     {categories?.find((cat) => cat.id === form.categoryId)?.name || 'Selecione...'}
                   </SelectTrigger>
-                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors">
                     {categories?.map((cat) => (
                       <SelectItem key={cat.id} value={cat.id}>
                         {cat.name}
@@ -282,76 +375,16 @@ export function GoalsPage() {
               )}
               {goals?.map((goal) => {
                 const category = categories?.find((c) => c.id === goal.categoryId);
-                const progress = calculateProgress(goal.currentAmount, goal.targetAmount);
-                const { data: progressData } = getProgress(goal.id);
-                const daysUntilDeadline = progressData?.daysUntilDeadline || 0;
-
                 return (
-                  <li key={goal.id} className="py-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3">
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center"
-                          style={{ backgroundColor: category?.color || '#6B7280' }}
-                        >
-                          {category?.icon ? (
-                            <span className="text-white">{category.icon}</span>
-                          ) : (
-                            <FlagIcon className="h-5 w-5 text-white" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium text-text dark:text-text-dark">
-                            {goal.name}
-                          </div>
-                          {goal.description && (
-                            <div className="text-sm text-gray-500 dark:text-gray-400">
-                              {goal.description}
-                            </div>
-                          )}
-                          <div className="mt-2">
-                            <Progress value={progress} className="h-2" />
-                            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                              <span>{progress}% concluído</span>
-                              <span>
-                                {formatCurrency(goal.currentAmount)} /{' '}
-                                {formatCurrency(goal.targetAmount)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {category?.name && <span className="mr-2">{category.name} • </span>}
-                            <span>
-                              {format(new Date(goal.deadline), "dd 'de' MMMM 'de' yyyy", {
-                                locale: ptBR,
-                              })}
-                            </span>
-                            {daysUntilDeadline > 0 && (
-                              <span className="ml-2">• {daysUntilDeadline} dias restantes</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-                          onClick={() => handleEdit(goal.id)}
-                          disabled={isUpdating}
-                        >
-                          Editar
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-                          onClick={() => handleDelete(goal.id)}
-                          disabled={isDeleting}
-                        >
-                          Excluir
-                        </Button>
-                      </div>
-                    </div>
-                  </li>
+                  <GoalItem
+                    key={goal.id}
+                    goal={goal}
+                    category={category}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    isUpdating={isUpdating}
+                    isDeleting={isDeleting}
+                  />
                 );
               })}
             </ul>

@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react';
 import { dependents } from '@/constants/dependents';
 import { useCompanyContext } from '@/contexts/companyContext';
+import { formatCurrency, parseCurrency, formatCurrencyInput } from '@/utils/formatters';
 
 export function NewTransaction() {
   const navigate = useNavigate();
@@ -41,14 +42,14 @@ export function NewTransaction() {
     navigate('/transactions');
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'amount' ? parseFloat(value) : value,
-    }));
+    if (name === 'amount') {
+      const formattedValue = formatCurrencyInput(value);
+      setFormData((prev) => ({ ...prev, [name]: parseCurrency(formattedValue) }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const filteredCategories = categories.filter(
@@ -158,9 +159,9 @@ export function NewTransaction() {
                     type="number"
                     step="0.01"
                     min="0"
-                    value={formData.amount || ''}
+                    value={formatCurrency(formData.amount)}
                     onChange={handleChange}
-                    placeholder="0,00"
+                    placeholder="R$ 0,00"
                     required
                     className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                   />

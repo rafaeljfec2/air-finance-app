@@ -2,20 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/FormField';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useIncomeSources } from '@/hooks/useIncomeSources';
-import { useCompanyContext } from '@/contexts/companyContext';
 import { IncomeSource } from '@/types/incomeSource';
-import { formatCurrency } from '@/utils/format';
+import { formatCurrency, parseCurrency, formatCurrencyInput } from '@/utils/formatters';
 import { formatDate } from '@/utils/date';
+import { toast } from '@/components/ui/toast';
+import { useCompanyStore } from '@/store/company';
 
 export function IncomeSourcesPage() {
-  const { companyId } = useCompanyContext() as { companyId: string };
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id || '';
   const { incomeSources, loading, error, addIncomeSource, updateIncomeSource, deleteIncomeSource } =
-    useIncomeSources();
+    useIncomeSources(companyId);
   const [form, setForm] = useState<Omit<IncomeSource, 'id' | 'createdAt' | 'updatedAt'>>({
     name: '',
     description: '',
@@ -38,7 +40,12 @@ export function IncomeSourcesPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === 'amount') {
+      const formattedValue = formatCurrencyInput(value);
+      setForm((prev) => ({ ...prev, [name]: parseCurrency(formattedValue) }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const validate = () => {
@@ -61,7 +68,7 @@ export function IncomeSourcesPage() {
         updateIncomeSource({ id: editingId, data: form });
         setEditingId(null);
       } else {
-        await addIncomeSource(form);
+        addIncomeSource(form);
       }
       setForm({
         name: '',
@@ -76,7 +83,11 @@ export function IncomeSourcesPage() {
       });
       setErrors({});
     } catch (err) {
-      console.error('Erro ao salvar fonte de receita:', err);
+      toast({
+        title: 'Erro ao salvar fonte de receita',
+        description: err.message,
+        type: 'error',
+      });
     }
   };
 
@@ -94,7 +105,7 @@ export function IncomeSourcesPage() {
   };
 
   const confirmDelete = async () => {
-    if (deleteId) await deleteIncomeSource(deleteId);
+    if (deleteId) deleteIncomeSource(deleteId);
     setShowConfirmDelete(false);
     setDeleteId(null);
   };
@@ -130,6 +141,70 @@ export function IncomeSourcesPage() {
       default:
         return frequency;
     }
+  };
+
+  const renderIncomeSources = () => {
+    if (loading) {
+      return <div className="text-center py-4">Carregando...</div>;
+    }
+
+    if (incomeSources.length === 0) {
+      return (
+        <div className="text-center py-4 text-gray-500">Nenhuma fonte de receita cadastrada.</div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {incomeSources.map((source) => (
+          <div key={source.id} className="border rounded-lg p-4">
+            <div className="flex justify-between items-start mb-2">
+              <div>
+                <h3 className="font-semibold">{source.name}</h3>
+                {source.description && (
+                  <p className="text-sm text-gray-600">{source.description}</p>
+                )}
+                <div className="flex gap-2 mt-1">
+                  <span className="text-xs px-2 py-1 rounded bg-primary-100 text-primary-800">
+                    {getTypeLabel(source.type)}
+                  </span>
+                  <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">
+                    {getFrequencyLabel(source.frequency)}
+                  </span>
+                  <span
+                    className={`text-xs px-2 py-1 rounded ${
+                      source.status === 'active'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                  >
+                    {source.status === 'active' ? 'Ativa' : 'Inativa'}
+                  </span>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" color="secondary" onClick={() => handleEdit(source.id)}>
+                  Editar
+                </Button>
+                <Button size="sm" color="danger" onClick={() => handleDelete(source.id)}>
+                  Excluir
+                </Button>
+              </div>
+            </div>
+            <div className="mt-2">
+              <div className="text-sm font-semibold">
+                {formatCurrency(source.amount)} por{' '}
+                {getFrequencyLabel(source.frequency).toLowerCase()}
+              </div>
+              <div className="text-xs text-gray-500">
+                Início: {formatDate(source.startDate)}
+                {source.endDate && ` • Término: ${formatDate(source.endDate)}`}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -173,22 +248,25 @@ export function IncomeSourcesPage() {
                     setForm((prev) => ({ ...prev, type: value as IncomeSource['type'] }))
                   }
                 >
-                  <option value="fixed">Fixa</option>
-                  <option value="variable">Variável</option>
-                  <option value="passive">Passiva</option>
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors">
+                    {getTypeLabel(form.type)}
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                    <SelectItem value="fixed">Fixa</SelectItem>
+                    <SelectItem value="variable">Variável</SelectItem>
+                    <SelectItem value="passive">Passiva</SelectItem>
+                  </SelectContent>
                 </Select>
               </FormField>
 
               <FormField label="Valor" error={errors.amount}>
                 <Input
                   name="amount"
-                  type="number"
-                  value={form.amount}
+                  value={formatCurrency(form.amount)}
                   onChange={handleChange}
-                  placeholder="Ex: 5000"
+                  placeholder="R$ 0,00"
                   required
-                  min="0"
-                  step="0.01"
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
 
@@ -199,10 +277,15 @@ export function IncomeSourcesPage() {
                     setForm((prev) => ({ ...prev, frequency: value as IncomeSource['frequency'] }))
                   }
                 >
-                  <option value="daily">Diária</option>
-                  <option value="weekly">Semanal</option>
-                  <option value="monthly">Mensal</option>
-                  <option value="yearly">Anual</option>
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors">
+                    {getFrequencyLabel(form.frequency)}
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                    <SelectItem value="daily">Diária</SelectItem>
+                    <SelectItem value="weekly">Semanal</SelectItem>
+                    <SelectItem value="monthly">Mensal</SelectItem>
+                    <SelectItem value="yearly">Anual</SelectItem>
+                  </SelectContent>
                 </Select>
               </FormField>
 
@@ -213,11 +296,18 @@ export function IncomeSourcesPage() {
                   value={form.startDate}
                   onChange={handleChange}
                   required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
 
               <FormField label="Data de Término (opcional)">
-                <Input name="endDate" type="date" value={form.endDate} onChange={handleChange} />
+                <Input
+                  name="endDate"
+                  type="date"
+                  value={form.endDate}
+                  onChange={handleChange}
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                />
               </FormField>
 
               <FormField label="Status" error={errors.status}>
@@ -227,8 +317,13 @@ export function IncomeSourcesPage() {
                     setForm((prev) => ({ ...prev, status: value as IncomeSource['status'] }))
                   }
                 >
-                  <option value="active">Ativa</option>
-                  <option value="inactive">Inativa</option>
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors">
+                    {form.status === 'active' ? 'Ativa' : 'Inativa'}
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                    <SelectItem value="active">Ativa</SelectItem>
+                    <SelectItem value="inactive">Inativa</SelectItem>
+                  </SelectContent>
                 </Select>
               </FormField>
 
@@ -265,63 +360,7 @@ export function IncomeSourcesPage() {
           {/* Listagem */}
           <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">Minhas Fontes de Receita</h2>
-            {loading ? (
-              <div className="text-center py-4">Carregando...</div>
-            ) : incomeSources.length === 0 ? (
-              <div className="text-center py-4 text-gray-500">
-                Nenhuma fonte de receita cadastrada.
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {incomeSources.map((source) => (
-                  <div key={source.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h3 className="font-semibold">{source.name}</h3>
-                        {source.description && (
-                          <p className="text-sm text-gray-600">{source.description}</p>
-                        )}
-                        <div className="flex gap-2 mt-1">
-                          <span className="text-xs px-2 py-1 rounded bg-primary-100 text-primary-800">
-                            {getTypeLabel(source.type)}
-                          </span>
-                          <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">
-                            {getFrequencyLabel(source.frequency)}
-                          </span>
-                          <span
-                            className={`text-xs px-2 py-1 rounded ${
-                              source.status === 'active'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
-                            }`}
-                          >
-                            {source.status === 'active' ? 'Ativa' : 'Inativa'}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" color="secondary" onClick={() => handleEdit(source.id)}>
-                          Editar
-                        </Button>
-                        <Button size="sm" color="danger" onClick={() => handleDelete(source.id)}>
-                          Excluir
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      <div className="text-sm font-semibold">
-                        {formatCurrency(source.amount)} por{' '}
-                        {getFrequencyLabel(source.frequency).toLowerCase()}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        Início: {formatDate(source.startDate)}
-                        {source.endDate && ` • Término: ${formatDate(source.endDate)}`}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            {renderIncomeSources()}
           </Card>
         </div>
 

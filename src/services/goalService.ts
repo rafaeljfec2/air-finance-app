@@ -26,9 +26,9 @@ export type Goal = z.infer<typeof GoalSchema>;
 export type CreateGoal = z.infer<typeof CreateGoalSchema>;
 
 // Service functions
-export const getGoals = async (): Promise<Goal[]> => {
+export const getGoals = async (companyId: string): Promise<Goal[]> => {
   try {
-    const response = await apiClient.get<Goal[]>('/goals');
+    const response = await apiClient.get<Goal[]>(`/companies/${companyId}/goals`);
     return GoalSchema.array().parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar metas:', error);
@@ -36,9 +36,9 @@ export const getGoals = async (): Promise<Goal[]> => {
   }
 };
 
-export const getGoalById = async (id: string): Promise<Goal> => {
+export const getGoalById = async (companyId: string, id: string): Promise<Goal> => {
   try {
-    const response = await apiClient.get<Goal>(`/goals/${id}`);
+    const response = await apiClient.get<Goal>(`/companies/${companyId}/goals/${id}`);
     return GoalSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar meta:', error);
@@ -46,10 +46,10 @@ export const getGoalById = async (id: string): Promise<Goal> => {
   }
 };
 
-export const createGoal = async (data: CreateGoal): Promise<Goal> => {
+export const createGoal = async (companyId: string, data: CreateGoal): Promise<Goal> => {
   try {
     const validatedData = CreateGoalSchema.parse(data);
-    const response = await apiClient.post<Goal>('/goals', validatedData);
+    const response = await apiClient.post<Goal>(`/companies/${companyId}/goals`, validatedData);
     return GoalSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao criar meta:', error);
@@ -57,10 +57,17 @@ export const createGoal = async (data: CreateGoal): Promise<Goal> => {
   }
 };
 
-export const updateGoal = async (id: string, data: Partial<CreateGoal>): Promise<Goal> => {
+export const updateGoal = async (
+  companyId: string,
+  id: string,
+  data: Partial<CreateGoal>,
+): Promise<Goal> => {
   try {
     const validatedData = CreateGoalSchema.partial().parse(data);
-    const response = await apiClient.put<Goal>(`/goals/${id}`, validatedData);
+    const response = await apiClient.put<Goal>(
+      `/companies/${companyId}/goals/${id}`,
+      validatedData,
+    );
     return GoalSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao atualizar meta:', error);
@@ -68,9 +75,9 @@ export const updateGoal = async (id: string, data: Partial<CreateGoal>): Promise
   }
 };
 
-export const deleteGoal = async (id: string): Promise<void> => {
+export const deleteGoal = async (companyId: string, id: string): Promise<void> => {
   try {
-    await apiClient.delete(`/goals/${id}`);
+    await apiClient.delete(`/companies/${companyId}/goals/${id}`);
   } catch (error) {
     console.error('Erro ao deletar meta:', error);
     throw new Error('Falha ao deletar meta');
@@ -90,5 +97,22 @@ export const getGoalProgress = async (
   } catch (error) {
     console.error('Erro ao buscar progresso da meta:', error);
     throw new Error('Falha ao buscar progresso da meta');
+  }
+};
+
+export const updateGoalCurrentAmount = async (
+  companyId: string,
+  id: string,
+  currentAmount: number,
+): Promise<Goal> => {
+  try {
+    const response = await apiClient.patch<Goal>(
+      `/companies/${companyId}/goals/${id}/current-amount`,
+      { currentAmount },
+    );
+    return GoalSchema.parse(response.data);
+  } catch (error) {
+    console.error('Erro ao atualizar valor acumulado da meta:', error);
+    throw new Error('Falha ao atualizar valor acumulado da meta');
   }
 };

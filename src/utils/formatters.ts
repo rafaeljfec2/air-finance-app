@@ -8,6 +8,23 @@ export function formatCurrency(value: number): string {
   }).format(value);
 }
 
+export function parseCurrency(value: string): number {
+  return parseFloat(
+    value
+      .replace(/[^\d,.-]/g, '')
+      .replace(',', '.')
+      .replace(/\.(?=.*\.)/g, ''),
+  );
+}
+
+export function formatCurrencyInput(value: string): string {
+  const numericValue = value.replace(/[^\d]/g, '');
+  if (!numericValue) return '';
+
+  const floatValue = parseFloat(numericValue) / 100;
+  return formatCurrency(floatValue);
+}
+
 export function formatPercentual(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
     style: 'percent',

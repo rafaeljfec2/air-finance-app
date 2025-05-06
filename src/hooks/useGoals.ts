@@ -10,7 +10,7 @@ import {
   type CreateGoal,
 } from '../services/goalService';
 
-export const useGoals = () => {
+export const useGoals = (companyId: string) => {
   const queryClient = useQueryClient();
 
   const {
@@ -18,35 +18,36 @@ export const useGoals = () => {
     isLoading,
     error,
   } = useQuery<Goal[]>({
-    queryKey: ['goals'],
-    queryFn: getGoals,
+    queryKey: ['goals', companyId],
+    queryFn: () => getGoals(companyId),
   });
 
   const getGoal = (id: string) => {
     return useQuery<Goal>({
-      queryKey: ['goal', id],
-      queryFn: () => getGoalById(id),
+      queryKey: ['goal', companyId, id],
+      queryFn: () => getGoalById(companyId, id),
       enabled: !!id,
     });
   };
 
   const getProgress = (id: string) => {
     return useQuery({
-      queryKey: ['goal-progress', id],
+      queryKey: ['goal-progress', companyId, id],
       queryFn: () => getGoalProgress(id),
       enabled: !!id,
     });
   };
 
   const createMutation = useMutation({
-    mutationFn: createGoal,
+    mutationFn: (data: CreateGoal) => createGoal(companyId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['goals'] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<CreateGoal> }) => updateGoal(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateGoal> }) =>
+      updateGoal(companyId, id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['goals'] });
       queryClient.invalidateQueries({ queryKey: ['goal', id] });
@@ -55,7 +56,7 @@ export const useGoals = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteGoal,
+    mutationFn: (id: string) => deleteGoal(companyId, id),
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['goals'] });
       queryClient.removeQueries({ queryKey: ['goal', id] });
