@@ -128,209 +128,219 @@ export function NewTransaction() {
                 </div>
               </div>
 
-              {/* Description and Amount */}
-              <div className="p-4 sm:p-6 space-y-4 bg-background dark:bg-background-dark">
-                <div>
-                  <label
-                    htmlFor="description"
-                    className="block text-sm font-medium text-text dark:text-text-dark mb-1"
-                  >
-                    Descrição
-                  </label>
-                  <Input
-                    id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    placeholder="Ex: Supermercado, Salário, etc."
-                    required
-                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                  />
-                </div>
+              {/* Description - Linha 1 */}
+              <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-text dark:text-text-dark mb-1"
+                >
+                  Descrição
+                </label>
+                <Input
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Ex: Supermercado, Salário, etc."
+                  required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                />
+              </div>
 
-                <div>
-                  <label
-                    htmlFor="amount"
-                    className="block text-sm font-medium text-text dark:text-text-dark mb-1"
-                  >
-                    Valor
-                  </label>
-                  <Input
-                    id="amount"
-                    name="amount"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formatCurrency(formData.amount)}
-                    onChange={handleChange}
-                    placeholder="R$ 0,00"
-                    required
-                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                  />
+              {/* Linha 2: Conta, Categoria, Dependente */}
+              <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {/* Conta */}
+                  <div>
+                    <label
+                      htmlFor="accountId"
+                      className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+                    >
+                      Conta
+                    </label>
+                    <Select
+                      value={formData.accountId}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, accountId: value }))
+                      }
+                    >
+                      <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors w-full">
+                        <div className="px-3 py-2">
+                          {formData.accountId
+                            ? accounts.find((acc) => acc.id === formData.accountId)?.name
+                            : 'Selecione uma conta'}
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
+                        {accounts.map((account) => (
+                          <SelectItem
+                            key={account.id}
+                            value={account.id}
+                            className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
+                          >
+                            {account.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {/* Categoria */}
+                  <div>
+                    <label
+                      htmlFor="categoryId"
+                      className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+                    >
+                      Categoria
+                    </label>
+                    <Select
+                      value={formData.categoryId}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, categoryId: value }))
+                      }
+                    >
+                      <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors w-full">
+                        <div className="px-3 py-2">
+                          {formData.categoryId
+                            ? filteredCategories.find((cat) => cat.id === formData.categoryId)?.name
+                            : 'Selecione uma categoria'}
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
+                        {filteredCategories.map((category) => (
+                          <SelectItem
+                            key={category.id}
+                            value={category.id}
+                            className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
+                          >
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {/* Dependente */}
+                  <div>
+                    <label
+                      htmlFor="dependent"
+                      className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+                    >
+                      Dependente
+                    </label>
+                    <Select
+                      value={formData.dependent || 'none'}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          dependent: value === 'none' ? '' : value,
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors w-full">
+                        <div className="px-3 py-2">
+                          {formData.dependent
+                            ? dependents.find((dep) => dep.id === formData.dependent)?.name
+                            : 'Selecione um dependente (opcional)'}
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
+                        <SelectItem
+                          value="none"
+                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
+                        >
+                          Nenhum
+                        </SelectItem>
+                        {dependents.map((dep) => (
+                          <SelectItem
+                            key={dep.id}
+                            value={dep.id}
+                            className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
+                          >
+                            {dep.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
 
-              {/* Category and Account */}
-              <div className="p-4 sm:p-6 space-y-4 bg-background dark:bg-background-dark">
-                <div>
-                  <label
-                    htmlFor="accountId"
-                    className="block text-sm font-medium text-text dark:text-text-dark mb-1"
-                  >
-                    Conta
-                  </label>
-                  <Select
-                    value={formData.accountId}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, accountId: value }))
-                    }
-                  >
-                    <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
-                      <div className="px-3 py-2">
-                        {formData.accountId
-                          ? accounts.find((acc) => acc.id === formData.accountId)?.name
-                          : 'Selecione uma conta'}
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
-                      {accounts.map((account) => (
-                        <SelectItem
-                          key={account.id}
-                          value={account.id}
-                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                        >
-                          {account.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="categoryId"
-                    className="block text-sm font-medium text-text dark:text-text-dark mb-1"
-                  >
-                    Categoria
-                  </label>
-                  <Select
-                    value={formData.categoryId}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, categoryId: value }))
-                    }
-                  >
-                    <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
-                      <div className="px-3 py-2">
-                        {formData.categoryId
-                          ? filteredCategories.find((cat) => cat.id === formData.categoryId)?.name
-                          : 'Selecione uma categoria'}
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
-                      {filteredCategories.map((category) => (
-                        <SelectItem
-                          key={category.id}
-                          value={category.id}
-                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                        >
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="dependent"
-                    className="block text-sm font-medium text-text dark:text-text-dark mb-1"
-                  >
-                    Dependente
-                  </label>
-                  <Select
-                    value={formData.dependent || 'none'}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, dependent: value === 'none' ? '' : value }))
-                    }
-                  >
-                    <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
-                      <div className="px-3 py-2">
-                        {formData.dependent
-                          ? dependents.find((dep) => dep.id === formData.dependent)?.name
-                          : 'Selecione um dependente (opcional)'}
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
-                      <SelectItem
-                        value="none"
-                        className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                      >
-                        Nenhum
-                      </SelectItem>
-                      {dependents.map((dep) => (
-                        <SelectItem
-                          key={dep.id}
-                          value={dep.id}
-                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                        >
-                          {dep.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="installmentCount"
-                    className="block text-sm font-medium text-text dark:text-text-dark mb-1"
-                  >
-                    Quantidade de parcelas
-                  </label>
-                  <Select
-                    value={String(formData.installmentCount)}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, installmentCount: Number(value) }))
-                    }
-                  >
-                    <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
-                      <div className="px-3 py-2">{formData.installmentCount}x</div>
-                    </SelectTrigger>
-                    <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
-                      {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
-                        <SelectItem
-                          key={num}
-                          value={String(num)}
-                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                        >
-                          {num}x
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              {/* Linha 3: Data, Valor, Parcelas */}
+              <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {/* Data */}
+                  <div>
+                    <label
+                      htmlFor="date"
+                      className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+                    >
+                      Data
+                    </label>
+                    <Input
+                      id="date"
+                      name="date"
+                      type="date"
+                      value={formData.date}
+                      onChange={handleChange}
+                      required
+                      className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full"
+                    />
+                  </div>
+                  {/* Valor */}
+                  <div>
+                    <label
+                      htmlFor="amount"
+                      className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+                    >
+                      Valor
+                    </label>
+                    <Input
+                      id="amount"
+                      name="amount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formatCurrency(formData.amount)}
+                      onChange={handleChange}
+                      placeholder="R$ 0,00"
+                      required
+                      className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full"
+                    />
+                  </div>
+                  {/* Parcelas */}
+                  <div>
+                    <label
+                      htmlFor="installmentCount"
+                      className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+                    >
+                      Quantidade de parcelas
+                    </label>
+                    <Select
+                      value={String(formData.installmentCount)}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, installmentCount: Number(value) }))
+                      }
+                    >
+                      <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors w-full">
+                        <div className="px-3 py-2">{formData.installmentCount}x</div>
+                      </SelectTrigger>
+                      <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
+                          <SelectItem
+                            key={num}
+                            value={String(num)}
+                            className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
+                          >
+                            {num}x
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
 
               {/* Date and Note */}
               <div className="p-4 sm:p-6 space-y-4 bg-background dark:bg-background-dark">
-                <div>
-                  <label
-                    htmlFor="date"
-                    className="block text-sm font-medium text-text dark:text-text-dark mb-1"
-                  >
-                    Data
-                  </label>
-                  <Input
-                    id="date"
-                    name="date"
-                    type="date"
-                    value={formData.date}
-                    onChange={handleChange}
-                    required
-                    className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                  />
-                </div>
-
                 <div>
                   <label
                     htmlFor="note"
