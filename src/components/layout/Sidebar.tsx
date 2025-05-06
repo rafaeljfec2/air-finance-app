@@ -49,8 +49,6 @@ export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
     setOpenMenu(itemName);
   };
 
-  console.log('Sidebar render - isOpen:', isOpen);
-
   return (
     <>
       {/* Overlay mobile */}
