@@ -1,16 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuthStore } from '@/store/auth';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
-  login,
-  register,
-  logout,
   getCurrentUser,
+  login,
+  logout,
+  register,
   requestPasswordRecovery,
   resetPassword,
   User,
 } from '../services/authService';
 import { authUtils } from '../utils/auth';
-import { useAuthStore } from '@/store/auth';
 
 export interface LoginOptions {
   rememberMe?: boolean;
@@ -46,11 +46,11 @@ export const useAuth = () => {
   const registerMutation = useMutation({
     mutationFn: register,
     onSuccess: async (data) => {
-      await authUtils.setToken(data.token);
+      authUtils.setToken(data.token);
       if (data.refreshToken) {
-        await authUtils.setRefreshToken(data.refreshToken);
+        authUtils.setRefreshToken(data.refreshToken);
       }
-      await authUtils.setUser(data.user);
+      authUtils.setUser(data.user);
       queryClient.setQueryData(['user'], data.user);
     },
   });
@@ -58,7 +58,7 @@ export const useAuth = () => {
   const logoutMutation = useMutation({
     mutationFn: logout,
     onSuccess: async () => {
-      await authUtils.clearAuth();
+      authUtils.clearAuth();
       queryClient.removeQueries({ queryKey: ['user'] });
       navigate('/');
     },

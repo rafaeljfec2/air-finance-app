@@ -1,60 +1,104 @@
-import { useState } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/components/ui/toast';
+import { ViewDefault } from '@/layouts/ViewDefault';
 import { useAuthStore } from '@/stores/auth';
 import { useTheme } from '@/stores/useTheme';
-import { toast } from '@/components/ui/toast';
 import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
   Bell,
-  Shield,
   Camera,
-  Palette,
-  Moon,
-  Sun,
-  Globe,
   DollarSign,
+  Edit2,
+  Globe,
+  Mail,
+  MapPin,
+  Moon,
+  Palette,
+  Phone,
+  Save,
+  Shield,
+  Sun,
+  User,
+  X,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useState } from 'react';
+
+type ProfileFormData = {
+  name: string;
+  email: string;
+  phone: string;
+  location: string;
+  bio: string;
+  notifications: {
+    email: boolean;
+    push: boolean;
+    updates: boolean;
+    marketing: boolean;
+    security: boolean;
+  };
+  preferences: {
+    currency: 'BRL' | 'USD' | 'EUR';
+    language: 'pt-BR' | 'en-US' | 'es-ES';
+    theme: 'light' | 'dark' | 'system';
+    dateFormat: 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
+  };
+};
 
 export function Profile() {
-  const { user } = useAuthStore();
-  const { isDarkMode, setTheme } = useTheme();
+  const { user, setUser } = useAuthStore();
+  const { setTheme } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [avatar, setAvatar] = useState('/avatars/default.png');
-  const [formData, setFormData] = useState({
+  const [avatar, setAvatar] = useState(user?.avatar || '/avatars/default.png');
+  const [formData, setFormData] = useState<ProfileFormData>({
     name: user?.name || '',
     email: user?.email || '',
-    phone: '',
-    location: '',
-    bio: '',
+    phone: user?.phone || '',
+    location: user?.location || '',
+    bio: user?.bio || '',
     notifications: {
-      email: true,
-      push: true,
-      updates: false,
+      email: user?.notifications?.email ?? true,
+      push: user?.notifications?.push ?? true,
+      updates: user?.notifications?.updates ?? false,
+      marketing: user?.notifications?.marketing ?? false,
+      security: user?.notifications?.security ?? true,
     },
     preferences: {
-      currency: 'BRL',
-      language: 'pt-BR',
+      currency: user?.preferences?.currency || 'BRL',
+      language: user?.preferences?.language || 'pt-BR',
+      theme: user?.preferences?.theme || 'system',
+      dateFormat: user?.preferences?.dateFormat || 'DD/MM/YYYY',
     },
   });
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (!file) return;
+
+    try {
+      // Preview imediato
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatar(reader.result as string);
       };
       reader.readAsDataURL(file);
+
+      // Upload real seria feito aqui
+      // const formData = new FormData();
+      // formData.append('avatar', file);
+      // const response = await api.post('/users/avatar', formData);
+      // setAvatar(response.data.avatarUrl);
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Erro ao fazer upload do avatar',
+        type: 'error',
+      });
     }
   };
 
@@ -66,7 +110,7 @@ export function Profile() {
     }));
   };
 
-  const handleNotificationChange = (key: keyof typeof formData.notifications) => {
+  const handleNotificationChange = (key: keyof ProfileFormData['notifications']) => {
     setFormData((prev) => ({
       ...prev,
       notifications: {
@@ -76,11 +120,39 @@ export function Profile() {
     }));
   };
 
+  const handlePreferenceChange = <K extends keyof ProfileFormData['preferences']>(
+    key: K,
+    value: ProfileFormData['preferences'][K],
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      preferences: {
+        ...prev.preferences,
+        [key]: value,
+      },
+    }));
+
+    // Atualiza o tema imediatamente se for alterado
+    if (key === 'theme') {
+      setTheme(value === 'dark');
+    }
+  };
+
   const handleSave = async () => {
+    if (!user) return;
+
     setIsSaving(true);
     try {
       // Simular salvamento
       await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Atualizar o usuário no store
+      setUser({
+        ...user,
+        ...formData,
+        avatar,
+      });
+
       setIsEditing(false);
       toast({
         title: 'Sucesso',
@@ -98,6 +170,34 @@ export function Profile() {
     }
   };
 
+  const handleCancel = () => {
+    if (!user) return;
+
+    // Restaurar dados originais
+    setFormData({
+      name: user.name,
+      email: user.email,
+      phone: user.phone || '',
+      location: user.location || '',
+      bio: user.bio || '',
+      notifications: {
+        email: user.notifications?.email ?? true,
+        push: user.notifications?.push ?? true,
+        updates: user.notifications?.updates ?? false,
+        marketing: user.notifications?.marketing ?? false,
+        security: user.notifications?.security ?? true,
+      },
+      preferences: {
+        currency: user.preferences?.currency || 'BRL',
+        language: user.preferences?.language || 'pt-BR',
+        theme: user.preferences?.theme || 'system',
+        dateFormat: user.preferences?.dateFormat || 'DD/MM/YYYY',
+      },
+    });
+    setAvatar(user.avatar || '/avatars/default.png');
+    setIsEditing(false);
+  };
+
   return (
     <ViewDefault>
       <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
@@ -113,6 +213,44 @@ export function Profile() {
                 Gerencie suas informações pessoais e preferências
               </p>
             </div>
+            <div className="flex gap-2">
+              {isEditing ? (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={handleCancel}
+                    disabled={isSaving}
+                    className="gap-2"
+                  >
+                    <X className="h-4 w-4" />
+                    Cancelar
+                  </Button>
+                  <Button
+                    variant="default"
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="gap-2"
+                  >
+                    {isSaving ? (
+                      <Spinner size="sm" />
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4" />
+                        Salvar
+                      </>
+                    )}
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  className="gap-2 bg-primary-500 hover:bg-primary-600 text-white dark:bg-primary-400 dark:hover:bg-primary-500 dark:text-background font-semibold shadow focus:ring-2 focus:ring-primary-300 focus:outline-none transition-colors"
+                >
+                  <Edit2 className="h-4 w-4" />
+                  Editar Perfil
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -127,20 +265,24 @@ export function Profile() {
                       <div className="relative flex items-center justify-center">
                         <img
                           src={avatar}
+                          alt={formData.name}
                           className="w-32 h-32 rounded-full object-cover border-4 border-border dark:border-border-dark"
                         />
-                        <label
-                          htmlFor="avatar-upload"
-                          className="absolute bottom-0 right-0 p-2 bg-primary-500 rounded-full cursor-pointer hover:bg-primary-600 transition-colors"
-                        >
-                          <Camera className="h-4 w-4 text-white" />
-                        </label>
+                        {isEditing && (
+                          <label
+                            htmlFor="avatar-upload"
+                            className="absolute bottom-0 right-0 p-2 bg-primary-500 rounded-full cursor-pointer hover:bg-primary-600 transition-colors"
+                          >
+                            <Camera className="h-4 w-4 text-white" />
+                          </label>
+                        )}
                         <input
                           type="file"
                           id="avatar-upload"
                           className="hidden"
                           accept="image/*"
                           onChange={handleAvatarChange}
+                          disabled={!isEditing}
                         />
                       </div>
                       <p className="text-sm font-medium text-text dark:text-text-dark">
@@ -153,7 +295,10 @@ export function Profile() {
                     <div className="flex-1 space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
+                          <label
+                            htmlFor="name"
+                            className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
+                          >
                             Nome
                           </label>
                           <div className="relative">
@@ -161,6 +306,7 @@ export function Profile() {
                               <User className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                             </div>
                             <Input
+                              id="name"
                               type="text"
                               name="name"
                               value={formData.name}
@@ -172,7 +318,10 @@ export function Profile() {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
+                          <label
+                            htmlFor="email"
+                            className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
+                          >
                             Email
                           </label>
                           <div className="relative">
@@ -180,6 +329,7 @@ export function Profile() {
                               <Mail className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                             </div>
                             <Input
+                              id="email"
                               type="email"
                               name="email"
                               value={formData.email}
@@ -191,7 +341,10 @@ export function Profile() {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
+                          <label
+                            htmlFor="phone"
+                            className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
+                          >
                             Telefone
                           </label>
                           <div className="relative">
@@ -199,6 +352,7 @@ export function Profile() {
                               <Phone className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                             </div>
                             <Input
+                              id="phone"
                               type="tel"
                               name="phone"
                               value={formData.phone}
@@ -210,7 +364,10 @@ export function Profile() {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
+                          <label
+                            htmlFor="location"
+                            className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
+                          >
                             Localização
                           </label>
                           <div className="relative">
@@ -218,65 +375,219 @@ export function Profile() {
                               <MapPin className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                             </div>
                             <Input
+                              id="location"
                               type="text"
                               name="location"
                               value={formData.location}
                               onChange={handleChange}
                               disabled={!isEditing}
                               className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                              placeholder="Cidade, Estado"
                             />
                           </div>
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
-                          Biografia
+                        <label
+                          htmlFor="bio"
+                          className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
+                        >
+                          Bio
                         </label>
                         <Textarea
+                          id="bio"
                           name="bio"
                           value={formData.bio}
                           onChange={handleChange}
                           disabled={!isEditing}
-                          className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                          placeholder="Conte um pouco sobre você..."
                           rows={3}
+                          className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                         />
                       </div>
                     </div>
                   </div>
+                </div>
+              </Card>
 
-                  {/* Botões */}
-                  <div className="mt-6 flex justify-end gap-3">
-                    {isEditing ? (
-                      <>
-                        <Button
-                          variant="outline"
-                          onClick={() => setIsEditing(false)}
-                          className="border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
-                        >
-                          Cancelar
-                        </Button>
-                        <Button
-                          onClick={handleSave}
-                          disabled={isSaving}
-                          className={cn(
-                            'bg-primary-500 hover:bg-primary-600 text-white',
-                            isSaving && 'opacity-70 cursor-not-allowed',
-                          )}
-                        >
-                          {isSaving ? 'Salvando...' : 'Salvar'}
-                        </Button>
-                      </>
-                    ) : (
-                      <Button
-                        onClick={() => setIsEditing(true)}
-                        className="bg-primary-500 hover:bg-primary-600 text-white"
+              {/* Card de Notificações */}
+              <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark">
+                <div className="p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Bell className="h-5 w-5 text-primary-400" />
+                    <h2 className="text-lg font-semibold text-text dark:text-text-dark">
+                      Notificações
+                    </h2>
+                  </div>
+                  <div className="space-y-4">
+                    {Object.entries(formData.notifications).map(([key, value]) => (
+                      <div key={key} className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-text dark:text-text-dark">
+                            {key.charAt(0).toUpperCase() + key.slice(1)}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {key === 'email'
+                              ? 'Receber notificações por email'
+                              : key === 'push'
+                                ? 'Receber notificações push'
+                                : key === 'updates'
+                                  ? 'Receber atualizações do sistema'
+                                  : key === 'marketing'
+                                    ? 'Receber novidades e promoções'
+                                    : 'Receber alertas de segurança'}
+                          </p>
+                        </div>
+                        <Switch
+                          checked={value}
+                          onCheckedChange={() =>
+                            handleNotificationChange(key as keyof ProfileFormData['notifications'])
+                          }
+                          disabled={!isEditing}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Coluna da Direita - Preferências */}
+            <div className="space-y-6">
+              {/* Card de Preferências */}
+              <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark">
+                <div className="p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Palette className="h-5 w-5 text-primary-400" />
+                    <h2 className="text-lg font-semibold text-text dark:text-text-dark">
+                      Preferências
+                    </h2>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <label
+                        htmlFor="currency"
+                        className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
                       >
-                        Editar Perfil
-                      </Button>
-                    )}
+                        Moeda
+                      </label>
+                      <Select
+                        value={formData.preferences.currency}
+                        onValueChange={(value) =>
+                          handlePreferenceChange('currency', value as 'BRL' | 'USD' | 'EUR')
+                        }
+                        disabled={!isEditing}
+                      >
+                        <SelectTrigger className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="h-4 w-4" />
+                            {formData.preferences.currency}
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
+                          <SelectItem value="BRL">BRL - Real Brasileiro</SelectItem>
+                          <SelectItem value="USD">USD - Dólar Americano</SelectItem>
+                          <SelectItem value="EUR">EUR - Euro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="language"
+                        className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
+                      >
+                        Idioma
+                      </label>
+                      <Select
+                        value={formData.preferences.language}
+                        onValueChange={(value) =>
+                          handlePreferenceChange('language', value as 'pt-BR' | 'en-US' | 'es-ES')
+                        }
+                        disabled={!isEditing}
+                      >
+                        <SelectTrigger className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                          <div className="flex items-center gap-2">
+                            <Globe className="h-4 w-4" />
+                            {formData.preferences.language === 'pt-BR'
+                              ? 'Português'
+                              : formData.preferences.language === 'en-US'
+                                ? 'English'
+                                : 'Español'}
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
+                          <SelectItem value="pt-BR">Português</SelectItem>
+                          <SelectItem value="en-US">English</SelectItem>
+                          <SelectItem value="es-ES">Español</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="theme"
+                        className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
+                      >
+                        Tema
+                      </label>
+                      <Select
+                        value={formData.preferences.theme}
+                        onValueChange={(value) =>
+                          handlePreferenceChange('theme', value as 'light' | 'dark' | 'system')
+                        }
+                        disabled={!isEditing}
+                      >
+                        <SelectTrigger className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                          <div className="flex items-center gap-2">
+                            {formData.preferences.theme === 'light' ? (
+                              <Sun className="h-4 w-4" />
+                            ) : formData.preferences.theme === 'dark' ? (
+                              <Moon className="h-4 w-4" />
+                            ) : (
+                              <Palette className="h-4 w-4" />
+                            )}
+                            {formData.preferences.theme === 'light'
+                              ? 'Claro'
+                              : formData.preferences.theme === 'dark'
+                                ? 'Escuro'
+                                : 'Sistema'}
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
+                          <SelectItem value="light">Claro</SelectItem>
+                          <SelectItem value="dark">Escuro</SelectItem>
+                          <SelectItem value="system">Sistema</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="dateFormat"
+                        className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
+                      >
+                        Formato de Data
+                      </label>
+                      <Select
+                        value={formData.preferences.dateFormat}
+                        onValueChange={(value) =>
+                          handlePreferenceChange(
+                            'dateFormat',
+                            value as 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD',
+                          )
+                        }
+                        disabled={!isEditing}
+                      >
+                        <SelectTrigger className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                          {formData.preferences.dateFormat}
+                        </SelectTrigger>
+                        <SelectContent className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
+                          <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+                          <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+                          <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -290,192 +601,27 @@ export function Profile() {
                       Segurança
                     </h2>
                   </div>
-
                   <div className="space-y-4">
                     <Button
                       variant="outline"
-                      className="w-full justify-start border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+                      className="w-full justify-start gap-2"
+                      onClick={() => {
+                        /* Implementar mudança de senha */
+                      }}
                     >
+                      <Shield className="h-4 w-4" />
                       Alterar Senha
                     </Button>
                     <Button
                       variant="outline"
-                      className="w-full justify-start border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+                      className="w-full justify-start gap-2"
+                      onClick={() => {
+                        /* Implementar autenticação de dois fatores */
+                      }}
                     >
-                      Autenticação em Duas Etapas
+                      <Shield className="h-4 w-4" />
+                      Autenticação de Dois Fatores
                     </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
-                    >
-                      Dispositivos Conectados
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            {/* Coluna da Direita - Preferências */}
-            <div className="space-y-6">
-              {/* Card de Notificações */}
-              <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark">
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Bell className="h-5 w-5 text-primary-400" />
-                    <h2 className="text-lg font-semibold text-text dark:text-text-dark">
-                      Notificações
-                    </h2>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-text dark:text-text-dark">
-                          Notificações por Email
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          Receba atualizações importantes por email
-                        </p>
-                      </div>
-                      <Switch
-                        checked={formData.notifications.email}
-                        onCheckedChange={() => handleNotificationChange('email')}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-text dark:text-text-dark">
-                          Notificações Push
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          Receba alertas em tempo real
-                        </p>
-                      </div>
-                      <Switch
-                        checked={formData.notifications.push}
-                        onCheckedChange={() => handleNotificationChange('push')}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-text dark:text-text-dark">
-                          Atualizações do Sistema
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          Novidades e melhorias
-                        </p>
-                      </div>
-                      <Switch
-                        checked={formData.notifications.updates}
-                        onCheckedChange={() => handleNotificationChange('updates')}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Card de Preferências */}
-              <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark">
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Palette className="h-5 w-5 text-primary-400" />
-                    <h2 className="text-lg font-semibold text-text dark:text-text-dark">
-                      Preferências
-                    </h2>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
-                        Tema
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            'border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark',
-                            isDarkMode
-                              ? 'bg-card dark:bg-card-dark text-primary-400'
-                              : 'text-gray-500 dark:text-gray-400',
-                          )}
-                          onClick={() => setTheme(true)}
-                        >
-                          <Moon className="h-4 w-4 mr-2" />
-                          Escuro
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            'border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark',
-                            !isDarkMode
-                              ? 'bg-card dark:bg-card-dark text-primary-400'
-                              : 'text-gray-500 dark:text-gray-400',
-                          )}
-                          onClick={() => setTheme(false)}
-                        >
-                          <Sun className="h-4 w-4 mr-2" />
-                          Claro
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
-                        Idioma
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Globe className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                        </div>
-                        <select
-                          value={formData.preferences.language}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              preferences: {
-                                ...prev.preferences,
-                                language: e.target.value,
-                              },
-                            }))
-                          }
-                          className="w-full pl-10 pr-4 py-2 bg-background dark:bg-background-dark border border-border dark:border-border-dark rounded-lg text-text dark:text-text-dark focus:border-primary-500"
-                        >
-                          <option value="pt-BR">Português (Brasil)</option>
-                          <option value="en-US">English (US)</option>
-                          <option value="es">Español</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
-                        Moeda
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <DollarSign className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                        </div>
-                        <select
-                          value={formData.preferences.currency}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              preferences: {
-                                ...prev.preferences,
-                                currency: e.target.value,
-                              },
-                            }))
-                          }
-                          className="w-full pl-10 pr-4 py-2 bg-background dark:bg-background-dark border border-border dark:border-border-dark rounded-lg text-text dark:text-text-dark focus:border-primary-500"
-                        >
-                          <option value="BRL">Real (R$)</option>
-                          <option value="USD">US Dollar ($)</option>
-                          <option value="EUR">Euro (€)</option>
-                        </select>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </Card>

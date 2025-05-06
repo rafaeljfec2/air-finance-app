@@ -13,14 +13,6 @@ export const UserSchema = z.object({
   status: z.enum(['active', 'inactive'], {
     errorMap: () => ({ message: 'Status inválido' }),
   }),
-  telephone: z.string(),
-  location: z.string(),
-  biography: z.string(),
-  emailNotification: z.boolean(),
-  pushNotification: z.boolean(),
-  systemUpdate: z.boolean(),
-  language: z.string(),
-  currency: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
