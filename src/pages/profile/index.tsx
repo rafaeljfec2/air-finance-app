@@ -201,7 +201,7 @@ export function Profile() {
   return (
     <ViewDefault>
       <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
-        <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="container mx-auto">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
@@ -217,7 +217,7 @@ export function Profile() {
               {isEditing ? (
                 <>
                   <Button
-                    variant="outline"
+                    variant="destructive"
                     onClick={handleCancel}
                     disabled={isSaving}
                     className="gap-2"
@@ -226,7 +226,7 @@ export function Profile() {
                     Cancelar
                   </Button>
                   <Button
-                    variant="default"
+                    variant="success"
                     onClick={handleSave}
                     disabled={isSaving}
                     className="gap-2"

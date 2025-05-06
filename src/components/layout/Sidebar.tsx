@@ -1,107 +1,34 @@
-import { Link, useLocation } from 'react-router-dom';
-import {
-  HomeIcon,
-  CalendarIcon,
-  ChartBarIcon,
-  ArrowsRightLeftIcon,
-  WalletIcon,
-  SparklesIcon,
-  Cog6ToothIcon,
-  TagIcon,
-  BanknotesIcon,
-  CreditCardIcon,
-  FlagIcon,
-  CurrencyDollarIcon,
-  BuildingOfficeIcon,
-  UserIcon,
-  ChevronDoubleLeftIcon,
-  ChevronDoubleRightIcon,
-  ArrowDownIcon,
-  XMarkIcon,
-  BellIcon,
-  ArrowUpIcon,
-} from '@heroicons/react/24/outline';
+declare const __APP_VERSION__: string;
+import { navigation } from '@/constants/natigation';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebar';
+import { NavigationGroupItem, NavigationItem } from '@/types/navigation';
+import {
+  ArrowDownIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 import { useState } from 'react';
-import { ImportIcon, PencilIcon, PlusIcon, SaveIcon } from 'lucide-react';
-
-const navigation = [
-  {
-    section: '📊 Análise e Planejamento',
-    items: [
-      { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-      { name: 'Meu Planner', href: '/planner', icon: CalendarIcon },
-      { name: 'Relatórios', href: '/reports', icon: ChartBarIcon },
-    ],
-  },
-  {
-    section: '💰 Gestão Financeira',
-    items: [
-      {
-        name: 'Financeiro',
-        icon: ArrowsRightLeftIcon,
-        children: [
-          { name: 'Fluxo de Caixa', href: '/transactions', icon: ArrowsRightLeftIcon },
-          { name: 'Novo lançamento', href: '/transactions/new', icon: PlusIcon },
-          { name: 'Importar Ofx', href: '/import-ofx', icon: ImportIcon },
-          { name: 'Contas a Pagar', href: '/payables', icon: ArrowDownIcon },
-          { name: 'Contas a Receber', href: '/receivables', icon: ArrowUpIcon },
-          { name: 'Fechamento Mensal', href: '/monthly-closing', icon: CalendarIcon },
-          { name: 'Resultado Anual', href: '/annual-result', icon: ChartBarIcon },
-          { name: 'Relatórios', href: '/reports-finance', icon: ChartBarIcon },
-        ],
-      },
-      { name: 'Budget', href: '/budget', icon: WalletIcon },
-    ],
-  },
-  {
-    section: '🧠 Automação e Inteligência',
-    items: [{ name: 'Classificação IA', href: '/ai/classification', icon: SparklesIcon }],
-  },
-  {
-    section: '🧾 Administração',
-    items: [
-      {
-        name: 'Cadastros',
-        icon: SaveIcon,
-        children: [
-          { name: 'Empresas', href: '/companies', icon: BuildingOfficeIcon },
-          { name: 'Contas Bancárias', href: '/accounts', icon: BanknotesIcon },
-          { name: 'Categorias', href: '/categories', icon: TagIcon },
-          /* { name: 'Dependentes', href: '/dependents', icon: UserGroupIcon }, */
-          { name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCardIcon },
-          { name: 'Metas', href: '/goals', icon: FlagIcon },
-          { name: 'Fontes de Receitas', href: '/income-sources', icon: CurrencyDollarIcon },
-          { name: 'Usuários', href: '/users', icon: UserIcon },
-        ],
-      },
-      {
-        name: 'Configurações',
-        icon: Cog6ToothIcon,
-        children: [
-          { name: 'Usuário', href: '/profile', icon: UserIcon },
-          { name: 'Preferências', href: '/settings/preferences', icon: PencilIcon },
-          { name: 'Notificações', href: '/settings/notifications', icon: BellIcon },
-        ],
-      },
-    ],
-  },
-];
+import { Link, useLocation } from 'react-router-dom';
 
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
 }
 
-export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
+function isGroupItem(item: NavigationItem): item is NavigationGroupItem {
+  return 'children' in item && Array.isArray(item.children);
+}
+
+export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
   const location = useLocation();
   const { isCollapsed, toggleCollapse } = useSidebarStore();
   const [openMenu, setOpenMenu] = useState<string | null>(() => {
     // Encontra o menu pai do item ativo
     for (const group of navigation) {
       for (const item of group.items) {
-        if (item.children) {
+        if ('children' in item && item.children) {
           const isAnyChildActive = item.children.some((child) => location.pathname === child.href);
           if (isAnyChildActive) {
             return item.name;
@@ -144,7 +71,6 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           isOpen ? 'translate-x-0' : '-translate-x-full',
           'lg:static lg:translate-x-0 lg:z-0',
         )}
-        role="navigation"
         aria-label="Menu lateral"
       >
         {/* Close button mobile */}
@@ -161,12 +87,12 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             {navigation.map((group, idx) => (
               <div key={group.section} className={cn('mb-2', idx !== 0 && 'mt-6')}>
                 {!isCollapsed && (
-                  <div className="text-[11px] font-semibold text-gray-500 tracking-widest uppercase mb-1 pl-2">
+                  <div className="text-[10px] font-semibold text-gray-500 tracking-widest uppercase mb-1 pl-2">
                     {group.section}
                   </div>
                 )}
                 {group.items.map((item) => {
-                  if (item.children) {
+                  if (isGroupItem(item)) {
                     const isOpen = openMenu === item.name;
                     const isAnyChildActive = item.children.some(
                       (child) => location.pathname === child.href,
@@ -176,7 +102,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                         <button
                           onClick={() => handleMenuClick(item.name)}
                           className={cn(
-                            'group flex items-center px-2 py-2 text-base font-medium rounded-md transition-colors w-full',
+                            'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors w-full',
                             isAnyChildActive
                               ? 'bg-primary-500/10 text-primary-500'
                               : 'text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark',
@@ -220,7 +146,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                                     key={child.name}
                                     to={child.href}
                                     className={cn(
-                                      'group flex items-center px-2 py-2 text-base font-medium rounded-md transition-colors',
+                                      'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors',
                                       isActive
                                         ? 'bg-primary-500/10 text-primary-500'
                                         : 'text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark',
@@ -236,38 +162,41 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                         )}
                       </div>
                     );
-                  }
-                  // Menu simples
-                  const isActive = location.pathname === item.href;
-                  return (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className={cn(
-                        'group flex items-center px-2 py-2 text-base font-medium rounded-md transition-colors',
-                        isActive
-                          ? 'bg-primary-500/10 text-primary-500'
-                          : 'text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark',
-                        isCollapsed ? 'justify-center' : 'justify-start',
-                      )}
-                    >
-                      <item.icon
+                  } else {
+                    const isActive = location.pathname === item.href;
+                    return (
+                      <Link
+                        key={item.name}
+                        to={item.href}
                         className={cn(
-                          'flex-shrink-0 h-6 w-6',
+                          'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors',
                           isActive
-                            ? 'text-primary-500'
-                            : 'text-text dark:text-text-dark group-hover:text-primary-500',
+                            ? 'bg-primary-500/10 text-primary-500'
+                            : 'text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark',
+                          isCollapsed ? 'justify-center' : 'justify-start',
                         )}
-                        aria-hidden="true"
-                      />
-                      {!isCollapsed && <span className="ml-3">{item.name}</span>}
-                    </Link>
-                  );
+                      >
+                        <item.icon
+                          className={cn(
+                            'flex-shrink-0 h-6 w-6',
+                            isActive
+                              ? 'text-primary-500'
+                              : 'text-text dark:text-text-dark group-hover:text-primary-500',
+                          )}
+                          aria-hidden="true"
+                        />
+                        {!isCollapsed && <span className="ml-3">{item.name}</span>}
+                      </Link>
+                    );
+                  }
                 })}
               </div>
             ))}
           </nav>
-
+          {/* Footer com versão do sistema */}
+          <div className="w-full py-2 border-t border-border dark:border-border-dark text-center text-xs text-gray-500 dark:text-gray-400 select-none">
+            v{__APP_VERSION__}
+          </div>
           {/* Toggle button */}
           <div className="p-4 border-t border-border dark:border-border-dark">
             <button
