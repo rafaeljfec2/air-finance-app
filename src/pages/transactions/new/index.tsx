@@ -19,7 +19,9 @@ export function NewTransaction() {
   const { addTransaction, categories, accounts } = useTransactionStore();
   const { companyId } = useCompanyContext() as { companyId: string };
   const [transactionType, setTransactionType] = useState<TransactionType>('EXPENSE');
-  const [formData, setFormData] = useState<TransactionInput>({
+  const [formData, setFormData] = useState<
+    TransactionInput & { transactionKind: 'FIXED' | 'VARIABLE' }
+  >({
     type: 'EXPENSE',
     description: '',
     amount: 0,
@@ -30,6 +32,7 @@ export function NewTransaction() {
     dependent: '',
     installmentCount: 1,
     companyId: companyId || '',
+    transactionKind: 'FIXED',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -264,16 +267,16 @@ export function NewTransaction() {
                 </div>
               </div>
 
-              {/* Linha 3: Data, Valor, Parcelas */}
+              {/* Linha 3: Data, Valor, Tipo, Parcelas */}
               <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   {/* Data */}
                   <div>
                     <label
                       htmlFor="date"
                       className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
                     >
-                      Data
+                      Data de pagamento
                     </label>
                     <Input
                       id="date"
@@ -305,6 +308,44 @@ export function NewTransaction() {
                       required
                       className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full"
                     />
+                  </div>
+                  {/* Tipo */}
+                  <div>
+                    <label
+                      htmlFor="transactionKind"
+                      className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+                    >
+                      Tipo
+                    </label>
+                    <Select
+                      value={formData.transactionKind}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          transactionKind: value as 'FIXED' | 'VARIABLE',
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors w-full">
+                        <div className="px-3 py-2">
+                          {formData.transactionKind === 'FIXED' ? 'Fixo' : 'Variável'}
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
+                        <SelectItem
+                          value="FIXED"
+                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
+                        >
+                          Fixo
+                        </SelectItem>
+                        <SelectItem
+                          value="VARIABLE"
+                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
+                        >
+                          Variável
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   {/* Parcelas */}
                   <div>
