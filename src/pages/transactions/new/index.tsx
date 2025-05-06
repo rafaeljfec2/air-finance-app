@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTransactionStore } from '@/stores/transaction';
-import { TransactionInput, Category, TransactionType } from '@/types/transaction';
-import { ViewDefault } from '@/layouts/ViewDefault';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { dependents } from '@/constants/dependents';
 import { useCompanyContext } from '@/contexts/companyContext';
-import { formatCurrency, parseCurrency, formatCurrencyInput } from '@/utils/formatters';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { cn } from '@/lib/utils';
+import { useTransactionStore } from '@/stores/transaction';
+import { Category, TransactionInput, TransactionType } from '@/types/transaction';
+import { formatCurrency, formatCurrencyInput, parseCurrency } from '@/utils/formatters';
+import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function NewTransaction() {
   const navigate = useNavigate();
@@ -42,7 +42,9 @@ export function NewTransaction() {
     navigate('/transactions');
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     if (name === 'amount') {
       const formattedValue = formatCurrencyInput(value);

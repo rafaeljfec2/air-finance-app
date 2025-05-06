@@ -23,7 +23,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'import', 'jsx-a11y'],
+  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'import', 'jsx-a11y', 'unused-imports'],
   rules: {
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',
@@ -37,6 +37,11 @@ module.exports = {
         'newlines-between': 'always',
         alphabetize: { order: 'asc', caseInsensitive: true },
       },
+    ],
+    'unused-imports/no-unused-imports': 'error',
+    'unused-imports/no-unused-vars': [
+      'warn',
+      { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
     ],
   },
   settings: {

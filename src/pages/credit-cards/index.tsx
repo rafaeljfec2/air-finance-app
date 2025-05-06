@@ -1,19 +1,18 @@
-import React, { useState } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { ColorPicker } from '@/components/ui/color-picker';
-import { IconPicker } from '@/components/ui/icon-picker';
 import { Button } from '@/components/ui/button';
-import { CreditCardIcon, BanknotesIcon, BuildingLibraryIcon } from '@heroicons/react/24/outline';
-import { FormField } from '@/components/ui/FormField';
-import { useCreditCards } from '@/hooks/useCreditCards';
+import { Card } from '@/components/ui/card';
+import { ColorPicker } from '@/components/ui/color-picker';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { useCompanyContext } from '@/contexts/companyContext';
+import { FormField } from '@/components/ui/FormField';
+import { IconPicker } from '@/components/ui/icon-picker';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
+import { useCreditCards } from '@/hooks/useCreditCards';
+import { ViewDefault } from '@/layouts/ViewDefault';
 import { type CreateCreditCardPayload } from '@/services/creditCardService';
 import { useCompanyStore } from '@/store/company';
+import { BanknotesIcon, BuildingLibraryIcon, CreditCardIcon } from '@heroicons/react/24/outline';
+import React, { useState } from 'react';
 
 const bankTypes = [
   { value: 'nubank', label: 'Nubank', icon: CreditCardIcon },

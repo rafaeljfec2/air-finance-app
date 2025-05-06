@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { FormField } from '@/components/ui/FormField';
+import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { useIncomeSources } from '@/hooks/useIncomeSources';
-import { IncomeSource } from '@/types/incomeSource';
-import { formatCurrency, parseCurrency, formatCurrencyInput } from '@/utils/formatters';
-import { formatDate } from '@/utils/date';
+import { FormField } from '@/components/ui/FormField';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
+import { useIncomeSources } from '@/hooks/useIncomeSources';
+import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/store/company';
+import { IncomeSource } from '@/types/incomeSource';
+import { formatDate } from '@/utils/date';
+import { formatCurrency, formatCurrencyInput, parseCurrency } from '@/utils/formatters';
+import React, { useEffect, useState } from 'react';
 
 export function IncomeSourcesPage() {
   const { activeCompany } = useCompanyStore();
@@ -83,11 +83,19 @@ export function IncomeSourcesPage() {
       });
       setErrors({});
     } catch (err) {
-      toast({
-        title: 'Erro ao salvar fonte de receita',
-        description: err.message,
-        type: 'error',
-      });
+      if (err instanceof Error) {
+        toast({
+          title: 'Erro ao salvar fonte de receita',
+          description: err.message,
+          type: 'error',
+        });
+      } else {
+        toast({
+          title: 'Erro ao salvar fonte de receita',
+          description: 'Erro desconhecido',
+          type: 'error',
+        });
+      }
     }
   };
 

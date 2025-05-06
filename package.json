@@ -4,10 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "dev": "vite --mode development",
+    "dev:env": "vite --mode development",
+    "build": "tsc && vite build --mode production",
+    "build:prod": "tsc && vite build --mode production",
+    "build:dev": "tsc && vite build --mode development",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
+    "preview": "vite preview --mode production",
+    "preview:prod": "vite preview --mode production",
+    "preview:dev": "vite preview --mode development",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "format": "prettier --write \"src/**/*.{ts,tsx}\""
