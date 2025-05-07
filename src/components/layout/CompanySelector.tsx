@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 import { useActiveCompany } from '@/hooks/useActiveCompany';
 import { cn } from '@/lib/utils';
 import { companyService } from '@/services/company';
-import { useAuthStore } from '@/store/auth';
+import { useAuthStore } from '@/stores/auth';
 import { Company } from '@/types/company';
 import { formatCNPJ } from '@/utils/formatCNPJ';
 import { useQuery } from '@tanstack/react-query';

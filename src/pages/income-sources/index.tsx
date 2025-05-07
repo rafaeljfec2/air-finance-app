@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 import { toast } from '@/components/ui/toast';
 import { useIncomeSources } from '@/hooks/useIncomeSources';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { useCompanyStore } from '@/store/company';
+import { useCompanyStore } from '@/stores/company';
 import { IncomeSource } from '@/types/incomeSource';
 import { formatDate } from '@/utils/date';
 import { formatCurrency, formatCurrencyInput, parseCurrency } from '@/utils/formatters';

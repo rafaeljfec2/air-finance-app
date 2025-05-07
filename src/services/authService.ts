@@ -1,5 +1,5 @@
-import { apiClient } from './apiClient';
 import { z } from 'zod';
+import { apiClient } from './apiClient';
 
 // Validation schemas
 export const UserSchema = z.object({
@@ -9,6 +9,25 @@ export const UserSchema = z.object({
   avatar: z.string().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
+  companyIds: z.array(z.string()),
+  role: z.enum(['admin', 'user']),
+  status: z.enum(['active', 'inactive']),
+  phone: z.string().optional(),
+  location: z.string().optional(),
+  bio: z.string().optional(),
+  notifications: z.object({
+    email: z.boolean(),
+    push: z.boolean(),
+    updates: z.boolean(),
+    marketing: z.boolean(),
+    security: z.boolean(),
+  }),
+  preferences: z.object({
+    currency: z.enum(['BRL', 'USD', 'EUR']),
+    language: z.enum(['pt-BR', 'en-US', 'es-ES']),
+    theme: z.enum(['light', 'dark', 'system']),
+    dateFormat: z.enum(['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY-MM-DD']),
+  }),
 });
 
 export const LoginSchema = z.object({

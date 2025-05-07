@@ -1,7 +1,7 @@
-import { useCallback } from 'react';
-import { useCompanyStore } from '@/store/company';
+import { useAuthStore } from '@/stores/auth';
+import { useCompanyStore } from '@/stores/company';
 import { Company } from '@/types';
-import { useAuthStore } from '@/store/auth';
+import { useCallback } from 'react';
 
 export const useActiveCompany = () => {
   const { activeCompany, setActiveCompany, clearActiveCompany } = useCompanyStore();

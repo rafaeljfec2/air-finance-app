@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { ColorPicker } from '@/components/ui/color-picker';
-import { IconPicker } from '@/components/ui/icon-picker';
+import { Loading } from '@/components/Loading';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ColorPicker } from '@/components/ui/color-picker';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { FormField } from '@/components/ui/FormField';
+import { IconPicker } from '@/components/ui/icon-picker';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { useAccounts } from '@/hooks/useAccounts';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { useCompanyStore } from '@/stores/company';
+import { formatCurrency } from '@/utils/format';
 import {
   BanknotesIcon,
+  BuildingLibraryIcon,
   CreditCardIcon,
   WalletIcon,
-  BuildingLibraryIcon,
 } from '@heroicons/react/24/outline';
-import { FormField } from '@/components/ui/FormField';
-import { useAccounts } from '@/hooks/useAccounts';
-import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { formatCurrency } from '@/utils/format';
-import { useCompanyStore } from '@/store/company';
 import { AxiosError } from 'axios';
-import { Loading } from '@/components/Loading';
+import React, { useEffect, useState } from 'react';
 
 const accountTypes = [
   { value: 'checking', label: 'Conta Corrente', icon: BanknotesIcon },

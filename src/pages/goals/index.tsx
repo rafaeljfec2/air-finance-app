@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { FormField } from '@/components/ui/FormField';
+import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { useGoals } from '@/hooks/useGoals';
-import { useCategories } from '@/hooks/useCategories';
-import { useCompanyStore } from '@/store/company';
-import { FlagIcon } from '@heroicons/react/24/outline';
-import { formatCurrency, parseCurrency, formatCurrencyInput } from '@/utils/formatters';
+import { FormField } from '@/components/ui/FormField';
+import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { useCategories } from '@/hooks/useCategories';
+import { useGoals } from '@/hooks/useGoals';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { Category } from '@/services/categoryService';
+import { CreateGoal, Goal } from '@/services/goalService';
+import { useCompanyStore } from '@/stores/company';
+import { formatCurrency, formatCurrencyInput, parseCurrency } from '@/utils/formatters';
+import { FlagIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CreateGoal, Goal } from '@/services/goalService';
-import { Category } from '@/services/categoryService';
+import React, { useState } from 'react';
 
 interface FormErrors {
   name?: string;

@@ -1,9 +1,10 @@
-import { useAuthStore } from '@/store/auth';
+import { useAuthStore } from '@/stores/auth';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
   getCurrentUser,
   login,
+  LoginData,
   logout,
   register,
   requestPasswordRecovery,
@@ -28,7 +29,7 @@ export const useAuth = () => {
   });
 
   const loginMutation = useMutation({
-    mutationFn: async (variables: any & LoginOptions) => {
+    mutationFn: async (variables: LoginOptions & LoginData) => {
       const { rememberMe, ...loginData } = variables;
       const data = await login(loginData);
       authUtils.setToken(data.token, !!rememberMe);

@@ -10,7 +10,7 @@ import { toast } from '@/components/ui/toast';
 import { useCreditCards } from '@/hooks/useCreditCards';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { type CreateCreditCardPayload } from '@/services/creditCardService';
-import { useCompanyStore } from '@/store/company';
+import { useCompanyStore } from '@/stores/company';
 import { BanknotesIcon, BuildingLibraryIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 import React, { useState } from 'react';
 

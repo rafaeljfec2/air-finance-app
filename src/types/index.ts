@@ -1,10 +1,5 @@
-import { Transaction, Category, Account, TransactionType } from './transaction';
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-}
+import { Account, Category, Transaction, TransactionType } from './transaction';
+import { User } from './user';
 
 export interface Dashboard {
   balance: number;
@@ -53,6 +48,6 @@ export interface TransactionFormData {
   note?: string;
 }
 
-export type { Transaction, Category, Account, TransactionType };
+export type { Account, Category, Transaction, TransactionType };
 
 export * from './company';

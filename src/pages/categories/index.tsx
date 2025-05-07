@@ -1,25 +1,25 @@
-import React, { useState } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { ColorPicker } from '@/components/ui/color-picker';
-import { IconPicker } from '@/components/ui/icon-picker';
-import { Button } from '@/components/ui/button';
-import { FormField } from '@/components/ui/FormField';
-import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { useCategories } from '@/hooks/useCategories';
-import {
-  TagIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
-  WalletIcon,
-  ShoppingCartIcon,
-  GiftIcon,
-  BuildingLibraryIcon,
-} from '@heroicons/react/24/outline';
-import { useCompanyStore } from '@/store/company';
 import { Loading } from '@/components/Loading';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ColorPicker } from '@/components/ui/color-picker';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { FormField } from '@/components/ui/FormField';
+import { IconPicker } from '@/components/ui/icon-picker';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { useCategories } from '@/hooks/useCategories';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { useCompanyStore } from '@/stores/company';
+import {
+  ArrowTrendingDownIcon,
+  ArrowTrendingUpIcon,
+  BuildingLibraryIcon,
+  GiftIcon,
+  ShoppingCartIcon,
+  TagIcon,
+  WalletIcon,
+} from '@heroicons/react/24/outline';
+import React, { useState } from 'react';
 
 const iconOptions = [
   { value: 'TagIcon', icon: TagIcon },
