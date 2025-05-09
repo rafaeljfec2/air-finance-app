@@ -4,7 +4,7 @@ export type User = {
   email: string;
   role: 'admin' | 'user';
   status: 'active' | 'inactive';
-  companyId: string;
+  companyIds: string[];
   avatar?: string;
   phone?: string;
   location?: string;
