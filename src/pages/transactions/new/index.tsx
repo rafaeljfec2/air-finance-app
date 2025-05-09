@@ -3,7 +3,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { dependents } from '@/constants/dependents';
 import { useCompanyContext } from '@/contexts/companyContext';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
@@ -13,6 +12,7 @@ import { formatCurrency, formatCurrencyInput, parseCurrency } from '@/utils/form
 import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Switch } from '@/components/ui/switch';
 
 export function NewTransaction() {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ export function NewTransaction() {
   const { companyId } = useCompanyContext() as { companyId: string };
   const [transactionType, setTransactionType] = useState<TransactionType>('EXPENSE');
   const [formData, setFormData] = useState<
-    TransactionInput & { transactionKind: 'FIXED' | 'VARIABLE' }
+    TransactionInput & { transactionKind: 'FIXED' | 'VARIABLE'; repeatMonthly: boolean }
   >({
     type: 'EXPENSE',
     description: '',
@@ -33,6 +33,7 @@ export function NewTransaction() {
     installmentCount: 1,
     companyId: companyId || '',
     transactionKind: 'FIXED',
+    repeatMonthly: false,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -150,7 +151,7 @@ export function NewTransaction() {
                 />
               </div>
 
-              {/* Linha 2: Conta, Categoria, Dependente */}
+              {/* Linha 2: Conta, Categoria, Tipo */}
               <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {/* Conta */}
@@ -221,53 +222,49 @@ export function NewTransaction() {
                       </SelectContent>
                     </Select>
                   </div>
-                  {/* Dependente */}
+                  {/* Tipo (toggle) */}
                   <div>
                     <label
-                      htmlFor="dependent"
+                      htmlFor="transactionKind"
                       className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
                     >
-                      Dependente
+                      Tipo
                     </label>
-                    <Select
-                      value={formData.dependent || 'none'}
-                      onValueChange={(value) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          dependent: value === 'none' ? '' : value,
-                        }))
-                      }
-                    >
-                      <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors w-full">
-                        <div className="px-3 py-2">
-                          {formData.dependent
-                            ? dependents.find((dep) => dep.id === formData.dependent)?.name
-                            : 'Selecione um dependente (opcional)'}
-                        </div>
-                      </SelectTrigger>
-                      <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
-                        <SelectItem
-                          value="none"
-                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                        >
-                          Nenhum
-                        </SelectItem>
-                        {dependents.map((dep) => (
-                          <SelectItem
-                            key={dep.id}
-                            value={dep.id}
-                            className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                          >
-                            {dep.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div id="transactionKind" className="flex gap-2">
+                      <button
+                        type="button"
+                        className={cn(
+                          'flex-1 px-4 py-2 rounded-lg border font-medium transition-colors',
+                          formData.transactionKind === 'FIXED'
+                            ? 'bg-card text-primary-500 border-primary-500 shadow'
+                            : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-400',
+                        )}
+                        onClick={() =>
+                          setFormData((prev) => ({ ...prev, transactionKind: 'FIXED' }))
+                        }
+                      >
+                        Fixa
+                      </button>
+                      <button
+                        type="button"
+                        className={cn(
+                          'flex-1 px-4 py-2 rounded-lg border font-medium transition-colors',
+                          formData.transactionKind === 'VARIABLE'
+                            ? 'bg-card text-primary-500 border-primary-500 shadow'
+                            : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-400',
+                        )}
+                        onClick={() =>
+                          setFormData((prev) => ({ ...prev, transactionKind: 'VARIABLE' }))
+                        }
+                      >
+                        Variável
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Linha 3: Data, Valor, Tipo, Parcelas */}
+              {/* Linha 3: Data, Valor, Parcelas, Repetir todo mês */}
               <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   {/* Data */}
@@ -299,53 +296,15 @@ export function NewTransaction() {
                     <Input
                       id="amount"
                       name="amount"
-                      type="number"
-                      step="0.01"
-                      min="0"
+                      type="text"
+                      inputMode="decimal"
                       value={formatCurrency(formData.amount)}
                       onChange={handleChange}
                       placeholder="R$ 0,00"
                       required
                       className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full"
+                      autoComplete="off"
                     />
-                  </div>
-                  {/* Tipo */}
-                  <div>
-                    <label
-                      htmlFor="transactionKind"
-                      className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
-                    >
-                      Tipo
-                    </label>
-                    <Select
-                      value={formData.transactionKind}
-                      onValueChange={(value) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          transactionKind: value as 'FIXED' | 'VARIABLE',
-                        }))
-                      }
-                    >
-                      <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors w-full">
-                        <div className="px-3 py-2">
-                          {formData.transactionKind === 'FIXED' ? 'Fixo' : 'Variável'}
-                        </div>
-                      </SelectTrigger>
-                      <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
-                        <SelectItem
-                          value="FIXED"
-                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                        >
-                          Fixo
-                        </SelectItem>
-                        <SelectItem
-                          value="VARIABLE"
-                          className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                        >
-                          Variável
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
                   {/* Parcelas */}
                   <div>
@@ -361,7 +320,7 @@ export function NewTransaction() {
                         setFormData((prev) => ({ ...prev, installmentCount: Number(value) }))
                       }
                     >
-                      <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors w-full">
+                      <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
                         <div className="px-3 py-2">{formData.installmentCount}x</div>
                       </SelectTrigger>
                       <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
@@ -376,6 +335,24 @@ export function NewTransaction() {
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                  {/* Repetir todo mês */}
+                  <div className="flex flex-col justify-center h-full">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={formData.repeatMonthly}
+                        onCheckedChange={(checked) =>
+                          setFormData((prev) => ({ ...prev, repeatMonthly: checked }))
+                        }
+                        id="repeat-monthly"
+                      />
+                      <label
+                        htmlFor="repeat-monthly"
+                        className="text-sm text-text dark:text-text-dark select-none cursor-pointer whitespace-nowrap"
+                      >
+                        Repetir todo mês
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
