@@ -1,11 +1,13 @@
+import { cn } from '@/lib/utils';
 import React from 'react';
 
 interface AlertProps {
   type?: 'success' | 'error' | 'warning' | 'info';
   message: string;
+  className?: string;
 }
 
-export const Alert: React.FC<AlertProps> = ({ type = 'info', message }) => {
+export const Alert: React.FC<AlertProps> = ({ type = 'info', message, className }) => {
   const getTypeClasses = () => {
     switch (type) {
       case 'success':
@@ -39,8 +41,15 @@ export const Alert: React.FC<AlertProps> = ({ type = 'info', message }) => {
   const classes = getTypeClasses();
 
   return (
-    <div className={`p-4 rounded-lg ${classes.bg} ${classes.border} border-l-4 mb-4`}>
-      <p className={`text-sm ${classes.text}`}>{message}</p>
+    <div
+      className={cn(
+        'p-4 rounded-lg border-l-4 mb-4 animate-bounce-in',
+        classes.bg,
+        classes.border,
+        className,
+      )}
+    >
+      <p className={cn('text-sm', classes.text)}>{message}</p>
     </div>
   );
 };
