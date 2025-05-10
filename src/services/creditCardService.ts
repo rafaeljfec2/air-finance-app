@@ -1,5 +1,6 @@
 import { apiClient } from './apiClient';
 import { z } from 'zod';
+import { parseApiError } from '@/utils/apiErrorHandler';
 
 // Validation schemas
 export const CreditCardSchema = z.object({
@@ -32,8 +33,7 @@ export const getCreditCards = async (companyId: string): Promise<CreditCard[]> =
     const response = await apiClient.get<CreditCard[]>(`/companies/${companyId}/credit-cards`);
     return CreditCardSchema.array().parse(response.data);
   } catch (error) {
-    console.error('Erro ao buscar cartões de crédito:', error);
-    throw new Error('Falha ao buscar cartões de crédito ' + error);
+    throw parseApiError(error);
   }
 };
 
@@ -42,8 +42,7 @@ export const getCreditCardById = async (companyId: string, id: string): Promise<
     const response = await apiClient.get<CreditCard>(`/companies/${companyId}/credit-cards/${id}`);
     return CreditCardSchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao buscar cartão de crédito:', error);
-    throw new Error('Falha ao buscar cartões de crédito ' + error);
+    throw parseApiError(error);
   }
 };
 
@@ -55,8 +54,7 @@ export const createCreditCard = async (
     const response = await apiClient.post<CreditCard>(`/companies/${companyId}/credit-cards`, data);
     return CreditCardSchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao criar cartão de crédito:', error);
-    throw new Error('Falha ao criar cartão de crédito');
+    throw parseApiError(error);
   }
 };
 
@@ -73,8 +71,7 @@ export const updateCreditCard = async (
     );
     return CreditCardSchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao atualizar cartão de crédito:', error);
-    throw new Error('Falha ao atualizar cartão de crédito');
+    throw parseApiError(error);
   }
 };
 
@@ -82,8 +79,7 @@ export const deleteCreditCard = async (companyId: string, id: string): Promise<v
   try {
     await apiClient.delete(`/companies/${companyId}/credit-cards/${id}`);
   } catch (error) {
-    console.error('Erro ao deletar cartão de crédito:', error);
-    throw new Error('Falha ao deletar cartão de crédito');
+    throw parseApiError(error);
   }
 };
 
@@ -108,8 +104,7 @@ export const getCreditCardStatement = async (
     });
     return response.data;
   } catch (error) {
-    console.error('Erro ao buscar fatura do cartão:', error);
-    throw new Error('Falha ao buscar fatura do cartão');
+    throw parseApiError(error);
   }
 };
 
@@ -125,7 +120,6 @@ export const updateCreditCardStatus = async (
     );
     return CreditCardSchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao atualizar status do cartão:', error);
-    throw new Error('Falha ao atualizar status do cartão');
+    throw parseApiError(error);
   }
 };

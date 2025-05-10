@@ -10,6 +10,8 @@ import {
   type CreditCard,
   CreateCreditCardPayload,
 } from '../services/creditCardService';
+import { toast } from '@/components/ui/toast';
+import { parseApiError, getUserFriendlyMessage, logApiError } from '@/utils/apiErrorHandler';
 
 export const useCreditCards = (companyId: string) => {
   const queryClient = useQueryClient();
@@ -44,6 +46,20 @@ export const useCreditCards = (companyId: string) => {
     mutationFn: (data: CreateCreditCardPayload) => createCreditCard(companyId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credit-cards', companyId] });
+      toast({
+        title: 'Sucesso',
+        description: 'Cartão cadastrado com sucesso!',
+        type: 'success',
+      });
+    },
+    onError: (error) => {
+      const apiError = parseApiError(error);
+      logApiError(apiError);
+      toast({
+        title: 'Erro',
+        description: getUserFriendlyMessage(apiError),
+        type: 'error',
+      });
     },
   });
 
@@ -53,6 +69,20 @@ export const useCreditCards = (companyId: string) => {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['credit-cards', companyId] });
       queryClient.invalidateQueries({ queryKey: ['credit-card', companyId, id] });
+      toast({
+        title: 'Sucesso',
+        description: 'Cartão atualizado com sucesso!',
+        type: 'success',
+      });
+    },
+    onError: (error) => {
+      const apiError = parseApiError(error);
+      logApiError(apiError);
+      toast({
+        title: 'Erro',
+        description: getUserFriendlyMessage(apiError),
+        type: 'error',
+      });
     },
   });
 
@@ -61,6 +91,20 @@ export const useCreditCards = (companyId: string) => {
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['credit-cards', companyId] });
       queryClient.removeQueries({ queryKey: ['credit-card', companyId, id] });
+      toast({
+        title: 'Sucesso',
+        description: 'Cartão excluído com sucesso!',
+        type: 'success',
+      });
+    },
+    onError: (error) => {
+      const apiError = parseApiError(error);
+      logApiError(apiError);
+      toast({
+        title: 'Erro',
+        description: getUserFriendlyMessage(apiError),
+        type: 'error',
+      });
     },
   });
 
@@ -70,6 +114,20 @@ export const useCreditCards = (companyId: string) => {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['credit-cards', companyId] });
       queryClient.invalidateQueries({ queryKey: ['credit-card', companyId, id] });
+      toast({
+        title: 'Sucesso',
+        description: 'Status do cartão atualizado com sucesso!',
+        type: 'success',
+      });
+    },
+    onError: (error) => {
+      const apiError = parseApiError(error);
+      logApiError(apiError);
+      toast({
+        title: 'Erro',
+        description: getUserFriendlyMessage(apiError),
+        type: 'error',
+      });
     },
   });
 
