@@ -1,5 +1,6 @@
 import { apiClient } from './apiClient';
 import { z } from 'zod';
+import { parseApiError } from '@/utils/apiErrorHandler';
 
 // Validation schemas
 export const AccountSchema = z.object({
@@ -21,7 +22,6 @@ export const AccountSchema = z.object({
 
 export const CreateAccountSchema = AccountSchema.omit({
   id: true,
-  companyId: true,
   createdAt: true,
   updatedAt: true,
   balance: true,
@@ -36,8 +36,7 @@ export const getAccounts = async (companyId: string): Promise<Account[]> => {
     const response = await apiClient.get<Account[]>(`/companies/${companyId}/accounts`);
     return AccountSchema.array().parse(response.data);
   } catch (error) {
-    console.error('Erro ao buscar contas:', error);
-    throw new Error('Falha ao buscar contas' + error);
+    throw parseApiError(error);
   }
 };
 
@@ -46,8 +45,7 @@ export const getAccountById = async (companyId: string, id: string): Promise<Acc
     const response = await apiClient.get<Account>(`/companies/${companyId}/accounts/${id}`);
     return AccountSchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao buscar conta:', error);
-    throw new Error('Falha ao buscar conta');
+    throw parseApiError(error);
   }
 };
 
@@ -60,8 +58,7 @@ export const createAccount = async (companyId: string, data: CreateAccount): Pro
     );
     return AccountSchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao criar conta:', error);
-    throw new Error('Falha ao criar conta');
+    throw parseApiError(error);
   }
 };
 
@@ -78,8 +75,7 @@ export const updateAccount = async (
     );
     return AccountSchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao atualizar conta:', error);
-    throw new Error('Falha ao atualizar conta');
+    throw parseApiError(error);
   }
 };
 
@@ -87,8 +83,7 @@ export const deleteAccount = async (companyId: string, id: string): Promise<void
   try {
     await apiClient.delete(`/companies/${companyId}/accounts/${id}`);
   } catch (error) {
-    console.error('Erro ao deletar conta:', error);
-    throw new Error('Falha ao deletar conta');
+    throw parseApiError(error);
   }
 };
 
@@ -97,7 +92,6 @@ export const getAccountBalance = async (id: string): Promise<number> => {
     const response = await apiClient.get<{ balance: number }>(`/accounts/${id}/balance`);
     return response.data.balance;
   } catch (error) {
-    console.error('Erro ao buscar saldo da conta:', error);
-    throw new Error('Falha ao buscar saldo da conta');
+    throw parseApiError(error);
   }
 };

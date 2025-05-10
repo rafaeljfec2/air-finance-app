@@ -10,6 +10,8 @@ import {
   type Account,
   type CreateAccount,
 } from '../services/accountService';
+import { toast } from '@/components/ui/toast';
+import { parseApiError, getUserFriendlyMessage, logApiError } from '@/utils/apiErrorHandler';
 
 export const useAccounts = () => {
   const { activeCompany } = useCompanyStore();
@@ -26,7 +28,7 @@ export const useAccounts = () => {
     enabled: !!companyId,
   });
 
-  const getAccount = (id: string) => {
+  const useGetAccount = (id: string) => {
     return useQuery<Account>({
       queryKey: ['account', companyId, id],
       queryFn: () =>
@@ -35,7 +37,7 @@ export const useAccounts = () => {
     });
   };
 
-  const getBalance = (id: string) => {
+  const useGetBalance = (id: string) => {
     return useQuery<number>({
       queryKey: ['account-balance', companyId, id],
       queryFn: () =>
@@ -49,6 +51,20 @@ export const useAccounts = () => {
       companyId ? createAccount(companyId, data) : Promise.reject('No companyId'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+      toast({
+        title: 'Sucesso',
+        description: 'Conta cadastrada com sucesso!',
+        type: 'success',
+      });
+    },
+    onError: (error) => {
+      const apiError = parseApiError(error);
+      logApiError(apiError);
+      toast({
+        title: 'Erro',
+        description: getUserFriendlyMessage(apiError),
+        type: 'error',
+      });
     },
   });
 
@@ -59,6 +75,20 @@ export const useAccounts = () => {
       queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
       queryClient.invalidateQueries({ queryKey: ['account', companyId, id] });
       queryClient.invalidateQueries({ queryKey: ['account-balance', companyId, id] });
+      toast({
+        title: 'Sucesso',
+        description: 'Conta atualizada com sucesso!',
+        type: 'success',
+      });
+    },
+    onError: (error) => {
+      const apiError = parseApiError(error);
+      logApiError(apiError);
+      toast({
+        title: 'Erro',
+        description: getUserFriendlyMessage(apiError),
+        type: 'error',
+      });
     },
   });
 
@@ -69,6 +99,20 @@ export const useAccounts = () => {
       queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
       queryClient.removeQueries({ queryKey: ['account', companyId, id] });
       queryClient.removeQueries({ queryKey: ['account-balance', companyId, id] });
+      toast({
+        title: 'Sucesso',
+        description: 'Conta excluída com sucesso!',
+        type: 'success',
+      });
+    },
+    onError: (error) => {
+      const apiError = parseApiError(error);
+      logApiError(apiError);
+      toast({
+        title: 'Erro',
+        description: getUserFriendlyMessage(apiError),
+        type: 'error',
+      });
     },
   });
 
@@ -76,8 +120,8 @@ export const useAccounts = () => {
     accounts,
     isLoading,
     error,
-    getAccount,
-    getBalance,
+    getAccount: useGetAccount,
+    getBalance: useGetBalance,
     createAccount: createMutation.mutate,
     updateAccount: updateMutation.mutate,
     deleteAccount: deleteMutation.mutate,

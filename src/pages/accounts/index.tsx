@@ -57,7 +57,7 @@ export function AccountsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setForm((prev) => ({
@@ -80,7 +80,7 @@ export function AccountsPage() {
   };
 
   const validate = () => {
-    const errs: any = {};
+    const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (!form.institution.trim()) errs.institution = 'Instituição obrigatória';
     if (!form.agency.trim()) errs.agency = 'Agência obrigatória';
