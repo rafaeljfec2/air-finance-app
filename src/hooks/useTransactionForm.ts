@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTransactionStore } from '@/stores/transaction';
 import { Transaction, TransactionType } from '@/types/transaction';
 import { formatCurrency } from '@/utils/formatters';
-import { useCompanyContext } from '@/contexts/companyContext';
+import { useCompanyStore } from '@/stores/company';
 
 export const INITIAL_FORM_STATE = {
   description: '',
@@ -26,7 +26,8 @@ type FormField = keyof FormData;
 export function useTransactionForm() {
   const navigate = useNavigate();
   const { addTransaction } = useTransactionStore();
-  const { companyId } = useCompanyContext() as { companyId: string };
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id || '';
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -117,7 +118,7 @@ export function useTransactionForm() {
         accountId: '1', // Mock - posteriormente virá da seleção de conta
       };
 
-      await addTransaction(transaction as Transaction, companyId);
+      addTransaction(transaction as Transaction, companyId);
       setShowSuccessTooltip(true);
       setTimeout(() => {
         navigate('/statement');

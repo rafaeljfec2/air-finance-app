@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/FormField';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useUsers } from '@/hooks/useUsers';
-import { useCompanyContext } from '@/contexts/companyContext';
 import { UserIcon } from '@heroicons/react/24/outline';
 import { CreateUser } from '@/services/userService';
+import { useCompanyStore } from '@/stores/company';
 
 export function UsersPage() {
-  const { companyId } = useCompanyContext();
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id || '';
   const {
     users,
     isLoading,
@@ -36,7 +37,7 @@ export function UsersPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -44,7 +45,7 @@ export function UsersPage() {
   };
 
   const validate = () => {
-    const errs: any = {};
+    const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (!form.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email))
       errs.email = 'E-mail inválido';
@@ -60,10 +61,10 @@ export function UsersPage() {
 
     try {
       if (editingId) {
-        await updateUser({ id: editingId, data: form });
+        updateUser({ id: editingId, data: form });
         setEditingId(null);
       } else {
-        await createUser(form);
+        createUser(form);
       }
       setForm({
         name: '',

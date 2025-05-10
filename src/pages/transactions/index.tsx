@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Receipt, Search, Plus, Calendar, Filter, Download } from 'lucide-react';
 import { TransactionGrid } from '@/components/transactions/TransactionGrid';
 import { useTransactionStore } from '@/stores/transaction';
-import { useCompanyContext } from '@/contexts/companyContext';
+import { useCompanyStore } from '@/stores/company';
 
 export function Transactions() {
   const navigate = useNavigate();
@@ -17,7 +17,8 @@ export function Transactions() {
   const [selectedType, setSelectedType] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
 
-  const { companyId } = useCompanyContext() as { companyId: string };
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id || '';
   const getTransactionsByCompany = useTransactionStore((s) => s.getTransactionsByCompany);
   const allTransactions = getTransactionsByCompany(companyId);
 

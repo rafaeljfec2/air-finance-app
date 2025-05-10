@@ -33,7 +33,7 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
   transactions: [],
   categories: initialCategories,
   accounts: initialAccounts,
-  addTransaction: (transaction, companyId) =>
+  addTransaction: (transaction, companyId: string) =>
     set((state) => {
       const category = state.categories.find((c) => c.id === transaction.categoryId);
       const account = state.accounts.find((a) => a.id === transaction.accountId);

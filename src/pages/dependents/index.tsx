@@ -10,8 +10,8 @@ import { UserGroupIcon, UserIcon, HeartIcon } from '@heroicons/react/24/outline'
 import { FormField } from '@/components/ui/FormField';
 import { useDependents } from '@/hooks/useDependents';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { useCompanyContext } from '@/contexts/companyContext';
 import { Loading } from '@/components/Loading';
+import { useCompanyStore } from '@/stores/company';
 
 const relationTypes = [
   { value: 'filho', label: 'Filho(a)', icon: UserIcon },
@@ -24,7 +24,8 @@ const relationTypes = [
 type RelationType = (typeof relationTypes)[number]['value'];
 
 export function DependentsPage() {
-  const { companyId } = useCompanyContext() as { companyId: string };
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id || '';
   const {
     dependents,
     isLoading,
@@ -42,13 +43,13 @@ export function DependentsPage() {
     relation: 'filho' as RelationType,
     color: '#8A05BE',
     icon: 'UserIcon',
-    companyId: companyId || '',
+    companyId: companyId,
   });
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -64,7 +65,7 @@ export function DependentsPage() {
   };
 
   const validate = () => {
-    const errs: any = {};
+    const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (!form.relation) errs.relation = 'Relação obrigatória';
     if (!form.companyId) errs.companyId = 'Selecione uma empresa';
@@ -79,17 +80,17 @@ export function DependentsPage() {
 
     try {
       if (editingId) {
-        await updateDependent({ id: editingId, data: form });
+        updateDependent({ id: editingId, data: form });
         setEditingId(null);
       } else {
-        await createDependent(form);
+        createDependent(form);
       }
       setForm({
         name: '',
         relation: 'filho',
         color: '#8A05BE',
         icon: 'UserIcon',
-        companyId: companyId || '',
+        companyId: companyId,
       });
       setErrors({});
     } catch (error) {
@@ -102,10 +103,10 @@ export function DependentsPage() {
     if (dependent) {
       setForm({
         name: dependent.name,
-        relation: dependent.relation as RelationType,
+        relation: dependent.relation,
         color: dependent.color,
         icon: dependent.icon,
-        companyId: dependent.companyId,
+        companyId: companyId,
       });
       setEditingId(id);
     }
@@ -119,7 +120,7 @@ export function DependentsPage() {
   const confirmDelete = async () => {
     if (deleteId) {
       try {
-        await deleteDependent(deleteId);
+        deleteDependent(deleteId);
       } catch (error) {
         console.error('Erro ao deletar dependente:', error);
       }

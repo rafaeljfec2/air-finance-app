@@ -29,8 +29,8 @@ import { ptBR } from 'date-fns/locale';
 import { BalanceChart } from '@/components/charts/BalanceChart';
 import { formatCurrency } from '@/utils/formatters';
 import { Modal } from '@/components/ui/Modal';
-import { useCompanyContext } from '@/contexts/companyContext';
 import { useTransactionStore } from '@/stores/transaction';
+import { useCompanyStore } from '@/stores/company';
 
 interface DashboardData {
   balance: number;
@@ -176,7 +176,8 @@ export function Dashboard() {
     },
   });
 
-  const { companyId } = useCompanyContext() as { companyId: string };
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id || '';
   const getTransactionsByCompany = useTransactionStore((s) => s.getTransactionsByCompany);
   const transactions = getTransactionsByCompany(companyId);
 

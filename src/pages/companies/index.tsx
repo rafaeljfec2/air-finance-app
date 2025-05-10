@@ -101,7 +101,7 @@ export function CompaniesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
@@ -119,7 +119,7 @@ export function CompaniesPage() {
   };
 
   const validate = () => {
-    const errs: any = {};
+    const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (!form.cnpj || !validateCNPJ(form.cnpj)) errs.cnpj = 'CNPJ inválido';
     if (!form.type) errs.type = 'Tipo obrigatório';

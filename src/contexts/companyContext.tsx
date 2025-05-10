@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import React, { createContext, useMemo } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Company } from '@/hooks/useCompanies';
+import { Company } from '@/types/company';
 
 interface CompanyState {
   companyId: string;
@@ -41,10 +41,4 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   );
 
   return <CompanyContext.Provider value={value}>{children}</CompanyContext.Provider>;
-};
-
-export const useCompanyContext = () => {
-  const ctx = useContext(CompanyContext);
-  if (!ctx) throw new Error('useCompanyContext must be used within CompanyProvider');
-  return ctx;
 };
