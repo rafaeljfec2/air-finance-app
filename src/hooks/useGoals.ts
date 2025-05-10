@@ -9,6 +9,8 @@ import {
   type Goal,
   type CreateGoal,
 } from '../services/goalService';
+import { toast } from '@/components/ui/toast';
+import { parseApiError, getUserFriendlyMessage, logApiError } from '@/utils/apiErrorHandler';
 
 export const useGoals = (companyId: string) => {
   const queryClient = useQueryClient();
@@ -20,28 +22,43 @@ export const useGoals = (companyId: string) => {
   } = useQuery<Goal[]>({
     queryKey: ['goals', companyId],
     queryFn: () => getGoals(companyId),
+    enabled: !!companyId,
   });
 
-  const getGoal = (id: string) => {
+  function useGetGoal(id: string) {
     return useQuery<Goal>({
       queryKey: ['goal', companyId, id],
       queryFn: () => getGoalById(companyId, id),
-      enabled: !!id,
+      enabled: !!id && !!companyId,
     });
-  };
+  }
 
-  const getProgress = (id: string) => {
+  function useGetProgress(id: string) {
     return useQuery({
       queryKey: ['goal-progress', companyId, id],
       queryFn: () => getGoalProgress(id),
-      enabled: !!id,
+      enabled: !!id && !!companyId,
     });
-  };
+  }
 
   const createMutation = useMutation({
     mutationFn: (data: CreateGoal) => createGoal(companyId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['goals'] });
+      queryClient.invalidateQueries({ queryKey: ['goals', companyId] });
+      toast({
+        title: 'Sucesso',
+        description: 'Meta cadastrada com sucesso!',
+        type: 'success',
+      });
+    },
+    onError: (error) => {
+      const apiError = parseApiError(error);
+      logApiError(apiError);
+      toast({
+        title: 'Erro',
+        description: getUserFriendlyMessage(apiError),
+        type: 'error',
+      });
     },
   });
 
@@ -49,18 +66,46 @@ export const useGoals = (companyId: string) => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateGoal> }) =>
       updateGoal(companyId, id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['goals'] });
-      queryClient.invalidateQueries({ queryKey: ['goal', id] });
-      queryClient.invalidateQueries({ queryKey: ['goal-progress', id] });
+      queryClient.invalidateQueries({ queryKey: ['goals', companyId] });
+      queryClient.invalidateQueries({ queryKey: ['goal', companyId, id] });
+      queryClient.invalidateQueries({ queryKey: ['goal-progress', companyId, id] });
+      toast({
+        title: 'Sucesso',
+        description: 'Meta atualizada com sucesso!',
+        type: 'success',
+      });
+    },
+    onError: (error) => {
+      const apiError = parseApiError(error);
+      logApiError(apiError);
+      toast({
+        title: 'Erro',
+        description: getUserFriendlyMessage(apiError),
+        type: 'error',
+      });
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteGoal(companyId, id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['goals'] });
-      queryClient.removeQueries({ queryKey: ['goal', id] });
-      queryClient.removeQueries({ queryKey: ['goal-progress', id] });
+      queryClient.invalidateQueries({ queryKey: ['goals', companyId] });
+      queryClient.removeQueries({ queryKey: ['goal', companyId, id] });
+      queryClient.removeQueries({ queryKey: ['goal-progress', companyId, id] });
+      toast({
+        title: 'Sucesso',
+        description: 'Meta removida com sucesso!',
+        type: 'success',
+      });
+    },
+    onError: (error) => {
+      const apiError = parseApiError(error);
+      logApiError(apiError);
+      toast({
+        title: 'Erro',
+        description: getUserFriendlyMessage(apiError),
+        type: 'error',
+      });
     },
   });
 
@@ -68,8 +113,8 @@ export const useGoals = (companyId: string) => {
     goals,
     isLoading,
     error,
-    getGoal,
-    getProgress,
+    getGoal: useGetGoal,
+    getProgress: useGetProgress,
     createGoal: createMutation.mutate,
     updateGoal: updateMutation.mutate,
     deleteGoal: deleteMutation.mutate,

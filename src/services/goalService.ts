@@ -1,5 +1,6 @@
 import { apiClient } from './apiClient';
 import { z } from 'zod';
+import { parseApiError } from '@/utils/apiErrorHandler';
 
 // Validation schemas
 export const GoalSchema = z.object({
@@ -8,7 +9,7 @@ export const GoalSchema = z.object({
   description: z.string().optional(),
   targetAmount: z.number().min(0, 'Valor alvo deve ser maior que zero'),
   currentAmount: z.number().min(0, 'Valor atual não pode ser negativo'),
-  deadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data limite inválida'),
+  deadline: z.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/, 'Data limite inválida'),
   status: z.enum(['active', 'completed', 'cancelled']),
   categoryId: z.string().optional(),
   companyId: z.string(),
@@ -31,8 +32,7 @@ export const getGoals = async (companyId: string): Promise<Goal[]> => {
     const response = await apiClient.get<Goal[]>(`/companies/${companyId}/goals`);
     return GoalSchema.array().parse(response.data);
   } catch (error) {
-    console.error('Erro ao buscar metas:', error);
-    throw new Error('Falha ao buscar metas');
+    throw parseApiError(error);
   }
 };
 
@@ -41,8 +41,7 @@ export const getGoalById = async (companyId: string, id: string): Promise<Goal> 
     const response = await apiClient.get<Goal>(`/companies/${companyId}/goals/${id}`);
     return GoalSchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao buscar meta:', error);
-    throw new Error('Falha ao buscar meta');
+    throw parseApiError(error);
   }
 };
 
@@ -52,8 +51,7 @@ export const createGoal = async (companyId: string, data: CreateGoal): Promise<G
     const response = await apiClient.post<Goal>(`/companies/${companyId}/goals`, validatedData);
     return GoalSchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao criar meta:', error);
-    throw new Error('Falha ao criar meta');
+    throw parseApiError(error);
   }
 };
 
@@ -70,8 +68,7 @@ export const updateGoal = async (
     );
     return GoalSchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao atualizar meta:', error);
-    throw new Error('Falha ao atualizar meta');
+    throw parseApiError(error);
   }
 };
 
@@ -79,8 +76,7 @@ export const deleteGoal = async (companyId: string, id: string): Promise<void> =
   try {
     await apiClient.delete(`/companies/${companyId}/goals/${id}`);
   } catch (error) {
-    console.error('Erro ao deletar meta:', error);
-    throw new Error('Falha ao deletar meta');
+    throw parseApiError(error);
   }
 };
 
@@ -95,8 +91,7 @@ export const getGoalProgress = async (
     const response = await apiClient.get(`/goals/${id}/progress`);
     return response.data;
   } catch (error) {
-    console.error('Erro ao buscar progresso da meta:', error);
-    throw new Error('Falha ao buscar progresso da meta');
+    throw parseApiError(error);
   }
 };
 
@@ -112,7 +107,6 @@ export const updateGoalCurrentAmount = async (
     );
     return GoalSchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao atualizar valor acumulado da meta:', error);
-    throw new Error('Falha ao atualizar valor acumulado da meta');
+    throw parseApiError(error);
   }
 };
