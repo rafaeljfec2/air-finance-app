@@ -3,7 +3,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useCompanyContext } from '@/contexts/companyContext';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
 import { useTransactionStore } from '@/stores/transaction';
@@ -13,11 +12,16 @@ import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
+import { useTransactions } from '@/hooks/useTransactions';
+import { toast } from '@/components/ui/toast';
+import { CreateTransactionPayload } from '@/services/transactionService';
+import { useCompanyStore } from '@/stores/company';
 
 export function NewTransaction() {
   const navigate = useNavigate();
-  const { addTransaction, categories, accounts } = useTransactionStore();
-  const { companyId } = useCompanyContext() as { companyId: string };
+  const { categories, accounts } = useTransactionStore();
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id || '';
   const [transactionType, setTransactionType] = useState<TransactionType>('EXPENSE');
   const [formData, setFormData] = useState<
     TransactionInput & { transactionKind: 'FIXED' | 'VARIABLE'; repeatMonthly: boolean }
@@ -31,19 +35,42 @@ export function NewTransaction() {
     note: '',
     dependent: '',
     installmentCount: 1,
-    companyId: companyId || '',
+    companyId: companyId,
     transactionKind: 'FIXED',
     repeatMonthly: false,
   });
+  const { createTransaction } = useTransactions(companyId);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!companyId) {
-      alert('Nenhuma empresa selecionada.');
+      toast({ type: 'error', description: 'Nenhuma empresa selecionada.' });
       return;
     }
-    addTransaction(formData, companyId);
-    navigate('/transactions');
+    const payload: CreateTransactionPayload = {
+      description: formData.description,
+      launchType: formData.type === 'EXPENSE' ? 'expense' : 'revenue',
+      valueType: formData.transactionKind === 'FIXED' ? 'fixed' : 'variable',
+      companyId: formData.companyId,
+      accountId: formData.accountId,
+      categoryId: formData.categoryId,
+      value: Number(formData.amount),
+      paymentDate: formData.date,
+      issueDate: formData.date,
+      quantityInstallments: Number(formData.installmentCount),
+      repeatMonthly: !!formData.repeatMonthly,
+      observation: formData.note,
+      reconciled: true,
+    };
+    createTransaction(payload, {
+      onSuccess: () => {
+        toast({ type: 'success', description: 'Transação salva com sucesso!' });
+        navigate('/transactions');
+      },
+      onError: () => {
+        toast({ type: 'error', description: 'Erro ao salvar transação.' });
+      },
+    });
   };
 
   const handleChange = (

@@ -5,10 +5,10 @@ import {
   updateTransaction,
   deleteTransaction,
   Transaction,
-  CreateTransaction,
+  CreateTransactionPayload,
 } from '../services/transactionService';
 
-export const useTransactions = () => {
+export const useTransactions = (companyId: string) => {
   const queryClient = useQueryClient();
 
   const {
@@ -16,29 +16,30 @@ export const useTransactions = () => {
     isLoading,
     error,
   } = useQuery<Transaction[]>({
-    queryKey: ['transactions'],
-    queryFn: getTransactions,
+    queryKey: ['transactions', companyId],
+    queryFn: () => getTransactions(companyId),
+    enabled: !!companyId,
   });
 
   const createMutation = useMutation({
-    mutationFn: createTransaction,
+    mutationFn: (data: CreateTransactionPayload) => createTransaction(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions', companyId] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<CreateTransaction> }) =>
-      updateTransaction(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateTransactionPayload> }) =>
+      updateTransaction(companyId, id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions', companyId] });
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteTransaction,
+    mutationFn: (id: string) => deleteTransaction(companyId, id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions', companyId] });
     },
   });
 
