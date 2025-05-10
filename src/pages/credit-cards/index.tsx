@@ -13,6 +13,7 @@ import { type CreateCreditCardPayload } from '@/services/creditCardService';
 import { useCompanyStore } from '@/stores/company';
 import { BanknotesIcon, BuildingLibraryIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 import React, { useState } from 'react';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 
 const bankTypes = [
   { value: 'nubank', label: 'Nubank', icon: CreditCardIcon },
@@ -46,14 +47,14 @@ export function CreditCardsPage() {
 
   const initialFormState = {
     name: '',
-    limit: 0,
+    limit: '',
     closingDay: 10,
     dueDay: 10,
     color: '#8A05BE',
     icon: 'CreditCardIcon',
     companyId: companyId || '',
   };
-  const [form, setForm] = useState<CreateCreditCardPayload>(initialFormState);
+  const [form, setForm] = useState<CreateCreditCardPayload & { limit: string }>(initialFormState);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -66,7 +67,7 @@ export function CreditCardsPage() {
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: name === 'limit' ? Number(value) : value,
+      [name]: name === 'limit' ? formatCurrencyInput(value) : value,
     }));
   };
 
@@ -76,6 +77,13 @@ export function CreditCardsPage() {
 
   const handleIconChange = (icon: string) => {
     setForm((prev) => ({ ...prev, icon }));
+  };
+
+  const handleLimitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((prev) => ({
+      ...prev,
+      limit: formatCurrencyInput(e.target.value),
+    }));
   };
 
   const validate = () => {
@@ -102,11 +110,15 @@ export function CreditCardsPage() {
 
     try {
       console.log('Dados enviados para criação:', form);
+      const payload = {
+        ...form,
+        limit: parseCurrency(form.limit),
+      };
       if (editingId) {
-        await updateCreditCard({ id: editingId, data: form });
+        await updateCreditCard({ id: editingId, data: payload });
         setEditingId(null);
       } else {
-        await createCreditCard(form);
+        await createCreditCard(payload);
       }
       setForm(initialFormState);
       setErrors({});
@@ -127,7 +139,7 @@ export function CreditCardsPage() {
     if (card) {
       setForm({
         name: card.name,
-        limit: card.limit,
+        limit: card.limit.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
         closingDay: card.closingDay,
         dueDay: card.dueDay,
         color: card.color,
@@ -222,9 +234,10 @@ export function CreditCardsPage() {
               <FormField label="Limite" error={errors.limit}>
                 <Input
                   name="limit"
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   value={form.limit}
-                  onChange={handleChange}
+                  onChange={handleLimitChange}
                   placeholder="R$ 0,00"
                   required
                   className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
