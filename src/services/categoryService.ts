@@ -1,5 +1,6 @@
 import { apiClient } from './apiClient';
 import { z } from 'zod';
+import { parseApiError } from '@/utils/apiErrorHandler';
 
 // Validation schemas
 export const CategorySchema = z.object({
@@ -31,8 +32,7 @@ export const getCategories = async (companyId: string): Promise<Category[]> => {
     const response = await apiClient.get<Category[]>(`/companies/${companyId}/categories`);
     return CategorySchema.array().parse(response.data);
   } catch (error) {
-    console.error('Erro ao buscar categorias:', error);
-    throw new Error('Falha ao buscar categorias');
+    throw parseApiError(error);
   }
 };
 
@@ -41,8 +41,7 @@ export const getCategoryById = async (companyId: string, id: string): Promise<Ca
     const response = await apiClient.get<Category>(`/companies/${companyId}/categories/${id}`);
     return CategorySchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao buscar categoria:', error);
-    throw new Error('Falha ao buscar categoria');
+    throw parseApiError(error);
   }
 };
 
@@ -58,8 +57,7 @@ export const createCategory = async (
     });
     return CategorySchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao criar categoria:', error);
-    throw new Error('Falha ao criar categoria');
+    throw parseApiError(error);
   }
 };
 
@@ -76,8 +74,7 @@ export const updateCategory = async (
     );
     return CategorySchema.parse(response.data);
   } catch (error) {
-    console.error('Erro ao atualizar categoria:', error);
-    throw new Error('Falha ao atualizar categoria');
+    throw parseApiError(error);
   }
 };
 
@@ -85,7 +82,6 @@ export const deleteCategory = async (companyId: string, id: string): Promise<voi
   try {
     await apiClient.delete(`/companies/${companyId}/categories/${id}`);
   } catch (error) {
-    console.error('Erro ao deletar categoria:', error);
-    throw new Error('Falha ao deletar categoria');
+    throw parseApiError(error);
   }
 };
