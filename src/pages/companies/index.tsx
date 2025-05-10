@@ -13,6 +13,7 @@ import { toast } from '@/components/ui/toast';
 import { FormCard } from '@/components/ui/FormCard';
 import { DetailsCard } from '@/components/ui/DetailsCard';
 import { Loading } from '@/components/Loading';
+import { useAuthStore } from '@/stores/auth';
 
 const typeOptions = [
   { value: 'matriz', label: 'Matriz' },
@@ -71,6 +72,7 @@ function validateCNPJ(cnpj: string) {
 }
 
 export function CompaniesPage() {
+  const { user } = useAuthStore();
   const {
     companies,
     isLoading,
@@ -88,7 +90,7 @@ export function CompaniesPage() {
     cnpj: '',
     type: 'matriz' as CompanyType,
     foundationDate: '',
-    userIds: [] as string[],
+    userIds: [user?.id || ''] as string[],
     email: '',
     phone: '',
     address: '',
@@ -152,6 +154,13 @@ export function CompaniesPage() {
               type: 'success',
             });
           },
+          onError: (error) => {
+            toast({
+              title: 'Erro',
+              description: 'Erro ao cadastrar empresa: ' + error,
+              type: 'error',
+            });
+          },
         });
       }
       setForm(initialFormState);
@@ -192,7 +201,7 @@ export function CompaniesPage() {
   const confirmDelete = async () => {
     if (deleteId) {
       try {
-        await deleteCompany(deleteId);
+        deleteCompany(deleteId);
       } catch (error) {
         console.error('Erro ao deletar empresa:', error);
       }
