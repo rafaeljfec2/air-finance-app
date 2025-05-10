@@ -140,28 +140,8 @@ export function CompaniesPage() {
       if (editingId) {
         updateCompany({ id: editingId, data: form });
         setEditingId(null);
-        toast({
-          title: 'Sucesso',
-          description: 'Empresa atualizada com sucesso!',
-          type: 'success',
-        });
       } else {
-        createCompany(form, {
-          onSuccess: () => {
-            toast({
-              title: 'Sucesso',
-              description: 'Empresa cadastrada com sucesso!',
-              type: 'success',
-            });
-          },
-          onError: (error) => {
-            toast({
-              title: 'Erro',
-              description: 'Erro ao cadastrar empresa: ' + error,
-              type: 'error',
-            });
-          },
-        });
+        createCompany(form);
       }
       setForm(initialFormState);
       setErrors({});

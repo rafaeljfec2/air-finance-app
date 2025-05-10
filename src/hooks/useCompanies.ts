@@ -1,58 +1,82 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  getCompanies,
-  getCompanyById,
-  createCompany,
-  updateCompany,
-  deleteCompany,
-  type Company,
-  type CreateCompany,
-} from '../services/companyService';
+import { companyService } from '@/services/companyService';
+import { Company } from '@/types/company';
+import { toast } from '@/components/ui/toast';
+import { parseApiError, getUserFriendlyMessage, logApiError } from '@/utils/apiErrorHandler';
 
-export type { Company };
-
-export const useCompanies = () => {
+export function useCompanies() {
   const queryClient = useQueryClient();
 
-  // Queries
   const {
     data: companies,
     isLoading,
     error,
   } = useQuery<Company[]>({
     queryKey: ['companies'],
-    queryFn: getCompanies,
+    queryFn: companyService.getAll,
   });
 
-  const getCompany = (id: string) =>
-    useQuery<Company>({
-      queryKey: ['companies', id],
-      queryFn: () => getCompanyById(id),
-      enabled: !!id,
-    });
-
-  // Mutations
-  const createCompanyMutation = useMutation({
-    mutationFn: createCompany,
+  const { mutate: createCompany, isPending: isCreating } = useMutation({
+    mutationFn: companyService.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] });
+      toast({
+        title: 'Sucesso',
+        description: 'Empresa cadastrada com sucesso!',
+        type: 'success',
+      });
+    },
+    onError: (error) => {
+      const apiError = parseApiError(error);
+      logApiError(apiError);
+      toast({
+        title: 'Erro',
+        description: getUserFriendlyMessage(apiError),
+        type: 'error',
+      });
     },
   });
 
-  const updateCompanyMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<CreateCompany> }) =>
-      updateCompany(id, data),
-    onSuccess: (_, { id }) => {
+  const { mutate: updateCompany, isPending: isUpdating } = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Company> }) =>
+      companyService.update(id, data),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] });
-      queryClient.invalidateQueries({ queryKey: ['companies', id] });
+      toast({
+        title: 'Sucesso',
+        description: 'Empresa atualizada com sucesso!',
+        type: 'success',
+      });
+    },
+    onError: (error) => {
+      const apiError = parseApiError(error);
+      logApiError(apiError);
+      toast({
+        title: 'Erro',
+        description: getUserFriendlyMessage(apiError),
+        type: 'error',
+      });
     },
   });
 
-  const deleteCompanyMutation = useMutation({
-    mutationFn: deleteCompany,
-    onSuccess: (_, id) => {
+  const { mutate: deleteCompany, isPending: isDeleting } = useMutation({
+    mutationFn: companyService.delete,
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] });
-      queryClient.removeQueries({ queryKey: ['companies', id] });
+      toast({
+        title: 'Sucesso',
+        description: 'Empresa excluída com sucesso!',
+        type: 'success',
+      });
+    },
+    onError: (error) => {
+      const apiError = parseApiError(error);
+      logApiError(apiError);
+      toast({
+        title: 'Erro',
+        description: getUserFriendlyMessage(apiError),
+        type: 'error',
+      });
     },
   });
 
@@ -60,15 +84,11 @@ export const useCompanies = () => {
     companies,
     isLoading,
     error,
-    getCompany,
-    createCompany: createCompanyMutation.mutate,
-    updateCompany: updateCompanyMutation.mutate,
-    deleteCompany: deleteCompanyMutation.mutate,
-    isCreating: createCompanyMutation.isPending,
-    isUpdating: updateCompanyMutation.isPending,
-    isDeleting: deleteCompanyMutation.isPending,
-    createError: createCompanyMutation.error,
-    updateError: updateCompanyMutation.error,
-    deleteError: deleteCompanyMutation.error,
+    createCompany,
+    updateCompany,
+    deleteCompany,
+    isCreating,
+    isUpdating,
+    isDeleting,
   };
-};
+}

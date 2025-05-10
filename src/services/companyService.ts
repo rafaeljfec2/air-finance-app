@@ -1,5 +1,7 @@
 import { apiClient } from './apiClient';
 import { z } from 'zod';
+import { Company } from '@/types/company';
+import { parseApiError } from '@/utils/apiErrorHandler';
 
 // Validation schemas
 export const CompanySchema = z.object({
@@ -23,65 +25,60 @@ export const CreateCompanySchema = CompanySchema.omit({
   updatedAt: true,
 });
 
-export type Company = z.infer<typeof CompanySchema>;
-export type CreateCompany = z.infer<typeof CreateCompanySchema>;
+export type CreateCompany = Omit<Company, 'id' | 'createdAt' | 'updatedAt'>;
 
-// Service functions
-export const getCompanies = async (): Promise<Company[]> => {
-  try {
-    const response = await apiClient.get<Company[]>('/companies');
-    return CompanySchema.array().parse(response.data);
-  } catch (error) {
-    console.error('Erro ao buscar empresas:', error);
-    throw new Error('Falha ao buscar empresas');
-  }
-};
+export const companyService = {
+  getAll: async (): Promise<Company[]> => {
+    try {
+      const response = await apiClient.get<Company[]>('/companies');
+      return CompanySchema.array().parse(response.data);
+    } catch (error) {
+      throw parseApiError(error);
+    }
+  },
 
-export const getCompanyById = async (id: string): Promise<Company> => {
-  try {
-    const response = await apiClient.get<Company>(`/companies/${id}`);
-    return CompanySchema.parse(response.data);
-  } catch (error) {
-    console.error('Erro ao buscar empresa:', error);
-    throw new Error('Falha ao buscar empresa');
-  }
-};
+  getById: async (companyId: string): Promise<Company> => {
+    try {
+      const response = await apiClient.get<Company>(`/companies/${companyId}`);
+      return CompanySchema.parse(response.data);
+    } catch (error) {
+      throw parseApiError(error);
+    }
+  },
 
-export const createCompany = async (data: CreateCompany): Promise<Company> => {
-  try {
-    const dataToValidate = {
-      ...data,
-      foundationDate: data.foundationDate ? new Date(data.foundationDate).toISOString() : '',
-    };
-    const validatedData = CreateCompanySchema.parse(dataToValidate);
-    const response = await apiClient.post<Company>('/companies', validatedData);
-    return CompanySchema.parse(response.data);
-  } catch (error) {
-    console.error('Erro ao criar empresa:', error);
-    throw new Error('Falha ao criar empresa');
-  }
-};
+  create: async (data: CreateCompany): Promise<Company> => {
+    try {
+      const dataToValidate = {
+        ...data,
+        foundationDate: data.foundationDate ? new Date(data.foundationDate).toISOString() : '',
+      };
+      const validatedData = CreateCompanySchema.parse(dataToValidate);
+      const response = await apiClient.post<Company>('/companies', validatedData);
+      return CompanySchema.parse(response.data);
+    } catch (error) {
+      throw parseApiError(error);
+    }
+  },
 
-export const updateCompany = async (id: string, data: Partial<CreateCompany>): Promise<Company> => {
-  try {
-    const dataToValidate = {
-      ...data,
-      foundationDate: data.foundationDate ? new Date(data.foundationDate).toISOString() : '',
-    };
-    const validatedData = CreateCompanySchema.partial().parse(dataToValidate);
-    const response = await apiClient.put<Company>(`/companies/${id}`, validatedData);
-    return CompanySchema.parse(response.data);
-  } catch (error) {
-    console.error('Erro ao atualizar empresa:', error);
-    throw new Error('Falha ao atualizar empresa');
-  }
-};
+  update: async (companyId: string, data: Partial<CreateCompany>): Promise<Company> => {
+    try {
+      const dataToValidate = {
+        ...data,
+        foundationDate: data.foundationDate ? new Date(data.foundationDate).toISOString() : '',
+      };
+      const validatedData = CreateCompanySchema.partial().parse(dataToValidate);
+      const response = await apiClient.put<Company>(`/companies/${companyId}`, validatedData);
+      return CompanySchema.parse(response.data);
+    } catch (error) {
+      throw parseApiError(error);
+    }
+  },
 
-export const deleteCompany = async (id: string): Promise<void> => {
-  try {
-    await apiClient.delete(`/companies/${id}`);
-  } catch (error) {
-    console.error('Erro ao deletar empresa:', error);
-    throw new Error('Falha ao deletar empresa');
-  }
+  delete: async (companyId: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/companies/${companyId}`);
+    } catch (error) {
+      throw parseApiError(error);
+    }
+  },
 };
