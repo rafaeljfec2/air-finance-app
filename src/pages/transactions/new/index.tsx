@@ -5,23 +5,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 import { Textarea } from '@/components/ui/textarea';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
-import { useTransactionStore } from '@/stores/transaction';
-import { Category, TransactionInput, TransactionType } from '@/types/transaction';
+import { TransactionInput, TransactionType } from '@/types/transaction';
 import { formatCurrency, formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
 import { useTransactions } from '@/hooks/useTransactions';
 import { toast } from '@/components/ui/toast';
 import { CreateTransactionPayload } from '@/services/transactionService';
 import { useCompanyStore } from '@/stores/company';
+import { Loading } from '@/components/Loading';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useCategories } from '@/hooks/useCategories';
 
 export function NewTransaction() {
   const navigate = useNavigate();
-  const { categories, accounts } = useTransactionStore();
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id || '';
+
+  // Buscar contas e categorias reais da empresa ativa
+  const { accounts, isLoading: isLoadingAccounts } = useAccounts();
+  const { categories, isLoading: isLoadingCategories } = useCategories(companyId);
+
   const [transactionType, setTransactionType] = useState<TransactionType>('EXPENSE');
   const [formData, setFormData] = useState<
     TransactionInput & { transactionKind: 'FIXED' | 'VARIABLE'; repeatMonthly: boolean }
@@ -39,10 +45,38 @@ export function NewTransaction() {
     transactionKind: 'FIXED',
     repeatMonthly: false,
   });
-  const { createTransaction } = useTransactions(companyId);
+  const { createTransaction, isCreating } = useTransactions(companyId);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Validação robusta
+  const validate = useCallback(() => {
+    const errs: Record<string, string> = {};
+    if (!formData.description.trim()) errs.description = 'Descrição é obrigatória';
+    if (!formData.amount || formData.amount <= 0) errs.amount = 'Valor deve ser maior que zero';
+    if (!formData.categoryId) errs.categoryId = 'Categoria é obrigatória';
+    if (!formData.accountId) errs.accountId = 'Conta é obrigatória';
+    if (!formData.date) errs.date = 'Data é obrigatória';
+    if (!companyId) errs.companyId = 'Empresa é obrigatória';
+    return errs;
+  }, [formData, companyId]);
+
+  // Autosave (opcional, pode remover se não quiser)
+  useEffect(() => {
+    localStorage.setItem('transaction_draft', JSON.stringify(formData));
+  }, [formData]);
+  useEffect(() => {
+    const draft = localStorage.getItem('transaction_draft');
+    if (draft) setFormData(JSON.parse(draft));
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const errs = validate();
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) {
+      toast({ type: 'error', description: 'Por favor, corrija os erros no formulário.' });
+      return;
+    }
     if (!companyId) {
       toast({ type: 'error', description: 'Nenhuma empresa selecionada.' });
       return;
@@ -62,15 +96,26 @@ export function NewTransaction() {
       observation: formData.note,
       reconciled: true,
     };
-    createTransaction(payload, {
-      onSuccess: () => {
-        toast({ type: 'success', description: 'Transação salva com sucesso!' });
-        navigate('/transactions');
-      },
-      onError: () => {
-        toast({ type: 'error', description: 'Erro ao salvar transação.' });
-      },
-    });
+    try {
+      createTransaction(payload, {
+        onSuccess: () => {
+          toast({ type: 'success', description: 'Transação salva com sucesso!' });
+          localStorage.removeItem('transaction_draft');
+          navigate('/transactions');
+        },
+        onError: (error) => {
+          toast({
+            type: 'error',
+            description: error instanceof Error ? error.message : 'Erro ao salvar transação.',
+          });
+        },
+      });
+    } catch (error) {
+      toast({
+        type: 'error',
+        description: error instanceof Error ? error.message : 'Erro ao salvar transação.',
+      });
+    }
   };
 
   const handleChange = (
@@ -83,11 +128,28 @@ export function NewTransaction() {
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
-  const filteredCategories = categories.filter(
-    (category: Category) => category.type === transactionType,
-  );
+  const filteredCategories = Array.isArray(categories)
+    ? categories.filter(
+        (category) =>
+          typeof category.type === 'string' && category.type.toUpperCase() === transactionType,
+      )
+    : [];
+
+  // Exibir loading enquanto carrega contas ou categorias
+  if (isLoadingAccounts || isLoadingCategories) {
+    return (
+      <ViewDefault>
+        <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
+          <div className="container mx-auto px-4 py-6">
+            <Loading size="large">Carregando dados...</Loading>
+          </div>
+        </div>
+      </ViewDefault>
+    );
+  }
 
   return (
     <ViewDefault>
@@ -176,6 +238,9 @@ export function NewTransaction() {
                   required
                   className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
+                {errors.description && (
+                  <span className="text-xs text-red-500 mt-1 block">{errors.description}</span>
+                )}
               </div>
 
               {/* Linha 2: Conta, Categoria, Tipo */}
@@ -198,22 +263,28 @@ export function NewTransaction() {
                       <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors w-full">
                         <div className="px-3 py-2">
                           {formData.accountId
-                            ? accounts.find((acc) => acc.id === formData.accountId)?.name
+                            ? Array.isArray(accounts)
+                              ? accounts.find((acc) => acc.id === formData.accountId)?.name
+                              : ''
                             : 'Selecione uma conta'}
                         </div>
                       </SelectTrigger>
                       <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
-                        {accounts.map((account) => (
-                          <SelectItem
-                            key={account.id}
-                            value={account.id}
-                            className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                          >
-                            {account.name}
-                          </SelectItem>
-                        ))}
+                        {Array.isArray(accounts) &&
+                          accounts.map((account) => (
+                            <SelectItem
+                              key={account.id}
+                              value={account.id}
+                              className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
+                            >
+                              {account.name}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
+                    {errors.accountId && (
+                      <span className="text-xs text-red-500 mt-1 block">{errors.accountId}</span>
+                    )}
                   </div>
                   {/* Categoria */}
                   <div>
@@ -248,6 +319,9 @@ export function NewTransaction() {
                         ))}
                       </SelectContent>
                     </Select>
+                    {errors.categoryId && (
+                      <span className="text-xs text-red-500 mt-1 block">{errors.categoryId}</span>
+                    )}
                   </div>
                   {/* Tipo (toggle) */}
                   <div>
@@ -311,6 +385,9 @@ export function NewTransaction() {
                       required
                       className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full"
                     />
+                    {errors.date && (
+                      <span className="text-xs text-red-500 mt-1 block">{errors.date}</span>
+                    )}
                   </div>
                   {/* Valor */}
                   <div>
@@ -332,6 +409,9 @@ export function NewTransaction() {
                       className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full"
                       autoComplete="off"
                     />
+                    {errors.amount && (
+                      <span className="text-xs text-red-500 mt-1 block">{errors.amount}</span>
+                    )}
                   </div>
                   {/* Parcelas */}
                   <div>
@@ -409,8 +489,9 @@ export function NewTransaction() {
                 <Button
                   type="submit"
                   className="w-full bg-primary-600 hover:bg-primary-700 text-white dark:bg-primary-500 dark:hover:bg-primary-400 transition-colors shadow-md"
+                  disabled={isCreating}
                 >
-                  Salvar Transação
+                  {isCreating ? 'Salvando...' : 'Salvar Transação'}
                 </Button>
               </div>
             </form>
