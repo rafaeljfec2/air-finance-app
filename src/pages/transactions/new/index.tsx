@@ -140,15 +140,7 @@ export function NewTransaction() {
 
   // Exibir loading enquanto carrega contas ou categorias
   if (isLoadingAccounts || isLoadingCategories) {
-    return (
-      <ViewDefault>
-        <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
-          <div className="container mx-auto px-4 py-6">
-            <Loading size="large">Carregando dados...</Loading>
-          </div>
-        </div>
-      </ViewDefault>
-    );
+    return <Loading size="large">Carregando dados...</Loading>;
   }
 
   return (
