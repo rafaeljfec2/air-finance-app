@@ -47,21 +47,19 @@ export function CreditCardsPage() {
 
   const initialFormState = {
     name: '',
-    limit: '',
+    limit: 0,
     closingDay: 10,
     dueDay: 10,
     color: '#8A05BE',
     icon: 'CreditCardIcon',
-    companyId: companyId || '',
+    companyId: companyId,
   };
-  const [form, setForm] = useState<CreateCreditCardPayload & { limit: string }>(initialFormState);
+  const [form, setForm] = useState<CreateCreditCardPayload>(initialFormState);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [errors, setErrors] = useState<any>({});
-
-  console.log('isCreating', isCreating, 'isUpdating', isUpdating);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -82,7 +80,7 @@ export function CreditCardsPage() {
   const handleLimitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({
       ...prev,
-      limit: formatCurrencyInput(e.target.value),
+      limit: parseCurrency(e.target.value),
     }));
   };
 
@@ -112,7 +110,7 @@ export function CreditCardsPage() {
       console.log('Dados enviados para criação:', form);
       const payload = {
         ...form,
-        limit: parseCurrency(form.limit),
+        limit: form.limit,
       };
       if (editingId) {
         await updateCreditCard({ id: editingId, data: payload });
@@ -139,7 +137,7 @@ export function CreditCardsPage() {
     if (card) {
       setForm({
         name: card.name,
-        limit: card.limit.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+        limit: card.limit,
         closingDay: card.closingDay,
         dueDay: card.dueDay,
         color: card.color,

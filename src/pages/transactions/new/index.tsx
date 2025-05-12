@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 import { Textarea } from '@/components/ui/textarea';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
-import { TransactionInput, TransactionType } from '@/types/transaction';
+import { TransactionInput, TransactionType, Account, Category } from '@/types/transaction';
 import { formatCurrency, formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
@@ -16,17 +16,42 @@ import { toast } from '@/components/ui/toast';
 import { CreateTransactionPayload } from '@/services/transactionService';
 import { useCompanyStore } from '@/stores/company';
 import { Loading } from '@/components/Loading';
-import { useAccounts } from '@/hooks/useAccounts';
-import { useCategories } from '@/hooks/useCategories';
+import { getAccounts } from '@/services/accountService';
+import { getCategories } from '@/services/categoryService';
 
 export function NewTransaction() {
   const navigate = useNavigate();
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id || '';
 
-  // Buscar contas e categorias reais da empresa ativa
-  const { accounts, isLoading: isLoadingAccounts } = useAccounts();
-  const { categories, isLoading: isLoadingCategories } = useCategories(companyId);
+  // Carregamento paralelo de contas e categorias
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    setLoadError(null);
+    Promise.all([getAccounts(companyId), getCategories(companyId)])
+      .then(([accountsData, categoriesData]) => {
+        setAccounts(accountsData);
+        setCategories(
+          categoriesData.map((cat) => ({
+            ...cat,
+            type: (typeof cat.type === 'string'
+              ? cat.type.toUpperCase()
+              : cat.type) as TransactionType,
+          })),
+        );
+      })
+      .catch((error) => {
+        setLoadError(
+          error instanceof Error ? error.message : 'Erro ao carregar contas ou categorias.',
+        );
+      })
+      .finally(() => setLoading(false));
+  }, [companyId]);
 
   const [transactionType, setTransactionType] = useState<TransactionType>('EXPENSE');
   const [formData, setFormData] = useState<
@@ -138,9 +163,16 @@ export function NewTransaction() {
       )
     : [];
 
+  const selectedAccountName = formData.accountId
+    ? (accounts.find((acc) => acc.id === formData.accountId)?.name ?? 'Selecione uma conta')
+    : 'Selecione uma conta';
+
   // Exibir loading enquanto carrega contas ou categorias
-  if (isLoadingAccounts || isLoadingCategories) {
+  if (loading) {
     return <Loading size="large">Carregando dados...</Loading>;
+  }
+  if (loadError) {
+    return <div className="text-red-500 text-center py-8">{loadError}</div>;
   }
 
   return (
@@ -253,13 +285,7 @@ export function NewTransaction() {
                       }
                     >
                       <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors w-full">
-                        <div className="px-3 py-2">
-                          {formData.accountId
-                            ? Array.isArray(accounts)
-                              ? accounts.find((acc) => acc.id === formData.accountId)?.name
-                              : ''
-                            : 'Selecione uma conta'}
-                        </div>
+                        <div className="px-3 py-2">{selectedAccountName}</div>
                       </SelectTrigger>
                       <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
                         {Array.isArray(accounts) &&
