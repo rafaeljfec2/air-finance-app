@@ -2,7 +2,6 @@ import { apiClient } from './apiClient';
 import { z } from 'zod';
 import { parseApiError } from '@/utils/apiErrorHandler';
 
-// Validation schemas
 export const AccountSchema = z.object({
   id: z.string(),
   companyId: z.string(),
@@ -16,6 +15,14 @@ export const AccountSchema = z.object({
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida'),
   icon: z.string().min(1, 'Ícone é obrigatório'),
   balance: z.number().default(0),
+  initialBalance: z.number().default(0),
+  initialBalanceDate: z
+    .string()
+    .transform((date) => {
+      if (!date) return null;
+      return new Date(date).toISOString();
+    })
+    .nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -30,7 +37,6 @@ export const CreateAccountSchema = AccountSchema.omit({
 export type Account = z.infer<typeof AccountSchema>;
 export type CreateAccount = z.infer<typeof CreateAccountSchema>;
 
-// Service functions
 export const getAccounts = async (companyId: string): Promise<Account[]> => {
   try {
     const response = await apiClient.get<Account[]>(`/companies/${companyId}/accounts`);

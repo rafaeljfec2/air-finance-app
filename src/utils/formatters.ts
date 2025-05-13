@@ -9,12 +9,26 @@ export function formatCurrency(value: number): string {
 }
 
 export function parseCurrency(value: string): number {
-  return parseFloat(
-    value
-      .replace(/[^\d,.-]/g, '')
-      .replace(',', '.')
-      .replace(/\.(?=.*\.)/g, ''),
-  );
+  if (!value) return 0;
+
+  // Remove todos os caracteres não numéricos exceto vírgula e ponto
+  const cleanValue = value.replace(/[^\d,.-]/g, '');
+
+  // Se não houver números, retorna 0
+  if (!cleanValue.match(/\d/)) return 0;
+
+  // Se houver mais de uma vírgula ou ponto, mantém apenas o último
+  const parts = cleanValue.split(/[.,]/);
+  if (parts.length > 2) {
+    const lastPart = parts.pop();
+    const firstPart = parts.join('');
+    return parseFloat(`${firstPart}.${lastPart}`);
+  }
+
+  // Substitui vírgula por ponto se necessário
+  const normalizedValue = cleanValue.replace(',', '.');
+
+  return parseFloat(normalizedValue);
 }
 
 export function formatCurrencyInput(value: string): string {

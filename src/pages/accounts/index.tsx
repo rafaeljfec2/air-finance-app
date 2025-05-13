@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 import { useAccounts } from '@/hooks/useAccounts';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
-import { formatCurrency } from '@/utils/format';
+import { formatCurrency, parseCurrency, formatCurrencyInput } from '@/utils/formatters';
 import {
   BanknotesIcon,
   BuildingLibraryIcon,
@@ -52,12 +52,15 @@ export function AccountsPage() {
     color: '#8A05BE',
     icon: 'BanknotesIcon',
     companyId: activeCompany?.id || '',
+    initialBalance: 0,
+    initialBalanceDate: new Date().toISOString().split('T')[0],
   });
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [initialBalanceInput, setInitialBalanceInput] = useState('');
 
   useEffect(() => {
     setForm((prev) => ({
@@ -65,6 +68,14 @@ export function AccountsPage() {
       companyId: activeCompany?.id || '',
     }));
   }, [activeCompany]);
+
+  useEffect(() => {
+    setInitialBalanceInput(
+      form.initialBalance
+        ? formatCurrencyInput(form.initialBalance.toFixed(2).replace('.', ''))
+        : '',
+    );
+  }, [form.initialBalance]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -96,11 +107,18 @@ export function AccountsPage() {
     if (Object.keys(errs).length > 0) return;
 
     try {
+      const payload = {
+        ...form,
+        initialBalanceDate: form.initialBalanceDate
+          ? new Date(form.initialBalanceDate).toISOString()
+          : null,
+      };
+
       if (editingId) {
-        updateAccount({ id: editingId, data: form });
+        await updateAccount({ id: editingId, data: payload });
         setEditingId(null);
       } else {
-        createAccount(form);
+        await createAccount(payload);
       }
       setForm({
         name: '',
@@ -111,6 +129,8 @@ export function AccountsPage() {
         color: '#8A05BE',
         icon: 'BanknotesIcon',
         companyId: activeCompany?.id || '',
+        initialBalance: 0,
+        initialBalanceDate: new Date().toISOString().split('T')[0],
       });
       setErrors({});
     } catch (error) {
@@ -130,8 +150,17 @@ export function AccountsPage() {
         color: account.color,
         icon: account.icon,
         companyId: account.companyId,
+        initialBalance: account.initialBalance,
+        initialBalanceDate: account.initialBalanceDate
+          ? account.initialBalanceDate.slice(0, 10)
+          : new Date().toISOString().split('T')[0],
       });
       setEditingId(id);
+      setInitialBalanceInput(
+        account.initialBalance !== undefined && account.initialBalance !== null
+          ? formatCurrencyInput(account.initialBalance.toFixed(2).replace('.', ''))
+          : '',
+      );
     }
   };
 
@@ -160,7 +189,7 @@ export function AccountsPage() {
   if (isLoading) {
     return (
       <ViewDefault>
-        <div className="container mx-auto px-2 sm:px-6 py-10">
+        <div className="container mx-auto">
           <Loading size="large">Carregando contas bancárias, por favor aguarde...</Loading>
         </div>
       </ViewDefault>
@@ -192,7 +221,7 @@ export function AccountsPage() {
     }
     return (
       <ViewDefault>
-        <div className="container mx-auto px-2 sm:px-6 py-10">
+        <div className="container mx-auto">
           <div className="text-red-500">Erro ao carregar contas: {error.message}</div>
         </div>
       </ViewDefault>
@@ -222,7 +251,7 @@ export function AccountsPage() {
 
   return (
     <ViewDefault>
-      <div className="container mx-auto px-2 sm:px-6 py-10">
+      <div className="container mx-auto">
         <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark mb-6 flex items-center gap-2">
           <BanknotesIcon className="h-6 w-6 text-primary-500" /> Contas Bancárias
         </h1>
@@ -289,6 +318,35 @@ export function AccountsPage() {
                   className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
                 />
               </FormField>
+              <FormField label="Saldo inicial" error={errors.initialBalance}>
+                <Input
+                  name="initialBalance"
+                  type="text"
+                  inputMode="decimal"
+                  value={initialBalanceInput}
+                  onChange={(e) => {
+                    const formatted = formatCurrencyInput(e.target.value);
+                    setInitialBalanceInput(formatted);
+                    setForm((prev) => ({
+                      ...prev,
+                      initialBalance: parseCurrency(formatted),
+                    }));
+                  }}
+                  placeholder="R$ 0,00"
+                  required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                />
+              </FormField>
+              <FormField label="Data do saldo inicial" error={errors.initialBalanceDate}>
+                <Input
+                  name="initialBalanceDate"
+                  type="date"
+                  value={form.initialBalanceDate}
+                  onChange={handleChange}
+                  required
+                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                />
+              </FormField>
               <FormField label="Cor">
                 <ColorPicker value={form.color} onChange={handleColorChange} />
               </FormField>
@@ -325,6 +383,8 @@ export function AccountsPage() {
                         color: '#8A05BE',
                         icon: 'BanknotesIcon',
                         companyId: activeCompany?.id || '',
+                        initialBalance: 0,
+                        initialBalanceDate: new Date().toISOString().split('T')[0],
                       });
                       setEditingId(null);
                     }}
@@ -363,6 +423,10 @@ export function AccountsPage() {
                         </div>
                         <div className="text-sm font-semibold text-text dark:text-text-dark">
                           Saldo: {formatCurrency(account.balance)}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          Saldo inicial: {formatCurrency(account.initialBalance)} em{' '}
+                          {new Date(account.initialBalanceDate || '').toLocaleDateString('pt-BR')}
                         </div>
                       </div>
                     </div>
