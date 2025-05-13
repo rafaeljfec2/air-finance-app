@@ -35,7 +35,6 @@ export interface Transaction {
   category: Category;
   account: Account;
   credit?: number;
-
   debit?: number;
   balance?: number;
   createdAt: string;

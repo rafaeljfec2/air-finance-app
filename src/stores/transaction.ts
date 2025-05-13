@@ -24,9 +24,33 @@ const initialCategories: Category[] = [
 ];
 
 const initialAccounts: Account[] = [
-  { id: '1', name: 'Conta Corrente', balance: 0, createdAt: '', updatedAt: '' },
-  { id: '2', name: 'Carteira', balance: 0, createdAt: '', updatedAt: '' },
-  { id: '3', name: 'Investimentos', balance: 0, createdAt: '', updatedAt: '' },
+  {
+    id: '1',
+    name: 'Conta Corrente',
+    balance: 0,
+    createdAt: '',
+    updatedAt: '',
+    initialBalance: 0,
+    initialBalanceDate: null,
+  },
+  {
+    id: '2',
+    name: 'Carteira',
+    balance: 0,
+    createdAt: '',
+    updatedAt: '',
+    initialBalance: 0,
+    initialBalanceDate: null,
+  },
+  {
+    id: '3',
+    name: 'Investimentos',
+    balance: 0,
+    createdAt: '',
+    updatedAt: '',
+    initialBalance: 0,
+    initialBalanceDate: null,
+  },
 ];
 
 export const useTransactionStore = create<TransactionStore>((set, get) => ({
@@ -60,6 +84,8 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
           balance: account.balance,
           createdAt: account.createdAt,
           updatedAt: account.updatedAt,
+          initialBalance: account.initialBalance,
+          initialBalanceDate: account.initialBalanceDate,
         },
         credit: transaction.type === 'INCOME' ? transaction.amount : 0,
         debit: transaction.type === 'EXPENSE' ? transaction.amount : 0,
@@ -110,6 +136,8 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
           balance: account.balance,
           createdAt: account.createdAt,
           updatedAt: account.updatedAt,
+          initialBalance: account.initialBalance,
+          initialBalanceDate: account.initialBalanceDate,
         },
         credit: transaction.type === 'INCOME' ? transaction.amount : existingTransaction.credit,
         debit: transaction.type === 'EXPENSE' ? transaction.amount : existingTransaction.debit,

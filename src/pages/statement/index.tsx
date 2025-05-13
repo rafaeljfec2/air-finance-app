@@ -4,8 +4,8 @@ import { StatementFilters } from '@/components/statement/StatementFilters';
 import { useStatementStore } from '@/stores/statement';
 import { Transaction } from '@/types/transaction';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
-import { 
-  ExclamationTriangleIcon, 
+import {
+  ExclamationTriangleIcon,
   ChevronDownIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
@@ -16,11 +16,11 @@ import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatters';
 import { TransactionGrid } from '@/components/transactions/TransactionGrid';
 
-export function Statement() {  
+export function Statement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showErrorDetails, setShowErrorDetails] = useState(false);
-  
+
   const {
     transactions,
     categories,
@@ -33,7 +33,7 @@ export function Statement() {
     isLoading,
     error,
     errorDetails,
-    loadTransactions,    
+    loadTransactions,
   } = useStatementStore();
 
   // Configurar pull-to-refresh
@@ -42,22 +42,20 @@ export function Statement() {
   });
 
   // Filtrar transações
-  const filteredTransactions = transactions.filter(transaction => {
+  const filteredTransactions = transactions.filter((transaction) => {
     const matchesSearch = searchTerm
       ? transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         transaction.category.name.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
 
-    const matchesCategory = selectedCategory
-      ? transaction.category.id === selectedCategory
-      : true;
+    const matchesCategory = selectedCategory ? transaction.category.id === selectedCategory : true;
 
     return matchesSearch && matchesCategory;
   });
 
   // Calcular saldo acumulado para cada transação
   let accumulatedBalance = 0;
-  const transactionsWithBalance = filteredTransactions.map(transaction => {
+  const transactionsWithBalance = filteredTransactions.map((transaction) => {
     const credit = transaction.type === 'INCOME' ? transaction.amount : 0;
     const debit = transaction.type === 'EXPENSE' ? transaction.amount : 0;
     accumulatedBalance += credit - debit;
@@ -71,13 +69,15 @@ export function Statement() {
         name: 'Main Account',
         balance: 0,
         createdAt: transaction.createdAt,
-        updatedAt: transaction.updatedAt
+        updatedAt: transaction.updatedAt,
+        initialBalance: 0,
+        initialBalanceDate: null,
       },
       note: transaction.note || '',
       category: {
         ...transaction.category,
-        type: transaction.type
-      }
+        type: transaction.type,
+      },
     };
   });
 
@@ -110,19 +110,19 @@ export function Statement() {
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">
               {error}
             </p>
-            
+
             {/* Technical error details */}
             <div className="mb-4 sm:mb-6">
               <button
                 onClick={() => setShowErrorDetails(!showErrorDetails)}
                 className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               >
-                <ChevronDownIcon 
+                <ChevronDownIcon
                   className={`h-4 w-4 sm:h-5 sm:w-5 mr-1 transition-transform ${showErrorDetails ? 'transform rotate-180' : ''}`}
                 />
                 Technical Details
               </button>
-              
+
               {showErrorDetails && (
                 <div className="mt-4 p-3 sm:p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-left">
                   <pre className="text-xs text-gray-800 dark:text-gray-200 overflow-x-auto">
@@ -153,7 +153,9 @@ export function Statement() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <DocumentTextIcon className="h-8 w-8 text-primary-400" />
-                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Financial Statement</h1>
+                <h1 className="text-2xl font-bold text-text dark:text-text-dark">
+                  Financial Statement
+                </h1>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 View your detailed transaction history
@@ -166,7 +168,9 @@ export function Statement() {
             <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
               <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Total Income</h3>
+                  <h3 className="text-sm font-medium text-text dark:text-text-dark">
+                    Total Income
+                  </h3>
                   <ArrowTrendingUpIcon className="h-5 w-5 text-green-400" />
                 </div>
                 <p className="text-xl sm:text-2xl font-semibold text-green-400">
@@ -179,11 +183,13 @@ export function Statement() {
                 )}
               </div>
             </Card>
-            
+
             <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
               <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Total Expenses</h3>
+                  <h3 className="text-sm font-medium text-text dark:text-text-dark">
+                    Total Expenses
+                  </h3>
                   <ArrowTrendingDownIcon className="h-5 w-5 text-red-400" />
                 </div>
                 <p className="text-xl sm:text-2xl font-semibold text-red-400">
@@ -200,18 +206,24 @@ export function Statement() {
             <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
               <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-text dark:text-text-dark">Available Balance</h3>
-                  <div className={cn(
-                    "h-5 w-5",
-                    availableBalance >= 0 ? "text-green-400" : "text-red-400"
-                  )}>
+                  <h3 className="text-sm font-medium text-text dark:text-text-dark">
+                    Available Balance
+                  </h3>
+                  <div
+                    className={cn(
+                      'h-5 w-5',
+                      availableBalance >= 0 ? 'text-green-400' : 'text-red-400',
+                    )}
+                  >
                     {availableBalance >= 0 ? <ArrowTrendingUpIcon /> : <ArrowTrendingDownIcon />}
                   </div>
                 </div>
-                <p className={cn(
-                  "text-xl sm:text-2xl font-semibold",
-                  availableBalance >= 0 ? "text-green-400" : "text-red-400"
-                )}>
+                <p
+                  className={cn(
+                    'text-xl sm:text-2xl font-semibold',
+                    availableBalance >= 0 ? 'text-green-400' : 'text-red-400',
+                  )}
+                >
                   {formatCurrency(availableBalance)}
                 </p>
                 {previousBalance !== 0 && (
@@ -244,4 +256,4 @@ export function Statement() {
       </div>
     </ViewDefault>
   );
-} 
+}
