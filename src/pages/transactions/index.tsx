@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Button } from '@/components/ui/button';
@@ -7,56 +7,53 @@ import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/u
 import { Card } from '@/components/ui/card';
 import { Receipt, Search, Plus, Calendar, Filter, Download } from 'lucide-react';
 import { TransactionGrid } from '@/components/transactions/TransactionGrid';
-import { useTransactionStore } from '@/stores/transaction';
 import { useCompanyStore } from '@/stores/company';
+import { useTransactions } from '@/hooks/useTransactions';
 
 export function Transactions() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPeriod, setSelectedPeriod] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
-  const [isLoading, setIsLoading] = useState(true);
 
   const { activeCompany } = useCompanyStore();
-  const companyId = activeCompany?.id || '';
-  const getTransactionsByCompany = useTransactionStore((s) => s.getTransactionsByCompany);
-  const allTransactions = getTransactionsByCompany(companyId);
+  const companyId = activeCompany?.id ?? '';
+  const { transactions = [], isLoading, deleteTransaction } = useTransactions(companyId);
 
-  // Simular loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const filteredTransactions = allTransactions
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  const filteredTransactions = transactions
+    .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
     .filter((transaction) => {
       const matchesSearch = transaction.description
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
       const matchesType =
         selectedType === 'all' ||
-        (selectedType === 'RECEITA' && transaction.type === 'INCOME') ||
-        (selectedType === 'DESPESA' && transaction.type === 'EXPENSE');
-      return matchesSearch && matchesType;
-    });
+        (selectedType === 'RECEITA' && transaction.launchType === 'revenue') ||
+        (selectedType === 'DESPESA' && transaction.launchType === 'expense');
 
-  // Calcular saldo acumulado para cada transação
-  let saldoAcumulado = 0;
-  const transactionsWithBalance = filteredTransactions.map((transaction) => {
-    const credit = transaction.type === 'INCOME' ? transaction.amount : 0;
-    const debit = transaction.type === 'EXPENSE' ? transaction.amount : 0;
-    saldoAcumulado += credit - debit;
-    return {
-      ...transaction,
-      credit,
-      debit,
-      balance: saldoAcumulado,
-    };
-  });
+      let matchesPeriod = true;
+      if (selectedPeriod !== 'all') {
+        const transactionDate = new Date(transaction.paymentDate);
+        const now = new Date();
+
+        switch (selectedPeriod) {
+          case 'current':
+            matchesPeriod =
+              transactionDate.getMonth() === now.getMonth() &&
+              transactionDate.getFullYear() === now.getFullYear();
+            break;
+          case 'last': {
+            const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
+            matchesPeriod =
+              transactionDate.getMonth() === lastMonth.getMonth() &&
+              transactionDate.getFullYear() === lastMonth.getFullYear();
+            break;
+          }
+        }
+      }
+
+      return matchesSearch && matchesType && matchesPeriod;
+    });
 
   return (
     <ViewDefault>
@@ -129,8 +126,8 @@ export function Transactions() {
                 </div>
                 <Button
                   onClick={() => {
-                    setIsLoading(true);
-                    setTimeout(() => setIsLoading(false), 1000);
+                    // Forçar refresh dos dados
+                    window.location.reload();
                   }}
                   className="bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
                 >
@@ -150,10 +147,11 @@ export function Transactions() {
 
           {/* Transactions Grid */}
           <TransactionGrid
-            transactions={transactionsWithBalance}
+            transactions={filteredTransactions}
             isLoading={isLoading}
             showActions={true}
             onActionClick={(transaction) => navigate(`/transactions/edit/${transaction.id}`)}
+            onDelete={deleteTransaction}
           />
         </div>
       </div>

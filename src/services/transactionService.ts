@@ -17,6 +17,9 @@ export const TransactionSchema = z.object({
   repeatMonthly: z.boolean(),
   observation: z.string().optional(),
   reconciled: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  balance: z.number().optional(),
 });
 
 export type Transaction = z.infer<typeof TransactionSchema>;

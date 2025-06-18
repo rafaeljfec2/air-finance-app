@@ -1,97 +1,133 @@
-import { useNavigate } from 'react-router-dom'
-import { Card } from '@/components/ui/card'
-import { formatCurrency } from '@/utils/formatters'
-import { MoreHorizontal, ChevronRight, Loader2, ChevronLeft, ChevronsLeft, ChevronsRight, ArrowUpDown, Filter } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
-import { useState, useMemo, useEffect, useRef, useCallback, memo } from 'react'
-import { Tooltip } from '@/components/ui/tooltip'
-import { Transaction as TransactionType } from '@/types/transaction'
+import { useNavigate } from 'react-router-dom';
+import { Card } from '@/components/ui/card';
+import { formatCurrency } from '@/utils/formatters';
+import {
+  MoreHorizontal,
+  ChevronRight,
+  Loader2,
+  ChevronLeft,
+  ChevronsLeft,
+  ChevronsRight,
+  ArrowUpDown,
+  Filter,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { useState, useMemo, useEffect, useRef, useCallback, memo } from 'react';
+import { Tooltip } from '@/components/ui/tooltip';
 
-type SortField = 'date' | 'category' | 'description' | 'account' | 'credit' | 'debit' | 'balance'
-type SortDirection = 'asc' | 'desc'
+// Tipo inline baseado no retorno real do backend
+type TransactionType = {
+  id: string;
+  description: string;
+  value: number;
+  launchType: 'revenue' | 'expense';
+  valueType: 'fixed' | 'variable';
+  companyId: string;
+  accountId: string;
+  categoryId: string;
+  paymentDate: string;
+  issueDate: string;
+  quantityInstallments: number;
+  repeatMonthly: boolean;
+  observation?: string;
+  reconciled: boolean;
+  createdAt: string;
+  updatedAt: string;
+  balance: number;
+};
+
+type SortField = 'date' | 'category' | 'description' | 'account' | 'credit' | 'debit' | 'balance';
+type SortDirection = 'asc' | 'desc';
 
 type FilterValue = {
-  field: SortField
-  values: Set<string>
-}
+  field: SortField;
+  values: Set<string>;
+};
 
 interface FilterMenuProps {
-  field: SortField
-  items: string[]
-  selectedValues: Set<string>
-  onFilter: (field: SortField, values: Set<string>) => void
-  onClose: () => void
-  position?: { top: number; left: number }
+  field: SortField;
+  items: string[];
+  selectedValues: Set<string>;
+  onFilter: (field: SortField, values: Set<string>) => void;
+  onClose: () => void;
+  position?: { top: number; left: number };
 }
 
-const FilterMenu = ({ field, items, selectedValues, onFilter, onClose, position }: FilterMenuProps) => {
-  const [selected, setSelected] = useState<Set<string>>(selectedValues)
-  const [searchTerm, setSearchTerm] = useState('')
-  const menuRef = useRef<HTMLDivElement>(null)
+const FilterMenu = ({
+  field,
+  items,
+  selectedValues,
+  onFilter,
+  onClose,
+  position,
+}: FilterMenuProps) => {
+  const [selected, setSelected] = useState<Set<string>>(selectedValues);
+  const [searchTerm, setSearchTerm] = useState('');
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        onClose()
+        onClose();
       }
-    }
+    };
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose()
+        onClose();
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
-    document.addEventListener('keydown', handleEscape)
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('keydown', handleEscape)
-    }
-  }, [onClose])
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [onClose]);
 
   const uniqueValues = useMemo(() => {
-    const values = Array.from(new Set(items)).sort()
+    const values = Array.from(new Set(items)).sort();
     if (searchTerm) {
-      return values.filter(value => 
-        value.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      return values.filter((value) => value.toLowerCase().includes(searchTerm.toLowerCase()));
     }
-    return values
-  }, [items, searchTerm])
+    return values;
+  }, [items, searchTerm]);
 
   const handleSelectAll = () => {
-    const newSelected = new Set(uniqueValues)
-    setSelected(newSelected)
-    onFilter(field, newSelected)
-  }
+    const newSelected = new Set(uniqueValues);
+    setSelected(newSelected);
+    onFilter(field, newSelected);
+  };
 
   const handleClearAll = () => {
-    setSelected(new Set())
-    onFilter(field, new Set())
-  }
+    setSelected(new Set());
+    onFilter(field, new Set());
+  };
 
   const handleCheckboxChange = (value: string) => {
-    const newSelected = new Set(selected)
+    const newSelected = new Set(selected);
     if (newSelected.has(value)) {
-      newSelected.delete(value)
+      newSelected.delete(value);
     } else {
-      newSelected.add(value)
+      newSelected.add(value);
     }
-    setSelected(newSelected)
-    onFilter(field, newSelected)
-  }
+    setSelected(newSelected);
+    onFilter(field, newSelected);
+  };
 
-  const style = position ? {
-    position: 'fixed' as const,
-    top: `${position.top}px`,
-    left: `${position.left}px`,
-  } : {}
+  const style = position
+    ? {
+        position: 'fixed' as const,
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+      }
+    : {};
 
   return (
-    <div 
-      ref={menuRef} 
+    <div
+      ref={menuRef}
       className="z-50 w-56 rounded-md bg-white dark:bg-gray-900 shadow-lg ring-1 ring-black/5 dark:ring-white/10 dark:border dark:border-gray-800"
       style={{ minWidth: '200px', ...style }}
       role="dialog"
@@ -132,8 +168,8 @@ const FilterMenu = ({ field, items, selectedValues, onFilter, onClose, position 
           </p>
         ) : (
           uniqueValues.map((value) => (
-            <label 
-              key={value} 
+            <label
+              key={value}
               className="flex items-center px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-800/80 rounded cursor-pointer"
             >
               <input
@@ -143,213 +179,219 @@ const FilterMenu = ({ field, items, selectedValues, onFilter, onClose, position 
                 onChange={() => handleCheckboxChange(value)}
                 aria-label={`Filtrar por ${value}`}
               />
-              <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">
-                {value}
-              </span>
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">{value}</span>
             </label>
           ))
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-const MemoizedFilterMenu = memo(FilterMenu)
+const MemoizedFilterMenu = memo(FilterMenu);
 
 interface TransactionGridProps {
-  transactions: TransactionType[]
-  isLoading?: boolean
-  showActions?: boolean
-  onActionClick?: (transaction: TransactionType) => void
-  className?: string
+  transactions: TransactionType[];
+  isLoading?: boolean;
+  showActions?: boolean;
+  onActionClick?: (transaction: TransactionType) => void;
+  className?: string;
 }
 
-const TableRow = memo(({ 
-  transaction, 
-  showActions, 
-  onActionClick 
-}: { 
-  transaction: TransactionType
-  showActions: boolean
-  onActionClick: (transaction: TransactionType) => void
-}) => {
-  const formatDate = (dateStr: string) => {
-    try {
-      const date = new Date(dateStr)
-      if (isNaN(date.getTime())) {
-        return '-'
-      }
-      return format(date, 'dd/MM/yyyy HH:mm')
-    } catch (error) {
-      console.error('Error formatting date:', error)
-      return '-'
-    }
-  }
-
-  return (
-    <tr className="hover:bg-background/70 dark:hover:bg-background-dark/70 transition-colors">
-      <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-        {formatDate(transaction.date)}
-      </td>
-      <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
-        <Tooltip content={transaction.category?.name || 'Sem categoria'}>
-          <span className="block overflow-hidden text-ellipsis">
-            {transaction.category?.name || 'Sem categoria'}
-          </span>
-        </Tooltip>
-      </td>
-      <td className="py-2 px-4 text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis">
-        <Tooltip content={transaction.description || 'Sem descrição'}>
-          <span className="block overflow-hidden text-ellipsis">
-            {transaction.description || 'Sem descrição'}
-          </span>
-        </Tooltip>
-      </td>
-      <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
-        <Tooltip content={transaction.account?.name || 'Sem conta'}>
-          <span className="block overflow-hidden text-ellipsis">
-            {transaction.account?.name || 'Sem conta'}
-          </span>
-        </Tooltip>
-      </td>
-      <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-emerald-400 whitespace-nowrap">
-        {transaction.type === 'INCOME' ? formatCurrency(transaction.amount) : '-'}
-      </td>
-      <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-red-400 whitespace-nowrap">
-        {transaction.type === 'EXPENSE' ? formatCurrency(transaction.amount) : '-'}
-      </td>
-      <td className={cn(
-        "py-2 pl-0 pr-8 text-xs font-medium text-right whitespace-nowrap",
-        (transaction.balance ?? 0) >= 0 ? "text-emerald-400" : "text-red-400"
-      )}>
-        {formatCurrency(transaction.balance ?? 0)}
-      </td>
-      {showActions && (
-        <td className="py-2 px-4 w-10">
-          <button
-            onClick={() => onActionClick(transaction)}
-            className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark"
-            aria-label="Mais ações"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </button>
-        </td>
-      )}
-    </tr>
-  )
-})
-
-TableRow.displayName = 'TableRow'
-
-const MobileCard = memo(({ 
-  transaction, 
-  showActions, 
-  onActionClick 
-}: { 
-  transaction: TransactionType
-  showActions: boolean
-  onActionClick: (transaction: TransactionType) => void
-}) => {
-  const formatDate = (dateStr: string) => {
-    try {
-      const date = new Date(dateStr)
-      if (isNaN(date.getTime())) {
-        return '-'
-      }
-      return format(date, 'dd/MM HH:mm')
-    } catch (error) {
-      console.error('Error formatting date:', error)
-      return '-'
-    }
-  }
-
-  return (
-    <div
-      className="bg-card dark:bg-card-dark rounded-lg p-4 hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors"
-      onClick={() => onActionClick(transaction)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          onActionClick(transaction)
+const TableRow = memo(
+  ({
+    transaction,
+    showActions,
+    onActionClick,
+  }: {
+    transaction: TransactionType;
+    showActions: boolean;
+    onActionClick: (transaction: TransactionType) => void;
+  }) => {
+    const formatDate = (dateStr: string) => {
+      try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) {
+          return '-';
         }
-      }}
-    >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-              {formatDate(transaction.date)}
+        return format(date, 'dd/MM/yyyy HH:mm');
+      } catch (error) {
+        console.error('Error formatting date:', error);
+        return '-';
+      }
+    };
+
+    return (
+      <tr className="hover:bg-background/70 dark:hover:bg-background-dark/70 transition-colors">
+        <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+          {formatDate(transaction.createdAt)}
+        </td>
+        <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
+          <Tooltip content={transaction.categoryId || 'Sem categoria'}>
+            <span className="block overflow-hidden text-ellipsis">
+              {transaction.categoryId || 'Sem categoria'}
             </span>
-            <span className="text-gray-400">•</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
-              {transaction.category?.name || 'Sem categoria'}
+          </Tooltip>
+        </td>
+        <td className="py-2 px-4 text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis">
+          <Tooltip content={transaction.description || 'Sem descrição'}>
+            <span className="block overflow-hidden text-ellipsis">
+              {transaction.description || 'Sem descrição'}
+            </span>
+          </Tooltip>
+        </td>
+        <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
+          <Tooltip content={transaction.accountId || 'Sem conta'}>
+            <span className="block overflow-hidden text-ellipsis">
+              {transaction.accountId || 'Sem conta'}
+            </span>
+          </Tooltip>
+        </td>
+        <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-emerald-400 whitespace-nowrap">
+          {transaction.launchType === 'revenue' ? formatCurrency(transaction.value) : '-'}
+        </td>
+        <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-red-400 whitespace-nowrap">
+          {transaction.launchType === 'expense' ? formatCurrency(transaction.value) : '-'}
+        </td>
+        <td
+          className={cn(
+            'py-2 pl-0 pr-8 text-xs font-medium text-right whitespace-nowrap',
+            (transaction.balance ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400',
+          )}
+        >
+          {formatCurrency(transaction.balance ?? 0)}
+        </td>
+        {showActions && (
+          <td className="py-2 px-4 w-10">
+            <button
+              onClick={() => onActionClick(transaction)}
+              className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark"
+              aria-label="Mais ações"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
+          </td>
+        )}
+      </tr>
+    );
+  },
+);
+
+TableRow.displayName = 'TableRow';
+
+const MobileCard = memo(
+  ({
+    transaction,
+    showActions,
+    onActionClick,
+  }: {
+    transaction: TransactionType;
+    showActions: boolean;
+    onActionClick: (transaction: TransactionType) => void;
+  }) => {
+    const formatDate = (dateStr: string) => {
+      try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) {
+          return '-';
+        }
+        return format(date, 'dd/MM HH:mm');
+      } catch (error) {
+        console.error('Error formatting date:', error);
+        return '-';
+      }
+    };
+
+    return (
+      <div
+        className="bg-card dark:bg-card-dark rounded-lg p-4 hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors"
+        onClick={() => onActionClick(transaction)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onActionClick(transaction);
+          }
+        }}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                {formatDate(transaction.createdAt)}
+              </span>
+              <span className="text-gray-400">•</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                {transaction.categoryId || 'Sem categoria'}
+              </span>
+            </div>
+            <h3 className="text-sm font-medium text-text dark:text-text-dark mb-1 truncate">
+              {transaction.description}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+              {transaction.accountId || 'Sem conta'}
+            </p>
+          </div>
+          <div className="text-right flex flex-col items-end justify-between h-full">
+            {transaction.launchType === 'revenue' ? (
+              <span className="text-sm font-medium text-emerald-400">
+                +{formatCurrency(transaction.value)}
+              </span>
+            ) : (
+              <span className="text-sm font-medium text-red-400">
+                -{formatCurrency(transaction.value)}
+              </span>
+            )}
+            <span
+              className={cn(
+                'text-xs mt-1',
+                transaction.balance >= 0 ? 'text-emerald-400' : 'text-red-400',
+              )}
+            >
+              {formatCurrency(transaction.balance ?? 0)}
             </span>
           </div>
-          <h3 className="text-sm font-medium text-text dark:text-text-dark mb-1 truncate">
-            {transaction.description}
-          </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-            {transaction.account?.name || 'Sem conta'}
-          </p>
         </div>
-        <div className="text-right flex flex-col items-end justify-between h-full">
-          {transaction.type === 'INCOME' ? (
-            <span className="text-sm font-medium text-emerald-400">
-              +{formatCurrency(transaction.amount)}
-            </span>
-          ) : (
-            <span className="text-sm font-medium text-red-400">
-              -{formatCurrency(transaction.amount)}
-            </span>
-          )}
-          <span className={cn(
-            "text-xs mt-1",
-            (transaction.balance ?? 0) >= 0 ? "text-emerald-400" : "text-red-400"
-          )}>
-            {formatCurrency(transaction.balance ?? 0)}
-          </span>
-        </div>
+        {showActions && (
+          <div className="mt-3 pt-3 border-t border-border/50 dark:border-border-dark/50 flex items-center justify-end">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onActionClick(transaction);
+              }}
+              className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark p-2 -m-2"
+              aria-label="Mais ações"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
+          </div>
+        )}
       </div>
-      {showActions && (
-        <div className="mt-3 pt-3 border-t border-border/50 dark:border-border-dark/50 flex items-center justify-end">
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onActionClick(transaction)
-            }}
-            className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark p-2 -m-2"
-            aria-label="Mais ações"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </button>
-        </div>
-      )}
-    </div>
-  )
-})
+    );
+  },
+);
 
-MobileCard.displayName = 'MobileCard'
+MobileCard.displayName = 'MobileCard';
 
 interface SortableHeaderProps {
-  field: SortField
-  children: React.ReactNode
-  className?: string
-  sortConfig: { field: SortField; direction: SortDirection }
-  filters: FilterValue[]
-  activeFilter: SortField | null
-  onSort: (field: SortField) => void
-  onFilterClick: (field: SortField) => void
-  onFilter: (field: SortField, values: Set<string>) => void
-  onCloseFilter: () => void
-  getFieldValues: (transactions: TransactionType[], field: SortField) => string[]
-  transactions: TransactionType[]
+  field: SortField;
+  children: React.ReactNode;
+  className?: string;
+  sortConfig: { field: SortField; direction: SortDirection };
+  filters: FilterValue[];
+  activeFilter: SortField | null;
+  onSort: (field: SortField) => void;
+  onFilterClick: (field: SortField) => void;
+  onFilter: (field: SortField, values: Set<string>) => void;
+  onCloseFilter: () => void;
+  getFieldValues: (transactions: TransactionType[], field: SortField) => string[];
+  transactions: TransactionType[];
 }
 
-const SortableHeader: React.FC<SortableHeaderProps> = ({ 
-  field, 
-  children, 
+const SortableHeader: React.FC<SortableHeaderProps> = ({
+  field,
+  children,
   className,
   sortConfig,
   filters,
@@ -359,18 +401,18 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
   onFilter,
   onCloseFilter,
   getFieldValues,
-  transactions
+  transactions,
 }) => {
   const getAriaSort = () => {
-    if (sortConfig.field !== field) return 'none'
-    return sortConfig.direction === 'asc' ? 'ascending' : 'descending'
-  }
+    if (sortConfig.field !== field) return 'none';
+    return sortConfig.direction === 'asc' ? 'ascending' : 'descending';
+  };
 
   return (
-    <th 
+    <th
       className={cn(
-        "text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none relative",
-        className
+        'text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none relative',
+        className,
       )}
       role="columnheader"
       aria-sort={getAriaSort()}
@@ -379,28 +421,34 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
       <div className="flex items-center justify-between">
         <div
           className={cn(
-            "flex items-center gap-1",
-            field === 'credit' || field === 'debit' || field === 'balance' ? "justify-end w-full" : "justify-start"
+            'flex items-center gap-1',
+            field === 'credit' || field === 'debit' || field === 'balance'
+              ? 'justify-end w-full'
+              : 'justify-start',
           )}
         >
           {children}
-          <ArrowUpDown className={cn(
-            "h-3 w-3 transition-all",
-            sortConfig.field === field ? "opacity-100" : "opacity-0 group-hover:opacity-50",
-            sortConfig.field === field && sortConfig.direction === 'asc' && "rotate-180"
-          )} />
+          <ArrowUpDown
+            className={cn(
+              'h-3 w-3 transition-all',
+              sortConfig.field === field ? 'opacity-100' : 'opacity-0 group-hover:opacity-50',
+              sortConfig.field === field && sortConfig.direction === 'asc' && 'rotate-180',
+            )}
+          />
         </div>
         <button
           onClick={(e) => {
-            e.stopPropagation()
-            onFilterClick(field)
+            e.stopPropagation();
+            onFilterClick(field);
           }}
           className="ml-2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
         >
-          <Filter className={cn(
-            "h-3 w-3",
-            filters.some(f => f.field === field) ? "text-primary-500" : "text-gray-400"
-          )} />
+          <Filter
+            className={cn(
+              'h-3 w-3',
+              filters.some((f) => f.field === field) ? 'text-primary-500' : 'text-gray-400',
+            )}
+          />
         </button>
       </div>
       {activeFilter === field && (
@@ -408,91 +456,97 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
           <MemoizedFilterMenu
             field={field}
             items={getFieldValues(transactions, field)}
-            selectedValues={filters.find(f => f.field === field)?.values ?? new Set()}
+            selectedValues={filters.find((f) => f.field === field)?.values ?? new Set()}
             onFilter={onFilter}
             onClose={onCloseFilter}
           />
         </div>
       )}
     </th>
-  )
-}
+  );
+};
 
 export function TransactionGrid({
   transactions,
   isLoading = false,
   showActions = true,
   onActionClick,
-  className
+  className,
 }: Readonly<TransactionGridProps>) {
-  const navigate = useNavigate()
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
-  const [itemsPerPageSelected, setItemsPerPageSelected] = useState(itemsPerPage)
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const [itemsPerPageSelected, setItemsPerPageSelected] = useState(itemsPerPage);
   const [sortConfig, setSortConfig] = useState<{ field: SortField; direction: SortDirection }>({
     field: 'date',
-    direction: 'desc'
-  })
-  const [activeFilter, setActiveFilter] = useState<SortField | null>(null)
-  const [filters, setFilters] = useState<FilterValue[]>([])
+    direction: 'desc',
+  });
+  const [activeFilter, setActiveFilter] = useState<SortField | null>(null);
+  const [filters, setFilters] = useState<FilterValue[]>([]);
 
-  const handleFilterClick = useCallback((field: SortField) => {
-    setActiveFilter(activeFilter === field ? null : field)
-  }, [activeFilter])
+  const handleFilterClick = useCallback(
+    (field: SortField) => {
+      setActiveFilter(activeFilter === field ? null : field);
+    },
+    [activeFilter],
+  );
 
   const handleFilter = useCallback((field: SortField, values: Set<string>) => {
-    setFilters(prev => {
-      const newFilters = prev.filter(f => f.field !== field)
+    setFilters((prev) => {
+      const newFilters = prev.filter((f) => f.field !== field);
       if (values.size > 0) {
-        newFilters.push({ field, values })
+        newFilters.push({ field, values });
       }
-      return newFilters
-    })
-  }, [])
+      return newFilters;
+    });
+  }, []);
 
-  const getFilteredTransactions = useCallback((transactions: TransactionType[]) => {
-    return transactions.filter(transaction => {
-      return filters.every(filter => {
-        const value = getFieldValue(transaction, filter.field)
-        return filter.values.has(value.toString())
-      })
-    })
-  }, [filters])
+  const getFilteredTransactions = useCallback(
+    (transactions: TransactionType[]) => {
+      return transactions.filter((transaction) => {
+        return filters.every((filter) => {
+          const value = getFieldValue(transaction, filter.field);
+          return filter.values.has(value.toString());
+        });
+      });
+    },
+    [filters],
+  );
 
   const getFieldValue = (transaction: TransactionType, field: SortField): string | number => {
     switch (field) {
       case 'date': {
         try {
-          const date = new Date(transaction.date)
+          const date = new Date(transaction.createdAt);
           if (isNaN(date.getTime())) {
-            return '-'
+            return '-';
           }
-          return format(date, 'dd/MM HH:mm')
+          return format(date, 'dd/MM HH:mm');
         } catch (error) {
-          console.error('Error formatting date:', error)
-          return '-'
+          console.error('Error formatting date:', error);
+          return '-';
         }
       }
       case 'category':
-        return transaction.category?.name || 'Sem categoria'
+        return transaction.categoryId || 'Sem categoria';
       case 'description':
-        return transaction.description || 'Sem descrição'
+        return transaction.description || 'Sem descrição';
       case 'account':
-        return transaction.account?.name || 'Sem conta'
+        return transaction.accountId || 'Sem conta';
       case 'credit':
-        return transaction.type === 'INCOME' ? transaction.amount : 0
+        return transaction.launchType === 'revenue' ? transaction.value : 0;
       case 'debit':
-        return transaction.type === 'EXPENSE' ? transaction.amount : 0
+        return transaction.launchType === 'expense' ? transaction.value : 0;
       case 'balance':
-        return transaction.balance ?? 0
+        return transaction.balance ?? 0;
       default:
-        return ''
+        return '';
     }
-  }
+  };
 
   const getFieldValues = (transactions: TransactionType[], field: SortField): string[] => {
-    return transactions.map(t => getFieldValue(t, field).toString())
-  }
+    return transactions.map((t) => getFieldValue(t, field).toString());
+  };
 
   // Função para ordenar transações
   const sortTransactions = (transactions: TransactionType[]) => {
@@ -500,112 +554,112 @@ export function TransactionGrid({
       switch (sortConfig.field) {
         case 'date': {
           try {
-            const dateA = new Date(a.date).getTime()
-            const dateB = new Date(b.date).getTime()
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
             if (isNaN(dateA) || isNaN(dateB)) {
-              return 0
+              return 0;
             }
-            return sortConfig.direction === 'asc'
-              ? dateA - dateB
-              : dateB - dateA
+            return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
           } catch (error) {
-            console.error('Error sorting dates:', error)
-            return 0
+            console.error('Error sorting dates:', error);
+            return 0;
           }
         }
         case 'category':
           return sortConfig.direction === 'asc'
-            ? a.category?.name.localeCompare(b.category?.name)
-            : b.category?.name.localeCompare(a.category?.name)
+            ? a.categoryId.localeCompare(b.categoryId)
+            : b.categoryId.localeCompare(a.categoryId);
         case 'description':
           return sortConfig.direction === 'asc'
             ? a.description.localeCompare(b.description)
-            : b.description.localeCompare(a.description)
+            : b.description.localeCompare(a.description);
         case 'account':
           return sortConfig.direction === 'asc'
-            ? a.account?.name.localeCompare(b.account?.name)
-            : b.account?.name.localeCompare(a.account?.name)
+            ? a.accountId.localeCompare(b.accountId)
+            : b.accountId.localeCompare(a.accountId);
         case 'credit': {
-          const aValue = a.type === 'INCOME' ? a.amount : 0
-          const bValue = b.type === 'INCOME' ? b.amount : 0
-          return sortConfig.direction === 'asc'
-            ? aValue - bValue
-            : bValue - aValue
+          const aValue = a.launchType === 'revenue' ? a.value : 0;
+          const bValue = b.launchType === 'revenue' ? b.value : 0;
+          return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
         }
         case 'debit': {
-          const aValue = a.type === 'EXPENSE' ? a.amount : 0
-          const bValue = b.type === 'EXPENSE' ? b.amount : 0
-          return sortConfig.direction === 'asc'
-            ? aValue - bValue
-            : bValue - aValue
+          const aValue = a.launchType === 'expense' ? a.value : 0;
+          const bValue = b.launchType === 'expense' ? b.value : 0;
+          return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
         }
         case 'balance': {
-          const aValue = a.balance ?? 0
-          const bValue = b.balance ?? 0
-          return sortConfig.direction === 'asc'
-            ? aValue - bValue
-            : bValue - aValue
+          const aValue = a.balance ?? 0;
+          const bValue = b.balance ?? 0;
+          return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
         }
         default:
-          return 0
+          return 0;
       }
-    })
-  }
+    });
+  };
 
   // Função para alternar ordenação
   const toggleSort = (field: SortField) => {
-    setSortConfig(current => ({
+    setSortConfig((current) => ({
       field,
-      direction: current.field === field && current.direction === 'asc' ? 'desc' : 'asc'
-    }))
-  }
+      direction: current.field === field && current.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
 
   // Calcular saldo acumulado para cada transação
-  let accumulatedBalance = 0
-  const transactionsWithBalance = transactions.map(transaction => {
-    const credit = transaction.type === 'INCOME' ? transaction.amount : 0
-    const debit = transaction.type === 'EXPENSE' ? transaction.amount : 0
-    accumulatedBalance += credit - debit
+  let accumulatedBalance = 0;
+  const transactionsWithBalance = transactions.map((transaction) => {
+    const credit = transaction.launchType === 'revenue' ? transaction.value : 0;
+    const debit = transaction.launchType === 'expense' ? transaction.value : 0;
+    accumulatedBalance += credit - debit;
     return {
       ...transaction,
       credit,
       debit,
-      balance: accumulatedBalance
-    }
-  })
+      balance: accumulatedBalance,
+    };
+  });
 
   // Aplicar filtros e ordenação
   const sortedAndFilteredTransactions = useMemo(() => {
-    const filtered = getFilteredTransactions(transactionsWithBalance)
-    return sortTransactions(filtered)
-  }, [transactionsWithBalance, sortConfig, filters])
+    const filtered = getFilteredTransactions(transactionsWithBalance);
+    return sortTransactions(filtered);
+  }, [transactionsWithBalance, sortConfig, filters]);
 
   // Lógica de paginação
-  const totalPages = Math.ceil(sortedAndFilteredTransactions.length / itemsPerPageSelected)
-  const startIndex = (currentPage - 1) * itemsPerPageSelected
-  const endIndex = startIndex + itemsPerPageSelected
-  const paginatedTransactions = sortedAndFilteredTransactions.slice(startIndex, endIndex)
+  const totalPages = Math.ceil(sortedAndFilteredTransactions.length / itemsPerPageSelected);
+  const startIndex = (currentPage - 1) * itemsPerPageSelected;
+  const endIndex = startIndex + itemsPerPageSelected;
+  const paginatedTransactions = sortedAndFilteredTransactions.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleItemsPerPageChange = (value: number) => {
-    setItemsPerPageSelected(value)
-    setCurrentPage(1)
-  }
+    setItemsPerPageSelected(value);
+    setCurrentPage(1);
+  };
 
-  const handleActionClick = useCallback((transaction: TransactionType) => {
-    if (onActionClick) {
-      onActionClick(transaction)
-    } else {
-      navigate(`/transactions/edit/${transaction.id}`)
-    }
-  }, [onActionClick, navigate])
+  const handleActionClick = useCallback(
+    (transaction: TransactionType) => {
+      if (onActionClick) {
+        onActionClick(transaction);
+      } else {
+        navigate(`/transactions/edit/${transaction.id}`);
+      }
+    },
+    [onActionClick, navigate],
+  );
 
   return (
-    <Card className={cn("bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm", className)}>
+    <Card
+      className={cn(
+        'bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm',
+        className,
+      )}
+    >
       <div className="p-3 sm:p-4">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-8">
@@ -629,7 +683,7 @@ export function TransactionGrid({
                   </colgroup>
                   <thead>
                     <tr className="bg-background/30 dark:bg-background-dark/30">
-                      <SortableHeader 
+                      <SortableHeader
                         field="date"
                         sortConfig={sortConfig}
                         filters={filters}
@@ -643,7 +697,7 @@ export function TransactionGrid({
                       >
                         Data/Hora
                       </SortableHeader>
-                      <SortableHeader 
+                      <SortableHeader
                         field="category"
                         sortConfig={sortConfig}
                         filters={filters}
@@ -657,7 +711,7 @@ export function TransactionGrid({
                       >
                         Categoria
                       </SortableHeader>
-                      <SortableHeader 
+                      <SortableHeader
                         field="description"
                         sortConfig={sortConfig}
                         filters={filters}
@@ -671,7 +725,7 @@ export function TransactionGrid({
                       >
                         Descrição
                       </SortableHeader>
-                      <SortableHeader 
+                      <SortableHeader
                         field="account"
                         sortConfig={sortConfig}
                         filters={filters}
@@ -685,7 +739,7 @@ export function TransactionGrid({
                       >
                         Conta
                       </SortableHeader>
-                      <SortableHeader 
+                      <SortableHeader
                         field="credit"
                         className="text-right pl-0 pr-8"
                         sortConfig={sortConfig}
@@ -700,7 +754,7 @@ export function TransactionGrid({
                       >
                         Crédito
                       </SortableHeader>
-                      <SortableHeader 
+                      <SortableHeader
                         field="debit"
                         className="text-right pl-0 pr-8"
                         sortConfig={sortConfig}
@@ -715,7 +769,7 @@ export function TransactionGrid({
                       >
                         Débito
                       </SortableHeader>
-                      <SortableHeader 
+                      <SortableHeader
                         field="balance"
                         className="text-right pl-0 pr-8"
                         sortConfig={sortConfig}
@@ -773,7 +827,9 @@ export function TransactionGrid({
                   <option value={50}>50 por página</option>
                 </select>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Mostrando {startIndex + 1} a {Math.min(endIndex, sortedAndFilteredTransactions.length)} de {sortedAndFilteredTransactions.length}
+                  Mostrando {startIndex + 1} a{' '}
+                  {Math.min(endIndex, sortedAndFilteredTransactions.length)} de{' '}
+                  {sortedAndFilteredTransactions.length}
                 </p>
               </div>
               <div className="flex items-center gap-1">
@@ -781,10 +837,10 @@ export function TransactionGrid({
                   onClick={() => handlePageChange(1)}
                   disabled={currentPage === 1}
                   className={cn(
-                    "p-1 rounded-md",
+                    'p-1 rounded-md',
                     currentPage === 1
-                      ? "text-gray-400 dark:text-gray-600 cursor-not-allowed"
-                      : "text-gray-500 dark:text-gray-400 hover:bg-background/50 dark:hover:bg-background-dark/50"
+                      ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-background/50 dark:hover:bg-background-dark/50',
                   )}
                   aria-label="Primeira página"
                 >
@@ -794,26 +850,29 @@ export function TransactionGrid({
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
                   className={cn(
-                    "p-1 rounded-md",
+                    'p-1 rounded-md',
                     currentPage === 1
-                      ? "text-gray-400 dark:text-gray-600 cursor-not-allowed"
-                      : "text-gray-500 dark:text-gray-400 hover:bg-background/50 dark:hover:bg-background-dark/50"
+                      ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-background/50 dark:hover:bg-background-dark/50',
                   )}
                   aria-label="Página anterior"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <span className="text-xs font-medium text-text dark:text-text-dark px-2" role="status">
+                <span
+                  className="text-xs font-medium text-text dark:text-text-dark px-2"
+                  role="status"
+                >
                   Página {currentPage} de {totalPages}
                 </span>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className={cn(
-                    "p-1 rounded-md",
+                    'p-1 rounded-md',
                     currentPage === totalPages
-                      ? "text-gray-400 dark:text-gray-600 cursor-not-allowed"
-                      : "text-gray-500 dark:text-gray-400 hover:bg-background/50 dark:hover:bg-background-dark/50"
+                      ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-background/50 dark:hover:bg-background-dark/50',
                   )}
                   aria-label="Próxima página"
                 >
@@ -823,10 +882,10 @@ export function TransactionGrid({
                   onClick={() => handlePageChange(totalPages)}
                   disabled={currentPage === totalPages}
                   className={cn(
-                    "p-1 rounded-md",
+                    'p-1 rounded-md',
                     currentPage === totalPages
-                      ? "text-gray-400 dark:text-gray-600 cursor-not-allowed"
-                      : "text-gray-500 dark:text-gray-400 hover:bg-background/50 dark:hover:bg-background-dark/50"
+                      ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-background/50 dark:hover:bg-background-dark/50',
                   )}
                   aria-label="Última página"
                 >
@@ -838,5 +897,5 @@ export function TransactionGrid({
         )}
       </div>
     </Card>
-  )
-} 
+  );
+}

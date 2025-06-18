@@ -45,7 +45,7 @@ package_manager = "yarn"
 linguagem = "Todo código, documentação e comentários devem ser em inglês. Conversas e respostas em português"
 arquitetura = "Aplicar princípios de Clean Architecture"
 boas_praticas = [
-  "Sempre criar codigo e layout de forma profissional, com boas praticas de UX e UI",
+  "Sempre criar código e layout de forma profissional, com boas práticas de UX e UI",
   "Seguir os princípios SOLID",
   "Aplicar práticas de Clean Code",
   "Separar bem camadas: components, views, services, etc",
@@ -68,7 +68,7 @@ boas_praticas = [
   "Toda nova tela deve obrigatoriamente utilizar o componente ViewDefault como base estrutural",
   "Nenhuma alteração deve modificar o comportamento visual, estrutural ou funcional da aplicação sem validação e justificativa clara"
 ]
-style = "Seguir o padrão atual do projeto, respeitando o que já foi feito como: themas, estilos, etc"
+style = "Seguir o padrão atual do projeto, respeitando o que já foi feito como: temas, estilos, etc"
 types = "Usar TypeScript fortemente tipado"
 tratamento_de_erros = "Sempre tratar erros com try/catch e mensagens claras"
 log = "Usar o logger central da aplicação (ex: react-native-logs ou Logger próprio)"
@@ -95,7 +95,27 @@ modo = "Sugira revisão técnica ou refatoração com base no código e contexto
 verificacao_previa = "Antes de sugerir novo código, procure soluções similares já existentes no projeto"
 
 [convencao_arquivos]
+descricao = "Padronização de nomes de arquivos e diretórios conforme o tipo e função no projeto"
 padrao = ["src/features", "src/services", "src/hooks", "src/components", "__tests__"]
+
+[convencao_arquivos.padroes]
+"componentes" = "PascalCase — ex: UserCard.tsx"
+"hooks" = "camelCase começando com 'use' — ex: useAuth.ts"
+"servicos" = "camelCase — ex: userService.ts"
+"paginas" = "PascalCase — ex: Dashboard.tsx"
+"estilos" = "camelCase ou global — ex: userCard.module.css ou global.css"
+"contextos" = "camelCase — ex: authContext.tsx"
+"testes" = "Mesmo nome do alvo + .test — ex: UserCard.test.tsx"
+"tipos_interfaces" = "PascalCase — ex: UserTypes.ts"
+"constantes" = "camelCase — ex: appConstants.ts ou colors.ts"
+
+[convencao_arquivos.regras]
+evitar = [
+  "kebab-case para arquivos React",
+  "Nomes genéricos como index.ts fora de contexto",
+  "Arquivos misturando responsabilidades (ex: lógica e UI no mesmo arquivo)",
+  "Arquivos com nomes ambíguos ou sem clareza de propósito"
+]
 
 [metricas]
 ferramentas = ["SonarQube", "Istanbul", "React Profiler"]
@@ -127,34 +147,101 @@ boas_praticas = [
   "Evitar o uso de bibliotecas sem manutenção ou sem histórico confiável",
   "Implementar autenticação segura (mesmo que mock) e controle de acesso básico",
   "Desabilitar logs sensíveis em produção"
-  "O cadastro de transações já está bem completo e serve de referência para UX e componentes reutilizáveis.",
-  "Os cadastros de contas, categorias e dependentes são essenciais para personalização e controle financeiro.",
-  "Recomendo criar cada cadastro como uma página dedicada em src/pages/{entidade}/new e um CRUD em src/pages/ {entidade}.",
-  "Aproveite componentes de formulário já existentes (Input, Select, Card, etc) para manter padrão visual.",
-  "Considere centralizar ícones e cores para entidades, facilitando a identificação visual no app."
 ]
 
-[convencao_arquivos]
-descricao = "Padronização de nomes de arquivos e diretórios conforme o tipo e função no projeto"
+[testes]
+unitarios = true
+integracao = true
+cenarios = "Cobrir lógica de negócio, fluxos principais e integrações entre módulos"
+cobertura = "Manter cobertura mínima de 80% para código crítico"
+ferramentas = ["Jest", "React Testing Library", "MSW para mocks de API"]
 
-[convencao_arquivos.padroes]
-"componentes" = "PascalCase — ex: UserCard.tsx"
-"hooks" = "camelCase começando com 'use' — ex: useAuth.ts"
-"servicos" = "camelCase — ex: userService.ts"
-"paginas" = "PascalCase — ex: Dashboard.tsx"
-"estilos" = "camelCase ou global — ex: userCard.module.css ou global.css"
-"contextos" = "camelCase — ex: authContext.tsx"
-"testes" = "Mesmo nome do alvo + .test — ex: UserCard.test.tsx"
-"tipos_interfaces" = "PascalCase — ex: UserTypes.ts"
-"constantes" = "camelCase — ex: appConstants.ts ou colors.ts"
-
-[convencao_arquivos.regras]
-evitar = [
-  "kebab-case para arquivos React",
-  "Nomes genéricos como index.ts fora de contexto",
-  "Arquivos misturando responsabilidades (ex: lógica e UI no mesmo arquivo)",
-  "Arquivos com nomes ambíguos ou sem clareza de propósito"
+[performance]
+boas_praticas = [
+  "Evitar re-renders desnecessários",
+  "Implementar virtualização para listas longas",
+  "Otimizar imagens e assets",
+  "Usar lazy loading quando apropriado",
+  "Monitorar e otimizar bundle size",
+  "Implementar cache de dados e queries"
 ]
+
+[acessibilidade]
+boas_praticas = [
+  "Garantir contraste adequado de cores",
+  "Implementar suporte a VoiceOver/TalkBack",
+  "Usar labels semânticos",
+  "Manter tamanho mínimo de toque (44x44)",
+  "Suportar modo escuro",
+  "Testar com leitores de tela"
+]
+
+[padrao_crud]
+descricao = "Padrão de implementação de CRUD usando Company como referência"
+estrutura = [
+  "src/features/{entidade}/components/",
+  "src/features/{entidade}/hooks/",
+  "src/features/{entidade}/services/",
+  "src/features/{entidade}/types/",
+  "src/features/{entidade}/utils/"
+]
+arquivos = [
+  "index.tsx - Lista principal com filtros e ações",
+  "components/Form.tsx - Formulário de criação/edição",
+  "components/List.tsx - Componente de listagem",
+  "components/Filter.tsx - Componente de filtros",
+  "hooks/use{Entidade}.ts - Hook com lógica de negócio",
+  "services/{entidade}Service.ts - Serviço de API",
+  "types/index.ts - Tipos e interfaces"
+]
+padrao_company = [
+  "Usar ViewDefault como base estrutural",
+  "Implementar filtros no topo (status, data, etc)",
+  "Lista com FlatList/SectionList para performance",
+  "Ações principais em FAB ou botão flutuante",
+  "Formulário em modal ou tela dedicada",
+  "Validação com zod/yup",
+  "Feedback visual com Alert/Toast",
+  "Loading states com Skeleton",
+  "Tratamento de erros com try/catch",
+  "Confirmação para ações destrutivas",
+  "Cache e invalidação com React Query",
+  "Tipagem forte com TypeScript"
+]
+componentes = [
+  "Input com validação e máscara",
+  "Select com busca e múltipla seleção",
+  "DatePicker para datas",
+  "Switch para booleanos",
+  "Card para agrupamento visual",
+  "Button com variantes (primary, danger, etc)",
+  "Modal para confirmações",
+  "Toast para feedback",
+  "Skeleton para loading"
+]
+hooks = [
+  "use{Entidade}List - Listagem e filtros",
+  "use{Entidade}Form - Formulário e validação",
+  "use{Entidade}Actions - Ações (create, update, delete)",
+  "use{Entidade}Filters - Lógica de filtros"
+]
+servicos = [
+  "list - Listagem com paginação e filtros",
+  "create - Criação com validação",
+  "update - Atualização com validação",
+  "delete - Remoção com confirmação",
+  "getById - Busca por ID"
+]
+tipos = [
+  "{Entidade} - Interface principal",
+  "Create{Entidade}Payload - Payload de criação",
+  "Update{Entidade}Payload - Payload de atualização",
+  "{Entidade}Filters - Filtros disponíveis",
+  "{Entidade}Status - Status possíveis"
+]
+
 [mensagem_commit]
 padrao = "sugira uma mensagem de commit para o usuário sempre em inglês"
 acoes = ["quando usuário digitar commit, sugerir uma mensagem de commit para o usuário em inglês"]
+formato = "tipo(escopo): descrição curta e clara"
+tipos = ["feat", "fix", "docs", "style", "refactor", "test", "chore", "perf", "ci", "build"]
