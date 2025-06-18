@@ -15,6 +15,7 @@ export const useTransactions = (companyId: string) => {
     data: transactions,
     isLoading,
     error,
+    refetch,
   } = useQuery<Transaction[]>({
     queryKey: ['transactions', companyId],
     queryFn: () => getTransactions(companyId),
@@ -53,5 +54,6 @@ export const useTransactions = (companyId: string) => {
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
+    refetch,
   };
 };

@@ -18,7 +18,7 @@ export function Transactions() {
 
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
-  const { transactions = [], isLoading, deleteTransaction } = useTransactions(companyId);
+  const { transactions = [], isLoading, refetch } = useTransactions(companyId);
 
   const filteredTransactions = transactions
     .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
@@ -126,8 +126,7 @@ export function Transactions() {
                 </div>
                 <Button
                   onClick={() => {
-                    // Forçar refresh dos dados
-                    window.location.reload();
+                    refetch();
                   }}
                   className="bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
                 >
@@ -151,7 +150,6 @@ export function Transactions() {
             isLoading={isLoading}
             showActions={true}
             onActionClick={(transaction) => navigate(`/transactions/edit/${transaction.id}`)}
-            onDelete={deleteTransaction}
           />
         </div>
       </div>
