@@ -34,7 +34,7 @@ type TransactionType = {
   reconciled: boolean;
   createdAt: string;
   updatedAt: string;
-  balance: number;
+  balance?: number;
 };
 
 type SortField = 'date' | 'category' | 'description' | 'account' | 'credit' | 'debit' | 'balance';
@@ -346,7 +346,7 @@ const MobileCard = memo(
             <span
               className={cn(
                 'text-xs mt-1',
-                transaction.balance >= 0 ? 'text-emerald-400' : 'text-red-400',
+                (transaction.balance ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400',
               )}
             >
               {formatCurrency(transaction.balance ?? 0)}
