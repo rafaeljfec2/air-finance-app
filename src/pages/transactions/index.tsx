@@ -18,7 +18,7 @@ export function Transactions() {
 
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
-  const { transactions = [], isLoading, refetch } = useTransactions(companyId);
+  const { transactions = [], isLoading, isFetching, refetch } = useTransactions(companyId);
 
   const filteredTransactions = transactions
     .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
@@ -147,7 +147,7 @@ export function Transactions() {
           {/* Transactions Grid */}
           <TransactionGrid
             transactions={filteredTransactions}
-            isLoading={isLoading}
+            isLoading={isLoading || isFetching}
             showActions={true}
             onActionClick={(transaction) => navigate(`/transactions/edit/${transaction.id}`)}
           />
