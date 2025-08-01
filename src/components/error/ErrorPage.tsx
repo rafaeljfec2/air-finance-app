@@ -61,7 +61,7 @@ export function ErrorPage({ error, code = 404 }: Readonly<ErrorPageProps>) {
           {/* Ações */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/budget')}
               className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900 w-full sm:w-auto"
             >
               <HomeIcon className="h-5 w-5 mr-2" />

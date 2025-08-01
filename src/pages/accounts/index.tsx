@@ -204,7 +204,7 @@ export function AccountsPage() {
         <ViewDefault>
           <div className="container mx-auto px-2 sm:px-6 py-10 flex flex-col items-center justify-center min-h-[40vh]">
             <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded shadow-md max-w-lg w-full text-center">
-              <h2 className="text-lg font-semibold mb-2">Nenhuma empresa encontrada</h2>
+              <h2 className="text-lg font-semibold mb-2">Nenhuma selecionada</h2>
               <p className="mb-4">
                 Para cadastrar contas bancárias, você precisa criar uma empresa primeiro.
               </p>
@@ -233,7 +233,7 @@ export function AccountsPage() {
       <ViewDefault>
         <div className="container mx-auto px-2 sm:px-6 py-10 flex flex-col items-center justify-center min-h-[40vh]">
           <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded shadow-md max-w-lg w-full text-center">
-            <h2 className="text-lg font-semibold mb-2">Nenhuma empresa encontrada</h2>
+            <h2 className="text-lg font-semibold mb-2">Nenhuma empresa selecionada</h2>
             <p className="mb-4">
               Para cadastrar contas bancárias, você precisa criar uma empresa primeiro.
             </p>

@@ -1,15 +1,10 @@
 import { NavigationSection } from '@/types/navigation';
 import {
-  ArrowDownIcon,
   ArrowsRightLeftIcon,
-  ArrowUpIcon,
   BanknotesIcon,
   BuildingOfficeIcon,
-  CalendarIcon,
-  ChartBarIcon,
   Cog6ToothIcon,
   FlagIcon,
-  HomeIcon,
   PlusIcon,
   SparklesIcon,
 } from '@heroicons/react/24/outline';
@@ -28,9 +23,10 @@ export const navigation: NavigationSection[] = [
   {
     section: '📊 Análise e Planejamento',
     items: [
-      { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-      { name: 'Meu Planner', href: '/planner', icon: CalendarIcon },
-      { name: 'Relatórios', href: '/reports', icon: ChartBarIcon },
+      { name: 'Budget', href: '/budget', icon: WalletIcon },
+      /*{ name: 'Dashboard', href: '/dashboard', icon: HomeIcon },  
+       { name: 'Meu Planner', href: '/planner', icon: CalendarIcon }, 
+       { name: 'Relatórios', href: '/reports', icon: ChartBarIcon }, */
     ],
   },
   {
@@ -43,19 +39,18 @@ export const navigation: NavigationSection[] = [
           { name: 'Novo lançamento', href: '/transactions/new', icon: PlusIcon },
           { name: 'Fluxo de Caixa', href: '/transactions', icon: ArrowsRightLeftIcon },
           { name: 'Importar Ofx', href: '/import-ofx', icon: ImportIcon },
-          { name: 'Contas a Pagar', href: '/payables', icon: ArrowDownIcon },
-          { name: 'Contas a Receber', href: '/receivables', icon: ArrowUpIcon },
+          /* { name: 'Contas a Pagar', href: '/payables', icon: ArrowDownIcon },
+          { name: 'Contas a Receber', href: '/receivables', icon: ArrowUpIcon }, 
           { name: 'Fechamento Mensal', href: '/monthly-closing', icon: CalendarIcon },
-          { name: 'Resultado Anual', href: '/annual-result', icon: ChartBarIcon },
+          { name: 'Resultado Anual', href: '/annual-result', icon: ChartBarIcon }, */
         ],
       },
-      { name: 'Budget', href: '/budget', icon: WalletIcon },
     ],
   },
-  {
+  /*{
     section: '🧠 Automação e Inteligência',
     items: [{ name: 'Classificação IA', href: '/ai/classification', icon: SparklesIcon }],
-  },
+  },*/
   {
     section: '🧾 Administração',
     items: [

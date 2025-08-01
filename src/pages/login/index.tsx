@@ -49,7 +49,7 @@ export function Login() {
 
   // Redireciona se já estiver autenticado
   if (isAuthenticated) {
-    const from = location.state?.from?.pathname || '/dashboard';
+    const from = location.state?.from?.pathname || '/budget';
     navigate(from);
     return null;
   }
