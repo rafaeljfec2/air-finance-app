@@ -1,8 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { StatementFilters } from '@/components/statement/StatementFilters';
 import { useStatementStore } from '@/stores/statement';
-import { Transaction } from '@/types/transaction';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import {
   ExclamationTriangleIcon,
@@ -14,7 +13,10 @@ import {
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatters';
-import { TransactionGrid } from '@/components/transactions/TransactionGrid';
+import {
+  TransactionGrid,
+  type TransactionGridTransaction,
+} from '@/components/transactions/TransactionGrid';
 
 export function Statement() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -53,35 +55,41 @@ export function Statement() {
     return matchesSearch && matchesCategory;
   });
 
-  // Calcular saldo acumulado para cada transação
-  let accumulatedBalance = 0;
-  const transactionsWithBalance = filteredTransactions.map((transaction) => {
-    const credit = transaction.type === 'INCOME' ? transaction.amount : 0;
-    const debit = transaction.type === 'EXPENSE' ? transaction.amount : 0;
-    accumulatedBalance += credit - debit;
-    return {
-      ...transaction,
-      credit,
-      debit,
-      balance: accumulatedBalance,
-      account: {
-        id: transaction.accountId,
-        name: 'Main Account',
-        balance: 0,
+  const transactionsForGrid = useMemo<TransactionGridTransaction[]>(() => {
+    let accumulatedBalance = 0;
+
+    return filteredTransactions.map((transaction) => {
+      const launchType: TransactionGridTransaction['launchType'] =
+        transaction.type === 'INCOME' ? 'revenue' : 'expense';
+      const value = transaction.amount;
+      const credit = launchType === 'revenue' ? value : 0;
+      const debit = launchType === 'expense' ? value : 0;
+      accumulatedBalance += credit - debit;
+
+      return {
+        id: transaction.id,
+        description: transaction.description,
+        value,
+        launchType,
+        valueType: 'fixed',
+        companyId: transaction.companyId,
+        accountId: transaction.accountId,
+        categoryId: transaction.categoryId,
+        paymentDate: transaction.date,
+        issueDate: transaction.date,
+        quantityInstallments: transaction.installmentCount ?? 1,
+        repeatMonthly:
+          transaction.installmentCount !== undefined && transaction.installmentCount > 1,
+        observation: transaction.note ?? undefined,
+        reconciled: false,
         createdAt: transaction.createdAt,
         updatedAt: transaction.updatedAt,
-        initialBalance: 0,
-        initialBalanceDate: null,
-      },
-      note: transaction.note || '',
-      category: {
-        ...transaction.category,
-        type: transaction.type,
-      },
-    };
-  });
+        balance: accumulatedBalance,
+      };
+    });
+  }, [filteredTransactions]);
 
-  const handleEdit = async (transaction: Transaction) => {
+  const handleEdit = (transaction: TransactionGridTransaction) => {
     // TODO: Implement edit modal
     console.log('Edit transaction:', transaction);
   };
@@ -246,7 +254,7 @@ export function Statement() {
           {/* Transactions List */}
           <div {...containerProps}>
             <TransactionGrid
-              transactions={transactionsWithBalance}
+              transactions={transactionsForGrid}
               isLoading={isLoading}
               showActions={true}
               onActionClick={handleEdit}

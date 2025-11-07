@@ -17,7 +17,7 @@ import { useState, useMemo, useEffect, useRef, useCallback, memo } from 'react';
 import { Tooltip } from '@/components/ui/tooltip';
 
 // Tipo inline baseado no retorno real do backend
-type TransactionType = {
+export type TransactionGridTransaction = {
   id: string;
   description: string;
   value: number;
@@ -191,10 +191,10 @@ const FilterMenu = ({
 const MemoizedFilterMenu = memo(FilterMenu);
 
 interface TransactionGridProps {
-  transactions: TransactionType[];
+  transactions: TransactionGridTransaction[];
   isLoading?: boolean;
   showActions?: boolean;
-  onActionClick?: (transaction: TransactionType) => void;
+  onActionClick?: (transaction: TransactionGridTransaction) => void;
   className?: string;
 }
 
@@ -204,9 +204,9 @@ const TableRow = memo(
     showActions,
     onActionClick,
   }: {
-    transaction: TransactionType;
+    transaction: TransactionGridTransaction;
     showActions: boolean;
-    onActionClick: (transaction: TransactionType) => void;
+    onActionClick: (transaction: TransactionGridTransaction) => void;
   }) => {
     const formatDate = (dateStr: string) => {
       try {
@@ -285,9 +285,9 @@ const MobileCard = memo(
     showActions,
     onActionClick,
   }: {
-    transaction: TransactionType;
+    transaction: TransactionGridTransaction;
     showActions: boolean;
-    onActionClick: (transaction: TransactionType) => void;
+    onActionClick: (transaction: TransactionGridTransaction) => void;
   }) => {
     const formatDate = (dateStr: string) => {
       try {
@@ -385,8 +385,8 @@ interface SortableHeaderProps {
   onFilterClick: (field: SortField) => void;
   onFilter: (field: SortField, values: Set<string>) => void;
   onCloseFilter: () => void;
-  getFieldValues: (transactions: TransactionType[], field: SortField) => string[];
-  transactions: TransactionType[];
+  getFieldValues: (transactions: TransactionGridTransaction[], field: SortField) => string[];
+  transactions: TransactionGridTransaction[];
 }
 
 const SortableHeader: React.FC<SortableHeaderProps> = ({
@@ -502,7 +502,7 @@ export function TransactionGrid({
   }, []);
 
   const getFilteredTransactions = useCallback(
-    (transactions: TransactionType[]) => {
+    (transactions: TransactionGridTransaction[]) => {
       return transactions.filter((transaction) => {
         return filters.every((filter) => {
           const value = getFieldValue(transaction, filter.field);
@@ -513,7 +513,10 @@ export function TransactionGrid({
     [filters],
   );
 
-  const getFieldValue = (transaction: TransactionType, field: SortField): string | number => {
+  const getFieldValue = (
+    transaction: TransactionGridTransaction,
+    field: SortField,
+  ): string | number => {
     switch (field) {
       case 'date': {
         try {
@@ -544,12 +547,12 @@ export function TransactionGrid({
     }
   };
 
-  const getFieldValues = (transactions: TransactionType[], field: SortField): string[] => {
+  const getFieldValues = (transactions: TransactionGridTransaction[], field: SortField): string[] => {
     return transactions.map((t) => getFieldValue(t, field).toString());
   };
 
   // Função para ordenar transações
-  const sortTransactions = (transactions: TransactionType[]) => {
+  const sortTransactions = (transactions: TransactionGridTransaction[]) => {
     return [...transactions].sort((a, b) => {
       switch (sortConfig.field) {
         case 'date': {
@@ -643,7 +646,7 @@ export function TransactionGrid({
   };
 
   const handleActionClick = useCallback(
-    (transaction: TransactionType) => {
+    (transaction: TransactionGridTransaction) => {
       if (onActionClick) {
         onActionClick(transaction);
       } else {
