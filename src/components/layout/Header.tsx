@@ -32,10 +32,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
         {/* Botão hambúrguer mobile */}
         <button
           className="lg:hidden mr-2 p-2 rounded-md text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary-500"
-          onClick={() => {
-            console.log('Abrir sidebar');
-            onOpenSidebar?.();
-          }}
+          onClick={onOpenSidebar}
           aria-label="Abrir menu"
         >
           <Bars3Icon className="h-6 w-6" />
