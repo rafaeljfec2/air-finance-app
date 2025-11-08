@@ -7,20 +7,28 @@ interface ModalProps {
   title?: string;
   children: ReactNode;
   className?: string;
+  dismissible?: boolean;
 }
 
-export function Modal({ open, onClose, title, children, className }: Readonly<ModalProps>) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  className,
+  dismissible = true,
+}: Readonly<ModalProps>) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Fechar ao pressionar ESC
   useEffect(() => {
-    if (!open) return;
+    if (!open || !dismissible) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, onClose]);
+  }, [open, onClose, dismissible]);
 
   // Foco automático
   useEffect(() => {
@@ -37,7 +45,7 @@ export function Modal({ open, onClose, title, children, className }: Readonly<Mo
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
         aria-hidden="true"
-        onClick={onClose}
+        onClick={dismissible ? onClose : undefined}
       />
       {/* Modal content */}
       <div
@@ -52,21 +60,23 @@ export function Modal({ open, onClose, title, children, className }: Readonly<Mo
         aria-label={title}
       >
         {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none"
-          aria-label="Fechar"
-        >
-          <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
+        {dismissible && (
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none"
+            aria-label="Fechar"
+          >
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+              <path
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        )}
         {title && (
           <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{title}</h2>
         )}

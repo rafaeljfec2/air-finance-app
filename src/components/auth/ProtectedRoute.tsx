@@ -20,7 +20,7 @@ export function ProtectedRoute({ children, requireAuth = true }: ProtectedRouteP
   }
 
   if (!requireAuth && user) {
-    return <Navigate to="/budget" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;

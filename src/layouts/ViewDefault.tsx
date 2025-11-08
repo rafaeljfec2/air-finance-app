@@ -4,6 +4,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { useSidebarStore } from '@/stores/sidebar';
 import { cn } from '@/lib/utils';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { CompanySelectionModal } from '@/features/company/components/CompanySelectionModal';
 
 interface ViewDefaultProps {
   children: ReactNode;
@@ -28,6 +29,7 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
   return (
     <div className="min-h-screen bg-background dark:bg-background-dark">
       <Header onOpenSidebar={handleOpenSidebar} />
+      <CompanySelectionModal />
 
       {/* Mobile menu button */}
       <div className="lg:hidden fixed bottom-4 right-4 z-50">
