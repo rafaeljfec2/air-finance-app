@@ -556,54 +556,57 @@ export function TransactionGrid({
   };
 
   // Função para ordenar transações
-  const sortTransactions = (transactions: TransactionGridTransaction[]) => {
-    return [...transactions].sort((a, b) => {
-      switch (sortConfig.field) {
-        case 'date': {
-          try {
-            const dateA = new Date(a.createdAt).getTime();
-            const dateB = new Date(b.createdAt).getTime();
-            if (isNaN(dateA) || isNaN(dateB)) {
+  const sortTransactions = useCallback(
+    (transactions: TransactionGridTransaction[]) => {
+      return [...transactions].sort((a, b) => {
+        switch (sortConfig.field) {
+          case 'date': {
+            try {
+              const dateA = new Date(a.createdAt).getTime();
+              const dateB = new Date(b.createdAt).getTime();
+              if (isNaN(dateA) || isNaN(dateB)) {
+                return 0;
+              }
+              return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
+            } catch (error) {
+              console.error('Error sorting dates:', error);
               return 0;
             }
-            return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
-          } catch (error) {
-            console.error('Error sorting dates:', error);
-            return 0;
           }
+          case 'category':
+            return sortConfig.direction === 'asc'
+              ? a.categoryId.localeCompare(b.categoryId)
+              : b.categoryId.localeCompare(a.categoryId);
+          case 'description':
+            return sortConfig.direction === 'asc'
+              ? a.description.localeCompare(b.description)
+              : b.description.localeCompare(a.description);
+          case 'account':
+            return sortConfig.direction === 'asc'
+              ? a.accountId.localeCompare(b.accountId)
+              : b.accountId.localeCompare(a.accountId);
+          case 'credit': {
+            const aValue = a.launchType === 'revenue' ? a.value : 0;
+            const bValue = b.launchType === 'revenue' ? b.value : 0;
+            return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+          }
+          case 'debit': {
+            const aValue = a.launchType === 'expense' ? a.value : 0;
+            const bValue = b.launchType === 'expense' ? b.value : 0;
+            return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+          }
+          case 'balance': {
+            const aValue = a.balance ?? 0;
+            const bValue = b.balance ?? 0;
+            return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+          }
+          default:
+            return 0;
         }
-        case 'category':
-          return sortConfig.direction === 'asc'
-            ? a.categoryId.localeCompare(b.categoryId)
-            : b.categoryId.localeCompare(a.categoryId);
-        case 'description':
-          return sortConfig.direction === 'asc'
-            ? a.description.localeCompare(b.description)
-            : b.description.localeCompare(a.description);
-        case 'account':
-          return sortConfig.direction === 'asc'
-            ? a.accountId.localeCompare(b.accountId)
-            : b.accountId.localeCompare(a.accountId);
-        case 'credit': {
-          const aValue = a.launchType === 'revenue' ? a.value : 0;
-          const bValue = b.launchType === 'revenue' ? b.value : 0;
-          return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
-        }
-        case 'debit': {
-          const aValue = a.launchType === 'expense' ? a.value : 0;
-          const bValue = b.launchType === 'expense' ? b.value : 0;
-          return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
-        }
-        case 'balance': {
-          const aValue = a.balance ?? 0;
-          const bValue = b.balance ?? 0;
-          return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
-        }
-        default:
-          return 0;
-      }
-    });
-  };
+      });
+    },
+    [sortConfig],
+  );
 
   // Função para alternar ordenação
   const toggleSort = (field: SortField) => {
