@@ -7,10 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Search, Download, Receipt } from 'lucide-react';
 import { useActiveCompany } from '@/hooks/useActiveCompany';
 import { useExtracts } from '@/hooks/useExtracts';
-import {
-  TransactionGrid,
-  TransactionGridTransaction,
-} from '@/components/transactions/TransactionGrid';
+import { TransactionGrid, TransactionGridTransaction } from '@/components/transactions/TransactionGrid';
+import type { ExtractTransaction } from '@/services/transactionService';
 
 export function ImportOfxPage() {
   const { activeCompany } = useActiveCompany();
@@ -27,17 +25,22 @@ export function ImportOfxPage() {
   } = useExtracts(companyId, startDate, endDate);
 
   const transactions: TransactionGridTransaction[] = useMemo(() => {
-    const flattened = extracts.flatMap((extract) => {
-      return extract.transactions.map((tx, index: number) => {
-        const isoDate = tx.date?.includes('-') ? tx.date : `${tx.date}T00:00:00Z`;
+    const flattened = extracts.flatMap((extract, extractIndex) => {
+      return extract.transactions.map((tx: ExtractTransaction, index: number) => {
+        const isoDate = tx.date ? `${tx.date}T00:00:00Z` : new Date().toISOString();
+        const amountNum = typeof tx.amount === 'number' ? tx.amount : Number(tx.amount) || 0;
+        const isRevenue = amountNum >= 0;
+        const valueAbs = Math.abs(amountNum);
+        const accountLabel = extract.header.account || extract.header.bank || 'Conta não informada';
+
         return {
-          id: tx.fitId || `${extract.id}-${index}`,
+          id: tx.fitId || `${extract.id ?? 'extract'}-${extractIndex}-${index}`,
           description: tx.description || 'Sem descrição',
-          value: tx.amount,
-          launchType: tx.amount >= 0 ? 'revenue' : 'expense',
+          value: valueAbs,
+          launchType: isRevenue ? 'revenue' : 'expense',
           valueType: 'fixed',
-          companyId: extract.companyId,
-          accountId: extract.header.account || 'Conta não informada',
+          companyId: extract.companyId || companyId || 'sem-company',
+          accountId: accountLabel,
           categoryId: 'Extrato bancário',
           paymentDate: isoDate,
           issueDate: isoDate,
@@ -51,21 +54,20 @@ export function ImportOfxPage() {
       });
     });
 
-    // calcula saldo acumulado (asc) e reordena (desc) para exibir
     const withBalanceAsc = [...flattened].sort(
       (a, b) => new Date(a.paymentDate).getTime() - new Date(b.paymentDate).getTime(),
     );
 
     let running = 0;
     const withBalance = withBalanceAsc.map((tx) => {
-      running += tx.value;
+      running += tx.value * (tx.launchType === 'expense' ? -1 : 1);
       return { ...tx, balance: running } as TransactionGridTransaction;
     });
 
     return withBalance.sort(
       (a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime(),
     );
-  }, [extracts]);
+  }, [companyId, extracts]);
 
   return (
     <ViewDefault>
@@ -76,9 +78,7 @@ export function ImportOfxPage() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <Receipt className="h-8 w-8 text-primary-400" />
-                <h1 className="text-2xl font-bold text-text dark:text-text-dark">
-                  Extrato Bancário
-                </h1>
+                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Extrato Bancário</h1>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Visualize os extratos importados por período.

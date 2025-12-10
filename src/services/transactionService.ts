@@ -72,13 +72,13 @@ export type ExtractHeader = z.infer<typeof ExtractHeaderSchema>;
 export type ExtractTransaction = z.infer<typeof ExtractTransactionSchema>;
 
 const ExtractSchema = z.object({
-  id: z.string(),
-  companyId: z.string(),
-  userId: z.string(),
+  id: z.string().optional(),
+  companyId: z.string().optional(),
+  userId: z.string().optional(),
   header: ExtractHeaderSchema,
   transactions: ExtractTransactionSchema.array(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
 });
 
 export type ExtractResponse = z.infer<typeof ExtractSchema>;
@@ -126,10 +126,7 @@ export const deleteTransaction = async (companyId: string, id: string): Promise<
   }
 };
 
-export const importOfx = async (
-  companyId: string,
-  file: File,
-): Promise<ImportOfxResponse> => {
+export const importOfx = async (companyId: string, file: File): Promise<ImportOfxResponse> => {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -144,6 +141,53 @@ export const importOfx = async (
   return ImportOfxResponseSchema.parse(response.data);
 };
 
+const normalizeExtract = (payload: unknown): ExtractResponse => {
+  // Se já vier no formato completo, valida e retorna
+  const parsed = ExtractSchema.safeParse(payload);
+  if (parsed.success) return parsed.data;
+
+  // Se vier apenas transactions em array (sem header)
+  if (Array.isArray(payload)) {
+    return {
+      id: undefined,
+      companyId: undefined,
+      userId: undefined,
+      header: {},
+      transactions: payload.map((tx) => ExtractTransactionSchema.parse(tx)),
+      createdAt: undefined,
+      updatedAt: undefined,
+    };
+  }
+
+  // Se vier objeto sem id mas com transactions
+  if (
+    typeof payload === 'object' &&
+    payload &&
+    'transactions' in (payload as Record<string, unknown>)
+  ) {
+    return ExtractSchema.parse({
+      id: (payload as Record<string, unknown>).id,
+      companyId: (payload as Record<string, unknown>).companyId,
+      userId: (payload as Record<string, unknown>).userId,
+      header: (payload as Record<string, unknown>).header ?? {},
+      transactions: (payload as Record<string, unknown>).transactions ?? [],
+      createdAt: (payload as Record<string, unknown>).createdAt,
+      updatedAt: (payload as Record<string, unknown>).updatedAt,
+    });
+  }
+
+  // Último recurso: retorna extrato vazio
+  return {
+    id: undefined,
+    companyId: undefined,
+    userId: undefined,
+    header: {},
+    transactions: [],
+    createdAt: undefined,
+    updatedAt: undefined,
+  };
+};
+
 export const getExtracts = async (
   companyId: string,
   startDate: string,
@@ -152,5 +196,17 @@ export const getExtracts = async (
   const response = await apiClient.get(`/companies/${companyId}/transactions/extracts`, {
     params: { startDate, endDate },
   });
-  return ExtractSchema.array().parse(response.data);
+
+  const data = response.data;
+  if (Array.isArray(data)) {
+    // Pode ser lista de extratos ou lista direta de transações
+    const looksLikeTransactionsOnly =
+      data.length > 0 && !('header' in data[0]) && 'date' in data[0] && 'amount' in data[0];
+    if (looksLikeTransactionsOnly) {
+      return [normalizeExtract(data)];
+    }
+    return data.map((item) => normalizeExtract(item));
+  }
+
+  return [normalizeExtract(data)];
 };
