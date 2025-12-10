@@ -78,7 +78,7 @@ export function ImportOfxPage() {
   const transactions: TransactionGridTransaction[] = useMemo(() => {
     const flattened = extracts.flatMap((extract, extractIndex) => {
       return extract.transactions.map((tx: ExtractTransaction, index: number) => {
-        const isoDate = tx.date ? `${tx.date}T00:00:00Z` : new Date().toISOString();
+        const isoDate = tx.date ? `${tx.date}T00:00:00` : new Date().toISOString();
         const amountNum = typeof tx.amount === 'number' ? tx.amount : Number(tx.amount) || 0;
         const isRevenue = amountNum >= 0;
         const valueAbs = Math.abs(amountNum);
