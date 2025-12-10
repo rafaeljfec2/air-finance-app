@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import type React from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { ViewDefault } from '@/layouts/ViewDefault';
@@ -123,10 +124,17 @@ export function ImportOfxPage() {
     if (!searchTerm.trim()) return transactions;
     const term = searchTerm.toLowerCase();
     return transactions.filter((tx) => {
+      const desc = (tx.description ?? '').toLowerCase();
+      const account = (tx.accountId ?? '').toLowerCase();
+      const obs = (tx.observation ?? '').toLowerCase();
+      const date = (tx.paymentDate ?? '').toLowerCase();
+      const amount = tx.value.toString().toLowerCase();
       return (
-        tx.description.toLowerCase().includes(term) ||
-        tx.accountId.toLowerCase().includes(term) ||
-        (tx.observation || '').toLowerCase().includes(term)
+        desc.includes(term) ||
+        account.includes(term) ||
+        obs.includes(term) ||
+        date.includes(term) ||
+        amount.includes(term)
       );
     });
   }, [transactions, searchTerm]);
