@@ -30,7 +30,7 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
     <div className="min-h-screen bg-background dark:bg-background-dark">
       <Header onOpenSidebar={handleOpenSidebar} />
       <CompanySelectionModal />
-
+      
       {/* Mobile menu button */}
       <div className="lg:hidden fixed bottom-4 right-4 z-50">
         <button

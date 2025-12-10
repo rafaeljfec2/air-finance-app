@@ -44,6 +44,33 @@ export interface CreateTransactionPayload {
   reconciled: boolean;
 }
 
+const ExtractHeaderSchema = z.object({
+  bank: z.string().optional().nullable(),
+  agency: z.string().optional().nullable(),
+  account: z.string().optional().nullable(),
+  accountType: z.string().optional().nullable(),
+  periodStart: z.string().optional().nullable(),
+  periodEnd: z.string().optional().nullable(),
+  generatedAt: z.string().optional().nullable(),
+});
+
+const ExtractTransactionSchema = z.object({
+  date: z.string(),
+  description: z.string(),
+  amount: z.number(),
+  fitId: z.string().optional().nullable(),
+});
+
+const ImportOfxResponseSchema = z.object({
+  extractId: z.string(),
+  header: ExtractHeaderSchema,
+  transactions: ExtractTransactionSchema.array(),
+});
+
+export type ImportOfxResponse = z.infer<typeof ImportOfxResponseSchema>;
+export type ExtractHeader = z.infer<typeof ExtractHeaderSchema>;
+export type ExtractTransaction = z.infer<typeof ExtractTransactionSchema>;
+
 // Service functions
 export const getTransactions = async (companyId: string): Promise<Transaction[]> => {
   try {
@@ -85,4 +112,22 @@ export const deleteTransaction = async (companyId: string, id: string): Promise<
     console.error('Error deleting transaction:', error);
     throw new Error('Failed to delete transaction');
   }
+};
+
+export const importOfx = async (
+  companyId: string,
+  file: File,
+): Promise<ImportOfxResponse> => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await apiClient.post(
+    `/companies/${companyId}/transactions/import-ofx`,
+    formData,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    },
+  );
+
+  return ImportOfxResponseSchema.parse(response.data);
 };
