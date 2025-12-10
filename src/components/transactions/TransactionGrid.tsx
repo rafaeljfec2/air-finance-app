@@ -14,6 +14,7 @@ import {
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useState, useMemo, useEffect, useRef, useCallback, memo } from 'react';
+import type React from 'react';
 import { Tooltip } from '@/components/ui/tooltip';
 
 // Tipo inline baseado no retorno real do backend
@@ -547,7 +548,10 @@ export function TransactionGrid({
     }
   };
 
-  const getFieldValues = (transactions: TransactionGridTransaction[], field: SortField): string[] => {
+  const getFieldValues = (
+    transactions: TransactionGridTransaction[],
+    field: SortField,
+  ): string[] => {
     return transactions.map((t) => getFieldValue(t, field).toString());
   };
 
@@ -627,7 +631,7 @@ export function TransactionGrid({
   const sortedAndFilteredTransactions = useMemo(() => {
     const filtered = getFilteredTransactions(transactionsWithBalance);
     return sortTransactions(filtered);
-  }, [transactionsWithBalance, sortConfig, filters]);
+  }, [getFilteredTransactions, sortTransactions, transactionsWithBalance]);
 
   // Lógica de paginação
   const totalPages = Math.ceil(sortedAndFilteredTransactions.length / itemsPerPageSelected);

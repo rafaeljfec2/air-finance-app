@@ -57,7 +57,7 @@ const ExtractHeaderSchema = z.object({
 const ExtractTransactionSchema = z.object({
   date: z.string(),
   description: z.string(),
-  amount: z.number(),
+  amount: z.union([z.number(), z.string().transform((v) => parseFloat(v))]),
   fitId: z.string().optional().nullable(),
 });
 
@@ -70,6 +70,18 @@ const ImportOfxResponseSchema = z.object({
 export type ImportOfxResponse = z.infer<typeof ImportOfxResponseSchema>;
 export type ExtractHeader = z.infer<typeof ExtractHeaderSchema>;
 export type ExtractTransaction = z.infer<typeof ExtractTransactionSchema>;
+
+const ExtractSchema = z.object({
+  id: z.string(),
+  companyId: z.string(),
+  userId: z.string(),
+  header: ExtractHeaderSchema,
+  transactions: ExtractTransactionSchema.array(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export type ExtractResponse = z.infer<typeof ExtractSchema>;
 
 // Service functions
 export const getTransactions = async (companyId: string): Promise<Transaction[]> => {
@@ -130,4 +142,15 @@ export const importOfx = async (
   );
 
   return ImportOfxResponseSchema.parse(response.data);
+};
+
+export const getExtracts = async (
+  companyId: string,
+  startDate: string,
+  endDate: string,
+): Promise<ExtractResponse[]> => {
+  const response = await apiClient.get(`/companies/${companyId}/transactions/extracts`, {
+    params: { startDate, endDate },
+  });
+  return ExtractSchema.array().parse(response.data);
 };
