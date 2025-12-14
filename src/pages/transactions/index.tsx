@@ -6,7 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { Receipt, Search, Plus, Calendar, Filter, Download } from 'lucide-react';
-import { TransactionGrid, type TransactionGridTransaction } from '@/components/transactions/TransactionGrid';
+import {
+  TransactionGrid,
+  type TransactionGridTransaction,
+} from '@/components/transactions/TransactionGrid';
 import { useCompanyStore } from '@/stores/company';
 import { useTransactions } from '@/hooks/useTransactions';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -18,11 +21,19 @@ export function Transactions() {
   const [selectedPeriod, setSelectedPeriod] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const [transactionToDelete, setTransactionToDelete] = useState<TransactionGridTransaction | null>(null);
+  const [transactionToDelete, setTransactionToDelete] = useState<TransactionGridTransaction | null>(
+    null,
+  );
 
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
-  const { transactions = [], isLoading, isFetching, refetch, deleteTransaction } = useTransactions(companyId);
+  const {
+    transactions = [],
+    isLoading,
+    isFetching,
+    refetch,
+    deleteTransaction,
+  } = useTransactions(companyId);
 
   const filteredTransactions = transactions
     .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())

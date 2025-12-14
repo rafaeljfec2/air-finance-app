@@ -8,10 +8,10 @@ interface TransactionListProps {
   transactions: TransactionType[];
 }
 
-export function TransactionList({ transactions }: TransactionListProps) {
+export function TransactionList({ transactions }: Readonly<TransactionListProps>) {
   return (
     <div className="space-y-4">
-      {transactions.map(transaction => {
+      {transactions.map((transaction) => {
         const isIncome = transaction.type === 'INCOME';
         const formattedDate = format(new Date(transaction.date), 'dd MMM yyyy', { locale: ptBR });
 
@@ -21,11 +21,11 @@ export function TransactionList({ transactions }: TransactionListProps) {
             className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50"
           >
             <div className="flex items-start gap-3">
-              <div className={`p-2 rounded-full ${
-                isIncome
-                  ? 'bg-green-100 dark:bg-green-900/20' 
-                  : 'bg-red-100 dark:bg-red-900/20'
-              }`}>
+              <div
+                className={`p-2 rounded-full ${
+                  isIncome ? 'bg-green-100 dark:bg-green-900/20' : 'bg-red-100 dark:bg-red-900/20'
+                }`}
+              >
                 {isIncome ? (
                   <ArrowUpIcon className="h-4 w-4 text-green-600 dark:text-green-400" />
                 ) : (
@@ -41,12 +41,13 @@ export function TransactionList({ transactions }: TransactionListProps) {
                 </p>
               </div>
             </div>
-            <span className={`font-medium ${
-              isIncome
-                ? 'text-green-600 dark:text-green-400'
-                : 'text-red-600 dark:text-red-400'
-            }`}>
-              {isIncome ? '+' : '-'}{formatCurrency(Math.abs(transaction.amount))}
+            <span
+              className={`font-medium ${
+                isIncome ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+              }`}
+            >
+              {isIncome ? '+' : '-'}
+              {formatCurrency(Math.abs(transaction.amount))}
             </span>
           </div>
         );

@@ -91,7 +91,7 @@ const FilterMenu = ({
   }, [onClose]);
 
   const uniqueValues = useMemo(() => {
-    const values = Array.from(new Set(items)).sort();
+    const values = Array.from(new Set(items)).sort((a, b) => a.localeCompare(b));
     if (searchTerm) {
       return values.filter((value) => value.toLowerCase().includes(searchTerm.toLowerCase()));
     }
@@ -133,7 +133,7 @@ const FilterMenu = ({
       ref={menuRef}
       className="z-50 w-56 rounded-md bg-white dark:bg-gray-900 shadow-lg ring-1 ring-black/5 dark:ring-white/10 dark:border dark:border-gray-800"
       style={{ minWidth: '200px', ...style }}
-      role="dialog"
+      role="menu"
       aria-label={`Filtrar por ${field}`}
     >
       <div className="p-2 border-b border-gray-200 dark:border-gray-800">
@@ -220,7 +220,7 @@ const TableRow = memo(
     const formatDate = (dateStr: string) => {
       try {
         const date = new Date(dateStr);
-        if (isNaN(date.getTime())) {
+        if (Number.isNaN(date.getTime())) {
           return '-';
         }
         return format(date, 'dd/MM/yyyy HH:mm');
@@ -270,10 +270,11 @@ const TableRow = memo(
         >
           {formatCurrency(transaction.balance ?? 0)}
         </td>
-        {showActions && (
-          <td className="py-2 px-4">
-            <div className="flex items-center gap-2">
-              {onEdit ? (
+        {showActions &&
+          (() => {
+            const renderEditButton = () => {
+              if (!onEdit) return null;
+              return (
                 <Tooltip content="Editar transação">
                   <button
                     onClick={(e) => {
@@ -286,7 +287,12 @@ const TableRow = memo(
                     <Edit className="h-4 w-4" />
                   </button>
                 </Tooltip>
-              ) : onActionClick ? (
+              );
+            };
+
+            const renderActionButton = () => {
+              if (!onActionClick) return null;
+              return (
                 <Tooltip content="Mais ações">
                   <button
                     onClick={(e) => {
@@ -299,24 +305,37 @@ const TableRow = memo(
                     <MoreHorizontal className="h-4 w-4" />
                   </button>
                 </Tooltip>
-              ) : null}
-              {onDelete && (
-                <Tooltip content="Excluir transação">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(transaction);
-                    }}
-                    className="text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-                    aria-label="Deletar transação"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </Tooltip>
-              )}
-            </div>
-          </td>
-        )}
+              );
+            };
+
+            const renderActionButtons = () => {
+              const editBtn = renderEditButton();
+              if (editBtn) return editBtn;
+              return renderActionButton();
+            };
+
+            return (
+              <td className="py-2 px-4">
+                <div className="flex items-center gap-2">
+                  {renderActionButtons()}
+                  {onDelete && (
+                    <Tooltip content="Excluir transação">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(transaction);
+                        }}
+                        className="text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                        aria-label="Deletar transação"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </Tooltip>
+                  )}
+                </div>
+              </td>
+            );
+          })()}
       </tr>
     );
   },
@@ -341,7 +360,7 @@ const MobileCard = memo(
     const formatDate = (dateStr: string) => {
       try {
         const date = new Date(dateStr);
-        if (isNaN(date.getTime())) {
+        if (Number.isNaN(date.getTime())) {
           return '-';
         }
         return format(date, 'dd/MM HH:mm');
@@ -352,11 +371,10 @@ const MobileCard = memo(
     };
 
     return (
-      <div
-        className="bg-card dark:bg-card-dark rounded-lg p-4 hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors"
+      <button
+        type="button"
+        className="w-full bg-card dark:bg-card-dark rounded-lg p-4 hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors text-left"
         onClick={() => onActionClick?.(transaction)}
-        role="button"
-        tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
@@ -402,52 +420,65 @@ const MobileCard = memo(
             </span>
           </div>
         </div>
-        {showActions && (
-          <div className="mt-3 pt-3 border-t border-border/50 dark:border-border-dark/50 flex items-center justify-end gap-2">
-            {onEdit ? (
-              <Tooltip content="Editar transação">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit(transaction);
-                  }}
-                  className="text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors p-2 -m-2"
-                  aria-label="Editar transação"
-                >
-                  <Edit className="h-4 w-4" />
-                </button>
-              </Tooltip>
-            ) : onActionClick ? (
-              <Tooltip content="Mais ações">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onActionClick(transaction);
-                  }}
-                  className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark p-2 -m-2"
-                  aria-label="Mais ações"
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                </button>
-              </Tooltip>
-            ) : null}
-            {onDelete && (
-              <Tooltip content="Excluir transação">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(transaction);
-                  }}
-                  className="text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors p-2 -m-2"
-                  aria-label="Deletar transação"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </Tooltip>
-            )}
-          </div>
-        )}
-      </div>
+        {showActions &&
+          (() => {
+            const renderEditButton = () => {
+              if (!onEdit) return null;
+              return (
+                <Tooltip content="Editar transação">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(transaction);
+                    }}
+                    className="text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors p-2 -m-2"
+                    aria-label="Editar transação"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                </Tooltip>
+              );
+            };
+
+            const renderActionButton = () => {
+              if (!onActionClick) return null;
+              return (
+                <Tooltip content="Mais ações">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onActionClick(transaction);
+                    }}
+                    className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark p-2 -m-2"
+                    aria-label="Mais ações"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </button>
+                </Tooltip>
+              );
+            };
+
+            return (
+              <div className="mt-3 pt-3 border-t border-border/50 dark:border-border-dark/50 flex items-center justify-end gap-2">
+                {renderEditButton() || renderActionButton()}
+                {onDelete && (
+                  <Tooltip content="Excluir transação">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(transaction);
+                      }}
+                      className="text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors p-2 -m-2"
+                      aria-label="Deletar transação"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </Tooltip>
+                )}
+              </div>
+            );
+          })()}
+      </button>
     );
   },
 );
@@ -604,7 +635,7 @@ export function TransactionGrid({
         try {
           const baseDate = transaction.paymentDate || transaction.createdAt;
           const date = new Date(baseDate);
-          if (isNaN(date.getTime())) {
+          if (Number.isNaN(date.getTime())) {
             return '-';
           }
           return format(date, 'dd/MM HH:mm');
@@ -637,57 +668,80 @@ export function TransactionGrid({
     return transactions.map((t) => getFieldValue(t, field).toString());
   };
 
+  // Função auxiliar para ordenar por data
+  const sortByDate = useCallback(
+    (a: TransactionGridTransaction, b: TransactionGridTransaction, direction: SortDirection) => {
+      try {
+        const dateA = new Date(a.paymentDate || a.createdAt).getTime();
+        const dateB = new Date(b.paymentDate || b.createdAt).getTime();
+        if (Number.isNaN(dateA) || Number.isNaN(dateB)) {
+          return 0;
+        }
+        return direction === 'asc' ? dateA - dateB : dateB - dateA;
+      } catch (error) {
+        console.error('Error sorting dates:', error);
+        return 0;
+      }
+    },
+    [],
+  );
+
+  // Função auxiliar para ordenar por string
+  const sortByString = useCallback((a: string, b: string, direction: SortDirection) => {
+    return direction === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
+  }, []);
+
+  // Função auxiliar para ordenar por número
+  const sortByNumber = useCallback((a: number, b: number, direction: SortDirection) => {
+    return direction === 'asc' ? a - b : b - a;
+  }, []);
+
   // Função para ordenar transações
   const sortTransactions = useCallback(
     (transactions: TransactionGridTransaction[]) => {
       return [...transactions].sort((a, b) => {
         switch (sortConfig.field) {
-          case 'date': {
-            try {
-              const dateA = new Date(a.paymentDate || a.createdAt).getTime();
-              const dateB = new Date(b.paymentDate || b.createdAt).getTime();
-              if (isNaN(dateA) || isNaN(dateB)) {
-                return 0;
-              }
-              return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
-            } catch (error) {
-              console.error('Error sorting dates:', error);
-              return 0;
-            }
-          }
+          case 'date':
+            return sortByDate(a, b, sortConfig.direction);
           case 'category':
-            return sortConfig.direction === 'asc'
-              ? a.categoryId.localeCompare(b.categoryId)
-              : b.categoryId.localeCompare(a.categoryId);
+            return sortByString(
+              a.categoryId || 'Sem categoria',
+              b.categoryId || 'Sem categoria',
+              sortConfig.direction,
+            );
           case 'description':
-            return sortConfig.direction === 'asc'
-              ? a.description.localeCompare(b.description)
-              : b.description.localeCompare(a.description);
+            return sortByString(
+              a.description || 'Sem descrição',
+              b.description || 'Sem descrição',
+              sortConfig.direction,
+            );
           case 'account':
-            return sortConfig.direction === 'asc'
-              ? a.accountId.localeCompare(b.accountId)
-              : b.accountId.localeCompare(a.accountId);
+            return sortByString(
+              a.accountId || 'Sem conta',
+              b.accountId || 'Sem conta',
+              sortConfig.direction,
+            );
           case 'credit': {
             const aValue = a.launchType === 'revenue' ? a.value : 0;
             const bValue = b.launchType === 'revenue' ? b.value : 0;
-            return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+            return sortByNumber(aValue, bValue, sortConfig.direction);
           }
           case 'debit': {
             const aValue = a.launchType === 'expense' ? a.value : 0;
             const bValue = b.launchType === 'expense' ? b.value : 0;
-            return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+            return sortByNumber(aValue, bValue, sortConfig.direction);
           }
           case 'balance': {
             const aValue = a.balance ?? 0;
             const bValue = b.balance ?? 0;
-            return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+            return sortByNumber(aValue, bValue, sortConfig.direction);
           }
           default:
             return 0;
         }
       });
     },
-    [sortConfig],
+    [sortConfig, sortByDate, sortByString, sortByNumber],
   );
 
   // Função para alternar ordenação
@@ -967,12 +1021,9 @@ export function TransactionGrid({
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <span
-                  className="text-xs font-medium text-text dark:text-text-dark px-2"
-                  role="status"
-                >
+                <output className="text-xs font-medium text-text dark:text-text-dark px-2">
                   Página {currentPage} de {totalPages}
-                </span>
+                </output>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
