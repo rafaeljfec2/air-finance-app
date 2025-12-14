@@ -476,7 +476,7 @@ export function TransactionGrid({
 }: Readonly<TransactionGridProps>) {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
   const [itemsPerPageSelected, setItemsPerPageSelected] = useState(itemsPerPage);
   const [sortConfig, setSortConfig] = useState<{ field: SortField; direction: SortDirection }>({
     field: 'date',
