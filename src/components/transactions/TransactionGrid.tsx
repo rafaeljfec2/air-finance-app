@@ -225,7 +225,7 @@ const TableRow = memo(
     return (
       <tr className="hover:bg-background/70 dark:hover:bg-background-dark/70 transition-colors">
         <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-          {formatDate(transaction.createdAt)}
+          {formatDate(transaction.paymentDate || transaction.createdAt)}
         </td>
         <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
           <Tooltip content={transaction.categoryId || 'Sem categoria'}>
@@ -320,7 +320,7 @@ const MobileCard = memo(
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                {formatDate(transaction.createdAt)}
+                {formatDate(transaction.paymentDate || transaction.createdAt)}
               </span>
               <span className="text-gray-400">•</span>
               <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
@@ -480,7 +480,7 @@ export function TransactionGrid({
   const [itemsPerPageSelected, setItemsPerPageSelected] = useState(itemsPerPage);
   const [sortConfig, setSortConfig] = useState<{ field: SortField; direction: SortDirection }>({
     field: 'date',
-    direction: 'desc',
+    direction: 'asc',
   });
   const [activeFilter, setActiveFilter] = useState<SortField | null>(null);
   const [filters, setFilters] = useState<FilterValue[]>([]);
@@ -521,7 +521,8 @@ export function TransactionGrid({
     switch (field) {
       case 'date': {
         try {
-          const date = new Date(transaction.createdAt);
+          const baseDate = transaction.paymentDate || transaction.createdAt;
+          const date = new Date(baseDate);
           if (isNaN(date.getTime())) {
             return '-';
           }
@@ -562,8 +563,8 @@ export function TransactionGrid({
         switch (sortConfig.field) {
           case 'date': {
             try {
-              const dateA = new Date(a.createdAt).getTime();
-              const dateB = new Date(b.createdAt).getTime();
+              const dateA = new Date(a.paymentDate || a.createdAt).getTime();
+              const dateB = new Date(b.paymentDate || b.createdAt).getTime();
               if (isNaN(dateA) || isNaN(dateB)) {
                 return 0;
               }
@@ -616,19 +617,27 @@ export function TransactionGrid({
     }));
   };
 
-  // Calcular saldo acumulado para cada transação
-  let accumulatedBalance = 0;
-  const transactionsWithBalance = transactions.map((transaction) => {
-    const credit = transaction.launchType === 'revenue' ? transaction.value : 0;
-    const debit = transaction.launchType === 'expense' ? transaction.value : 0;
-    accumulatedBalance += credit - debit;
-    return {
-      ...transaction,
-      credit,
-      debit,
-      balance: accumulatedBalance,
-    };
-  });
+  // Calcular saldo acumulado para cada transação (ordenado por data asc para consistência)
+  const transactionsWithBalance = useMemo(() => {
+    const sortedByDateAsc = [...transactions].sort((a, b) => {
+      const dateA = new Date(a.paymentDate || a.createdAt).getTime();
+      const dateB = new Date(b.paymentDate || b.createdAt).getTime();
+      return dateA - dateB;
+    });
+
+    let accumulatedBalance = 0;
+    return sortedByDateAsc.map((transaction) => {
+      const credit = transaction.launchType === 'revenue' ? transaction.value : 0;
+      const debit = transaction.launchType === 'expense' ? transaction.value : 0;
+      accumulatedBalance += credit - debit;
+      return {
+        ...transaction,
+        credit,
+        debit,
+        balance: accumulatedBalance,
+      };
+    });
+  }, [transactions]);
 
   // Aplicar filtros e ordenação
   const sortedAndFilteredTransactions = useMemo(() => {
