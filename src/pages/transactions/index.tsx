@@ -6,19 +6,23 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { Receipt, Search, Plus, Calendar, Filter, Download } from 'lucide-react';
-import { TransactionGrid } from '@/components/transactions/TransactionGrid';
+import { TransactionGrid, type TransactionGridTransaction } from '@/components/transactions/TransactionGrid';
 import { useCompanyStore } from '@/stores/company';
 import { useTransactions } from '@/hooks/useTransactions';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { toast } from '@/components/ui/toast';
 
 export function Transactions() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPeriod, setSelectedPeriod] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [transactionToDelete, setTransactionToDelete] = useState<TransactionGridTransaction | null>(null);
 
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
-  const { transactions = [], isLoading, isFetching, refetch } = useTransactions(companyId);
+  const { transactions = [], isLoading, isFetching, refetch, deleteTransaction } = useTransactions(companyId);
 
   const filteredTransactions = transactions
     .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
@@ -54,6 +58,40 @@ export function Transactions() {
 
       return matchesSearch && matchesType && matchesPeriod;
     });
+
+  const handleEdit = (transaction: TransactionGridTransaction) => {
+    navigate(`/transactions/edit/${transaction.id}`);
+  };
+
+  const handleDelete = (transaction: TransactionGridTransaction) => {
+    setTransactionToDelete(transaction);
+    setShowConfirmDelete(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!transactionToDelete) return;
+    try {
+      await deleteTransaction(transactionToDelete.id);
+      toast({
+        title: 'Transação excluída',
+        description: 'A transação foi excluída com sucesso.',
+        type: 'success',
+      });
+      setShowConfirmDelete(false);
+      setTransactionToDelete(null);
+    } catch (error) {
+      toast({
+        title: 'Erro ao excluir',
+        description: 'Não foi possível excluir a transação. Tente novamente.',
+        type: 'error',
+      });
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowConfirmDelete(false);
+    setTransactionToDelete(null);
+  };
 
   return (
     <ViewDefault>
@@ -149,10 +187,21 @@ export function Transactions() {
             transactions={filteredTransactions}
             isLoading={isLoading || isFetching}
             showActions={true}
-            onActionClick={(transaction) => navigate(`/transactions/edit/${transaction.id}`)}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
           />
         </div>
       </div>
+      <ConfirmModal
+        open={showConfirmDelete}
+        title="Confirmar exclusão"
+        description="Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        cancelLabel="Cancelar"
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        danger
+      />
     </ViewDefault>
   );
 }

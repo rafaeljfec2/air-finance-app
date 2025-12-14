@@ -10,6 +10,8 @@ import {
   ChevronsRight,
   ArrowUpDown,
   Filter,
+  Edit,
+  Trash2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -196,6 +198,8 @@ interface TransactionGridProps {
   isLoading?: boolean;
   showActions?: boolean;
   onActionClick?: (transaction: TransactionGridTransaction) => void;
+  onEdit?: (transaction: TransactionGridTransaction) => void;
+  onDelete?: (transaction: TransactionGridTransaction) => void;
   className?: string;
 }
 
@@ -204,10 +208,14 @@ const TableRow = memo(
     transaction,
     showActions,
     onActionClick,
+    onEdit,
+    onDelete,
   }: {
     transaction: TransactionGridTransaction;
     showActions: boolean;
-    onActionClick: (transaction: TransactionGridTransaction) => void;
+    onActionClick?: (transaction: TransactionGridTransaction) => void;
+    onEdit?: (transaction: TransactionGridTransaction) => void;
+    onDelete?: (transaction: TransactionGridTransaction) => void;
   }) => {
     const formatDate = (dateStr: string) => {
       try {
@@ -263,14 +271,50 @@ const TableRow = memo(
           {formatCurrency(transaction.balance ?? 0)}
         </td>
         {showActions && (
-          <td className="py-2 px-4 w-10">
-            <button
-              onClick={() => onActionClick(transaction)}
-              className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark"
-              aria-label="Mais ações"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-            </button>
+          <td className="py-2 px-4">
+            <div className="flex items-center gap-2">
+              {onEdit ? (
+                <Tooltip content="Editar transação">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(transaction);
+                    }}
+                    className="text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+                    aria-label="Editar transação"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                </Tooltip>
+              ) : onActionClick ? (
+                <Tooltip content="Mais ações">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onActionClick(transaction);
+                    }}
+                    className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark"
+                    aria-label="Mais ações"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </button>
+                </Tooltip>
+              ) : null}
+              {onDelete && (
+                <Tooltip content="Excluir transação">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(transaction);
+                    }}
+                    className="text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                    aria-label="Deletar transação"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </Tooltip>
+              )}
+            </div>
           </td>
         )}
       </tr>
@@ -285,10 +329,14 @@ const MobileCard = memo(
     transaction,
     showActions,
     onActionClick,
+    onEdit,
+    onDelete,
   }: {
     transaction: TransactionGridTransaction;
     showActions: boolean;
-    onActionClick: (transaction: TransactionGridTransaction) => void;
+    onActionClick?: (transaction: TransactionGridTransaction) => void;
+    onEdit?: (transaction: TransactionGridTransaction) => void;
+    onDelete?: (transaction: TransactionGridTransaction) => void;
   }) => {
     const formatDate = (dateStr: string) => {
       try {
@@ -306,13 +354,13 @@ const MobileCard = memo(
     return (
       <div
         className="bg-card dark:bg-card-dark rounded-lg p-4 hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors"
-        onClick={() => onActionClick(transaction)}
+        onClick={() => onActionClick?.(transaction)}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            onActionClick(transaction);
+            onActionClick?.(transaction);
           }
         }}
       >
@@ -355,17 +403,48 @@ const MobileCard = memo(
           </div>
         </div>
         {showActions && (
-          <div className="mt-3 pt-3 border-t border-border/50 dark:border-border-dark/50 flex items-center justify-end">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onActionClick(transaction);
-              }}
-              className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark p-2 -m-2"
-              aria-label="Mais ações"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-            </button>
+          <div className="mt-3 pt-3 border-t border-border/50 dark:border-border-dark/50 flex items-center justify-end gap-2">
+            {onEdit ? (
+              <Tooltip content="Editar transação">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(transaction);
+                  }}
+                  className="text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors p-2 -m-2"
+                  aria-label="Editar transação"
+                >
+                  <Edit className="h-4 w-4" />
+                </button>
+              </Tooltip>
+            ) : onActionClick ? (
+              <Tooltip content="Mais ações">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onActionClick(transaction);
+                  }}
+                  className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark p-2 -m-2"
+                  aria-label="Mais ações"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </button>
+              </Tooltip>
+            ) : null}
+            {onDelete && (
+              <Tooltip content="Excluir transação">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(transaction);
+                  }}
+                  className="text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors p-2 -m-2"
+                  aria-label="Deletar transação"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </Tooltip>
+            )}
           </div>
         )}
       </div>
@@ -472,6 +551,8 @@ export function TransactionGrid({
   isLoading = false,
   showActions = true,
   onActionClick,
+  onEdit,
+  onDelete,
   className,
 }: Readonly<TransactionGridProps>) {
   const navigate = useNavigate();
@@ -803,7 +884,11 @@ export function TransactionGrid({
                       >
                         Saldo
                       </SortableHeader>
-                      {showActions && <th className="w-10"></th>}
+                      {showActions && (
+                        <th className="w-24 text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">
+                          Ações
+                        </th>
+                      )}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
@@ -813,6 +898,8 @@ export function TransactionGrid({
                         transaction={transaction}
                         showActions={showActions}
                         onActionClick={handleActionClick}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
                       />
                     ))}
                   </tbody>
@@ -828,6 +915,8 @@ export function TransactionGrid({
                   transaction={transaction}
                   showActions={showActions}
                   onActionClick={handleActionClick}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
                 />
               ))}
             </div>
