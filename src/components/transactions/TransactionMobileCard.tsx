@@ -16,16 +16,8 @@ interface MobileCardProps {
 export const MobileCard = memo(
   ({ transaction, showActions, onActionClick, onEdit, onDelete }: MobileCardProps) => {
     return (
-      <button
-        type="button"
+      <div
         className="w-full bg-card dark:bg-card-dark rounded-lg p-4 hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors text-left"
-        onClick={() => onActionClick?.(transaction)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onActionClick?.(transaction);
-          }
-        }}
       >
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
@@ -76,7 +68,7 @@ export const MobileCard = memo(
             />
           </div>
         )}
-      </button>
+      </div>
     );
   },
 );

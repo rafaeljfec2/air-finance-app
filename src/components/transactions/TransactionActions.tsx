@@ -1,4 +1,4 @@
-import { Edit, Trash2, MoreHorizontal } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { Tooltip } from '@/components/ui/tooltip';
 import type { TransactionActionsProps } from './TransactionGrid.types';
 
@@ -8,7 +8,6 @@ export function TransactionActions({
   transaction,
   onEdit,
   onDelete,
-  onActionClick,
   variant = 'table',
 }: TransactionActionsPropsReadonly) {
   const buttonClassName =
@@ -39,25 +38,7 @@ export function TransactionActions({
     );
   };
 
-  const renderActionButton = () => {
-    if (!onActionClick) return null;
-    return (
-      <Tooltip content="Mais ações">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onActionClick(transaction);
-          }}
-          className="text-gray-500 dark:text-gray-400 hover:text-text dark:hover:text-text-dark transition-colors"
-          aria-label="Mais ações"
-        >
-          <MoreHorizontal className="h-4 w-4" />
-        </button>
-      </Tooltip>
-    );
-  };
-
-  const actionButton = renderEditButton() || renderActionButton();
+  const renderMenu = () => null;
 
   return (
     <div
@@ -65,7 +46,8 @@ export function TransactionActions({
         variant === 'table' ? 'flex items-center gap-2' : 'flex items-center justify-end gap-2'
       }
     >
-      {actionButton}
+      {renderEditButton()}
+      {renderMenu()}
       {onDelete && (
         <Tooltip content="Excluir transação">
           <button

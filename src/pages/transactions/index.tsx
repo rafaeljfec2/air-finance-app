@@ -14,6 +14,8 @@ import { useCompanyStore } from '@/stores/company';
 import { useTransactions } from '@/hooks/useTransactions';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { toast } from '@/components/ui/toast';
+import { AccountEditModal } from '@/components/accounts/AccountEditModal';
+import { useAccounts } from '@/hooks/useAccounts';
 
 export function Transactions() {
   const navigate = useNavigate();
@@ -24,9 +26,11 @@ export function Transactions() {
   const [transactionToDelete, setTransactionToDelete] = useState<TransactionGridTransaction | null>(
     null,
   );
+  const [showAccountModal, setShowAccountModal] = useState(false);
 
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
+  const { accounts } = useAccounts();
   const {
     transactions = [],
     isLoading,
@@ -35,7 +39,7 @@ export function Transactions() {
     deleteTransaction,
   } = useTransactions(companyId);
 
-  const filteredTransactions = transactions
+  const filteredTransactions = [...transactions]
     .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
     .filter((transaction) => {
       const matchesSearch = transaction.description
@@ -70,8 +74,8 @@ export function Transactions() {
       return matchesSearch && matchesType && matchesPeriod;
     });
 
-  const handleEdit = (transaction: TransactionGridTransaction) => {
-    navigate(`/transactions/edit/${transaction.id}`);
+  const handleEdit = () => {
+    setShowAccountModal(true);
   };
 
   const handleDelete = (transaction: TransactionGridTransaction) => {
@@ -82,7 +86,7 @@ export function Transactions() {
   const confirmDelete = async () => {
     if (!transactionToDelete) return;
     try {
-      await deleteTransaction(transactionToDelete.id);
+      await Promise.resolve(deleteTransaction(transactionToDelete.id));
       toast({
         title: 'Transação excluída',
         description: 'A transação foi excluída com sucesso.',
@@ -90,7 +94,7 @@ export function Transactions() {
       });
       setShowConfirmDelete(false);
       setTransactionToDelete(null);
-    } catch (error) {
+    } catch {
       toast({
         title: 'Erro ao excluir',
         description: 'Não foi possível excluir a transação. Tente novamente.',
@@ -185,6 +189,14 @@ export function Transactions() {
                 <Button
                   variant="outline"
                   className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center justify-center gap-2"
+                  onClick={() => setShowAccountModal(true)}
+                >
+                  <Filter className="h-4 w-4" />
+                  Editar contas
+                </Button>
+                <Button
+                  variant="outline"
+                  className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center justify-center gap-2"
                 >
                   <Download className="h-4 w-4" />
                   Exportar
@@ -212,6 +224,12 @@ export function Transactions() {
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
         danger
+      />
+      <AccountEditModal
+        open={showAccountModal}
+        onClose={() => setShowAccountModal(false)}
+        // evita abrir modal sem contas carregadas
+        key={accounts?.length ?? 0}
       />
     </ViewDefault>
   );

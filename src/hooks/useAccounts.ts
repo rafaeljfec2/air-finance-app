@@ -71,7 +71,38 @@ export const useAccounts = () => {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateAccount> }) =>
       companyId && id ? updateAccount(companyId, id, data) : Promise.reject('No companyId or id'),
-    onSuccess: (_, { id }) => {
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ['accounts', companyId] });
+      await queryClient.cancelQueries({ queryKey: ['account', companyId, id] });
+
+      const previousAccounts = queryClient.getQueryData<Account[]>(['accounts', companyId]);
+      const previousAccount = queryClient.getQueryData<Account>(['account', companyId, id]);
+
+      if (previousAccounts) {
+        queryClient.setQueryData<Account[]>(['accounts', companyId], prev =>
+          (prev ?? []).map(acc =>
+            acc.id === id ? { ...acc, ...data, updatedAt: new Date().toISOString() } : acc,
+          ),
+        );
+      }
+
+      if (previousAccount) {
+        queryClient.setQueryData<Account>(['account', companyId, id], {
+          ...previousAccount,
+          ...data,
+          updatedAt: new Date().toISOString(),
+        });
+      }
+
+      return { previousAccounts, previousAccount };
+    },
+    onSuccess: (updatedAccount, { id }) => {
+      if (updatedAccount) {
+        queryClient.setQueryData<Account[]>(['accounts', companyId], prev =>
+          (prev ?? []).map(acc => (acc.id === id ? updatedAccount : acc)),
+        );
+        queryClient.setQueryData<Account>(['account', companyId, id], updatedAccount);
+      }
       queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
       queryClient.invalidateQueries({ queryKey: ['account', companyId, id] });
       queryClient.invalidateQueries({ queryKey: ['account-balance', companyId, id] });
@@ -81,7 +112,13 @@ export const useAccounts = () => {
         type: 'success',
       });
     },
-    onError: (error) => {
+    onError: (error, variables, context) => {
+      if (context?.previousAccounts) {
+        queryClient.setQueryData(['accounts', companyId], context.previousAccounts);
+      }
+      if (context?.previousAccount && variables?.id) {
+        queryClient.setQueryData(['account', companyId, variables.id], context.previousAccount);
+      }
       const apiError = parseApiError(error);
       logApiError(apiError);
       toast({
@@ -89,6 +126,13 @@ export const useAccounts = () => {
         description: getUserFriendlyMessage(apiError),
         type: 'error',
       });
+    },
+    onSettled: (_data, _error, variables) => {
+      if (variables?.id) {
+        queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+        queryClient.invalidateQueries({ queryKey: ['account', companyId, variables.id] });
+        queryClient.invalidateQueries({ queryKey: ['account-balance', companyId, variables.id] });
+      }
     },
   });
 
@@ -125,6 +169,7 @@ export const useAccounts = () => {
     createAccount: createMutation.mutate,
     updateAccount: updateMutation.mutate,
     deleteAccount: deleteMutation.mutate,
+    updateAccountAsync: updateMutation.mutateAsync,
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
