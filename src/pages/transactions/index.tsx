@@ -14,8 +14,9 @@ import { useCompanyStore } from '@/stores/company';
 import { useTransactions } from '@/hooks/useTransactions';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { toast } from '@/components/ui/toast';
-import { AccountEditModal } from '@/components/accounts/AccountEditModal';
+import { TransactionEditModal } from '@/components/transactions/TransactionEditModal';
 import { useAccounts } from '@/hooks/useAccounts';
+import { useCategories } from '@/hooks/useCategories';
 
 export function Transactions() {
   const navigate = useNavigate();
@@ -26,11 +27,15 @@ export function Transactions() {
   const [transactionToDelete, setTransactionToDelete] = useState<TransactionGridTransaction | null>(
     null,
   );
-  const [showAccountModal, setShowAccountModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [transactionToEdit, setTransactionToEdit] = useState<TransactionGridTransaction | null>(
+    null,
+  );
 
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
   const { accounts } = useAccounts();
+  const { categories } = useCategories(companyId);
   const {
     transactions = [],
     isLoading,
@@ -74,8 +79,9 @@ export function Transactions() {
       return matchesSearch && matchesType && matchesPeriod;
     });
 
-  const handleEdit = () => {
-    setShowAccountModal(true);
+  const handleEdit = (transaction: TransactionGridTransaction) => {
+    setTransactionToEdit(transaction);
+    setShowEditModal(true);
   };
 
   const handleDelete = (transaction: TransactionGridTransaction) => {
@@ -189,14 +195,6 @@ export function Transactions() {
                 <Button
                   variant="outline"
                   className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center justify-center gap-2"
-                  onClick={() => setShowAccountModal(true)}
-                >
-                  <Filter className="h-4 w-4" />
-                  Editar contas
-                </Button>
-                <Button
-                  variant="outline"
-                  className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center justify-center gap-2"
                 >
                   <Download className="h-4 w-4" />
                   Exportar
@@ -225,11 +223,12 @@ export function Transactions() {
         onCancel={cancelDelete}
         danger
       />
-      <AccountEditModal
-        open={showAccountModal}
-        onClose={() => setShowAccountModal(false)}
-        // evita abrir modal sem contas carregadas
-        key={accounts?.length ?? 0}
+      <TransactionEditModal
+        open={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        transaction={transactionToEdit}
+        accounts={accounts ?? []}
+        categories={categories ?? []}
       />
     </ViewDefault>
   );
