@@ -1,27 +1,30 @@
-import { Loading } from '@/components/Loading';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { ColorPicker } from '@/components/ui/color-picker';
-import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { FormField } from '@/components/ui/FormField';
-import { IconPicker } from '@/components/ui/icon-picker';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
-import { useAccounts } from '@/hooks/useAccounts';
+import { useState, useMemo, useEffect } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { useAccounts } from '@/hooks/useAccounts';
 import { useCompanyStore } from '@/stores/company';
-import { formatCurrency, parseCurrency, formatCurrencyInput } from '@/utils/formatters';
+import { BanknotesIcon } from '@heroicons/react/24/outline';
+import { Plus, Search, Edit, Trash2, Grid3x3, List } from 'lucide-react';
+import { formatCurrency } from '@/utils/formatters';
+import { Account } from '@/services/accountService';
+import { CreateAccount } from '@/services/accountService';
+import { AccountFormModal } from '@/components/accounts/AccountFormModal';
+import { Loading } from '@/components/Loading';
+import { cn } from '@/lib/utils';
+import { AxiosError } from 'axios';
 import {
-  BanknotesIcon,
+  BanknotesIcon as BanknotesIconHero,
   BuildingLibraryIcon,
   CreditCardIcon,
   WalletIcon,
 } from '@heroicons/react/24/outline';
-import { AxiosError } from 'axios';
-import React, { useEffect, useState } from 'react';
 
 const accountTypes = [
-  { value: 'checking', label: 'Conta Corrente', icon: BanknotesIcon },
+  { value: 'checking', label: 'Conta Corrente', icon: BanknotesIconHero },
   { value: 'savings', label: 'Poupança', icon: WalletIcon },
   { value: 'credit_card', label: 'Cartão de Crédito', icon: CreditCardIcon },
   { value: 'digital_wallet', label: 'Carteira Digital', icon: WalletIcon },
@@ -29,6 +32,21 @@ const accountTypes = [
 ] as const;
 
 type AccountType = (typeof accountTypes)[number]['value'];
+
+function getTypeLabel(type: AccountType): string {
+  return accountTypes.find((t) => t.value === type)?.label ?? type;
+}
+
+function getTypeBadgeColor(type: AccountType): string {
+  const colors: Record<AccountType, string> = {
+    checking: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+    savings: 'bg-green-500/20 text-green-400 border-green-500/30',
+    credit_card: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+    digital_wallet: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+    investment: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+  };
+  return colors[type] ?? colors.checking;
+}
 
 export function AccountsPage() {
   const {
@@ -38,130 +56,63 @@ export function AccountsPage() {
     createAccount,
     updateAccount,
     deleteAccount,
+    isCreating,
     isUpdating,
     isDeleting,
   } = useAccounts();
   const { activeCompany } = useCompanyStore();
 
-  const [form, setForm] = useState({
-    name: '',
-    type: 'checking' as AccountType,
-    institution: '',
-    agency: '',
-    accountNumber: '',
-    color: '#8A05BE',
-    icon: 'BanknotesIcon',
-    companyId: activeCompany?.id || '',
-    initialBalance: 0,
-    initialBalanceDate: new Date().toISOString().split('T')[0],
-  });
-
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [initialBalanceInput, setInitialBalanceInput] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
+    const saved = localStorage.getItem('accounts-view-mode');
+    if (saved === 'grid' || saved === 'list') {
+      return saved;
+    }
+    return 'grid';
+  });
 
   useEffect(() => {
-    setForm((prev) => ({
-      ...prev,
-      companyId: activeCompany?.id || '',
-    }));
-  }, [activeCompany]);
+    localStorage.setItem('accounts-view-mode', viewMode);
+  }, [viewMode]);
 
-  useEffect(() => {
-    setInitialBalanceInput(
-      form.initialBalance
-        ? formatCurrencyInput(form.initialBalance.toFixed(2).replace('.', ''))
-        : '',
-    );
-  }, [form.initialBalance]);
+  const filteredAccounts = useMemo(() => {
+    if (!accounts) return [];
+    return accounts.filter((account) => {
+      const matchesSearch =
+        account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        account.institution.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        account.agency.includes(searchTerm) ||
+        account.accountNumber.includes(searchTerm);
+      const matchesType = filterType === 'all' || account.type === filterType;
+      return matchesSearch && matchesType;
+    });
+  }, [accounts, searchTerm, filterType]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+  const handleCreate = () => {
+    setEditingAccount(null);
+    setShowFormModal(true);
   };
 
-  const handleColorChange = (color: string) => {
-    setForm((prev) => ({ ...prev, color }));
+  const handleEdit = (account: Account) => {
+    setEditingAccount(account);
+    setShowFormModal(true);
   };
 
-  const handleIconChange = (icon: string) => {
-    setForm((prev) => ({ ...prev, icon }));
-  };
+  const handleSubmit = (data: CreateAccount) => {
+    if (!activeCompany?.id) return;
 
-  const validate = () => {
-    const errs: Record<string, string> = {};
-    if (!form.name.trim()) errs.name = 'Nome obrigatório';
-    if (!form.institution.trim()) errs.institution = 'Instituição obrigatória';
-    if (!form.agency.trim()) errs.agency = 'Agência obrigatória';
-    if (!form.accountNumber.trim()) errs.accountNumber = 'Número da conta obrigatório';
-    if (!form.companyId) errs.companyId = 'Selecione uma empresa';
-    return errs;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const errs = validate();
-    setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
-
-    try {
-      const payload = {
-        ...form,
-        initialBalanceDate: form.initialBalanceDate
-          ? new Date(form.initialBalanceDate).toISOString()
-          : null,
-      };
-
-      if (editingId) {
-        await updateAccount({ id: editingId, data: payload });
-        setEditingId(null);
-      } else {
-        await createAccount(payload);
-      }
-      setForm({
-        name: '',
-        type: 'checking',
-        institution: '',
-        agency: '',
-        accountNumber: '',
-        color: '#8A05BE',
-        icon: 'BanknotesIcon',
-        companyId: activeCompany?.id || '',
-        initialBalance: 0,
-        initialBalanceDate: new Date().toISOString().split('T')[0],
-      });
-      setErrors({});
-    } catch (error) {
-      console.error('Erro ao salvar conta:', error);
+    if (editingAccount) {
+      updateAccount({ id: editingAccount.id, data });
+    } else {
+      createAccount(data);
     }
-  };
-
-  const handleEdit = (id: string) => {
-    const account = accounts?.find((a) => a.id === id);
-    if (account) {
-      setForm({
-        name: account.name,
-        type: account.type as AccountType,
-        institution: account.institution,
-        agency: account.agency,
-        accountNumber: account.accountNumber,
-        color: account.color,
-        icon: account.icon,
-        companyId: account.companyId,
-        initialBalance: account.initialBalance,
-        initialBalanceDate: account.initialBalanceDate
-          ? account.initialBalanceDate.slice(0, 10)
-          : new Date().toISOString().split('T')[0],
-      });
-      setEditingId(id);
-      setInitialBalanceInput(
-        account.initialBalance !== undefined && account.initialBalance !== null
-          ? formatCurrencyInput(account.initialBalance.toFixed(2).replace('.', ''))
-          : '',
-      );
-    }
+    setShowFormModal(false);
+    setEditingAccount(null);
   };
 
   const handleDelete = (id: string) => {
@@ -169,13 +120,9 @@ export function AccountsPage() {
     setDeleteId(id);
   };
 
-  const confirmDelete = async () => {
+  const confirmDelete = () => {
     if (deleteId) {
-      try {
-        await deleteAccount(deleteId);
-      } catch (error) {
-        console.error('Erro ao deletar conta:', error);
-      }
+      deleteAccount(deleteId);
     }
     setShowConfirmDelete(false);
     setDeleteId(null);
@@ -189,7 +136,7 @@ export function AccountsPage() {
   if (isLoading) {
     return (
       <ViewDefault>
-        <div className="container mx-auto">
+        <div className="container mx-auto px-4 sm:px-6 py-10">
           <Loading size="large">Carregando contas bancárias, por favor aguarde...</Loading>
         </div>
       </ViewDefault>
@@ -197,14 +144,13 @@ export function AccountsPage() {
   }
 
   if (error) {
-    // Trata erro 404 como "empresa não existe" (usando AxiosError)
     const isCompanyNotFound = error instanceof AxiosError && error.response?.status === 404;
     if (isCompanyNotFound) {
       return (
         <ViewDefault>
           <div className="container mx-auto px-2 sm:px-6 py-10 flex flex-col items-center justify-center min-h-[40vh]">
             <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded shadow-md max-w-lg w-full text-center">
-              <h2 className="text-lg font-semibold mb-2">Nenhuma selecionada</h2>
+              <h2 className="text-lg font-semibold mb-2">Nenhuma empresa selecionada</h2>
               <p className="mb-4">
                 Para cadastrar contas bancárias, você precisa criar uma empresa primeiro.
               </p>
@@ -221,7 +167,7 @@ export function AccountsPage() {
     }
     return (
       <ViewDefault>
-        <div className="container mx-auto">
+        <div className="container mx-auto px-4 sm:px-6 py-10">
           <div className="text-red-500">Erro ao carregar contas: {error.message}</div>
         </div>
       </ViewDefault>
@@ -251,210 +197,330 @@ export function AccountsPage() {
 
   return (
     <ViewDefault>
-      <div className="container mx-auto">
-        <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark mb-6 flex items-center gap-2">
-          <BanknotesIcon className="h-6 w-6 text-primary-500" /> Contas Bancárias
-        </h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Formulário */}
-          <Card className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <FormField label="Nome da conta" error={errors.name}>
-                <Input
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Ex: Conta Principal"
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
-              </FormField>
-              <FormField label="Tipo de conta" error={errors.type}>
-                <Select
-                  value={form.type}
-                  onValueChange={(value) =>
-                    setForm((prev) => ({ ...prev, type: value as AccountType }))
-                  }
-                >
-                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
-                    {accountTypes.find((t) => t.value === form.type)?.label || 'Selecione...'}
+      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <BanknotesIcon className="h-8 w-8 text-primary-400" />
+                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Contas Bancárias</h1>
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Gerencie suas contas bancárias e investimentos
+              </p>
+            </div>
+            <Button
+              onClick={handleCreate}
+              className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
+            >
+              <Plus className="h-5 w-5" />
+              Nova Conta
+            </Button>
+          </div>
+
+          {/* Busca e Filtros */}
+          <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm mb-6">
+            <div className="p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Buscar por nome, instituição, agência ou conta..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                  />
+                </div>
+                <Select value={filterType} onValueChange={setFilterType}>
+                  <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
+                    <span>
+                      {filterType === 'all'
+                        ? 'Todos os tipos'
+                        : getTypeLabel(filterType as AccountType)}
+                    </span>
                   </SelectTrigger>
-                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
-                    {accountTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
+                    <SelectItem value="all">Todos os tipos</SelectItem>
+                    {accountTypes.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-              </FormField>
-              <FormField label="Instituição" error={errors.institution}>
-                <Input
-                  name="institution"
-                  value={form.institution}
-                  onChange={handleChange}
-                  placeholder="Ex: Banco do Brasil"
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
-              </FormField>
-              <FormField label="Agência" error={errors.agency}>
-                <Input
-                  name="agency"
-                  value={form.agency}
-                  onChange={handleChange}
-                  placeholder="0000"
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
-              </FormField>
-              <FormField label="Número da conta" error={errors.accountNumber}>
-                <Input
-                  name="accountNumber"
-                  value={form.accountNumber}
-                  onChange={handleChange}
-                  placeholder="00000-0"
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
-              </FormField>
-              <FormField label="Saldo inicial" error={errors.initialBalance}>
-                <Input
-                  name="initialBalance"
-                  type="text"
-                  inputMode="decimal"
-                  value={initialBalanceInput}
-                  onChange={(e) => {
-                    const formatted = formatCurrencyInput(e.target.value);
-                    setInitialBalanceInput(formatted);
-                    setForm((prev) => ({
-                      ...prev,
-                      initialBalance: parseCurrency(formatted),
-                    }));
-                  }}
-                  placeholder="R$ 0,00"
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
-              </FormField>
-              <FormField label="Data do saldo inicial" error={errors.initialBalanceDate}>
-                <Input
-                  name="initialBalanceDate"
-                  type="date"
-                  value={form.initialBalanceDate}
-                  onChange={handleChange}
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
-              </FormField>
-              <FormField label="Cor">
-                <ColorPicker value={form.color} onChange={handleColorChange} />
-              </FormField>
-              <FormField label="Ícone">
-                <IconPicker
-                  value={form.icon}
-                  onChange={handleIconChange}
-                  options={accountTypes.map((t) => ({
-                    value: t.icon.displayName || t.icon.name || t.value,
-                    icon: t.icon,
-                  }))}
-                />
-              </FormField>
-              <div className="flex gap-2 mt-4">
-                <Button
-                  type="submit"
-                  size="sm"
-                  className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-                >
-                  {editingId ? 'Salvar Alterações' : 'Adicionar Conta'}
-                </Button>
-                {editingId && (
+                <div className="flex gap-2 border border-border dark:border-border-dark rounded-md overflow-hidden bg-background dark:bg-background-dark">
                   <Button
                     type="button"
+                    variant="ghost"
                     size="sm"
-                    className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-                    onClick={() => {
-                      setForm({
-                        name: '',
-                        type: 'checking',
-                        institution: '',
-                        agency: '',
-                        accountNumber: '',
-                        color: '#8A05BE',
-                        icon: 'BanknotesIcon',
-                        companyId: activeCompany?.id || '',
-                        initialBalance: 0,
-                        initialBalanceDate: new Date().toISOString().split('T')[0],
-                      });
-                      setEditingId(null);
-                    }}
+                    onClick={() => setViewMode('grid')}
+                    className={cn(
+                      'flex-1 rounded-none border-0',
+                      viewMode === 'grid'
+                        ? 'bg-primary-500 text-white hover:bg-primary-600'
+                        : 'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
+                    )}
                   >
-                    Cancelar
+                    <Grid3x3 className="h-4 w-4" />
                   </Button>
-                )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    className={cn(
+                      'flex-1 rounded-none border-0',
+                      viewMode === 'list'
+                        ? 'bg-primary-500 text-white hover:bg-primary-600'
+                        : 'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
+                    )}
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-            </form>
+            </div>
           </Card>
-          {/* Listagem */}
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Minhas Contas</h2>
-            <ul className="divide-y divide-border dark:divide-border-dark">
-              {accounts?.length === 0 && (
-                <li className="text-gray-400 text-sm">Nenhuma conta cadastrada.</li>
+
+          {/* Lista de Contas */}
+          {filteredAccounts.length === 0 ? (
+            <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+              <div className="p-12 text-center">
+                <BanknotesIcon className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                {(() => {
+                  const hasFilters = searchTerm || filterType !== 'all';
+                  const emptyTitle = hasFilters
+                    ? 'Nenhuma conta encontrada'
+                    : 'Nenhuma conta cadastrada';
+                  const emptyDescription = hasFilters
+                    ? 'Tente ajustar os filtros de busca'
+                    : 'Comece criando sua primeira conta bancária';
+
+                  return (
+                    <>
+                      <h3 className="text-lg font-semibold text-text dark:text-text-dark mb-2">
+                        {emptyTitle}
+                      </h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                        {emptyDescription}
+                      </p>
+                      {!hasFilters && (
+                        <Button
+                          onClick={handleCreate}
+                          className="bg-primary-500 hover:bg-primary-600 text-white"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Criar Primeira Conta
+                        </Button>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </Card>
+          ) : (
+            <>
+              {viewMode === 'grid' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredAccounts.map((account) => {
+                    const Icon =
+                      accountTypes.find((t) => t.value === account.type)?.icon || BanknotesIconHero;
+                    return (
+                      <Card
+                        key={account.id}
+                        className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow"
+                      >
+                        <div className="p-6">
+                          {/* Header do Card */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div
+                                className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                                style={{ backgroundColor: account.color }}
+                              >
+                                <Icon className="h-6 w-6 text-white" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="text-lg font-semibold text-text dark:text-text-dark mb-1 truncate">
+                                  {account.name}
+                                </h3>
+                                <span
+                                  className={cn(
+                                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+                                    getTypeBadgeColor(account.type as AccountType),
+                                  )}
+                                >
+                                  {getTypeLabel(account.type as AccountType)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Informações */}
+                          <div className="space-y-2 mb-4">
+                            <div className="text-sm">
+                              <span className="text-gray-500 dark:text-gray-400">Instituição: </span>
+                              <span className="text-text dark:text-text-dark">{account.institution}</span>
+                            </div>
+                            <div className="text-sm">
+                              <span className="text-gray-500 dark:text-gray-400">Agência: </span>
+                              <span className="text-text dark:text-text-dark font-mono">
+                                {account.agency}
+                              </span>
+                            </div>
+                            <div className="text-sm">
+                              <span className="text-gray-500 dark:text-gray-400">Conta: </span>
+                              <span className="text-text dark:text-text-dark font-mono">
+                                {account.accountNumber}
+                              </span>
+                            </div>
+                            <div className="text-sm pt-2 border-t border-border dark:border-border-dark">
+                              <span className="text-gray-500 dark:text-gray-400">Saldo: </span>
+                              <span className="text-text dark:text-text-dark font-semibold text-lg">
+                                {formatCurrency(account.balance)}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Ações */}
+                          <div className="flex gap-2 pt-4 border-t border-border dark:border-border-dark">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(account)}
+                              disabled={isUpdating}
+                              className="flex-1 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+                            >
+                              <Edit className="h-4 w-4 mr-2" />
+                              Editar
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDelete(account.id)}
+                              disabled={isDeleting}
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredAccounts.map((account) => {
+                    const Icon =
+                      accountTypes.find((t) => t.value === account.type)?.icon || BanknotesIconHero;
+                    return (
+                      <Card
+                        key={account.id}
+                        className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow"
+                      >
+                        <div className="p-6">
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            {/* Informações principais */}
+                            <div className="flex items-center gap-4 flex-1 min-w-0">
+                              <div
+                                className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                                style={{ backgroundColor: account.color }}
+                              >
+                                <Icon className="h-6 w-6 text-white" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <h3 className="text-lg font-semibold text-text dark:text-text-dark">
+                                    {account.name}
+                                  </h3>
+                                  <span
+                                    className={cn(
+                                      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+                                      getTypeBadgeColor(account.type as AccountType),
+                                    )}
+                                  >
+                                    {getTypeLabel(account.type as AccountType)}
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+                                  <div>
+                                    <span className="text-gray-500 dark:text-gray-400">
+                                      Instituição:{' '}
+                                    </span>
+                                    <span className="text-text dark:text-text-dark">
+                                      {account.institution}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-500 dark:text-gray-400">Agência: </span>
+                                    <span className="text-text dark:text-text-dark font-mono">
+                                      {account.agency}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-500 dark:text-gray-400">Conta: </span>
+                                    <span className="text-text dark:text-text-dark font-mono">
+                                      {account.accountNumber}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-500 dark:text-gray-400">Saldo: </span>
+                                    <span className="text-text dark:text-text-dark font-semibold">
+                                      {formatCurrency(account.balance)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Ações */}
+                            <div className="flex gap-2 md:flex-shrink-0">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleEdit(account)}
+                                disabled={isUpdating}
+                                className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+                              >
+                                <Edit className="h-4 w-4 mr-2" />
+                                Editar
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDelete(account.id)}
+                                disabled={isDeleting}
+                                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
               )}
-              {accounts?.map((account) => {
-                const Icon =
-                  accountTypes.find((t) => t.value === account.type)?.icon || BanknotesIcon;
-                return (
-                  <li key={account.id} className="flex items-center justify-between py-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: account.color }}
-                      >
-                        <Icon className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-text dark:text-text-dark">
-                          {account.name}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {account.institution} • Ag: {account.agency} • CC: {account.accountNumber}
-                        </div>
-                        <div className="text-sm font-semibold text-text dark:text-text-dark">
-                          Saldo: {formatCurrency(account.balance)}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          Saldo inicial: {formatCurrency(account.initialBalance)} em{' '}
-                          {new Date(account.initialBalanceDate || '').toLocaleDateString('pt-BR')}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-                        onClick={() => handleEdit(account.id)}
-                        disabled={isUpdating}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-                        onClick={() => handleDelete(account.id)}
-                        disabled={isDeleting}
-                      >
-                        Excluir
-                      </Button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </Card>
+            </>
+          )}
         </div>
       </div>
+
+      {/* Modals */}
+      <AccountFormModal
+        open={showFormModal}
+        onClose={() => {
+          setShowFormModal(false);
+          setEditingAccount(null);
+        }}
+        onSubmit={handleSubmit}
+        account={editingAccount}
+        isLoading={isCreating || isUpdating}
+      />
       <ConfirmModal
         open={showConfirmDelete}
         title="Confirmar exclusão"
