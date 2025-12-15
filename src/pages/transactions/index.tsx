@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Button } from '@/components/ui/button';
@@ -44,7 +44,29 @@ export function Transactions() {
     deleteTransaction,
   } = useTransactions(companyId);
 
-  const filteredTransactions = [...transactions]
+  const categoryMap = useMemo(() => {
+    const map = new Map<string, string>();
+    categories?.forEach((c) => map.set(c.id, c.name));
+    return map;
+  }, [categories]);
+
+  const accountMap = useMemo(() => {
+    const map = new Map<string, string>();
+    accounts?.forEach((a) => map.set(a.id, a.name));
+    return map;
+  }, [accounts]);
+
+  const transactionsWithLabels = useMemo(
+    () =>
+      [...transactions].map((tx) => ({
+        ...tx,
+        categoryId: categoryMap.get(tx.categoryId) ?? tx.categoryId,
+        accountId: accountMap.get(tx.accountId) ?? tx.accountId,
+      })),
+    [transactions, categoryMap, accountMap],
+  );
+
+  const filteredTransactions = [...transactionsWithLabels]
     .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
     .filter((transaction) => {
       const matchesSearch = transaction.description
