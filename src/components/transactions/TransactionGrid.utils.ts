@@ -1,7 +1,11 @@
 import { format } from 'date-fns';
 import type { TransactionGridTransaction, SortField } from './TransactionGrid.types';
+import { formatCurrency } from '@/utils/formatters';
 
-export const formatTransactionDate = (dateStr: string, formatStr: string = 'dd/MM/yyyy HH:mm'): string => {
+export const formatTransactionDate = (
+  dateStr: string,
+  formatStr: string = 'dd/MM/yyyy HH:mm',
+): string => {
   try {
     const date = new Date(dateStr);
     if (Number.isNaN(date.getTime())) {
@@ -44,7 +48,17 @@ export const getFieldValues = (
   transactions: TransactionGridTransaction[],
   field: SortField,
 ): string[] => {
-  return transactions.map((t) => getFieldValue(t, field).toString());
+  return transactions.map((transaction) => {
+    const rawValue = getFieldValue(transaction, field);
+
+    if (typeof rawValue === 'number') {
+      // Para valores numéricos (crédito, débito, saldo),
+      // usamos o valor absoluto para exibição e formatamos como moeda.
+      return formatCurrency(Math.abs(rawValue));
+    }
+
+    return rawValue.toString();
+  });
 };
 
 export const calculateBalance = (
@@ -67,4 +81,3 @@ export const calculateBalance = (
     };
   });
 };
-

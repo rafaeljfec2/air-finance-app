@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef, memo } from 'react';
 import type { SortField } from './TransactionGrid.types';
+import { parseCurrency } from '@/utils/formatters';
 
 interface FilterMenuProps {
   field: SortField;
@@ -38,7 +39,17 @@ export const FilterMenu = memo(
     }, [onClose]);
 
     const uniqueValues = useMemo(() => {
-      const values = Array.from(new Set(items)).sort((a, b) => a.localeCompare(b));
+      const isNumericField = field === 'credit' || field === 'debit' || field === 'balance';
+
+      const values = Array.from(new Set(items)).sort((a, b) => {
+        if (!isNumericField) {
+          return a.localeCompare(b);
+        }
+
+        const aValue = parseCurrency(a);
+        const bValue = parseCurrency(b);
+        return aValue - bValue;
+      });
       if (searchTerm) {
         return values.filter((value) => value.toLowerCase().includes(searchTerm.toLowerCase()));
       }

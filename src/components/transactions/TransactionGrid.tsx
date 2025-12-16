@@ -44,7 +44,7 @@ export function TransactionGrid({
     paginate,
     handlePageChange,
     handleItemsPerPageChange,
-  } = usePagination(5);
+  } = usePagination(10);
 
   const handleFilterClick = useCallback(
     (field: SortField) => {
@@ -105,6 +105,8 @@ export function TransactionGrid({
     transactions,
   };
 
+  const hasItems = paginatedItems.length > 0;
+
   return (
     <Card
       className={cn(
@@ -122,7 +124,7 @@ export function TransactionGrid({
           <>
             {/* Desktop Table View */}
             <div className="hidden md:block">
-              <div className="w-full">
+              <div className="w-full min-h-[320px]">
                 <table className="w-full table-fixed">
                   <colgroup>
                     <col className="w-[6%] sm:w-[8%]" />
@@ -176,33 +178,52 @@ export function TransactionGrid({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
-                    {paginatedItems.map((transaction) => (
-                      <TableRow
-                        key={transaction.id}
-                        transaction={transaction}
-                        showActions={showActions}
-                        onActionClick={handleActionClick}
-                        onEdit={onEdit}
-                        onDelete={onDelete}
-                      />
-                    ))}
+                    {hasItems ? (
+                      paginatedItems.map((transaction) => (
+                        <TableRow
+                          key={transaction.id}
+                          transaction={transaction}
+                          showActions={showActions}
+                          onActionClick={handleActionClick}
+                          onEdit={onEdit}
+                          onDelete={onDelete}
+                        />
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={showActions ? 8 : 7}
+                          className="py-10 text-center text-sm text-gray-500 dark:text-gray-400"
+                        >
+                          Nenhuma transação encontrada para o período selecionado.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
             </div>
 
             {/* Mobile Card View */}
-            <div className="md:hidden space-y-2">
-              {paginatedItems.map((transaction) => (
-                <MobileCard
-                  key={transaction.id}
-                  transaction={transaction}
-                  showActions={showActions}
-                  onActionClick={handleActionClick}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                />
-              ))}
+            <div className="md:hidden space-y-2 min-h-[320px]">
+              {hasItems ? (
+                paginatedItems.map((transaction) => (
+                  <MobileCard
+                    key={transaction.id}
+                    transaction={transaction}
+                    showActions={showActions}
+                    onActionClick={handleActionClick}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                  />
+                ))
+              ) : (
+                <div className="flex h-full items-center justify-center py-8">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                    Nenhuma transação encontrada para o período selecionado.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Pagination */}
