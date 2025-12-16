@@ -39,7 +39,7 @@ export function GoalFormModal({
       currentAmount: 0,
       deadline: '',
       status: 'active',
-      categoryId: '',
+      categoryId: undefined,
       companyId: companyId,
     }),
     [companyId],
@@ -59,7 +59,7 @@ export function GoalFormModal({
         currentAmount: goal.currentAmount,
         deadline: goal.deadline,
         status: goal.status,
-        categoryId: goal.categoryId || '',
+        categoryId: goal.categoryId || undefined,
         companyId: goal.companyId,
       });
       setTargetAmountInput(
@@ -205,8 +205,10 @@ export function GoalFormModal({
 
                 <FormField label="Categoria" error={errors.categoryId}>
                   <Select
-                    value={form.categoryId}
-                    onValueChange={(value) => setForm((prev) => ({ ...prev, categoryId: value }))}
+                    value={form.categoryId || undefined}
+                    onValueChange={(value) =>
+                      setForm((prev) => ({ ...prev, categoryId: value || undefined }))
+                    }
                   >
                     <SelectTrigger
                       className={cn(
@@ -223,16 +225,21 @@ export function GoalFormModal({
                       </div>
                     </SelectTrigger>
                     <SelectContent className="bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark">
-                      <SelectItem value="">Nenhuma categoria</SelectItem>
-                      {categories?.map((cat) => (
-                        <SelectItem
-                          key={cat.id}
-                          value={cat.id}
-                          className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30"
-                        >
-                          {cat.name}
+                      {categories && categories.length > 0 ? (
+                        categories.map((cat) => (
+                          <SelectItem
+                            key={cat.id}
+                            value={cat.id}
+                            className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30"
+                          >
+                            {cat.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no-categories" disabled>
+                          Nenhuma categoria disponível
                         </SelectItem>
-                      ))}
+                      )}
                     </SelectContent>
                   </Select>
                 </FormField>
