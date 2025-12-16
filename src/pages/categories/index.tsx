@@ -108,9 +108,9 @@ export function CategoriesPage() {
   const handleSubmit = (data: CreateCategory) => {
     if (editingCategory) {
       updateCategory({ id: editingCategory.id, data });
-    } else {
+      } else {
       createCategory(data);
-    }
+      }
     setShowFormModal(false);
     setEditingCategory(null);
   };
@@ -204,13 +204,13 @@ export function CategoriesPage() {
               <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                  <Input
+                <Input
                     type="text"
                     placeholder="Buscar por nome..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                  />
+                />
                 </div>
                 <Select value={filterType} onValueChange={setFilterType}>
                   <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
@@ -230,10 +230,10 @@ export function CategoriesPage() {
                   </SelectContent>
                 </Select>
                 <div className="flex gap-2 border border-border dark:border-border-dark rounded-md overflow-hidden bg-background dark:bg-background-dark">
-                  <Button
+                <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
+                  size="sm"
                     onClick={() => setViewMode('grid')}
                     className={cn(
                       'flex-1 rounded-none border-0',
@@ -241,9 +241,9 @@ export function CategoriesPage() {
                         ? 'bg-primary-500 text-white hover:bg-primary-600'
                         : 'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
                     )}
-                  >
+                >
                     <Grid3x3 className="h-4 w-4" />
-                  </Button>
+                </Button>
                   <Button
                     type="button"
                     variant="ghost"
@@ -306,9 +306,9 @@ export function CategoriesPage() {
                   {filteredCategories.map((category) => {
                     const Icon =
                       iconOptions.find((t) => t.value === category.icon)?.icon || TagIconHero;
-                    const TypeIcon =
+                const TypeIcon =
                       categoryTypes.find((t) => t.value === category.type)?.icon || TagIconHero;
-                    return (
+                return (
                       <Card
                         key={category.id}
                         className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow"
@@ -317,15 +317,15 @@ export function CategoriesPage() {
                           {/* Header do Card */}
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <div
+                      <div
                                 className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                                style={{ backgroundColor: category.color }}
-                              >
+                        style={{ backgroundColor: category.color }}
+                      >
                                 <Icon className="h-6 w-6 text-white" />
-                              </div>
+                      </div>
                               <div className="flex-1 min-w-0">
                                 <h3 className="text-lg font-semibold text-text dark:text-text-dark mb-1 truncate">
-                                  {category.name}
+                          {category.name}
                                 </h3>
                                 <span
                                   className={cn(
@@ -403,37 +403,37 @@ export function CategoriesPage() {
                                     <TypeIcon className="h-3 w-3 mr-1" />
                                     {getTypeLabel(category.type as CategoryType)}
                                   </span>
-                                </div>
-                              </div>
-                            </div>
+                        </div>
+                      </div>
+                    </div>
 
                             {/* Ações */}
                             <div className="flex gap-2 md:flex-shrink-0">
-                              <Button
-                                size="sm"
+                      <Button
+                        size="sm"
                                 variant="outline"
                                 onClick={() => handleEdit(category)}
-                                disabled={isUpdating}
+                        disabled={isUpdating}
                                 className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
-                              >
+                      >
                                 <Edit className="h-4 w-4 mr-2" />
-                                Editar
-                              </Button>
-                              <Button
-                                size="sm"
+                        Editar
+                      </Button>
+                      <Button
+                        size="sm"
                                 variant="outline"
-                                onClick={() => handleDelete(category.id)}
-                                disabled={isDeleting}
+                        onClick={() => handleDelete(category.id)}
+                        disabled={isDeleting}
                                 className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
-                              >
+                      >
                                 <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
+                      </Button>
+                    </div>
                           </div>
                         </div>
                       </Card>
-                    );
-                  })}
+                );
+              })}
                 </div>
               )}
             </>

@@ -84,9 +84,9 @@ export function CreditCardsPage() {
   const handleSubmit = async (data: CreateCreditCardPayload) => {
     if (editingCreditCard) {
       updateCreditCard({ id: editingCreditCard.id, data });
-    } else {
+      } else {
       createCreditCard(data);
-    }
+      }
     setShowFormModal(false);
     setEditingCreditCard(null);
   };
@@ -161,7 +161,7 @@ export function CreditCardsPage() {
                 <CreditCardIcon className="h-8 w-8 text-primary-400" />
                 <h1 className="text-2xl font-bold text-text dark:text-text-dark">
                   Cartões de Crédito
-                </h1>
+        </h1>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Gerencie seus cartões de crédito e limites
@@ -182,8 +182,8 @@ export function CreditCardsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                  <Input
-                    type="text"
+                <Input
+                  type="text"
                     placeholder="Buscar por nome..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -191,10 +191,10 @@ export function CreditCardsPage() {
                   />
                 </div>
                 <div className="flex gap-2 border border-border dark:border-border-dark rounded-md overflow-hidden bg-background dark:bg-background-dark">
-                  <Button
+                <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
+                  size="sm"
                     onClick={() => setViewMode('grid')}
                     className={cn(
                       'flex-1 rounded-none border-0',
@@ -202,9 +202,9 @@ export function CreditCardsPage() {
                         ? 'bg-primary-500 text-white hover:bg-primary-600'
                         : 'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
                     )}
-                  >
+                >
                     <Grid3x3 className="h-4 w-4" />
-                  </Button>
+                </Button>
                   <Button
                     type="button"
                     variant="ghost"
@@ -265,10 +265,10 @@ export function CreditCardsPage() {
               {viewMode === 'grid' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredCreditCards.map((card) => {
-                    const Icon =
+                const Icon =
                       bankTypes.find((t) => t.icon.displayName === card.icon)?.icon ||
                       CreditCardIconHero;
-                    return (
+                return (
                       <Card
                         key={card.id}
                         className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow"
@@ -277,10 +277,10 @@ export function CreditCardsPage() {
                           {/* Header do Card */}
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <div
+                      <div
                                 className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                                style={{ backgroundColor: card.color }}
-                              >
+                        style={{ backgroundColor: card.color }}
+                      >
                                 <Icon className="h-6 w-6 text-white" />
                               </div>
                               <div className="flex-1 min-w-0">
@@ -307,10 +307,10 @@ export function CreditCardsPage() {
                               <span className="text-gray-500 dark:text-gray-400">
                                 Fechamento: {card.closingDay}º dia
                               </span>
-                            </div>
+                      </div>
                             <div className="text-sm">
                               <span className="text-gray-500 dark:text-gray-400">
-                                Vencimento: {card.dueDay}º dia
+                          Vencimento: {card.dueDay}º dia
                               </span>
                             </div>
                           </div>
@@ -396,37 +396,37 @@ export function CreditCardsPage() {
                                       {card.dueDay}º dia
                                     </span>
                                   </div>
-                                </div>
-                              </div>
-                            </div>
+                        </div>
+                      </div>
+                    </div>
 
                             {/* Ações */}
                             <div className="flex gap-2 md:flex-shrink-0">
-                              <Button
-                                size="sm"
+                      <Button
+                        size="sm"
                                 variant="outline"
                                 onClick={() => handleEdit(card)}
-                                disabled={isUpdating}
+                        disabled={isUpdating}
                                 className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
-                              >
+                      >
                                 <Edit className="h-4 w-4 mr-2" />
-                                Editar
-                              </Button>
-                              <Button
-                                size="sm"
+                        Editar
+                      </Button>
+                      <Button
+                        size="sm"
                                 variant="outline"
-                                onClick={() => handleDelete(card.id)}
-                                disabled={isDeleting}
+                        onClick={() => handleDelete(card.id)}
+                        disabled={isDeleting}
                                 className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
-                              >
+                      >
                                 <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
+                      </Button>
+                    </div>
                           </div>
                         </div>
                       </Card>
-                    );
-                  })}
+                );
+              })}
                 </div>
               )}
             </>

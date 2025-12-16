@@ -1,117 +1,37 @@
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { FormField } from '@/components/ui/FormField';
-import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
-import { useCategories } from '@/hooks/useCategories';
-import { useGoals } from '@/hooks/useGoals';
+import { useState, useMemo, useEffect } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { Category } from '@/services/categoryService';
-import { CreateGoal, Goal } from '@/services/goalService';
-import { useCompanyStore } from '@/stores/company';
-import { formatCurrency, formatCurrencyInput, parseCurrency } from '@/utils/formatters';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { Progress } from '@/components/ui/progress';
+import { useGoals } from '@/hooks/useGoals';
 import { FlagIcon } from '@heroicons/react/24/outline';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import React, { useState } from 'react';
+import { Plus, Search, Grid3x3, List } from 'lucide-react';
+import { CreateGoal, Goal } from '@/services/goalService';
+import { GoalFormModal } from '@/components/goals/GoalFormModal';
+import { GoalCard } from '@/components/goals/GoalCard';
+import { Loading } from '@/components/Loading';
+import { cn } from '@/lib/utils';
+import { useCompanyStore } from '@/stores/company';
+import { AxiosError } from 'axios';
 
-interface FormErrors {
-  name?: string;
-  description?: string;
-  targetAmount?: string;
-  currentAmount?: string;
-  deadline?: string;
-  categoryId?: string;
-  companyId?: string;
+const statusOptions = [
+  { value: 'active', label: 'Ativa', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+  { value: 'completed', label: 'Concluída', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
+  { value: 'cancelled', label: 'Cancelada', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
+] as const;
+
+type GoalStatus = (typeof statusOptions)[number]['value'];
+
+function getStatusLabel(status: GoalStatus): string {
+  return statusOptions.find((s) => s.value === status)?.label ?? status;
 }
-
-const calculateProgress = (current: number, target: number) => {
-  return Math.min(Math.round((current / target) * 100), 100);
-};
-
-interface GoalItemProps {
-  goal: Goal;
-  category?: Category;
-  onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
-  isUpdating: boolean;
-  isDeleting: boolean;
-}
-
-const GoalItem = ({ goal, category, onEdit, onDelete, isUpdating, isDeleting }: GoalItemProps) => {
-  const { data: progressData } = useGoals(goal.companyId).getProgress(goal.id);
-  const progress = calculateProgress(goal.currentAmount, goal.targetAmount);
-  const daysUntilDeadline = progressData?.daysUntilDeadline || 0;
-
-  return (
-    <li key={goal.id} className="py-4">
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: category?.color || '#6B7280' }}
-          >
-            {category?.icon ? (
-              <span className="text-white">{category.icon}</span>
-            ) : (
-              <FlagIcon className="h-5 w-5 text-white" />
-            )}
-          </div>
-          <div className="flex-1">
-            <div className="font-medium text-text dark:text-text-dark">{goal.name}</div>
-            {goal.description && (
-              <div className="text-sm text-gray-500 dark:text-gray-400">{goal.description}</div>
-            )}
-            <div className="mt-2">
-              <Progress value={progress} className="h-2" />
-              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                <span>{progress}% concluído</span>
-                <span>
-                  {formatCurrency(goal.currentAmount)} / {formatCurrency(goal.targetAmount)}
-                </span>
-              </div>
-            </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {category?.name && <span className="mr-2">{category.name} • </span>}
-              <span>
-                {format(new Date(goal.deadline), "dd 'de' MMMM 'de' yyyy", {
-                  locale: ptBR,
-                })}
-              </span>
-              {daysUntilDeadline > 0 && (
-                <span className="ml-2">• {daysUntilDeadline} dias restantes</span>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-            onClick={() => onEdit(goal.id)}
-            disabled={isUpdating}
-          >
-            Editar
-          </Button>
-          <Button
-            size="sm"
-            className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-            onClick={() => onDelete(goal.id)}
-            disabled={isDeleting}
-          >
-            Excluir
-          </Button>
-        </div>
-      </div>
-    </li>
-  );
-};
 
 export function GoalsPage() {
   const { activeCompany } = useCompanyStore();
-  const companyId = activeCompany?.id || '';
+  const companyId = activeCompany?.id ?? '';
 
   const {
     goals,
@@ -125,87 +45,53 @@ export function GoalsPage() {
     isDeleting,
   } = useGoals(companyId);
 
-  const { categories } = useCategories(companyId);
-
-  const [form, setForm] = useState<CreateGoal>({
-    name: '',
-    description: '',
-    targetAmount: 0,
-    currentAmount: 0,
-    deadline: '',
-    status: 'active',
-    categoryId: '',
-    companyId,
-  });
-
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
+    const saved = localStorage.getItem('goals-view-mode');
+    if (saved === 'grid' || saved === 'list') {
+      return saved;
+    }
+    return 'grid';
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    if (name === 'targetAmount' || name === 'currentAmount') {
-      const formattedValue = formatCurrencyInput(value);
-      setForm((prev) => ({ ...prev, [name]: parseCurrency(formattedValue) }));
+  useEffect(() => {
+    localStorage.setItem('goals-view-mode', viewMode);
+  }, [viewMode]);
+
+  const filteredGoals = useMemo(() => {
+    if (!goals) return [];
+    return goals.filter((goal) => {
+      const matchesSearch =
+        goal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (goal.description && goal.description.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesStatus = filterStatus === 'all' || goal.status === filterStatus;
+      return matchesSearch && matchesStatus;
+    });
+  }, [goals, searchTerm, filterStatus]);
+
+  const handleCreate = () => {
+    setEditingGoal(null);
+    setShowFormModal(true);
+  };
+
+  const handleEdit = (goal: Goal) => {
+    setEditingGoal(goal);
+    setShowFormModal(true);
+  };
+
+  const handleSubmit = (data: CreateGoal) => {
+    if (editingGoal) {
+      updateGoal({ id: editingGoal.id, data });
     } else {
-      setForm((prev) => ({ ...prev, [name]: value }));
+      createGoal(data);
     }
-  };
-
-  const validate = () => {
-    const errs: FormErrors = {};
-    if (!form.name.trim()) errs.name = 'Nome obrigatório';
-    if (form.targetAmount <= 0) errs.targetAmount = 'Valor alvo deve ser maior que zero';
-    if (!form.deadline) errs.deadline = 'Data limite obrigatória';
-    if (!form.companyId) errs.companyId = 'Selecione uma empresa';
-    return errs;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const errs = validate();
-    setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
-
-    try {
-      if (editingId) {
-        await updateGoal({ id: editingId, data: form });
-        setEditingId(null);
-      } else {
-        await createGoal(form);
-      }
-      setForm({
-        name: '',
-        description: '',
-        targetAmount: 0,
-        currentAmount: 0,
-        deadline: '',
-        status: 'active',
-        categoryId: '',
-        companyId,
-      });
-      setErrors({});
-    } catch (error) {
-      console.error('Erro ao salvar meta:', error);
-    }
-  };
-
-  const handleEdit = (id: string) => {
-    const goal = goals?.find((g) => g.id === id);
-    if (goal) {
-      setForm({
-        name: goal.name,
-        description: goal.description || '',
-        targetAmount: goal.targetAmount,
-        currentAmount: goal.currentAmount,
-        deadline: goal.deadline,
-        status: goal.status,
-        categoryId: goal.categoryId || '',
-        companyId: goal.companyId,
-      });
-      setEditingId(id);
-    }
+    setShowFormModal(false);
+    setEditingGoal(null);
   };
 
   const handleDelete = (id: string) => {
@@ -213,13 +99,9 @@ export function GoalsPage() {
     setDeleteId(id);
   };
 
-  const confirmDelete = async () => {
+  const confirmDelete = () => {
     if (deleteId) {
-      try {
-        await deleteGoal(deleteId);
-      } catch (error) {
-        console.error('Erro ao deletar meta:', error);
-      }
+      deleteGoal(deleteId);
     }
     setShowConfirmDelete(false);
     setDeleteId(null);
@@ -233,24 +115,60 @@ export function GoalsPage() {
   if (isLoading) {
     return (
       <ViewDefault>
-        <div className="container mx-auto px-2 sm:px-6 py-10">
-          <div className="animate-pulse">
-            <div className="h-8 w-48 bg-gray-200 rounded mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="h-96 bg-gray-200 rounded"></div>
-              <div className="h-96 bg-gray-200 rounded"></div>
-            </div>
-          </div>
+        <div className="container mx-auto px-4 sm:px-6 py-10">
+          <Loading size="large">Carregando metas, por favor aguarde...</Loading>
         </div>
       </ViewDefault>
     );
   }
 
   if (error) {
+    const isCompanyNotFound = error instanceof AxiosError && error.response?.status === 404;
+    if (isCompanyNotFound) {
+      return (
+        <ViewDefault>
+          <div className="container mx-auto px-2 sm:px-6 py-10 flex flex-col items-center justify-center min-h-[40vh]">
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded shadow-md max-w-lg w-full text-center">
+              <h2 className="text-lg font-semibold mb-2">Nenhuma empresa selecionada</h2>
+              <p className="mb-4">
+                Para cadastrar metas, você precisa criar uma empresa primeiro.
+              </p>
+              <Button
+                className="bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded"
+                onClick={() => (window.location.href = '/companies')}
+              >
+                Criar empresa
+              </Button>
+            </div>
+          </div>
+        </ViewDefault>
+      );
+    }
     return (
       <ViewDefault>
-        <div className="container mx-auto px-2 sm:px-6 py-10">
+        <div className="container mx-auto px-4 sm:px-6 py-10">
           <div className="text-red-500">Erro ao carregar metas: {error.message}</div>
+        </div>
+      </ViewDefault>
+    );
+  }
+
+  if (!activeCompany) {
+    return (
+      <ViewDefault>
+        <div className="container mx-auto px-2 sm:px-6 py-10 flex flex-col items-center justify-center min-h-[40vh]">
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded shadow-md max-w-lg w-full text-center">
+            <h2 className="text-lg font-semibold mb-2">Nenhuma empresa selecionada</h2>
+            <p className="mb-4">
+              Para cadastrar metas, você precisa criar uma empresa primeiro.
+            </p>
+            <Button
+              className="bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded"
+              onClick={() => (window.location.href = '/companies')}
+            >
+              Criar empresa
+            </Button>
+          </div>
         </div>
       </ViewDefault>
     );
@@ -258,139 +176,176 @@ export function GoalsPage() {
 
   return (
     <ViewDefault>
-      <div className="container mx-auto px-2 sm:px-6 py-10">
-        <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark mb-6 flex items-center gap-2">
-          <FlagIcon className="h-6 w-6 text-primary-500" /> Objetivos / Metas
-        </h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Formulário */}
-          <Card className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <FormField label="Nome da meta" error={errors.name}>
-                <Input
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Ex: Viagem, Reserva de emergência..."
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
-              </FormField>
-              <FormField label="Descrição" error={errors.description}>
-                <Input
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                  placeholder="Descreva sua meta..."
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
-              </FormField>
-              <FormField label="Valor alvo" error={errors.targetAmount}>
-                <Input
-                  name="targetAmount"
-                  value={formatCurrency(form.targetAmount)}
-                  onChange={handleChange}
-                  placeholder="R$ 0,00"
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
-              </FormField>
-              <FormField label="Valor atual" error={errors.currentAmount}>
-                <Input
-                  name="currentAmount"
-                  value={formatCurrency(form.currentAmount)}
-                  onChange={handleChange}
-                  placeholder="R$ 0,00"
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
-              </FormField>
-              <FormField label="Data limite" error={errors.deadline}>
-                <Input
-                  name="deadline"
-                  type="date"
-                  value={form.deadline}
-                  onChange={handleChange}
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
-                />
-              </FormField>
-              <FormField label="Categoria" error={errors.categoryId}>
-                <Select
-                  value={form.categoryId}
-                  onValueChange={(value) => setForm((prev) => ({ ...prev, categoryId: value }))}
-                >
-                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors">
-                    {categories?.find((cat) => cat.id === form.categoryId)?.name || 'Selecione...'}
+      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <FlagIcon className="h-8 w-8 text-primary-400" />
+                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Metas</h1>
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Gerencie suas metas e objetivos financeiros
+              </p>
+            </div>
+            <Button
+              onClick={handleCreate}
+              className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
+            >
+              <Plus className="h-5 w-5" />
+              Nova Meta
+            </Button>
+          </div>
+
+          {/* Busca e Filtros */}
+          <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm mb-6">
+            <div className="p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Buscar por nome ou descrição..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                  />
+                </div>
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
+                    <span>
+                      {filterStatus === 'all'
+                        ? 'Todos os status'
+                        : getStatusLabel(filterStatus as GoalStatus)}
+                    </span>
                   </SelectTrigger>
-                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors">
-                    {categories?.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {cat.name}
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
+                    <SelectItem value="all">Todos os status</SelectItem>
+                    {statusOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-              </FormField>
-              <div className="flex gap-2 mt-4">
-                <Button
-                  type="submit"
-                  size="sm"
-                  className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-                  disabled={isCreating || isUpdating}
-                >
-                  {editingId ? 'Salvar Alterações' : 'Adicionar Meta'}
-                </Button>
-                {editingId && (
+                <div className="flex gap-2 border border-border dark:border-border-dark rounded-md overflow-hidden bg-background dark:bg-background-dark">
                   <Button
                     type="button"
+                    variant="ghost"
                     size="sm"
-                    className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-                    onClick={() => {
-                      setForm({
-                        name: '',
-                        description: '',
-                        targetAmount: 0,
-                        currentAmount: 0,
-                        deadline: '',
-                        status: 'active',
-                        categoryId: '',
-                        companyId,
-                      });
-                      setEditingId(null);
-                    }}
+                    onClick={() => setViewMode('grid')}
+                    className={cn(
+                      'flex-1 rounded-none border-0',
+                      viewMode === 'grid'
+                        ? 'bg-primary-500 text-white hover:bg-primary-600'
+                        : 'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
+                    )}
                   >
-                    Cancelar
+                    <Grid3x3 className="h-4 w-4" />
                   </Button>
-                )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    className={cn(
+                      'flex-1 rounded-none border-0',
+                      viewMode === 'list'
+                        ? 'bg-primary-500 text-white hover:bg-primary-600'
+                        : 'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
+                    )}
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-            </form>
+            </div>
           </Card>
-          {/* Listagem */}
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Minhas Metas</h2>
-            <ul className="divide-y divide-border dark:divide-border-dark">
-              {goals?.length === 0 && (
-                <li className="text-gray-400 text-sm">Nenhuma meta cadastrada.</li>
+
+          {/* Lista de Metas */}
+          {filteredGoals.length === 0 ? (
+            <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+              <div className="p-12 text-center">
+                <FlagIcon className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                {(() => {
+                  const hasFilters = searchTerm || filterStatus !== 'all';
+                  const emptyTitle = hasFilters
+                    ? 'Nenhuma meta encontrada'
+                    : 'Nenhuma meta cadastrada';
+                  const emptyDescription = hasFilters
+                    ? 'Tente ajustar os filtros de busca'
+                    : 'Comece criando sua primeira meta';
+
+                  return (
+                    <>
+                      <h3 className="text-lg font-semibold text-text dark:text-text-dark mb-2">
+                        {emptyTitle}
+                      </h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                        {emptyDescription}
+                      </p>
+                      {!hasFilters && (
+                        <Button
+                          onClick={handleCreate}
+                          className="bg-primary-500 hover:bg-primary-600 text-white"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Criar Primeira Meta
+                        </Button>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </Card>
+          ) : (
+            <>
+              {viewMode === 'grid' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredGoals.map((goal) => (
+                    <GoalCard
+                      key={goal.id}
+                      goal={goal}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                      isUpdating={isUpdating}
+                      isDeleting={isDeleting}
+                      viewMode="grid"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredGoals.map((goal) => (
+                    <GoalCard
+                      key={goal.id}
+                      goal={goal}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                      isUpdating={isUpdating}
+                      isDeleting={isDeleting}
+                      viewMode="list"
+                    />
+                  ))}
+                </div>
               )}
-              {goals?.map((goal) => {
-                const category = categories?.find((c) => c.id === goal.categoryId);
-                return (
-                  <GoalItem
-                    key={goal.id}
-                    goal={goal}
-                    category={category}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    isUpdating={isUpdating}
-                    isDeleting={isDeleting}
-                  />
-                );
-              })}
-            </ul>
-          </Card>
+            </>
+          )}
         </div>
       </div>
+
+      {/* Modals */}
+      <GoalFormModal
+        open={showFormModal}
+        onClose={() => {
+          setShowFormModal(false);
+          setEditingGoal(null);
+        }}
+        onSubmit={handleSubmit}
+        goal={editingGoal}
+        isLoading={isCreating || isUpdating}
+      />
       <ConfirmModal
         open={showConfirmDelete}
         title="Confirmar exclusão"
