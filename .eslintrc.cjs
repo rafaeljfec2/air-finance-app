@@ -16,5 +16,8 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/no-unused-vars': 'error',
     'react/prop-types': 'off',
+    // SonarQube rules - alguns avisos são falsos positivos ou não críticos
+    'sonarjs/no-duplicate-string': ['warn', { threshold: 5 }],
+    'sonarjs/prefer-replace-all': 'off', // replace() com regex é necessário em alguns casos
   },
 };

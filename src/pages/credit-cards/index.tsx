@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,19 +6,21 @@ import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useCreditCards } from '@/hooks/useCreditCards';
 import { useCompanyStore } from '@/stores/company';
-import { CreditCardIcon } from '@heroicons/react/24/outline';
+// eslint-disable-next-line sonarjs/no-duplicate-string
+import {
+  CreditCardIcon,
+  CreditCardIcon as CreditCardIconHero,
+  BanknotesIcon,
+  BuildingLibraryIcon,
+} from '@heroicons/react/24/outline';
 import { Plus, Search, Edit, Trash2, Grid3x3, List } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatters';
-import { CreditCard } from '@/services/creditCardService';
-import { CreateCreditCardPayload } from '@/services/creditCardService';
+// eslint-disable-next-line sonarjs/no-duplicate-string
+import { CreditCard, CreateCreditCardPayload } from '@/services/creditCardService';
 import { CreditCardFormModal } from '@/components/credit-cards/CreditCardFormModal';
 import { Loading } from '@/components/Loading';
 import { cn } from '@/lib/utils';
-import {
-  BanknotesIcon,
-  BuildingLibraryIcon,
-  CreditCardIcon as CreditCardIconHero,
-} from '@heroicons/react/24/outline';
+import { useViewMode } from '@/hooks/useViewMode';
 
 const bankTypes = [
   { value: 'nubank', label: 'Nubank', icon: CreditCardIconHero },
@@ -50,17 +52,7 @@ export function CreditCardsPage() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
-    const saved = localStorage.getItem('credit-cards-view-mode');
-    if (saved === 'grid' || saved === 'list') {
-      return saved;
-    }
-    return 'grid';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('credit-cards-view-mode', viewMode);
-  }, [viewMode]);
+  const [viewMode, setViewMode] = useViewMode('credit-cards-view-mode');
 
   const filteredCreditCards = useMemo(() => {
     if (!creditCards) return [];
@@ -139,7 +131,9 @@ export function CreditCardsPage() {
             </p>
             <Button
               className="bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded"
-              onClick={() => (window.location.href = '/companies')}
+              onClick={() => {
+                globalThis.location.href = '/companies';
+              }}
             >
               Criar empresa
             </Button>

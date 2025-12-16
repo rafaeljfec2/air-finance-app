@@ -9,9 +9,14 @@ export const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Backend já suporta HttpOnly cookies - manter withCredentials: true
+  // Interceptor de token será removido após migração completa do frontend
+  withCredentials: true, // Cookies HttpOnly são enviados automaticamente
 });
 
 api.interceptors.request.use((config) => {
+  // Backend já usa HttpOnly cookies - este interceptor será removido após migração completa
+  // Mantido temporariamente para backward compatibility durante transição
   const { token } = useAuthStore.getState();
 
   if (token) {
@@ -27,6 +32,6 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       useAuthStore.getState().clearAuth();
     }
-    return Promise.reject(error);
+    throw error;
   },
 );

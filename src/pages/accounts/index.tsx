@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,21 +7,21 @@ import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/u
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCompanyStore } from '@/stores/company';
-import { BanknotesIcon } from '@heroicons/react/24/outline';
-import { Plus, Search, Edit, Trash2, Grid3x3, List } from 'lucide-react';
-import { formatCurrency } from '@/utils/formatters';
-import { Account } from '@/services/accountService';
-import { CreateAccount } from '@/services/accountService';
-import { AccountFormModal } from '@/components/accounts/AccountFormModal';
-import { Loading } from '@/components/Loading';
-import { cn } from '@/lib/utils';
-import { AxiosError } from 'axios';
 import {
+  BanknotesIcon,
   BanknotesIcon as BanknotesIconHero,
   BuildingLibraryIcon,
   CreditCardIcon,
   WalletIcon,
 } from '@heroicons/react/24/outline';
+import { Plus, Search, Edit, Trash2, Grid3x3, List } from 'lucide-react';
+import { formatCurrency } from '@/utils/formatters';
+import { Account, CreateAccount } from '@/services/accountService';
+import { AccountFormModal } from '@/components/accounts/AccountFormModal';
+import { Loading } from '@/components/Loading';
+import { cn } from '@/lib/utils';
+import { AxiosError } from 'axios';
+import { useViewMode } from '@/hooks/useViewMode';
 
 const accountTypes = [
   { value: 'checking', label: 'Conta Corrente', icon: BanknotesIconHero },
@@ -68,17 +68,7 @@ export function AccountsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
-    const saved = localStorage.getItem('accounts-view-mode');
-    if (saved === 'grid' || saved === 'list') {
-      return saved;
-    }
-    return 'grid';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('accounts-view-mode', viewMode);
-  }, [viewMode]);
+  const [viewMode, setViewMode] = useViewMode('accounts-view-mode');
 
   const filteredAccounts = useMemo(() => {
     if (!accounts) return [];
@@ -108,9 +98,9 @@ export function AccountsPage() {
 
     if (editingAccount) {
       updateAccount({ id: editingAccount.id, data });
-      } else {
+    } else {
       createAccount(data);
-      }
+    }
     setShowFormModal(false);
     setEditingAccount(null);
   };
@@ -156,7 +146,9 @@ export function AccountsPage() {
               </p>
               <Button
                 className="bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded"
-                onClick={() => (window.location.href = '/companies')}
+                onClick={() => {
+                  globalThis.location.href = '/companies';
+                }}
               >
                 Criar empresa
               </Button>
@@ -185,7 +177,9 @@ export function AccountsPage() {
             </p>
             <Button
               className="bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded"
-              onClick={() => (window.location.href = '/companies')}
+              onClick={() => {
+                globalThis.location.href = '/companies';
+              }}
             >
               Criar empresa
             </Button>
@@ -204,7 +198,9 @@ export function AccountsPage() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <BanknotesIcon className="h-8 w-8 text-primary-400" />
-                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Contas Bancárias</h1>
+                <h1 className="text-2xl font-bold text-text dark:text-text-dark">
+                  Contas Bancárias
+                </h1>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Gerencie suas contas bancárias e investimentos
@@ -225,20 +221,18 @@ export function AccountsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <Input
+                  <Input
                     type="text"
                     placeholder="Buscar por nome, instituição, agência ou conta..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                />
+                  />
                 </div>
                 <Select value={filterType} onValueChange={setFilterType}>
                   <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
                     <span>
-                      {filterType === 'all'
-                        ? 'Todos os tipos'
-                        : getTypeLabel(filterType as AccountType)}
+                      {filterType === 'all' ? 'Todos os tipos' : getTypeLabel(filterType)}
                     </span>
                   </SelectTrigger>
                   <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
@@ -251,10 +245,10 @@ export function AccountsPage() {
                   </SelectContent>
                 </Select>
                 <div className="flex gap-2 border border-border dark:border-border-dark rounded-md overflow-hidden bg-background dark:bg-background-dark">
-                <Button
+                  <Button
                     type="button"
                     variant="ghost"
-                  size="sm"
+                    size="sm"
                     onClick={() => setViewMode('grid')}
                     className={cn(
                       'flex-1 rounded-none border-0',
@@ -264,7 +258,7 @@ export function AccountsPage() {
                     )}
                   >
                     <Grid3x3 className="h-4 w-4" />
-                </Button>
+                  </Button>
                   <Button
                     type="button"
                     variant="ghost"
@@ -325,9 +319,9 @@ export function AccountsPage() {
               {viewMode === 'grid' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredAccounts.map((account) => {
-                const Icon =
+                    const Icon =
                       accountTypes.find((t) => t.value === account.type)?.icon || BanknotesIconHero;
-                return (
+                    return (
                       <Card
                         key={account.id}
                         className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow"
@@ -336,23 +330,23 @@ export function AccountsPage() {
                           {/* Header do Card */}
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div
+                              <div
                                 className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: account.color }}
-                      >
+                                style={{ backgroundColor: account.color }}
+                              >
                                 <Icon className="h-6 w-6 text-white" />
-                      </div>
+                              </div>
                               <div className="flex-1 min-w-0">
                                 <h3 className="text-lg font-semibold text-text dark:text-text-dark mb-1 truncate">
-                          {account.name}
+                                  {account.name}
                                 </h3>
                                 <span
                                   className={cn(
                                     'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-                                    getTypeBadgeColor(account.type as AccountType),
+                                    getTypeBadgeColor(account.type),
                                   )}
                                 >
-                                  {getTypeLabel(account.type as AccountType)}
+                                  {getTypeLabel(account.type)}
                                 </span>
                               </div>
                             </div>
@@ -361,8 +355,12 @@ export function AccountsPage() {
                           {/* Informações */}
                           <div className="space-y-2 mb-4">
                             <div className="text-sm">
-                              <span className="text-gray-500 dark:text-gray-400">Instituição: </span>
-                              <span className="text-text dark:text-text-dark">{account.institution}</span>
+                              <span className="text-gray-500 dark:text-gray-400">
+                                Instituição:{' '}
+                              </span>
+                              <span className="text-text dark:text-text-dark">
+                                {account.institution}
+                              </span>
                             </div>
                             <div className="text-sm">
                               <span className="text-gray-500 dark:text-gray-400">Agência: </span>
@@ -439,10 +437,10 @@ export function AccountsPage() {
                                   <span
                                     className={cn(
                                       'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-                                      getTypeBadgeColor(account.type as AccountType),
+                                      getTypeBadgeColor(account.type),
                                     )}
                                   >
-                                    {getTypeLabel(account.type as AccountType)}
+                                    {getTypeLabel(account.type)}
                                   </span>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
@@ -455,54 +453,60 @@ export function AccountsPage() {
                                     </span>
                                   </div>
                                   <div>
-                                    <span className="text-gray-500 dark:text-gray-400">Agência: </span>
+                                    <span className="text-gray-500 dark:text-gray-400">
+                                      Agência:{' '}
+                                    </span>
                                     <span className="text-text dark:text-text-dark font-mono">
                                       {account.agency}
                                     </span>
                                   </div>
                                   <div>
-                                    <span className="text-gray-500 dark:text-gray-400">Conta: </span>
+                                    <span className="text-gray-500 dark:text-gray-400">
+                                      Conta:{' '}
+                                    </span>
                                     <span className="text-text dark:text-text-dark font-mono">
                                       {account.accountNumber}
                                     </span>
-                        </div>
+                                  </div>
                                   <div>
-                                    <span className="text-gray-500 dark:text-gray-400">Saldo: </span>
+                                    <span className="text-gray-500 dark:text-gray-400">
+                                      Saldo:{' '}
+                                    </span>
                                     <span className="text-text dark:text-text-dark font-semibold">
                                       {formatCurrency(account.balance)}
                                     </span>
-                        </div>
-                        </div>
-                      </div>
-                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
 
                             {/* Ações */}
                             <div className="flex gap-2 md:flex-shrink-0">
-                      <Button
-                        size="sm"
+                              <Button
+                                size="sm"
                                 variant="outline"
                                 onClick={() => handleEdit(account)}
-                        disabled={isUpdating}
+                                disabled={isUpdating}
                                 className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
-                      >
+                              >
                                 <Edit className="h-4 w-4 mr-2" />
-                        Editar
-                      </Button>
-                      <Button
-                        size="sm"
+                                Editar
+                              </Button>
+                              <Button
+                                size="sm"
                                 variant="outline"
-                        onClick={() => handleDelete(account.id)}
-                        disabled={isDeleting}
+                                onClick={() => handleDelete(account.id)}
+                                disabled={isDeleting}
                                 className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
-                      >
+                              >
                                 <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </Card>
-                );
-              })}
+                    );
+                  })}
                 </div>
               )}
             </>

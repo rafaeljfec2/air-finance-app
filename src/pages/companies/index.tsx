@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import { Company } from '@/types/company';
 import { CompanyFormModal } from '@/components/companies/CompanyFormModal';
 import { Loading } from '@/components/Loading';
 import { cn } from '@/lib/utils';
+import { useViewMode } from '@/hooks/useViewMode';
 
 const typeOptions = [
   { value: 'matriz', label: 'Matriz' },
@@ -27,6 +28,7 @@ type CompanyType = 'matriz' | 'filial' | 'holding' | 'prestadora' | 'outra';
 
 // Helper function to remove non-digit characters using regex
 // Note: replaceAll() doesn't support regex, so replace() with global flag is required
+// eslint-disable-next-line sonarjs/prefer-replace-all
 function removeNonDigits(value: string): string {
   return value.replace(/\D/g, '');
 }
@@ -65,17 +67,7 @@ export function CompaniesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
-    const saved = localStorage.getItem('companies-view-mode');
-    if (saved === 'grid' || saved === 'list') {
-      return saved;
-    }
-    return 'grid';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('companies-view-mode', viewMode);
-  }, [viewMode]);
+  const [viewMode, setViewMode] = useViewMode('companies-view-mode');
 
   const filteredCompanies = useMemo(() => {
     if (!companies) return [];

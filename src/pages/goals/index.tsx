@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,10 +15,15 @@ import { Loading } from '@/components/Loading';
 import { cn } from '@/lib/utils';
 import { useCompanyStore } from '@/stores/company';
 import { AxiosError } from 'axios';
+import { useViewMode } from '@/hooks/useViewMode';
 
 const statusOptions = [
   { value: 'active', label: 'Ativa', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
-  { value: 'completed', label: 'Concluída', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
+  {
+    value: 'completed',
+    label: 'Concluída',
+    color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+  },
   { value: 'cancelled', label: 'Cancelada', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
 ] as const;
 
@@ -50,24 +55,14 @@ export function GoalsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
-    const saved = localStorage.getItem('goals-view-mode');
-    if (saved === 'grid' || saved === 'list') {
-      return saved;
-    }
-    return 'grid';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('goals-view-mode', viewMode);
-  }, [viewMode]);
+  const [viewMode, setViewMode] = useViewMode('goals-view-mode');
 
   const filteredGoals = useMemo(() => {
     if (!goals) return [];
     return goals.filter((goal) => {
       const matchesSearch =
         goal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (goal.description && goal.description.toLowerCase().includes(searchTerm.toLowerCase()));
+        goal.description?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = filterStatus === 'all' || goal.status === filterStatus;
       return matchesSearch && matchesStatus;
     });
@@ -129,12 +124,12 @@ export function GoalsPage() {
           <div className="container mx-auto px-2 sm:px-6 py-10 flex flex-col items-center justify-center min-h-[40vh]">
             <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded shadow-md max-w-lg w-full text-center">
               <h2 className="text-lg font-semibold mb-2">Nenhuma empresa selecionada</h2>
-              <p className="mb-4">
-                Para cadastrar metas, você precisa criar uma empresa primeiro.
-              </p>
+              <p className="mb-4">Para cadastrar metas, você precisa criar uma empresa primeiro.</p>
               <Button
                 className="bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded"
-                onClick={() => (window.location.href = '/companies')}
+                onClick={() => {
+                  globalThis.location.href = '/companies';
+                }}
               >
                 Criar empresa
               </Button>
@@ -158,12 +153,12 @@ export function GoalsPage() {
         <div className="container mx-auto px-2 sm:px-6 py-10 flex flex-col items-center justify-center min-h-[40vh]">
           <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded shadow-md max-w-lg w-full text-center">
             <h2 className="text-lg font-semibold mb-2">Nenhuma empresa selecionada</h2>
-            <p className="mb-4">
-              Para cadastrar metas, você precisa criar uma empresa primeiro.
-            </p>
+            <p className="mb-4">Para cadastrar metas, você precisa criar uma empresa primeiro.</p>
             <Button
               className="bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded"
-              onClick={() => (window.location.href = '/companies')}
+              onClick={() => {
+                globalThis.location.href = '/companies';
+              }}
             >
               Criar empresa
             </Button>

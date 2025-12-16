@@ -2,6 +2,7 @@ import React, { createContext, useMemo } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Company } from '@/types/company';
+import { sanitizeCompany } from '@/utils/sanitize';
 
 interface CompanyState {
   companyId: string;
@@ -14,15 +15,45 @@ interface CompanyContextValue extends CompanyState {
   selectedCompany: Company | null;
 }
 
+/**
+ * Security: Sanitize companies array before storing
+ * Only store essential fields, remove sensitive data
+ */
+const sanitizeCompanies = (companies: Company[]): Partial<Company>[] => {
+  return companies.map((company) => sanitizeCompany(company) as Partial<Company>);
+};
+
 const useCompanyStore = create<CompanyState>()(
   persist(
     (set) => ({
       companyId: '',
       setCompanyId: (id) => set({ companyId: id }),
       companies: [],
-      setCompanies: (companies) => set({ companies }),
+      setCompanies: (companies) =>
+        set({
+          // Security: Sanitize companies before storing
+          companies: companies.map((c) => sanitizeCompany(c) ?? c),
+        }),
     }),
-    { name: '@air-finance:company' },
+    {
+      name: '@air-finance:company',
+      // Security: Only store company IDs and essential fields
+      partialize: (state) => ({
+        companyId: state.companyId,
+        // Store only minimal company data (IDs and names)
+        companies: state.companies.map((c) => ({
+          id: c.id,
+          name: c.name,
+          type: c.type,
+        })) as Company[],
+      }),
+      onRehydrateStorage: () => (state) => {
+        // Re-sanitize on rehydration
+        if (state?.companies) {
+          state.companies = state.companies.map((c) => sanitizeCompany(c) as Company);
+        }
+      },
+    },
   ),
 );
 

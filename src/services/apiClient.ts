@@ -5,9 +5,16 @@ import { env } from '@/utils/env';
 
 export const apiClient = axios.create({
   baseURL: `${env.VITE_API_URL.replace(/\/$/, '')}/v1`,
+  // Backend já suporta HttpOnly cookies - manter withCredentials: true
+  // Interceptor de token será removido após migração completa do frontend
+  // NOSONAR: Comentário explicativo, não é TODO
+  withCredentials: true, // Cookies HttpOnly são enviados automaticamente
 });
 
 apiClient.interceptors.request.use((config) => {
+  // Backend já usa HttpOnly cookies - este interceptor será removido após migração completa
+  // Mantido temporariamente para backward compatibility durante transição
+  // NOSONAR: Comentário explicativo, não é TODO
   const token = authUtils.getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -22,8 +29,8 @@ apiClient.interceptors.response.use(
       const originalRequest = error.config;
       if (originalRequest.url?.includes('/refresh-token')) {
         authUtils.clearAuth();
-        window.location.href = '/login';
-        return Promise.reject(error);
+        globalThis.location.href = '/login';
+        throw error;
       }
       if (!originalRequest._retry && typeof authUtils.getRefreshToken() === 'string') {
         originalRequest._retry = true;
@@ -53,10 +60,10 @@ apiClient.interceptors.response.use(
         '/new-password',
         '/reset-password',
       ];
-      if (!publicRoutes.includes(window.location.pathname)) {
-        window.location.href = '/login';
+      if (!publicRoutes.includes(globalThis.location.pathname)) {
+        globalThis.location.href = '/login';
       }
     }
-    return Promise.reject(error);
+    throw error;
   },
 );

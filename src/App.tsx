@@ -5,6 +5,8 @@ import { ThemeProvider } from './components/ThemeProvider';
 import { Toaster } from 'sonner';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { CompanyProvider } from '@/contexts/companyContext';
+import { useEffect } from 'react';
+import { initStorageCleanup } from '@/utils/storageCleanup';
 
 // Criando uma instância do QueryClient
 const queryClient = new QueryClient({
@@ -17,6 +19,11 @@ const queryClient = new QueryClient({
 });
 
 export function App() {
+  // Initialize storage cleanup on app start
+  useEffect(() => {
+    initStorageCleanup();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <CompanyProvider>

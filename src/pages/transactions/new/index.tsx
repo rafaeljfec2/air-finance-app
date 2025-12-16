@@ -85,13 +85,28 @@ export function NewTransaction() {
     return errs;
   }, [formData, companyId]);
 
-  // Autosave (opcional, pode remover se não quiser)
+  // Security: Use sessionStorage instead of localStorage for draft data
+  // sessionStorage is cleared when tab closes, reducing exposure
   useEffect(() => {
-    localStorage.setItem('transaction_draft', JSON.stringify(formData));
+    try {
+      sessionStorage.setItem('transaction_draft', JSON.stringify(formData));
+    } catch (error) {
+      console.warn('Failed to save transaction draft:', error);
+    }
   }, [formData]);
+  
   useEffect(() => {
-    const draft = localStorage.getItem('transaction_draft');
-    if (draft) setFormData(JSON.parse(draft));
+    try {
+      const draft = sessionStorage.getItem('transaction_draft');
+      if (draft) {
+        const parsed = JSON.parse(draft);
+        setFormData(parsed);
+      }
+    } catch (error) {
+      console.warn('Failed to load transaction draft:', error);
+      // Clear corrupted draft
+      sessionStorage.removeItem('transaction_draft');
+    }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -125,7 +140,7 @@ export function NewTransaction() {
       createTransaction(payload, {
         onSuccess: () => {
           toast({ type: 'success', description: 'Transação salva com sucesso!' });
-          localStorage.removeItem('transaction_draft');
+          sessionStorage.removeItem('transaction_draft');
           navigate('/transactions');
         },
         onError: (error) => {
@@ -383,7 +398,7 @@ export function NewTransaction() {
                 </div>
               </div>
 
-              {/* Linha 3: Data, Valor, Parcelas, Repetir todo mês */}
+              {/* Linha 3: Data, Valor, Parcelas, Repetir mensalmente */}
               <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   {/* Data */}
@@ -461,7 +476,7 @@ export function NewTransaction() {
                       </SelectContent>
                     </Select>
                   </div>
-                  {/* Repetir todo mês */}
+                  {/* Repetir mensalmente */}
                   <div className="flex flex-col justify-center h-full">
                     <div className="flex items-center gap-2">
                       <Switch

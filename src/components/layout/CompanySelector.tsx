@@ -45,16 +45,21 @@ export const CompanySelector = () => {
     changeActiveCompany(selectedCompany || null);
   };
 
+  // Get full company data from query (includes CNPJ) if activeCompany is missing it
+  const displayCompany = activeCompany
+    ? companies.find((c: Company) => c.id === activeCompany.id) || activeCompany
+    : null;
+
   return (
     <Select value={activeCompany?.id || ''} onValueChange={handleCompanyChange}>
       <SelectTrigger className="min-w-[220px] h-12 px-4 bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-md flex items-center justify-between shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors gap-2">
         <div className="flex flex-col items-start flex-1">
           <span className="font-bold text-text dark:text-text-dark leading-tight">
-            {activeCompany?.name || 'Selecione uma empresa'}
+            {displayCompany?.name || 'Selecione uma empresa'}
           </span>
-          {activeCompany?.cnpj && (
+          {displayCompany?.cnpj && (
             <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              {formatCNPJ(activeCompany.cnpj)}
+              {formatCNPJ(displayCompany.cnpj)}
             </span>
           )}
         </div>

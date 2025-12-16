@@ -9,6 +9,8 @@ import { toast } from '@/components/ui/toast';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useAuthStore } from '@/stores/auth';
 import { useTheme } from '@/stores/useTheme';
+import { getCurrentUser } from '@/services/authService';
+import { useEffect, useState } from 'react';
 import {
   Bell,
   Camera,
@@ -26,7 +28,6 @@ import {
   User,
   X,
 } from 'lucide-react';
-import React, { useState } from 'react';
 
 type ProfileFormData = {
   name: string;
@@ -54,27 +55,80 @@ export function Profile() {
   const { setTheme } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(false);
+  const [fullUserData, setFullUserData] = useState<typeof user | null>(null);
   const [avatar, setAvatar] = useState(user?.avatar || '/avatars/default.png');
+  
+  // Fetch full user data from server (includes email and other sensitive fields)
+  useEffect(() => {
+    const fetchFullUserData = async () => {
+      if (!user?.id) return;
+      
+      setIsLoadingUser(true);
+      try {
+        const fullUser = await getCurrentUser();
+        setFullUserData(fullUser);
+      } catch (error) {
+        console.error('Error fetching full user data:', error);
+        // Fallback to stored user data
+        setFullUserData(user);
+      } finally {
+        setIsLoadingUser(false);
+      }
+    };
+
+    fetchFullUserData();
+  }, [user?.id]);
+
+  const displayUser = fullUserData || user;
+  
   const [formData, setFormData] = useState<ProfileFormData>({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    location: user?.location || '',
-    bio: user?.bio || '',
+    name: displayUser?.name || '',
+    email: displayUser?.email || '',
+    phone: displayUser?.phone || '',
+    location: displayUser?.location || '',
+    bio: displayUser?.bio || '',
     notifications: {
-      email: user?.notifications?.email ?? true,
-      push: user?.notifications?.push ?? true,
-      updates: user?.notifications?.updates ?? false,
-      marketing: user?.notifications?.marketing ?? false,
-      security: user?.notifications?.security ?? true,
+      email: displayUser?.notifications?.email ?? true,
+      push: displayUser?.notifications?.push ?? true,
+      updates: displayUser?.notifications?.updates ?? false,
+      marketing: displayUser?.notifications?.marketing ?? false,
+      security: displayUser?.notifications?.security ?? true,
     },
     preferences: {
-      currency: user?.preferences?.currency || 'BRL',
-      language: user?.preferences?.language || 'pt-BR',
-      theme: user?.preferences?.theme || 'system',
-      dateFormat: user?.preferences?.dateFormat || 'DD/MM/YYYY',
+      currency: displayUser?.preferences?.currency || 'BRL',
+      language: displayUser?.preferences?.language || 'pt-BR',
+      theme: displayUser?.preferences?.theme || 'system',
+      dateFormat: displayUser?.preferences?.dateFormat || 'DD/MM/YYYY',
     },
   });
+
+  // Update form data when full user data is loaded
+  useEffect(() => {
+    if (fullUserData) {
+      setFormData({
+        name: fullUserData.name || '',
+        email: fullUserData.email || '',
+        phone: fullUserData.phone || '',
+        location: fullUserData.location || '',
+        bio: fullUserData.bio || '',
+        notifications: {
+          email: fullUserData.notifications?.email ?? true,
+          push: fullUserData.notifications?.push ?? true,
+          updates: fullUserData.notifications?.updates ?? false,
+          marketing: fullUserData.notifications?.marketing ?? false,
+          security: fullUserData.notifications?.security ?? true,
+        },
+        preferences: {
+          currency: fullUserData.preferences?.currency || 'BRL',
+          language: fullUserData.preferences?.language || 'pt-BR',
+          theme: fullUserData.preferences?.theme || 'system',
+          dateFormat: fullUserData.preferences?.dateFormat || 'DD/MM/YYYY',
+        },
+      });
+      setAvatar(fullUserData.avatar || '/avatars/default.png');
+    }
+  }, [fullUserData]);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -171,30 +225,30 @@ export function Profile() {
   };
 
   const handleCancel = () => {
-    if (!user) return;
+    if (!displayUser) return;
 
     // Restaurar dados originais
     setFormData({
-      name: user.name,
-      email: user.email,
-      phone: user.phone || '',
-      location: user.location || '',
-      bio: user.bio || '',
+      name: displayUser.name,
+      email: displayUser.email,
+      phone: displayUser.phone || '',
+      location: displayUser.location || '',
+      bio: displayUser.bio || '',
       notifications: {
-        email: user.notifications?.email ?? true,
-        push: user.notifications?.push ?? true,
-        updates: user.notifications?.updates ?? false,
-        marketing: user.notifications?.marketing ?? false,
-        security: user.notifications?.security ?? true,
+        email: displayUser.notifications?.email ?? true,
+        push: displayUser.notifications?.push ?? true,
+        updates: displayUser.notifications?.updates ?? false,
+        marketing: displayUser.notifications?.marketing ?? false,
+        security: displayUser.notifications?.security ?? true,
       },
       preferences: {
-        currency: user.preferences?.currency || 'BRL',
-        language: user.preferences?.language || 'pt-BR',
-        theme: user.preferences?.theme || 'system',
-        dateFormat: user.preferences?.dateFormat || 'DD/MM/YYYY',
+        currency: displayUser.preferences?.currency || 'BRL',
+        language: displayUser.preferences?.language || 'pt-BR',
+        theme: displayUser.preferences?.theme || 'system',
+        dateFormat: displayUser.preferences?.dateFormat || 'DD/MM/YYYY',
       },
     });
-    setAvatar(user.avatar || '/avatars/default.png');
+    setAvatar(displayUser.avatar || '/avatars/default.png');
     setIsEditing(false);
   };
 

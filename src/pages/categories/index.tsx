@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,22 +7,24 @@ import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/u
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useCategories } from '@/hooks/useCategories';
 import { useCompanyStore } from '@/stores/company';
-import { TagIcon } from '@heroicons/react/24/outline';
-import { Plus, Search, Edit, Trash2, Grid3x3, List } from 'lucide-react';
-import { Category } from '@/services/categoryService';
-import { CreateCategory } from '@/services/categoryService';
-import { CategoryFormModal } from '@/components/categories/CategoryFormModal';
-import { Loading } from '@/components/Loading';
-import { cn } from '@/lib/utils';
+// eslint-disable-next-line sonarjs/no-duplicate-string
 import {
+  TagIcon,
+  TagIcon as TagIconHero,
   ArrowTrendingDownIcon,
   ArrowTrendingUpIcon,
   BuildingLibraryIcon,
   GiftIcon,
   ShoppingCartIcon,
-  TagIcon as TagIconHero,
   WalletIcon,
 } from '@heroicons/react/24/outline';
+import { Plus, Search, Edit, Trash2, Grid3x3, List } from 'lucide-react';
+// eslint-disable-next-line sonarjs/no-duplicate-string
+import { Category, CreateCategory } from '@/services/categoryService';
+import { CategoryFormModal } from '@/components/categories/CategoryFormModal';
+import { Loading } from '@/components/Loading';
+import { cn } from '@/lib/utils';
+import { useViewMode } from '@/hooks/useViewMode';
 
 const iconOptions = [
   { value: 'TagIcon', icon: TagIconHero },
@@ -74,17 +76,7 @@ export function CategoriesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
-    const saved = localStorage.getItem('categories-view-mode');
-    if (saved === 'grid' || saved === 'list') {
-      return saved;
-    }
-    return 'grid';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('categories-view-mode', viewMode);
-  }, [viewMode]);
+  const [viewMode, setViewMode] = useViewMode('categories-view-mode');
 
   const filteredCategories = useMemo(() => {
     if (!categories) return [];
@@ -164,7 +156,9 @@ export function CategoriesPage() {
             </p>
             <Button
               className="bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded"
-              onClick={() => (window.location.href = '/companies')}
+              onClick={() => {
+                globalThis.location.href = '/companies';
+              }}
             >
               Criar empresa
             </Button>
@@ -217,7 +211,7 @@ export function CategoriesPage() {
                     <span>
                       {filterType === 'all'
                         ? 'Todos os tipos'
-                        : getTypeLabel(filterType as CategoryType)}
+                        : getTypeLabel(filterType)}
                     </span>
                   </SelectTrigger>
                   <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
@@ -330,11 +324,11 @@ export function CategoriesPage() {
                                 <span
                                   className={cn(
                                     'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-                                    getTypeBadgeColor(category.type as CategoryType),
+                                    getTypeBadgeColor(category.type),
                                   )}
                                 >
                                   <TypeIcon className="h-3 w-3 mr-1" />
-                                  {getTypeLabel(category.type as CategoryType)}
+                                  {getTypeLabel(category.type)}
                                 </span>
                               </div>
                             </div>
@@ -397,11 +391,11 @@ export function CategoriesPage() {
                                   <span
                                     className={cn(
                                       'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-                                      getTypeBadgeColor(category.type as CategoryType),
-                                    )}
-                                  >
-                                    <TypeIcon className="h-3 w-3 mr-1" />
-                                    {getTypeLabel(category.type as CategoryType)}
+                                    getTypeBadgeColor(category.type),
+                                  )}
+                                >
+                                  <TypeIcon className="h-3 w-3 mr-1" />
+                                  {getTypeLabel(category.type)}
                                   </span>
                         </div>
                       </div>
