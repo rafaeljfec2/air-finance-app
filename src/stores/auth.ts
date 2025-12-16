@@ -3,7 +3,6 @@ import { User } from '@/types/user';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { sanitizeUser } from '@/utils/sanitize';
-import { createSecureStorage, STORAGE_CONFIG } from '@/utils/secureStorage';
 
 interface AuthStore extends AuthState {
   setUser: (user: User | null) => void;

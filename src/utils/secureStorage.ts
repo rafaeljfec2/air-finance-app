@@ -5,7 +5,7 @@
 
 import { StateStorage } from 'zustand/middleware';
 import { encryptObject, decryptObject } from './encryption';
-import { getStorageItem, setStorageItem, clearExpiredItems, getStorageSize } from './storage';
+import { clearExpiredItems, getStorageSize } from './storage';
 
 interface SecureStorageOptions {
   /**
@@ -36,7 +36,7 @@ interface SecureStorageOptions {
  * Supports expiration, encryption, and monitoring
  */
 export const createSecureStorage = (
-  name: string,
+  _name: string,
   options: SecureStorageOptions = {},
 ): StateStorage => {
   const {

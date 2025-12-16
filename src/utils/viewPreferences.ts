@@ -8,7 +8,7 @@ import { STORAGE_CONFIG } from './secureStorage';
 
 const VIEW_PREFERENCES_KEY = 'view-preferences';
 
-interface ViewPreferences {
+export interface ViewPreferences {
   'companies-view-mode'?: 'grid' | 'list';
   'accounts-view-mode'?: 'grid' | 'list';
   'categories-view-mode'?: 'grid' | 'list';

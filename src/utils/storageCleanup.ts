@@ -5,7 +5,6 @@
  */
 
 import { clearExpiredItems, getStorageSize } from './storage';
-import { STORAGE_CONFIG } from './secureStorage';
 
 /**
  * Clean expired items from all stores
@@ -48,7 +47,7 @@ export const initStorageCleanup = (): void => {
  * Manually clean specific store if it's expired
  * This can be used to check expiration before reading
  */
-export const checkAndCleanStore = (storeName: string, ttl: number): boolean => {
+export const checkAndCleanStore = (storeName: string, _ttl: number): boolean => {
   try {
     const item = localStorage.getItem(storeName);
     if (!item) return false;

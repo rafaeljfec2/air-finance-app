@@ -15,14 +15,6 @@ interface CompanyContextValue extends CompanyState {
   selectedCompany: Company | null;
 }
 
-/**
- * Security: Sanitize companies array before storing
- * Only store essential fields, remove sensitive data
- */
-const sanitizeCompanies = (companies: Company[]): Partial<Company>[] => {
-  return companies.map((company) => sanitizeCompany(company) as Partial<Company>);
-};
-
 const useCompanyStore = create<CompanyState>()(
   persist(
     (set) => ({

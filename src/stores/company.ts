@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Company } from '@/types';
 import { sanitizeCompany } from '@/utils/sanitize';
-import { createSecureStorage, STORAGE_CONFIG } from '@/utils/secureStorage';
 
 interface CompanyStore {
   activeCompany: Company | null;

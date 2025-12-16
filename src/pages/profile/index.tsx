@@ -55,7 +55,7 @@ export function Profile() {
   const { setTheme } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoadingUser, setIsLoadingUser] = useState(false);
+  const [, setIsLoadingUser] = useState(false);
   const [fullUserData, setFullUserData] = useState<typeof user | null>(null);
   const [avatar, setAvatar] = useState(user?.avatar || '/avatars/default.png');
   
