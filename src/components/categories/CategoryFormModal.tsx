@@ -168,7 +168,11 @@ export function CategoryFormModal({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField label="Nome da categoria *" error={errors.name} className="md:col-span-2">
+                <FormField
+                  label="Nome da categoria *"
+                  error={errors.name}
+                  className="md:col-span-2"
+                >
                   <div className="relative">
                     <Input
                       name="name"
@@ -205,7 +209,8 @@ export function CategoryFormModal({
                           <TrendingDown className="h-4 w-4 text-red-500" />
                         )}
                         <span>
-                          {categoryTypes.find((t) => t.value === form.type)?.label || 'Selecione...'}
+                          {categoryTypes.find((t) => t.value === form.type)?.label ||
+                            'Selecione...'}
                         </span>
                       </div>
                     </SelectTrigger>
@@ -284,5 +289,3 @@ export function CategoryFormModal({
     </Modal>
   );
 }
-
-

@@ -9,14 +9,13 @@ import { FormField } from '@/components/ui/FormField';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
-import { CreditCard as CreditCardType, CreateCreditCardPayload } from '@/services/creditCardService';
+import {
+  CreditCard as CreditCardType,
+  CreateCreditCardPayload,
+} from '@/services/creditCardService';
 import { useCompanyStore } from '@/stores/company';
 import { cn } from '@/lib/utils';
-import {
-  BanknotesIcon,
-  BuildingLibraryIcon,
-  CreditCardIcon,
-} from '@heroicons/react/24/outline';
+import { BanknotesIcon, BuildingLibraryIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 
 const bankTypes = [
   { value: 'nubank', label: 'Nubank', icon: CreditCardIcon },
@@ -78,9 +77,7 @@ export function CreditCardFormModal({
         companyId: creditCard.companyId,
       });
       setLimitInput(
-        creditCard.limit
-          ? formatCurrencyInput(creditCard.limit.toFixed(2).replace('.', ''))
-          : '',
+        creditCard.limit ? formatCurrencyInput(creditCard.limit.toFixed(2).replace('.', '')) : '',
       );
     } else {
       setForm({
@@ -274,7 +271,9 @@ export function CreditCardFormModal({
                 <FormField label="Dia de vencimento *" error={errors.dueDay}>
                   <Select
                     value={String(form.dueDay)}
-                    onValueChange={(value) => setForm((prev) => ({ ...prev, dueDay: Number(value) }))}
+                    onValueChange={(value) =>
+                      setForm((prev) => ({ ...prev, dueDay: Number(value) }))
+                    }
                   >
                     <SelectTrigger
                       className={cn(
@@ -356,5 +355,3 @@ export function CreditCardFormModal({
     </Modal>
   );
 }
-
-
