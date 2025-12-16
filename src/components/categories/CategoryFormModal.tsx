@@ -10,7 +10,6 @@ import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Category } from '@/services/categoryService';
 import { CreateCategory } from '@/services/categoryService';
-import { useCompanyStore } from '@/stores/company';
 import { cn } from '@/lib/utils';
 import {
   ArrowTrendingDownIcon,
@@ -54,7 +53,6 @@ export function CategoryFormModal({
   category,
   isLoading = false,
 }: Readonly<CategoryFormModalProps>) {
-  const { activeCompany } = useCompanyStore();
   const initialFormState: CreateCategory = useMemo(
     () => ({
       name: '',

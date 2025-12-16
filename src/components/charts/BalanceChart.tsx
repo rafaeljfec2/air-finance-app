@@ -31,23 +31,23 @@ interface CustomTooltipProps extends TooltipProps<number, string> {
   label?: string;
 }
 
-export function BalanceChart({ data }: Readonly<BalanceChartProps>) {
-  const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {format(new Date(label || ''), 'dd MMM yyyy', { locale: ptBR })}
-          </p>
-          <p className="text-base font-medium text-gray-900 dark:text-white">
-            {formatCurrency(payload[0].value)}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
+function CustomTooltip({ active, payload, label }: Readonly<CustomTooltipProps>) {
+  if (active && payload?.length) {
+    return (
+      <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {format(new Date(label ?? ''), 'dd MMM yyyy', { locale: ptBR })}
+        </p>
+        <p className="text-base font-medium text-gray-900 dark:text-white">
+          {formatCurrency(payload[0]?.value ?? 0)}
+        </p>
+      </div>
+    );
+  }
+  return null;
+}
 
+export function BalanceChart({ data }: Readonly<BalanceChartProps>) {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart
@@ -61,16 +61,8 @@ export function BalanceChart({ data }: Readonly<BalanceChartProps>) {
       >
         <defs>
           <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop
-              offset="5%"
-              stopColor="rgb(34, 197, 94)"
-              stopOpacity={0.2}
-            />
-            <stop
-              offset="95%"
-              stopColor="rgb(34, 197, 94)"
-              stopOpacity={0}
-            />
+            <stop offset="5%" stopColor="rgb(34, 197, 94)" stopOpacity={0.2} />
+            <stop offset="95%" stopColor="rgb(34, 197, 94)" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid
@@ -105,4 +97,4 @@ export function BalanceChart({ data }: Readonly<BalanceChartProps>) {
       </AreaChart>
     </ResponsiveContainer>
   );
-} 
+}

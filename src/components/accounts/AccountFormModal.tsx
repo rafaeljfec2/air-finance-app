@@ -343,7 +343,7 @@ export function AccountFormModal({
                     <Input
                       name="initialBalanceDate"
                       type="date"
-                      value={form.initialBalanceDate}
+                      value={form.initialBalanceDate ?? ''}
                       onChange={handleChange}
                       required
                       className={cn(

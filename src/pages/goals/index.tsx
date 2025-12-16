@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { Progress } from '@/components/ui/progress';
 import { useGoals } from '@/hooks/useGoals';
 import { FlagIcon } from '@heroicons/react/24/outline';
 import { Plus, Search, Grid3x3, List } from 'lucide-react';
