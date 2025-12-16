@@ -207,7 +207,9 @@ export function CategoriesPage() {
                 <Select value={filterType} onValueChange={setFilterType}>
                   <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
                     <span>
-                      {filterType === 'all' ? 'Todos os tipos' : getTypeLabel(filterType as CategoryType)}
+                      {filterType === 'all'
+                        ? 'Todos os tipos'
+                        : getTypeLabel(filterType as CategoryType)}
                     </span>
                   </SelectTrigger>
                   <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
