@@ -1,63 +1,86 @@
 import axios from 'axios';
 import { authUtils } from '../utils/auth';
-import { refreshToken as refreshTokenService } from './authService';
 import { env } from '@/utils/env';
 
+/**
+ * Axios client principal da aplicação.
+ * - Usa withCredentials para enviar cookies HttpOnly automaticamente.
+ * - NÃO injeta mais Authorization manual com Bearer token.
+ */
 export const apiClient = axios.create({
   baseURL: `${env.VITE_API_URL.replace(/\/$/, '')}/v1`,
   withCredentials: true, // Cookies HttpOnly são enviados automaticamente
 });
 
-apiClient.interceptors.request.use((config) => {
-  const token = authUtils.getToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+/**
+ * Cliente dedicado apenas para refresh, sem interceptors,
+ * para evitar loops de 401 dentro do próprio interceptor.
+ */
+const refreshClient = axios.create({
+  baseURL: `${env.VITE_API_URL.replace(/\/$/, '')}/v1`,
+  withCredentials: true,
 });
+
+const REFRESH_URL = '/auth/refresh-token';
+
+interface RetryableRequestConfig {
+  _retry?: boolean;
+  url?: string;
+  // Permite outras propriedades sem perder compatibilidade com o tipo original do Axios
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
+function redirectToLogin() {
+  authUtils.clearAuth();
+  const publicRoutes = [
+    '/login',
+    '/register',
+    '/signup',
+    '/forgot-password',
+    '/new-password',
+    '/reset-password',
+  ];
+  if (!publicRoutes.includes(globalThis.location.pathname)) {
+    globalThis.location.href = '/login';
+  }
+}
 
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      const originalRequest = error.config;
-      if (originalRequest.url?.includes('/refresh-token')) {
-        authUtils.clearAuth();
-        globalThis.location.href = '/login';
-        throw error;
-      }
-      if (!originalRequest._retry && typeof authUtils.getRefreshToken() === 'string') {
-        originalRequest._retry = true;
-        try {
-          const refreshToken = authUtils.getRefreshToken() as string;
-          const data = await refreshTokenService(refreshToken);
-          authUtils.setToken(data.token, !!localStorage.getItem('@Auth:token'));
-          if (data.refreshToken) {
-            authUtils.setRefreshToken(
-              data.refreshToken,
-              !!localStorage.getItem('@Auth:refreshToken'),
-            );
-          }
-          authUtils.setUser(data.user, !!localStorage.getItem('@Auth:user'));
-          originalRequest.headers.Authorization = `Bearer ${data.token}`;
-          return apiClient(originalRequest);
-        } catch (refreshError) {
-          console.warn('Token refresh failed', refreshError);
-        }
-      }
-      authUtils.clearAuth();
-      const publicRoutes = [
-        '/login',
-        '/register',
-        '/signup',
-        '/forgot-password',
-        '/new-password',
-        '/reset-password',
-      ];
-      if (!publicRoutes.includes(globalThis.location.pathname)) {
-        globalThis.location.href = '/login';
-      }
+    const { response, config } = error;
+
+    if (response?.status !== 401) {
+      throw error;
     }
-    throw error;
+
+    const originalRequest: RetryableRequestConfig = (config ?? {}) as RetryableRequestConfig;
+
+    // Se o próprio refresh falhou, encerra sessão imediatamente
+    if (originalRequest.url?.includes(REFRESH_URL)) {
+      redirectToLogin();
+      throw error;
+    }
+
+    // Evita loop infinito de refresh
+    if (originalRequest._retry) {
+      redirectToLogin();
+      throw error;
+    }
+
+    originalRequest._retry = true;
+
+    try {
+      // Chama o endpoint de refresh que lê o refresh_token do cookie HttpOnly
+      await refreshClient.post(REFRESH_URL);
+
+      // Após refresh bem sucedido, repete a requisição original
+      return apiClient(originalRequest);
+    } catch (refreshError) {
+      console.warn('Token refresh via cookies failed', refreshError);
+      redirectToLogin();
+      throw refreshError;
+    }
   },
 );

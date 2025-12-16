@@ -57,7 +57,7 @@ const ExtractHeaderSchema = z.object({
 const ExtractTransactionSchema = z.object({
   date: z.string(),
   description: z.string(),
-  amount: z.union([z.number(), z.string().transform((v) => parseFloat(v))]),
+  amount: z.union([z.number(), z.string().transform((v) => Number.parseFloat(v))]),
   fitId: z.string().optional().nullable(),
 });
 
