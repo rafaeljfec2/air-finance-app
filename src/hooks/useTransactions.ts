@@ -6,9 +6,10 @@ import {
   deleteTransaction,
   Transaction,
   CreateTransactionPayload,
+  type TransactionFilters,
 } from '../services/transactionService';
 
-export const useTransactions = (companyId: string) => {
+export const useTransactions = (companyId: string, filters?: TransactionFilters) => {
   const queryClient = useQueryClient();
 
   const {
@@ -18,8 +19,8 @@ export const useTransactions = (companyId: string) => {
     refetch,
     isFetching,
   } = useQuery<Transaction[]>({
-    queryKey: ['transactions', companyId],
-    queryFn: () => getTransactions(companyId),
+    queryKey: ['transactions', companyId, filters?.startDate ?? null, filters?.endDate ?? null],
+    queryFn: () => getTransactions(companyId, filters),
     enabled: !!companyId,
   });
 

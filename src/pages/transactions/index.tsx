@@ -21,7 +21,16 @@ import { useCategories } from '@/hooks/useCategories';
 export function Transactions() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPeriod, setSelectedPeriod] = useState('all');
+  const [startDate, setStartDate] = useState(() => {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    return firstDay.toISOString().slice(0, 10);
+  });
+  const [endDate, setEndDate] = useState(() => {
+    const now = new Date();
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return lastDay.toISOString().slice(0, 10);
+  });
   const [selectedType, setSelectedType] = useState('all');
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<TransactionGridTransaction | null>(
@@ -42,7 +51,7 @@ export function Transactions() {
     isFetching,
     refetch,
     deleteTransaction,
-  } = useTransactions(companyId);
+  } = useTransactions(companyId, { startDate, endDate });
 
   const categoryMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -78,22 +87,22 @@ export function Transactions() {
         (selectedType === 'DESPESA' && transaction.launchType === 'expense');
 
       let matchesPeriod = true;
-      if (selectedPeriod !== 'all') {
+      if (startDate || endDate) {
         const transactionDate = new Date(transaction.paymentDate);
-        const now = new Date();
 
-        switch (selectedPeriod) {
-          case 'current':
-            matchesPeriod =
-              transactionDate.getMonth() === now.getMonth() &&
-              transactionDate.getFullYear() === now.getFullYear();
-            break;
-          case 'last': {
-            const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
-            matchesPeriod =
-              transactionDate.getMonth() === lastMonth.getMonth() &&
-              transactionDate.getFullYear() === lastMonth.getFullYear();
-            break;
+        if (startDate) {
+          const start = new Date(startDate);
+          start.setHours(0, 0, 0, 0);
+          if (transactionDate < start) {
+            matchesPeriod = false;
+          }
+        }
+
+        if (endDate && matchesPeriod) {
+          const end = new Date(endDate);
+          end.setHours(23, 59, 59, 999);
+          if (transactionDate > end) {
+            matchesPeriod = false;
           }
         }
       }
@@ -176,19 +185,21 @@ export function Transactions() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                  <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-                    <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
-                      {selectedPeriod === '' ? (
-                        <span className="text-muted-foreground">Selecione o período</span>
-                      ) : null}
-                    </SelectTrigger>
-                    <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
-                      <SelectItem value="all">Todos os períodos</SelectItem>
-                      <SelectItem value="current">Mês atual</SelectItem>
-                      <SelectItem value="last">Mês anterior</SelectItem>
-                      <SelectItem value="custom">Personalizado</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex flex-1 items-center gap-2">
+                    <Input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                    />
+                    <span className="text-gray-500 dark:text-gray-400">até</span>
+                    <Input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                    />
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />

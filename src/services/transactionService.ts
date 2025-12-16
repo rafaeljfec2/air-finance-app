@@ -83,10 +83,20 @@ const ExtractSchema = z.object({
 
 export type ExtractResponse = z.infer<typeof ExtractSchema>;
 
+export interface TransactionFilters {
+  startDate?: string;
+  endDate?: string;
+}
+
 // Service functions
-export const getTransactions = async (companyId: string): Promise<Transaction[]> => {
+export const getTransactions = async (
+  companyId: string,
+  filters?: TransactionFilters,
+): Promise<Transaction[]> => {
   try {
-    const response = await apiClient.get<Transaction[]>(`/companies/${companyId}/transactions`);
+    const response = await apiClient.get<Transaction[]>(`/companies/${companyId}/transactions`, {
+      params: filters,
+    });
     return TransactionSchema.array().parse(response.data);
   } catch (error) {
     console.error('Error fetching transactions:', error);
