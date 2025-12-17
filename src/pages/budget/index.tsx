@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { MonthNavigator } from '@/components/budget/MonthNavigator';
-import { mockCashFlows, mockReceivables, mockPayables, mockCreditCards } from '@/mocks/budget';
 import { Wallet, TrendingUp, TrendingDown, CreditCard } from 'lucide-react';
 import {
   CardContainer,
@@ -11,11 +10,24 @@ import {
   CardEmpty,
   CardTotal,
 } from '@/components/budget';
+import { useCompanyStore } from '@/stores/company';
+import { useBudget } from '@/hooks/useBudget';
 
 export function BudgetPage() {
   // Estado único para filtro central
-  const [filter, setFilter] = useState({ month: '05', year: '2024' });
-  const [activeCardTab, setActiveCardTab] = useState(mockCreditCards[0]?.id || '');
+  const [filter, setFilter] = useState({ month: '12', year: '2025' });
+
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id ?? null;
+
+  const { data, isLoading } = useBudget(companyId, filter);
+
+  const cashFlow = data?.cashFlow ?? null;
+  const receivables = data?.receivables ?? [];
+  const payables = data?.payables ?? [];
+  const cards = data?.creditCards ?? [];
+
+  const [activeCardTab, setActiveCardTab] = useState(cards[0]?.id || '');
 
   // Estados de página para cada grid
   const [receivablesPage, setReceivablesPage] = useState(1);
@@ -23,15 +35,6 @@ export function BudgetPage() {
   const [cardPage, setCardPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
-  // Helpers para filtrar mocks usando o filtro central
-  const cashFlow = mockCashFlows.find((c) => c.month === `${filter.year}-${filter.month}`);
-  const receivables = mockReceivables.filter((r) =>
-    r.dueDate.startsWith(`${filter.year}-${filter.month}`),
-  );
-  const payables = mockPayables.filter((p) =>
-    p.dueDate.startsWith(`${filter.year}-${filter.month}`),
-  );
-  const cards = mockCreditCards;
   const activeCard = cards.find((c) => c.id === activeCardTab);
   const activeBill = activeCard?.bills.find((b) => b.month === `${filter.year}-${filter.month}`);
 
@@ -54,11 +57,7 @@ export function BudgetPage() {
   // Resetar página ao trocar de mês/ano ou cartão
   React.useEffect(() => {
     setReceivablesPage(1);
-  }, [filter]);
-  React.useEffect(() => {
     setPayablesPage(1);
-  }, [filter]);
-  React.useEffect(() => {
     setCardPage(1);
   }, [filter, activeCardTab]);
 
@@ -120,7 +119,9 @@ export function BudgetPage() {
           <CardContainer color="emerald" className="min-h-[420px]">
             <CardHeader icon={<Wallet size={24} />} title="Fluxo de Caixa" />
             <CardTotal value={cashFlow?.finalBalance ?? 0} color="emerald" label="Saldo Final" />
-            {cashFlow ? (
+            {isLoading ? (
+              <CardEmpty />
+            ) : cashFlow ? (
               <div className="flex flex-col gap-3 mt-3">
                 <CardStat label="Entradas" value={cashFlow.totalIncome} positive />
                 <CardStat label="Saídas" value={cashFlow.totalExpense} negative />
