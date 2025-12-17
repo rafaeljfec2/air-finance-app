@@ -53,12 +53,10 @@ const CreditCardSchema = z.object({
   bills: z.array(CreditCardBillSchema),
 });
 
-const BudgetResponseSchema = z.object({
-  cashFlow: CashFlowSchema.nullable(),
-  receivables: z.array(ReceivableSchema),
-  payables: z.array(PayableSchema),
-  creditCards: z.array(CreditCardSchema),
-});
+const CashFlowResponseSchema = CashFlowSchema.nullable();
+const ReceivablesResponseSchema = z.array(ReceivableSchema);
+const PayablesResponseSchema = z.array(PayableSchema);
+const CreditCardsResponseSchema = z.array(CreditCardSchema);
 
 export interface BudgetFilters {
   year: string;
@@ -72,23 +70,77 @@ export interface BudgetResponse {
   creditCards: CreditCard[];
 }
 
-export const budgetService = {
-  getBudget: async (
-    companyId: string,
-    filters: BudgetFilters,
-  ): Promise<BudgetResponse> => {
-    try {
-      const { year, month } = filters;
-      const response = await apiClient.get('/companies/' + companyId + '/budget', {
-        params: { year, month: Number.parseInt(month, 10) },
-      });
+async function fetchCashFlow(companyId: string, filters: BudgetFilters): Promise<CashFlow | null> {
+  try {
+    const { year, month } = filters;
+    const response = await apiClient.get(`/companies/${companyId}/budget/cash-flow`, {
+      params: { year, month: Number.parseInt(month, 10) },
+    });
 
-      const parsed = BudgetResponseSchema.parse(response.data);
-      return parsed;
-    } catch (error) {
-      throw parseApiError(error);
-    }
+    return CashFlowResponseSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+}
+
+async function fetchReceivables(companyId: string, filters: BudgetFilters): Promise<Receivable[]> {
+  try {
+    const { year, month } = filters;
+    const response = await apiClient.get(`/companies/${companyId}/budget/receivables`, {
+      params: { year, month: Number.parseInt(month, 10) },
+    });
+
+    return ReceivablesResponseSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+}
+
+async function fetchPayables(companyId: string, filters: BudgetFilters): Promise<Payable[]> {
+  try {
+    const { year, month } = filters;
+    const response = await apiClient.get(`/companies/${companyId}/budget/payables`, {
+      params: { year, month: Number.parseInt(month, 10) },
+    });
+
+    return PayablesResponseSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+}
+
+async function fetchCreditCards(companyId: string, filters: BudgetFilters): Promise<CreditCard[]> {
+  try {
+    const { year, month } = filters;
+    const response = await apiClient.get(`/companies/${companyId}/budget/credit-cards`, {
+      params: { year, month: Number.parseInt(month, 10) },
+    });
+
+    return CreditCardsResponseSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+}
+
+export const budgetService = {
+  getCashFlow: fetchCashFlow,
+  getReceivables: fetchReceivables,
+  getPayables: fetchPayables,
+  getCreditCards: fetchCreditCards,
+
+  getBudget: async (companyId: string, filters: BudgetFilters): Promise<BudgetResponse> => {
+    const [cashFlow, receivables, payables, creditCards] = await Promise.all([
+      fetchCashFlow(companyId, filters),
+      fetchReceivables(companyId, filters),
+      fetchPayables(companyId, filters),
+      fetchCreditCards(companyId, filters),
+    ]);
+
+    return {
+      cashFlow,
+      receivables,
+      payables,
+      creditCards,
+    };
   },
 };
-
-
