@@ -19,7 +19,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
   className,
 }) => (
   <div
-    className={`bg-card dark:bg-card-dark rounded-xl shadow-lg border-t-4 ${colorMap[color]} p-6 flex flex-col h-full flex-1 ${className ?? ''}`}
+    className={`bg-card dark:bg-card-dark rounded-xl shadow-lg border-t-4 ${colorMap[color]} p-6 flex flex-col h-full flex-1 w-full max-w-full overflow-hidden ${className ?? ''}`}
   >
     {children}
   </div>
