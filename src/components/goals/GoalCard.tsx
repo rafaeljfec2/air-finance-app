@@ -1,19 +1,23 @@
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { useGoals } from '@/hooks/useGoals';
 import { useCategories } from '@/hooks/useCategories';
-import { FlagIcon } from '@heroicons/react/24/outline';
-import { Edit, Trash2 } from 'lucide-react';
-import { formatCurrency } from '@/utils/formatters';
-import { Goal } from '@/services/goalService';
+import { useGoals } from '@/hooks/useGoals';
 import { cn } from '@/lib/utils';
+import { Goal } from '@/services/goalService';
+import { formatCurrency } from '@/utils/formatters';
+import { ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Edit, Trash2 } from 'lucide-react';
 
 const statusOptions = [
   { value: 'active', label: 'Ativa', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
-  { value: 'completed', label: 'Concluída', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
+  {
+    value: 'completed',
+    label: 'Concluída',
+    color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+  },
   { value: 'cancelled', label: 'Cancelada', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
 ] as const;
 
@@ -47,7 +51,7 @@ export function GoalCard({
   isUpdating,
   isDeleting,
   viewMode,
-}: GoalCardProps) {
+}: Readonly<GoalCardProps>) {
   const { data: progressData } = useGoals(goal.companyId).getProgress(goal.id);
   const { categories } = useCategories(goal.companyId);
   const category = categories?.find((c) => c.id === goal.categoryId);
@@ -78,11 +82,7 @@ export function GoalCard({
                 className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: category.color }}
               >
-                {category.icon ? (
-                  <span className="text-white text-xs">{category.icon}</span>
-                ) : (
-                  <FlagIcon className="h-5 w-5 text-white" />
-                )}
+                <ArrowTrendingUpIcon className="h-5 w-5 text-white" />
               </div>
             )}
           </div>
@@ -170,11 +170,7 @@ export function GoalCard({
                   className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                   style={{ backgroundColor: category.color }}
                 >
-                  {category.icon ? (
-                    <span className="text-white text-xs">{category.icon}</span>
-                  ) : (
-                    <FlagIcon className="h-5 w-5 text-white" />
-                  )}
+                  <ArrowTrendingUpIcon className="h-5 w-5 text-white" />
                 </div>
               )}
               <div className="flex-1">
@@ -260,4 +256,3 @@ export function GoalCard({
     </Card>
   );
 }
-
