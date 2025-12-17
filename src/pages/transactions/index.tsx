@@ -112,8 +112,12 @@ export function Transactions() {
     });
 
   const handleEdit = (transaction: TransactionGridTransaction) => {
-    setTransactionToEdit(transaction);
-    setShowEditModal(true);
+    // Find the original transaction with IDs (not labels) from the original transactions array
+    const originalTransaction = transactions.find((tx) => tx.id === transaction.id);
+    if (originalTransaction) {
+      setTransactionToEdit(originalTransaction);
+      setShowEditModal(true);
+    }
   };
 
   const handleDelete = (transaction: TransactionGridTransaction) => {
