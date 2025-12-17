@@ -71,6 +71,13 @@ export function FinancialGoalsCard({ companyId, onViewAll }: Readonly<FinancialG
             })}
           </div>
         )}
+
+        {!isLoading && !error && goals.length > 0 && (
+          <p className="mt-4 text-[11px] text-gray-500 dark:text-gray-400">
+            O progresso das metas é calculado automaticamente com base nos lançamentos das contas
+            vinculadas.
+          </p>
+        )}
       </div>
     </Card>
   );

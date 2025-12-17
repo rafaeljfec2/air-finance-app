@@ -1,6 +1,6 @@
-import { apiClient } from './apiClient';
-import { z } from 'zod';
 import { parseApiError } from '@/utils/apiErrorHandler';
+import { z } from 'zod';
+import { apiClient } from './apiClient';
 
 // Validation schemas
 export const GoalSchema = z.object({
@@ -11,6 +11,7 @@ export const GoalSchema = z.object({
   currentAmount: z.number().min(0, 'Valor atual não pode ser negativo'),
   deadline: z.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/, 'Data limite inválida'),
   status: z.enum(['active', 'completed', 'cancelled']),
+  accountId: z.string().optional(),
   categoryId: z.string().optional(),
   companyId: z.string(),
   createdAt: z.string().datetime(),
@@ -81,6 +82,7 @@ export const deleteGoal = async (companyId: string, id: string): Promise<void> =
 };
 
 export const getGoalProgress = async (
+  companyId: string,
   id: string,
 ): Promise<{
   progress: number;
@@ -88,7 +90,7 @@ export const getGoalProgress = async (
   daysUntilDeadline: number;
 }> => {
   try {
-    const response = await apiClient.get(`/goals/${id}/progress`);
+    const response = await apiClient.get(`/companies/${companyId}/goals/${id}/progress`);
     return response.data;
   } catch (error) {
     throw parseApiError(error);

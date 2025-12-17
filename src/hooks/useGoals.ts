@@ -1,16 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  getGoals,
-  getGoalById,
-  createGoal,
-  updateGoal,
-  deleteGoal,
-  getGoalProgress,
-  type Goal,
-  type CreateGoal,
-} from '../services/goalService';
 import { toast } from '@/components/ui/toast';
-import { parseApiError, getUserFriendlyMessage, logApiError } from '@/utils/apiErrorHandler';
+import { getUserFriendlyMessage, logApiError, parseApiError } from '@/utils/apiErrorHandler';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  createGoal,
+  deleteGoal,
+  getGoalById,
+  getGoalProgress,
+  getGoals,
+  updateGoal,
+  type CreateGoal,
+  type Goal,
+} from '../services/goalService';
 
 export const useGoals = (companyId: string) => {
   const queryClient = useQueryClient();
@@ -36,7 +36,7 @@ export const useGoals = (companyId: string) => {
   function useGetProgress(id: string) {
     return useQuery({
       queryKey: ['goal-progress', companyId, id],
-      queryFn: () => getGoalProgress(id),
+      queryFn: () => (companyId ? getGoalProgress(companyId, id) : Promise.reject('No companyId')),
       enabled: !!id && !!companyId,
     });
   }

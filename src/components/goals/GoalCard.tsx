@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { useAccounts } from '@/hooks/useAccounts';
 import { useCategories } from '@/hooks/useCategories';
 import { useGoals } from '@/hooks/useGoals';
 import { cn } from '@/lib/utils';
@@ -31,10 +32,6 @@ function getStatusBadgeColor(status: GoalStatus): string {
   return statusOptions.find((s) => s.value === status)?.color ?? statusOptions[0].color;
 }
 
-const calculateProgress = (current: number, target: number) => {
-  return Math.min(Math.round((current / target) * 100), 100);
-};
-
 interface GoalCardProps {
   goal: Goal;
   onEdit: (goal: Goal) => void;
@@ -54,9 +51,15 @@ export function GoalCard({
 }: Readonly<GoalCardProps>) {
   const { data: progressData } = useGoals(goal.companyId).getProgress(goal.id);
   const { categories } = useCategories(goal.companyId);
+  const { accounts } = useAccounts();
   const category = categories?.find((c) => c.id === goal.categoryId);
-  const progress = calculateProgress(goal.currentAmount, goal.targetAmount);
-  const daysUntilDeadline = progressData?.daysUntilDeadline || 0;
+  const account = accounts?.find((a) => a.id === goal.accountId);
+  const apiProgress = progressData?.progress ?? null;
+  const progress =
+    apiProgress !== null
+      ? apiProgress
+      : Math.min(Math.round((goal.currentAmount / goal.targetAmount) * 100), 100);
+  const daysUntilDeadline = progressData?.daysUntilDeadline ?? 0;
 
   if (viewMode === 'grid') {
     return (
@@ -107,6 +110,12 @@ export function GoalCard({
 
           {/* Informações */}
           <div className="space-y-2 mb-4">
+            {account && (
+              <div className="text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Conta vinculada: </span>
+                <span className="text-text dark:text-text-dark">{account.name}</span>
+              </div>
+            )}
             {category && (
               <div className="text-sm">
                 <span className="text-gray-500 dark:text-gray-400">Categoria: </span>
@@ -130,6 +139,11 @@ export function GoalCard({
               </div>
             )}
           </div>
+
+          <p className="mt-2 text-[11px] text-gray-500 dark:text-gray-400">
+            O progresso desta meta é calculado automaticamente com base nos lançamentos da conta
+            vinculada.
+          </p>
 
           {/* Ações */}
           <div className="flex gap-2 pt-4 border-t border-border dark:border-border-dark">
@@ -202,6 +216,12 @@ export function GoalCard({
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                  {account && (
+                    <div>
+                      <span className="text-gray-500 dark:text-gray-400">Conta vinculada: </span>
+                      <span className="text-text dark:text-text-dark">{account.name}</span>
+                    </div>
+                  )}
                   {category && (
                     <div>
                       <span className="text-gray-500 dark:text-gray-400">Categoria: </span>

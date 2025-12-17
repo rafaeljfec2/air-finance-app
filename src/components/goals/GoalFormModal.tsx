@@ -1,16 +1,17 @@
-import { useEffect, useState, useMemo } from 'react';
-import type { ChangeEvent, FormEvent } from 'react';
-import { Target, FileText, DollarSign, Calendar, Tag, X } from 'lucide-react';
-import { Modal } from '@/components/ui/Modal';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { FormField } from '@/components/ui/FormField';
-import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
-import { Goal, CreateGoal } from '@/services/goalService';
-import { useCompanyStore } from '@/stores/company';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { useAccounts } from '@/hooks/useAccounts';
 import { useCategories } from '@/hooks/useCategories';
 import { cn } from '@/lib/utils';
+import { CreateGoal, Goal } from '@/services/goalService';
+import { useCompanyStore } from '@/stores/company';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
+import { Calendar, DollarSign, FileText, Tag, Target, Wallet, X } from 'lucide-react';
+import type { ChangeEvent, FormEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface GoalFormModalProps {
   open: boolean;
@@ -30,6 +31,7 @@ export function GoalFormModal({
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id || '';
   const { categories } = useCategories(companyId);
+  const { accounts } = useAccounts();
 
   const initialFormState: CreateGoal = useMemo(
     () => ({
@@ -39,6 +41,7 @@ export function GoalFormModal({
       currentAmount: 0,
       deadline: '',
       status: 'active',
+      accountId: '',
       categoryId: undefined,
       companyId: companyId,
     }),
@@ -59,6 +62,7 @@ export function GoalFormModal({
         currentAmount: goal.currentAmount,
         deadline: goal.deadline,
         status: goal.status,
+        accountId: goal.accountId || '',
         categoryId: goal.categoryId || undefined,
         companyId: goal.companyId,
       });
@@ -92,6 +96,7 @@ export function GoalFormModal({
     if (form.targetAmount <= 0) errs.targetAmount = 'Valor alvo deve ser maior que zero';
     if (!form.deadline) errs.deadline = 'Data limite obrigatória';
     if (!form.companyId) errs.companyId = 'Selecione uma empresa';
+    if (!form.accountId) errs.accountId = 'Selecione uma conta vinculada à meta';
     return errs;
   };
 
@@ -224,7 +229,7 @@ export function GoalFormModal({
                         </span>
                       </div>
                     </SelectTrigger>
-                    <SelectContent className="bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark">
+                    <SelectContent className="bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark max-h-56 overflow-y-auto">
                       {categories && categories.length > 0 ? (
                         categories.map((cat) => (
                           <SelectItem
@@ -243,7 +248,51 @@ export function GoalFormModal({
                     </SelectContent>
                   </Select>
                 </FormField>
+                <FormField label="Conta da meta *" error={errors.accountId}>
+                  <Select
+                    value={form.accountId || undefined}
+                    onValueChange={(value) => setForm((prev) => ({ ...prev, accountId: value }))}
+                  >
+                    <SelectTrigger
+                      className={cn(
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all',
+                        errors.accountId && 'border-red-500 focus:ring-red-500',
+                      )}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Wallet className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                        <span>
+                          {accounts && accounts.length > 0
+                            ? accounts.find((acc) => acc.id === form.accountId)?.name ||
+                              'Selecione...'
+                            : 'Nenhuma conta disponível'}
+                        </span>
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark max-h-56 overflow-y-auto">
+                      {accounts && accounts.length > 0 ? (
+                        accounts.map((acc) => (
+                          <SelectItem
+                            key={acc.id}
+                            value={acc.id}
+                            className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30"
+                          >
+                            {acc.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no-accounts" disabled>
+                          Nenhuma conta disponível
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </FormField>
               </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                O progresso da meta será calculado automaticamente com base nos lançamentos
+                (entradas e saídas) da conta vinculada.
+              </p>
             </div>
 
             {/* Seção: Valores */}
