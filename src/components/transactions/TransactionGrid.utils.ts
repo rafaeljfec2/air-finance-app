@@ -72,9 +72,12 @@ export const calculateBalance = (
 
   let accumulatedBalance = 0;
   return sortedByDateAsc.map((transaction) => {
-    const credit = transaction.launchType === 'revenue' ? transaction.value : 0;
-    const debit = transaction.launchType === 'expense' ? transaction.value : 0;
-    accumulatedBalance += credit - debit;
+    // Backend already normalizes values:
+    // - Revenue: positive value
+    // - Expense: negative value
+    // So we can simply add the value directly to the balance
+    accumulatedBalance += transaction.value;
+    
     return {
       ...transaction,
       balance: accumulatedBalance,

@@ -53,7 +53,9 @@ export const MobileCard = memo(
                 (transaction.balance ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400',
               )}
             >
-              {formatCurrency(transaction.balance ?? 0)}
+              {(transaction.balance ?? 0) >= 0
+                ? `+${formatCurrency(Math.abs(transaction.balance ?? 0))}`
+                : formatCurrency(transaction.balance ?? 0)}
             </span>
           </div>
         </div>
