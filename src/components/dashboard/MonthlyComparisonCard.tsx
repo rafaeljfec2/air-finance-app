@@ -1,0 +1,103 @@
+import { Card } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
+import { useDashboardComparison } from '@/hooks/useDashboard';
+import type { DashboardComparison, DashboardFilters } from '@/types/dashboard';
+import { formatCurrency } from '@/utils/formatters';
+import { ArrowDownIcon, ArrowUpIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
+
+interface MonthlyComparisonCardProps {
+  companyId: string;
+  filters: DashboardFilters;
+}
+
+function getChangePct(current: number, previous: number): number {
+  if (!previous) return 0;
+  return (current / previous - 1) * 100;
+}
+
+function formatPctLabel(pct: number): string {
+  const rounded = Number.isFinite(pct) ? pct.toFixed(1) : '0.0';
+  return `${rounded}% vs mês anterior`;
+}
+
+export function MonthlyComparisonCard({
+  companyId,
+  filters,
+}: Readonly<MonthlyComparisonCardProps>) {
+  const { data, isLoading, error } = useDashboardComparison(companyId, filters);
+
+  const comparison: DashboardComparison | undefined = data ?? undefined;
+
+  const incomePct = comparison
+    ? getChangePct(comparison.current.income, comparison.previous.income)
+    : 0;
+  const expensesPct = comparison
+    ? getChangePct(comparison.current.expenses, comparison.previous.expenses)
+    : 0;
+  const savingsPct = comparison
+    ? getChangePct(comparison.current.savings, comparison.previous.savings)
+    : 0;
+
+  return (
+    <Card className="border-border dark:border-border-dark">
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-medium text-text dark:text-text-dark">Comparativo Mensal</h3>
+        </div>
+
+        {isLoading && (
+          <div className="flex items-center justify-center h-32">
+            <Spinner size="lg" className="text-emerald-500" />
+          </div>
+        )}
+
+        {!isLoading && error && (
+          <p className="text-sm text-red-500">Erro ao carregar comparativo mensal.</p>
+        )}
+
+        {!isLoading && !error && comparison && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <ArrowUpIcon className="h-5 w-5 text-green-500" />
+                <span className="text-sm text-gray-500">Receitas</span>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium text-green-500">
+                  {formatCurrency(comparison.current.income)}
+                </p>
+                <p className="text-xs text-gray-500">{formatPctLabel(incomePct)}</p>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <ArrowDownIcon className="h-5 w-5 text-red-500" />
+                <span className="text-sm text-gray-500">Despesas</span>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium text-red-500">
+                  {formatCurrency(comparison.current.expenses)}
+                </p>
+                <p className="text-xs text-gray-500">{formatPctLabel(expensesPct)}</p>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <CurrencyDollarIcon className="h-5 w-5 text-blue-500" />
+                <span className="text-sm text-gray-500">Economia</span>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium text-blue-500">
+                  {formatCurrency(comparison.current.savings)}
+                </p>
+                <p className="text-xs text-gray-500">{formatPctLabel(savingsPct)}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
