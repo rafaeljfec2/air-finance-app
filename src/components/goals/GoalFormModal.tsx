@@ -72,7 +72,7 @@ export function GoalFormModal({
       setCurrentAmountInput(
         goal.currentAmount
           ? formatCurrencyInput(goal.currentAmount.toFixed(2).replace('.', ''))
-          : '',
+          : formatCurrencyInput('0'),
       );
     } else {
       setForm({
@@ -80,7 +80,7 @@ export function GoalFormModal({
         companyId: activeCompany?.id || '',
       });
       setTargetAmountInput('');
-      setCurrentAmountInput('');
+      setCurrentAmountInput(formatCurrencyInput('0'));
     }
     setErrors({});
   }, [goal, open, initialFormState, activeCompany]);
@@ -331,26 +331,17 @@ export function GoalFormModal({
                   </div>
                 </FormField>
 
-                <FormField label="Valor atual *" error={errors.currentAmount}>
+                <FormField label="Valor atual">
                   <div className="relative">
                     <Input
                       name="currentAmount"
                       type="text"
-                      inputMode="decimal"
                       value={currentAmountInput}
-                      onChange={(e) => {
-                        const formatted = formatCurrencyInput(e.target.value);
-                        setCurrentAmountInput(formatted);
-                        setForm((prev) => ({
-                          ...prev,
-                          currentAmount: parseCurrency(formatted),
-                        }));
-                      }}
+                      readOnly
+                      disabled
                       placeholder="R$ 0,00"
-                      required
                       className={cn(
                         'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
-                        errors.currentAmount && 'border-red-500 focus-visible:ring-red-500',
                       )}
                     />
                     <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
