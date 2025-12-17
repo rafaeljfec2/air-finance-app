@@ -11,7 +11,8 @@ export const CompanySchema = z.object({
   type: z.enum(['matriz', 'filial', 'holding', 'prestadora', 'outra']),
   foundationDate: z.string().datetime(),
   email: z.string().email().optional(),
-  phone: z.string().min(10).optional(),
+  // Phone is validated no formulário; aqui aceitamos vazio/qualquer string opcional
+  phone: z.string().optional(),
   address: z.string().optional(),
   notes: z.string().optional(),
   userIds: z.array(z.string()),
