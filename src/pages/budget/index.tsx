@@ -44,6 +44,18 @@ export function BudgetPage() {
   const activeCardBillTotal = activeBill?.total ?? 0;
   const activeCardAvailable = activeCardLimit > 0 ? activeCardLimit - activeCardBillTotal : null;
 
+  // Garante que sempre exista um cartão ativo (primeiro da lista) quando houver cartões
+  React.useEffect(() => {
+    if (cards.length === 0) {
+      return;
+    }
+
+    const hasActiveCard = cards.some((card) => card.id === activeCardTab);
+    if (!hasActiveCard) {
+      setActiveCardTab(cards[0].id);
+    }
+  }, [cards, activeCardTab]);
+
   // Resetar página ao trocar de mês/ano ou cartão
   React.useEffect(() => {
     setReceivablesPage(1);
