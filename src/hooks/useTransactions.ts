@@ -1,11 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  getTransactions,
   createTransaction,
-  updateTransaction,
-  deleteTransaction,
-  Transaction,
   CreateTransactionPayload,
+  deleteTransaction,
+  getTransactions,
+  Transaction,
+  updateTransaction,
   type TransactionFilters,
 } from '../services/transactionService';
 
@@ -19,7 +19,13 @@ export const useTransactions = (companyId: string, filters?: TransactionFilters)
     refetch,
     isFetching,
   } = useQuery<Transaction[]>({
-    queryKey: ['transactions', companyId, filters?.startDate ?? null, filters?.endDate ?? null],
+    queryKey: [
+      'transactions',
+      companyId,
+      filters?.startDate ?? null,
+      filters?.endDate ?? null,
+      filters?.accountId ?? null,
+    ],
     queryFn: () => getTransactions(companyId, filters),
     enabled: !!companyId,
   });

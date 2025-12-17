@@ -1,22 +1,22 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { Card } from '@/components/ui/card';
-import { Receipt, Search, Plus, Calendar, Filter, Download } from 'lucide-react';
+import { TransactionEditModal } from '@/components/transactions/TransactionEditModal';
 import {
   TransactionGrid,
   type TransactionGridTransaction,
 } from '@/components/transactions/TransactionGrid';
-import { useCompanyStore } from '@/stores/company';
-import { useTransactions } from '@/hooks/useTransactions';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
-import { TransactionEditModal } from '@/components/transactions/TransactionEditModal';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCategories } from '@/hooks/useCategories';
+import { useTransactions } from '@/hooks/useTransactions';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { useCompanyStore } from '@/stores/company';
+import { Calendar, Download, Filter, Plus, Receipt, Search } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function Transactions() {
   const navigate = useNavigate();
@@ -32,6 +32,7 @@ export function Transactions() {
     return lastDay.toISOString().slice(0, 10);
   });
   const [selectedType, setSelectedType] = useState('all');
+  const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>(undefined);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<TransactionGridTransaction | null>(
     null,
@@ -51,7 +52,7 @@ export function Transactions() {
     isFetching,
     refetch,
     deleteTransaction,
-  } = useTransactions(companyId, { startDate, endDate });
+  } = useTransactions(companyId, { startDate, endDate, accountId: selectedAccountId });
 
   const categoryMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -172,7 +173,7 @@ export function Transactions() {
           {/* Filters and Search */}
           <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm mb-6">
             <div className="p-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto_auto] gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto_auto] gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                   <Input
@@ -200,6 +201,31 @@ export function Transactions() {
                       className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                     />
                   </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                  <Select
+                    value={selectedAccountId || 'all'}
+                    onValueChange={(value) =>
+                      setSelectedAccountId(value === 'all' ? undefined : value)
+                    }
+                  >
+                    <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
+                      <span className="truncate">
+                        {selectedAccountId
+                          ? accounts?.find((acc) => acc.id === selectedAccountId)?.name || 'Todas'
+                          : 'Todas as contas'}
+                      </span>
+                    </SelectTrigger>
+                    <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark max-h-56 overflow-y-auto">
+                      <SelectItem value="all">Todas as contas</SelectItem>
+                      {accounts?.map((account) => (
+                        <SelectItem key={account.id} value={account.id}>
+                          {account.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex items-center gap-2">
                   <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />

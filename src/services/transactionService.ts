@@ -1,5 +1,5 @@
-import { apiClient } from './apiClient';
 import { z } from 'zod';
+import { apiClient } from './apiClient';
 
 // Validation schemas
 export const TransactionSchema = z.object({
@@ -86,6 +86,7 @@ export type ExtractResponse = z.infer<typeof ExtractSchema>;
 export interface TransactionFilters {
   startDate?: string;
   endDate?: string;
+  accountId?: string;
 }
 
 // Service functions
