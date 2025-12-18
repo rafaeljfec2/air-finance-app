@@ -37,9 +37,9 @@ export const navigation: NavigationSection[] = [
         name: 'Financeiro',
         icon: ArrowsRightLeftIcon,
         children: [
-          { name: 'Novo lançamento', href: '/transactions/new', icon: PlusIcon },
+          { name: 'Novo Lançamento', href: '/transactions/new', icon: PlusIcon },
           { name: 'Fluxo de Caixa', href: '/transactions', icon: ArrowsRightLeftIcon },
-          { name: 'Importar Ofx', href: '/import-ofx', icon: ImportIcon },
+          { name: 'Extrato Bancário', href: '/import-ofx', icon: ImportIcon },
           /* { name: 'Contas a Pagar', href: '/payables', icon: ArrowDownIcon },
           { name: 'Contas a Receber', href: '/receivables', icon: ArrowUpIcon }, 
           { name: 'Fechamento Mensal', href: '/monthly-closing', icon: CalendarIcon },
