@@ -261,34 +261,48 @@ export function ComboBox<T extends string | number = string>({
           className={cn(
             'bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark',
             maxHeight,
-            'overflow-y-auto',
+            'flex flex-col',
             contentClassName,
           )}
         >
-          {searchable && (
-            <div className="p-2 border-b border-border dark:border-border-dark sticky top-0 bg-card dark:bg-card-dark z-10">
-              <div className="relative">
-                <Input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder={searchPlaceholder}
-                  className="pl-10 bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark"
-                  onClick={(e) => e.stopPropagation()}
-                  onKeyDown={(e) => {
-                    // Prevent closing dropdown when typing
-                    e.stopPropagation();
-                  }}
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+          <div className="flex flex-col overflow-hidden h-full">
+            {searchable && (
+              <div className="sticky top-0 z-50 p-2 border-b border-border dark:border-border-dark bg-card dark:bg-card-dark flex-shrink-0 shadow-sm">
+                <div className="relative">
+                  <Input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder={searchPlaceholder}
+                    className="pl-10 bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark"
+                    onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => {
+                      // Prevent closing dropdown when typing
+                      e.stopPropagation();
+                    }}
+                  />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 pointer-events-none" />
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <div className="p-1">
-            {filteredOptions.length > 0
-              ? filteredOptions.map((option) => {
-                  if (renderItem) {
+              <div className={cn('p-1 overflow-y-auto flex-1 min-h-0', searchable && 'pt-0')}>
+              {filteredOptions.length > 0
+                ? filteredOptions.map((option) => {
+                    if (renderItem) {
+                      return (
+                        <SelectItem
+                          key={String(option.value)}
+                          value={String(option.value)}
+                          disabled={option.disabled}
+                          className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30 cursor-pointer"
+                        >
+                          {renderItem(option)}
+                        </SelectItem>
+                      );
+                    }
+
+                    const OptionIcon = option.icon;
                     return (
                       <SelectItem
                         key={String(option.value)}
@@ -296,35 +310,23 @@ export function ComboBox<T extends string | number = string>({
                         disabled={option.disabled}
                         className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30 cursor-pointer"
                       >
-                        {renderItem(option)}
+                        {OptionIcon ? (
+                          <div className="flex items-center gap-2">
+                            <OptionIcon className="h-4 w-4" />
+                            <span>{option.label}</span>
+                          </div>
+                        ) : (
+                          <span>{option.label}</span>
+                        )}
                       </SelectItem>
                     );
-                  }
-
-                  const OptionIcon = option.icon;
-                  return (
-                    <SelectItem
-                      key={String(option.value)}
-                      value={String(option.value)}
-                      disabled={option.disabled}
-                      className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30 cursor-pointer"
-                    >
-                      {OptionIcon ? (
-                        <div className="flex items-center gap-2">
-                          <OptionIcon className="h-4 w-4" />
-                          <span>{option.label}</span>
-                        </div>
-                      ) : (
-                        <span>{option.label}</span>
-                      )}
-                    </SelectItem>
-                  );
-                })
-              : showEmptyMessage && (
-                  <div className="px-2 py-1.5 text-sm text-muted-foreground dark:text-gray-400 text-center">
-                    {emptyMessage}
-                  </div>
-                )}
+                  })
+                : showEmptyMessage && (
+                    <div className="px-2 py-1.5 text-sm text-muted-foreground dark:text-gray-400 text-center">
+                      {emptyMessage}
+                    </div>
+                  )}
+            </div>
           </div>
         </SelectContent>
       </Select>
