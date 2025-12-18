@@ -70,12 +70,17 @@ export function Dashboard() {
   const goalsSummary = goalsSummaryQuery.data ?? [];
 
   const detailedMovements =
-    recentTransactionsQuery.data?.map((tx) => ({
-      date: tx.paymentDate,
-      description: tx.description,
-      value: tx.launchType === 'revenue' ? tx.value : -tx.value,
-      type: tx.launchType === 'revenue' ? 'INCOME' : 'EXPENSE',
-    })) ?? [];
+    recentTransactionsQuery.data?.map((tx) => {
+      // Backend returns values as positive numbers, so we need to apply the sign
+      // Revenue: positive, Expense: negative
+      const value = tx.launchType === 'revenue' ? Math.abs(tx.value) : -Math.abs(tx.value);
+      return {
+        date: tx.paymentDate,
+        description: tx.description,
+        value,
+        type: tx.launchType === 'revenue' ? 'INCOME' : 'EXPENSE',
+      };
+    }) ?? [];
 
   const renderBalanceHistoryContent = () => {
     if (isLoadingBalanceHistory) {
@@ -105,45 +110,57 @@ export function Dashboard() {
         open={showDetailsModal}
         onClose={() => setShowDetailsModal(false)}
         title="Evolução do Saldo"
+        className="max-w-4xl"
       >
-        <div className="mb-4 h-64">{renderBalanceHistoryContent()}</div>
-        <div className="overflow-x-auto max-h-80">
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="text-left text-gray-500 dark:text-gray-400">
-                <th className="py-2 pr-4">Data</th>
-                <th className="py-2 pr-4">Descrição</th>
-                <th className="py-2 pr-4">Valor</th>
-                <th className="py-2">Tipo</th>
-              </tr>
-            </thead>
-            <tbody>
-              {detailedMovements.map((mov, idx) => (
-                <tr
-                  key={`${mov.date}-${mov.description}-${idx}`}
-                  className="border-b border-gray-200 dark:border-gray-700"
-                >
-                  <td className="py-2 pr-4">{format(new Date(mov.date), 'dd/MM/yyyy')}</td>
-                  <td className="py-2 pr-4">{mov.description}</td>
-                  <td
-                    className={
-                      mov.value >= 0 ? 'text-green-500 py-2 pr-4' : 'text-red-500 py-2 pr-4'
-                    }
+        <div className="mb-6 h-64">{renderBalanceHistoryContent()}</div>
+        <div className="border-t border-border dark:border-border-dark pt-4">
+          <h3 className="text-sm font-medium text-text dark:text-text-dark mb-3">
+            Movimentações Recentes
+          </h3>
+          <div className="overflow-y-auto max-h-80 pr-2">
+            <table className="min-w-full text-sm">
+              <thead className="sticky top-0 bg-card dark:bg-card-dark">
+                <tr className="text-left text-gray-500 dark:text-gray-400">
+                  <th className="py-2 pr-4 font-medium">Data</th>
+                  <th className="py-2 pr-4 font-medium">Descrição</th>
+                  <th className="py-2 pr-4 font-medium text-right">Valor</th>
+                  <th className="py-2 font-medium">Tipo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {detailedMovements.map((mov, idx) => (
+                  <tr
+                    key={`${mov.date}-${mov.description}-${idx}`}
+                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-background/50 dark:hover:bg-background-dark/50"
                   >
-                    {formatCurrency(mov.value)}
-                  </td>
-                  <td className="py-2">{mov.type === 'INCOME' ? 'Receita' : 'Despesa'}</td>
-                </tr>
-              ))}
-              {detailedMovements.length === 0 && (
-                <tr>
-                  <td className="py-3 text-center text-gray-500 dark:text-gray-400" colSpan={4}>
-                    Nenhuma transação recente para exibir.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                    <td className="py-2 pr-4 text-text dark:text-text-dark">
+                      {format(new Date(mov.date), 'dd/MM/yyyy')}
+                    </td>
+                    <td className="py-2 pr-4 text-text dark:text-text-dark">{mov.description}</td>
+                    <td
+                      className={`py-2 pr-4 text-right font-medium ${
+                        mov.value >= 0 ? 'text-emerald-400' : 'text-red-400'
+                      }`}
+                    >
+                      {mov.value >= 0
+                        ? `+${formatCurrency(Math.abs(mov.value))}`
+                        : formatCurrency(mov.value)}
+                    </td>
+                    <td className="py-2 text-text dark:text-text-dark">
+                      {mov.type === 'INCOME' ? 'Receita' : 'Despesa'}
+                    </td>
+                  </tr>
+                ))}
+                {detailedMovements.length === 0 && (
+                  <tr>
+                    <td className="py-3 text-center text-gray-500 dark:text-gray-400" colSpan={4}>
+                      Nenhuma transação recente para exibir.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </Modal>
 
