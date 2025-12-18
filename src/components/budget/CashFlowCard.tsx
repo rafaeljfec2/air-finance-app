@@ -13,7 +13,7 @@ interface CashFlowCardProps {
 export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlowCardProps>) {
   return (
     <CardContainer color="emerald" className="min-h-[420px]">
-      <CardHeader icon={<Wallet size={24} />} title="Fluxo de Caixa">
+      <CardHeader icon={<Wallet size={24} />} title="Previsão de Caixa">
         <Button
           type="button"
           variant="ghost"
