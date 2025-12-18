@@ -3,6 +3,7 @@ import {
   TransactionGrid,
   type TransactionGridTransaction,
 } from '@/components/transactions/TransactionGrid';
+import { createPreviousBalanceRow } from '@/components/transactions/TransactionGrid.utils';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -11,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 import { toast } from '@/components/ui/toast';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCategories } from '@/hooks/useCategories';
-import { useTransactions } from '@/hooks/useTransactions';
+import { usePreviousBalance, useTransactions } from '@/hooks/useTransactions';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
 import { Calendar, Download, Filter, Plus, Receipt, Search } from 'lucide-react';
@@ -54,6 +55,8 @@ export function Transactions() {
     deleteTransaction,
   } = useTransactions(companyId, { startDate, endDate, accountId: selectedAccountId });
 
+  const { previousBalance = 0 } = usePreviousBalance(companyId, startDate, selectedAccountId);
+
   const categoryMap = useMemo(() => {
     const map = new Map<string, string>();
     categories?.forEach((c) => map.set(c.id, c.name));
@@ -76,9 +79,32 @@ export function Transactions() {
     [transactions, categoryMap, accountMap],
   );
 
-  const filteredTransactions = [...transactionsWithLabels]
+  // Add previous balance row if startDate is set
+  const transactionsWithPreviousBalance = useMemo(() => {
+    let transactionsList = [...transactionsWithLabels];
+    
+    // Insert SALDO ANTERIOR if startDate exists
+    if (startDate) {
+      const previousBalanceRow = createPreviousBalanceRow(previousBalance, startDate);
+      // Map labels for the previous balance row
+      previousBalanceRow.categoryId = 'Saldo Anterior';
+      previousBalanceRow.accountId = selectedAccountId
+        ? accountMap.get(selectedAccountId) ?? 'Todas'
+        : 'Todas';
+      transactionsList = [previousBalanceRow, ...transactionsList];
+    }
+    
+    return transactionsList;
+  }, [transactionsWithLabels, previousBalance, startDate, selectedAccountId, accountMap]);
+
+  const filteredTransactions = [...transactionsWithPreviousBalance]
     .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
     .filter((transaction) => {
+      // Always include previous balance row
+      if (transaction.id === 'previous-balance') {
+        return true;
+      }
+
       const matchesSearch = transaction.description
         .toLowerCase()
         .includes(searchTerm.toLowerCase());

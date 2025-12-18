@@ -3,6 +3,7 @@ import {
   createTransaction,
   CreateTransactionPayload,
   deleteTransaction,
+  getPreviousBalance,
   getTransactions,
   Transaction,
   updateTransaction,
@@ -64,5 +65,32 @@ export const useTransactions = (companyId: string, filters?: TransactionFilters)
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
     refetch,
+  };
+};
+
+export const usePreviousBalance = (
+  companyId: string,
+  startDate?: string,
+  accountId?: string,
+) => {
+  const {
+    data: previousBalance,
+    isLoading,
+    error,
+  } = useQuery<number>({
+    queryKey: ['previousBalance', companyId, startDate ?? null, accountId ?? null],
+    queryFn: () => {
+      if (!startDate) {
+        return Promise.resolve(0);
+      }
+      return getPreviousBalance(companyId, startDate, accountId);
+    },
+    enabled: !!companyId && !!startDate,
+  });
+
+  return {
+    previousBalance: previousBalance ?? 0,
+    isLoading,
+    error,
   };
 };

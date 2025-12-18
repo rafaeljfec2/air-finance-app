@@ -89,6 +89,10 @@ export interface TransactionFilters {
   accountId?: string;
 }
 
+export interface PreviousBalanceResponse {
+  previousBalance: number;
+}
+
 // Service functions
 export const getTransactions = async (
   companyId: string,
@@ -102,6 +106,25 @@ export const getTransactions = async (
   } catch (error) {
     console.error('Error fetching transactions:', error);
     throw new Error('Failed to fetch transactions');
+  }
+};
+
+export const getPreviousBalance = async (
+  companyId: string,
+  startDate: string,
+  accountId?: string,
+): Promise<number> => {
+  try {
+    const response = await apiClient.get<PreviousBalanceResponse>(
+      `/companies/${companyId}/transactions/previous-balance`,
+      {
+        params: { startDate, accountId },
+      },
+    );
+    return response.data.previousBalance;
+  } catch (error) {
+    console.error('Error fetching previous balance:', error);
+    throw new Error('Failed to fetch previous balance');
   }
 };
 

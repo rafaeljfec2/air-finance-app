@@ -16,8 +16,17 @@ interface TableRowProps {
 
 export const TableRow = memo(
   ({ transaction, showActions, onActionClick, onEdit, onDelete }: TableRowProps) => {
+    const isPreviousBalance = transaction.id === 'previous-balance';
+    
     return (
-      <tr className="hover:bg-background/70 dark:hover:bg-background-dark/70 transition-colors">
+      <tr
+        className={cn(
+          'transition-colors',
+          isPreviousBalance
+            ? 'bg-gray-100 dark:bg-gray-800 font-semibold'
+            : 'hover:bg-background/70 dark:hover:bg-background-dark/70',
+        )}
+      >
         <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
           {formatTransactionDate(transaction.paymentDate || transaction.createdAt)}
         </td>
@@ -43,10 +52,10 @@ export const TableRow = memo(
           </Tooltip>
         </td>
         <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-emerald-400 whitespace-nowrap">
-          {transaction.launchType === 'revenue' ? formatCurrency(transaction.value) : '-'}
+          {isPreviousBalance ? '-' : transaction.launchType === 'revenue' ? formatCurrency(transaction.value) : '-'}
         </td>
         <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-red-400 whitespace-nowrap">
-          {transaction.launchType === 'expense' ? formatCurrency(transaction.value) : '-'}
+          {isPreviousBalance ? '-' : transaction.launchType === 'expense' ? formatCurrency(transaction.value) : '-'}
         </td>
         <td
           className={cn(
@@ -58,7 +67,7 @@ export const TableRow = memo(
             ? `+${formatCurrency(Math.abs(transaction.balance ?? 0))}`
             : formatCurrency(transaction.balance ?? 0)}
         </td>
-        {showActions && (
+        {showActions && !isPreviousBalance && (
           <td className="py-2 px-4">
             <TransactionActions
               transaction={transaction}
@@ -69,6 +78,7 @@ export const TableRow = memo(
             />
           </td>
         )}
+        {showActions && isPreviousBalance && <td className="py-2 px-4" />}
       </tr>
     );
   },
