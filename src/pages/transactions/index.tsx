@@ -118,16 +118,18 @@ export function Transactions() {
         const transactionDate = new Date(transaction.paymentDate);
 
         if (startDate) {
-          const start = new Date(startDate);
-          start.setHours(0, 0, 0, 0);
+          // Parse date string "YYYY-MM-DD" and create date in local timezone
+          const [year, month, day] = startDate.split('-').map(Number);
+          const start = new Date(year, month - 1, day, 0, 0, 0, 0);
           if (transactionDate < start) {
             matchesPeriod = false;
           }
         }
 
         if (endDate && matchesPeriod) {
-          const end = new Date(endDate);
-          end.setHours(23, 59, 59, 999);
+          // Parse date string "YYYY-MM-DD" and create date in local timezone
+          const [year, month, day] = endDate.split('-').map(Number);
+          const end = new Date(year, month - 1, day, 23, 59, 59, 999);
           if (transactionDate > end) {
             matchesPeriod = false;
           }
