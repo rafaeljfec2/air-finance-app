@@ -25,7 +25,7 @@ export const navigation: NavigationSection[] = [
     section: '📊 Análise e Planejamento',
     items: [
       { name: 'Dashboard', href: '/dashboard', icon: ChartBarIcon },
-      { name: 'Orçamento', href: '/budget', icon: WalletIcon },
+      { name: 'Meu Orçamento', href: '/budget', icon: WalletIcon },
       /* { name: 'Meu Planner', href: '/planner', icon: CalendarIcon }, 
        { name: 'Relatórios', href: '/reports', icon: ChartBarIcon }, */
     ],

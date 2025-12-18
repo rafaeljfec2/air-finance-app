@@ -72,7 +72,7 @@ export function BudgetPage() {
               <Wallet className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark">
-              Orçamento
+              Meu Orçamento
             </h1>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 ml-11">
