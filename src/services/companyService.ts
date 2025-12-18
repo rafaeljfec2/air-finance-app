@@ -24,6 +24,9 @@ export const CreateCompanySchema = CompanySchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+  userIds: true, // userIds é opcional, será preenchido pelo backend
+}).extend({
+  userIds: z.array(z.string()).optional(),
 });
 
 export type CreateCompany = Omit<Company, 'id' | 'createdAt' | 'updatedAt'>;
