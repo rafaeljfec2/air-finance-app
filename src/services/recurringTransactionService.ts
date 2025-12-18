@@ -13,7 +13,7 @@ export const RecurringTransactionSchema = z.object({
   accountId: z.string().min(1, 'Conta é obrigatória'),
   startDate: z.string(), // Aceita tanto YYYY-MM-DD quanto ISO datetime
   frequency: z.enum(['daily', 'weekly', 'monthly', 'yearly']),
-  repeatUntil: z.string().optional().nullable(),
+  repeatUntil: z.string(),
   companyId: z.string(),
   createdAutomatically: z.boolean().optional(),
   createdAt: z.string().datetime(),

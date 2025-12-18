@@ -58,20 +58,23 @@ export function RecurringTransactionFormModal({
   const { categories } = useCategories(companyId);
   const { accounts } = useAccounts();
 
-  const initialFormState: CreateRecurringTransaction = useMemo(
-    () => ({
+  const initialFormState: CreateRecurringTransaction = useMemo(() => {
+    const today = new Date();
+    const oneYearLater = new Date(today);
+    oneYearLater.setFullYear(today.getFullYear() + 1);
+    
+    return {
       description: '',
       value: 0,
       type: 'Expense',
       category: '',
       accountId: '',
-      startDate: new Date().toISOString().split('T')[0],
+      startDate: today.toISOString().split('T')[0],
       frequency: 'monthly',
-      repeatUntil: undefined,
+      repeatUntil: oneYearLater.toISOString().split('T')[0],
       createdAutomatically: false,
-    }),
-    [],
-  );
+    };
+  }, []);
 
   const [form, setForm] = useState<CreateRecurringTransaction>(initialFormState);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -82,7 +85,7 @@ export function RecurringTransactionFormModal({
       const startDate = new Date(recurringTransaction.startDate).toISOString().split('T')[0];
       const repeatUntil = recurringTransaction.repeatUntil
         ? new Date(recurringTransaction.repeatUntil).toISOString().split('T')[0]
-        : undefined;
+        : new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0];
 
       setForm({
         description: recurringTransaction.description,
@@ -123,7 +126,9 @@ export function RecurringTransactionFormModal({
     if (!form.accountId) errs.accountId = 'Conta obrigatória';
     if (!form.startDate) errs.startDate = 'Data inicial obrigatória';
     if (!form.frequency) errs.frequency = 'Frequência obrigatória';
-    if (form.repeatUntil && form.repeatUntil < form.startDate) {
+    if (!form.repeatUntil) {
+      errs.repeatUntil = 'Data final obrigatória';
+    } else if (form.repeatUntil < form.startDate) {
       errs.repeatUntil = 'Data final deve ser posterior à data inicial';
     }
     return errs;
@@ -137,18 +142,28 @@ export function RecurringTransactionFormModal({
 
     onSubmit(form);
     onClose();
+    const today = new Date();
+    const oneYearLater = new Date(today);
+    oneYearLater.setFullYear(today.getFullYear() + 1);
+    
     setForm({
       ...initialFormState,
-      startDate: new Date().toISOString().split('T')[0],
+      startDate: today.toISOString().split('T')[0],
+      repeatUntil: oneYearLater.toISOString().split('T')[0],
     });
     setErrors({});
     setValueInput('');
   };
 
   const handleClose = () => {
+    const today = new Date();
+    const oneYearLater = new Date(today);
+    oneYearLater.setFullYear(today.getFullYear() + 1);
+    
     setForm({
       ...initialFormState,
-      startDate: new Date().toISOString().split('T')[0],
+      startDate: today.toISOString().split('T')[0],
+      repeatUntil: oneYearLater.toISOString().split('T')[0],
     });
     setErrors({});
     setValueInput('');
@@ -434,7 +449,7 @@ export function RecurringTransactionFormModal({
                 </FormField>
 
                 <FormField
-                  label="Data final (opcional)"
+                  label="Data final *"
                   error={errors.repeatUntil}
                   className="md:col-span-2"
                 >
@@ -445,6 +460,7 @@ export function RecurringTransactionFormModal({
                       value={form.repeatUntil || ''}
                       onChange={handleChange}
                       min={form.startDate}
+                      required
                       className={cn(
                         'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
                         errors.repeatUntil && 'border-red-500 focus-visible:ring-red-500',
@@ -452,9 +468,6 @@ export function RecurringTransactionFormModal({
                     />
                     <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 pointer-events-none" />
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Deixe em branco para repetir indefinidamente
-                  </p>
                 </FormField>
               </div>
             </div>
