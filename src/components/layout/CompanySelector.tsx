@@ -29,6 +29,16 @@ export const CompanySelector = () => {
     }
   }, [user, refetch]);
 
+  // Convert companies to ComboBox options (must be before early returns)
+  const companyOptions: ComboBoxOption<string>[] = useMemo(
+    () =>
+      (companies ?? []).map((company) => ({
+        value: company.id,
+        label: company.name,
+      })),
+    [companies],
+  );
+
   if (!user) return null;
 
   if (isLoading) {
@@ -48,16 +58,6 @@ export const CompanySelector = () => {
     changeActiveCompany(selectedCompany || null);
   };
 
-  // Convert companies to ComboBox options
-  const companyOptions: ComboBoxOption<string>[] = useMemo(
-    () =>
-      companies.map((company) => ({
-        value: company.id,
-        label: company.name,
-      })),
-    [companies],
-  );
-
   // Custom render for company items (name + CNPJ in two lines)
   const renderCompanyItem = (option: ComboBoxOption<string>) => {
     const company = companies.find((c) => c.id === option.value);
@@ -74,7 +74,10 @@ export const CompanySelector = () => {
   };
 
   // Custom render for trigger (name + CNPJ in two lines)
-  const renderCompanyTrigger = (option: ComboBoxOption<string> | undefined, displayValue: string) => {
+  const renderCompanyTrigger = (
+    option: ComboBoxOption<string> | undefined,
+    displayValue: string,
+  ) => {
     if (!option) {
       return (
         <div className="flex flex-col items-start flex-1">
@@ -109,7 +112,7 @@ export const CompanySelector = () => {
   };
 
   return (
-    <div className="min-w-[220px]">
+    <div className="min-w-[242px]">
       <ComboBox
         options={companyOptions}
         value={activeCompany?.id || null}
@@ -120,7 +123,7 @@ export const CompanySelector = () => {
         renderItem={renderCompanyItem}
         renderTrigger={renderCompanyTrigger}
         maxHeight="max-h-56"
-        className="h-12 px-4 bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-md shadow-sm"
+        className="h-[52px] px-4 bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-md shadow-sm"
         contentClassName="rounded-md shadow-lg"
       />
     </div>
