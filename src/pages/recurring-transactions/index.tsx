@@ -213,8 +213,8 @@ export function RecurringTransactionsPage() {
           {/* Busca e Filtros */}
           <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm mb-6">
             <div className="p-4">
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="relative flex-1 min-w-[200px]">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                   <Input
                     type="text"
@@ -225,7 +225,7 @@ export function RecurringTransactionsPage() {
                   />
                 </div>
                 <Select value={filterType} onValueChange={setFilterType}>
-                  <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500 min-w-[140px]">
+                  <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500 w-full sm:w-auto sm:min-w-[140px]">
                     <span>
                       {filterType === 'all'
                         ? 'Todos os tipos'
@@ -242,7 +242,7 @@ export function RecurringTransactionsPage() {
                   </SelectContent>
                 </Select>
                 <Select value={filterFrequency} onValueChange={setFilterFrequency}>
-                  <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500 min-w-[160px]">
+                  <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500 w-full sm:w-auto sm:min-w-[160px]">
                     <span>
                       {filterFrequency === 'all'
                         ? 'Todas as frequências'
@@ -258,7 +258,7 @@ export function RecurringTransactionsPage() {
                     ))}
                   </SelectContent>
                 </Select>
-                <div className="flex gap-2 border border-border dark:border-border-dark rounded-md overflow-hidden bg-background dark:bg-background-dark">
+                <div className="flex gap-2 border border-border dark:border-border-dark rounded-md overflow-hidden bg-background dark:bg-background-dark w-full sm:w-auto">
                   <Button
                     type="button"
                     variant="ghost"
