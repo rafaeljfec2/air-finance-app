@@ -13,9 +13,14 @@ import {
   TransactionGrid,
   TransactionGridTransaction,
 } from '@/components/transactions/TransactionGrid';
+import {
+  calculateBalance,
+  createPreviousBalanceRow,
+} from '@/components/transactions/TransactionGrid.utils';
 import { importOfx, type ExtractTransaction } from '@/services/transactionService';
 import { Loading } from '@/components/Loading';
 import { toast } from '@/components/ui/toast';
+import { usePreviousBalance } from '@/hooks/useTransactions';
 
 export function ImportOfxPage() {
   const { activeCompany } = useActiveCompany();
@@ -32,6 +37,8 @@ export function ImportOfxPage() {
     isFetching,
     refetch,
   } = useExtracts(companyId, startDate, endDate);
+
+  const { previousBalance = 0 } = usePreviousBalance(companyId, startDate);
 
   const importMutation = useMutation({
     mutationFn: async (file: File) => {
@@ -81,13 +88,14 @@ export function ImportOfxPage() {
         const isoDate = tx.date ? `${tx.date}T00:00:00` : new Date().toISOString();
         const amountNum = typeof tx.amount === 'number' ? tx.amount : Number(tx.amount) || 0;
         const isRevenue = amountNum >= 0;
-        const valueAbs = Math.abs(amountNum);
+        // Normalize value: revenue = positive, expense = negative (same as backend)
+        const normalizedValue = isRevenue ? Math.abs(amountNum) : -Math.abs(amountNum);
         const accountLabel = extract.header.account || extract.header.bank || 'Conta não informada';
 
         return {
           id: tx.fitId || `${extract.id ?? 'extract'}-${extractIndex}-${index}`,
           description: tx.description || 'Sem descrição',
-          value: valueAbs,
+          value: normalizedValue, // Already normalized: positive for revenue, negative for expense
           launchType: isRevenue ? 'revenue' : 'expense',
           valueType: 'fixed',
           companyId: extract.companyId || companyId || 'sem-company',
@@ -105,25 +113,32 @@ export function ImportOfxPage() {
       });
     });
 
-    const withBalanceAsc = [...flattened].sort(
-      (a, b) => new Date(a.paymentDate).getTime() - new Date(b.paymentDate).getTime(),
-    );
+    // Use the same calculateBalance function as the transactions screen
+    let transactionsWithBalance = calculateBalance(flattened);
 
-    let running = 0;
-    const withBalance = withBalanceAsc.map((tx) => {
-      running += tx.value * (tx.launchType === 'expense' ? -1 : 1);
-      return { ...tx, balance: running } as TransactionGridTransaction;
-    });
+    // Add previous balance row if startDate is set
+    if (startDate) {
+      const previousBalanceRow = createPreviousBalanceRow(previousBalance, startDate);
+      previousBalanceRow.accountId = 'Todas';
+      transactionsWithBalance = [previousBalanceRow, ...transactionsWithBalance];
+      // Recalculate balance with previous balance included
+      transactionsWithBalance = calculateBalance(transactionsWithBalance);
+    }
 
-    return withBalance.sort(
+    // Sort descending by date (most recent first)
+    return transactionsWithBalance.sort(
       (a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime(),
     );
-  }, [companyId, extracts]);
+  }, [companyId, extracts, previousBalance, startDate]);
 
   const filteredTransactions = useMemo(() => {
     if (!searchTerm.trim()) return transactions;
     const term = searchTerm.toLowerCase();
     return transactions.filter((tx) => {
+      // Always include previous balance row
+      if (tx.id === 'previous-balance') {
+        return true;
+      }
       const desc = (tx.description ?? '').toLowerCase();
       const account = (tx.accountId ?? '').toLowerCase();
       const obs = (tx.observation ?? '').toLowerCase();
