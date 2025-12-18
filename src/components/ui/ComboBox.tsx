@@ -286,7 +286,7 @@ export function ComboBox<T extends string | number = string>({
               </div>
             )}
 
-              <div className={cn('p-1 overflow-y-auto flex-1 min-h-0', searchable && 'pt-0')}>
+            <div className={cn('p-1 overflow-y-auto flex-1 min-h-0', searchable && 'pt-0')}>
               {filteredOptions.length > 0
                 ? filteredOptions.map((option) => {
                     if (renderItem) {
