@@ -1,20 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Modal } from '@/components/ui/Modal';
-import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Loading } from '@/components/Loading';
+import { Button } from '@/components/ui/button';
+import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
+import { Modal } from '@/components/ui/Modal';
 import { useActiveCompany } from '@/hooks/useActiveCompany';
-import { useAuthStore } from '@/stores/auth';
 import { companyService } from '@/services/company';
-import { Company } from '@/types/company';
-import { useQuery } from '@tanstack/react-query';
+import { useAuthStore } from '@/stores/auth';
 import { formatCNPJ } from '@/utils/formatCNPJ';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
 
 export function CompanySelectionModal() {
   const { user } = useAuthStore();
@@ -71,6 +64,37 @@ export function CompanySelectionModal() {
     return 'Selecione uma empresa';
   }, [isLoading, hasCompanies]);
 
+  // Convert companies to ComboBox options
+  const companyOptions: ComboBoxOption<string>[] = useMemo(
+    () =>
+      companies.map((company) => ({
+        value: company.id,
+        label: company.name,
+      })),
+    [companies],
+  );
+
+  // Format selected value to show name and CNPJ
+  const formatSelectedCompany = (option: ComboBoxOption<string> | undefined) => {
+    if (!option) return 'Selecione uma empresa';
+    const company = companies.find((c) => c.id === option.value);
+    if (!company) return option.label;
+    return `${company.name} - ${formatCNPJ(company.cnpj)}`;
+  };
+
+  // Custom render for company items (name + CNPJ in two lines)
+  const renderCompanyItem = (option: ComboBoxOption<string>) => {
+    const company = companies.find((c) => c.id === option.value);
+    if (!company) return <span>{option.label}</span>;
+
+    return (
+      <div className="flex flex-col">
+        <span className="text-sm">{company.name}</span>
+        <span className="text-xs opacity-80">{formatCNPJ(company.cnpj)}</span>
+      </div>
+    );
+  };
+
   return (
     <Modal
       open={shouldShowModal}
@@ -110,26 +134,18 @@ export function CompanySelectionModal() {
         {!isLoading && !isError && hasCompanies && (
           <div className="space-y-5">
             <div className="space-y-2">
-              <p className="text-sm font-medium text-foreground">Empresa</p>
-              <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
-                <SelectTrigger className="h-11 w-full bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
-                  <SelectValue placeholder="Selecione uma empresa" />
-                </SelectTrigger>
-                <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg">
-                  {companies.map((company: Company) => (
-                    <SelectItem
-                      key={company.id}
-                      value={company.id}
-                      className="relative overflow-hidden before:absolute before:inset-0 before:rounded-md before:border before:border-border/60 before:opacity-0 before:transition-opacity data-[state=checked]:before:opacity-100 data-[state=checked]:before:border-primary-500 hover:bg-primary-500 hover:text-white data-[state=checked]:hover:bg-primary-600 data-[state=checked]:text-white data-[state=checked]:font-semibold data-[state=checked]:shadow-lg"
-                    >
-                      <div className="flex flex-col">
-                        <span className="text-sm">{company.name}</span>
-                        <span className="text-xs opacity-80">{formatCNPJ(company.cnpj)}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ComboBox
+                label="Empresa"
+                options={companyOptions}
+                value={selectedCompanyId}
+                onValueChange={(value) => setSelectedCompanyId(value ?? '')}
+                placeholder="Selecione uma empresa"
+                searchable
+                searchPlaceholder="Buscar empresa..."
+                formatSelectedValue={formatSelectedCompany}
+                renderItem={renderCompanyItem}
+                maxHeight="max-h-56"
+              />
               <p className="text-xs text-muted-foreground">
                 Você pode alterar essa seleção a qualquer momento pelo menu superior.
               </p>
