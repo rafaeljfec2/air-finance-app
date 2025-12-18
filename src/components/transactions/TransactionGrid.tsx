@@ -3,6 +3,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/utils/formatters';
 import { TableRow } from './TransactionTableRow';
 import { MobileCard } from './TransactionMobileCard';
 import { SortableHeader } from './SortableHeader';
@@ -81,6 +82,34 @@ export function TransactionGrid({
     () => paginate(sortedAndFilteredTransactions),
     [paginate, sortedAndFilteredTransactions],
   );
+
+  // Calculate totals for footer
+  const totals = useMemo(() => {
+    let totalCredits = 0;
+    let totalDebits = 0;
+    let finalBalance = 0;
+
+    sortedAndFilteredTransactions.forEach((transaction) => {
+      // Skip previous balance row for totals calculation
+      if (transaction.id === 'previous-balance') {
+        finalBalance = transaction.balance ?? 0;
+        return;
+      }
+
+      if (transaction.launchType === 'revenue') {
+        totalCredits += Math.abs(transaction.value);
+      } else if (transaction.launchType === 'expense') {
+        totalDebits += Math.abs(transaction.value);
+      }
+
+      // Update final balance with the last transaction balance
+      if (transaction.balance !== undefined) {
+        finalBalance = transaction.balance;
+      }
+    });
+
+    return { totalCredits, totalDebits, finalBalance };
+  }, [sortedAndFilteredTransactions]);
 
   const handleActionClick = useCallback(
     (transaction: TransactionGridTransaction) => {
@@ -200,6 +229,36 @@ export function TransactionGrid({
                       </tr>
                     )}
                   </tbody>
+                  {sortedAndFilteredTransactions.length > 0 && (
+                    <tfoot className="bg-background/50 dark:bg-background-dark/50 border-t-2 border-border dark:border-border-dark">
+                      <tr>
+                        <td className="py-2 px-4 text-xs font-semibold text-text dark:text-text-dark"></td>
+                        <td className="py-2 px-4 text-xs font-semibold text-text dark:text-text-dark"></td>
+                        <td className="py-2 px-4 text-xs font-semibold text-text dark:text-text-dark"></td>
+                        <td className="py-2 px-4 text-xs font-semibold text-text dark:text-text-dark text-right">
+                          TOTAL:
+                        </td>
+                        <td className="py-2 pl-0 pr-8 text-xs font-semibold text-green-500 dark:text-green-400 text-right whitespace-nowrap">
+                          {formatCurrency(totals.totalCredits)}
+                        </td>
+                        <td className="py-2 pl-0 pr-8 text-xs font-semibold text-red-500 dark:text-red-400 text-right whitespace-nowrap">
+                          -{formatCurrency(totals.totalDebits)}
+                        </td>
+                        <td
+                          className={cn(
+                            'py-2 pl-0 pr-8 text-xs font-semibold text-right whitespace-nowrap',
+                            totals.finalBalance >= 0
+                              ? 'text-green-500 dark:text-green-400'
+                              : 'text-red-500 dark:text-red-400',
+                          )}
+                        >
+                          {totals.finalBalance >= 0 ? '+' : ''}
+                          {formatCurrency(Math.abs(totals.finalBalance))}
+                        </td>
+                        {showActions && <td className="py-2 px-4"></td>}
+                      </tr>
+                    </tfoot>
+                  )}
                 </table>
               </div>
             </div>
