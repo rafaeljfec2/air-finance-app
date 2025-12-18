@@ -42,7 +42,9 @@ export function MonthlyComparisonCard({
     <Card className="border-border dark:border-border-dark">
       <div className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-medium text-text dark:text-text-dark">Comparativo Mensal</h3>
+          <h3 className="text-base font-medium text-text dark:text-text-dark">
+            Comparativo Mensal
+          </h3>
         </div>
 
         {isLoading && (
