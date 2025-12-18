@@ -1,14 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
-import type React from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { format, startOfMonth, endOfMonth } from 'date-fns';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Search, Download, Receipt } from 'lucide-react';
-import { useActiveCompany } from '@/hooks/useActiveCompany';
-import { useExtracts } from '@/hooks/useExtracts';
+import { Loading } from '@/components/Loading';
 import {
   TransactionGrid,
   TransactionGridTransaction,
@@ -17,10 +7,20 @@ import {
   calculateBalance,
   createPreviousBalanceRow,
 } from '@/components/transactions/TransactionGrid.utils';
-import { importOfx, type ExtractTransaction } from '@/services/transactionService';
-import { Loading } from '@/components/Loading';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/toast';
+import { useActiveCompany } from '@/hooks/useActiveCompany';
+import { useExtracts } from '@/hooks/useExtracts';
 import { usePreviousBalance } from '@/hooks/useTransactions';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { importOfx, type ExtractTransaction } from '@/services/transactionService';
+import { useMutation } from '@tanstack/react-query';
+import { endOfMonth, format, startOfMonth } from 'date-fns';
+import { Download, Receipt, Search } from 'lucide-react';
+import type React from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 export function ImportOfxPage() {
   const { activeCompany } = useActiveCompany();
@@ -192,46 +192,31 @@ export function ImportOfxPage() {
           {/* Filters */}
           <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm mb-6">
             <div className="p-4">
-              <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
-                <div className="space-y-1">
-                  <label htmlFor="start-date" className="text-xs text-muted-foreground">
-                    Início
-                  </label>
+              <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-center">
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                />
+                <Input
+                  id="end-date"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                />
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                   <Input
-                    id="start-date"
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                    id="search-term"
+                    type="text"
+                    placeholder="Descrição, conta ou ID externo"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                   />
-                </div>
-                <div className="space-y-1">
-                  <label htmlFor="end-date" className="text-xs text-muted-foreground">
-                    Fim
-                  </label>
-                  <Input
-                    id="end-date"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label htmlFor="search-term" className="text-xs text-muted-foreground">
-                    Busca geral
-                  </label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                    <Input
-                      id="search-term"
-                      type="text"
-                      placeholder="Descrição, conta ou ID externo"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-9 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                    />
-                  </div>
                 </div>
                 <div className="flex gap-3 justify-end">
                   <Button

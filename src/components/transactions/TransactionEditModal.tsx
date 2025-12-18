@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Modal } from '@/components/ui/Modal';
-import { Input } from '@/components/ui/input';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
+import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useTransactions } from '@/hooks/useTransactions';
-import { useCompanyStore } from '@/stores/company';
-import type { TransactionGridTransaction } from './TransactionGrid.types';
 import type { Account } from '@/services/accountService';
 import type { Category } from '@/services/categoryService';
+import { useCompanyStore } from '@/stores/company';
+import { useEffect, useMemo, useState } from 'react';
+import type { TransactionGridTransaction } from './TransactionGrid.types';
 
 interface TransactionEditModalProps {
   open: boolean;
@@ -73,8 +73,8 @@ export function TransactionEditModal({
       const displayValue =
         typeof transaction.value === 'number'
           ? Math.abs(transaction.value).toFixed(2)
-          : transaction.value?.replace(/^-/, '') ?? '';
-      
+          : ((transaction.value as string)?.replace(/^-/, '') ?? '');
+
       setForm({
         description: transaction.description ?? '',
         categoryId: transaction.categoryId ?? '',
@@ -211,4 +211,3 @@ export function TransactionEditModal({
     </Modal>
   );
 }
-
