@@ -33,6 +33,7 @@ export function TransactionEditModal({
     categoryId: '',
     accountId: '',
     value: '',
+    launchType: 'revenue' as 'revenue' | 'expense',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -57,16 +58,29 @@ export function TransactionEditModal({
     [accounts],
   );
 
+  // Launch type options
+  const launchTypeOptions: ComboBoxOption<'revenue' | 'expense'>[] = useMemo(
+    () => [
+      { value: 'revenue', label: 'Crédito' },
+      { value: 'expense', label: 'Débito' },
+    ],
+    [],
+  );
+
   useEffect(() => {
     if (open && transaction) {
+      // Remove negative sign for display - backend handles the sign based on launchType
+      const displayValue =
+        typeof transaction.value === 'number'
+          ? Math.abs(transaction.value).toFixed(2)
+          : transaction.value?.replace(/^-/, '') ?? '';
+      
       setForm({
         description: transaction.description ?? '',
         categoryId: transaction.categoryId ?? '',
         accountId: transaction.accountId ?? '',
-        value:
-          typeof transaction.value === 'number'
-            ? transaction.value.toFixed(2)
-            : transaction.value ?? '',
+        value: displayValue,
+        launchType: transaction.launchType ?? 'revenue',
       });
       setErrors({});
     }
@@ -74,7 +88,7 @@ export function TransactionEditModal({
 
   if (!open || !transaction) return null;
 
-  const handleChange = (field: keyof typeof form, value: string) => {
+  const handleChange = (field: keyof typeof form, value: string | 'revenue' | 'expense') => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -102,6 +116,7 @@ export function TransactionEditModal({
         categoryId: form.categoryId,
         accountId: form.accountId,
         value: numericValue,
+        launchType: form.launchType,
       },
     });
     onClose();
@@ -151,17 +166,28 @@ export function TransactionEditModal({
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Valor</label>
-            <Input
-              type="number"
-              step="0.01"
-              value={form.value}
-              onChange={(e) => handleChange('value', e.target.value)}
-              placeholder="0.00"
-              className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+            <label className="text-xs text-muted-foreground">Tipo</label>
+            <ComboBox
+              options={launchTypeOptions}
+              value={form.launchType}
+              onValueChange={(value) => handleChange('launchType', value ?? 'revenue')}
+              placeholder="Selecionar tipo"
+              className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500"
             />
-            {errors.value && <p className="text-xs text-red-500">{errors.value}</p>}
           </div>
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">Valor</label>
+          <Input
+            type="number"
+            step="0.01"
+            value={form.value}
+            onChange={(e) => handleChange('value', e.target.value)}
+            placeholder="0.00"
+            className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+          />
+          {errors.value && <p className="text-xs text-red-500">{errors.value}</p>}
         </div>
 
         <div className="flex justify-end gap-3 pt-2">
