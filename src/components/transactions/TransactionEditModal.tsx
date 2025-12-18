@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { Button } from '@/components/ui/button';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useCompanyStore } from '@/stores/company';
@@ -36,6 +36,26 @@ export function TransactionEditModal({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Convert categories to ComboBox options
+  const categoryOptions: ComboBoxOption<string>[] = useMemo(
+    () =>
+      categories.map((category) => ({
+        value: category.id,
+        label: category.name,
+      })),
+    [categories],
+  );
+
+  // Convert accounts to ComboBox options
+  const accountOptions: ComboBoxOption<string>[] = useMemo(
+    () =>
+      accounts.map((account) => ({
+        value: account.id,
+        label: `${account.name} • ${account.institution}`,
+      })),
+    [accounts],
+  );
 
   useEffect(() => {
     if (open && transaction) {
@@ -92,24 +112,16 @@ export function TransactionEditModal({
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-1">
           <label className="text-xs text-muted-foreground">Categoria</label>
-          <Select
-            value={form.categoryId}
-            onValueChange={(value) => handleChange('categoryId', value)}
-          >
-            <SelectTrigger className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
-              {form.categoryId
-                ? categories.find((c) => c.id === form.categoryId)?.name ?? 'Selecionar categoria'
-                : 'Selecionar categoria'}
-            </SelectTrigger>
-            <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.categoryId && <p className="text-xs text-red-500">{errors.categoryId}</p>}
+          <ComboBox
+            options={categoryOptions}
+            value={form.categoryId || null}
+            onValueChange={(value) => handleChange('categoryId', value ?? '')}
+            placeholder="Selecionar categoria"
+            searchable
+            searchPlaceholder="Buscar categoria..."
+            error={errors.categoryId}
+            className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500"
+          />
         </div>
 
         <div className="space-y-1">
@@ -126,24 +138,16 @@ export function TransactionEditModal({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Conta</label>
-            <Select
-              value={form.accountId}
-              onValueChange={(value) => handleChange('accountId', value)}
-            >
-              <SelectTrigger className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
-                {form.accountId
-                  ? accounts.find((acc) => acc.id === form.accountId)?.name ?? 'Selecionar conta'
-                  : 'Selecionar conta'}
-              </SelectTrigger>
-              <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
-                {accounts.map((account) => (
-                  <SelectItem key={account.id} value={account.id}>
-                    {account.name} • {account.institution}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.accountId && <p className="text-xs text-red-500">{errors.accountId}</p>}
+            <ComboBox
+              options={accountOptions}
+              value={form.accountId || null}
+              onValueChange={(value) => handleChange('accountId', value ?? '')}
+              placeholder="Selecionar conta"
+              searchable
+              searchPlaceholder="Buscar conta..."
+              error={errors.accountId}
+              className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500"
+            />
           </div>
 
           <div className="space-y-1">
