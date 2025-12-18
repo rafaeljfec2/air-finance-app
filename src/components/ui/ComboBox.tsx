@@ -102,6 +102,11 @@ export interface ComboBoxProps<T = string> {
    * Custom render function for each option item
    */
   renderItem?: (option: ComboBoxOption<T>) => React.ReactNode;
+
+  /**
+   * Custom render function for the trigger content
+   */
+  renderTrigger?: (option: ComboBoxOption<T> | undefined, displayValue: string) => React.ReactNode;
 }
 
 /**
@@ -140,6 +145,7 @@ export function ComboBox<T extends string | number = string>({
   formatSelectedValue,
   filterOptions,
   renderItem,
+  renderTrigger,
 }: Readonly<ComboBoxProps<T>>) {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [isOpen, setIsOpen] = React.useState(false);
@@ -229,13 +235,17 @@ export function ComboBox<T extends string | number = string>({
             className,
           )}
         >
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            {Icon && (
-              <Icon className="h-4 w-4 text-muted-foreground dark:text-gray-400 flex-shrink-0" />
-            )}
-            <span className="truncate">{displayValue}</span>
-          </div>
-          {hasValue && !disabled && (
+          {renderTrigger ? (
+            renderTrigger(selectedOption, displayValue)
+          ) : (
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              {Icon && (
+                <Icon className="h-4 w-4 text-muted-foreground dark:text-gray-400 flex-shrink-0" />
+              )}
+              <span className="truncate">{displayValue}</span>
+            </div>
+          )}
+          {hasValue && !disabled && !renderTrigger && (
             <button
               type="button"
               onClick={handleClear}
