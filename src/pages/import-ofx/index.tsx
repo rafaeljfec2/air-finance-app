@@ -1,4 +1,4 @@
-import { Loading } from '@/components/Loading';
+import { ImportOfxModal } from '@/components/import-ofx/ImportOfxModal';
 import {
   TransactionGrid,
   TransactionGridTransaction,
@@ -21,33 +21,38 @@ import { importOfx, type ExtractTransaction } from '@/services/transactionServic
 import { useMutation } from '@tanstack/react-query';
 import { endOfMonth, format, startOfMonth } from 'date-fns';
 import { Download, Filter, Receipt, Search } from 'lucide-react';
-import type React from 'react';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export function ImportOfxPage() {
   const { activeCompany } = useActiveCompany();
   const companyId = activeCompany?.id ?? '';
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const [startDate, setStartDate] = useState(() => format(startOfMonth(new Date()), 'yyyy-MM-dd'));
   const [endDate, setEndDate] = useState(() => format(endOfMonth(new Date()), 'yyyy-MM-dd'));
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>(undefined);
+  const [showImportModal, setShowImportModal] = useState(false);
+
+  const { accounts } = useAccounts();
+
+  // Convert selectedAccountId (accountNumber) to accountId for API call
+  const selectedAccount = useMemo(() => {
+    if (!selectedAccountId || selectedAccountId === 'all') return undefined;
+    return accounts?.find((acc) => acc.accountNumber === selectedAccountId);
+  }, [selectedAccountId, accounts]);
 
   const {
     data: extracts = [],
     isLoading,
     isFetching,
     refetch,
-  } = useExtracts(companyId, startDate, endDate);
-
-  const { accounts } = useAccounts();
-  const { previousBalance = 0 } = usePreviousBalance(companyId, startDate);
+  } = useExtracts(companyId, startDate, endDate, selectedAccount?.id);
+  const { previousBalance = 0 } = usePreviousBalance(companyId, startDate, selectedAccount?.id);
 
   const importMutation = useMutation({
-    mutationFn: async (file: File) => {
+    mutationFn: async ({ file, accountId }: { file: File; accountId: string }) => {
       if (!companyId) throw new Error('Selecione uma empresa');
-      return importOfx(companyId, file);
+      return importOfx(companyId, file, accountId);
     },
     onSuccess: () => {
       toast({
@@ -56,50 +61,38 @@ export function ImportOfxPage() {
         type: 'success',
       });
       refetch();
+      setShowImportModal(false);
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: 'Erro na importação',
-        description: 'Não foi possível importar o arquivo OFX. Tente novamente.',
+        description: error.message || 'Não foi possível importar o arquivo OFX. Tente novamente.',
         type: 'error',
       });
     },
   });
 
-  const handleImportClick = () => {
-    inputRef.current?.click();
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImport = async (file: File, accountId: string) => {
     if (!file.name.toLowerCase().endsWith('.ofx')) {
-      toast({
-        title: 'Arquivo inválido',
-        description: 'Selecione um arquivo com extensão .ofx',
-        type: 'warning',
-      });
-      e.target.value = '';
-      return;
+      throw new Error('Selecione um arquivo com extensão .ofx');
     }
-    importMutation.mutate(file);
-    e.target.value = '';
+    await importMutation.mutateAsync({ file, accountId });
   };
 
   // List all registered accounts for the combo
   const accountOptions: ComboBoxOption<string>[] = useMemo(() => {
     if (!accounts || accounts.length === 0) return [];
 
-    return accounts
-      .sort((a, b) => {
-        return a.name.localeCompare(b.name, 'pt-BR', {
-          sensitivity: 'base',
-        });
-      })
-      .map((account) => ({
-        value: account.accountNumber,
-        label: `${account.name} ${account.accountNumber}`,
-      }));
+    const sortedAccounts = [...accounts].sort((a, b) => {
+      return a.name.localeCompare(b.name, 'pt-BR', {
+        sensitivity: 'base',
+      });
+    });
+
+    return sortedAccounts.map((account) => ({
+      value: account.accountNumber,
+      label: `${account.name} ${account.accountNumber}`,
+    }));
   }, [accounts]);
 
   const transactions: TransactionGridTransaction[] = useMemo(() => {
@@ -215,19 +208,12 @@ export function ImportOfxPage() {
               </p>
             </div>
             <div className="flex gap-3">
-              <input
-                ref={inputRef}
-                type="file"
-                accept=".ofx"
-                className="hidden"
-                onChange={handleFileChange}
-              />
               <Button
-                onClick={handleImportClick}
-                disabled={!companyId || importMutation.isPending}
+                onClick={() => setShowImportModal(true)}
+                disabled={!companyId}
                 className="bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
               >
-                {importMutation.isPending ? <Loading size="small" /> : 'Importar extrato (OFX)'}
+                Importar extrato (OFX)
               </Button>
             </div>
           </div>
@@ -344,6 +330,15 @@ export function ImportOfxPage() {
           />
         </div>
       </div>
+
+      {/* Import Modal */}
+      <ImportOfxModal
+        open={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        accounts={accounts || []}
+        onImport={handleImport}
+        isImporting={importMutation.isPending}
+      />
     </ViewDefault>
   );
 }

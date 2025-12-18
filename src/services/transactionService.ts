@@ -160,9 +160,14 @@ export const deleteTransaction = async (companyId: string, id: string): Promise<
   }
 };
 
-export const importOfx = async (companyId: string, file: File): Promise<ImportOfxResponse> => {
+export const importOfx = async (
+  companyId: string,
+  file: File,
+  accountId: string,
+): Promise<ImportOfxResponse> => {
   const formData = new FormData();
   formData.append('file', file);
+  formData.append('accountId', accountId);
 
   const response = await apiClient.post(
     `/companies/${companyId}/transactions/import-ofx`,
@@ -226,9 +231,14 @@ export const getExtracts = async (
   companyId: string,
   startDate: string,
   endDate: string,
+  accountId?: string,
 ): Promise<ExtractResponse[]> => {
+  const params: Record<string, string> = { startDate, endDate };
+  if (accountId) {
+    params.accountId = accountId;
+  }
   const response = await apiClient.get(`/companies/${companyId}/transactions/extracts`, {
-    params: { startDate, endDate },
+    params,
   });
 
   const data = response.data;
