@@ -40,59 +40,59 @@ export function MonthlyComparisonCard({
 
   return (
     <Card className="border-border dark:border-border-dark">
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-text dark:text-text-dark">Comparativo Mensal</h3>
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-medium text-text dark:text-text-dark">Comparativo Mensal</h3>
         </div>
 
         {isLoading && (
-          <div className="flex items-center justify-center h-32">
-            <Spinner size="lg" className="text-emerald-500" />
+          <div className="flex items-center justify-center h-24">
+            <Spinner size="md" className="text-emerald-500" />
           </div>
         )}
 
         {!isLoading && error && (
-          <p className="text-sm text-red-500">Erro ao carregar comparativo mensal.</p>
+          <p className="text-xs text-red-500">Erro ao carregar comparativo mensal.</p>
         )}
 
         {!isLoading && !error && comparison && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <ArrowUpIcon className="h-5 w-5 text-green-500" />
-                <span className="text-sm text-gray-500">Receitas</span>
+                <ArrowUpIcon className="h-4 w-4 text-green-500" />
+                <span className="text-xs text-gray-500">Receitas</span>
               </div>
               <div className="text-right">
-                <p className="text-sm font-medium text-green-500">
+                <p className="text-xs font-medium text-green-500">
                   {formatCurrency(comparison.current.income)}
                 </p>
-                <p className="text-xs text-gray-500">{formatPctLabel(incomePct)}</p>
+                <p className="text-[10px] text-gray-500">{formatPctLabel(incomePct)}</p>
               </div>
             </div>
 
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <ArrowDownIcon className="h-5 w-5 text-red-500" />
-                <span className="text-sm text-gray-500">Despesas</span>
+                <ArrowDownIcon className="h-4 w-4 text-red-500" />
+                <span className="text-xs text-gray-500">Despesas</span>
               </div>
               <div className="text-right">
-                <p className="text-sm font-medium text-red-500">
+                <p className="text-xs font-medium text-red-500">
                   {formatCurrency(comparison.current.expenses)}
                 </p>
-                <p className="text-xs text-gray-500">{formatPctLabel(expensesPct)}</p>
+                <p className="text-[10px] text-gray-500">{formatPctLabel(expensesPct)}</p>
               </div>
             </div>
 
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <CurrencyDollarIcon className="h-5 w-5 text-blue-500" />
-                <span className="text-sm text-gray-500">Economia</span>
+                <CurrencyDollarIcon className="h-4 w-4 text-blue-500" />
+                <span className="text-xs text-gray-500">Economia</span>
               </div>
               <div className="text-right">
-                <p className="text-sm font-medium text-blue-500">
+                <p className="text-xs font-medium text-blue-500">
                   {formatCurrency(comparison.current.savings)}
                 </p>
-                <p className="text-xs text-gray-500">{formatPctLabel(savingsPct)}</p>
+                <p className="text-[10px] text-gray-500">{formatPctLabel(savingsPct)}</p>
               </div>
             </div>
           </div>
