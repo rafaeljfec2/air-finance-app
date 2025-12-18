@@ -13,6 +13,7 @@ import { DependentsPage } from '@/pages/dependents';
 import { ForgotPasswordPage } from '@/pages/forgot-password';
 import { GoalsPage } from '@/pages/goals';
 import { ImportOfxPage } from '@/pages/import-ofx';
+import { RecurringTransactionsPage } from '@/pages/recurring-transactions';
 import { IncomeSourcesPage } from '@/pages/income-sources';
 import { LandingPage } from '@/pages/landing';
 import { Login } from '@/pages/login';
@@ -240,6 +241,17 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <GoalsPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/recurring-transactions',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <RecurringTransactionsPage />
         </ProtectedRoute>
       </ErrorBoundary>
     ),

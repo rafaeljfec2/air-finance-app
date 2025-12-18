@@ -1,5 +1,6 @@
 import { NavigationSection } from '@/types/navigation';
 import {
+  ArrowPathIcon,
   ArrowsRightLeftIcon,
   BanknotesIcon,
   BuildingOfficeIcon,
@@ -64,6 +65,7 @@ export const navigation: NavigationSection[] = [
           /* { name: 'Dependentes', href: '/dependents', icon: UserGroupIcon }, */
           { name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCardIcon },
           { name: 'Metas', href: '/goals', icon: FlagIcon },
+          { name: 'Transações Recorrentes', href: '/recurring-transactions', icon: ArrowPathIcon },
           /* { name: 'Fontes de Receitas', href: '/income-sources', icon: CurrencyDollarIcon },
           { name: 'Usuários', href: '/users', icon: UserIcon }, */
         ],
