@@ -34,6 +34,7 @@ export interface TransactionGridProps {
   onEdit?: (transaction: TransactionGridTransaction) => void;
   onDelete?: (transaction: TransactionGridTransaction) => void;
   className?: string;
+  resetPageKey?: string | number; // Key that changes when page should be reset (e.g., account filter change)
 }
 
 export interface TransactionActionsProps {

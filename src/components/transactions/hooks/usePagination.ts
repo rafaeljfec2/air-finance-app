@@ -33,11 +33,16 @@ export function usePagination(itemsPerPage: number = 5) {
     setCurrentPage(1);
   };
 
+  const resetPage = () => {
+    setCurrentPage(1);
+  };
+
   return {
     currentPage,
     itemsPerPageSelected,
     paginate,
     handlePageChange,
     handleItemsPerPageChange,
+    resetPage,
   };
 }

@@ -327,6 +327,7 @@ export function ImportOfxPage() {
             transactions={filteredTransactions}
             isLoading={isLoading || isFetching}
             showActions={false}
+            resetPageKey={selectedAccountId}
           />
         </div>
       </div>

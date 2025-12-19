@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -28,6 +28,7 @@ export function TransactionGrid({
   onEdit,
   onDelete,
   className,
+  resetPageKey,
 }: Readonly<TransactionGridProps>) {
   const navigate = useNavigate();
   const [sortConfig, setSortConfig] = useState<{ field: SortField; direction: SortDirection }>({
@@ -45,6 +46,7 @@ export function TransactionGrid({
     paginate,
     handlePageChange,
     handleItemsPerPageChange,
+    resetPage,
   } = usePagination(10);
 
   const handleFilterClick = useCallback(
@@ -72,6 +74,21 @@ export function TransactionGrid({
   }, []);
 
   const transactionsWithBalance = useMemo(() => calculateBalance(transactions), [transactions]);
+
+  // Track resetPageKey to detect when page should be reset (e.g., account filter change)
+  const previousResetPageKeyRef = useRef<string | number | undefined>(resetPageKey);
+
+  // Reset page to 1 when resetPageKey changes
+  useEffect(() => {
+    if (
+      resetPageKey !== undefined &&
+      previousResetPageKeyRef.current !== undefined &&
+      previousResetPageKeyRef.current !== resetPageKey
+    ) {
+      resetPage();
+    }
+    previousResetPageKeyRef.current = resetPageKey;
+  }, [resetPageKey, resetPage]);
 
   const sortedAndFilteredTransactions = useMemo(() => {
     const filtered = getFilteredTransactions(transactionsWithBalance);
