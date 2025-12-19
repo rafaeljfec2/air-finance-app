@@ -11,6 +11,7 @@ interface InstallmentsModalProps {
   onClose: () => void;
   installments: InstallmentTransaction[];
   accountId: string;
+  periodEnd?: string | null;
   onConfirm: (installments: InstallmentTransaction[]) => Promise<void>;
   isCreating?: boolean;
 }
@@ -20,6 +21,7 @@ export function InstallmentsModal({
   onClose,
   installments,
   accountId: _accountId, // Unused but kept for API compatibility
+  periodEnd,
   onConfirm,
   isCreating = false,
 }: Readonly<InstallmentsModalProps>) {
@@ -45,9 +47,20 @@ export function InstallmentsModal({
             <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
               Foram detectadas {installments.length} transação(ões) parcelada(s) no extrato.
             </p>
-            <p className="text-xs text-amber-700 dark:text-amber-300">
-              Deseja criar automaticamente as parcelas futuras para essas transações?
+            <p className="text-xs text-amber-700 dark:text-amber-300 mb-2">
+              As parcelas serão criadas a partir do mês de fechamento do extrato
+              {periodEnd
+                ? ` (${format(new Date(periodEnd), "MMMM 'de' yyyy", { locale: ptBR })})`
+                : ''}
+              . Deseja criar automaticamente as parcelas futuras para essas transações?
             </p>
+            {periodEnd && (
+              <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                💡 As parcelas começarão em{' '}
+                {format(new Date(periodEnd), "01/MM/yyyy", { locale: ptBR })} (primeiro dia do mês
+                de fechamento)
+              </p>
+            )}
           </div>
         </div>
 
@@ -65,7 +78,10 @@ export function InstallmentsModal({
                   Parcela
                 </th>
                 <th className="px-4 py-3 text-center text-gray-400 dark:text-gray-500 font-medium text-xs uppercase tracking-wider w-28">
-                  Data
+                  Data Extrato
+                </th>
+                <th className="px-4 py-3 text-center text-gray-400 dark:text-gray-500 font-medium text-xs uppercase tracking-wider w-32">
+                  Parcelas a Criar
                 </th>
               </tr>
             </thead>
@@ -113,6 +129,26 @@ export function InstallmentsModal({
                     </td>
                     <td className="px-4 py-3 text-center text-text dark:text-text-dark font-medium whitespace-nowrap">
                       {formattedDate}
+                    </td>
+                    <td className="px-4 py-3 text-center text-text dark:text-text-dark">
+                      {remaining > 0 ? (
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-xs font-medium">
+                            {installmentInfo.current}/{installmentInfo.total} até{' '}
+                            {installmentInfo.total}/{installmentInfo.total}
+                          </span>
+                          {periodEnd && (
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              A partir de{' '}
+                              {format(new Date(periodEnd), 'MM/yyyy', { locale: ptBR })}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          Completa
+                        </span>
+                      )}
                     </td>
                   </tr>
                 );

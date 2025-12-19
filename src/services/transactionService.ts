@@ -99,6 +99,7 @@ export interface CreateInstallmentsPayload {
   totalInstallments: number;
   baseDescription: string;
   fitId?: string;
+  periodEnd?: string;
 }
 
 // ============================================================================

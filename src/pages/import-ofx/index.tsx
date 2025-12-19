@@ -86,9 +86,11 @@ export function ImportOfxPage() {
     mutationFn: async ({
       installments,
       accountId,
+      periodEnd,
     }: {
       installments: InstallmentTransaction[];
       accountId: string | null | undefined;
+      periodEnd?: string;
     }) => {
       if (!companyId || !accountId) {
         throw new Error('Dados insuficientes para criar parcelas');
@@ -103,6 +105,7 @@ export function ImportOfxPage() {
           totalInstallments: tx.installmentInfo.total,
           baseDescription: tx.installmentInfo.baseDescription,
           fitId: tx.fitId ?? undefined,
+          periodEnd,
         }),
       );
 
@@ -135,8 +138,9 @@ export function ImportOfxPage() {
   const handleCreateInstallments = async (
     installments: InstallmentTransaction[],
     accountId: string,
+    periodEnd?: string,
   ) => {
-    await createInstallmentsMutation.mutateAsync({ installments, accountId });
+    await createInstallmentsMutation.mutateAsync({ installments, accountId, periodEnd });
   };
 
   // List all registered accounts for the combo

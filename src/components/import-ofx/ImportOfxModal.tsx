@@ -34,6 +34,7 @@ export function ImportOfxModal({
   const [detectedInstallments, setDetectedInstallments] = useState<InstallmentTransaction[]>([]);
   const [showInstallmentsModal, setShowInstallmentsModal] = useState(false);
   const [lastImportedAccountId, setLastImportedAccountId] = useState<string | null>(null);
+  const [lastImportedPeriodEnd, setLastImportedPeriodEnd] = useState<string | null>(null);
   const [isCreatingInstallments, setIsCreatingInstallments] = useState(false);
 
   const {
@@ -63,6 +64,8 @@ export function ImportOfxModal({
         setDetectedInstallments(result.installmentTransactions);
         // Always use the account selected by the user in the combo, not the one from backend
         setLastImportedAccountId(selectedAccountId);
+        // Store periodEnd from extract header to use as base date for installments
+        setLastImportedPeriodEnd(result.header?.periodEnd ?? null);
         setShowInstallmentsModal(true);
         // Don't close the import modal yet, wait for user to handle installments
       } else {
@@ -82,12 +85,17 @@ export function ImportOfxModal({
 
     try {
       setIsCreatingInstallments(true);
-      await onCreateInstallments(installments, lastImportedAccountId ?? '');
+      await onCreateInstallments(
+        installments,
+        lastImportedAccountId ?? '',
+        lastImportedPeriodEnd ?? undefined,
+      );
 
       // Close both modals and reset form
       setShowInstallmentsModal(false);
       setDetectedInstallments([]);
       setLastImportedAccountId(null);
+      setLastImportedPeriodEnd(null);
       resetFileUpload();
       setSelectedAccountId(null);
       onClose();
@@ -103,6 +111,7 @@ export function ImportOfxModal({
     setShowInstallmentsModal(false);
     setDetectedInstallments([]);
     setLastImportedAccountId(null);
+    setLastImportedPeriodEnd(null);
     // Close import modal and reset form
     resetFileUpload();
     setSelectedAccountId(null);
@@ -171,6 +180,7 @@ export function ImportOfxModal({
         onClose={handleCloseInstallmentsModal}
         installments={detectedInstallments}
         accountId={lastImportedAccountId || ''}
+        periodEnd={lastImportedPeriodEnd}
         onConfirm={handleCreateInstallments}
         isCreating={isCreatingInstallments}
       />
