@@ -82,18 +82,18 @@ export function Transactions() {
   // Add previous balance row if startDate is set
   const transactionsWithPreviousBalance = useMemo(() => {
     let transactionsList = [...transactionsWithLabels];
-    
+
     // Insert SALDO ANTERIOR if startDate exists
     if (startDate) {
       const previousBalanceRow = createPreviousBalanceRow(previousBalance, startDate);
       // Map labels for the previous balance row
       previousBalanceRow.categoryId = 'Saldo Anterior';
       previousBalanceRow.accountId = selectedAccountId
-        ? accountMap.get(selectedAccountId) ?? 'Todas'
+        ? (accountMap.get(selectedAccountId) ?? 'Todas')
         : 'Todas';
       transactionsList = [previousBalanceRow, ...transactionsList];
     }
-    
+
     return transactionsList;
   }, [transactionsWithLabels, previousBalance, startDate, selectedAccountId, accountMap]);
 
@@ -232,6 +232,36 @@ export function Transactions() {
                       onChange={(e) => setEndDate(e.target.value)}
                       className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                     />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const now = new Date();
+                        const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+                        setStartDate(threeMonthsAgo.toISOString().slice(0, 10));
+                        setEndDate(now.toISOString().slice(0, 10));
+                      }}
+                      className="text-xs px-2 py-1 h-auto text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400"
+                      title="Últimos 3 meses"
+                    >
+                      3M
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const now = new Date();
+                        const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, 1);
+                        setStartDate(sixMonthsAgo.toISOString().slice(0, 10));
+                        setEndDate(now.toISOString().slice(0, 10));
+                      }}
+                      className="text-xs px-2 py-1 h-auto text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400"
+                      title="Últimos 6 meses"
+                    >
+                      6M
+                    </Button>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
