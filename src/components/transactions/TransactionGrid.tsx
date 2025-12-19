@@ -77,14 +77,19 @@ export function TransactionGrid({
 
   // Track resetPageKey to detect when page should be reset (e.g., account filter change)
   const previousResetPageKeyRef = useRef<string | number | undefined>(resetPageKey);
+  const isInitialMountRef = useRef(true);
 
   // Reset page to 1 when resetPageKey changes
   useEffect(() => {
-    if (
-      resetPageKey !== undefined &&
-      previousResetPageKeyRef.current !== undefined &&
-      previousResetPageKeyRef.current !== resetPageKey
-    ) {
+    // Skip reset on initial mount
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      previousResetPageKeyRef.current = resetPageKey;
+      return;
+    }
+
+    // Reset if resetPageKey changed (including undefined changes)
+    if (previousResetPageKeyRef.current !== resetPageKey) {
       resetPage();
     }
     previousResetPageKeyRef.current = resetPageKey;

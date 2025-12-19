@@ -301,6 +301,7 @@ export function Transactions() {
             showActions={true}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            resetPageKey={selectedAccountId}
           />
         </div>
       </div>
