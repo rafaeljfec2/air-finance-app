@@ -61,7 +61,8 @@ export function ImportOfxModal({
       if (result.installmentTransactions && result.installmentTransactions.length > 0) {
         console.log('Found installment transactions, opening modal');
         setDetectedInstallments(result.installmentTransactions);
-        setLastImportedAccountId(result.accountId || selectedAccountId);
+        // Always use the account selected by the user in the combo, not the one from backend
+        setLastImportedAccountId(selectedAccountId);
         setShowInstallmentsModal(true);
         // Don't close the import modal yet, wait for user to handle installments
       } else {
