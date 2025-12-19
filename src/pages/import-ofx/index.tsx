@@ -17,7 +17,12 @@ import { useActiveCompany } from '@/hooks/useActiveCompany';
 import { useExtracts } from '@/hooks/useExtracts';
 import { usePreviousBalance } from '@/hooks/useTransactions';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { importOfx, type ExtractTransaction } from '@/services/transactionService';
+import {
+  createInstallments,
+  importOfx,
+  type ExtractTransaction,
+  type InstallmentTransaction,
+} from '@/services/transactionService';
 import { useMutation } from '@tanstack/react-query';
 import { endOfMonth, format, startOfMonth } from 'date-fns';
 import { Download, Filter, Receipt, Search } from 'lucide-react';
@@ -49,19 +54,38 @@ export function ImportOfxPage() {
   } = useExtracts(companyId, startDate, endDate, selectedAccount?.id);
   const { previousBalance = 0 } = usePreviousBalance(companyId, startDate, selectedAccount?.id);
 
+  // Debug: Log extracts data
+  console.log('Extracts data:', extracts);
+  console.log('Extracts count:', extracts.length);
+  extracts.forEach((extract, idx) => {
+    console.log(`Extract ${idx}:`, {
+      id: extract.id,
+      transactionsCount: extract.transactions?.length ?? 0,
+      header: extract.header,
+    });
+  });
+
   const importMutation = useMutation({
     mutationFn: async ({ file, accountId }: { file: File; accountId: string }) => {
       if (!companyId) throw new Error('Selecione uma empresa');
       return importOfx(companyId, file, accountId);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Import response:', data);
+      console.log('Installment transactions:', data.installmentTransactions);
+
       toast({
         title: 'Importação concluída',
         description: 'Extrato salvo com sucesso.',
         type: 'success',
       });
       refetch();
-      setShowImportModal(false);
+
+      // If no installments, close modal
+      if (!data.installmentTransactions || data.installmentTransactions.length === 0) {
+        setShowImportModal(false);
+      }
+      // If installments found, the ImportOfxModal will handle showing the installments modal
     },
     onError: (error: Error) => {
       toast({
@@ -72,11 +96,61 @@ export function ImportOfxPage() {
     },
   });
 
+  const createInstallmentsMutation = useMutation({
+    mutationFn: async ({
+      installments,
+      accountId,
+    }: {
+      installments: InstallmentTransaction[];
+      accountId: string | null | undefined;
+    }) => {
+      if (!companyId || !accountId) {
+        throw new Error('Dados insuficientes para criar parcelas');
+      }
+
+      const promises = installments.map((tx) =>
+        createInstallments(companyId, accountId ?? '', {
+          description: tx.description,
+          amount: tx.amount,
+          date: tx.date,
+          currentInstallment: tx.installmentInfo.current,
+          totalInstallments: tx.installmentInfo.total,
+          baseDescription: tx.installmentInfo.baseDescription,
+          fitId: tx.fitId ?? undefined,
+        }),
+      );
+
+      await Promise.all(promises);
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Parcelas criadas',
+        description: 'As parcelas futuras foram criadas com sucesso.',
+        type: 'success',
+      });
+      refetch();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Erro ao criar parcelas',
+        description: error.message || 'Não foi possível criar as parcelas futuras.',
+        type: 'error',
+      });
+    },
+  });
+
   const handleImport = async (file: File, accountId: string) => {
     if (!file.name.toLowerCase().endsWith('.ofx')) {
       throw new Error('Selecione um arquivo com extensão .ofx');
     }
-    await importMutation.mutateAsync({ file, accountId });
+    return await importMutation.mutateAsync({ file, accountId });
+  };
+
+  const handleCreateInstallments = async (
+    installments: InstallmentTransaction[],
+    accountId: string,
+  ) => {
+    await createInstallmentsMutation.mutateAsync({ installments, accountId });
   };
 
   // List all registered accounts for the combo
@@ -96,8 +170,26 @@ export function ImportOfxPage() {
   }, [accounts]);
 
   const transactions: TransactionGridTransaction[] = useMemo(() => {
+    console.log('Processing extracts:', extracts.length);
+    console.log('Extracts data:', JSON.stringify(extracts, null, 2));
+    
+    if (!extracts || extracts.length === 0) {
+      console.log('No extracts to process');
+      return [];
+    }
+    
     const flattened = extracts.flatMap((extract, extractIndex) => {
-      const extractAccountNumber = extract.header.account || 'Conta não informada';
+      // Skip extracts with no transactions
+      if (!extract || !extract.transactions || extract.transactions.length === 0) {
+        console.log(`Skipping extract ${extractIndex} - no transactions`, {
+          hasExtract: !!extract,
+          hasTransactions: !!extract?.transactions,
+          transactionsLength: extract?.transactions?.length ?? 0,
+        });
+        return [];
+      }
+
+      const extractAccountNumber = extract.header?.account || extract.accountId || 'Conta não informada';
 
       // Try to find a matching registered account by accountNumber
       const matchedAccount = accounts?.find((acc) => acc.accountNumber === extractAccountNumber);
@@ -105,6 +197,8 @@ export function ImportOfxPage() {
       const accountName = matchedAccount?.name || extractAccountNumber;
       const accountLabel = `${accountName} ${extractAccountNumber}`;
       const accountKey = extractAccountNumber; // Use accountNumber as key for filtering
+
+      console.log(`Processing extract ${extractIndex}: ${extract.transactions.length} transactions`);
 
       return extract.transactions.map((tx: ExtractTransaction, index: number) => {
         const isoDate = tx.date ? `${tx.date}T00:00:00` : new Date().toISOString();
@@ -338,6 +432,7 @@ export function ImportOfxPage() {
         onClose={() => setShowImportModal(false)}
         accounts={accounts || []}
         onImport={handleImport}
+        onCreateInstallments={handleCreateInstallments}
         isImporting={importMutation.isPending}
       />
     </ViewDefault>

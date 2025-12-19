@@ -7,7 +7,7 @@ import { companyService } from '@/services/company';
 import { useAuthStore } from '@/stores/auth';
 import { formatCNPJ } from '@/utils/formatCNPJ';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export function CompanySelectionModal() {
   const { user } = useAuthStore();
@@ -25,35 +25,40 @@ export function CompanySelectionModal() {
   });
 
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
-  const hasCompanies = companies.length > 0;
+  const hasCompanies = Array.isArray(companies) && companies.length > 0;
   const shouldShowModal = !!user && !activeCompany;
+
+  // Memoize first company ID to avoid unnecessary re-renders
+  const firstCompanyId = useMemo(() => {
+    return hasCompanies && companies[0]?.id ? companies[0].id : null;
+  }, [hasCompanies, companies]);
+
+  // Stabilize clearActiveCompany callback to avoid infinite loops
+  const handleClearActiveCompany = useCallback(() => {
+    clearActiveCompany();
+  }, [clearActiveCompany]);
 
   useEffect(() => {
     if (!user) {
       setSelectedCompanyId('');
-      clearActiveCompany();
+      handleClearActiveCompany();
       return;
     }
 
-    if (activeCompany) {
+    if (activeCompany?.id) {
       setSelectedCompanyId(activeCompany.id);
       return;
     }
 
-    if (hasCompanies) {
-      setSelectedCompanyId(companies[0].id);
+    if (firstCompanyId) {
+      setSelectedCompanyId(firstCompanyId);
     }
-  }, [user, activeCompany, hasCompanies, companies, clearActiveCompany]);
-
-  useEffect(() => {
-    if (user) {
-      refetch();
-    }
-  }, [user, refetch]);
+  }, [user, activeCompany?.id, firstCompanyId, handleClearActiveCompany]);
 
   const handleConfirmSelection = () => {
     if (!selectedCompanyId) return;
-    const selectedCompany = companies.find((company) => company.id === selectedCompanyId);
+    if (!Array.isArray(companies) || companies.length === 0) return;
+    const selectedCompany = companies.find((company) => company?.id === selectedCompanyId);
     if (!selectedCompany) return;
     changeActiveCompany(selectedCompany);
   };
@@ -67,30 +72,32 @@ export function CompanySelectionModal() {
   // Convert companies to ComboBox options
   const companyOptions: ComboBoxOption<string>[] = useMemo(
     () =>
-      companies.map((company) => ({
-        value: company.id,
-        label: company.name,
-      })),
+      Array.isArray(companies)
+        ? companies.map((company) => ({
+            value: company.id,
+            label: company.name || 'Sem nome',
+          }))
+        : [],
     [companies],
   );
 
   // Format selected value to show name and CNPJ
   const formatSelectedCompany = (option: ComboBoxOption<string> | undefined) => {
     if (!option) return 'Selecione uma empresa';
-    const company = companies.find((c) => c.id === option.value);
+    const company = Array.isArray(companies) ? companies.find((c) => c.id === option.value) : null;
     if (!company) return option.label;
-    return `${company.name} - ${formatCNPJ(company.cnpj)}`;
+    return `${company.name || 'Sem nome'} - ${formatCNPJ(company.cnpj || '')}`;
   };
 
   // Custom render for company items (name + CNPJ in two lines)
   const renderCompanyItem = (option: ComboBoxOption<string>) => {
-    const company = companies.find((c) => c.id === option.value);
+    const company = Array.isArray(companies) ? companies.find((c) => c.id === option.value) : null;
     if (!company) return <span>{option.label}</span>;
 
     return (
       <div className="flex flex-col">
-        <span className="text-sm">{company.name}</span>
-        <span className="text-xs opacity-80">{formatCNPJ(company.cnpj)}</span>
+        <span className="text-sm">{company.name || 'Sem nome'}</span>
+        <span className="text-xs opacity-80">{formatCNPJ(company.cnpj || '')}</span>
       </div>
     );
   };

@@ -2,17 +2,23 @@ import { Loading } from '@/components/Loading';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import type { Account } from '@/services/accountService';
+import type { ImportOfxResponse, InstallmentTransaction } from '@/services/transactionService';
 import { Upload } from 'lucide-react';
 import { useState } from 'react';
 import { AccountSelector } from './AccountSelector';
 import { FileUploadArea } from './FileUploadArea';
+import { InstallmentsModal } from './InstallmentsModal';
 import { useFileUpload } from './hooks/useFileUpload';
 
 interface ImportOfxModalProps {
   open: boolean;
   onClose: () => void;
   accounts: Account[];
-  onImport: (file: File, accountId: string) => Promise<void>;
+  onImport: (file: File, accountId: string) => Promise<ImportOfxResponse>;
+  onCreateInstallments?: (
+    installments: InstallmentTransaction[],
+    accountId: string,
+  ) => Promise<void>;
   isImporting?: boolean;
 }
 
@@ -21,9 +27,14 @@ export function ImportOfxModal({
   onClose,
   accounts,
   onImport,
+  onCreateInstallments,
   isImporting = false,
 }: Readonly<ImportOfxModalProps>) {
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+  const [detectedInstallments, setDetectedInstallments] = useState<InstallmentTransaction[]>([]);
+  const [showInstallmentsModal, setShowInstallmentsModal] = useState(false);
+  const [lastImportedAccountId, setLastImportedAccountId] = useState<string | null>(null);
+  const [isCreatingInstallments, setIsCreatingInstallments] = useState(false);
 
   const {
     selectedFile,
@@ -44,15 +55,57 @@ export function ImportOfxModal({
     if (!selectedFile || !selectedAccountId) return;
 
     try {
-      await onImport(selectedFile, selectedAccountId);
-      // Reset form on success
-      resetFileUpload();
-      setSelectedAccountId(null);
-      onClose();
+      const result = await onImport(selectedFile, selectedAccountId);
+
+      // Check for installment transactions
+      if (result.installmentTransactions && result.installmentTransactions.length > 0) {
+        console.log('Found installment transactions, opening modal');
+        setDetectedInstallments(result.installmentTransactions);
+        setLastImportedAccountId(result.accountId || selectedAccountId);
+        setShowInstallmentsModal(true);
+        // Don't close the import modal yet, wait for user to handle installments
+      } else {
+        // No installments, close modal and reset form
+        resetFileUpload();
+        setSelectedAccountId(null);
+        onClose();
+      }
     } catch (error: unknown) {
       // Error handling is done in the parent component
       console.error('Import error:', error);
     }
+  };
+
+  const handleCreateInstallments = async (installments: InstallmentTransaction[]) => {
+    if (!onCreateInstallments || !lastImportedAccountId) return;
+
+    try {
+      setIsCreatingInstallments(true);
+      await onCreateInstallments(installments, lastImportedAccountId ?? '');
+
+      // Close both modals and reset form
+      setShowInstallmentsModal(false);
+      setDetectedInstallments([]);
+      setLastImportedAccountId(null);
+      resetFileUpload();
+      setSelectedAccountId(null);
+      onClose();
+    } catch (error: unknown) {
+      console.error('Error creating installments:', error);
+      throw error; // Re-throw to let InstallmentsModal handle the error
+    } finally {
+      setIsCreatingInstallments(false);
+    }
+  };
+
+  const handleCloseInstallmentsModal = () => {
+    setShowInstallmentsModal(false);
+    setDetectedInstallments([]);
+    setLastImportedAccountId(null);
+    // Close import modal and reset form
+    resetFileUpload();
+    setSelectedAccountId(null);
+    onClose();
   };
 
   const canImport = selectedFile && selectedAccountId && !isImporting;
@@ -110,6 +163,16 @@ export function ImportOfxModal({
           </Button>
         </div>
       </div>
+
+      {/* Installments Modal */}
+      <InstallmentsModal
+        open={showInstallmentsModal}
+        onClose={handleCloseInstallmentsModal}
+        installments={detectedInstallments}
+        accountId={lastImportedAccountId || ''}
+        onConfirm={handleCreateInstallments}
+        isCreating={isCreatingInstallments}
+      />
     </Modal>
   );
 }

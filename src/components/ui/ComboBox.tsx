@@ -212,11 +212,15 @@ export function ComboBox<T extends string | number = string>({
   }, [isOpen]);
 
   const hasValue = value !== null && value !== undefined && selectedOption !== undefined;
+  const selectId = React.useId();
 
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
+        <label
+          htmlFor={selectId}
+          className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
+        >
           {label}
         </label>
       )}

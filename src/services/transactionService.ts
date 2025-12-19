@@ -61,13 +61,28 @@ const ExtractTransactionSchema = z.object({
   fitId: z.string().optional().nullable(),
 });
 
+const InstallmentTransactionSchema = z.object({
+  date: z.string(),
+  description: z.string(),
+  amount: z.number(),
+  fitId: z.string().optional().nullable(),
+  installmentInfo: z.object({
+    current: z.number(),
+    total: z.number(),
+    baseDescription: z.string(),
+  }),
+});
+
 const ImportOfxResponseSchema = z.object({
-  extractId: z.string(),
+  extractId: z.string().optional().nullable(),
   header: ExtractHeaderSchema,
   transactions: ExtractTransactionSchema.array(),
+  installmentTransactions: z.array(InstallmentTransactionSchema).optional().nullable(),
+  accountId: z.string().optional().nullable(),
 });
 
 export type ImportOfxResponse = z.infer<typeof ImportOfxResponseSchema>;
+export type InstallmentTransaction = z.infer<typeof InstallmentTransactionSchema>;
 export type ExtractHeader = z.infer<typeof ExtractHeaderSchema>;
 export type ExtractTransaction = z.infer<typeof ExtractTransactionSchema>;
 
@@ -75,6 +90,7 @@ const ExtractSchema = z.object({
   id: z.string().optional(),
   companyId: z.string().optional(),
   userId: z.string().optional(),
+  accountId: z.string().optional(), // Backend returns accountId
   header: ExtractHeaderSchema,
   transactions: ExtractTransactionSchema.array(),
   createdAt: z.string().optional(),
@@ -177,13 +193,90 @@ export const importOfx = async (
     },
   );
 
-  return ImportOfxResponseSchema.parse(response.data);
+  console.log('Raw API response:', response.data);
+  console.log('Installment transactions in response:', response.data?.installmentTransactions);
+
+  try {
+    const parsed = ImportOfxResponseSchema.parse(response.data);
+    console.log('Parsed response:', parsed);
+    console.log('Installment transactions after parse:', parsed.installmentTransactions);
+    return parsed;
+  } catch (error) {
+    console.error('Error parsing ImportOfxResponse:', error);
+    if (error instanceof z.ZodError) {
+      console.error('Zod validation errors:', error.errors);
+    }
+    throw error;
+  }
+};
+
+export interface CreateInstallmentsPayload {
+  description: string;
+  amount: number;
+  date: string;
+  currentInstallment: number;
+  totalInstallments: number;
+  baseDescription: string;
+  fitId?: string;
+}
+
+export const createInstallments = async (
+  companyId: string,
+  accountId: string,
+  payload: CreateInstallmentsPayload,
+): Promise<Transaction[]> => {
+  const response = await apiClient.post(
+    `/companies/${companyId}/transactions/create-installments`,
+    {
+      ...payload,
+      accountId,
+    },
+  );
+
+  return z.array(TransactionSchema).parse(response.data);
+};
+
+// Helper function to safely convert to string
+const safeString = (value: unknown): string | undefined => {
+  if (value === null || value === undefined) return undefined;
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return undefined;
+};
+
+// Helper function to safely parse transaction
+const safeParseTransaction = (tx: unknown): ExtractTransaction | null => {
+  if (typeof tx !== 'object' || tx === null) return null;
+  const txObj = tx as Record<string, unknown>;
+  const date = safeString(txObj.date);
+  const description = safeString(txObj.description);
+  if (!date || !description) return null;
+
+  let amount: number;
+  if (typeof txObj.amount === 'number') {
+    amount = txObj.amount;
+  } else {
+    const amountStr = safeString(txObj.amount);
+    amount = amountStr ? Number.parseFloat(amountStr) : 0;
+  }
+
+  return {
+    date,
+    description,
+    amount,
+    fitId: safeString(txObj.fitId) ?? undefined,
+  };
 };
 
 const normalizeExtract = (payload: unknown): ExtractResponse => {
   // Se já vier no formato completo, valida e retorna
   const parsed = ExtractSchema.safeParse(payload);
-  if (parsed.success) return parsed.data;
+  if (parsed.success) {
+    console.log('ExtractSchema validation succeeded');
+    return parsed.data;
+  }
+
+  console.log('ExtractSchema validation failed:', parsed.error?.errors);
 
   // Se vier apenas transactions em array (sem header)
   if (Array.isArray(payload)) {
@@ -204,15 +297,79 @@ const normalizeExtract = (payload: unknown): ExtractResponse => {
     payload &&
     'transactions' in (payload as Record<string, unknown>)
   ) {
-    return ExtractSchema.parse({
-      id: (payload as Record<string, unknown>).id,
-      companyId: (payload as Record<string, unknown>).companyId,
-      userId: (payload as Record<string, unknown>).userId,
-      header: (payload as Record<string, unknown>).header ?? {},
-      transactions: (payload as Record<string, unknown>).transactions ?? [],
-      createdAt: (payload as Record<string, unknown>).createdAt,
-      updatedAt: (payload as Record<string, unknown>).updatedAt,
+    const payloadObj = payload as Record<string, unknown>;
+    console.log('Attempting to parse object with transactions:', {
+      hasId: 'id' in payloadObj,
+      hasCompanyId: 'companyId' in payloadObj,
+      hasAccountId: 'accountId' in payloadObj,
+      hasHeader: 'header' in payloadObj,
+      transactionsCount: Array.isArray(payloadObj.transactions)
+        ? payloadObj.transactions.length
+        : 0,
     });
+
+    try {
+      const result = ExtractSchema.parse({
+        id: payloadObj.id,
+        companyId: payloadObj.companyId,
+        userId: payloadObj.userId,
+        accountId: payloadObj.accountId,
+        header: payloadObj.header ?? {},
+        transactions: payloadObj.transactions ?? [],
+        createdAt: payloadObj.createdAt,
+        updatedAt: payloadObj.updatedAt,
+      });
+      console.log(
+        'Successfully parsed extract with',
+        result.transactions?.length ?? 0,
+        'transactions',
+      );
+      return result;
+    } catch (error) {
+      console.error('Failed to parse extract:', error);
+      // Fallback: try to extract what we can without strict validation
+      console.log('Using fallback parsing for extract');
+      const headerData = payloadObj.header as Record<string, unknown> | undefined;
+      const transactionsData = Array.isArray(payloadObj.transactions)
+        ? payloadObj.transactions
+        : [];
+
+      const parsedTransactions = transactionsData
+        .map((tx, idx) => {
+          try {
+            return ExtractTransactionSchema.parse(tx);
+          } catch (err) {
+            console.warn(`Failed to parse transaction ${idx}:`, err);
+            return safeParseTransaction(tx);
+          }
+        })
+        .filter((tx): tx is ExtractTransaction => tx !== null);
+
+      console.log(
+        `Fallback parsing: ${parsedTransactions.length} transactions extracted from ${transactionsData.length} total`,
+      );
+
+      return {
+        id: payloadObj.id as string | undefined,
+        companyId: payloadObj.companyId as string | undefined,
+        userId: payloadObj.userId as string | undefined,
+        accountId: payloadObj.accountId as string | undefined,
+        header: headerData
+          ? {
+              bank: safeString(headerData.bank) ?? null,
+              agency: safeString(headerData.agency) ?? null,
+              account: safeString(headerData.account) ?? null,
+              accountType: safeString(headerData.accountType) ?? null,
+              periodStart: safeString(headerData.periodStart) ?? null,
+              periodEnd: safeString(headerData.periodEnd) ?? null,
+              generatedAt: safeString(headerData.generatedAt) ?? null,
+            }
+          : {},
+        transactions: parsedTransactions,
+        createdAt: payloadObj.createdAt as string | undefined,
+        updatedAt: payloadObj.updatedAt as string | undefined,
+      };
+    }
   }
 
   // Último recurso: retorna extrato vazio
@@ -242,15 +399,46 @@ export const getExtracts = async (
   });
 
   const data = response.data;
+  console.log('Raw API response:', data);
+  console.log('Is array?', Array.isArray(data));
+  console.log('Response type:', typeof data);
+
+  // Handle case where backend returns an object with header and transactions directly
+  if (data && typeof data === 'object' && !Array.isArray(data)) {
+    if ('header' in data && 'transactions' in data) {
+      console.log('Single extract object detected');
+      return [normalizeExtract(data)];
+    }
+  }
+
   if (Array.isArray(data)) {
+    console.log('Array length:', data.length);
+    if (data.length === 0) {
+      console.log('Empty array returned');
+      return [];
+    }
+
     // Pode ser lista de extratos ou lista direta de transações
     const looksLikeTransactionsOnly =
       data.length > 0 && !('header' in data[0]) && 'date' in data[0] && 'amount' in data[0];
     if (looksLikeTransactionsOnly) {
+      console.log('Looks like transactions only, normalizing...');
       return [normalizeExtract(data)];
     }
-    return data.map((item) => normalizeExtract(item));
+    console.log('Normalizing array of extracts...');
+    const normalized = data.map((item, idx) => {
+      const normalizedItem = normalizeExtract(item);
+      console.log(`Extract ${idx}:`, {
+        id: normalizedItem.id,
+        transactionsCount: normalizedItem.transactions?.length ?? 0,
+        hasHeader: !!normalizedItem.header,
+        firstTransaction: normalizedItem.transactions?.[0],
+      });
+      return normalizedItem;
+    });
+    return normalized;
   }
 
+  console.log('Normalizing single extract...');
   return [normalizeExtract(data)];
 };
