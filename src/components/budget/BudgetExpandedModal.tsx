@@ -1,9 +1,15 @@
 import { BadgeStatus, CardEmpty, CardStat } from '@/components/budget';
 import { CreditCardBrandIcon } from '@/components/budget/CreditCardBrandIcon';
+import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/Modal';
 import { Spinner } from '@/components/ui/spinner';
+import { toast } from '@/components/ui/toast';
+import { useTransactions } from '@/hooks/useTransactions';
+import { useCompanyStore } from '@/stores/company';
 import type { CashFlow, CreditCard, CreditCardBill, Payable, Receivable } from '@/types/budget';
 import { formatDate } from '@/utils/date';
+import { useQueryClient } from '@tanstack/react-query';
+import React, { useEffect, useRef, useState } from 'react';
 
 export type ExpandedCard = 'cashFlow' | 'receivables' | 'payables' | 'creditCards' | null;
 
@@ -46,6 +52,88 @@ export function BudgetExpandedModal({
   onActiveCardChange,
   onClose,
 }: Readonly<BudgetExpandedModalProps>) {
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id ?? '';
+  const queryClient = useQueryClient();
+  const { updateTransaction, isUpdating } = useTransactions(companyId);
+
+  // Estado para controlar qual item está sendo editado
+  const [editingPayableId, setEditingPayableId] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState<string>('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Focar no input quando começar a edição
+  useEffect(() => {
+    if (editingPayableId && inputRef.current) {
+      // Usar setTimeout para garantir que o DOM está atualizado
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+          inputRef.current.select();
+        }
+      }, 0);
+    }
+  }, [editingPayableId]);
+
+  const handleDoubleClick = (payable: Payable) => {
+    setEditingPayableId(payable.id);
+    setEditingValue(payable.value.toFixed(2).replace('.', ','));
+  };
+
+  const handleSave = async (payableId: string) => {
+    const numericValue = Number.parseFloat(editingValue.replace(/,/g, '.'));
+
+    if (Number.isNaN(numericValue) || numericValue < 0) {
+      toast({
+        title: 'Valor inválido',
+        description: 'Digite um valor válido maior ou igual a zero.',
+        type: 'error',
+      });
+      return;
+    }
+
+    try {
+      await Promise.resolve(
+        updateTransaction({
+          id: payableId,
+          data: { value: numericValue },
+        }),
+      );
+
+      // Invalidar cache do budget para atualizar os dados
+      queryClient.invalidateQueries({ queryKey: ['budget', companyId] });
+      queryClient.invalidateQueries({ queryKey: ['transactions', companyId] });
+
+      toast({
+        title: 'Valor atualizado',
+        description: 'O valor foi atualizado com sucesso.',
+        type: 'success',
+      });
+
+      setEditingPayableId(null);
+      setEditingValue('');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      toast({
+        title: 'Erro ao atualizar',
+        description: `Não foi possível atualizar o valor: ${errorMessage}`,
+        type: 'error',
+      });
+    }
+  };
+
+  const handleCancel = () => {
+    setEditingPayableId(null);
+    setEditingValue('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, payableId: string) => {
+    if (e.key === 'Enter') {
+      handleSave(payableId);
+    } else if (e.key === 'Escape') {
+      handleCancel();
+    }
+  };
   return (
     <Modal
       open={expandedCard !== null}
@@ -145,8 +233,49 @@ export function BudgetExpandedModal({
                       <td className="px-3 py-2 text-left text-text dark:text-text-dark">
                         {p.description}
                       </td>
-                      <td className="px-3 py-2 text-right font-medium whitespace-nowrap">
-                        R$ {p.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      <td
+                        className="px-3 py-2 text-right font-medium whitespace-nowrap cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors"
+                        onDoubleClick={() => handleDoubleClick(p)}
+                        title="Clique duas vezes para editar"
+                      >
+                        {editingPayableId === p.id ? (
+                          <div className="flex items-center justify-end gap-2">
+                            <span className="text-sm">R$</span>
+                            <Input
+                              ref={inputRef}
+                              type="text"
+                              value={editingValue}
+                              onChange={(e) => {
+                                let value = e.target.value;
+                                // Permite apenas números e vírgula
+                                value = value.replace(/[^\d,]/g, '');
+                                // Permite apenas uma vírgula
+                                const parts = value.split(',');
+                                if (parts.length > 2) {
+                                  value = parts[0] + ',' + parts.slice(1).join('');
+                                }
+                                setEditingValue(value);
+                              }}
+                              onBlur={() => {
+                                // Pequeno delay para permitir que eventos de clique sejam processados
+                                setTimeout(() => {
+                                  if (editingPayableId === p.id) {
+                                    handleSave(p.id);
+                                  }
+                                }, 200);
+                              }}
+                              onKeyDown={(e) => {
+                                e.stopPropagation();
+                                handleKeyDown(e, p.id);
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              className="w-32 h-8 text-right font-medium bg-background dark:bg-background-dark border-primary-500 focus:ring-2 focus:ring-primary-500"
+                              disabled={isUpdating}
+                            />
+                          </div>
+                        ) : (
+                          `R$ ${p.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+                        )}
                       </td>
                       <td className="px-3 py-2 text-center">
                         <BadgeStatus status={p.status === 'PAID' ? 'success' : 'danger'}>
