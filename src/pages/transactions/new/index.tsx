@@ -192,7 +192,7 @@ export function NewTransaction() {
 
   return (
     <ViewDefault>
-      <div className="flex-1 overflow-x-hidden bg-background dark:bg-background-dark">
+      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
         {/* Fixed Header */}
         <div className="sticky top-0 z-10 bg-background/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-border dark:border-border-dark">
           <div className="container mx-auto">
