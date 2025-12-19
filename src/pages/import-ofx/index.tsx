@@ -54,26 +54,12 @@ export function ImportOfxPage() {
   } = useExtracts(companyId, startDate, endDate, selectedAccount?.id);
   const { previousBalance = 0 } = usePreviousBalance(companyId, startDate, selectedAccount?.id);
 
-  // Debug: Log extracts data
-  console.log('Extracts data:', extracts);
-  console.log('Extracts count:', extracts.length);
-  extracts.forEach((extract, idx) => {
-    console.log(`Extract ${idx}:`, {
-      id: extract.id,
-      transactionsCount: extract.transactions?.length ?? 0,
-      header: extract.header,
-    });
-  });
-
   const importMutation = useMutation({
     mutationFn: async ({ file, accountId }: { file: File; accountId: string }) => {
       if (!companyId) throw new Error('Selecione uma empresa');
       return importOfx(companyId, file, accountId);
     },
     onSuccess: (data) => {
-      console.log('Import response:', data);
-      console.log('Installment transactions:', data.installmentTransactions);
-
       toast({
         title: 'Importação concluída',
         description: 'Extrato salvo com sucesso.',
@@ -170,22 +156,13 @@ export function ImportOfxPage() {
   }, [accounts]);
 
   const transactions: TransactionGridTransaction[] = useMemo(() => {
-    console.log('Processing extracts:', extracts.length);
-    console.log('Extracts data:', JSON.stringify(extracts, null, 2));
-    
     if (!extracts || extracts.length === 0) {
-      console.log('No extracts to process');
       return [];
     }
     
     const flattened = extracts.flatMap((extract, extractIndex) => {
       // Skip extracts with no transactions
       if (!extract || !extract.transactions || extract.transactions.length === 0) {
-        console.log(`Skipping extract ${extractIndex} - no transactions`, {
-          hasExtract: !!extract,
-          hasTransactions: !!extract?.transactions,
-          transactionsLength: extract?.transactions?.length ?? 0,
-        });
         return [];
       }
 
@@ -197,8 +174,6 @@ export function ImportOfxPage() {
       const accountName = matchedAccount?.name || extractAccountNumber;
       const accountLabel = `${accountName} ${extractAccountNumber}`;
       const accountKey = extractAccountNumber; // Use accountNumber as key for filtering
-
-      console.log(`Processing extract ${extractIndex}: ${extract.transactions.length} transactions`);
 
       return extract.transactions.map((tx: ExtractTransaction, index: number) => {
         const isoDate = tx.date ? `${tx.date}T00:00:00` : new Date().toISOString();

@@ -272,11 +272,8 @@ const normalizeExtract = (payload: unknown): ExtractResponse => {
   // Se já vier no formato completo, valida e retorna
   const parsed = ExtractSchema.safeParse(payload);
   if (parsed.success) {
-    console.log('ExtractSchema validation succeeded');
     return parsed.data;
   }
-
-  console.log('ExtractSchema validation failed:', parsed.error?.errors);
 
   // Se vier apenas transactions em array (sem header)
   if (Array.isArray(payload)) {
@@ -298,15 +295,6 @@ const normalizeExtract = (payload: unknown): ExtractResponse => {
     'transactions' in (payload as Record<string, unknown>)
   ) {
     const payloadObj = payload as Record<string, unknown>;
-    console.log('Attempting to parse object with transactions:', {
-      hasId: 'id' in payloadObj,
-      hasCompanyId: 'companyId' in payloadObj,
-      hasAccountId: 'accountId' in payloadObj,
-      hasHeader: 'header' in payloadObj,
-      transactionsCount: Array.isArray(payloadObj.transactions)
-        ? payloadObj.transactions.length
-        : 0,
-    });
 
     try {
       const result = ExtractSchema.parse({
@@ -319,35 +307,23 @@ const normalizeExtract = (payload: unknown): ExtractResponse => {
         createdAt: payloadObj.createdAt,
         updatedAt: payloadObj.updatedAt,
       });
-      console.log(
-        'Successfully parsed extract with',
-        result.transactions?.length ?? 0,
-        'transactions',
-      );
       return result;
-    } catch (error) {
-      console.error('Failed to parse extract:', error);
+    } catch {
       // Fallback: try to extract what we can without strict validation
-      console.log('Using fallback parsing for extract');
       const headerData = payloadObj.header as Record<string, unknown> | undefined;
       const transactionsData = Array.isArray(payloadObj.transactions)
         ? payloadObj.transactions
         : [];
 
       const parsedTransactions = transactionsData
-        .map((tx, idx) => {
+        .map((tx) => {
           try {
             return ExtractTransactionSchema.parse(tx);
-          } catch (err) {
-            console.warn(`Failed to parse transaction ${idx}:`, err);
+          } catch {
             return safeParseTransaction(tx);
           }
         })
         .filter((tx): tx is ExtractTransaction => tx !== null);
-
-      console.log(
-        `Fallback parsing: ${parsedTransactions.length} transactions extracted from ${transactionsData.length} total`,
-      );
 
       return {
         id: payloadObj.id as string | undefined,
@@ -399,22 +375,16 @@ export const getExtracts = async (
   });
 
   const data = response.data;
-  console.log('Raw API response:', data);
-  console.log('Is array?', Array.isArray(data));
-  console.log('Response type:', typeof data);
 
   // Handle case where backend returns an object with header and transactions directly
   if (data && typeof data === 'object' && !Array.isArray(data)) {
     if ('header' in data && 'transactions' in data) {
-      console.log('Single extract object detected');
       return [normalizeExtract(data)];
     }
   }
 
   if (Array.isArray(data)) {
-    console.log('Array length:', data.length);
     if (data.length === 0) {
-      console.log('Empty array returned');
       return [];
     }
 
@@ -422,23 +392,11 @@ export const getExtracts = async (
     const looksLikeTransactionsOnly =
       data.length > 0 && !('header' in data[0]) && 'date' in data[0] && 'amount' in data[0];
     if (looksLikeTransactionsOnly) {
-      console.log('Looks like transactions only, normalizing...');
       return [normalizeExtract(data)];
     }
-    console.log('Normalizing array of extracts...');
-    const normalized = data.map((item, idx) => {
-      const normalizedItem = normalizeExtract(item);
-      console.log(`Extract ${idx}:`, {
-        id: normalizedItem.id,
-        transactionsCount: normalizedItem.transactions?.length ?? 0,
-        hasHeader: !!normalizedItem.header,
-        firstTransaction: normalizedItem.transactions?.[0],
-      });
-      return normalizedItem;
-    });
+    const normalized = data.map((item) => normalizeExtract(item));
     return normalized;
   }
 
-  console.log('Normalizing single extract...');
   return [normalizeExtract(data)];
 };
