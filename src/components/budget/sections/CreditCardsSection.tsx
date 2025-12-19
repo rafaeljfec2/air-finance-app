@@ -96,28 +96,78 @@ export function CreditCardsSection({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/60 dark:divide-border-dark/60">
-            {activeBill?.transactions.map((t) => (
-              <tr key={t.id}>
-                <td className="px-3 py-2 text-left text-text dark:text-text-dark truncate">
-                  {t.description}
-                </td>
-                <td className="px-3 py-2 text-right font-medium whitespace-nowrap">
-                  R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </td>
-                <td className="px-3 py-2 text-center">
-                  <BadgeStatus status={t.category === 'Parcelado' ? 'success' : 'default'}>
-                    {t.category}
-                  </BadgeStatus>
-                </td>
-              </tr>
-            )) || null}
-            {(!activeBill || activeBill.transactions.length === 0) && (
-              <tr>
-                <td className="px-3 py-4 text-center text-gray-500 dark:text-gray-400" colSpan={3}>
-                  Nenhuma transação de cartão neste período.
-                </td>
-              </tr>
-            )}
+            {(() => {
+              if (!activeBill?.transactions || activeBill.transactions.length === 0) {
+                return (
+                  <tr>
+                    <td
+                      className="px-3 py-4 text-center text-gray-500 dark:text-gray-400"
+                      colSpan={3}
+                    >
+                      Nenhuma transação de cartão neste período.
+                    </td>
+                  </tr>
+                );
+              }
+
+              // Sort transactions: first those that are finishing (fewer remaining installments), then the rest
+              const sortedTransactions = [...activeBill.transactions].sort((a, b) => {
+                // Extract installment info from description (e.g., "Parcela 3/5" or "3/5")
+                const extractInstallment = (
+                  desc: string,
+                ): { current: number; total: number } | null => {
+                  const regex1 = /parcela\s+(\d+)\/(\d+)/i;
+                  const regex2 = /(?:^|\s|-)(\d+)\/(\d+)(?:\s|$)/;
+                  let match = regex1.exec(desc);
+                  if (!match) {
+                    match = regex2.exec(desc);
+                  }
+                  if (!match) return null;
+                  const current = Number.parseInt(match[1] ?? '0', 10);
+                  const total = Number.parseInt(match[2] ?? '0', 10);
+                  if (current <= 0 || total <= 0 || current > total) return null;
+                  return { current, total };
+                };
+
+                const installmentA = extractInstallment(a.description);
+                const installmentB = extractInstallment(b.description);
+
+                // If neither has installment info, keep original order
+                if (!installmentA && !installmentB) return 0;
+
+                // Transactions with installments come first
+                if (!installmentA) return 1;
+                if (!installmentB) return -1;
+
+                // Calculate remaining installments
+                const remainingA = installmentA.total - installmentA.current;
+                const remainingB = installmentB.total - installmentB.current;
+
+                // First: those with fewer remaining installments (finishing first)
+                if (remainingA !== remainingB) {
+                  return remainingA - remainingB;
+                }
+
+                // If same remaining, sort by current installment (higher current first)
+                return installmentB.current - installmentA.current;
+              });
+
+              return sortedTransactions.map((t) => (
+                <tr key={t.id}>
+                  <td className="px-3 py-2 text-left text-text dark:text-text-dark truncate">
+                    {t.description}
+                  </td>
+                  <td className="px-3 py-2 text-right font-medium whitespace-nowrap">
+                    R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </td>
+                  <td className="px-3 py-2 text-center">
+                    <BadgeStatus status={t.category === 'Parcelado' ? 'success' : 'default'}>
+                      {t.category}
+                    </BadgeStatus>
+                  </td>
+                </tr>
+              ));
+            })()}
           </tbody>
         </table>
       </div>

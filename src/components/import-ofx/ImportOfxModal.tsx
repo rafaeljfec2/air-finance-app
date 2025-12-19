@@ -85,11 +85,7 @@ export function ImportOfxModal({
 
     try {
       setIsCreatingInstallments(true);
-      await onCreateInstallments(
-        installments,
-        lastImportedAccountId ?? '',
-        lastImportedPeriodEnd ?? undefined,
-      );
+      await onCreateInstallments(installments, lastImportedAccountId ?? '');
 
       // Close both modals and reset form
       setShowInstallmentsModal(false);

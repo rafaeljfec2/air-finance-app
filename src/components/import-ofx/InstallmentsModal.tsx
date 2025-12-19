@@ -33,6 +33,20 @@ export function InstallmentsModal({
     return null;
   }
 
+  // Sort installments: first those that are finishing (fewer remaining installments), then the rest
+  const sortedInstallments = [...installments].sort((a, b) => {
+    const remainingA = a.installmentInfo.total - a.installmentInfo.current;
+    const remainingB = b.installmentInfo.total - b.installmentInfo.current;
+    
+    // First: those with fewer remaining installments (finishing first)
+    if (remainingA !== remainingB) {
+      return remainingA - remainingB;
+    }
+    
+    // If same remaining, sort by current installment (higher current first)
+    return b.installmentInfo.current - a.installmentInfo.current;
+  });
+
   return (
     <Modal
       open={open}
@@ -86,7 +100,7 @@ export function InstallmentsModal({
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60 dark:divide-border-dark/60 bg-background dark:bg-background-dark">
-              {installments.map((tx) => {
+              {sortedInstallments.map((tx) => {
                 const installmentInfo = tx.installmentInfo;
                 const remaining = installmentInfo.total - installmentInfo.current;
                 const isExpense = tx.amount < 0;

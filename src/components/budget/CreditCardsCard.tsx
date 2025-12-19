@@ -1,9 +1,10 @@
-import { BadgeStatus, CardContainer, CardHeader } from '@/components/budget';
+import { CardContainer, CardHeader } from '@/components/budget';
 import { CreditCardBrandIcon } from '@/components/budget/CreditCardBrandIcon';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import type { CreditCardBill, CreditCard as CreditCardType } from '@/types/budget';
 import { CreditCard, Maximize2 } from 'lucide-react';
+import { useMemo } from 'react';
 
 interface CreditCardsCardProps {
   cards: CreditCardType[];
@@ -28,11 +29,53 @@ export function CreditCardsCard({
   onChangeActiveCard,
   onExpand,
 }: Readonly<CreditCardsCardProps>) {
-  const transactions = activeBill?.transactions ?? [];
-  const totalPages = Math.ceil(transactions.length / itemsPerPage) || 1;
+  // Sort transactions: first those that are finishing (fewer remaining installments), then the rest
+  const sortedTransactions = useMemo(() => {
+    const transactions = activeBill?.transactions ?? [];
+    return [...transactions].sort((a, b) => {
+      // Extract installment info from description (e.g., "Parcela 3/5" or "3/5")
+      const extractInstallment = (desc: string): { current: number; total: number } | null => {
+        const regex1 = /parcela\s+(\d+)\/(\d+)/i;
+        const regex2 = /(?:^|\s|-)(\d+)\/(\d+)(?:\s|$)/;
+        let match = regex1.exec(desc);
+        if (!match) {
+          match = regex2.exec(desc);
+        }
+        if (!match) return null;
+        const current = Number.parseInt(match[1] ?? '0', 10);
+        const total = Number.parseInt(match[2] ?? '0', 10);
+        if (current <= 0 || total <= 0 || current > total) return null;
+        return { current, total };
+      };
+
+      const installmentA = extractInstallment(a.description);
+      const installmentB = extractInstallment(b.description);
+
+      // If neither has installment info, keep original order
+      if (!installmentA && !installmentB) return 0;
+
+      // Transactions with installments come first
+      if (!installmentA) return 1;
+      if (!installmentB) return -1;
+
+      // Calculate remaining installments
+      const remainingA = installmentA.total - installmentA.current;
+      const remainingB = installmentB.total - installmentB.current;
+
+      // First: those with fewer remaining installments (finishing first)
+      if (remainingA !== remainingB) {
+        return remainingA - remainingB;
+      }
+
+      // If same remaining, sort by current installment (higher current first)
+      return installmentB.current - installmentA.current;
+    });
+  }, [activeBill?.transactions]);
+
+  const totalPages = Math.ceil(sortedTransactions.length / itemsPerPage) || 1;
   const safePage = Math.min(Math.max(currentPage, 1), totalPages);
   const startIndex = (safePage - 1) * itemsPerPage;
-  const paginatedTransactions = transactions.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedTransactions = sortedTransactions.slice(startIndex, startIndex + itemsPerPage);
 
   const handlePrev = () => {
     onPageChange(Math.max(1, safePage - 1));
@@ -99,7 +142,6 @@ export function CreditCardsCard({
                 <tr>
                   <th className="px-2 py-1.5 text-left text-gray-400 w-[45%]">Descrição</th>
                   <th className="px-2 py-1.5 text-right text-gray-400 w-[30%]">Valor</th>
-                  <th className="px-2 py-1.5 text-center text-gray-400 w-[25%]">Categoria</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
@@ -113,11 +155,6 @@ export function CreditCardsCard({
                       </td>
                       <td className="px-2 py-1.5 text-right font-medium whitespace-nowrap">
                         R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </td>
-                      <td className="px-2 py-1.5 text-center">
-                        <BadgeStatus status={t.category === 'Parcelado' ? 'success' : 'default'}>
-                          {t.category}
-                        </BadgeStatus>
                       </td>
                     </tr>
                   ) : (
