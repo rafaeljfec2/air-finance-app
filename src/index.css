@@ -4,11 +4,11 @@
 
 @layer base {
   html {
-    @apply antialiased;
+    @apply antialiased overflow-hidden;
   }
 
   body {
-    @apply bg-background dark:bg-background-dark text-text dark:text-text-dark;
+    @apply bg-background dark:bg-background-dark text-text dark:text-text-dark overflow-hidden;
   }
 }
 

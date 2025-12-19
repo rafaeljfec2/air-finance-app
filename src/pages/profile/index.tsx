@@ -254,7 +254,7 @@ export function Profile() {
 
   return (
     <ViewDefault>
-      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
+      <div className="flex-1 overflow-x-hidden bg-background dark:bg-background-dark">
         <div className="container mx-auto">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">

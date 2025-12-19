@@ -49,7 +49,7 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
         <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} />
         <main
           className={cn(
-            'flex-1 overflow-auto p-4 sm:p-6 transition-all duration-300 w-full',
+            'flex-1 p-4 sm:p-6 transition-all duration-300 w-full',
             isCollapsed ? 'lg:pl-6' : 'lg:pl-8'
           )}
         >
