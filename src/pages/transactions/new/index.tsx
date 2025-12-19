@@ -1,23 +1,23 @@
+import { Loading } from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/components/ui/toast';
+import { useTransactions } from '@/hooks/useTransactions';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
-import { TransactionInput, TransactionType, Account, Category } from '@/types/transaction';
-import { formatCurrency, formatCurrencyInput, parseCurrency } from '@/utils/formatters';
-import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react';
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Switch } from '@/components/ui/switch';
-import { useTransactions } from '@/hooks/useTransactions';
-import { toast } from '@/components/ui/toast';
-import { CreateTransactionPayload } from '@/services/transactionService';
-import { useCompanyStore } from '@/stores/company';
-import { Loading } from '@/components/Loading';
 import { getAccounts } from '@/services/accountService';
 import { getCategories } from '@/services/categoryService';
+import { CreateTransactionPayload } from '@/services/transactionService';
+import { useCompanyStore } from '@/stores/company';
+import { Account, Category, TransactionInput, TransactionType } from '@/types/transaction';
+import { formatCurrency, formatCurrencyInput, parseCurrency } from '@/utils/formatters';
+import { ArrowDownCircle, ArrowUpCircle, ChevronLeft } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function NewTransaction() {
   const navigate = useNavigate();
@@ -94,7 +94,7 @@ export function NewTransaction() {
       console.warn('Failed to save transaction draft:', error);
     }
   }, [formData]);
-  
+
   useEffect(() => {
     try {
       const draft = sessionStorage.getItem('transaction_draft');

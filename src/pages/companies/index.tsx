@@ -1,20 +1,20 @@
-import { useState, useMemo } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { useCompanies } from '@/hooks/useCompanies';
-import { BuildingOfficeIcon } from '@heroicons/react/24/outline';
-import { Plus, Search, Edit, Trash2, Grid3x3, List } from 'lucide-react';
-import { formatDate } from '@/utils/date';
-import { CreateCompany } from '@/services/companyService';
-import { Company } from '@/types/company';
 import { CompanyFormModal } from '@/components/companies/CompanyFormModal';
 import { Loading } from '@/components/Loading';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { useCompanies } from '@/hooks/useCompanies';
 import { useViewMode } from '@/hooks/useViewMode';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { cn } from '@/lib/utils';
+import { CreateCompany } from '@/services/companyService';
+import { Company } from '@/types/company';
+import { formatDate } from '@/utils/date';
+import { BuildingOfficeIcon } from '@heroicons/react/24/outline';
+import { Edit, Grid3x3, List, Plus, Search, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 const typeOptions = [
   { value: 'matriz', label: 'Matriz' },
