@@ -1,7 +1,16 @@
 import { z } from 'zod';
 import { apiClient } from './apiClient';
+import {
+  ExtractHeaderSchema,
+  ExtractTransactionSchema,
+  type ExtractResponse,
+} from './types/extract.types';
+import { normalizeExtract } from './utils/extractNormalizer';
 
-// Validation schemas
+// ============================================================================
+// Validation Schemas
+// ============================================================================
+
 export const TransactionSchema = z.object({
   id: z.string(),
   description: z.string(),
@@ -22,44 +31,7 @@ export const TransactionSchema = z.object({
   balance: z.number().optional(),
 });
 
-export type Transaction = z.infer<typeof TransactionSchema>;
-
 export const CreateTransactionSchema = TransactionSchema.omit({ id: true });
-
-export type CreateTransaction = z.infer<typeof CreateTransactionSchema>;
-
-export interface CreateTransactionPayload {
-  description: string;
-  launchType: 'expense' | 'revenue';
-  valueType: 'fixed' | 'variable';
-  companyId: string;
-  accountId: string;
-  categoryId: string;
-  value: number;
-  paymentDate: string;
-  issueDate: string;
-  quantityInstallments: number;
-  repeatMonthly: boolean;
-  observation?: string;
-  reconciled: boolean;
-}
-
-const ExtractHeaderSchema = z.object({
-  bank: z.string().optional().nullable(),
-  agency: z.string().optional().nullable(),
-  account: z.string().optional().nullable(),
-  accountType: z.string().optional().nullable(),
-  periodStart: z.string().optional().nullable(),
-  periodEnd: z.string().optional().nullable(),
-  generatedAt: z.string().optional().nullable(),
-});
-
-const ExtractTransactionSchema = z.object({
-  date: z.string(),
-  description: z.string(),
-  amount: z.union([z.number(), z.string().transform((v) => Number.parseFloat(v))]),
-  fitId: z.string().optional().nullable(),
-});
 
 const InstallmentTransactionSchema = z.object({
   date: z.string(),
@@ -81,23 +53,33 @@ const ImportOfxResponseSchema = z.object({
   accountId: z.string().optional().nullable(),
 });
 
+// ============================================================================
+// Type Exports
+// ============================================================================
+
+export type Transaction = z.infer<typeof TransactionSchema>;
+export type CreateTransaction = z.infer<typeof CreateTransactionSchema>;
 export type ImportOfxResponse = z.infer<typeof ImportOfxResponseSchema>;
 export type InstallmentTransaction = z.infer<typeof InstallmentTransactionSchema>;
-export type ExtractHeader = z.infer<typeof ExtractHeaderSchema>;
-export type ExtractTransaction = z.infer<typeof ExtractTransactionSchema>;
 
-const ExtractSchema = z.object({
-  id: z.string().optional(),
-  companyId: z.string().optional(),
-  userId: z.string().optional(),
-  accountId: z.string().optional(), // Backend returns accountId
-  header: ExtractHeaderSchema,
-  transactions: ExtractTransactionSchema.array(),
-  createdAt: z.string().optional(),
-  updatedAt: z.string().optional(),
-});
+// Re-export extract types for convenience
+export type { ExtractHeader, ExtractResponse, ExtractTransaction } from './types/extract.types';
 
-export type ExtractResponse = z.infer<typeof ExtractSchema>;
+export interface CreateTransactionPayload {
+  description: string;
+  launchType: 'expense' | 'revenue';
+  valueType: 'fixed' | 'variable';
+  companyId: string;
+  accountId: string;
+  categoryId: string;
+  value: number;
+  paymentDate: string;
+  issueDate: string;
+  quantityInstallments: number;
+  repeatMonthly: boolean;
+  observation?: string;
+  reconciled: boolean;
+}
 
 export interface TransactionFilters {
   startDate?: string;
@@ -109,7 +91,20 @@ export interface PreviousBalanceResponse {
   previousBalance: number;
 }
 
-// Service functions
+export interface CreateInstallmentsPayload {
+  description: string;
+  amount: number;
+  date: string;
+  currentInstallment: number;
+  totalInstallments: number;
+  baseDescription: string;
+  fitId?: string;
+}
+
+// ============================================================================
+// Transaction CRUD Operations
+// ============================================================================
+
 export const getTransactions = async (
   companyId: string,
   filters?: TransactionFilters,
@@ -176,6 +171,10 @@ export const deleteTransaction = async (companyId: string, id: string): Promise<
   }
 };
 
+// ============================================================================
+// OFX Import Operations
+// ============================================================================
+
 export const importOfx = async (
   companyId: string,
   file: File,
@@ -193,14 +192,8 @@ export const importOfx = async (
     },
   );
 
-  console.log('Raw API response:', response.data);
-  console.log('Installment transactions in response:', response.data?.installmentTransactions);
-
   try {
-    const parsed = ImportOfxResponseSchema.parse(response.data);
-    console.log('Parsed response:', parsed);
-    console.log('Installment transactions after parse:', parsed.installmentTransactions);
-    return parsed;
+    return ImportOfxResponseSchema.parse(response.data);
   } catch (error) {
     console.error('Error parsing ImportOfxResponse:', error);
     if (error instanceof z.ZodError) {
@@ -209,16 +202,6 @@ export const importOfx = async (
     throw error;
   }
 };
-
-export interface CreateInstallmentsPayload {
-  description: string;
-  amount: number;
-  date: string;
-  currentInstallment: number;
-  totalInstallments: number;
-  baseDescription: string;
-  fitId?: string;
-}
 
 export const createInstallments = async (
   companyId: string,
@@ -236,128 +219,36 @@ export const createInstallments = async (
   return z.array(TransactionSchema).parse(response.data);
 };
 
-// Helper function to safely convert to string
-const safeString = (value: unknown): string | undefined => {
-  if (value === null || value === undefined) return undefined;
-  if (typeof value === 'string') return value;
-  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
-  return undefined;
+// ============================================================================
+// Extract Operations
+// ============================================================================
+
+/**
+ * Checks if data looks like an array of transactions (without header)
+ */
+const isTransactionsArray = (data: unknown[]): boolean => {
+  if (data.length === 0) return false;
+  const firstItem = data[0];
+  return (
+    typeof firstItem === 'object' &&
+    firstItem !== null &&
+    !('header' in firstItem) &&
+    'date' in firstItem &&
+    'amount' in firstItem
+  );
 };
 
-// Helper function to safely parse transaction
-const safeParseTransaction = (tx: unknown): ExtractTransaction | null => {
-  if (typeof tx !== 'object' || tx === null) return null;
-  const txObj = tx as Record<string, unknown>;
-  const date = safeString(txObj.date);
-  const description = safeString(txObj.description);
-  if (!date || !description) return null;
-
-  let amount: number;
-  if (typeof txObj.amount === 'number') {
-    amount = txObj.amount;
-  } else {
-    const amountStr = safeString(txObj.amount);
-    amount = amountStr ? Number.parseFloat(amountStr) : 0;
-  }
-
-  return {
-    date,
-    description,
-    amount,
-    fitId: safeString(txObj.fitId) ?? undefined,
-  };
-};
-
-const normalizeExtract = (payload: unknown): ExtractResponse => {
-  // Se já vier no formato completo, valida e retorna
-  const parsed = ExtractSchema.safeParse(payload);
-  if (parsed.success) {
-    return parsed.data;
-  }
-
-  // Se vier apenas transactions em array (sem header)
-  if (Array.isArray(payload)) {
-    return {
-      id: undefined,
-      companyId: undefined,
-      userId: undefined,
-      header: {},
-      transactions: payload.map((tx) => ExtractTransactionSchema.parse(tx)),
-      createdAt: undefined,
-      updatedAt: undefined,
-    };
-  }
-
-  // Se vier objeto sem id mas com transactions
-  if (
-    typeof payload === 'object' &&
-    payload &&
-    'transactions' in (payload as Record<string, unknown>)
-  ) {
-    const payloadObj = payload as Record<string, unknown>;
-
-    try {
-      const result = ExtractSchema.parse({
-        id: payloadObj.id,
-        companyId: payloadObj.companyId,
-        userId: payloadObj.userId,
-        accountId: payloadObj.accountId,
-        header: payloadObj.header ?? {},
-        transactions: payloadObj.transactions ?? [],
-        createdAt: payloadObj.createdAt,
-        updatedAt: payloadObj.updatedAt,
-      });
-      return result;
-    } catch {
-      // Fallback: try to extract what we can without strict validation
-      const headerData = payloadObj.header as Record<string, unknown> | undefined;
-      const transactionsData = Array.isArray(payloadObj.transactions)
-        ? payloadObj.transactions
-        : [];
-
-      const parsedTransactions = transactionsData
-        .map((tx) => {
-          try {
-            return ExtractTransactionSchema.parse(tx);
-          } catch {
-            return safeParseTransaction(tx);
-          }
-        })
-        .filter((tx): tx is ExtractTransaction => tx !== null);
-
-      return {
-        id: payloadObj.id as string | undefined,
-        companyId: payloadObj.companyId as string | undefined,
-        userId: payloadObj.userId as string | undefined,
-        accountId: payloadObj.accountId as string | undefined,
-        header: headerData
-          ? {
-              bank: safeString(headerData.bank) ?? null,
-              agency: safeString(headerData.agency) ?? null,
-              account: safeString(headerData.account) ?? null,
-              accountType: safeString(headerData.accountType) ?? null,
-              periodStart: safeString(headerData.periodStart) ?? null,
-              periodEnd: safeString(headerData.periodEnd) ?? null,
-              generatedAt: safeString(headerData.generatedAt) ?? null,
-            }
-          : {},
-        transactions: parsedTransactions,
-        createdAt: payloadObj.createdAt as string | undefined,
-        updatedAt: payloadObj.updatedAt as string | undefined,
-      };
-    }
-  }
-
-  // Último recurso: retorna extrato vazio
-  return {
-    id: undefined,
-    companyId: undefined,
-    userId: undefined,
-    header: {},
-    transactions: [],
-    createdAt: undefined,
-    updatedAt: undefined,
-  };
+/**
+ * Checks if data is a single extract object
+ */
+const isSingleExtractObject = (data: unknown): boolean => {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    !Array.isArray(data) &&
+    'header' in data &&
+    'transactions' in data
+  );
 };
 
 export const getExtracts = async (
@@ -370,33 +261,33 @@ export const getExtracts = async (
   if (accountId) {
     params.accountId = accountId;
   }
+
   const response = await apiClient.get(`/companies/${companyId}/transactions/extracts`, {
     params,
   });
 
   const data = response.data;
 
-  // Handle case where backend returns an object with header and transactions directly
-  if (data && typeof data === 'object' && !Array.isArray(data)) {
-    if ('header' in data && 'transactions' in data) {
-      return [normalizeExtract(data)];
-    }
+  // Handle single extract object
+  if (isSingleExtractObject(data)) {
+    return [normalizeExtract(data)];
   }
 
+  // Handle array of extracts or transactions
   if (Array.isArray(data)) {
     if (data.length === 0) {
       return [];
     }
 
-    // Pode ser lista de extratos ou lista direta de transações
-    const looksLikeTransactionsOnly =
-      data.length > 0 && !('header' in data[0]) && 'date' in data[0] && 'amount' in data[0];
-    if (looksLikeTransactionsOnly) {
+    // Check if it's an array of transactions (without header)
+    if (isTransactionsArray(data)) {
       return [normalizeExtract(data)];
     }
-    const normalized = data.map((item) => normalizeExtract(item));
-    return normalized;
+
+    // Normalize each extract in the array
+    return data.map((item) => normalizeExtract(item));
   }
 
+  // Fallback: try to normalize as single extract
   return [normalizeExtract(data)];
 };
