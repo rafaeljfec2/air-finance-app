@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
-import { Search, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import * as React from 'react';
-import { Input } from './input';
+import { useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger } from './select';
 
 export interface ComboBoxOption<T = string> {
@@ -107,6 +107,21 @@ export interface ComboBoxProps<T = string> {
    * Custom render function for the trigger content
    */
   renderTrigger?: (option: ComboBoxOption<T> | undefined, displayValue: string) => React.ReactNode;
+
+  /**
+   * Whether to show "Select all" and "Clear" buttons
+   */
+  showSelectAll?: boolean;
+
+  /**
+   * Callback when "Select all" is clicked (only for multi-select)
+   */
+  onSelectAll?: () => void;
+
+  /**
+   * Callback when "Clear" is clicked
+   */
+  onClearAll?: () => void;
 }
 
 /**
@@ -146,6 +161,9 @@ export function ComboBox<T extends string | number = string>({
   filterOptions,
   renderItem,
   renderTrigger,
+  showSelectAll = false,
+  onSelectAll,
+  onClearAll,
 }: Readonly<ComboBoxProps<T>>) {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [isOpen, setIsOpen] = React.useState(false);
@@ -211,6 +229,23 @@ export function ComboBox<T extends string | number = string>({
     }
   }, [isOpen]);
 
+  // Handle Escape key (similar to FilterMenu)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen]);
+
   const hasValue = value !== null && value !== undefined && selectedOption !== undefined;
   const selectId = React.useId();
 
@@ -263,7 +298,7 @@ export function ComboBox<T extends string | number = string>({
 
         <SelectContent
           className={cn(
-            'bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark',
+            'bg-white dark:bg-gray-900 text-text dark:text-text-dark border-border dark:border-gray-800 shadow-lg ring-1 ring-black/5 dark:ring-white/10',
             maxHeight,
             'flex flex-col',
             contentClassName,
@@ -271,26 +306,63 @@ export function ComboBox<T extends string | number = string>({
         >
           <div className="flex flex-col overflow-hidden h-full">
             {searchable && (
-              <div className="sticky top-0 z-50 p-2 border-b border-border dark:border-border-dark bg-card dark:bg-card-dark flex-shrink-0 shadow-sm">
-                <div className="relative">
-                  <Input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder={searchPlaceholder}
-                    className="pl-10 bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark"
-                    onClick={(e) => e.stopPropagation()}
-                    onKeyDown={(e) => {
-                      // Prevent closing dropdown when typing
-                      e.stopPropagation();
-                    }}
-                  />
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 pointer-events-none" />
+              <div className="p-2 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder={searchPlaceholder}
+                  className="w-full px-2 py-1 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => {
+                    // Prevent closing dropdown when typing
+                    e.stopPropagation();
+                  }}
+                  aria-label="Buscar valores"
+                />
+              </div>
+            )}
+
+            {showSelectAll && (onSelectAll || onClearAll) && (
+              <div className="p-2 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
+                <div className="flex justify-between items-center">
+                  {onSelectAll && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectAll();
+                      }}
+                      className="text-xs text-primary-500 hover:text-primary-400 dark:text-primary-400 dark:hover:text-primary-300"
+                      aria-label="Selecionar todos os valores"
+                    >
+                      Selecionar todos
+                    </button>
+                  )}
+                  {onClearAll && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onClearAll();
+                      }}
+                      className="text-xs text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
+                      aria-label="Limpar seleção"
+                    >
+                      Limpar
+                    </button>
+                  )}
                 </div>
               </div>
             )}
 
-            <div className={cn('p-1 overflow-y-auto flex-1 min-h-0', searchable && 'pt-0')}>
+            <div
+              className={cn(
+                'p-2 max-h-60 overflow-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 flex-1 min-h-0',
+                searchable && 'pt-0',
+                showSelectAll && (onSelectAll || onClearAll) && 'pt-0',
+              )}
+            >
               {filteredOptions.length > 0
                 ? filteredOptions.map((option) => {
                     if (renderItem) {
@@ -299,7 +371,7 @@ export function ComboBox<T extends string | number = string>({
                           key={String(option.value)}
                           value={String(option.value)}
                           disabled={option.disabled}
-                          className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30 cursor-pointer"
+                          className="hover:bg-gray-100 dark:hover:bg-gray-800/80 focus:bg-gray-100 dark:focus:bg-gray-800/80 cursor-pointer rounded px-2 py-1.5"
                         >
                           {renderItem(option)}
                         </SelectItem>
@@ -312,21 +384,25 @@ export function ComboBox<T extends string | number = string>({
                         key={String(option.value)}
                         value={String(option.value)}
                         disabled={option.disabled}
-                        className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30 cursor-pointer"
+                        className="hover:bg-gray-100 dark:hover:bg-gray-800/80 focus:bg-gray-100 dark:focus:bg-gray-800/80 cursor-pointer rounded px-2 py-1.5"
                       >
                         {OptionIcon ? (
                           <div className="flex items-center gap-2">
                             <OptionIcon className="h-4 w-4" />
-                            <span>{option.label}</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-200">
+                              {option.label}
+                            </span>
                           </div>
                         ) : (
-                          <span>{option.label}</span>
+                          <span className="text-sm text-gray-700 dark:text-gray-200">
+                            {option.label}
+                          </span>
                         )}
                       </SelectItem>
                     );
                   })
                 : showEmptyMessage && (
-                    <div className="px-2 py-1.5 text-sm text-muted-foreground dark:text-gray-400 text-center">
+                    <div className="px-2 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">
                       {emptyMessage}
                     </div>
                   )}
