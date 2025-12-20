@@ -1,5 +1,6 @@
 import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { HelmetProvider } from 'react-helmet-async';
 import { router } from './routes';
 import { ThemeProvider } from './components/ThemeProvider';
 import { Toaster } from 'sonner';
@@ -25,20 +26,22 @@ export function App() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <CompanyProvider>
-        <ThemeProvider>
-          <RouterProvider router={router} />
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              className: '!bg-transparent !p-0 !shadow-none !border-0',
-              duration: 3000,
-            }}
-          />
-          <ReactQueryDevtools initialIsOpen={false} />
-        </ThemeProvider>
-      </CompanyProvider>
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <CompanyProvider>
+          <ThemeProvider>
+            <RouterProvider router={router} />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                className: '!bg-transparent !p-0 !shadow-none !border-0',
+                duration: 3000,
+              }}
+            />
+            <ReactQueryDevtools initialIsOpen={false} />
+          </ThemeProvider>
+        </CompanyProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 }
