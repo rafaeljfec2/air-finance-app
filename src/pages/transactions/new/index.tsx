@@ -55,11 +55,12 @@ export function NewTransaction() {
       <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
         {/* Fixed Header */}
         <div className="sticky top-0 z-10 bg-background/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-border dark:border-border-dark">
-          <div className="container mx-auto">
-            <div className="flex items-center">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center py-4">
               <button
                 onClick={() => navigate('/transactions')}
-                className="p-2 -ml-2 hover:bg-card dark:hover:bg-card-dark rounded-lg transition-colors"
+                className="p-2 hover:bg-card dark:hover:bg-card-dark rounded-lg transition-colors"
+                aria-label="Voltar para transações"
               >
                 <ChevronLeft className="h-5 w-5 text-text dark:text-text-dark" />
               </button>
@@ -67,7 +68,7 @@ export function NewTransaction() {
                 <h1 className="text-lg font-semibold text-text dark:text-text-dark">
                   Novo lançamento
                 </h1>
-                <p className="text-sm text-text/60 dark:text-text-dark/60 mb-4">
+                <p className="text-sm text-text/60 dark:text-text-dark/60">
                   Preencha os dados da transação
                 </p>
               </div>
@@ -91,6 +92,7 @@ export function NewTransaction() {
                 value={formData.description}
                 onChange={handleChange}
                 error={errors.description}
+                autoFocus
               />
 
               <AccountCategoryTypeFields
@@ -123,13 +125,24 @@ export function NewTransaction() {
 
               {/* Submit Button */}
               <div className="p-4 sm:p-6 bg-background dark:bg-background-dark rounded-b-lg">
-                <Button
-                  type="submit"
-                  className="w-full bg-primary-600 hover:bg-primary-700 text-white dark:bg-primary-500 dark:hover:bg-primary-400 transition-colors shadow-md"
-                  disabled={isCreating}
-                >
-                  {isCreating ? 'Salvando...' : 'Salvar Transação'}
-                </Button>
+                <div className="flex gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate('/transactions')}
+                    className="flex-1 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+                    disabled={isCreating}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-primary-600 hover:bg-primary-700 text-white dark:bg-primary-500 dark:hover:bg-primary-400 transition-colors shadow-md"
+                    disabled={isCreating}
+                  >
+                    {isCreating ? 'Salvando...' : 'Salvar Transação'}
+                  </Button>
+                </div>
               </div>
             </form>
           </Card>

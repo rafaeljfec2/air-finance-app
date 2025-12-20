@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/toast';
 import { useTransactions } from '@/hooks/useTransactions';
 import { CreateTransactionPayload } from '@/services/transactionService';
 import { useCompanyStore } from '@/stores/company';
 import type { TransactionInput, TransactionType } from '@/types/transaction';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { validateTransactionForm } from '../utils/transactionValidation';
 
-export interface TransactionFormData
-  extends TransactionInput {
+export interface TransactionFormData extends TransactionInput {
   transactionKind: 'FIXED' | 'VARIABLE';
   repeatMonthly: boolean;
 }
@@ -105,7 +104,7 @@ export function useTransactionForm() {
     async (e: React.FormEvent) => {
       e.preventDefault();
       const validationErrors = validateTransactionForm(formData, companyId);
-      setErrors(validationErrors);
+      setErrors(validationErrors as Record<string, string>);
 
       if (Object.keys(validationErrors).length > 0) {
         toast({ type: 'error', description: 'Por favor, corrija os erros no formulário.' });
@@ -168,4 +167,3 @@ export function useTransactionForm() {
     handleSubmit,
   };
 }
-

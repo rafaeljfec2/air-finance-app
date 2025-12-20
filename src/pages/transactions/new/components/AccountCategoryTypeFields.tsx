@@ -1,7 +1,6 @@
-import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
-import type { Account, Category } from '@/types/transaction';
 import { cn } from '@/lib/utils';
+import type { Account, Category } from '@/types/transaction';
 
 interface AccountCategoryTypeFieldsProps {
   accounts: Account[];
@@ -27,11 +26,11 @@ export function AccountCategoryTypeFields({
   onTransactionKindChange,
 }: Readonly<AccountCategoryTypeFieldsProps>) {
   const selectedAccountName = accountId
-    ? accounts.find((acc) => acc.id === accountId)?.name ?? 'Selecione uma conta'
+    ? (accounts.find((acc) => acc.id === accountId)?.name ?? 'Selecione uma conta')
     : 'Selecione uma conta';
 
   const selectedCategoryName = categoryId
-    ? categories.find((cat) => cat.id === categoryId)?.name ?? 'Selecione uma categoria'
+    ? (categories.find((cat) => cat.id === categoryId)?.name ?? 'Selecione uma categoria')
     : 'Selecione uma categoria';
 
   return (
@@ -43,10 +42,19 @@ export function AccountCategoryTypeFields({
             htmlFor="accountId"
             className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
           >
-            Conta
+            Conta <span className="text-red-500">*</span>
           </label>
           <Select value={accountId} onValueChange={onAccountChange}>
-            <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+            <SelectTrigger
+              className={cn(
+                'w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors',
+                errors.accountId
+                  ? 'border-red-500 dark:border-red-500 focus:ring-red-500 focus:border-red-500'
+                  : 'border-border dark:border-border-dark',
+              )}
+              aria-invalid={errors.accountId ? 'true' : 'false'}
+              aria-describedby={errors.accountId ? 'accountId-error' : undefined}
+            >
               <div className="px-3 py-2">{selectedAccountName}</div>
             </SelectTrigger>
             <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
@@ -63,7 +71,9 @@ export function AccountCategoryTypeFields({
             </SelectContent>
           </Select>
           {errors.accountId && (
-            <span className="text-xs text-red-500 mt-1 block">{errors.accountId}</span>
+            <span id="accountId-error" className="text-xs text-red-500 mt-1 block" role="alert">
+              {errors.accountId}
+            </span>
           )}
         </div>
 
@@ -73,10 +83,19 @@ export function AccountCategoryTypeFields({
             htmlFor="categoryId"
             className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
           >
-            Categoria
+            Categoria <span className="text-red-500">*</span>
           </label>
           <Select value={categoryId} onValueChange={onCategoryChange}>
-            <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+            <SelectTrigger
+              className={cn(
+                'w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors',
+                errors.categoryId
+                  ? 'border-red-500 dark:border-red-500 focus:ring-red-500 focus:border-red-500'
+                  : 'border-border dark:border-border-dark',
+              )}
+              aria-invalid={errors.categoryId ? 'true' : 'false'}
+              aria-describedby={errors.categoryId ? 'categoryId-error' : undefined}
+            >
               <div className="px-3 py-2">{selectedCategoryName}</div>
             </SelectTrigger>
             <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
@@ -92,7 +111,9 @@ export function AccountCategoryTypeFields({
             </SelectContent>
           </Select>
           {errors.categoryId && (
-            <span className="text-xs text-red-500 mt-1 block">{errors.categoryId}</span>
+            <span id="categoryId-error" className="text-xs text-red-500 mt-1 block" role="alert">
+              {errors.categoryId}
+            </span>
           )}
         </div>
 
@@ -135,4 +156,3 @@ export function AccountCategoryTypeFields({
     </div>
   );
 }
-

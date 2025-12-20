@@ -1,7 +1,9 @@
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatters';
+import React, { useMemo } from 'react';
 
 interface TransactionDetailsFieldsProps {
   date: string;
@@ -26,6 +28,13 @@ export function TransactionDetailsFields({
   onInstallmentCountChange,
   onRepeatMonthlyChange,
 }: Readonly<TransactionDetailsFieldsProps>) {
+  const installmentValue = useMemo(() => {
+    if (installmentCount > 1 && amount > 0) {
+      return amount / installmentCount;
+    }
+    return amount;
+  }, [amount, installmentCount]);
+
   return (
     <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -35,7 +44,7 @@ export function TransactionDetailsFields({
             htmlFor="date"
             className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
           >
-            Data de pagamento
+            Data de pagamento <span className="text-red-500">*</span>
           </label>
           <Input
             id="date"
@@ -46,10 +55,20 @@ export function TransactionDetailsFields({
             min="1970-01-01"
             max="2100-12-31"
             required
-            className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full"
+            aria-required="true"
+            aria-invalid={errors.date ? 'true' : 'false'}
+            aria-describedby={errors.date ? 'date-error' : undefined}
+            className={cn(
+              'bg-card dark:bg-card-dark text-text dark:text-text-dark border placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full',
+              errors.date
+                ? 'border-red-500 dark:border-red-500 focus-visible:ring-red-500 focus-visible:border-red-500'
+                : 'border-border dark:border-border-dark',
+            )}
           />
           {errors.date && (
-            <span className="text-xs text-red-500 mt-1 block">{errors.date}</span>
+            <span id="date-error" className="text-xs text-red-500 mt-1 block" role="alert">
+              {errors.date}
+            </span>
           )}
         </div>
 
@@ -59,7 +78,7 @@ export function TransactionDetailsFields({
             htmlFor="amount"
             className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
           >
-            Valor
+            Valor <span className="text-red-500">*</span>
           </label>
           <Input
             id="amount"
@@ -70,11 +89,21 @@ export function TransactionDetailsFields({
             onChange={onAmountChange}
             placeholder="R$ 0,00"
             required
-            className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full"
+            aria-required="true"
+            aria-invalid={errors.amount ? 'true' : 'false'}
+            aria-describedby={errors.amount ? 'amount-error' : undefined}
+            className={cn(
+              'bg-card dark:bg-card-dark text-text dark:text-text-dark border placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full',
+              errors.amount
+                ? 'border-red-500 dark:border-red-500 focus-visible:ring-red-500 focus-visible:border-red-500'
+                : 'border-border dark:border-border-dark',
+            )}
             autoComplete="off"
           />
           {errors.amount && (
-            <span className="text-xs text-red-500 mt-1 block">{errors.amount}</span>
+            <span id="amount-error" className="text-xs text-red-500 mt-1 block" role="alert">
+              {errors.amount}
+            </span>
           )}
         </div>
 
@@ -102,6 +131,11 @@ export function TransactionDetailsFields({
               ))}
             </SelectContent>
           </Select>
+          {installmentCount > 1 && amount > 0 && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              R$ {formatCurrency(installmentValue)} por parcela
+            </p>
+          )}
         </div>
 
         {/* Repetir mensalmente */}
@@ -124,4 +158,3 @@ export function TransactionDetailsFields({
     </div>
   );
 }
-
