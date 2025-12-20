@@ -1,29 +1,43 @@
+import dashboardImage from '@/assets/images/landing/dashboard.svg';
+import heroImage from '@/assets/images/landing/hero.svg';
+import mobileImage from '@/assets/images/landing/mobile.svg';
+import securityImage from '@/assets/images/landing/security.svg';
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 import {
   ArrowRight,
-  Shield,
-  CheckCircle2,
-  Users,
-  Lock,
-  Cloud,
   Bell,
+  CheckCircle2,
+  Cloud,
   FileText,
-  MessageSquare,
   Headphones,
+  Lock,
+  MessageSquare,
+  Shield,
+  Users,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import heroImage from '@/assets/images/landing/hero.svg';
-import dashboardImage from '@/assets/images/landing/dashboard.svg';
-import securityImage from '@/assets/images/landing/security.svg';
-import mobileImage from '@/assets/images/landing/mobile.svg';
+import './landing.css';
 
 export function LandingPage() {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Enable scrolling for landing page
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+
+    return () => {
+      // Restore default overflow when leaving landing page
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-white text-text">
+    <div className="landing-page min-h-screen bg-gradient-to-br from-background to-white text-text">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between p-4">

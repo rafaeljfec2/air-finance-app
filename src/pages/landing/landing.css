@@ -1,0 +1,11 @@
+/* Landing Page Specific Styles */
+/* Allow scrolling on landing page */
+.landing-page {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.landing-page html,
+.landing-page body {
+  overflow: visible;
+}
