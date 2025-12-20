@@ -293,9 +293,15 @@ export function Transactions() {
                   <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                   <Select value={selectedType} onValueChange={setSelectedType}>
                     <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
-                      {selectedType === '' ? (
-                        <span className="text-muted-foreground">Selecione o tipo</span>
-                      ) : null}
+                      <span className="truncate">
+                        {selectedType === 'all'
+                          ? 'Todos os tipos'
+                          : selectedType === 'RECEITA'
+                            ? 'Receitas'
+                            : selectedType === 'DESPESA'
+                              ? 'Despesas'
+                              : 'Todos os tipos'}
+                      </span>
                     </SelectTrigger>
                     <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
                       <SelectItem value="all">Todos os tipos</SelectItem>
