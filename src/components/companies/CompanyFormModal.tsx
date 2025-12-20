@@ -1,14 +1,15 @@
-import { useEffect, useState, useMemo } from 'react';
-import type { ChangeEvent, FormEvent } from 'react';
-import { Building2, Mail, Phone, MapPin, FileText, Calendar, X } from 'lucide-react';
-import { Modal } from '@/components/ui/Modal';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { FormField } from '@/components/ui/FormField';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 import { CreateCompany } from '@/services/companyService';
 import { Company } from '@/types/company';
-import { cn } from '@/lib/utils';
+import { formatDocument, unformatDocument } from '@/utils/formatDocument';
+import { Building2, Calendar, FileText, Mail, MapPin, Phone, X } from 'lucide-react';
+import type { ChangeEvent, FormEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const typeOptions = [
   { value: 'matriz', label: 'Matriz' },
@@ -23,16 +24,8 @@ type CompanyType = 'matriz' | 'filial' | 'holding' | 'prestadora' | 'outra';
 // Helper function to remove non-digit characters using regex
 // Note: replaceAll() doesn't support regex, so replace() with global flag is required
 function removeNonDigits(value: string): string {
+  // eslint-disable-next-line
   return value.replace(/\D/g, '');
-}
-
-function formatCNPJ(value: string) {
-  return removeNonDigits(value)
-    .replace(/(\d{2})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1/$2')
-    .replace(/(\d{4})(\d)/, '$1-$2')
-    .slice(0, 18);
 }
 
 function formatPhone(value: string) {
@@ -40,6 +33,30 @@ function formatPhone(value: string) {
     .replace(/(\d{2})(\d)/, '($1) $2')
     .replace(/(\d{5})(\d)/, '$1-$2')
     .slice(0, 15);
+}
+
+function validateCPF(cpf: string) {
+  cpf = removeNonDigits(cpf);
+  if (cpf.length !== 11) return false;
+  if (/^(\d)\1+$/.test(cpf)) return false;
+
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += Number.parseInt(cpf.charAt(i), 10) * (10 - i);
+  }
+  let digit = 11 - (sum % 11);
+  if (digit >= 10) digit = 0;
+  if (digit !== Number.parseInt(cpf.charAt(9), 10)) return false;
+
+  sum = 0;
+  for (let i = 0; i < 10; i++) {
+    sum += Number.parseInt(cpf.charAt(i), 10) * (11 - i);
+  }
+  digit = 11 - (sum % 11);
+  if (digit >= 10) digit = 0;
+  if (digit !== Number.parseInt(cpf.charAt(10), 10)) return false;
+
+  return true;
 }
 
 function validateCNPJ(cnpj: string) {
@@ -68,6 +85,17 @@ function validateCNPJ(cnpj: string) {
   if (digit !== Number.parseInt(cnpj.charAt(13), 10)) return false;
 
   return true;
+}
+
+function validateDocument(document: string) {
+  const digits = removeNonDigits(document);
+  if (digits.length === 11) {
+    return validateCPF(document);
+  }
+  if (digits.length === 14) {
+    return validateCNPJ(document);
+  }
+  return false;
 }
 
 interface CompanyFormModalProps {
@@ -107,7 +135,7 @@ export function CompanyFormModal({
     if (company) {
       setForm({
         name: company.name,
-        cnpj: company.cnpj,
+        cnpj: formatDocument(company.cnpj), // Format when loading for editing
         type: company.type,
         foundationDate: company.foundationDate.split('T')[0],
         email: company.email ?? '',
@@ -127,7 +155,7 @@ export function CompanyFormModal({
   ) => {
     const { name, value } = e.target;
     if (name === 'cnpj') {
-      setForm((prev) => ({ ...prev, cnpj: formatCNPJ(value) }));
+      setForm((prev) => ({ ...prev, cnpj: formatDocument(value) }));
     } else if (name === 'phone') {
       setForm((prev) => ({ ...prev, phone: formatPhone(value) }));
     } else {
@@ -138,7 +166,9 @@ export function CompanyFormModal({
   const validate = () => {
     const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
-    if (!form.cnpj || !validateCNPJ(form.cnpj)) errs.cnpj = 'CNPJ inválido';
+    if (!form.cnpj || !validateDocument(form.cnpj)) {
+      errs.cnpj = 'CNPJ ou CPF inválido';
+    }
     if (!form.type) errs.type = 'Tipo obrigatório';
     if (!form.foundationDate) errs.foundationDate = 'Data de fundação obrigatória';
     if (form.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email))
@@ -153,7 +183,13 @@ export function CompanyFormModal({
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    onSubmit(form);
+    // Remove mask from CNPJ/CPF before submitting
+    const formDataToSubmit = {
+      ...form,
+      cnpj: unformatDocument(form.cnpj),
+    };
+
+    onSubmit(formDataToSubmit);
     onClose();
     setForm(initialFormState);
     setErrors({});
@@ -182,12 +218,12 @@ export function CompanyFormModal({
             </div>
             <div>
               <h2 className="text-xl font-semibold text-text dark:text-text-dark">
-                {company ? 'Editar Empresa' : 'Nova Empresa'}
+                {company ? 'Editar Empresa/Pessoa' : 'Nova Empresa/Pessoa'}
               </h2>
               <p className="text-sm text-muted-foreground dark:text-gray-400">
                 {company
-                  ? 'Atualize as informações da empresa'
-                  : 'Preencha os dados da nova empresa'}
+                  ? 'Atualize as informações da empresa ou pessoa física'
+                  : 'Preencha os dados da empresa ou pessoa física'}
               </p>
             </div>
           </div>
@@ -213,13 +249,17 @@ export function CompanyFormModal({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField label="Nome da empresa *" error={errors.name} className="md:col-span-2">
+                <FormField
+                  label="Nome/Razão Social *"
+                  error={errors.name}
+                  className="md:col-span-2"
+                >
                   <div className="relative">
                     <Input
                       name="name"
                       value={form.name}
                       onChange={handleChange}
-                      placeholder="Ex: Minha Empresa Ltda."
+                      placeholder="Ex: Minha Empresa Ltda. ou João Silva"
                       required
                       className={cn(
                         'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
@@ -230,12 +270,12 @@ export function CompanyFormModal({
                   </div>
                 </FormField>
 
-                <FormField label="CNPJ *" error={errors.cnpj}>
+                <FormField label="CNPJ/CPF *" error={errors.cnpj}>
                   <Input
                     name="cnpj"
                     value={form.cnpj}
                     onChange={handleChange}
-                    placeholder="00.000.000/0000-00"
+                    placeholder="00.000.000/0000-00 ou 000.000.000-00"
                     required
                     maxLength={18}
                     className={cn(

@@ -4,7 +4,7 @@ import { useActiveCompany } from '@/hooks/useActiveCompany';
 import { companyService } from '@/services/company';
 import { useAuthStore } from '@/stores/auth';
 import { Company } from '@/types/company';
-import { formatCNPJ } from '@/utils/formatCNPJ';
+import { formatDocument } from '@/utils/formatDocument';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
 
@@ -58,7 +58,7 @@ export const CompanySelector = () => {
     changeActiveCompany(selectedCompany || null);
   };
 
-  // Custom render for company items (name + CNPJ in two lines)
+  // Custom render for company items (name + CNPJ/CPF in two lines)
   const renderCompanyItem = (option: ComboBoxOption<string>) => {
     const company = companies.find((c) => c.id === option.value);
     if (!company) return <span>{option.label}</span>;
@@ -67,13 +67,13 @@ export const CompanySelector = () => {
       <div className="flex flex-col">
         <span className="font-medium leading-tight text-sm">{company.name}</span>
         <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-          {formatCNPJ(company.cnpj)}
+          {formatDocument(company.cnpj)}
         </span>
       </div>
     );
   };
 
-  // Custom render for trigger (name + CNPJ in two lines)
+  // Custom render for trigger (name + CNPJ/CPF in two lines)
   const renderCompanyTrigger = (
     option: ComboBoxOption<string> | undefined,
     displayValue: string,
@@ -105,7 +105,7 @@ export const CompanySelector = () => {
           {company.name}
         </span>
         <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-          {formatCNPJ(company.cnpj)}
+          {formatDocument(company.cnpj)}
         </span>
       </div>
     );

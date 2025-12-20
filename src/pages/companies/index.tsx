@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { CreateCompany } from '@/services/companyService';
 import { Company } from '@/types/company';
 import { formatDate } from '@/utils/date';
+import { formatDocument } from '@/utils/formatDocument';
 import { BuildingOfficeIcon } from '@heroicons/react/24/outline';
 import { Edit, Grid3x3, List, Plus, Search, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -170,7 +171,7 @@ export function CompaniesPage() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                   <Input
                     type="text"
-                    placeholder="Buscar por nome ou CNPJ..."
+                    placeholder="Buscar por nome ou CNPJ/CPF..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
@@ -293,9 +294,9 @@ export function CompaniesPage() {
                         {/* Informações */}
                         <div className="space-y-2 mb-4">
                           <div className="text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">CNPJ: </span>
+                            <span className="text-gray-500 dark:text-gray-400">CNPJ/CPF: </span>
                             <span className="text-text dark:text-text-dark font-mono">
-                              {company.cnpj}
+                              {formatDocument(company.cnpj)}
                             </span>
                           </div>
                           <div className="text-sm">
@@ -382,9 +383,9 @@ export function CompaniesPage() {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
                                   <div>
-                                    <span className="text-gray-500 dark:text-gray-400">CNPJ: </span>
+                                    <span className="text-gray-500 dark:text-gray-400">CNPJ/CPF: </span>
                                     <span className="text-text dark:text-text-dark font-mono">
-                                      {company.cnpj}
+                                      {formatDocument(company.cnpj)}
                                     </span>
                                   </div>
                                   <div>

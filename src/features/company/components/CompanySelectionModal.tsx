@@ -5,7 +5,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useActiveCompany } from '@/hooks/useActiveCompany';
 import { companyService } from '@/services/company';
 import { useAuthStore } from '@/stores/auth';
-import { formatCNPJ } from '@/utils/formatCNPJ';
+import { formatDocument } from '@/utils/formatDocument';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -81,15 +81,15 @@ export function CompanySelectionModal() {
     [companies],
   );
 
-  // Format selected value to show name and CNPJ
+  // Format selected value to show name and CNPJ/CPF
   const formatSelectedCompany = (option: ComboBoxOption<string> | undefined) => {
     if (!option) return 'Selecione uma empresa';
     const company = Array.isArray(companies) ? companies.find((c) => c.id === option.value) : null;
     if (!company) return option.label;
-    return `${company.name || 'Sem nome'} - ${formatCNPJ(company.cnpj || '')}`;
+    return `${company.name || 'Sem nome'} - ${formatDocument(company.cnpj || '')}`;
   };
 
-  // Custom render for company items (name + CNPJ in two lines)
+  // Custom render for company items (name + CNPJ/CPF in two lines)
   const renderCompanyItem = (option: ComboBoxOption<string>) => {
     const company = Array.isArray(companies) ? companies.find((c) => c.id === option.value) : null;
     if (!company) return <span>{option.label}</span>;
@@ -97,7 +97,7 @@ export function CompanySelectionModal() {
     return (
       <div className="flex flex-col">
         <span className="text-sm">{company.name || 'Sem nome'}</span>
-        <span className="text-xs opacity-80">{formatCNPJ(company.cnpj || '')}</span>
+        <span className="text-xs opacity-80">{formatDocument(company.cnpj || '')}</span>
       </div>
     );
   };
