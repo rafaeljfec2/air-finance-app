@@ -1,3 +1,4 @@
+import { DatePicker } from '@/components/ui/DatePicker';
 import { FormField } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
@@ -361,20 +362,18 @@ export function GoalFormModal({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField label="Data limite *" error={errors.deadline}>
-                  <div className="relative">
-                    <Input
-                      name="deadline"
-                      type="date"
-                      value={form.deadline}
-                      onChange={handleChange}
-                      required
-                      className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
-                        errors.deadline && 'border-red-500 focus-visible:ring-red-500',
-                      )}
-                    />
-                    <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 pointer-events-none" />
-                  </div>
+                  <DatePicker
+                    value={form.deadline ? new Date(form.deadline) : undefined}
+                    onChange={(date) => {
+                      const dateString = date ? date.toISOString().split('T')[0] : '';
+                      handleChange({
+                        target: { name: 'deadline', value: dateString },
+                      } as ChangeEvent<HTMLInputElement>);
+                    }}
+                    placeholder="Selecionar data limite"
+                    error={errors.deadline}
+                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                  />
                 </FormField>
               </div>
             </div>

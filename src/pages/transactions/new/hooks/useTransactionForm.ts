@@ -85,6 +85,17 @@ export function useTransactionForm() {
     [errors],
   );
 
+  const handleDateChange = useCallback(
+    (date: Date | undefined) => {
+      const dateString = date ? date.toISOString().split('T')[0] : '';
+      setFormData((prev) => ({ ...prev, date: dateString }));
+      if (errors.date) {
+        setErrors((prev) => ({ ...prev, date: '' }));
+      }
+    },
+    [errors],
+  );
+
   const handleSelectChange = useCallback(
     (name: string, value: string | number | boolean) => {
       setFormData((prev) => ({ ...prev, [name]: value }));
@@ -162,6 +173,7 @@ export function useTransactionForm() {
     errors,
     isCreating,
     handleChange,
+    handleDateChange,
     handleSelectChange,
     handleTypeChange,
     handleSubmit,

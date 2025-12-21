@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ComboBox, type ComboBoxOption } from '@/components/ui/ComboBox';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/toast';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -34,6 +35,18 @@ export function ImportOfxPage() {
 
   const [startDate, setStartDate] = useState(() => format(startOfMonth(new Date()), 'yyyy-MM-dd'));
   const [endDate, setEndDate] = useState(() => format(endOfMonth(new Date()), 'yyyy-MM-dd'));
+
+  // Convert date strings to Date objects for DatePicker
+  const startDateObj = startDate ? new Date(startDate) : undefined;
+  const endDateObj = endDate ? new Date(endDate) : undefined;
+
+  const handleStartDateChange = (date: Date | undefined) => {
+    setStartDate(date ? format(date, 'yyyy-MM-dd') : '');
+  };
+
+  const handleEndDateChange = (date: Date | undefined) => {
+    setEndDate(date ? format(date, 'yyyy-MM-dd') : '');
+  };
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>(undefined);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -163,14 +176,15 @@ export function ImportOfxPage() {
     if (!extracts || extracts.length === 0) {
       return [];
     }
-    
+
     const flattened = extracts.flatMap((extract, extractIndex) => {
       // Skip extracts with no transactions
       if (!extract || !extract.transactions || extract.transactions.length === 0) {
         return [];
       }
 
-      const extractAccountNumber = extract.header?.account || extract.accountId || 'Conta não informada';
+      const extractAccountNumber =
+        extract.header?.account || extract.accountId || 'Conta não informada';
 
       // Try to find a matching registered account by accountNumber
       const matchedAccount = accounts?.find((acc) => acc.accountNumber === extractAccountNumber);
@@ -295,19 +309,19 @@ export function ImportOfxPage() {
           <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm mb-6">
             <div className="p-4">
               <div className="grid grid-cols-1 sm:grid-cols-5 lg:grid-cols-[1fr_1fr_1fr_auto_auto] gap-4 items-center">
-                <Input
-                  id="start-date"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
+                <DatePicker
+                  value={startDateObj}
+                  onChange={handleStartDateChange}
+                  placeholder="Data inicial"
                   className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                  showIcon={false}
                 />
-                <Input
-                  id="end-date"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
+                <DatePicker
+                  value={endDateObj}
+                  onChange={handleEndDateChange}
+                  placeholder="Data final"
                   className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                  showIcon={false}
                 />
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />

@@ -7,6 +7,7 @@ import { createPreviousBalanceRow } from '@/components/transactions/TransactionG
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
@@ -32,6 +33,18 @@ export function Transactions() {
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     return lastDay.toISOString().slice(0, 10);
   });
+
+  // Convert date strings to Date objects for DatePicker
+  const startDateObj = startDate ? new Date(startDate) : undefined;
+  const endDateObj = endDate ? new Date(endDate) : undefined;
+
+  const handleStartDateChange = (date: Date | undefined) => {
+    setStartDate(date ? date.toISOString().slice(0, 10) : '');
+  };
+
+  const handleEndDateChange = (date: Date | undefined) => {
+    setEndDate(date ? date.toISOString().slice(0, 10) : '');
+  };
   const [selectedType, setSelectedType] = useState('all');
   const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>(undefined);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -209,18 +222,20 @@ export function Transactions() {
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                   <div className="flex flex-1 items-center gap-2">
-                    <Input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
+                    <DatePicker
+                      value={startDateObj}
+                      onChange={handleStartDateChange}
+                      placeholder="Data inicial"
                       className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                      showIcon={false}
                     />
                     <span className="text-gray-500 dark:text-gray-400">até</span>
-                    <Input
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
+                    <DatePicker
+                      value={endDateObj}
+                      onChange={handleEndDateChange}
+                      placeholder="Data final"
                       className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                      showIcon={false}
                     />
                     <Button
                       type="button"

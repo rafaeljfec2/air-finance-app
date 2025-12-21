@@ -1,24 +1,24 @@
-import { useEffect, useState, useMemo } from 'react';
-import type { ChangeEvent, FormEvent } from 'react';
-import { CreditCard, Building2, Hash, Calendar, DollarSign, Palette, X } from 'lucide-react';
-import { Modal } from '@/components/ui/Modal';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { FormField } from '@/components/ui/FormField';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/button';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
-import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
-import { Account } from '@/services/accountService';
-import { CreateAccount } from '@/services/accountService';
-import { useCompanyStore } from '@/stores/company';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { Account, CreateAccount } from '@/services/accountService';
+import { useCompanyStore } from '@/stores/company';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import {
   BanknotesIcon,
   BuildingLibraryIcon,
   CreditCardIcon,
   WalletIcon,
 } from '@heroicons/react/24/outline';
+import { Building2, CreditCard, DollarSign, Hash, Palette, X } from 'lucide-react';
+import type { ChangeEvent, FormEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const accountTypes = [
   { value: 'checking', label: 'Conta Corrente', icon: BanknotesIcon },
@@ -70,7 +70,7 @@ export function AccountFormModal({
     if (account) {
       setForm({
         name: account.name,
-        type: account.type as AccountType,
+        type: account.type,
         institution: account.institution,
         agency: account.agency,
         accountNumber: account.accountNumber,
@@ -339,20 +339,18 @@ export function AccountFormModal({
                 </FormField>
 
                 <FormField label="Data do saldo inicial *" error={errors.initialBalanceDate}>
-                  <div className="relative">
-                    <Input
-                      name="initialBalanceDate"
-                      type="date"
-                      value={form.initialBalanceDate ?? ''}
-                      onChange={handleChange}
-                      required
-                      className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
-                        errors.initialBalanceDate && 'border-red-500 focus-visible:ring-red-500',
-                      )}
-                    />
-                    <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 pointer-events-none" />
-                  </div>
+                  <DatePicker
+                    value={form.initialBalanceDate ? new Date(form.initialBalanceDate) : undefined}
+                    onChange={(date) => {
+                      const dateString = date ? date.toISOString().split('T')[0] : '';
+                      handleChange({
+                        target: { name: 'initialBalanceDate', value: dateString },
+                      } as ChangeEvent<HTMLInputElement>);
+                    }}
+                    placeholder="Selecionar data do saldo inicial"
+                    error={errors.initialBalanceDate}
+                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                  />
                 </FormField>
               </div>
             </div>
@@ -413,4 +411,3 @@ export function AccountFormModal({
     </Modal>
   );
 }
-

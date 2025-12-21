@@ -1,3 +1,4 @@
+import { DatePicker } from '@/components/ui/DatePicker';
 import { FormField } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,6 @@ import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import {
   ArrowDownCircle,
   ArrowUpCircle,
-  Calendar,
   DollarSign,
   FileText,
   Repeat,
@@ -62,7 +62,7 @@ export function RecurringTransactionFormModal({
     const today = new Date();
     const oneYearLater = new Date(today);
     oneYearLater.setFullYear(today.getFullYear() + 1);
-    
+
     return {
       description: '',
       value: 0,
@@ -85,7 +85,9 @@ export function RecurringTransactionFormModal({
       const startDate = new Date(recurringTransaction.startDate).toISOString().split('T')[0];
       const repeatUntil = recurringTransaction.repeatUntil
         ? new Date(recurringTransaction.repeatUntil).toISOString().split('T')[0]
-        : new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0];
+        : new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+            .toISOString()
+            .split('T')[0];
 
       setForm({
         description: recurringTransaction.description,
@@ -145,7 +147,7 @@ export function RecurringTransactionFormModal({
     const today = new Date();
     const oneYearLater = new Date(today);
     oneYearLater.setFullYear(today.getFullYear() + 1);
-    
+
     setForm({
       ...initialFormState,
       startDate: today.toISOString().split('T')[0],
@@ -159,7 +161,7 @@ export function RecurringTransactionFormModal({
     const today = new Date();
     const oneYearLater = new Date(today);
     oneYearLater.setFullYear(today.getFullYear() + 1);
-    
+
     setForm({
       ...initialFormState,
       startDate: today.toISOString().split('T')[0],
@@ -397,20 +399,18 @@ export function RecurringTransactionFormModal({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField label="Data inicial *" error={errors.startDate}>
-                  <div className="relative">
-                    <Input
-                      name="startDate"
-                      type="date"
-                      value={form.startDate}
-                      onChange={handleChange}
-                      required
-                      className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
-                        errors.startDate && 'border-red-500 focus-visible:ring-red-500',
-                      )}
-                    />
-                    <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 pointer-events-none" />
-                  </div>
+                  <DatePicker
+                    value={form.startDate ? new Date(form.startDate) : undefined}
+                    onChange={(date) => {
+                      const dateString = date ? date.toISOString().split('T')[0] : '';
+                      handleChange({
+                        target: { name: 'startDate', value: dateString },
+                      } as ChangeEvent<HTMLInputElement>);
+                    }}
+                    placeholder="Selecionar data inicial"
+                    error={errors.startDate}
+                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                  />
                 </FormField>
 
                 <FormField label="Frequência *" error={errors.frequency}>
@@ -453,21 +453,19 @@ export function RecurringTransactionFormModal({
                   error={errors.repeatUntil}
                   className="md:col-span-2"
                 >
-                  <div className="relative">
-                    <Input
-                      name="repeatUntil"
-                      type="date"
-                      value={form.repeatUntil || ''}
-                      onChange={handleChange}
-                      min={form.startDate}
-                      required
-                      className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
-                        errors.repeatUntil && 'border-red-500 focus-visible:ring-red-500',
-                      )}
-                    />
-                    <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 pointer-events-none" />
-                  </div>
+                  <DatePicker
+                    value={form.repeatUntil ? new Date(form.repeatUntil) : undefined}
+                    onChange={(date) => {
+                      const dateString = date ? date.toISOString().split('T')[0] : '';
+                      handleChange({
+                        target: { name: 'repeatUntil', value: dateString },
+                      } as ChangeEvent<HTMLInputElement>);
+                    }}
+                    placeholder="Selecionar data final"
+                    error={errors.repeatUntil}
+                    minDate={form.startDate ? new Date(form.startDate) : undefined}
+                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                  />
                 </FormField>
               </div>
             </div>

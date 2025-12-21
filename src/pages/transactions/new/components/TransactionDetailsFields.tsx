@@ -1,3 +1,4 @@
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -6,12 +7,12 @@ import { formatCurrency } from '@/utils/formatters';
 import React, { useMemo } from 'react';
 
 interface TransactionDetailsFieldsProps {
-  date: string;
+  date: string | Date | null | undefined;
   amount: number;
   installmentCount: number;
   repeatMonthly: boolean;
   errors: Record<string, string>;
-  onDateChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onDateChange: (date: Date | undefined) => void;
   onAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onInstallmentCountChange: (value: string) => void;
   onRepeatMonthlyChange: (checked: boolean) => void;
@@ -40,36 +41,20 @@ export function TransactionDetailsFields({
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {/* Data */}
         <div>
-          <label
-            htmlFor="date"
-            className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
-          >
-            Data de pagamento <span className="text-red-500">*</span>
-          </label>
-          <Input
-            id="date"
-            name="date"
-            type="date"
+          <DatePicker
+            label={
+              <>
+                Data de pagamento <span className="text-red-500">*</span>
+              </>
+            }
             value={date}
             onChange={onDateChange}
-            min="1970-01-01"
-            max="2100-12-31"
-            required
-            aria-required="true"
-            aria-invalid={errors.date ? 'true' : 'false'}
-            aria-describedby={errors.date ? 'date-error' : undefined}
-            className={cn(
-              'bg-card dark:bg-card-dark text-text dark:text-text-dark border placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full',
-              errors.date
-                ? 'border-red-500 dark:border-red-500 focus-visible:ring-red-500 focus-visible:border-red-500'
-                : 'border-border dark:border-border-dark',
-            )}
+            placeholder="Selecionar data de pagamento"
+            error={errors.date}
+            minDate={new Date(1970, 0, 1)}
+            maxDate={new Date(2100, 11, 31)}
+            className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
           />
-          {errors.date && (
-            <span id="date-error" className="text-xs text-red-500 mt-1 block" role="alert">
-              {errors.date}
-            </span>
-          )}
         </div>
 
         {/* Valor */}

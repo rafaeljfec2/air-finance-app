@@ -1,3 +1,4 @@
+import { DatePicker } from '@/components/ui/DatePicker';
 import { FormField } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { CreateCompany } from '@/services/companyService';
 import { Company } from '@/types/company';
 import { formatDocument, unformatDocument } from '@/utils/formatDocument';
-import { Building2, Calendar, FileText, Mail, MapPin, Phone, X } from 'lucide-react';
+import { Building2, FileText, Mail, MapPin, Phone, X } from 'lucide-react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -317,20 +318,18 @@ export function CompanyFormModal({
                 </FormField>
 
                 <FormField label="Data de fundação *" error={errors.foundationDate}>
-                  <div className="relative">
-                    <Input
-                      name="foundationDate"
-                      type="date"
-                      value={form.foundationDate}
-                      onChange={handleChange}
-                      required
-                      className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
-                        errors.foundationDate && 'border-red-500 focus-visible:ring-red-500',
-                      )}
-                    />
-                    <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 pointer-events-none" />
-                  </div>
+                  <DatePicker
+                    value={form.foundationDate ? new Date(form.foundationDate) : undefined}
+                    onChange={(date) => {
+                      const dateString = date ? date.toISOString().split('T')[0] : '';
+                      handleChange({
+                        target: { name: 'foundationDate', value: dateString },
+                      } as ChangeEvent<HTMLInputElement>);
+                    }}
+                    placeholder="Selecionar data de fundação"
+                    error={errors.foundationDate}
+                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                  />
                 </FormField>
               </div>
             </div>

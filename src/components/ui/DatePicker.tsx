@@ -57,7 +57,7 @@ export interface DatePickerProps {
   /**
    * Label for the date picker
    */
-  label?: string;
+  label?: React.ReactNode;
 
   /**
    * Whether to show the calendar icon

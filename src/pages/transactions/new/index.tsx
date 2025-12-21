@@ -26,6 +26,7 @@ export function NewTransaction() {
     errors,
     isCreating,
     handleChange,
+    handleDateChange,
     handleSelectChange,
     handleTypeChange,
     handleSubmit,
@@ -113,7 +114,7 @@ export function NewTransaction() {
                 installmentCount={formData.installmentCount ?? 1}
                 repeatMonthly={formData.repeatMonthly ?? false}
                 errors={errors}
-                onDateChange={handleChange}
+                onDateChange={handleDateChange}
                 onAmountChange={handleChange}
                 onInstallmentCountChange={(value) =>
                   handleSelectChange('installmentCount', Number(value))

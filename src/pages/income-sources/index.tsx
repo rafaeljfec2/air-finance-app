@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
@@ -298,23 +299,31 @@ export function IncomeSourcesPage() {
               </FormField>
 
               <FormField label="Data de Início" error={errors.startDate}>
-                <Input
-                  name="startDate"
-                  type="date"
-                  value={form.startDate}
-                  onChange={handleChange}
-                  required
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                <DatePicker
+                  value={form.startDate ? new Date(form.startDate) : undefined}
+                  onChange={(date) => {
+                    const dateString = date ? date.toISOString().split('T')[0] : '';
+                    handleChange({
+                      target: { name: 'startDate', value: dateString },
+                    } as React.ChangeEvent<HTMLInputElement>);
+                  }}
+                  placeholder="Selecionar data de início"
+                  error={errors.startDate}
+                  className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                 />
               </FormField>
 
               <FormField label="Data de Término (opcional)">
-                <Input
-                  name="endDate"
-                  type="date"
-                  value={form.endDate}
-                  onChange={handleChange}
-                  className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors"
+                <DatePicker
+                  value={form.endDate ? new Date(form.endDate) : undefined}
+                  onChange={(date) => {
+                    const dateString = date ? date.toISOString().split('T')[0] : '';
+                    handleChange({
+                      target: { name: 'endDate', value: dateString },
+                    } as React.ChangeEvent<HTMLInputElement>);
+                  }}
+                  placeholder="Selecionar data de término"
+                  className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                 />
               </FormField>
 
