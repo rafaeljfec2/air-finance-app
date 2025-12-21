@@ -1,9 +1,9 @@
-import { memo } from 'react';
-import { formatCurrency } from '@/utils/formatters';
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/utils/formatters';
+import { memo } from 'react';
 import { TransactionActions } from './TransactionActions';
-import { formatTransactionDate } from './TransactionGrid.utils';
 import type { TransactionGridTransaction } from './TransactionGrid.types';
+import { formatTransactionDate } from './TransactionGrid.utils';
 
 interface MobileCardProps {
   transaction: TransactionGridTransaction;
@@ -16,7 +16,7 @@ interface MobileCardProps {
 export const MobileCard = memo(
   ({ transaction, showActions, onActionClick, onEdit, onDelete }: MobileCardProps) => {
     const isPreviousBalance = transaction.id === 'previous-balance';
-    
+
     return (
       <div
         className={cn(
@@ -30,7 +30,10 @@ export const MobileCard = memo(
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                {formatTransactionDate(transaction.paymentDate || transaction.createdAt, 'dd/MM HH:mm')}
+                {formatTransactionDate(
+                  transaction.paymentDate || transaction.createdAt,
+                  'dd/MM/yyyy',
+                )}
               </span>
               <span className="text-gray-400">•</span>
               <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
@@ -45,8 +48,8 @@ export const MobileCard = memo(
             </p>
           </div>
           <div className="text-right flex flex-col items-end justify-between h-full">
-            {!isPreviousBalance && (
-              transaction.launchType === 'revenue' ? (
+            {!isPreviousBalance &&
+              (transaction.launchType === 'revenue' ? (
                 <span className="text-sm font-medium text-emerald-400">
                   +{formatCurrency(transaction.value)}
                 </span>
@@ -54,8 +57,7 @@ export const MobileCard = memo(
                 <span className="text-sm font-medium text-red-400">
                   -{formatCurrency(transaction.value)}
                 </span>
-              )
-            )}
+              ))}
             <span
               className={cn(
                 'text-xs mt-1',
@@ -85,4 +87,3 @@ export const MobileCard = memo(
 );
 
 MobileCard.displayName = 'MobileCard';
-

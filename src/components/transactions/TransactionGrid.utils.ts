@@ -1,17 +1,41 @@
 import { formatCurrency } from '@/utils/formatters';
 import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import type { SortField, TransactionGridTransaction } from './TransactionGrid.types';
 
+/**
+ * Formats a date string preserving the date components (year, month, day)
+ * without timezone conversion. This ensures that a date like "2025-12-02T00:00:00.000Z"
+ * is displayed as 02/12/2025, not 01/12/2025 (which would happen with timezone conversion).
+ *
+ * Strategy: Extract date components directly from ISO string to avoid timezone issues.
+ */
 export const formatTransactionDate = (
   dateStr: string,
-  formatStr: string = 'dd/MM/yyyy HH:mm',
+  formatStr: string = 'dd/MM/yyyy',
 ): string => {
   try {
+    // Extract date components directly from ISO string (YYYY-MM-DD) to avoid timezone conversion
+    const isoDateRegex = /^(\d{4})-(\d{2})-(\d{2})/;
+    const isoDateMatch = isoDateRegex.exec(dateStr);
+    if (isoDateMatch) {
+      const [, year, month, day] = isoDateMatch;
+      // Create date using local timezone with the extracted components
+      // This preserves the date as intended, without UTC conversion
+      const date = new Date(
+        Number.parseInt(year, 10),
+        Number.parseInt(month, 10) - 1,
+        Number.parseInt(day, 10),
+      );
+      return format(date, formatStr, { locale: ptBR });
+    }
+
+    // Fallback to standard parsing if not ISO format
     const date = new Date(dateStr);
     if (Number.isNaN(date.getTime())) {
       return '-';
     }
-    return format(date, formatStr);
+    return format(date, formatStr, { locale: ptBR });
   } catch (error) {
     console.error('Error formatting date:', error);
     return '-';
@@ -25,7 +49,7 @@ export const getFieldValue = (
   switch (field) {
     case 'date': {
       const baseDate = transaction.paymentDate || transaction.createdAt;
-      return formatTransactionDate(baseDate, 'dd/MM HH:mm');
+      return formatTransactionDate(baseDate, 'dd/MM/yyyy');
     }
     case 'category':
       return transaction.categoryId || 'Sem categoria';

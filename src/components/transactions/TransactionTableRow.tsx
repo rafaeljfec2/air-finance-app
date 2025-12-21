@@ -1,10 +1,10 @@
-import { memo } from 'react';
-import { formatCurrency } from '@/utils/formatters';
-import { cn } from '@/lib/utils';
 import { Tooltip } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/utils/formatters';
+import { memo } from 'react';
 import { TransactionActions } from './TransactionActions';
-import { formatTransactionDate } from './TransactionGrid.utils';
 import type { TransactionGridTransaction } from './TransactionGrid.types';
+import { formatTransactionDate } from './TransactionGrid.utils';
 
 interface TableRowProps {
   transaction: TransactionGridTransaction;
@@ -17,7 +17,7 @@ interface TableRowProps {
 export const TableRow = memo(
   ({ transaction, showActions, onActionClick, onEdit, onDelete }: TableRowProps) => {
     const isPreviousBalance = transaction.id === 'previous-balance';
-    
+
     return (
       <tr
         className={cn(
@@ -28,7 +28,7 @@ export const TableRow = memo(
         )}
       >
         <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-          {formatTransactionDate(transaction.paymentDate || transaction.createdAt)}
+          {formatTransactionDate(transaction.paymentDate || transaction.createdAt, 'dd/MM/yyyy')}
         </td>
         <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
           <Tooltip content={transaction.categoryId || 'Sem categoria'}>
@@ -52,10 +52,18 @@ export const TableRow = memo(
           </Tooltip>
         </td>
         <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-emerald-400 whitespace-nowrap">
-          {isPreviousBalance ? '-' : transaction.launchType === 'revenue' ? formatCurrency(transaction.value) : '-'}
+          {isPreviousBalance
+            ? '-'
+            : transaction.launchType === 'revenue'
+              ? formatCurrency(transaction.value)
+              : '-'}
         </td>
         <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-red-400 whitespace-nowrap">
-          {isPreviousBalance ? '-' : transaction.launchType === 'expense' ? formatCurrency(transaction.value) : '-'}
+          {isPreviousBalance
+            ? '-'
+            : transaction.launchType === 'expense'
+              ? formatCurrency(transaction.value)
+              : '-'}
         </td>
         <td
           className={cn(
