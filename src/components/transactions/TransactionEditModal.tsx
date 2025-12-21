@@ -2,11 +2,13 @@ import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useTransactions } from '@/hooks/useTransactions';
 import type { Account } from '@/services/accountService';
 import type { Category } from '@/services/categoryService';
 import { useCompanyStore } from '@/stores/company';
-import { useEffect, useMemo, useState } from 'react';
+import { formatDateForInput } from '@/utils/date';
+import React, { useEffect, useMemo, useState } from 'react';
 import type { TransactionGridTransaction } from './TransactionGrid.types';
 
 interface TransactionEditModalProps {
@@ -34,6 +36,9 @@ export function TransactionEditModal({
     accountId: '',
     value: '',
     launchType: 'revenue' as 'revenue' | 'expense',
+    issueDate: '',
+    paymentDate: '',
+    observation: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -81,6 +86,9 @@ export function TransactionEditModal({
         accountId: transaction.accountId ?? '',
         value: displayValue,
         launchType: transaction.launchType ?? 'revenue',
+        issueDate: transaction.issueDate ? formatDateForInput(transaction.issueDate) : '',
+        paymentDate: transaction.paymentDate ? formatDateForInput(transaction.paymentDate) : '',
+        observation: transaction.observation ?? '',
       });
       setErrors({});
     }
@@ -88,7 +96,7 @@ export function TransactionEditModal({
 
   if (!open || !transaction) return null;
 
-  const handleChange = (field: keyof typeof form, value: string | 'revenue' | 'expense') => {
+  const handleChange = (field: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -109,6 +117,23 @@ export function TransactionEditModal({
     if (Object.keys(validation).length > 0) return;
 
     const numericValue = Number(form.value);
+    // Convert date strings to ISO format
+    // Use local date components to avoid timezone conversion issues
+    const issueDateISO = form.issueDate
+      ? (() => {
+          const [year, month, day] = form.issueDate.split('-').map(Number);
+          const date = new Date(year, month - 1, day);
+          return date.toISOString();
+        })()
+      : transaction.issueDate;
+    const paymentDateISO = form.paymentDate
+      ? (() => {
+          const [year, month, day] = form.paymentDate.split('-').map(Number);
+          const date = new Date(year, month - 1, day);
+          return date.toISOString();
+        })()
+      : transaction.paymentDate;
+
     updateTransaction({
       id: transaction.id,
       data: {
@@ -117,6 +142,9 @@ export function TransactionEditModal({
         accountId: form.accountId,
         value: numericValue,
         launchType: form.launchType,
+        issueDate: issueDateISO,
+        paymentDate: paymentDateISO,
+        observation: form.observation || undefined,
       },
     });
     onClose();
@@ -125,8 +153,40 @@ export function TransactionEditModal({
   return (
     <Modal open={open} onClose={onClose} title="Editar transação" className="max-w-xl">
       <form className="space-y-4" onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <label htmlFor="issueDate" className="text-xs text-muted-foreground">
+              Data de Emissão
+            </label>
+            <Input
+              id="issueDate"
+              type="date"
+              value={form.issueDate}
+              onChange={(e) => handleChange('issueDate', e.target.value)}
+              className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+            />
+            {errors.issueDate && <p className="text-xs text-red-500">{errors.issueDate}</p>}
+          </div>
+
+          <div className="space-y-1">
+            <label htmlFor="paymentDate" className="text-xs text-muted-foreground">
+              Data de Vencimento
+            </label>
+            <Input
+              id="paymentDate"
+              type="date"
+              value={form.paymentDate}
+              onChange={(e) => handleChange('paymentDate', e.target.value)}
+              className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+            />
+            {errors.paymentDate && <p className="text-xs text-red-500">{errors.paymentDate}</p>}
+          </div>
+        </div>
+
         <div className="space-y-1">
-          <label className="text-xs text-muted-foreground">Categoria</label>
+          <label htmlFor="category" className="text-xs text-muted-foreground">
+            Categoria
+          </label>
           <ComboBox
             options={categoryOptions}
             value={form.categoryId || null}
@@ -140,8 +200,11 @@ export function TransactionEditModal({
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs text-muted-foreground">Descrição</label>
+          <label htmlFor="description" className="text-xs text-muted-foreground">
+            Descrição
+          </label>
           <Input
+            id="description"
             value={form.description}
             onChange={(e) => handleChange('description', e.target.value)}
             placeholder="Descrição da transação"
@@ -152,7 +215,9 @@ export function TransactionEditModal({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Conta</label>
+            <label htmlFor="account" className="text-xs text-muted-foreground">
+              Conta
+            </label>
             <ComboBox
               options={accountOptions}
               value={form.accountId || null}
@@ -166,7 +231,9 @@ export function TransactionEditModal({
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Tipo</label>
+            <label htmlFor="launchType" className="text-xs text-muted-foreground">
+              Tipo
+            </label>
             <ComboBox
               options={launchTypeOptions}
               value={form.launchType}
@@ -178,8 +245,11 @@ export function TransactionEditModal({
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs text-muted-foreground">Valor</label>
+          <label htmlFor="value" className="text-xs text-muted-foreground">
+            Valor
+          </label>
           <Input
+            id="value"
             type="number"
             step="0.01"
             value={form.value}
@@ -188,6 +258,20 @@ export function TransactionEditModal({
             className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
           />
           {errors.value && <p className="text-xs text-red-500">{errors.value}</p>}
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="observation" className="text-xs text-muted-foreground">
+            Observação
+          </label>
+          <Textarea
+            id="observation"
+            value={form.observation}
+            onChange={(e) => handleChange('observation', e.target.value)}
+            placeholder="Observações sobre a transação"
+            rows={3}
+            className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 resize-none"
+          />
         </div>
 
         <div className="flex justify-end gap-3 pt-2">
