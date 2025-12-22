@@ -68,9 +68,17 @@ export function ImportOfxPage() {
   const { previousBalance = 0 } = usePreviousBalance(companyId, startDate, selectedAccount?.id);
 
   const importMutation = useMutation({
-    mutationFn: async ({ file, accountId }: { file: File; accountId: string }) => {
+    mutationFn: async ({
+      file,
+      accountId,
+      importToCashFlow,
+    }: {
+      file: File;
+      accountId: string;
+      importToCashFlow?: boolean;
+    }) => {
       if (!companyId) throw new Error('Selecione uma empresa');
-      return importOfx(companyId, file, accountId);
+      return importOfx(companyId, file, accountId, importToCashFlow);
     },
     onSuccess: (data) => {
       toast({
@@ -118,7 +126,8 @@ export function ImportOfxPage() {
           totalInstallments: tx.installmentInfo.total,
           baseDescription: tx.installmentInfo.baseDescription,
           fitId: tx.fitId ?? undefined,
-          periodEnd,
+          // Use periodEnd from transaction if available, otherwise use the one from modal
+          periodEnd: tx.periodEnd ?? periodEnd,
         }),
       );
 
@@ -141,11 +150,11 @@ export function ImportOfxPage() {
     },
   });
 
-  const handleImport = async (file: File, accountId: string) => {
+  const handleImport = async (file: File, accountId: string, importToCashFlow?: boolean) => {
     if (!file.name.toLowerCase().endsWith('.ofx')) {
       throw new Error('Selecione um arquivo com extensão .ofx');
     }
-    return await importMutation.mutateAsync({ file, accountId });
+    return await importMutation.mutateAsync({ file, accountId, importToCashFlow });
   };
 
   const handleCreateInstallments = async (

@@ -1,6 +1,7 @@
 import { Loading } from '@/components/Loading';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import type { Account } from '@/services/accountService';
 import type { ImportOfxResponse, InstallmentTransaction } from '@/services/transactionService';
 import { Upload } from 'lucide-react';
@@ -14,7 +15,11 @@ interface ImportOfxModalProps {
   open: boolean;
   onClose: () => void;
   accounts: Account[];
-  onImport: (file: File, accountId: string) => Promise<ImportOfxResponse>;
+  onImport: (
+    file: File,
+    accountId: string,
+    importToCashFlow?: boolean,
+  ) => Promise<ImportOfxResponse>;
   onCreateInstallments?: (
     installments: InstallmentTransaction[],
     accountId: string,
@@ -36,6 +41,7 @@ export function ImportOfxModal({
   const [lastImportedAccountId, setLastImportedAccountId] = useState<string | null>(null);
   const [lastImportedPeriodEnd, setLastImportedPeriodEnd] = useState<string | null>(null);
   const [isCreatingInstallments, setIsCreatingInstallments] = useState(false);
+  const [importToCashFlow, setImportToCashFlow] = useState(true);
 
   const {
     selectedFile,
@@ -56,7 +62,7 @@ export function ImportOfxModal({
     if (!selectedFile || !selectedAccountId) return;
 
     try {
-      const result = await onImport(selectedFile, selectedAccountId);
+      const result = await onImport(selectedFile, selectedAccountId, importToCashFlow);
 
       // Check for installment transactions
       if (result.installmentTransactions && result.installmentTransactions.length > 0) {
@@ -72,6 +78,7 @@ export function ImportOfxModal({
         // No installments, close modal and reset form
         resetFileUpload();
         setSelectedAccountId(null);
+        setImportToCashFlow(true);
         onClose();
       }
     } catch (error: unknown) {
@@ -94,6 +101,7 @@ export function ImportOfxModal({
       setLastImportedPeriodEnd(null);
       resetFileUpload();
       setSelectedAccountId(null);
+      setImportToCashFlow(true);
       onClose();
     } catch (error: unknown) {
       console.error('Error creating installments:', error);
@@ -111,6 +119,7 @@ export function ImportOfxModal({
     // Close import modal and reset form
     resetFileUpload();
     setSelectedAccountId(null);
+    setImportToCashFlow(true);
     onClose();
   };
 
@@ -137,6 +146,28 @@ export function ImportOfxModal({
           onRemoveFile={handleRemoveFile}
           onOpenFileDialog={openFileDialog}
         />
+
+        {/* Import to Cash Flow Option */}
+        <div className="flex items-center justify-between p-4 bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg">
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor="import-to-cashflow"
+              className="text-sm font-medium text-text dark:text-text-dark cursor-pointer"
+            >
+              Importar para o fluxo de caixa
+            </label>
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
+              Ao marcar esta opção, as transações do extrato também serão criadas no fluxo de caixa
+              correspondente
+            </p>
+          </div>
+          <Switch
+            id="import-to-cashflow"
+            checked={importToCashFlow}
+            onCheckedChange={setImportToCashFlow}
+            disabled={isImporting}
+          />
+        </div>
 
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-4 border-t border-border dark:border-border-dark">
