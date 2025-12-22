@@ -130,11 +130,9 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
 
     const handleSelect = (date: Date | undefined) => {
       if (date) {
-        // Normalize date to start of day in UTC to avoid timezone issues
-        // DayPicker uses UTC internally, so we need to match that
-        const normalizedDate = new Date(
-          Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
-        );
+        // Normalize date to start of day in local timezone
+        // DayPicker returns dates in local timezone, so we use local methods
+        const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         onChange?.(normalizedDate);
         setOpen(false);
       } else {
