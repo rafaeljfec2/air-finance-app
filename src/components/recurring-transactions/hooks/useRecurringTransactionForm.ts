@@ -131,8 +131,9 @@ export function useRecurringTransactionForm({
 
   const validate = (): Record<string, string> => {
     const validationErrors = validateRecurringTransactionForm(form);
-    setErrors(validationErrors);
-    return validationErrors;
+    const errorsRecord = validationErrors as Record<string, string>;
+    setErrors(errorsRecord);
+    return errorsRecord;
   };
 
   const reset = () => {
