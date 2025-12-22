@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { Account, CreateAccount } from '@/services/accountService';
 import { useCompanyStore } from '@/stores/company';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
+import { formatDateToLocalISO } from '@/utils/date';
 import {
   BanknotesIcon,
   BuildingLibraryIcon,
@@ -57,7 +58,7 @@ export function AccountFormModal({
       icon: 'BanknotesIcon',
       companyId: activeCompany?.id || '',
       initialBalance: 0,
-      initialBalanceDate: new Date().toISOString().split('T')[0],
+      initialBalanceDate: formatDateToLocalISO(new Date()),
     }),
     [activeCompany],
   );
@@ -80,7 +81,7 @@ export function AccountFormModal({
         initialBalance: account.initialBalance,
         initialBalanceDate: account.initialBalanceDate
           ? account.initialBalanceDate.slice(0, 10)
-          : new Date().toISOString().split('T')[0],
+          : formatDateToLocalISO(new Date()),
       });
       setInitialBalanceInput(
         account.initialBalance !== undefined && account.initialBalance !== null
@@ -129,7 +130,7 @@ export function AccountFormModal({
     const payload = {
       ...form,
       initialBalanceDate: form.initialBalanceDate
-        ? new Date(form.initialBalanceDate).toISOString()
+        ? form.initialBalanceDate
         : null,
     };
 
@@ -340,9 +341,9 @@ export function AccountFormModal({
 
                 <FormField label="Data do saldo inicial *" error={errors.initialBalanceDate}>
                   <DatePicker
-                    value={form.initialBalanceDate ? new Date(form.initialBalanceDate) : undefined}
+                    value={form.initialBalanceDate || undefined}
                     onChange={(date) => {
-                      const dateString = date ? date.toISOString().split('T')[0] : '';
+                      const dateString = date ? formatDateToLocalISO(date) : '';
                       handleChange({
                         target: { name: 'initialBalanceDate', value: dateString },
                       } as ChangeEvent<HTMLInputElement>);

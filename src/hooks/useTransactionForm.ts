@@ -4,6 +4,7 @@ import { useTransactionStore } from '@/stores/transaction';
 import { Transaction, TransactionType } from '@/types/transaction';
 import { formatCurrency } from '@/utils/formatters';
 import { useCompanyStore } from '@/stores/company';
+import { formatDateToLocalISO } from '@/utils/date';
 
 export const INITIAL_FORM_STATE = {
   description: '',
@@ -15,7 +16,7 @@ export const INITIAL_FORM_STATE = {
     icon: '',
     color: '',
   },
-  date: new Date().toISOString().split('T')[0],
+  date: formatDateToLocalISO(new Date()),
   note: '',
 };
 

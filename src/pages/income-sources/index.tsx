@@ -10,7 +10,7 @@ import { useIncomeSources } from '@/hooks/useIncomeSources';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
 import { IncomeSource } from '@/types/incomeSource';
-import { formatDate } from '@/utils/date';
+import { formatDate, formatDateToLocalISO } from '@/utils/date';
 import { formatCurrency, formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import React, { useEffect, useState } from 'react';
 
@@ -300,9 +300,9 @@ export function IncomeSourcesPage() {
 
               <FormField label="Data de Início" error={errors.startDate}>
                 <DatePicker
-                  value={form.startDate ? new Date(form.startDate) : undefined}
+                  value={form.startDate || undefined}
                   onChange={(date) => {
-                    const dateString = date ? date.toISOString().split('T')[0] : '';
+                    const dateString = date ? formatDateToLocalISO(date) : '';
                     handleChange({
                       target: { name: 'startDate', value: dateString },
                     } as React.ChangeEvent<HTMLInputElement>);
@@ -315,9 +315,9 @@ export function IncomeSourcesPage() {
 
               <FormField label="Data de Término (opcional)">
                 <DatePicker
-                  value={form.endDate ? new Date(form.endDate) : undefined}
+                  value={form.endDate || undefined}
                   onChange={(date) => {
-                    const dateString = date ? date.toISOString().split('T')[0] : '';
+                    const dateString = date ? formatDateToLocalISO(date) : '';
                     handleChange({
                       target: { name: 'endDate', value: dateString },
                     } as React.ChangeEvent<HTMLInputElement>);

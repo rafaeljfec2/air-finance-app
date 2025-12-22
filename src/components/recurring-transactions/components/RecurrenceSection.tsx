@@ -1,6 +1,7 @@
 import { DatePicker } from '@/components/ui/DatePicker';
 import { FormField } from '@/components/ui/FormField';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { parseLocalDate } from '@/utils/date';
 import { cn } from '@/lib/utils';
 import type { CreateRecurringTransaction } from '@/services/recurringTransactionService';
 import { Repeat } from 'lucide-react';
@@ -33,7 +34,7 @@ export function RecurrenceSection({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField label="Data inicial *" error={errors.startDate}>
           <DatePicker
-            value={form.startDate ? new Date(form.startDate) : undefined}
+            value={form.startDate || undefined}
             onChange={onStartDateChange}
             placeholder="Selecionar data inicial"
             error={errors.startDate}
@@ -73,11 +74,11 @@ export function RecurrenceSection({
 
         <FormField label="Data final *" error={errors.repeatUntil} className="md:col-span-2">
           <DatePicker
-            value={form.repeatUntil ? new Date(form.repeatUntil) : undefined}
+            value={form.repeatUntil || undefined}
             onChange={onRepeatUntilChange}
             placeholder="Selecionar data final"
             error={errors.repeatUntil}
-            minDate={form.startDate ? new Date(form.startDate) : undefined}
+            minDate={form.startDate ? parseLocalDate(form.startDate) : undefined}
             className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
           />
         </FormField>

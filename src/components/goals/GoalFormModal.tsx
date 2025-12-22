@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { CreateGoal, Goal } from '@/services/goalService';
 import { useCompanyStore } from '@/stores/company';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
+import { formatDateToLocalISO } from '@/utils/date';
 import { Calendar, DollarSign, FileText, Tag, Target, Wallet, X } from 'lucide-react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
@@ -363,9 +364,9 @@ export function GoalFormModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField label="Data limite *" error={errors.deadline}>
                   <DatePicker
-                    value={form.deadline ? new Date(form.deadline) : undefined}
+                    value={form.deadline || undefined}
                     onChange={(date) => {
-                      const dateString = date ? date.toISOString().split('T')[0] : '';
+                      const dateString = date ? formatDateToLocalISO(date) : '';
                       handleChange({
                         target: { name: 'deadline', value: dateString },
                       } as ChangeEvent<HTMLInputElement>);

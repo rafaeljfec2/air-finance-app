@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 import { cn } from '@/lib/utils';
 import { CreateCompany } from '@/services/companyService';
 import { Company } from '@/types/company';
+import { formatDateToLocalISO } from '@/utils/date';
 import { formatDocument, unformatDocument } from '@/utils/formatDocument';
 import { Building2, FileText, Mail, MapPin, Phone, X } from 'lucide-react';
 import type { ChangeEvent, FormEvent } from 'react';
@@ -319,9 +320,9 @@ export function CompanyFormModal({
 
                 <FormField label="Data de fundação *" error={errors.foundationDate}>
                   <DatePicker
-                    value={form.foundationDate ? new Date(form.foundationDate) : undefined}
+                    value={form.foundationDate || undefined}
                     onChange={(date) => {
-                      const dateString = date ? date.toISOString().split('T')[0] : '';
+                      const dateString = date ? formatDateToLocalISO(date) : '';
                       handleChange({
                         target: { name: 'foundationDate', value: dateString },
                       } as ChangeEvent<HTMLInputElement>);

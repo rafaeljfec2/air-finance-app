@@ -104,11 +104,21 @@ flatpickr.localize(ptLocale);
 export interface DatePickerProps {
   /**
    * Selected date value (ISO string or Date object)
+   * 
+   * The DatePicker handles ALL timezone conversions internally.
+   * You can pass:
+   * - ISO string (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss.sssZ) - will be parsed in local timezone
+   * - Date object - will be normalized to start of day in local timezone
+   * 
+   * No manual timezone handling is needed - the component does it all automatically.
    */
   value?: string | Date | null;
 
   /**
    * Callback when date changes
+   * 
+   * Returns a Date object normalized to start of day in local timezone.
+   * If you need a string for API calls, use formatDateToLocalISO(date) from @/utils/date
    */
   onChange?: (date: Date | undefined) => void;
 
@@ -171,7 +181,13 @@ export interface DatePickerProps {
 /**
  * Converts a value (string or Date) to a Date object
  * Always creates dates in local timezone to avoid timezone issues
- * Uses utility functions to ensure consistency across the application
+ * This is the central place for all date parsing - ensures consistency across the application
+ * 
+ * Handles:
+ * - ISO strings (YYYY-MM-DD) - parses in local timezone
+ * - Date objects - normalizes to start of day in local timezone
+ * - DD/MM/YYYY format strings - parses in local timezone
+ * - ISO strings with time (YYYY-MM-DDTHH:mm:ss) - extracts date part and parses in local timezone
  */
 function convertValueToDate(value: string | Date | null | undefined): Date | null {
   if (!value) {
@@ -179,17 +195,21 @@ function convertValueToDate(value: string | Date | null | undefined): Date | nul
   }
 
   if (typeof value === 'string') {
+    // Remove time part if present (handle ISO strings with time like "2025-12-01T00:00:00.000Z")
+    // This is critical - we only care about the date part, not the time or timezone
+    const datePart = value.split('T')[0].split(' ')[0].trim();
+    
     // Try to parse ISO string first (YYYY-MM-DD format)
     const isoDateRegex = /^(\d{4})-(\d{2})-(\d{2})/;
-    const isoDateMatch = isoDateRegex.exec(value);
+    const isoDateMatch = isoDateRegex.exec(datePart);
     if (isoDateMatch) {
-      // Use utility function to parse in local timezone
-      return parseLocalDate(value);
+      // Use utility function to parse in local timezone - this is the key fix
+      return parseLocalDate(datePart);
     }
 
     // Try to parse DD/MM/YYYY format
     const ddmmyyyyRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/;
-    const ddmmyyyyMatch = ddmmyyyyRegex.exec(value);
+    const ddmmyyyyMatch = ddmmyyyyRegex.exec(datePart);
     if (ddmmyyyyMatch) {
       const [, day, month, year] = ddmmyyyyMatch;
       // Create date in local timezone (no time component)
@@ -204,10 +224,12 @@ function convertValueToDate(value: string | Date | null | undefined): Date | nul
       );
     }
 
-    // Fallback to default parsing, then normalize
+    // Fallback: try to parse as Date, then normalize to local timezone
+    // This handles edge cases but should rarely be needed
     const parsed = new Date(value);
     if (!Number.isNaN(parsed.getTime())) {
       // Normalize to local timezone start of day
+      // This ensures we don't have timezone conversion issues
       return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate(), 0, 0, 0, 0);
     }
 
@@ -215,11 +237,13 @@ function convertValueToDate(value: string | Date | null | undefined): Date | nul
   }
 
   // If it's already a Date, normalize to local timezone start of day
+  // This is critical - even if the Date was created from an ISO string,
+  // we normalize it to ensure it represents the correct local date
   if (value instanceof Date && !Number.isNaN(value.getTime())) {
     return new Date(value.getFullYear(), value.getMonth(), value.getDate(), 0, 0, 0, 0);
   }
 
-  return value;
+  return null;
 }
 
 /**

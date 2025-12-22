@@ -8,6 +8,7 @@ import { useTransactions } from '@/hooks/useTransactions';
 import type { Account } from '@/services/accountService';
 import type { Category } from '@/services/categoryService';
 import { useCompanyStore } from '@/stores/company';
+import { formatDateToLocalISO } from '@/utils/date';
 import React, { useEffect, useMemo, useState } from 'react';
 import type { TransactionGridTransaction } from './TransactionGrid.types';
 
@@ -36,8 +37,9 @@ export function TransactionEditModal({
     accountId: '',
     value: '',
     launchType: 'revenue' as 'revenue' | 'expense',
-    issueDate: undefined as Date | undefined,
-    paymentDate: undefined as Date | undefined,
+    // DatePicker accepts strings directly - no need to use Date objects
+    issueDate: undefined as string | undefined,
+    paymentDate: undefined as string | undefined,
     observation: '',
   });
 
@@ -80,21 +82,15 @@ export function TransactionEditModal({
           ? Math.abs(transaction.value).toFixed(2)
           : ((transaction.value as string)?.replace(/^-/, '') ?? '');
 
-      // Parse dates to Date objects
-      const parseDate = (dateString: string | undefined): Date | undefined => {
-        if (!dateString) return undefined;
-        const date = new Date(dateString);
-        return Number.isNaN(date.getTime()) ? undefined : date;
-      };
-
       setForm({
         description: transaction.description ?? '',
         categoryId: transaction.categoryId ?? '',
         accountId: transaction.accountId ?? '',
         value: displayValue,
         launchType: transaction.launchType ?? 'revenue',
-        issueDate: parseDate(transaction.issueDate),
-        paymentDate: parseDate(transaction.paymentDate),
+        // DatePicker handles string parsing internally - no need to convert to Date
+        issueDate: transaction.issueDate || undefined,
+        paymentDate: transaction.paymentDate || undefined,
         observation: transaction.observation ?? '',
       });
       setErrors({});
@@ -104,7 +100,11 @@ export function TransactionEditModal({
   if (!open || !transaction) return null;
 
   const handleChange = (field: keyof typeof form, value: string | Date | undefined) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    // DatePicker returns Date objects, but we store as strings in form state
+    // Convert Date to string using formatDateToLocalISO
+    const formValue =
+      value instanceof Date ? formatDateToLocalISO(value) : value ?? undefined;
+    setForm((prev) => ({ ...prev, [field]: formValue }));
   };
 
   const validate = () => {
@@ -124,11 +124,9 @@ export function TransactionEditModal({
     if (Object.keys(validation).length > 0) return;
 
     const numericValue = Number(form.value);
-    // Convert Date objects to ISO format
-    const issueDateISO = form.issueDate ? form.issueDate.toISOString() : transaction.issueDate;
-    const paymentDateISO = form.paymentDate
-      ? form.paymentDate.toISOString()
-      : transaction.paymentDate;
+    // Form dates are strings (converted from DatePicker's Date objects via handleChange)
+    const issueDateISO = form.issueDate || transaction.issueDate;
+    const paymentDateISO = form.paymentDate || transaction.paymentDate;
 
     updateTransaction({
       id: transaction.id,

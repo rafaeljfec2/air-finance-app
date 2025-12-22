@@ -1,4 +1,5 @@
 import type { CreateRecurringTransaction } from '@/services/recurringTransactionService';
+import { formatDateToLocalISO } from '@/utils/date';
 
 /**
  * Creates initial form state with default values
@@ -14,18 +15,18 @@ export function createInitialFormState(): CreateRecurringTransaction {
     type: 'Expense',
     category: '',
     accountId: '',
-    startDate: today.toISOString().split('T')[0],
+    startDate: formatDateToLocalISO(today),
     frequency: 'monthly',
-    repeatUntil: oneYearLater.toISOString().split('T')[0],
+    repeatUntil: formatDateToLocalISO(oneYearLater),
     createdAutomatically: false,
   };
 }
 
 /**
- * Formats date to YYYY-MM-DD string
+ * Formats date to YYYY-MM-DD string in local timezone
  */
 export function formatDateToString(date: Date): string {
-  return date.toISOString().split('T')[0];
+  return formatDateToLocalISO(date);
 }
 
 /**

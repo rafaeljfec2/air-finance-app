@@ -4,6 +4,7 @@ import { CreateTransactionPayload } from '@/services/transactionService';
 import { useCompanyStore } from '@/stores/company';
 import type { TransactionInput, TransactionType } from '@/types/transaction';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
+import { formatDateToLocalISO } from '@/utils/date';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { validateTransactionForm } from '../utils/transactionValidation';
@@ -17,7 +18,7 @@ const INITIAL_FORM_DATA: TransactionFormData = {
   type: 'EXPENSE',
   description: '',
   amount: 0,
-  date: new Date().toISOString().split('T')[0],
+  date: formatDateToLocalISO(new Date()),
   categoryId: '',
   accountId: '',
   note: '',
@@ -87,7 +88,7 @@ export function useTransactionForm() {
 
   const handleDateChange = useCallback(
     (date: Date | undefined) => {
-      const dateString = date ? date.toISOString().split('T')[0] : '';
+      const dateString = date ? formatDateToLocalISO(date) : '';
       setFormData((prev) => ({ ...prev, date: dateString }));
       if (errors.date) {
         setErrors((prev) => ({ ...prev, date: '' }));
