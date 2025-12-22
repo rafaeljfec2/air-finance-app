@@ -128,47 +128,98 @@ export function Transactions() {
     return transactionsList;
   }, [transactionsWithLabels, previousBalance, startDate, selectedAccountId, accountMap]);
 
+  // Helper function to get transaction type label
+  const getTransactionTypeLabel = (type: string): string => {
+    if (type === 'all') {
+      return 'Todos os tipos';
+    }
+    if (type === 'RECEITA') {
+      return 'Receitas';
+    }
+    if (type === 'DESPESA') {
+      return 'Despesas';
+    }
+    return 'Todos os tipos';
+  };
+
+  // Helper function to get account name or default
+  const getAccountDisplayName = (accountId: string | undefined): string => {
+    if (!accountId) {
+      return 'Todas as contas';
+    }
+    const account = accounts?.find((acc) => acc.id === accountId);
+    return account?.name ?? 'Todas';
+  };
+
+  // Helper function to check if transaction matches search term
+  const matchesSearchTerm = (description: string, search: string): boolean => {
+    return description.toLowerCase().includes(search.toLowerCase());
+  };
+
+  // Helper function to check if transaction matches selected type
+  const matchesTransactionType = (type: string, launchType: string): boolean => {
+    if (type === 'all') {
+      return true;
+    }
+    if (type === 'RECEITA' && launchType === 'revenue') {
+      return true;
+    }
+    if (type === 'DESPESA' && launchType === 'expense') {
+      return true;
+    }
+    return false;
+  };
+
+  // Helper function to check if transaction matches date period
+  const matchesDatePeriod = (
+    paymentDate: string,
+    start: string | null,
+    end: string | null,
+  ): boolean => {
+    if (!start && !end) {
+      return true;
+    }
+
+    const transactionDate = new Date(paymentDate);
+
+    if (start) {
+      // Parse date string "YYYY-MM-DD" and create date in local timezone
+      const [year, month, day] = start.split('-').map(Number);
+      const startDate = new Date(year, month - 1, day, 0, 0, 0, 0);
+      if (transactionDate < startDate) {
+        return false;
+      }
+    }
+
+    if (end) {
+      // Parse date string "YYYY-MM-DD" and create date in local timezone
+      const [year, month, day] = end.split('-').map(Number);
+      const endDate = new Date(year, month - 1, day, 23, 59, 59, 999);
+      if (transactionDate > endDate) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  // Helper function to filter transactions
+  const shouldIncludeTransaction = (transaction: TransactionGridTransaction): boolean => {
+    // Always include previous balance row
+    if (transaction.id === 'previous-balance') {
+      return true;
+    }
+
+    const matchesSearch = matchesSearchTerm(transaction.description, searchTerm);
+    const matchesType = matchesTransactionType(selectedType, transaction.launchType);
+    const matchesPeriod = matchesDatePeriod(transaction.paymentDate, startDate, endDate);
+
+    return matchesSearch && matchesType && matchesPeriod;
+  };
+
   const filteredTransactions = [...transactionsWithPreviousBalance]
     .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
-    .filter((transaction) => {
-      // Always include previous balance row
-      if (transaction.id === 'previous-balance') {
-        return true;
-      }
-
-      const matchesSearch = transaction.description
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const matchesType =
-        selectedType === 'all' ||
-        (selectedType === 'RECEITA' && transaction.launchType === 'revenue') ||
-        (selectedType === 'DESPESA' && transaction.launchType === 'expense');
-
-      let matchesPeriod = true;
-      if (startDate || endDate) {
-        const transactionDate = new Date(transaction.paymentDate);
-
-        if (startDate) {
-          // Parse date string "YYYY-MM-DD" and create date in local timezone
-          const [year, month, day] = startDate.split('-').map(Number);
-          const start = new Date(year, month - 1, day, 0, 0, 0, 0);
-          if (transactionDate < start) {
-            matchesPeriod = false;
-          }
-        }
-
-        if (endDate && matchesPeriod) {
-          // Parse date string "YYYY-MM-DD" and create date in local timezone
-          const [year, month, day] = endDate.split('-').map(Number);
-          const end = new Date(year, month - 1, day, 23, 59, 59, 999);
-          if (transactionDate > end) {
-            matchesPeriod = false;
-          }
-        }
-      }
-
-      return matchesSearch && matchesType && matchesPeriod;
-    });
+    .filter(shouldIncludeTransaction);
 
   const handleEdit = (transaction: TransactionGridTransaction) => {
     // Find the original transaction with IDs (not labels) from the original transactions array
@@ -306,11 +357,7 @@ export function Transactions() {
                     }
                   >
                     <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
-                      <span className="truncate">
-                        {selectedAccountId
-                          ? accounts?.find((acc) => acc.id === selectedAccountId)?.name || 'Todas'
-                          : 'Todas as contas'}
-                      </span>
+                      <span className="truncate">{getAccountDisplayName(selectedAccountId)}</span>
                     </SelectTrigger>
                     <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark max-h-56 overflow-y-auto">
                       <SelectItem value="all">Todas as contas</SelectItem>
@@ -326,15 +373,7 @@ export function Transactions() {
                   <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                   <Select value={selectedType} onValueChange={setSelectedType}>
                     <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
-                      <span className="truncate">
-                        {selectedType === 'all'
-                          ? 'Todos os tipos'
-                          : selectedType === 'RECEITA'
-                            ? 'Receitas'
-                            : selectedType === 'DESPESA'
-                              ? 'Despesas'
-                              : 'Todos os tipos'}
-                      </span>
+                      <span className="truncate">{getTransactionTypeLabel(selectedType)}</span>
                     </SelectTrigger>
                     <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
                       <SelectItem value="all">Todos os tipos</SelectItem>
