@@ -72,13 +72,15 @@ export function ImportOfxPage() {
       file,
       accountId,
       importToCashFlow,
+      clearCashFlow,
     }: {
       file: File;
       accountId: string;
       importToCashFlow?: boolean;
+      clearCashFlow?: boolean;
     }) => {
       if (!companyId) throw new Error('Selecione uma empresa');
-      return importOfx(companyId, file, accountId, importToCashFlow);
+      return importOfx(companyId, file, accountId, importToCashFlow, clearCashFlow);
     },
     onSuccess: (data) => {
       toast({
@@ -150,11 +152,16 @@ export function ImportOfxPage() {
     },
   });
 
-  const handleImport = async (file: File, accountId: string, importToCashFlow?: boolean) => {
+  const handleImport = async (
+    file: File,
+    accountId: string,
+    importToCashFlow?: boolean,
+    clearCashFlow?: boolean,
+  ) => {
     if (!file.name.toLowerCase().endsWith('.ofx')) {
       throw new Error('Selecione um arquivo com extensão .ofx');
     }
-    return await importMutation.mutateAsync({ file, accountId, importToCashFlow });
+    return await importMutation.mutateAsync({ file, accountId, importToCashFlow, clearCashFlow });
   };
 
   const handleCreateInstallments = async (

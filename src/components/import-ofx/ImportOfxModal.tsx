@@ -19,6 +19,7 @@ interface ImportOfxModalProps {
     file: File,
     accountId: string,
     importToCashFlow?: boolean,
+    clearCashFlow?: boolean,
   ) => Promise<ImportOfxResponse>;
   onCreateInstallments?: (
     installments: InstallmentTransaction[],
@@ -42,6 +43,7 @@ export function ImportOfxModal({
   const [lastImportedPeriodEnd, setLastImportedPeriodEnd] = useState<string | null>(null);
   const [isCreatingInstallments, setIsCreatingInstallments] = useState(false);
   const [importToCashFlow, setImportToCashFlow] = useState(true);
+  const [clearCashFlow, setClearCashFlow] = useState(true);
 
   const {
     selectedFile,
@@ -62,7 +64,12 @@ export function ImportOfxModal({
     if (!selectedFile || !selectedAccountId) return;
 
     try {
-      const result = await onImport(selectedFile, selectedAccountId, importToCashFlow);
+      const result = await onImport(
+        selectedFile,
+        selectedAccountId,
+        importToCashFlow,
+        clearCashFlow,
+      );
 
       // Check for installment transactions
       if (result.installmentTransactions && result.installmentTransactions.length > 0) {
@@ -79,6 +86,7 @@ export function ImportOfxModal({
         resetFileUpload();
         setSelectedAccountId(null);
         setImportToCashFlow(true);
+        setClearCashFlow(false);
         onClose();
       }
     } catch (error: unknown) {
@@ -102,6 +110,7 @@ export function ImportOfxModal({
       resetFileUpload();
       setSelectedAccountId(null);
       setImportToCashFlow(true);
+      setClearCashFlow(false);
       onClose();
     } catch (error: unknown) {
       console.error('Error creating installments:', error);
@@ -168,6 +177,30 @@ export function ImportOfxModal({
             disabled={isImporting}
           />
         </div>
+
+        {/* Clear Cash Flow Option */}
+        {importToCashFlow && (
+          <div className="flex items-center justify-between p-4 bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg">
+            <div className="flex flex-col gap-1">
+              <label
+                htmlFor="clear-cashflow"
+                className="text-sm font-medium text-text dark:text-text-dark cursor-pointer"
+              >
+                Limpar o caixa e importar tudo novamente
+              </label>
+              <p className="text-xs text-muted-foreground dark:text-gray-400">
+                Ao marcar esta opção, todas as transações do fluxo de caixa da conta selecionada
+                serão removidas antes de importar o novo extrato
+              </p>
+            </div>
+            <Switch
+              id="clear-cashflow"
+              checked={clearCashFlow}
+              onCheckedChange={setClearCashFlow}
+              disabled={isImporting || !importToCashFlow}
+            />
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-4 border-t border-border dark:border-border-dark">

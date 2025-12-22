@@ -182,11 +182,13 @@ export const importOfx = async (
   file: File,
   accountId: string,
   importToCashFlow: boolean = false,
+  clearCashFlow: boolean = false,
 ): Promise<ImportOfxResponse> => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('accountId', accountId);
   formData.append('importToCashFlow', String(importToCashFlow));
+  formData.append('clearCashFlow', String(clearCashFlow));
 
   const response = await apiClient.post(
     `/companies/${companyId}/transactions/import-ofx`,
