@@ -76,6 +76,37 @@ export interface DatePickerProps {
 }
 
 /**
+ * Converts a value (string or Date) to a Date object in UTC timezone
+ * @param value - Date value as string (ISO format) or Date object
+ * @returns Date object in UTC or undefined
+ */
+function convertValueToDate(value: string | Date | null | undefined): Date | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  if (typeof value === 'string') {
+    // Parse ISO string and create date in UTC to match DayPicker
+    const isoDateRegex = /^(\d{4})-(\d{2})-(\d{2})/;
+    const isoDateMatch = isoDateRegex.exec(value);
+    if (isoDateMatch) {
+      const [, year, month, day] = isoDateMatch;
+      // Create date using UTC to avoid timezone conversion
+      return new Date(
+        Date.UTC(
+          Number.parseInt(year, 10),
+          Number.parseInt(month, 10) - 1,
+          Number.parseInt(day, 10),
+        ),
+      );
+    }
+    return new Date(value);
+  }
+
+  return value;
+}
+
+/**
  * Customizable and reusable DatePicker component using react-day-picker and Radix UI Popover
  */
 export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
@@ -101,29 +132,7 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
     const [open, setOpen] = useState(false);
 
     // Convert value to Date object, handling timezone correctly
-    let selectedDate: Date | undefined;
-    if (value) {
-      if (typeof value === 'string') {
-        // Parse ISO string and create date in UTC to match DayPicker
-        const isoDateRegex = /^(\d{4})-(\d{2})-(\d{2})/;
-        const isoDateMatch = isoDateRegex.exec(value);
-        if (isoDateMatch) {
-          const [, year, month, day] = isoDateMatch;
-          // Create date using UTC to avoid timezone conversion
-          selectedDate = new Date(
-            Date.UTC(
-              Number.parseInt(year, 10),
-              Number.parseInt(month, 10) - 1,
-              Number.parseInt(day, 10),
-            ),
-          );
-        } else {
-          selectedDate = new Date(value);
-        }
-      } else {
-        selectedDate = value;
-      }
-    }
+    const selectedDate = convertValueToDate(value);
 
     // Validate date
     const isValidDate = selectedDate && !Number.isNaN(selectedDate.getTime());
