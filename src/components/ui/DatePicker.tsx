@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/utils/date';
+import { subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Calendar, X } from 'lucide-react';
 import React, { useState } from 'react';
@@ -93,7 +94,7 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
       label,
       showIcon = true,
       clearable = true,
-      displayFormat = 'dd/MM/yyyy',
+      // displayFormat, // Reserved for future use
       ...props
     },
     ref,
@@ -101,7 +102,10 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
     const [open, setOpen] = useState(false);
 
     // Convert value to Date object
-    const selectedDate = value ? (typeof value === 'string' ? new Date(value) : value) : undefined;
+    let selectedDate: Date | undefined;
+    if (value) {
+      selectedDate = typeof value === 'string' ? new Date(value) : value;
+    }
 
     // Validate date
     const isValidDate = selectedDate && !Number.isNaN(selectedDate.getTime());
@@ -118,7 +122,13 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
       onChange?.(undefined);
     };
 
-    const displayValue = isValidDate ? formatDate(selectedDate.toISOString()) : placeholder;
+    const handleQuickSelect = (days: number) => {
+      const date = days === 0 ? new Date() : subDays(new Date(), days);
+      handleSelect(date);
+    };
+
+    const displayValue =
+      isValidDate && selectedDate ? formatDate(selectedDate.toISOString()) : placeholder;
 
     return (
       <div className="w-full">
@@ -150,40 +160,48 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className={cn('w-auto p-0', contentClassName)} align="start">
+          <PopoverContent
+            className={cn('w-auto p-0 bg-card dark:bg-card-dark', contentClassName)}
+            align="start"
+          >
             <DayPicker
               mode="single"
               selected={isValidDate ? selectedDate : undefined}
               onSelect={handleSelect}
               locale={ptBR}
               disabled={disabled}
-              fromDate={minDate}
-              toDate={maxDate}
+              // Note: fromDate/toDate are deprecated in react-day-picker v9, but still work
+              // Consider migrating to 'disabled' prop with date ranges in future versions
+              {...(minDate && { fromDate: minDate })}
+              {...(maxDate && { toDate: maxDate })}
               classNames={{
                 months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
-                month: 'space-y-4',
-                caption: 'flex justify-center pt-1 relative items-center',
-                caption_label: 'text-sm font-medium text-text dark:text-text-dark',
-                nav: 'space-x-1 flex items-center',
+                month: 'space-y-4 p-3',
+                caption: 'relative flex items-center pt-1 px-1 mb-4',
+                caption_label:
+                  'text-base font-medium text-text dark:text-text-dark absolute left-1/2 -translate-x-1/2 z-10',
+                nav: 'flex items-center justify-between w-full',
                 nav_button: cn(
-                  'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
-                  'border border-border dark:border-border-dark rounded-md',
+                  'h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100',
+                  'border border-border dark:border-border-dark rounded',
                   'flex items-center justify-center',
                   'hover:bg-card dark:hover:bg-card-dark',
-                  'text-text dark:text-text-dark',
+                  'text-text dark:text-text-dark transition-opacity',
                 ),
-                nav_button_previous: 'absolute left-1',
-                nav_button_next: 'absolute right-1',
+                nav_button_previous: '',
+                nav_button_next: '',
                 table: 'w-full border-collapse space-y-1',
-                head_row: 'flex',
-                head_cell: 'text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]',
-                row: 'flex w-full mt-2',
+                head_row: 'flex mb-2',
+                head_cell:
+                  'text-muted-foreground dark:text-gray-400 rounded-md w-9 font-normal text-xs uppercase',
+                row: 'flex w-full mt-1',
                 cell: 'h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
                 day: cn(
                   'h-9 w-9 p-0 font-normal aria-selected:opacity-100',
                   'rounded-md hover:bg-card dark:hover:bg-card-dark',
                   'text-text dark:text-text-dark',
                   'hover:text-text dark:hover:text-text-dark',
+                  'transition-colors',
                 ),
                 day_range_end: 'day-range-end',
                 day_selected:
@@ -191,12 +209,48 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
                 day_today:
                   'bg-accent text-accent-foreground font-semibold dark:bg-accent dark:text-accent-foreground',
                 day_outside:
-                  'day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30',
+                  'day-outside text-muted-foreground dark:text-gray-500 opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30',
                 day_disabled: 'text-muted-foreground opacity-50',
                 day_range_middle: 'aria-selected:bg-accent aria-selected:text-accent-foreground',
                 day_hidden: 'invisible',
               }}
+              modifiersClassNames={{
+                sunday: '!text-red-500 dark:!text-red-400 !font-medium',
+              }}
+              modifiers={{
+                sunday: (date) => date.getDay() === 0,
+              }}
             />
+            {/* Quick select buttons */}
+            <div className="flex gap-2 p-3 border-t border-border dark:border-border-dark">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => handleQuickSelect(0)}
+                className="flex-1 text-xs h-8 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+              >
+                Hoje
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => handleQuickSelect(7)}
+                className="flex-1 text-xs h-8 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+              >
+                Últimos 7 dias
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => handleQuickSelect(14)}
+                className="flex-1 text-xs h-8 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+              >
+                Últimos 14 dias
+              </Button>
+            </div>
           </PopoverContent>
         </Popover>
         {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
