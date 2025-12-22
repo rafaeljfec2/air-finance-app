@@ -22,6 +22,10 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, './src'),
       },
     },
+    optimizeDeps: {
+      include: ['flatpickr'],
+      exclude: [],
+    },
     build: {
       outDir: 'dist',
       sourcemap: true,
