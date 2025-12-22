@@ -46,7 +46,8 @@
   border-radius: 12px !important;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
   padding: 8px !important;
-  width: 320px !important;
+  width: 340px !important;
+  min-width: 340px !important;
   overflow: hidden;
 }
 
@@ -54,7 +55,7 @@
   @apply bg-card dark:bg-card-dark;
   border-bottom: 1px solid;
   @apply border-border dark:border-border-dark;
-  padding: 12px 8px 8px 8px !important;
+  padding: 12px 12px 8px 12px !important;
   margin-bottom: 8px;
 }
 
@@ -66,8 +67,9 @@
   align-items: center !important;
   justify-content: center !important;
   flex-direction: row !important;
-  gap: 8px !important;
+  gap: 12px !important;
   width: 100% !important;
+  flex-wrap: nowrap !important;
 }
 
 .flatpickr-current-month {
@@ -77,9 +79,10 @@
   padding: 0 !important;
   display: inline-flex !important;
   align-items: center !important;
-  gap: 4px !important;
+  gap: 6px !important;
   flex-wrap: nowrap !important;
   white-space: nowrap !important;
+  flex: 0 1 auto !important;
 }
 
 .flatpickr-current-month .flatpickr-monthDropdown-months,
@@ -96,8 +99,18 @@
   background-repeat: no-repeat !important;
   background-position: right 10px center !important;
   background-size: 12px !important;
-  min-width: 130px !important;
   height: 32px !important;
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+  min-width: 123px !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-years {
+  min-width: 130px !important;
 }
 
 .flatpickr-current-month .flatpickr-monthDropdown-months:hover,
@@ -125,6 +138,7 @@
   position: static !important;
   float: none !important;
   margin: 0 !important;
+  min-width: 32px !important;
 }
 
 /* Ensure all elements are in a single row */
@@ -282,11 +296,18 @@
   background-repeat: no-repeat !important;
   background-position: right 10px center !important;
   background-size: 12px !important;
-  min-width: 130px !important;
   height: 32px !important;
-  margin: 0 4px !important;
+  margin: 0 2px 0 2px !important;
   display: inline-block !important;
   vertical-align: middle !important;
+}
+
+.flatpickr-monthDropdown-months {
+  min-width: 123px !important;
+}
+
+.flatpickr-monthDropdown-years {
+  min-width: 130px !important;
 }
 
 /* Force single line layout for month container */
@@ -319,9 +340,38 @@
 
 /* Ensure month container is flex */
 .flatpickr-current-month .flatpickr-monthDropdown-months {
-  margin-right: 4px !important;
+  margin-right: 6px !important;
 }
 
 .flatpickr-current-month .flatpickr-monthDropdown-years {
+  margin-left: 6px !important;
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Ensure year dropdown is always visible */
+.flatpickr-current-month .flatpickr-monthDropdown-years,
+.flatpickr-monthDropdown-years {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: auto !important;
+  min-width: 100px !important;
+}
+
+/* Show year text by default */
+.flatpickr-current-month .cur-year {
+  display: inline-block !important;
   margin-left: 4px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Hide year text only if dropdown exists */
+.flatpickr-current-month .flatpickr-monthDropdown-years ~ .cur-year,
+.flatpickr-current-month:has(.flatpickr-monthDropdown-years) .cur-year {
+  display: none !important;
 }

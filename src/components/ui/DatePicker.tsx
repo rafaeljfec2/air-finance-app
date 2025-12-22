@@ -9,7 +9,15 @@ import { Input } from './input';
 // Portuguese locale configuration
 const ptLocale = {
   weekdays: {
-    shorthand: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+    shorthand: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'] as [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+    ],
     longhand: [
       'Domingo',
       'Segunda-feira',
@@ -18,7 +26,7 @@ const ptLocale = {
       'Quinta-feira',
       'Sexta-feira',
       'Sábado',
-    ],
+    ] as [string, string, string, string, string, string, string],
   },
   months: {
     shorthand: [
@@ -34,7 +42,7 @@ const ptLocale = {
       'Out',
       'Nov',
       'Dez',
-    ],
+    ] as [string, string, string, string, string, string, string, string, string, string, string, string],
     longhand: [
       'Janeiro',
       'Fevereiro',
@@ -48,14 +56,14 @@ const ptLocale = {
       'Outubro',
       'Novembro',
       'Dezembro',
-    ],
+    ] as [string, string, string, string, string, string, string, string, string, string, string, string],
   },
   firstDayOfWeek: 1,
   rangeSeparator: ' até ',
   weekAbbreviation: 'Sem',
   scrollTitle: 'Scroll para incrementar',
   toggleTitle: 'Clique para alternar',
-  amPM: ['AM', 'PM'],
+  amPM: ['AM', 'PM'] as [string, string],
   yearAriaLabel: 'Ano',
   monthAriaLabel: 'Mês',
   hourAriaLabel: 'Hora',
@@ -211,7 +219,7 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
         appendTo: document.body, // Append to body to avoid z-index issues
         positionElement: inputRef.current,
         wrap: false, // Don't wrap input, we handle it ourselves
-        disabled: disabled, // Set disabled state
+        disable: disabled ? [() => true] : [], // Set disabled state
         onChange: (selectedDates) => {
           if (selectedDates.length > 0) {
             const date = selectedDates[0];
@@ -222,7 +230,7 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
             onChange?.(undefined);
           }
         },
-        onReady: (selectedDates, dateStr, instance) => {
+        onReady: (_selectedDates, _dateStr, instance) => {
           // Apply custom styling and ensure high z-index
           const calendar = instance.calendarContainer;
           if (calendar) {
@@ -232,8 +240,29 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
               calendar.classList.add(...contentClassName.split(' '));
             }
           }
+          
+          // Ensure year dropdown is visible if it exists
+          const yearDropdown = calendar?.querySelector('.flatpickr-monthDropdown-years') as HTMLSelectElement;
+          if (yearDropdown) {
+            yearDropdown.style.display = 'inline-block';
+            yearDropdown.style.visibility = 'visible';
+            yearDropdown.style.opacity = '1';
+            // Hide the year text if dropdown exists
+            const yearText = calendar?.querySelector('.cur-year') as HTMLElement;
+            if (yearText) {
+              yearText.style.display = 'none';
+            }
+          } else {
+            // Show year text if dropdown doesn't exist
+            const yearText = calendar?.querySelector('.cur-year') as HTMLElement;
+            if (yearText) {
+              yearText.style.display = 'inline-block';
+              yearText.style.visibility = 'visible';
+              yearText.style.opacity = '1';
+            }
+          }
         },
-        onOpen: (selectedDates, dateStr, instance) => {
+        onOpen: (_selectedDates, _dateStr, instance) => {
           // Ensure calendar is on top when opened
           const calendar = instance.calendarContainer;
           if (calendar) {
@@ -242,7 +271,34 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
         },
       });
 
+      // Handle click outside to close calendar
+      const handleClickOutside = (event: MouseEvent) => {
+        if (!flatpickrInstance.current || !flatpickrInstance.current.isOpen) {
+          return;
+        }
+
+        const calendar = flatpickrInstance.current.calendarContainer;
+        const input = inputRef.current;
+        const target = event.target as Node;
+
+        // Check if click is outside calendar and input
+        if (
+          calendar &&
+          input &&
+          target &&
+          !calendar.contains(target) &&
+          !input.contains(target) &&
+          !(target as Element).closest('.flatpickr-calendar')
+        ) {
+          flatpickrInstance.current.close();
+        }
+      };
+
+      // Add click outside listener with capture phase to catch events early
+      document.addEventListener('mousedown', handleClickOutside, true);
+
       return () => {
+        document.removeEventListener('mousedown', handleClickOutside, true);
         if (flatpickrInstance.current) {
           flatpickrInstance.current.destroy();
           flatpickrInstance.current = null;
