@@ -22,28 +22,46 @@ import { useNavigate } from 'react-router-dom';
 
 export function Transactions() {
   const navigate = useNavigate();
+  // Helper function to format date as YYYY-MM-DD in local timezone
+  const formatDateLocal = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState(() => {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    return firstDay.toISOString().slice(0, 10);
+    return formatDateLocal(firstDay);
   });
   const [endDate, setEndDate] = useState(() => {
     const now = new Date();
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    return lastDay.toISOString().slice(0, 10);
+    return formatDateLocal(lastDay);
   });
 
-  // Convert date strings to Date objects for DatePicker
-  const startDateObj = startDate ? new Date(startDate) : undefined;
-  const endDateObj = endDate ? new Date(endDate) : undefined;
+  // Convert date strings to Date objects for DatePicker (parse as local timezone)
+  const startDateObj = startDate
+    ? (() => {
+        const [year, month, day] = startDate.split('-').map(Number);
+        return new Date(year, month - 1, day, 0, 0, 0, 0);
+      })()
+    : undefined;
+  const endDateObj = endDate
+    ? (() => {
+        const [year, month, day] = endDate.split('-').map(Number);
+        return new Date(year, month - 1, day, 0, 0, 0, 0);
+      })()
+    : undefined;
 
   const handleStartDateChange = (date: Date | undefined) => {
-    setStartDate(date ? date.toISOString().slice(0, 10) : '');
+    setStartDate(date ? formatDateLocal(date) : '');
   };
 
   const handleEndDateChange = (date: Date | undefined) => {
-    setEndDate(date ? date.toISOString().slice(0, 10) : '');
+    setEndDate(date ? formatDateLocal(date) : '');
   };
   const [selectedType, setSelectedType] = useState('all');
   const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>(undefined);

@@ -1,9 +1,9 @@
 import { cn } from '@/lib/utils';
 import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 import type { Instance } from 'flatpickr/dist/types/instance';
 import { Calendar, X } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
-import 'flatpickr/dist/flatpickr.min.css';
 import { Input } from './input';
 
 // Portuguese locale configuration
@@ -42,7 +42,20 @@ const ptLocale = {
       'Out',
       'Nov',
       'Dez',
-    ] as [string, string, string, string, string, string, string, string, string, string, string, string],
+    ] as [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+    ],
     longhand: [
       'Janeiro',
       'Fevereiro',
@@ -56,7 +69,20 @@ const ptLocale = {
       'Outubro',
       'Novembro',
       'Dezembro',
-    ] as [string, string, string, string, string, string, string, string, string, string, string, string],
+    ] as [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+    ],
   },
   firstDayOfWeek: 1,
   rangeSeparator: ' até ',
@@ -143,6 +169,7 @@ export interface DatePickerProps {
 
 /**
  * Converts a value (string or Date) to a Date object
+ * Always creates dates in local timezone to avoid timezone issues
  */
 function convertValueToDate(value: string | Date | null | undefined): Date | null {
   if (!value) {
@@ -150,18 +177,53 @@ function convertValueToDate(value: string | Date | null | undefined): Date | nul
   }
 
   if (typeof value === 'string') {
-    // Try to parse ISO string first
+    // Try to parse ISO string first (YYYY-MM-DD format)
     const isoDateRegex = /^(\d{4})-(\d{2})-(\d{2})/;
     const isoDateMatch = isoDateRegex.exec(value);
     if (isoDateMatch) {
       const [, year, month, day] = isoDateMatch;
+      // Create date in local timezone (no time component)
       return new Date(
         Number.parseInt(year, 10),
         Number.parseInt(month, 10) - 1,
         Number.parseInt(day, 10),
+        0,
+        0,
+        0,
+        0,
       );
     }
-    return new Date(value);
+
+    // Try to parse DD/MM/YYYY format
+    const ddmmyyyyRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/;
+    const ddmmyyyyMatch = ddmmyyyyRegex.exec(value);
+    if (ddmmyyyyMatch) {
+      const [, day, month, year] = ddmmyyyyMatch;
+      // Create date in local timezone (no time component)
+      return new Date(
+        Number.parseInt(year, 10),
+        Number.parseInt(month, 10) - 1,
+        Number.parseInt(day, 10),
+        0,
+        0,
+        0,
+        0,
+      );
+    }
+
+    // Fallback to default parsing, then normalize
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) {
+      // Normalize to local timezone start of day
+      return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate(), 0, 0, 0, 0);
+    }
+
+    return null;
+  }
+
+  // If it's already a Date, normalize to local timezone start of day
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return new Date(value.getFullYear(), value.getMonth(), value.getDate(), 0, 0, 0, 0);
   }
 
   return value;
@@ -192,6 +254,7 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
   ) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const flatpickrInstance = useRef<Instance | null>(null);
+    const isInternalChange = useRef(false); // Flag to track internal changes from flatpickr
 
     // Merge refs
     React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement);
@@ -220,15 +283,84 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
         positionElement: inputRef.current,
         wrap: false, // Don't wrap input, we handle it ourselves
         disable: disabled ? [() => true] : [], // Set disabled state
+        parseDate: (datestr, format) => {
+          if (!datestr?.trim()) {
+            // Return invalid date that flatpickr will handle
+            return new Date(Number.NaN);
+          }
+
+          // Parse date in local timezone to avoid timezone issues
+          // Handle dd/MM/yyyy format
+          if (format === 'd/m/Y' || format === 'dd/MM/yyyy') {
+            const parts = datestr.trim().split(/[/\-.]/);
+            if (parts.length === 3) {
+              const day = Number.parseInt(parts[0], 10);
+              const month = Number.parseInt(parts[1], 10) - 1;
+              const year = Number.parseInt(parts[2], 10);
+
+              // Validate date components
+              if (
+                Number.isNaN(day) ||
+                Number.isNaN(month) ||
+                Number.isNaN(year) ||
+                day < 1 ||
+                day > 31 ||
+                month < 0 ||
+                month > 11 ||
+                year < 1000 ||
+                year > 9999
+              ) {
+                return new Date(Number.NaN);
+              }
+
+              // Create date in local timezone (no time component)
+              const date = new Date(year, month, day, 0, 0, 0, 0);
+
+              // Validate that the date is valid (handles invalid dates like 31/02/2025)
+              if (
+                date.getFullYear() !== year ||
+                date.getMonth() !== month ||
+                date.getDate() !== day
+              ) {
+                return new Date(Number.NaN);
+              }
+
+              return date;
+            }
+          }
+          // Fallback to default parsing
+          const parsed = flatpickr.parseDate(datestr, format);
+          if (parsed) {
+            // Normalize to local timezone
+            return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate(), 0, 0, 0, 0);
+          }
+          return new Date(Number.NaN);
+        },
         onChange: (selectedDates) => {
+          // Set flag to prevent useEffect from updating flatpickr
+          isInternalChange.current = true;
+
           if (selectedDates.length > 0) {
             const date = selectedDates[0];
-            // Normalize to start of day
-            const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            // Normalize to start of day in local timezone
+            const normalizedDate = new Date(
+              date.getFullYear(),
+              date.getMonth(),
+              date.getDate(),
+              0,
+              0,
+              0,
+              0,
+            );
             onChange?.(normalizedDate);
           } else {
             onChange?.(undefined);
           }
+
+          // Reset flag after a short delay to allow state updates to complete
+          setTimeout(() => {
+            isInternalChange.current = false;
+          }, 0);
         },
         onReady: (_selectedDates, _dateStr, instance) => {
           // Apply custom styling and ensure high z-index
@@ -240,9 +372,11 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
               calendar.classList.add(...contentClassName.split(' '));
             }
           }
-          
+
           // Ensure year dropdown is visible if it exists
-          const yearDropdown = calendar?.querySelector('.flatpickr-monthDropdown-years') as HTMLSelectElement;
+          const yearDropdown = calendar?.querySelector(
+            '.flatpickr-monthDropdown-years',
+          ) as HTMLSelectElement;
           if (yearDropdown) {
             yearDropdown.style.display = 'inline-block';
             yearDropdown.style.visibility = 'visible';
@@ -304,13 +438,47 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
           flatpickrInstance.current = null;
         }
       };
-    }, []);
+    }, [displayFormat, minDate, maxDate, disabled, onChange, contentClassName, selectedDate]);
 
-    // Update flatpickr when value changes
+    // Update flatpickr when value changes from external source (not from flatpickr onChange)
     useEffect(() => {
-      if (flatpickrInstance.current) {
+      if (!flatpickrInstance.current || isInternalChange.current) {
+        return;
+      }
+
+      // Get current selected date from flatpickr
+      const currentSelectedDates = flatpickrInstance.current.selectedDates;
+      const currentFlatpickrDate = currentSelectedDates.length > 0 ? currentSelectedDates[0] : null;
+
+      // Compare dates (ignoring time)
+      const datesMatch =
+        selectedDate && currentFlatpickrDate
+          ? selectedDate.getTime() ===
+            new Date(
+              currentFlatpickrDate.getFullYear(),
+              currentFlatpickrDate.getMonth(),
+              currentFlatpickrDate.getDate(),
+              0,
+              0,
+              0,
+              0,
+            ).getTime()
+          : !selectedDate && !currentFlatpickrDate;
+
+      // Only update if dates don't match (external change)
+      if (!datesMatch) {
         if (selectedDate) {
-          flatpickrInstance.current.setDate(selectedDate, false);
+          // Normalize date to avoid timezone issues
+          const normalizedDate = new Date(
+            selectedDate.getFullYear(),
+            selectedDate.getMonth(),
+            selectedDate.getDate(),
+            0,
+            0,
+            0,
+            0,
+          );
+          flatpickrInstance.current.setDate(normalizedDate, false);
         } else {
           flatpickrInstance.current.clear(false);
         }
