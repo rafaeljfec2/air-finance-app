@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { formatDate } from '@/utils/date';
 import { subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Calendar, X } from 'lucide-react';
@@ -101,19 +100,45 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
   ) => {
     const [open, setOpen] = useState(false);
 
-    // Convert value to Date object
+    // Convert value to Date object, handling timezone correctly
     let selectedDate: Date | undefined;
     if (value) {
-      selectedDate = typeof value === 'string' ? new Date(value) : value;
+      if (typeof value === 'string') {
+        // Parse ISO string and create date in UTC to match DayPicker
+        const isoDateRegex = /^(\d{4})-(\d{2})-(\d{2})/;
+        const isoDateMatch = isoDateRegex.exec(value);
+        if (isoDateMatch) {
+          const [, year, month, day] = isoDateMatch;
+          // Create date using UTC to avoid timezone conversion
+          selectedDate = new Date(
+            Date.UTC(
+              Number.parseInt(year, 10),
+              Number.parseInt(month, 10) - 1,
+              Number.parseInt(day, 10),
+            ),
+          );
+        } else {
+          selectedDate = new Date(value);
+        }
+      } else {
+        selectedDate = value;
+      }
     }
 
     // Validate date
     const isValidDate = selectedDate && !Number.isNaN(selectedDate.getTime());
 
     const handleSelect = (date: Date | undefined) => {
-      onChange?.(date);
       if (date) {
+        // Normalize date to start of day in UTC to avoid timezone issues
+        // DayPicker uses UTC internally, so we need to match that
+        const normalizedDate = new Date(
+          Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+        );
+        onChange?.(normalizedDate);
         setOpen(false);
+      } else {
+        onChange?.(undefined);
       }
     };
 
@@ -127,8 +152,17 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
       handleSelect(date);
     };
 
+    // Format date using UTC components to match what DayPicker uses
     const displayValue =
-      isValidDate && selectedDate ? formatDate(selectedDate.toISOString()) : placeholder;
+      isValidDate && selectedDate
+        ? (() => {
+            // Use UTC methods to avoid timezone conversion issues
+            const year = selectedDate.getUTCFullYear();
+            const month = String(selectedDate.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(selectedDate.getUTCDate()).padStart(2, '0');
+            return `${day}/${month}/${year}`;
+          })()
+        : placeholder;
 
     return (
       <div className="w-full">
