@@ -21,6 +21,9 @@ export function PayablesSection({ payables, isLoading }: Readonly<PayablesSectio
     handleValueChange,
   } = useEditableValue();
 
+  // Calculate total
+  const total = payables.reduce((sum, p) => sum + p.value, 0);
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
@@ -81,6 +84,17 @@ export function PayablesSection({ payables, isLoading }: Readonly<PayablesSectio
             >
               Nenhuma conta a pagar neste período.
             </td>
+          </tr>
+        )}
+        {payables.length > 0 && (
+          <tr className="border-t-2 border-border dark:border-border-dark bg-gray-50 dark:bg-gray-800/50">
+            <td className="px-3 py-3 text-left font-semibold text-text dark:text-text-dark">
+              Total
+            </td>
+            <td className="px-3 py-3 text-right font-bold text-rose-600 dark:text-rose-400 whitespace-nowrap">
+              R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </td>
+            <td className="px-3 py-3 text-center"></td>
           </tr>
         )}
       </tbody>

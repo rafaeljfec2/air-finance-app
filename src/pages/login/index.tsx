@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { ChevronLeft, Eye, EyeOff, Lock, Mail } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export function Login() {
@@ -20,6 +20,14 @@ export function Login() {
     rememberMe: false,
   });
   const [error, setError] = useState<string | null>(null);
+
+  // Redireciona se já estiver autenticado (usando useEffect para evitar setState durante render)
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from);
+    }
+  }, [isAuthenticated, location.state?.from?.pathname, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,10 +55,8 @@ export function Login() {
     }));
   };
 
-  // Redireciona se já estiver autenticado
+  // Retorna null se já estiver autenticado (evita render desnecessário)
   if (isAuthenticated) {
-    const from = location.state?.from?.pathname || '/dashboard';
-    navigate(from);
     return null;
   }
 

@@ -214,8 +214,9 @@ export function ComboBox<T extends string | number = string>({
 
   // Handle clear
   const handleClear = React.useCallback(
-    (e: React.MouseEvent) => {
+    (e: React.MouseEvent | React.KeyboardEvent) => {
       e.stopPropagation();
+      e.preventDefault();
       onValueChange?.(null);
       setSearchTerm('');
     },
@@ -285,14 +286,15 @@ export function ComboBox<T extends string | number = string>({
             </div>
           )}
           {hasValue && !disabled && !renderTrigger && (
-            <button
-              type="button"
+            // Note: Using span instead of button to avoid nested button issue (SelectTrigger is already a button)
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+            <span
               onClick={handleClear}
-              className="ml-2 p-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
+              className="ml-2 p-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex-shrink-0 cursor-pointer"
               aria-label="Limpar seleção"
             >
               <X className="h-3 w-3 text-muted-foreground dark:text-gray-400" />
-            </button>
+            </span>
           )}
         </SelectTrigger>
 

@@ -11,6 +11,9 @@ export function ReceivablesSection({
   receivables,
   isLoading,
 }: Readonly<ReceivablesSectionProps>) {
+  // Calculate total
+  const total = receivables.reduce((sum, r) => sum + r.value, 0);
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
@@ -52,6 +55,17 @@ export function ReceivablesSection({
             >
               Nenhuma conta a receber neste período.
             </td>
+          </tr>
+        )}
+        {receivables.length > 0 && (
+          <tr className="border-t-2 border-border dark:border-border-dark bg-gray-50 dark:bg-gray-800/50">
+            <td className="px-3 py-3 text-left font-semibold text-text dark:text-text-dark">
+              Total
+            </td>
+            <td className="px-3 py-3 text-right font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+              R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </td>
+            <td className="px-3 py-3 text-center"></td>
           </tr>
         )}
       </tbody>
