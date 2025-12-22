@@ -24,8 +24,9 @@ import {
   type ExtractTransaction,
   type InstallmentTransaction,
 } from '@/services/transactionService';
+import { formatDateToLocalISO } from '@/utils/date';
 import { useMutation } from '@tanstack/react-query';
-import { endOfMonth, format, startOfMonth } from 'date-fns';
+import { endOfMonth, startOfMonth } from 'date-fns';
 import { Download, Filter, Receipt, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -33,19 +34,24 @@ export function ImportOfxPage() {
   const { activeCompany } = useActiveCompany();
   const companyId = activeCompany?.id ?? '';
 
-  const [startDate, setStartDate] = useState(() => format(startOfMonth(new Date()), 'yyyy-MM-dd'));
-  const [endDate, setEndDate] = useState(() => format(endOfMonth(new Date()), 'yyyy-MM-dd'));
+  // Initialize dates as Date objects - DatePicker handles timezone internally
+  const [startDateObj, setStartDateObj] = useState<Date | undefined>(() => {
+    return startOfMonth(new Date());
+  });
+  const [endDateObj, setEndDateObj] = useState<Date | undefined>(() => {
+    return endOfMonth(new Date());
+  });
 
-  // Convert date strings to Date objects for DatePicker
-  const startDateObj = startDate ? new Date(startDate) : undefined;
-  const endDateObj = endDate ? new Date(endDate) : undefined;
+  // Convert to strings for API calls (DatePicker already normalizes dates)
+  const startDate = startDateObj ? formatDateToLocalISO(startDateObj) : '';
+  const endDate = endDateObj ? formatDateToLocalISO(endDateObj) : '';
 
   const handleStartDateChange = (date: Date | undefined) => {
-    setStartDate(date ? format(date, 'yyyy-MM-dd') : '');
+    setStartDateObj(date);
   };
 
   const handleEndDateChange = (date: Date | undefined) => {
-    setEndDate(date ? format(date, 'yyyy-MM-dd') : '');
+    setEndDateObj(date);
   };
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>(undefined);
@@ -195,7 +201,7 @@ export function ImportOfxPage() {
 
     const flattened = extracts.flatMap((extract, extractIndex) => {
       // Skip extracts with no transactions
-      if (!extract || !extract.transactions || extract.transactions.length === 0) {
+      if (!extract?.transactions || extract.transactions.length === 0) {
         return [];
       }
 

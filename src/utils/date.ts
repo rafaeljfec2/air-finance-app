@@ -37,6 +37,30 @@ export function formatDate(dateString: string): string {
 }
 
 /**
+ * Formats a Date object to YYYY-MM-DD string in local timezone
+ * This avoids timezone conversion issues when converting dates to strings
+ * @param date - Date object
+ * @returns Date string in YYYY-MM-DD format (local timezone)
+ */
+export function formatDateToLocalISO(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Parses a YYYY-MM-DD string to a Date object in local timezone
+ * This avoids timezone conversion issues when parsing date strings
+ * @param dateString - Date string in YYYY-MM-DD format
+ * @returns Date object in local timezone (start of day)
+ */
+export function parseLocalDate(dateString: string): Date {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day, 0, 0, 0, 0);
+}
+
+/**
  * Converts an ISO date string to YYYY-MM-DD format for HTML date input
  * Preserves the date components without timezone conversion
  * @param dateString - ISO date string
@@ -52,15 +76,12 @@ export function formatDateForInput(dateString: string): string {
       return `${year}-${month}-${day}`;
     }
 
-    // Fallback: try to parse and format
+    // Fallback: try to parse and format using local timezone
     const date = new Date(dateString);
     if (Number.isNaN(date.getTime())) {
       return '';
     }
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return formatDateToLocalISO(date);
   } catch (error) {
     console.error('Error formatting date for input:', error);
     return '';

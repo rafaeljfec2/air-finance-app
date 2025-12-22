@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { parseLocalDate } from '@/utils/date';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import type { Instance } from 'flatpickr/dist/types/instance';
@@ -170,6 +171,7 @@ export interface DatePickerProps {
 /**
  * Converts a value (string or Date) to a Date object
  * Always creates dates in local timezone to avoid timezone issues
+ * Uses utility functions to ensure consistency across the application
  */
 function convertValueToDate(value: string | Date | null | undefined): Date | null {
   if (!value) {
@@ -181,17 +183,8 @@ function convertValueToDate(value: string | Date | null | undefined): Date | nul
     const isoDateRegex = /^(\d{4})-(\d{2})-(\d{2})/;
     const isoDateMatch = isoDateRegex.exec(value);
     if (isoDateMatch) {
-      const [, year, month, day] = isoDateMatch;
-      // Create date in local timezone (no time component)
-      return new Date(
-        Number.parseInt(year, 10),
-        Number.parseInt(month, 10) - 1,
-        Number.parseInt(day, 10),
-        0,
-        0,
-        0,
-        0,
-      );
+      // Use utility function to parse in local timezone
+      return parseLocalDate(value);
     }
 
     // Try to parse DD/MM/YYYY format

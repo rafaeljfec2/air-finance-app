@@ -16,52 +16,35 @@ import { useCategories } from '@/hooks/useCategories';
 import { usePreviousBalance, useTransactions } from '@/hooks/useTransactions';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
+import { formatDateToLocalISO, parseLocalDate } from '@/utils/date';
 import { Calendar, Download, Filter, Plus, Receipt, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export function Transactions() {
   const navigate = useNavigate();
-  // Helper function to format date as YYYY-MM-DD in local timezone
-  const formatDateLocal = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState(() => {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    return formatDateLocal(firstDay);
+    return formatDateToLocalISO(firstDay);
   });
   const [endDate, setEndDate] = useState(() => {
     const now = new Date();
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    return formatDateLocal(lastDay);
+    return formatDateToLocalISO(lastDay);
   });
 
   // Convert date strings to Date objects for DatePicker (parse as local timezone)
-  const startDateObj = startDate
-    ? (() => {
-        const [year, month, day] = startDate.split('-').map(Number);
-        return new Date(year, month - 1, day, 0, 0, 0, 0);
-      })()
-    : undefined;
-  const endDateObj = endDate
-    ? (() => {
-        const [year, month, day] = endDate.split('-').map(Number);
-        return new Date(year, month - 1, day, 0, 0, 0, 0);
-      })()
-    : undefined;
+  const startDateObj = startDate ? parseLocalDate(startDate) : undefined;
+  const endDateObj = endDate ? parseLocalDate(endDate) : undefined;
 
   const handleStartDateChange = (date: Date | undefined) => {
-    setStartDate(date ? formatDateLocal(date) : '');
+    setStartDate(date ? formatDateToLocalISO(date) : '');
   };
 
   const handleEndDateChange = (date: Date | undefined) => {
-    setEndDate(date ? formatDateLocal(date) : '');
+    setEndDate(date ? formatDateToLocalISO(date) : '');
   };
   const [selectedType, setSelectedType] = useState('all');
   const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>(undefined);
@@ -313,8 +296,8 @@ export function Transactions() {
                       onClick={() => {
                         const now = new Date();
                         const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
-                        setStartDate(threeMonthsAgo.toISOString().slice(0, 10));
-                        setEndDate(now.toISOString().slice(0, 10));
+                        setStartDate(formatDateToLocalISO(threeMonthsAgo));
+                        setEndDate(formatDateToLocalISO(now));
                       }}
                       className="text-xs px-2 py-1 h-auto text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400"
                       title="Últimos 3 meses"
@@ -328,8 +311,8 @@ export function Transactions() {
                       onClick={() => {
                         const now = new Date();
                         const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, 1);
-                        setStartDate(sixMonthsAgo.toISOString().slice(0, 10));
-                        setEndDate(now.toISOString().slice(0, 10));
+                        setStartDate(formatDateToLocalISO(sixMonthsAgo));
+                        setEndDate(formatDateToLocalISO(now));
                       }}
                       className="text-xs px-2 py-1 h-auto text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400"
                       title="Últimos 6 meses"
