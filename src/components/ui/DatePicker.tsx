@@ -76,6 +76,18 @@ export interface DatePickerProps {
 }
 
 /**
+ * Formats a Date object to Brazilian format (dd/MM/yyyy) using UTC components
+ * @param date - Date object to format
+ * @returns Formatted date string
+ */
+function formatDateForDisplay(date: Date): string {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${day}/${month}/${year}`;
+}
+
+/**
  * Converts a value (string or Date) to a Date object in UTC timezone
  * @param value - Date value as string (ISO format) or Date object
  * @returns Date object in UTC or undefined
@@ -161,15 +173,7 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
 
     // Format date using UTC components to match what DayPicker uses
     const displayValue =
-      isValidDate && selectedDate
-        ? (() => {
-            // Use UTC methods to avoid timezone conversion issues
-            const year = selectedDate.getUTCFullYear();
-            const month = String(selectedDate.getUTCMonth() + 1).padStart(2, '0');
-            const day = String(selectedDate.getUTCDate()).padStart(2, '0');
-            return `${day}/${month}/${year}`;
-          })()
-        : placeholder;
+      isValidDate && selectedDate ? formatDateForDisplay(selectedDate) : placeholder;
 
     return (
       <div className="w-full">
