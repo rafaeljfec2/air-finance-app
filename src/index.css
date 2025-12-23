@@ -248,6 +248,48 @@
   opacity: 0.7 !important;
 }
 
+/* Weekend days styling (Saturday and Sunday) */
+.flatpickr-day.weekend {
+  @apply bg-rose-50 dark:bg-rose-950/30;
+  color: #dc2626 !important; /* red-600 */
+}
+
+.dark .flatpickr-day.weekend {
+  color: #f87171 !important; /* red-400 */
+}
+
+.flatpickr-day.weekend:hover {
+  @apply bg-rose-100 dark:bg-rose-900/40;
+  color: #b91c1c !important; /* red-700 */
+}
+
+.dark .flatpickr-day.weekend:hover {
+  color: #fca5a5 !important; /* red-300 */
+}
+
+.flatpickr-day.weekend.selected {
+  @apply bg-rose-500 text-white;
+  color: white !important;
+}
+
+.flatpickr-day.weekend.selected:hover {
+  @apply bg-rose-600 text-white;
+}
+
+.flatpickr-day.weekend.today {
+  @apply border-rose-500;
+  border-width: 2px !important;
+  background-color: rgba(244, 63, 94, 0.1) !important; /* rose-500 with opacity */
+}
+
+.dark .flatpickr-day.weekend.today {
+  background-color: rgba(244, 63, 94, 0.2) !important;
+}
+
+.flatpickr-day.weekend.today.selected {
+  @apply bg-rose-500 text-white border-rose-500;
+}
+
 /* Ensure calendar appears above all elements */
 .flatpickr-calendar.open {
   z-index: 999999 !important;

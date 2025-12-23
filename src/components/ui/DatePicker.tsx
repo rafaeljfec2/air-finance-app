@@ -85,7 +85,7 @@ const ptLocale = {
       string,
     ],
   },
-  firstDayOfWeek: 1,
+  firstDayOfWeek: 0, // 0 = Sunday (domingo na esquerda)
   rangeSeparator: ' até ',
   weekAbbreviation: 'Sem',
   scrollTitle: 'Scroll para incrementar',
@@ -412,6 +412,77 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
               yearText.style.opacity = '1';
             }
           }
+          
+          // Mark weekend days (Saturday and Sunday)
+          const markWeekends = () => {
+            const days = calendar?.querySelectorAll('.flatpickr-day');
+            const currentMonth = instance.currentMonth;
+            const currentYear = instance.currentYear;
+            
+            days?.forEach((day) => {
+              const dayElement = day as HTMLElement;
+              
+              // Skip disabled days
+              if (dayElement.classList.contains('flatpickr-disabled')) {
+                dayElement.classList.remove('weekend');
+                return;
+              }
+              
+              // Skip days from previous or next month - only mark days from current month
+              if (
+                dayElement.classList.contains('prevMonthDay') ||
+                dayElement.classList.contains('nextMonthDay')
+              ) {
+                dayElement.classList.remove('weekend');
+                return;
+              }
+              
+              // Get day number from text content
+              const dayNum = dayElement.textContent?.trim();
+              if (!dayNum) {
+                dayElement.classList.remove('weekend');
+                return;
+              }
+              
+              const dayValue = Number.parseInt(dayNum, 10);
+              if (Number.isNaN(dayValue) || dayValue < 1 || dayValue > 31) {
+                dayElement.classList.remove('weekend');
+                return;
+              }
+              
+              // Create date object for this day in the current month/year
+              const dateObj = new Date(currentYear, currentMonth, dayValue);
+              
+              // Verify this date is actually in the current month (handles edge cases like day 31 in months with 30 days)
+              if (
+                dateObj.getMonth() === currentMonth &&
+                dateObj.getFullYear() === currentYear &&
+                dateObj.getDate() === dayValue
+              ) {
+                const dayOfWeek = dateObj.getDay(); // 0 = Sunday, 6 = Saturday
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
+                  dayElement.classList.add('weekend');
+                } else {
+                  dayElement.classList.remove('weekend');
+                }
+              } else {
+                // Date doesn't match - remove weekend class
+                dayElement.classList.remove('weekend');
+              }
+            });
+          };
+          
+          // Mark weekends on ready
+          setTimeout(markWeekends, 100);
+          
+          // Also mark weekends when month changes (observe calendar changes)
+          const daysContainer = calendar?.querySelector('.flatpickr-days');
+          if (daysContainer) {
+            const observer = new MutationObserver(() => {
+              setTimeout(markWeekends, 50);
+            });
+            observer.observe(daysContainer, { childList: true, subtree: true });
+          }
         },
         onOpen: (_selectedDates, _dateStr, instance) => {
           // Ensure calendar is on top when opened
@@ -419,6 +490,65 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
           if (calendar) {
             calendar.style.setProperty('z-index', '999999', 'important');
           }
+          
+          // Mark weekend days when calendar opens (reuse same logic)
+          setTimeout(() => {
+            const days = calendar?.querySelectorAll('.flatpickr-day');
+            const currentMonth = instance.currentMonth;
+            const currentYear = instance.currentYear;
+            
+            days?.forEach((day) => {
+              const dayElement = day as HTMLElement;
+              
+              // Skip disabled days
+              if (dayElement.classList.contains('flatpickr-disabled')) {
+                dayElement.classList.remove('weekend');
+                return;
+              }
+              
+              // Skip days from previous or next month - only mark days from current month
+              if (
+                dayElement.classList.contains('prevMonthDay') ||
+                dayElement.classList.contains('nextMonthDay')
+              ) {
+                dayElement.classList.remove('weekend');
+                return;
+              }
+              
+              // Get day number from text content
+              const dayNum = dayElement.textContent?.trim();
+              if (!dayNum) {
+                dayElement.classList.remove('weekend');
+                return;
+              }
+              
+              const dayValue = Number.parseInt(dayNum, 10);
+              if (Number.isNaN(dayValue) || dayValue < 1 || dayValue > 31) {
+                dayElement.classList.remove('weekend');
+                return;
+              }
+              
+              // Create date object for this day in the current month/year
+              const dateObj = new Date(currentYear, currentMonth, dayValue);
+              
+              // Verify this date is actually in the current month (handles edge cases like day 31 in months with 30 days)
+              if (
+                dateObj.getMonth() === currentMonth &&
+                dateObj.getFullYear() === currentYear &&
+                dateObj.getDate() === dayValue
+              ) {
+                const dayOfWeek = dateObj.getDay(); // 0 = Sunday, 6 = Saturday
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
+                  dayElement.classList.add('weekend');
+                } else {
+                  dayElement.classList.remove('weekend');
+                }
+              } else {
+                // Date doesn't match - remove weekend class
+                dayElement.classList.remove('weekend');
+              }
+            });
+          }, 100);
         },
       });
 
