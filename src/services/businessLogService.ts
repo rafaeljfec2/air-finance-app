@@ -1,6 +1,6 @@
-import { apiClient } from './apiClient';
-import { z } from 'zod';
 import { parseApiError } from '@/utils/apiErrorHandler';
+import { z } from 'zod';
+import { apiClient } from './apiClient';
 
 export const BusinessLogSchema = z.object({
   id: z.string(),
@@ -62,7 +62,10 @@ export const getBusinessLogs = async (
     if (filters?.limit) params.append('limit', filters.limit.toString());
 
     const queryString = params.toString();
-    const url = `/companies/${companyId}/business-logs${queryString ? `?${queryString}` : ''}`;
+    let url = `/companies/${companyId}/business-logs`;
+    if (queryString) {
+      url = `${url}?${queryString}`;
+    }
 
     const response = await apiClient.get<BusinessLogListResponse>(url);
     return BusinessLogListResponseSchema.parse(response.data);
@@ -71,10 +74,7 @@ export const getBusinessLogs = async (
   }
 };
 
-export const getBusinessLogById = async (
-  companyId: string,
-  id: string,
-): Promise<BusinessLog> => {
+export const getBusinessLogById = async (companyId: string, id: string): Promise<BusinessLog> => {
   try {
     const response = await apiClient.get<BusinessLog>(
       `/companies/${companyId}/business-logs/${id}`,
@@ -84,4 +84,3 @@ export const getBusinessLogById = async (
     throw parseApiError(error);
   }
 };
-
