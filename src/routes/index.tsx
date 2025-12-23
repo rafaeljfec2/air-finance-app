@@ -5,6 +5,7 @@ import { AccountsPage } from '@/pages/accounts';
 import { AiClassificationPage } from '@/pages/ai-classification';
 import { AnnualResult } from '@/pages/annual-result';
 import { BudgetPage } from '@/pages/budget';
+import { BusinessLogsPage } from '@/pages/business-logs';
 import { CategoriesPage } from '@/pages/categories';
 import { CompaniesPage } from '@/pages/companies';
 import { CreditCardsPage } from '@/pages/credit-cards';
@@ -96,6 +97,17 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <AccountsPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/business-logs',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <BusinessLogsPage />
         </ProtectedRoute>
       </ErrorBoundary>
     ),
