@@ -78,7 +78,7 @@ export function NewTransaction() {
         </div>
 
         <div className="container mx-auto px-4 py-6">
-          <Card className="bg-card dark:bg-card-dark border border-border dark:border-border-dark w-full sm:max-w-[60%] sm:mx-auto shadow-lg">
+          <Card className="bg-card dark:bg-card-dark border border-border dark:border-border-dark w-full sm:max-w-[60%] sm:mx-auto shadow-lgp-4 sm:p-6">
             <form
               id="transaction-form"
               onSubmit={handleSubmit}
@@ -93,7 +93,6 @@ export function NewTransaction() {
                 value={formData.description}
                 onChange={handleChange}
                 error={errors.description}
-                autoFocus
               />
 
               <AccountCategoryTypeFields

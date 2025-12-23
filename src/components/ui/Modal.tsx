@@ -18,7 +18,7 @@ export function Modal({
   className,
   dismissible = true,
 }: Readonly<ModalProps>) {
-  const modalRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDialogElement>(null);
 
   // Fechar ao pressionar ESC
   useEffect(() => {
@@ -26,8 +26,8 @@ export function Modal({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    globalThis.addEventListener('keydown', handleKeyDown);
+    return () => globalThis.removeEventListener('keydown', handleKeyDown);
   }, [open, onClose, dismissible]);
 
   // Foco automático
@@ -48,15 +48,13 @@ export function Modal({
         onClick={dismissible ? onClose : undefined}
       />
       {/* Modal content */}
-      <div
+      <dialog
         ref={modalRef}
-        tabIndex={-1}
+        open={open}
         className={cn(
-          'relative z-10 w-full max-w-lg mx-auto rounded-xl bg-white dark:bg-gray-900 shadow-xl p-4 sm:p-6 focus:outline-none',
+          'relative z-10 w-full max-w-lg mx-auto rounded-xl bg-white dark:bg-gray-900 shadow-xl p-4 sm:p-6 focus:outline-none border-0',
           className,
         )}
-        role="dialog"
-        aria-modal="true"
         aria-label={title}
       >
         {/* Close button */}
@@ -83,7 +81,7 @@ export function Modal({
         <div className={className?.includes('flex flex-col') ? 'flex flex-col h-full' : ''}>
           {children}
         </div>
-      </div>
+      </dialog>
     </div>
   );
 }

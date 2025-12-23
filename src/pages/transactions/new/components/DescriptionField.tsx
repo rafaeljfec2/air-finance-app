@@ -1,13 +1,12 @@
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 
 interface DescriptionFieldProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   error?: string;
-  autoFocus?: boolean;
 }
 
 export function DescriptionField({
@@ -15,15 +14,8 @@ export function DescriptionField({
   onChange,
   onBlur,
   error,
-  autoFocus = false,
 }: Readonly<DescriptionFieldProps>) {
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (autoFocus && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [autoFocus]);
 
   return (
     <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
