@@ -12,10 +12,11 @@ interface TableRowProps {
   onActionClick?: (transaction: TransactionGridTransaction) => void;
   onEdit?: (transaction: TransactionGridTransaction) => void;
   onDelete?: (transaction: TransactionGridTransaction) => void;
+  onViewHistory?: (transaction: TransactionGridTransaction) => void;
 }
 
 export const TableRow = memo(
-  ({ transaction, showActions, onActionClick, onEdit, onDelete }: TableRowProps) => {
+  ({ transaction, showActions, onActionClick, onEdit, onDelete, onViewHistory }: TableRowProps) => {
     const isPreviousBalance = transaction.id === 'previous-balance';
 
     return (
@@ -82,6 +83,7 @@ export const TableRow = memo(
               onEdit={onEdit}
               onDelete={onDelete}
               onActionClick={onActionClick}
+              onViewHistory={onViewHistory}
               variant="table"
             />
           </td>

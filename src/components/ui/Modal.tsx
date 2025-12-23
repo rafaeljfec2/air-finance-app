@@ -1,5 +1,5 @@
-import { ReactNode, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { ReactNode, useEffect, useRef } from 'react';
 
 interface ModalProps {
   open: boolean;
@@ -40,7 +40,7 @@ export function Modal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Overlay */}
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
@@ -52,7 +52,7 @@ export function Modal({
         ref={modalRef}
         tabIndex={-1}
         className={cn(
-          'relative z-10 w-full max-w-lg mx-auto rounded-xl bg-white dark:bg-gray-900 shadow-xl p-6 focus:outline-none',
+          'relative z-10 w-full max-w-lg mx-auto rounded-xl bg-white dark:bg-gray-900 shadow-xl p-4 sm:p-6 focus:outline-none',
           className,
         )}
         role="dialog"

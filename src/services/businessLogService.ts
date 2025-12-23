@@ -39,6 +39,7 @@ export type BusinessLogListResponse = z.infer<typeof BusinessLogListResponseSche
 
 export interface BusinessLogFilters {
   entityType?: string;
+  entityId?: string;
   operation?: 'create' | 'update' | 'delete';
   userId?: string;
   startDate?: string;
@@ -54,6 +55,7 @@ export const getBusinessLogs = async (
   try {
     const params = new URLSearchParams();
     if (filters?.entityType) params.append('entityType', filters.entityType);
+    if (filters?.entityId) params.append('entityId', filters.entityId);
     if (filters?.operation) params.append('operation', filters.operation);
     if (filters?.userId) params.append('userId', filters.userId);
     if (filters?.startDate) params.append('startDate', filters.startDate);

@@ -6,6 +6,7 @@ interface UseBusinessLogsParams {
   filters: {
     entityType: string;
     operation: string;
+    entityId?: string;
     startDate: string;
     endDate: string;
     currentPage: number;
@@ -38,6 +39,7 @@ export function useBusinessLogs({
     try {
       const apiFilters: BusinessLogFilters = {
         entityType: filters.entityType === 'all' ? undefined : filters.entityType,
+        entityId: filters.entityId,
         operation:
           filters.operation === 'all'
             ? undefined
@@ -58,7 +60,7 @@ export function useBusinessLogs({
     } finally {
       setIsLoading(false);
     }
-  }, [companyId, filters.entityType, filters.operation, filters.startDate, filters.endDate, filters.currentPage]);
+  }, [companyId, filters.entityType, filters.operation, filters.entityId, filters.startDate, filters.endDate, filters.currentPage]);
 
   useEffect(() => {
     loadLogs();

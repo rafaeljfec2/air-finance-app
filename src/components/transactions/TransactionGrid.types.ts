@@ -18,7 +18,14 @@ export type TransactionGridTransaction = {
   balance?: number;
 };
 
-export type SortField = 'date' | 'category' | 'description' | 'account' | 'credit' | 'debit' | 'balance';
+export type SortField =
+  | 'date'
+  | 'category'
+  | 'description'
+  | 'account'
+  | 'credit'
+  | 'debit'
+  | 'balance';
 export type SortDirection = 'asc' | 'desc';
 
 export type FilterValue = {
@@ -33,6 +40,7 @@ export interface TransactionGridProps {
   onActionClick?: (transaction: TransactionGridTransaction) => void;
   onEdit?: (transaction: TransactionGridTransaction) => void;
   onDelete?: (transaction: TransactionGridTransaction) => void;
+  onViewHistory?: (transaction: TransactionGridTransaction) => void;
   className?: string;
   resetPageKey?: string | number; // Key that changes when page should be reset (e.g., account filter change)
 }
@@ -42,6 +50,6 @@ export interface TransactionActionsProps {
   onEdit?: (transaction: TransactionGridTransaction) => void;
   onDelete?: (transaction: TransactionGridTransaction) => void;
   onActionClick?: (transaction: TransactionGridTransaction) => void;
+  onViewHistory?: (transaction: TransactionGridTransaction) => void;
   variant?: 'table' | 'mobile';
 }
-

@@ -11,10 +11,11 @@ interface MobileCardProps {
   onActionClick?: (transaction: TransactionGridTransaction) => void;
   onEdit?: (transaction: TransactionGridTransaction) => void;
   onDelete?: (transaction: TransactionGridTransaction) => void;
+  onViewHistory?: (transaction: TransactionGridTransaction) => void;
 }
 
 export const MobileCard = memo(
-  ({ transaction, showActions, onActionClick, onEdit, onDelete }: MobileCardProps) => {
+  ({ transaction, showActions, onActionClick, onEdit, onDelete, onViewHistory }: MobileCardProps) => {
     const isPreviousBalance = transaction.id === 'previous-balance';
 
     return (
@@ -77,6 +78,7 @@ export const MobileCard = memo(
               onEdit={onEdit}
               onDelete={onDelete}
               onActionClick={onActionClick}
+              onViewHistory={onViewHistory}
               variant="mobile"
             />
           </div>

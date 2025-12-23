@@ -34,11 +34,12 @@ export function FilterCard({
   onSearch,
 }: FilterCardProps) {
   return (
-    <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm mb-6">
-      <div className="p-4">
-        <div className="flex flex-wrap items-end gap-4">
+    <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm mb-4 sm:mb-6">
+      <div className="p-3 sm:p-4">
+        <div className="flex flex-wrap items-end gap-3 sm:gap-4">
+          {/* Datas */}
           <div className="flex items-center gap-2">
-            <div>
+            <div className="w-[140px] sm:w-[150px]">
               <span className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 block">
                 Data Inicial
               </span>
@@ -46,10 +47,10 @@ export function FilterCard({
                 value={startDate}
                 onChange={(date) => onStartDateChange(date)}
                 placeholder="Data inicial"
-                className="bg-background dark:bg-background-dark"
+                className="bg-background dark:bg-background-dark w-full text-xs"
               />
             </div>
-            <div>
+            <div className="w-[140px] sm:w-[150px]">
               <span className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 block">
                 Data Final
               </span>
@@ -57,11 +58,12 @@ export function FilterCard({
                 value={endDate}
                 onChange={(date) => onEndDateChange(date)}
                 placeholder="Data final"
-                className="bg-background dark:bg-background-dark"
+                className="bg-background dark:bg-background-dark w-full text-xs"
               />
             </div>
           </div>
 
+          {/* Buscar */}
           <div className="relative flex-1 min-w-[200px]">
             <span className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 block">Buscar</span>
             <Search className="absolute left-3 top-9 h-4 w-4 text-gray-500 dark:text-gray-400 pointer-events-none" />
@@ -75,11 +77,12 @@ export function FilterCard({
                   onSearch();
                 }
               }}
-              className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark"
+              className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark w-full"
             />
           </div>
 
-          <div className="min-w-[180px]">
+          {/* Tipo de Entidade */}
+          <div className="min-w-[160px] sm:min-w-[180px]">
             <ComboBox
               options={[
                 { value: 'all', label: 'Todas as entidades' },
@@ -94,7 +97,8 @@ export function FilterCard({
             />
           </div>
 
-          <div className="min-w-[180px]">
+          {/* Tipo de Operação */}
+          <div className="min-w-[160px] sm:min-w-[180px]">
             <ComboBox
               options={[
                 { value: 'all', label: 'Todas as operações' },
@@ -108,14 +112,17 @@ export function FilterCard({
             />
           </div>
 
-          <Button
-            onClick={onSearch}
-            className="bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2 whitespace-nowrap"
-            title="Pesquisar"
-          >
-            <Search className="h-4 w-4" />
-            Pesquisar
-          </Button>
+          {/* Botão Pesquisar */}
+          <div className="flex items-end">
+            <Button
+              onClick={onSearch}
+              className="bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2 whitespace-nowrap"
+              title="Pesquisar"
+            >
+              <Search className="h-4 w-4" />
+              Pesquisar
+            </Button>
+          </div>
         </div>
       </div>
     </Card>

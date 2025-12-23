@@ -1,4 +1,4 @@
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, History, Trash2 } from 'lucide-react';
 import { Tooltip } from '@/components/ui/tooltip';
 import type { TransactionActionsProps } from './TransactionGrid.types';
 
@@ -8,6 +8,7 @@ export function TransactionActions({
   transaction,
   onEdit,
   onDelete,
+  onViewHistory,
   variant = 'table',
 }: TransactionActionsPropsReadonly) {
   const buttonClassName =
@@ -38,6 +39,24 @@ export function TransactionActions({
     );
   };
 
+  const renderHistoryButton = () => {
+    if (!onViewHistory) return null;
+    return (
+      <Tooltip content="Ver histórico">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewHistory(transaction);
+          }}
+          className={buttonClassName}
+          aria-label="Ver histórico"
+        >
+          <History className="h-4 w-4" />
+        </button>
+      </Tooltip>
+    );
+  };
+
   const renderMenu = () => null;
 
   return (
@@ -47,6 +66,7 @@ export function TransactionActions({
       }
     >
       {renderEditButton()}
+      {renderHistoryButton()}
       {renderMenu()}
       {onDelete && (
         <Tooltip content="Excluir transação">

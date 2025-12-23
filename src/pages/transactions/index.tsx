@@ -15,9 +15,10 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useCategories } from '@/hooks/useCategories';
 import { usePreviousBalance, useTransactions } from '@/hooks/useTransactions';
 import { ViewDefault } from '@/layouts/ViewDefault';
+import { BusinessLogsModal } from '@/pages/business-logs/components/BusinessLogsModal';
 import { useCompanyStore } from '@/stores/company';
 import { formatDateToLocalISO, parseLocalDate } from '@/utils/date';
-import { Calendar, Download, Filter, Plus, Receipt, Search } from 'lucide-react';
+import { Calendar, Download, Filter, History, Plus, Receipt, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -56,6 +57,8 @@ export function Transactions() {
   const [transactionToEdit, setTransactionToEdit] = useState<TransactionGridTransaction | null>(
     null,
   );
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
 
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
@@ -218,6 +221,11 @@ export function Transactions() {
     setShowConfirmDelete(true);
   };
 
+  const handleViewHistory = (transaction: TransactionGridTransaction) => {
+    setSelectedTransactionId(transaction.id);
+    setShowHistoryModal(true);
+  };
+
   const confirmDelete = async () => {
     if (!transactionToDelete) return;
     try {
@@ -258,13 +266,23 @@ export function Transactions() {
                 Gerencie seu fluxo de caixa
               </p>
             </div>
-            <Button
-              onClick={() => navigate('/transactions/new')}
-              className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
-            >
-              <Plus className="h-5 w-5" />
-              Novo lançamento
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => navigate('/business-logs')}
+                variant="outline"
+                className="w-full sm:w-auto bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center justify-center gap-2"
+              >
+                <History className="h-5 w-5" />
+                Histórico
+              </Button>
+              <Button
+                onClick={() => navigate('/transactions/new')}
+                className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
+              >
+                <Plus className="h-5 w-5" />
+                Novo lançamento
+              </Button>
+            </div>
           </div>
 
           {/* Filters and Search */}
@@ -392,6 +410,7 @@ export function Transactions() {
             showActions={true}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onViewHistory={handleViewHistory}
             resetPageKey={selectedAccountId}
           />
         </div>
@@ -412,6 +431,15 @@ export function Transactions() {
         transaction={transactionToEdit}
         accounts={accounts ?? []}
         categories={categories ?? []}
+      />
+      <BusinessLogsModal
+        open={showHistoryModal}
+        onClose={() => {
+          setShowHistoryModal(false);
+          setSelectedTransactionId(null);
+        }}
+        entityId={selectedTransactionId || undefined}
+        entityType="Transaction"
       />
     </ViewDefault>
   );

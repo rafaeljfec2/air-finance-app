@@ -27,6 +27,7 @@ export function TransactionGrid({
   onActionClick,
   onEdit,
   onDelete,
+  onViewHistory,
   className,
   resetPageKey,
 }: Readonly<TransactionGridProps>) {
@@ -238,6 +239,7 @@ export function TransactionGrid({
                           onActionClick={handleActionClick}
                           onEdit={onEdit}
                           onDelete={onDelete}
+                          onViewHistory={onViewHistory}
                         />
                       ))
                     ) : (
@@ -296,6 +298,7 @@ export function TransactionGrid({
                     onActionClick={handleActionClick}
                     onEdit={onEdit}
                     onDelete={onDelete}
+                    onViewHistory={onViewHistory}
                   />
                 ))
               ) : (
