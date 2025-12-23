@@ -40,7 +40,7 @@ export function Modal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
       {/* Overlay */}
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
@@ -52,7 +52,7 @@ export function Modal({
         ref={modalRef}
         open={open}
         className={cn(
-          'relative z-10 w-full max-w-lg mx-auto rounded-xl bg-white dark:bg-gray-900 shadow-xl p-4 sm:p-6 focus:outline-none border-0',
+          'relative z-10 w-full max-w-lg mx-auto rounded-xl bg-white dark:bg-gray-900 shadow-xl p-4 sm:p-6 focus:outline-none border-0 max-h-[90vh] overflow-y-auto',
           className,
         )}
         aria-label={title}
@@ -76,7 +76,9 @@ export function Modal({
           </button>
         )}
         {title && (
-          <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{title}</h2>
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-gray-100 pr-8">
+            {title}
+          </h2>
         )}
         <div className={className?.includes('flex flex-col') ? 'flex flex-col h-full' : ''}>
           {children}

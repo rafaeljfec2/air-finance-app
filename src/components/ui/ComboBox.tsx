@@ -280,9 +280,9 @@ export function ComboBox<T extends string | number = string>({
           ) : (
             <div className="flex items-center gap-2 flex-1 min-w-0">
               {Icon && (
-                <Icon className="h-4 w-4 text-muted-foreground dark:text-gray-400 flex-shrink-0" />
+                <Icon className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
               )}
-              <span className="truncate">{displayValue}</span>
+              <span className="truncate text-gray-900 dark:text-gray-100">{displayValue}</span>
             </div>
           )}
           {hasValue && !disabled && !renderTrigger && (
@@ -314,7 +314,7 @@ export function ComboBox<T extends string | number = string>({
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder={searchPlaceholder}
-                  className="w-full px-2 py-1 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
+                  className="w-full px-2 py-1 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                   onClick={(e) => e.stopPropagation()}
                   onKeyDown={(e) => {
                     // Prevent closing dropdown when typing

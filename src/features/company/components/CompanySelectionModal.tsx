@@ -92,12 +92,16 @@ export function CompanySelectionModal() {
   // Custom render for company items (name + CNPJ/CPF in two lines)
   const renderCompanyItem = (option: ComboBoxOption<string>) => {
     const company = Array.isArray(companies) ? companies.find((c) => c.id === option.value) : null;
-    if (!company) return <span>{option.label}</span>;
+    if (!company) return <span className="text-gray-900 dark:text-gray-100">{option.label}</span>;
 
     return (
       <div className="flex flex-col">
-        <span className="text-sm">{company.name || 'Sem nome'}</span>
-        <span className="text-xs opacity-80">{formatDocument(company.cnpj || '')}</span>
+        <span className="text-sm text-gray-900 dark:text-gray-100">
+          {company.name || 'Sem nome'}
+        </span>
+        <span className="text-xs text-gray-600 dark:text-gray-400">
+          {formatDocument(company.cnpj || '')}
+        </span>
       </div>
     );
   };
@@ -108,38 +112,38 @@ export function CompanySelectionModal() {
       onClose={() => {}}
       dismissible={false}
       title={modalTitle}
-      className="max-w-lg p-8"
+      className="max-w-lg p-4 sm:p-6 md:p-8"
     >
-      <div className="space-y-6">
-        <p className="text-sm text-muted-foreground">
+      <div className="space-y-4 sm:space-y-6">
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
           Escolha a empresa que deseja gerenciar. Essa definição pode ser alterada depois no seletor
           do cabeçalho.
         </p>
 
         {isLoading && (
-          <div className="flex min-h-[180px] flex-col items-center justify-center gap-3 rounded-lg bg-muted/40 py-6">
+          <div className="flex min-h-[140px] sm:min-h-[180px] flex-col items-center justify-center gap-3 rounded-lg bg-gray-100/50 dark:bg-gray-800/50 py-4 sm:py-6">
             <Loading size="large" />
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center px-2">
               Carregando empresas vinculadas ao seu usuário...
             </p>
           </div>
         )}
 
         {!isLoading && isError && (
-          <div className="rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <div className="rounded-lg bg-red-500/10 dark:bg-red-500/20 px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-red-600 dark:text-red-400">
             Não foi possível carregar as empresas. Tente novamente em instantes.
           </div>
         )}
 
         {!isLoading && !isError && !hasCompanies && (
-          <div className="rounded-lg bg-muted/40 px-4 py-5 text-center text-sm text-muted-foreground">
+          <div className="rounded-lg bg-gray-100/50 dark:bg-gray-800/50 px-3 sm:px-4 py-4 sm:py-5 text-center text-xs sm:text-sm text-gray-600 dark:text-gray-400">
             Nenhuma empresa está vinculada à sua conta. Solicite o cadastro de uma empresa para
             continuar utilizando a plataforma.
           </div>
         )}
 
         {!isLoading && !isError && hasCompanies && (
-          <div className="space-y-5">
+          <div className="space-y-4 sm:space-y-5">
             <div className="space-y-2">
               <ComboBox
                 label="Empresa"
@@ -153,7 +157,7 @@ export function CompanySelectionModal() {
                 renderItem={renderCompanyItem}
                 maxHeight="max-h-56"
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Você pode alterar essa seleção a qualquer momento pelo menu superior.
               </p>
             </div>
@@ -161,7 +165,7 @@ export function CompanySelectionModal() {
             <Button
               onClick={handleConfirmSelection}
               disabled={!selectedCompanyId}
-              className="w-full h-11 text-sm font-semibold bg-primary-500 hover:bg-primary-600 text-white transition-colors"
+              className="w-full h-11 sm:h-12 text-sm font-semibold bg-primary-500 hover:bg-primary-600 text-white transition-colors"
             >
               Continuar
             </Button>
