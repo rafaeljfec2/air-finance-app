@@ -15,14 +15,20 @@ export const CardStat: React.FC<CardStatProps> = ({
   negative,
   highlight,
 }) => {
-  let valueClass = 'font-bold';
-  if (positive) valueClass += ' text-green-600 dark:text-green-400';
-  if (negative) valueClass += ' text-red-600 dark:text-red-400';
-  if (highlight) valueClass += ' text-primary-600 dark:text-primary-400';
+  let valueClass = 'font-bold text-lg sm:text-xl text-white dark:text-white';
+  if (positive) {
+    valueClass = 'font-bold text-lg sm:text-xl text-green-400 dark:text-green-400';
+  } else if (negative) {
+    valueClass = 'font-bold text-lg sm:text-xl text-red-400 dark:text-red-400';
+  } else if (highlight) {
+    valueClass = 'font-bold text-lg sm:text-xl text-primary-400 dark:text-primary-400';
+  }
 
   return (
-    <div className="flex justify-between items-center text-base">
-      <span className="text-sm text-gray-500 dark:text-gray-400">{label}</span>
+    <div className="flex flex-col gap-1.5">
+      <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium">
+        {label}
+      </span>
       <span className={valueClass}>
         R$ {value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
       </span>

@@ -3,6 +3,7 @@ import { CreditCardBrandIcon } from '@/components/budget/CreditCardBrandIcon';
 import { Spinner } from '@/components/ui/spinner';
 import type { CreditCard, CreditCardBill } from '@/types/budget';
 import { formatDate } from '@/utils/date';
+import { useMemo } from 'react';
 
 interface CreditCardsSectionProps {
   cards: CreditCard[];
@@ -20,11 +21,64 @@ export function CreditCardsSection({
   activeBill,
   activeCardLimit,
   activeCardBillTotal,
-  activeCardAvailable,
+  activeCardAvailable: _activeCardAvailable,
   activeCardTab,
   isLoading,
   onActiveCardChange,
 }: Readonly<CreditCardsSectionProps>) {
+  // Extract installment info from description
+  const extractInstallment = (
+    desc: string,
+  ): { current: number; total: number } | null => {
+    const regex1 = /parcela\s+(\d+)\/(\d+)/i;
+    const regex2 = /(?:^|\s|-)(\d+)\/(\d+)(?:\s|$)/;
+    let match = regex1.exec(desc);
+    if (!match) {
+      match = regex2.exec(desc);
+    }
+    if (!match) return null;
+    const current = Number.parseInt(match[1] ?? '0', 10);
+    const total = Number.parseInt(match[2] ?? '0', 10);
+    if (current <= 0 || total <= 0 || current > total) return null;
+    return { current, total };
+  };
+
+  // Calculate totals from transactions
+  const totals = useMemo(() => {
+    if (!activeBill?.transactions || activeBill.transactions.length === 0) {
+      return {
+        totalParcelado: 0,
+        totalVista: 0,
+        totalFinalizando: 0,
+      };
+    }
+
+    let totalParcelado = 0;
+    let totalVista = 0;
+    let totalFinalizando = 0;
+
+    activeBill.transactions.forEach((transaction) => {
+      const installment = extractInstallment(transaction.description);
+      const isParcelado = transaction.category === 'Parcelado' || installment !== null;
+
+      if (isParcelado) {
+        totalParcelado += transaction.value;
+        // Check if it's the last installment (finalizando)
+        if (installment && installment.current === installment.total) {
+          totalFinalizando += transaction.value;
+        }
+      } else {
+        totalVista += transaction.value;
+      }
+    });
+
+    return {
+      totalParcelado,
+      totalVista,
+      totalFinalizando,
+    };
+  }, [activeBill?.transactions]);
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
@@ -35,17 +89,16 @@ export function CreditCardsSection({
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mb-6">
         <CardStat label="Limite do cartão" value={activeCardLimit} highlight />
         <CardStat label="Total da fatura" value={activeCardBillTotal} negative />
-        {activeCardAvailable !== null && (
-          <CardStat
-            label="Limite disponível"
-            value={activeCardAvailable}
-            positive={activeCardAvailable >= 0}
-            negative={activeCardAvailable < 0}
-          />
-        )}
+        <CardStat label="Total parcelado" value={totals.totalParcelado} />
+        <CardStat label="Total crédito à vista" value={totals.totalVista} />
+        <CardStat
+          label="Parcelas finalizando"
+          value={totals.totalFinalizando}
+          highlight={totals.totalFinalizando > 0}
+        />
       </div>
       {activeBill && (
         <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">
@@ -112,23 +165,6 @@ export function CreditCardsSection({
 
               // Sort transactions: first those that are finishing (fewer remaining installments), then the rest
               const sortedTransactions = [...activeBill.transactions].sort((a, b) => {
-                // Extract installment info from description (e.g., "Parcela 3/5" or "3/5")
-                const extractInstallment = (
-                  desc: string,
-                ): { current: number; total: number } | null => {
-                  const regex1 = /parcela\s+(\d+)\/(\d+)/i;
-                  const regex2 = /(?:^|\s|-)(\d+)\/(\d+)(?:\s|$)/;
-                  let match = regex1.exec(desc);
-                  if (!match) {
-                    match = regex2.exec(desc);
-                  }
-                  if (!match) return null;
-                  const current = Number.parseInt(match[1] ?? '0', 10);
-                  const total = Number.parseInt(match[2] ?? '0', 10);
-                  if (current <= 0 || total <= 0 || current > total) return null;
-                  return { current, total };
-                };
-
                 const installmentA = extractInstallment(a.description);
                 const installmentB = extractInstallment(b.description);
 
