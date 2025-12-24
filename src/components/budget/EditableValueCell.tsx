@@ -46,7 +46,7 @@ export function EditableValueCell({
   return (
     <button
       type="button"
-      className="cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors px-2 py-1 rounded text-right font-medium whitespace-nowrap"
+      className="cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors px-2 py-1 rounded text-right font-medium whitespace-nowrap text-white dark:text-white"
       onDoubleClick={onDoubleClick}
       title="Clique duas vezes para editar"
     >

@@ -47,7 +47,7 @@ export function PayablesSection({ payables, isLoading }: Readonly<PayablesSectio
             <td className="px-3 py-2 text-left text-text dark:text-text-dark">
               {p.description}
             </td>
-            <td className="px-3 py-2 text-right font-medium whitespace-nowrap">
+            <td className="px-3 py-2 text-right font-medium whitespace-nowrap text-white dark:text-white">
               <EditableValueCell
                 value={p.value}
                 isEditing={editingId === p.id}

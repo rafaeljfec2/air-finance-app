@@ -37,7 +37,7 @@ export function ReceivablesSection({
             <td className="px-3 py-2 text-left text-text dark:text-text-dark">
               {r.description}
             </td>
-            <td className="px-3 py-2 text-right font-medium whitespace-nowrap">
+            <td className="px-3 py-2 text-right font-medium whitespace-nowrap text-white dark:text-white">
               R$ {r.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </td>
             <td className="px-3 py-2 text-center">
