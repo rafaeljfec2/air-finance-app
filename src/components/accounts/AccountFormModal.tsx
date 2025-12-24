@@ -9,8 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 import { cn } from '@/lib/utils';
 import { Account, CreateAccount } from '@/services/accountService';
 import { useCompanyStore } from '@/stores/company';
-import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { formatDateToLocalISO } from '@/utils/date';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import {
   BanknotesIcon,
   BuildingLibraryIcon,
@@ -85,7 +85,7 @@ export function AccountFormModal({
       });
       setInitialBalanceInput(
         account.initialBalance !== undefined && account.initialBalance !== null
-          ? formatCurrencyInput(account.initialBalance.toFixed(2).replace('.', ''))
+          ? formatCurrencyInput(account.initialBalance.toFixed(2).replace('.', ''), true)
           : '',
       );
     } else {
@@ -321,7 +321,7 @@ export function AccountFormModal({
                       inputMode="decimal"
                       value={initialBalanceInput}
                       onChange={(e) => {
-                        const formatted = formatCurrencyInput(e.target.value);
+                        const formatted = formatCurrencyInput(e.target.value, true);
                         setInitialBalanceInput(formatted);
                         setForm((prev) => ({
                           ...prev,

@@ -31,12 +31,14 @@ export function parseCurrency(value: string): number {
   return parseFloat(normalizedValue);
 }
 
-export function formatCurrencyInput(value: string): string {
+export function formatCurrencyInput(value: string, allowNegative = false): string {
+  const isNegative = allowNegative && value.includes('-');
   const numericValue = value.replace(/[^\d]/g, '');
   if (!numericValue) return '';
 
   const floatValue = parseFloat(numericValue) / 100;
-  return formatCurrency(floatValue);
+  const finalValue = isNegative ? -floatValue : floatValue;
+  return formatCurrency(finalValue);
 }
 
 export function formatPercentual(value: number): string {
