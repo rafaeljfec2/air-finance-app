@@ -166,22 +166,31 @@ export function Transactions() {
       return true;
     }
 
+    // Parse paymentDate as UTC (backend stores dates in UTC)
     const transactionDate = new Date(paymentDate);
+    
+    // Normalize transaction date to start of day in UTC for comparison
+    const txDateUTC = new Date(Date.UTC(
+      transactionDate.getUTCFullYear(),
+      transactionDate.getUTCMonth(),
+      transactionDate.getUTCDate(),
+      0, 0, 0, 0
+    ));
 
     if (start) {
-      // Parse date string "YYYY-MM-DD" and create date in local timezone
+      // Parse date string "YYYY-MM-DD" and create date in UTC
       const [year, month, day] = start.split('-').map(Number);
-      const startDate = new Date(year, month - 1, day, 0, 0, 0, 0);
-      if (transactionDate < startDate) {
+      const startDateUTC = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+      if (txDateUTC < startDateUTC) {
         return false;
       }
     }
 
     if (end) {
-      // Parse date string "YYYY-MM-DD" and create date in local timezone
+      // Parse date string "YYYY-MM-DD" and create date in UTC at end of day
       const [year, month, day] = end.split('-').map(Number);
-      const endDate = new Date(year, month - 1, day, 23, 59, 59, 999);
-      if (transactionDate > endDate) {
+      const endDateUTC = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
+      if (txDateUTC > endDateUTC) {
         return false;
       }
     }
@@ -199,6 +208,24 @@ export function Transactions() {
     const matchesSearch = matchesSearchTerm(transaction.description, searchTerm);
     const matchesType = matchesTransactionType(selectedType, transaction.launchType);
     const matchesPeriod = matchesDatePeriod(transaction.paymentDate, startDate, endDate);
+
+    // Debug log for transactions that don't match
+    if (!matchesSearch || !matchesType || !matchesPeriod) {
+      console.debug('[Transaction Filter] Transaction excluded:', {
+        id: transaction.id,
+        description: transaction.description,
+        paymentDate: transaction.paymentDate,
+        launchType: transaction.launchType,
+        value: transaction.value,
+        matchesSearch,
+        matchesType,
+        matchesPeriod,
+        searchTerm,
+        selectedType,
+        startDate,
+        endDate,
+      });
+    }
 
     return matchesSearch && matchesType && matchesPeriod;
   };
