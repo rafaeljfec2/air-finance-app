@@ -10,7 +10,7 @@ function renderData(data: unknown, label: string) {
   return (
     <div className="mt-2">
       <h4 className="text-sm font-semibold text-text dark:text-text-dark mb-2">{label}:</h4>
-      <pre className="bg-background dark:bg-background-dark p-3 rounded-md text-xs overflow-auto max-h-64 border border-border dark:border-border-dark">
+      <pre className="bg-background dark:bg-background-dark p-3 rounded-md text-xs overflow-auto max-h-64 border border-border dark:border-border-dark dark:text-gray-200">
         {JSON.stringify(data, null, 2)}
       </pre>
     </div>
@@ -33,7 +33,7 @@ export function LogDetails({ log }: LogDetailsProps) {
       {log.operation === 'update' && log.changes && (
         <div>
           <h4 className="text-sm font-semibold text-text dark:text-text-dark mb-2">Mudanças:</h4>
-          <pre className="bg-background dark:bg-background-dark p-3 rounded-md text-xs overflow-auto max-h-64 border border-border dark:border-border-dark">
+          <pre className="bg-background dark:bg-background-dark p-3 rounded-md text-xs overflow-auto max-h-64 border border-border dark:border-border-dark dark:text-gray-200">
             {JSON.stringify(log.changes, null, 2)}
           </pre>
         </div>
