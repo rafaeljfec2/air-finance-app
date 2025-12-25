@@ -51,18 +51,20 @@ export const MobileCard = memo(
           <div className="text-right flex flex-col items-end justify-between h-full">
             {!isPreviousBalance &&
               (transaction.launchType === 'revenue' ? (
-                <span className="text-sm font-medium text-emerald-400">
+                <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
                   +{formatCurrency(transaction.value)}
                 </span>
               ) : (
-                <span className="text-sm font-medium text-red-400">
+                <span className="text-sm font-medium text-red-600 dark:text-red-400">
                   -{formatCurrency(transaction.value)}
                 </span>
               ))}
             <span
               className={cn(
                 'text-xs mt-1',
-                (transaction.balance ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400',
+                (transaction.balance ?? 0) >= 0
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-red-600 dark:text-red-400',
               )}
             >
               {(transaction.balance ?? 0) >= 0

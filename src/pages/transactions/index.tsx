@@ -1,7 +1,7 @@
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal';
 import {
-  TransactionGrid,
-  type TransactionGridTransaction,
+    TransactionGrid,
+    type TransactionGridTransaction,
 } from '@/components/transactions/TransactionGrid';
 import { createPreviousBalanceRow } from '@/components/transactions/TransactionGrid.utils';
 import { Button } from '@/components/ui/button';
@@ -293,7 +293,7 @@ export function Transactions() {
                 Gerencie seu fluxo de caixa
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <Button
                 onClick={() => navigate('/business-logs')}
                 variant="outline"
@@ -315,55 +315,63 @@ export function Transactions() {
           {/* Filters and Search */}
           <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm mb-6">
             <div className="p-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto_auto] gap-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                  <div className="flex flex-1 items-center gap-2">
-                    <DatePicker
-                      value={startDateObj}
-                      onChange={handleStartDateChange}
-                      placeholder="Data inicial"
-                      className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                      showIcon={false}
-                    />
-                    <span className="text-gray-500 dark:text-gray-400">até</span>
-                    <DatePicker
-                      value={endDateObj}
-                      onChange={handleEndDateChange}
-                      placeholder="Data final"
-                      className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                      showIcon={false}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        const now = new Date();
-                        const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
-                        setStartDate(formatDateToLocalISO(threeMonthsAgo));
-                        setEndDate(formatDateToLocalISO(now));
-                      }}
-                      className="text-xs px-2 py-1 h-auto text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400"
-                      title="Últimos 3 meses"
-                    >
-                      3M
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        const now = new Date();
-                        const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, 1);
-                        setStartDate(formatDateToLocalISO(sixMonthsAgo));
-                        setEndDate(formatDateToLocalISO(now));
-                      }}
-                      className="text-xs px-2 py-1 h-auto text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400"
-                      title="Últimos 6 meses"
-                    >
-                      6M
-                    </Button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[auto_1fr_auto_auto] gap-4">
+                {/* Date Range Filter */}
+                <div className="flex flex-col gap-2 sm:col-span-2 lg:col-span-1 lg:flex-row lg:items-center">
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1 lg:mb-0">
+                    <Calendar className="h-4 w-4" />
+                    <span className="text-sm font-medium lg:hidden">Período</span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full">
+                    <div className="grid grid-cols-[1fr_auto_1fr] sm:flex sm:items-center gap-2 w-full">
+                      <DatePicker
+                        value={startDateObj}
+                        onChange={handleStartDateChange}
+                        placeholder="Início"
+                        className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full"
+                        showIcon={false}
+                      />
+                      <span className="text-gray-500 dark:text-gray-400 text-sm">até</span>
+                      <DatePicker
+                        value={endDateObj}
+                        onChange={handleEndDateChange}
+                        placeholder="Fim"
+                        className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full"
+                        showIcon={false}
+                      />
+                    </div>
+                    <div className="flex gap-2 justify-end sm:justify-start">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const now = new Date();
+                          const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+                          setStartDate(formatDateToLocalISO(threeMonthsAgo));
+                          setEndDate(formatDateToLocalISO(now));
+                        }}
+                        className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
+                        title="Últimos 3 meses"
+                      >
+                        3 Meses
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const now = new Date();
+                          const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, 1);
+                          setStartDate(formatDateToLocalISO(sixMonthsAgo));
+                          setEndDate(formatDateToLocalISO(now));
+                        }}
+                        className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
+                        title="Últimos 6 meses"
+                      >
+                        6 Meses
+                      </Button>
+                    </div>
                   </div>
                 </div>
                 <div className="relative">
