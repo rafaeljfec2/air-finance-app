@@ -1,4 +1,5 @@
 import { BalanceEvolutionCard } from '@/components/dashboard/BalanceEvolutionCard';
+import { CreditCardExpensesCard } from '@/components/dashboard/CreditCardExpensesCard';
 import { ExpensesDistributionCard } from '@/components/dashboard/ExpensesDistributionCard';
 import { FinancialGoalsCard } from '@/components/dashboard/FinancialGoalsCard';
 import { MonthlyComparisonCard } from '@/components/dashboard/MonthlyComparisonCard';
@@ -303,24 +304,31 @@ export function Dashboard() {
 
           {selectedView === 'overview' ? (
             /* Overview - Charts and Additional Info */
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Left Column */}
-              <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {/* Row 1 */}
+              <div className="md:col-span-2">
                 <BalanceEvolutionCard
                   companyId={companyId}
                   filters={filters}
                   onOpenDetails={() => setShowDetailsModal(true)}
                 />
-                <MonthlyComparisonCard companyId={companyId} filters={filters} />
               </div>
-
-              {/* Right Column */}
-              <div className="space-y-6">
+              <div className="md:col-span-1">
                 <ExpensesDistributionCard
                   companyId={companyId}
                   filters={filters}
                   onOpenCategories={() => setShowCategoriesModal(true)}
                 />
+              </div>
+
+              {/* Row 2 */}
+              <div className="md:col-span-1">
+                <MonthlyComparisonCard companyId={companyId} filters={filters} />
+              </div>
+              <div className="md:col-span-1">
+                <CreditCardExpensesCard companyId={companyId} filters={filters} />
+              </div>
+              <div className="md:col-span-1">
                 <FinancialGoalsCard
                   companyId={companyId}
                   onViewAll={() => setShowGoalsModal(true)}

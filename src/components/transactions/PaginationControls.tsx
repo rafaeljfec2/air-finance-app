@@ -1,5 +1,5 @@
-import { ChevronRight, ChevronLeft, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
 interface PaginationControlsProps {
   readonly currentPage: number;
@@ -23,8 +23,8 @@ export function PaginationControls({
   onItemsPerPageChange,
 }: PaginationControlsProps) {
   return (
-    <div className="mt-4 flex items-center justify-between border-t border-border dark:border-border-dark pt-4">
-      <div className="flex items-center gap-2">
+    <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0 border-t border-border dark:border-border-dark pt-4">
+      <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto justify-center sm:justify-start text-center sm:text-left">
         <select
           value={itemsPerPage}
           onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
@@ -39,7 +39,7 @@ export function PaginationControls({
           Mostrando {startIndex + 1} a {Math.min(endIndex, totalItems)} de {totalItems}
         </p>
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 w-full sm:w-auto justify-center sm:justify-end">
         <button
           onClick={() => onPageChange(1)}
           disabled={currentPage === 1}
