@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { useAccounts } from '@/hooks/useAccounts';
 import type { Account } from '@/services/accountService';
+import { useEffect, useMemo, useState } from 'react';
 
 interface AccountEditModalProps {
   open: boolean;
@@ -92,7 +92,7 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
     <Modal open={open} onClose={onClose} title="Editar conta" className="max-w-xl">
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-1">
-          <label className="text-xs text-muted-foreground">Conta</label>
+          <label className="text-xs text-muted-foreground dark:text-gray-400">Conta</label>
           <Select value={selectedId} onValueChange={setSelectedId}>
             <SelectTrigger className="w-full">
               {renderOptionLabel(selectedAccount)}
@@ -109,7 +109,7 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Nome</label>
+            <label className="text-xs text-muted-foreground dark:text-gray-400">Nome</label>
             <Input
               value={form.name}
               onChange={(e) => handleChange('name', e.target.value)}
@@ -118,7 +118,7 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
             {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Instituição</label>
+            <label className="text-xs text-muted-foreground dark:text-gray-400">Instituição</label>
             <Input
               value={form.institution}
               onChange={(e) => handleChange('institution', e.target.value)}
@@ -130,7 +130,7 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Agência</label>
+            <label className="text-xs text-muted-foreground dark:text-gray-400">Agência</label>
             <Input
               value={form.agency}
               onChange={(e) => handleChange('agency', e.target.value)}
@@ -139,7 +139,7 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
             {errors.agency && <p className="text-xs text-red-500">{errors.agency}</p>}
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Número da conta</label>
+            <label className="text-xs text-muted-foreground dark:text-gray-400">Número da conta</label>
             <Input
               value={form.accountNumber}
               onChange={(e) => handleChange('accountNumber', e.target.value)}
