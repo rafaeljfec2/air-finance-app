@@ -15,13 +15,13 @@ export const CardStat: React.FC<CardStatProps> = ({
   negative,
   highlight,
 }) => {
-  let valueClass = 'font-bold text-lg sm:text-xl text-white dark:text-white';
+  let valueClass = 'font-bold text-lg sm:text-xl text-gray-900 dark:text-white';
   if (positive) {
-    valueClass = 'font-bold text-lg sm:text-xl text-green-400 dark:text-green-400';
+    valueClass = 'font-bold text-lg sm:text-xl text-green-600 dark:text-green-400';
   } else if (negative) {
-    valueClass = 'font-bold text-lg sm:text-xl text-red-400 dark:text-red-400';
+    valueClass = 'font-bold text-lg sm:text-xl text-red-600 dark:text-red-400';
   } else if (highlight) {
-    valueClass = 'font-bold text-lg sm:text-xl text-primary-400 dark:text-primary-400';
+    valueClass = 'font-bold text-lg sm:text-xl text-primary-600 dark:text-primary-400';
   }
 
   return (
