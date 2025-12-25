@@ -663,7 +663,7 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
 
     return (
       <div className="w-full">
-        {label && <label className="text-xs text-muted-foreground mb-1 block">{label}</label>}
+        {label && <label className="text-xs text-muted-foreground dark:text-gray-400 mb-1 block">{label}</label>}
         <div className="relative">
           {showIcon && (
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 pointer-events-none z-10" />

@@ -54,11 +54,11 @@ export function BasicInfoSection({
               placeholder="Ex: Aluguel, Salário, Internet..."
               required
               className={cn(
-                'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                 errors.description && 'border-red-500 focus-visible:ring-red-500',
               )}
             />
-            <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+            <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
           </div>
         </FormField>
 
@@ -72,7 +72,7 @@ export function BasicInfoSection({
             >
               <div className="flex items-center gap-2">
                 {TypeIcon && (
-                  <TypeIcon className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                  <TypeIcon className="h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                 )}
                 <span>
                   {TYPE_OPTIONS.find((opt) => opt.value === form.type)?.label || 'Selecione...'}
@@ -110,11 +110,11 @@ export function BasicInfoSection({
               placeholder="R$ 0,00"
               required
               className={cn(
-                'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                 errors.value && 'border-red-500 focus-visible:ring-red-500',
               )}
             />
-            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
           </div>
         </FormField>
 
@@ -127,7 +127,7 @@ export function BasicInfoSection({
               )}
             >
               <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                <Tag className="h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                 <span>
                   {categories?.find((cat) => cat.id === form.category)?.name || 'Selecione...'}
                 </span>
@@ -162,7 +162,7 @@ export function BasicInfoSection({
               )}
             >
               <div className="flex items-center gap-2">
-                <Wallet className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                <Wallet className="h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                 <span>
                   {accounts && accounts.length > 0
                     ? accounts.find((acc) => acc.id === form.accountId)?.name || 'Selecione...'

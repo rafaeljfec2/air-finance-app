@@ -12,10 +12,10 @@ import { useCompanyStore } from '@/stores/company';
 import { formatDateToLocalISO } from '@/utils/date';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import {
-  BanknotesIcon,
-  BuildingLibraryIcon,
-  CreditCardIcon,
-  WalletIcon,
+    BanknotesIcon,
+    BuildingLibraryIcon,
+    CreditCardIcon,
+    WalletIcon,
 } from '@heroicons/react/24/outline';
 import { Building2, CreditCard, DollarSign, Hash, Palette, X } from 'lucide-react';
 import type { ChangeEvent, FormEvent } from 'react';
@@ -167,7 +167,7 @@ export function AccountFormModal({
               <h2 className="text-xl font-semibold text-text dark:text-text-dark">
                 {account ? 'Editar Conta' : 'Nova Conta'}
               </h2>
-              <p className="text-sm text-muted-foreground dark:text-gray-400">
+              <p className="text-sm text-muted-foreground dark:text-gray-400 dark:text-gray-400">
                 {account
                   ? 'Atualize as informações da conta'
                   : 'Preencha os dados da nova conta bancária'}
@@ -205,11 +205,11 @@ export function AccountFormModal({
                       placeholder="Ex: Conta Principal"
                       required
                       className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                         errors.name && 'border-red-500 focus-visible:ring-red-500',
                       )}
                     />
-                    <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                    <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                   </div>
                 </FormField>
 
@@ -253,11 +253,11 @@ export function AccountFormModal({
                       placeholder="Ex: Banco do Brasil"
                       required
                       className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                         errors.institution && 'border-red-500 focus-visible:ring-red-500',
                       )}
                     />
-                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                   </div>
                 </FormField>
               </div>
@@ -281,7 +281,7 @@ export function AccountFormModal({
                     placeholder="0000"
                     required
                     className={cn(
-                      'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
+                      'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
                       errors.agency && 'border-red-500 focus-visible:ring-red-500',
                     )}
                   />
@@ -295,7 +295,7 @@ export function AccountFormModal({
                     placeholder="00000-0"
                     required
                     className={cn(
-                      'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
+                      'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
                       errors.accountNumber && 'border-red-500 focus-visible:ring-red-500',
                     )}
                   />
@@ -331,11 +331,11 @@ export function AccountFormModal({
                       placeholder="R$ 0,00"
                       required
                       className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                         errors.initialBalance && 'border-red-500 focus-visible:ring-red-500',
                       )}
                     />
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                   </div>
                 </FormField>
 

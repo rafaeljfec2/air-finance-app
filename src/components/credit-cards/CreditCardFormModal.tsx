@@ -1,21 +1,21 @@
-import { useEffect, useState, useMemo } from 'react';
-import type { ChangeEvent, FormEvent } from 'react';
-import { CreditCard, DollarSign, Calendar, Palette, X } from 'lucide-react';
-import { Modal } from '@/components/ui/Modal';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { FormField } from '@/components/ui/FormField';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/button';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
-import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 import {
-  CreditCard as CreditCardType,
-  CreateCreditCardPayload,
+    CreateCreditCardPayload,
+    CreditCard as CreditCardType,
 } from '@/services/creditCardService';
 import { useCompanyStore } from '@/stores/company';
-import { cn } from '@/lib/utils';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { BanknotesIcon, BuildingLibraryIcon, CreditCardIcon } from '@heroicons/react/24/outline';
+import { Calendar, CreditCard, DollarSign, Palette, X } from 'lucide-react';
+import type { ChangeEvent, FormEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const bankTypes = [
   { value: 'nubank', label: 'Nubank', icon: CreditCardIcon },
@@ -155,7 +155,7 @@ export function CreditCardFormModal({
               <h2 className="text-xl font-semibold text-text dark:text-text-dark">
                 {creditCard ? 'Editar Cartão' : 'Novo Cartão de Crédito'}
               </h2>
-              <p className="text-sm text-muted-foreground dark:text-gray-400">
+              <p className="text-sm text-muted-foreground dark:text-gray-400 dark:text-gray-400">
                 {creditCard
                   ? 'Atualize as informações do cartão'
                   : 'Preencha os dados do novo cartão de crédito'}
@@ -193,11 +193,11 @@ export function CreditCardFormModal({
                       placeholder="Ex: Cartão Nubank"
                       required
                       className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                         errors.name && 'border-red-500 focus-visible:ring-red-500',
                       )}
                     />
-                    <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                    <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                   </div>
                 </FormField>
 
@@ -219,11 +219,11 @@ export function CreditCardFormModal({
                       placeholder="R$ 0,00"
                       required
                       className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                         errors.limit && 'border-red-500 focus-visible:ring-red-500',
                       )}
                     />
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                   </div>
                 </FormField>
               </div>

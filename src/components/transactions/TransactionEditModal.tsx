@@ -168,7 +168,7 @@ export function TransactionEditModal({
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="category" className="text-xs text-muted-foreground">
+          <label htmlFor="category" className="text-xs text-muted-foreground dark:text-gray-400">
             Categoria
           </label>
           <ComboBox
@@ -184,7 +184,7 @@ export function TransactionEditModal({
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="description" className="text-xs text-muted-foreground">
+          <label htmlFor="description" className="text-xs text-muted-foreground dark:text-gray-400">
             Descrição
           </label>
           <Input
@@ -199,7 +199,7 @@ export function TransactionEditModal({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label htmlFor="account" className="text-xs text-muted-foreground">
+            <label htmlFor="account" className="text-xs text-muted-foreground dark:text-gray-400">
               Conta
             </label>
             <ComboBox
@@ -215,7 +215,7 @@ export function TransactionEditModal({
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="launchType" className="text-xs text-muted-foreground">
+            <label htmlFor="launchType" className="text-xs text-muted-foreground dark:text-gray-400">
               Tipo
             </label>
             <ComboBox
@@ -229,7 +229,7 @@ export function TransactionEditModal({
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="value" className="text-xs text-muted-foreground">
+          <label htmlFor="value" className="text-xs text-muted-foreground dark:text-gray-400">
             Valor
           </label>
           <Input
@@ -245,7 +245,7 @@ export function TransactionEditModal({
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="observation" className="text-xs text-muted-foreground">
+          <label htmlFor="observation" className="text-xs text-muted-foreground dark:text-gray-400">
             Observação
           </label>
           <Textarea

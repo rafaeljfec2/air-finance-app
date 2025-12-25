@@ -1,25 +1,24 @@
-import { useEffect, useState, useMemo } from 'react';
-import type { ChangeEvent, FormEvent } from 'react';
-import { Tag, TrendingUp, TrendingDown, Palette, X } from 'lucide-react';
-import { Modal } from '@/components/ui/Modal';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { FormField } from '@/components/ui/FormField';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/button';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
-import { Category } from '@/services/categoryService';
-import { CreateCategory } from '@/services/categoryService';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { Category, CreateCategory } from '@/services/categoryService';
 import {
-  ArrowTrendingDownIcon,
-  ArrowTrendingUpIcon,
-  BuildingLibraryIcon,
-  GiftIcon,
-  ShoppingCartIcon,
-  TagIcon,
-  WalletIcon,
+    ArrowTrendingDownIcon,
+    ArrowTrendingUpIcon,
+    BuildingLibraryIcon,
+    GiftIcon,
+    ShoppingCartIcon,
+    TagIcon,
+    WalletIcon,
 } from '@heroicons/react/24/outline';
+import { Palette, Tag, TrendingDown, TrendingUp, X } from 'lucide-react';
+import type { ChangeEvent, FormEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const iconOptions = [
   { value: 'TagIcon', icon: TagIcon },
@@ -137,7 +136,7 @@ export function CategoryFormModal({
               <h2 className="text-xl font-semibold text-text dark:text-text-dark">
                 {category ? 'Editar Categoria' : 'Nova Categoria'}
               </h2>
-              <p className="text-sm text-muted-foreground dark:text-gray-400">
+              <p className="text-sm text-muted-foreground dark:text-gray-400 dark:text-gray-400">
                 {category
                   ? 'Atualize as informações da categoria'
                   : 'Preencha os dados da nova categoria'}
@@ -179,11 +178,11 @@ export function CategoryFormModal({
                       placeholder="Ex: Alimentação"
                       required
                       className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                         errors.name && 'border-red-500 focus-visible:ring-red-500',
                       )}
                     />
-                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                   </div>
                 </FormField>
 

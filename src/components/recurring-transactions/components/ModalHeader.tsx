@@ -16,7 +16,7 @@ export function ModalHeader({ isEditing, onClose }: Readonly<ModalHeaderProps>) 
           <h2 className="text-xl font-semibold text-text dark:text-text-dark">
             {isEditing ? 'Editar Transação Recorrente' : 'Nova Transação Recorrente'}
           </h2>
-          <p className="text-sm text-muted-foreground dark:text-gray-400">
+          <p className="text-sm text-muted-foreground dark:text-gray-400 dark:text-gray-400">
             {isEditing
               ? 'Atualize as informações da transação recorrente'
               : 'Preencha os dados da nova transação recorrente'}

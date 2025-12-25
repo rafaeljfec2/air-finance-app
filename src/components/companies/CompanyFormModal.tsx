@@ -222,7 +222,7 @@ export function CompanyFormModal({
               <h2 className="text-xl font-semibold text-text dark:text-text-dark">
                 {company ? 'Editar Empresa/Pessoa' : 'Nova Empresa/Pessoa'}
               </h2>
-              <p className="text-sm text-muted-foreground dark:text-gray-400">
+              <p className="text-sm text-muted-foreground dark:text-gray-400 dark:text-gray-400">
                 {company
                   ? 'Atualize as informações da empresa ou pessoa física'
                   : 'Preencha os dados da empresa ou pessoa física'}
@@ -264,11 +264,11 @@ export function CompanyFormModal({
                       placeholder="Ex: Minha Empresa Ltda. ou João Silva"
                       required
                       className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                         errors.name && 'border-red-500 focus-visible:ring-red-500',
                       )}
                     />
-                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                   </div>
                 </FormField>
 
@@ -281,7 +281,7 @@ export function CompanyFormModal({
                     required
                     maxLength={18}
                     className={cn(
-                      'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all font-mono',
+                      'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all font-mono',
                       errors.cnpj && 'border-red-500 focus-visible:ring-red-500',
                     )}
                   />
@@ -354,11 +354,11 @@ export function CompanyFormModal({
                       onChange={handleChange}
                       placeholder="contato@empresa.com"
                       className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                         errors.email && 'border-red-500 focus-visible:ring-red-500',
                       )}
                     />
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                   </div>
                 </FormField>
 
@@ -371,11 +371,11 @@ export function CompanyFormModal({
                       placeholder="(00) 00000-0000"
                       maxLength={15}
                       className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                         errors.phone && 'border-red-500 focus-visible:ring-red-500',
                       )}
                     />
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                   </div>
                 </FormField>
               </div>
@@ -397,9 +397,9 @@ export function CompanyFormModal({
                     value={form.address}
                     onChange={handleChange}
                     placeholder="Rua, número, bairro, cidade, UF"
-                    className="bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10"
+                    className="bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10"
                   />
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                 </div>
               </FormField>
             </div>
@@ -421,9 +421,9 @@ export function CompanyFormModal({
                     onChange={handleChange}
                     placeholder="Adicione observações ou notas sobre a empresa..."
                     rows={3}
-                    className="w-full bg-background dark:bg-background-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all rounded-md resize-none p-3 pl-10"
+                    className="w-full bg-background dark:bg-background-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all rounded-md resize-none p-3 pl-10"
                   />
-                  <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                  <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
                 </div>
               </FormField>
             </div>
