@@ -18,7 +18,7 @@ export const UserSchema = z.object({
   integrations: z
     .object({
       openaiApiKey: z.string().optional(),
-      openaiModel: z.enum(['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo']).optional(),
+      openaiModel: z.enum(['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo', 'gpt-5.2', 'gpt-5-mini']).optional(),
     })
     .optional(),
 });
@@ -35,7 +35,7 @@ export type CreateUser = z.infer<typeof CreateUserSchema>;
 // Service functions
 export const getUsers = async (): Promise<User[]> => {
   try {
-    const response = await apiClient.get<User[]>('/users');
+    const response = await apiClient.get<User[]>('/user');
     return UserSchema.array().parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar usuários:', error);
@@ -45,7 +45,7 @@ export const getUsers = async (): Promise<User[]> => {
 
 export const getUserById = async (id: string): Promise<User> => {
   try {
-    const response = await apiClient.get<User>(`/users/${id}`);
+    const response = await apiClient.get<User>(`/user/${id}`);
     return UserSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao buscar usuário:', error);
@@ -56,7 +56,7 @@ export const getUserById = async (id: string): Promise<User> => {
 export const createUser = async (data: CreateUser): Promise<User> => {
   try {
     const validatedData = CreateUserSchema.parse(data);
-    const response = await apiClient.post<User>('/users', validatedData);
+    const response = await apiClient.post<User>('/user', validatedData);
     return UserSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao criar usuário:', error);
@@ -67,7 +67,7 @@ export const createUser = async (data: CreateUser): Promise<User> => {
 export const updateUser = async (id: string, data: Partial<CreateUser>): Promise<User> => {
   try {
     const validatedData = CreateUserSchema.partial().parse(data);
-    const response = await apiClient.put<User>(`/users/${id}`, validatedData);
+    const response = await apiClient.put<User>(`/user/${id}`, validatedData);
     return UserSchema.parse(response.data);
   } catch (error) {
     console.error('Erro ao atualizar usuário:', error);
@@ -77,7 +77,7 @@ export const updateUser = async (id: string, data: Partial<CreateUser>): Promise
 
 export const deleteUser = async (id: string): Promise<void> => {
   try {
-    await apiClient.delete(`/users/${id}`);
+    await apiClient.delete(`/user/${id}`);
   } catch (error) {
     console.error('Erro ao deletar usuário:', error);
     throw new Error('Falha ao deletar usuário');

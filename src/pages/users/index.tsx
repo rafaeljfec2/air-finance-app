@@ -61,7 +61,16 @@ export function UsersPage() {
 
     try {
       if (editingId) {
-        updateUser({ id: editingId, data: form });
+        // Prepare data matching CreateUser structure
+        const updateData: CreateUser = {
+          name: form.name,
+          email: form.email,
+          role: form.role,
+          status: form.status,
+          companyIds: form.companyIds,
+          integrations: form.integrations,
+        };
+        updateUser({ id: editingId, data: updateData });
         setEditingId(null);
       } else {
         createUser(form);
@@ -72,6 +81,10 @@ export function UsersPage() {
         role: 'user',
         status: 'active',
         companyIds: companyId ? [companyId] : [],
+        integrations: {
+          openaiApiKey: '',
+          openaiModel: 'gpt-3.5-turbo',
+        },
       });
       setErrors({});
     } catch (error) {
@@ -88,6 +101,10 @@ export function UsersPage() {
         role: user.role,
         status: user.status,
         companyIds: user.companyIds,
+        integrations: {
+          openaiApiKey: user.integrations?.openaiApiKey || '',
+          openaiModel: user.integrations?.openaiModel || 'gpt-3.5-turbo',
+        },
       });
       setEditingId(id);
     }
@@ -206,6 +223,32 @@ export function UsersPage() {
                 </Select>
               </FormField>
 
+              <FormField label="Modelo OpenAI (Padrão)">
+                <Select
+                  value={form.integrations?.openaiModel || 'gpt-3.5-turbo'}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      integrations: {
+                        ...prev.integrations,
+                        openaiModel: value as any,
+                      },
+                    }))
+                  }
+                >
+                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
+                    {form.integrations?.openaiModel || 'gpt-3.5-turbo'}
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                    <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                    <SelectItem value="gpt-4">GPT-4</SelectItem>
+                    <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                    <SelectItem value="gpt-5.2">GPT-5.2</SelectItem>
+                    <SelectItem value="gpt-5-mini">GPT-5 Mini</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormField>
+
               <div className="flex gap-2 mt-4">
                 <Button
                   type="submit"
@@ -227,6 +270,10 @@ export function UsersPage() {
                         role: 'user',
                         status: 'active',
                         companyIds: companyId ? [companyId] : [],
+                        integrations: {
+                          openaiApiKey: '',
+                          openaiModel: 'gpt-3.5-turbo',
+                        },
                       });
                       setEditingId(null);
                     }}
@@ -251,7 +298,7 @@ export function UsersPage() {
                     <div className="flex-1">
                       <div className="font-medium text-text dark:text-text-dark">{user.name}</div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
-                      <div className="flex gap-2 mt-2">
+                      <div className="flex flex-wrap gap-2 mt-2">
                         <span className="text-xs px-2 py-1 rounded bg-primary-100 text-primary-800">
                           {user.role === 'admin' ? 'Administrador' : 'Usuário'}
                         </span>
@@ -264,6 +311,11 @@ export function UsersPage() {
                         >
                           {user.status === 'active' ? 'Ativo' : 'Inativo'}
                         </span>
+                        {user.integrations?.openaiModel && (
+                          <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+                             🤖 {user.integrations.openaiModel}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="flex gap-2">

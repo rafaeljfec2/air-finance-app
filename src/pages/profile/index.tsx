@@ -54,7 +54,7 @@ type ProfileFormData = {
   };
   integrations: {
     openaiApiKey: string;
-    openaiModel: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo';
+    openaiModel: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo' | 'gpt-5.2' | 'gpt-5-mini';
   };
 };
 
@@ -583,7 +583,7 @@ export function Profile() {
                         onValueChange={(value) =>
                           handleIntegrationChange(
                             'openaiModel',
-                            value as 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo',
+                            value as 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo' | 'gpt-5.2' | 'gpt-5-mini',
                           )
                         }
                         disabled={!isEditing}
@@ -595,6 +595,8 @@ export function Profile() {
                           <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo (Rápido e Econômico)</SelectItem>
                           <SelectItem value="gpt-4">GPT-4 (Maior Precisão)</SelectItem>
                           <SelectItem value="gpt-4-turbo">GPT-4 Turbo (Atualizado)</SelectItem>
+                          <SelectItem value="gpt-5.2">GPT-5.2 (Experimenta/Novo)</SelectItem>
+                          <SelectItem value="gpt-5-mini">GPT-5 Mini (Leve)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
