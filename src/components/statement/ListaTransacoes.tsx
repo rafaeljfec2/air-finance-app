@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { Transaction } from '@/types/transaction';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Transaction } from '@/types/transaction';
-import { Card } from '@/components/ui/card';
-import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline';
+import { TrendingDown, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
 
 interface ListaTransacoesProps {
   transacoes: Transaction[];
@@ -47,9 +47,9 @@ export function ListaTransacoes({ transacoes, onEditar, onRemover }: Readonly<Li
                     style={{ backgroundColor: transacao.category.color + '20' }}
                   >
                     {transacao.type === 'INCOME' ? (
-                      <ArrowTrendingUpIcon className="h-6 w-6 text-green-500" />
+                      <TrendingUp className="h-6 w-6 text-green-500" />
                     ) : (
-                      <ArrowTrendingDownIcon className="h-6 w-6 text-red-500" />
+                      <TrendingDown className="h-6 w-6 text-red-500" />
                     )}
                   </div>
 

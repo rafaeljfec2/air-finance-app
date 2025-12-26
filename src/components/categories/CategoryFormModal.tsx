@@ -8,31 +8,32 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 import { cn } from '@/lib/utils';
 import { Category, CreateCategory } from '@/services/categoryService';
 import {
-    ArrowTrendingDownIcon,
-    ArrowTrendingUpIcon,
-    BuildingLibraryIcon,
-    GiftIcon,
-    ShoppingCartIcon,
-    TagIcon,
-    WalletIcon,
-} from '@heroicons/react/24/outline';
-import { Palette, Tag, TrendingDown, TrendingUp, X } from 'lucide-react';
+  Gift,
+  Landmark,
+  Palette,
+  ShoppingCart,
+  Tag,
+  TrendingDown,
+  TrendingUp,
+  Wallet,
+  X,
+} from 'lucide-react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 const iconOptions = [
-  { value: 'TagIcon', icon: TagIcon },
-  { value: 'ArrowTrendingUpIcon', icon: ArrowTrendingUpIcon },
-  { value: 'ArrowTrendingDownIcon', icon: ArrowTrendingDownIcon },
-  { value: 'WalletIcon', icon: WalletIcon },
-  { value: 'ShoppingCartIcon', icon: ShoppingCartIcon },
-  { value: 'GiftIcon', icon: GiftIcon },
-  { value: 'BuildingLibraryIcon', icon: BuildingLibraryIcon },
+  { value: 'Tag', icon: Tag },
+  { value: 'TrendingUp', icon: TrendingUp },
+  { value: 'TrendingDown', icon: TrendingDown },
+  { value: 'Wallet', icon: Wallet },
+  { value: 'ShoppingCart', icon: ShoppingCart },
+  { value: 'Gift', icon: Gift },
+  { value: 'Landmark', icon: Landmark },
 ] as const;
 
 const categoryTypes = [
-  { value: 'income', label: 'Receita', icon: ArrowTrendingUpIcon },
-  { value: 'expense', label: 'Despesa', icon: ArrowTrendingDownIcon },
+  { value: 'income', label: 'Receita', icon: TrendingUp },
+  { value: 'expense', label: 'Despesa', icon: TrendingDown },
 ] as const;
 
 type CategoryType = (typeof categoryTypes)[number]['value'];
@@ -57,7 +58,7 @@ export function CategoryFormModal({
       name: '',
       type: 'expense',
       color: '#8A05BE',
-      icon: 'TagIcon',
+      icon: 'Tag',
     }),
     [],
   );
@@ -136,7 +137,7 @@ export function CategoryFormModal({
               <h2 className="text-xl font-semibold text-text dark:text-text-dark">
                 {category ? 'Editar Categoria' : 'Nova Categoria'}
               </h2>
-              <p className="text-sm text-muted-foreground dark:text-gray-400 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground dark:text-gray-400">
                 {category
                   ? 'Atualize as informações da categoria'
                   : 'Preencha os dados da nova categoria'}
@@ -178,11 +179,11 @@ export function CategoryFormModal({
                       placeholder="Ex: Alimentação"
                       required
                       className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                         errors.name && 'border-red-500 focus-visible:ring-red-500',
                       )}
                     />
-                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
+                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
                   </div>
                 </FormField>
 
@@ -249,7 +250,7 @@ export function CategoryFormModal({
                     value={form.icon}
                     onChange={handleIconChange}
                     options={iconOptions.map((t) => ({
-                      value: t.icon.displayName || t.icon.name || t.value,
+                      value: t.value,
                       icon: t.icon,
                     }))}
                   />

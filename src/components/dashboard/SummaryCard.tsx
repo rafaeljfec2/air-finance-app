@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline';
+import { TrendingDown, TrendingUp } from 'lucide-react';
 
 interface SummaryCardProps {
   title: string;
@@ -9,7 +9,7 @@ interface SummaryCardProps {
 
 export function SummaryCard({ title, value, type }: SummaryCardProps) {
   const isPositive = type === 'income' || (type === 'balance' && value >= 0);
-  const Icon = isPositive ? ArrowTrendingUpIcon : ArrowTrendingDownIcon;
+  const Icon = isPositive ? TrendingUp : TrendingDown;
   const color = isPositive ? 'text-green-500' : 'text-red-500';
 
   return (
@@ -26,4 +26,4 @@ export function SummaryCard({ title, value, type }: SummaryCardProps) {
       </p>
     </div>
   );
-} 
+}

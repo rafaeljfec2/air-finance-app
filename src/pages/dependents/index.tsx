@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { ColorPicker } from '@/components/ui/color-picker';
-import { IconPicker } from '@/components/ui/icon-picker';
-import { Button } from '@/components/ui/button';
-import { UserGroupIcon, UserIcon, HeartIcon } from '@heroicons/react/24/outline';
-import { FormField } from '@/components/ui/FormField';
-import { useDependents } from '@/hooks/useDependents';
-import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { Loading } from '@/components/Loading';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ColorPicker } from '@/components/ui/color-picker';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { FormField } from '@/components/ui/FormField';
+import { IconPicker } from '@/components/ui/icon-picker';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { useDependents } from '@/hooks/useDependents';
+import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
+import { Heart, User, Users } from 'lucide-react';
+import React, { useState } from 'react';
 
 const relationTypes = [
-  { value: 'filho', label: 'Filho(a)', icon: UserIcon },
-  { value: 'conjuge', label: 'Cônjuge', icon: HeartIcon },
-  { value: 'pai', label: 'Pai', icon: UserIcon },
-  { value: 'mae', label: 'Mãe', icon: UserIcon },
-  { value: 'outro', label: 'Outro', icon: UserIcon },
+  { value: 'filho', label: 'Filho(a)', icon: User, iconName: 'User' },
+  { value: 'conjuge', label: 'Cônjuge', icon: Heart, iconName: 'Heart' },
+  { value: 'pai', label: 'Pai', icon: User, iconName: 'User' },
+  { value: 'mae', label: 'Mãe', icon: User, iconName: 'User' },
+  { value: 'outro', label: 'Outro', icon: User, iconName: 'User' },
 ] as const;
 
 type RelationType = (typeof relationTypes)[number]['value'];
@@ -42,7 +42,7 @@ export function DependentsPage() {
     name: '',
     relation: 'filho' as RelationType,
     color: '#8A05BE',
-    icon: 'UserIcon',
+    icon: 'User',
     companyId: companyId,
   });
 
@@ -89,7 +89,7 @@ export function DependentsPage() {
         name: '',
         relation: 'filho',
         color: '#8A05BE',
-        icon: 'UserIcon',
+        icon: 'User',
         companyId: companyId,
       });
       setErrors({});
@@ -158,7 +158,7 @@ export function DependentsPage() {
     <ViewDefault>
       <div className="container mx-auto px-2 sm:px-6 py-10">
         <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark mb-6 flex items-center gap-2">
-          <UserGroupIcon className="h-6 w-6 text-primary-500" /> Dependentes
+          <Users className="h-6 w-6 text-primary-500" /> Dependentes
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Formulário */}
@@ -201,7 +201,7 @@ export function DependentsPage() {
                   value={form.icon}
                   onChange={handleIconChange}
                   options={relationTypes.map((t) => ({
-                    value: t.icon.displayName || t.icon.name || t.value,
+                    value: t.iconName,
                     icon: t.icon,
                   }))}
                 />
@@ -225,7 +225,7 @@ export function DependentsPage() {
                         name: '',
                         relation: 'filho',
                         color: '#8A05BE',
-                        icon: 'UserIcon',
+                        icon: 'User',
                         companyId: companyId || '',
                       });
                       setEditingId(null);
@@ -246,7 +246,7 @@ export function DependentsPage() {
               )}
               {dependents?.map((dependent) => {
                 const Icon =
-                  relationTypes.find((t) => t.value === dependent.relation)?.icon || UserIcon;
+                  relationTypes.find((t) => t.value === dependent.relation)?.icon || User;
                 return (
                   <li key={dependent.id} className="flex items-center justify-between py-3">
                     <div className="flex items-center gap-3">

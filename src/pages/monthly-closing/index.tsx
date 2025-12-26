@@ -1,5 +1,5 @@
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { CalendarIcon } from '@heroicons/react/24/outline';
+import { Calendar } from 'lucide-react';
 
 export function MonthlyClosing() {
   return (
@@ -8,7 +8,7 @@ export function MonthlyClosing() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="inline-flex items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900 p-2">
-              <CalendarIcon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+              <Calendar className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark">
               Fechamento Mensal

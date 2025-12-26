@@ -1,6 +1,6 @@
 import { MonthlyReport } from '@/types/report';
 import { formatCurrency } from '@/utils/formatters';
-import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 
 interface FinancialSummaryProps {
   report: MonthlyReport;
@@ -16,7 +16,7 @@ export function FinancialSummary({ report }: Readonly<FinancialSummaryProps>) {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-medium text-gray-900 dark:text-white">Receitas</h2>
           <div className="flex items-center text-green-600 dark:text-green-400">
-            <ArrowUpIcon className="h-5 w-5 mr-1" />
+            <ArrowUp className="h-5 w-5 mr-1" />
             <span className="text-sm font-medium">Entradas</span>
           </div>
         </div>
@@ -41,7 +41,7 @@ export function FinancialSummary({ report }: Readonly<FinancialSummaryProps>) {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-medium text-gray-900 dark:text-white">Despesas</h2>
           <div className="flex items-center text-red-600 dark:text-red-400">
-            <ArrowDownIcon className="h-5 w-5 mr-1" />
+            <ArrowDown className="h-5 w-5 mr-1" />
             <span className="text-sm font-medium">Saídas</span>
           </div>
         </div>

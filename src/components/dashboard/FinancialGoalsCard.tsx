@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { useDashboardGoalsSummary } from '@/hooks/useDashboard';
 import type { DashboardGoalSummary } from '@/types/dashboard';
-import { BuildingOfficeIcon, CreditCardIcon } from '@heroicons/react/24/outline';
+import { Building2, CreditCard } from 'lucide-react';
 
 interface FinancialGoalsCardProps {
   companyId: string;
@@ -46,7 +46,7 @@ export function FinancialGoalsCard({ companyId, onViewAll }: Readonly<FinancialG
         {!isLoading && !error && goals.length > 0 && (
           <div className="space-y-4">
             {goals.slice(0, 2).map((goal, index) => {
-              const Icon = index === 0 ? BuildingOfficeIcon : CreditCardIcon;
+              const Icon = index === 0 ? Building2 : CreditCard;
               return (
                 <div key={goal.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">

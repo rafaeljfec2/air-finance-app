@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { FormField } from '@/components/ui/FormField';
+import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { FormField } from '@/components/ui/FormField';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { useUsers } from '@/hooks/useUsers';
-import { UserIcon } from '@heroicons/react/24/outline';
+import { ViewDefault } from '@/layouts/ViewDefault';
 import { CreateUser } from '@/services/userService';
 import { useCompanyStore } from '@/stores/company';
+import { User } from 'lucide-react';
+import React, { useState } from 'react';
 
 export function UsersPage() {
   const { activeCompany } = useCompanyStore();
@@ -145,7 +145,7 @@ export function UsersPage() {
     <ViewDefault>
       <div className="container mx-auto px-2 sm:px-6 py-10">
         <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark mb-6 flex items-center gap-2">
-          <UserIcon className="h-6 w-6 text-primary-500" /> Usuários
+          <User className="h-6 w-6 text-primary-500" /> Usuários
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Formulário */}

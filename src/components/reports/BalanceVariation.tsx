@@ -1,6 +1,6 @@
 import { MonthlyReport } from '@/types/report';
 import { formatCurrency, formatPercentual } from '@/utils/formatters';
-import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline';
+import { TrendingDown, TrendingUp } from 'lucide-react';
 
 interface BalanceVariationProps {
   report: MonthlyReport;
@@ -9,7 +9,7 @@ interface BalanceVariationProps {
 export function BalanceVariation({ report }: BalanceVariationProps) {
   const { balance } = report.summary;
   const isPositive = balance.variation >= 0;
-  const Icon = isPositive ? ArrowTrendingUpIcon : ArrowTrendingDownIcon;
+  const Icon = isPositive ? TrendingUp : TrendingDown;
 
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">

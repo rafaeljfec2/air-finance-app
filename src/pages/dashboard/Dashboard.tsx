@@ -19,15 +19,15 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
 import type { DashboardFilters, DashboardTimeRange } from '@/types/dashboard';
 import { formatCurrency } from '@/utils/formatters';
-import {
-  BanknotesIcon,
-  CalendarIcon,
-  ChartBarIcon,
-  ListBulletIcon,
-} from '@heroicons/react/24/outline';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import {
+  Banknote,
+  BarChart3,
+  Calendar,
+  List,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 export function Dashboard() {
@@ -247,14 +247,14 @@ export function Dashboard() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-primary-100 dark:bg-primary-900/20 rounded-lg">
-                <BanknotesIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
+                <Banknote className="h-6 w-6 text-primary-600 dark:text-primary-400" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                   Dashboard Financeiro
                 </h1>
                 <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                  <CalendarIcon className="h-4 w-4" />
+                  <Calendar className="h-4 w-4" />
                   <span className="capitalize">{formattedDate}</span>
                 </div>
               </div>
@@ -283,7 +283,7 @@ export function Dashboard() {
                   onClick={() => setSelectedView('overview')}
                   className="flex items-center gap-2"
                 >
-                  <ChartBarIcon className="h-4 w-4" />
+                  <BarChart3 className="h-4 w-4" />
                   <span className="hidden sm:inline">Visão Geral</span>
                 </Button>
                 <Button
@@ -292,7 +292,7 @@ export function Dashboard() {
                   onClick={() => setSelectedView('details')}
                   className="flex items-center gap-2"
                 >
-                  <ListBulletIcon className="h-4 w-4" />
+                  <List className="h-4 w-4" />
                   <span className="hidden sm:inline">Detalhes</span>
                 </Button>
               </div>

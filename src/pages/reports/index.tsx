@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { useMonthlyReport } from '@/hooks/useMonthlyReport';
-import { formatMonthYear } from '@/utils/formatters';
-import { ArrowLeftIcon, ArrowRightIcon, ChartPieIcon } from '@heroicons/react/24/outline';
-import { Button } from '@/components/ui/button';
-import { FinancialSummary } from '@/components/reports/FinancialSummary';
+import { BalanceVariation } from '@/components/reports/BalanceVariation';
 import { CategoryCharts } from '@/components/reports/CategoryCharts';
 import { CategoryDetails } from '@/components/reports/CategoryDetails';
-import { BalanceVariation } from '@/components/reports/BalanceVariation';
+import { FinancialSummary } from '@/components/reports/FinancialSummary';
+import { Button } from '@/components/ui/button';
+import { useMonthlyReport } from '@/hooks/useMonthlyReport';
+import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
+import { formatMonthYear } from '@/utils/formatters';
+import { ArrowLeft, ArrowRight, PieChart } from 'lucide-react';
+import { useState } from 'react';
 
 type ReportSection = 'summary' | 'charts' | 'details';
 
@@ -35,7 +35,7 @@ export function Reports() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-primary-100 dark:bg-primary-900/20 rounded-lg">
-              <ChartPieIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary-600 dark:text-primary-400" />
+              <PieChart className="h-5 w-5 sm:h-6 sm:w-6 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
@@ -55,13 +55,13 @@ export function Reports() {
               className="p-2"
               aria-label="Mês anterior"
             >
-              <ArrowLeftIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
             <span className="min-w-[120px] text-center text-base sm:text-lg font-medium text-gray-900 dark:text-white">
               {formatMonthYear(date)}
             </span>
             <Button variant="outline" onClick={nextMonth} className="p-2" aria-label="Próximo mês">
-              <ArrowRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
           </div>
         </div>
@@ -117,4 +117,4 @@ export function Reports() {
       </div>
     </ViewDefault>
   );
-} 
+}

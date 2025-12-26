@@ -2,7 +2,7 @@ import { Transaction as TransactionType } from '@/types/transaction';
 import { formatCurrency } from '@/utils/formatters';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 
 interface TransactionListProps {
   transactions: TransactionType[];
@@ -27,9 +27,9 @@ export function TransactionList({ transactions }: Readonly<TransactionListProps>
                 }`}
               >
                 {isIncome ? (
-                  <ArrowUpIcon className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <ArrowUp className="h-4 w-4 text-green-600 dark:text-green-400" />
                 ) : (
-                  <ArrowDownIcon className="h-4 w-4 text-red-600 dark:text-red-400" />
+                  <ArrowDown className="h-4 w-4 text-red-600 dark:text-red-400" />
                 )}
               </div>
               <div>

@@ -1,22 +1,22 @@
-import { useState } from 'react';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  BarChart,
-  Bar
-} from 'recharts';
-import { ChartBarIcon, ChartPieIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
-import { formatCurrency } from '@/utils/formatters';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/utils/formatters';
+import { BarChart3, PieChart as PieChartIcon, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Cell,
+    Line,
+    LineChart,
+    Pie,
+    PieChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis
+} from 'recharts';
 
 interface ChartData {
   name: string;
@@ -165,7 +165,7 @@ export function CategoryCharts({ report }: CategoryChartsProps) {
               : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
           )}
         >
-          <ChartPieIcon className="h-5 w-5 mr-1" />
+          <PieChartIcon className="h-5 w-5 mr-1" />
           Pie Chart
         </button>
         <button
@@ -177,7 +177,7 @@ export function CategoryCharts({ report }: CategoryChartsProps) {
               : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
           )}
         >
-          <ChartBarIcon className="h-5 w-5 mr-1" />
+          <BarChart3 className="h-5 w-5 mr-1" />
           Bar Chart
         </button>
         <button
@@ -189,7 +189,7 @@ export function CategoryCharts({ report }: CategoryChartsProps) {
               : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
           )}
         >
-          <ArrowTrendingUpIcon className="h-5 w-5 mr-1" />
+          <TrendingUp className="h-5 w-5 mr-1" />
           Line Chart
         </button>
       </div>

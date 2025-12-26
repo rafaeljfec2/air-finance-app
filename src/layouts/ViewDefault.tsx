@@ -3,7 +3,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { CompanySelectionModal } from '@/features/company/components/CompanySelectionModal';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebar';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Menu, X } from 'lucide-react';
 import { ReactNode, useCallback, useState } from 'react';
 
 interface ViewDefaultProps {
@@ -37,7 +37,7 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
           onClick={handleToggleSidebar}
           className="p-3 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
-          {isSidebarOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
+          {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 

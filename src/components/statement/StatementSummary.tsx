@@ -1,5 +1,5 @@
 import { formatCurrency } from '@/utils/formatters';
-import { ArrowTrendingUpIcon, ArrowTrendingDownIcon, BanknotesIcon } from '@heroicons/react/24/outline';
+import { Banknote, TrendingDown, TrendingUp } from 'lucide-react';
 
 interface StatementSummaryProps {
   balance: number;
@@ -32,9 +32,9 @@ export function StatementSummary({
           : 'text-red-600 dark:text-red-400'
       }`}>
         {variation > 0 ? (
-          <ArrowTrendingUpIcon className="h-4 w-4 mr-1" />
+          <TrendingUp className="h-4 w-4 mr-1" />
         ) : (
-          <ArrowTrendingDownIcon className="h-4 w-4 mr-1" />
+          <TrendingDown className="h-4 w-4 mr-1" />
         )}
         {Math.abs(variation).toFixed(1)}%
       </span>
@@ -45,7 +45,7 @@ export function StatementSummary({
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800 relative overflow-hidden">
         <div className="absolute right-0 top-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-primary-500/10 dark:bg-primary-400/10">
-          <BanknotesIcon className="h-12 w-12 absolute bottom-4 left-4 text-primary-500/40 dark:text-primary-400/40" />
+          <Banknote className="h-12 w-12 absolute bottom-4 left-4 text-primary-500/40 dark:text-primary-400/40" />
         </div>
         <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Saldo Disponível</h3>
         <div className="mt-2">
@@ -60,7 +60,7 @@ export function StatementSummary({
 
       <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800 relative overflow-hidden">
         <div className="absolute right-0 top-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-green-500/10 dark:bg-green-400/10">
-          <ArrowTrendingUpIcon className="h-12 w-12 absolute bottom-4 left-4 text-green-500/40 dark:text-green-400/40" />
+          <TrendingUp className="h-12 w-12 absolute bottom-4 left-4 text-green-500/40 dark:text-green-400/40" />
         </div>
         <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Receitas</h3>
         <div className="mt-2">
@@ -73,7 +73,7 @@ export function StatementSummary({
 
       <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800 relative overflow-hidden">
         <div className="absolute right-0 top-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-red-500/10 dark:bg-red-400/10">
-          <ArrowTrendingDownIcon className="h-12 w-12 absolute bottom-4 left-4 text-red-500/40 dark:text-red-400/40" />
+          <TrendingDown className="h-12 w-12 absolute bottom-4 left-4 text-red-500/40 dark:text-red-400/40" />
         </div>
         <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Despesas</h3>
         <div className="mt-2">

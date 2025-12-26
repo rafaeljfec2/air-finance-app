@@ -1,6 +1,6 @@
 import { Transaction } from '@/types/transaction';
 import { formatCurrency, formatDateTime } from '@/utils/formatters';
-import { ArrowPathIcon, InboxIcon } from '@heroicons/react/24/outline';
+import { Inbox, RefreshCw } from 'lucide-react';
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -20,7 +20,7 @@ export function TransactionList({
   if (transactions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 px-4">
-        <InboxIcon className="h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" />
+        <Inbox className="h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" />
         <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
           Nenhuma transação encontrada
         </h3>
@@ -42,7 +42,7 @@ export function TransactionList({
       {/* Pull to refresh indicator */}
       {isLoading && (
         <div className="absolute inset-x-0 top-0 flex items-center justify-center py-4 bg-gray-50 dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-90 backdrop-blur-sm z-10">
-          <ArrowPathIcon className="h-6 w-6 text-primary-600 dark:text-primary-400 animate-spin" />
+          <RefreshCw className="h-6 w-6 text-primary-600 dark:text-primary-400 animate-spin" />
         </div>
       )}
 

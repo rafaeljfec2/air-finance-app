@@ -1,19 +1,19 @@
-import { Fragment } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Logo } from '@/components/Logo';
+import { useAuth } from '@/hooks/useAuth';
+import { cn } from '@/lib/utils';
+import { useTheme } from '@/stores/useTheme';
 import { Menu, Transition } from '@headlessui/react';
 import {
-  UserCircleIcon,
-  ArrowRightOnRectangleIcon,
-  BellIcon,
-  SunIcon,
-  MoonIcon,
-  Cog6ToothIcon,
-  Bars3Icon,
-} from '@heroicons/react/24/outline';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/useAuth';
-import { useTheme } from '@/stores/useTheme';
-import { Logo } from '@/components/Logo';
+    Bell,
+    CircleUser,
+    LogOut,
+    Menu as MenuIcon,
+    Moon,
+    Settings,
+    Sun,
+} from 'lucide-react';
+import { Fragment } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CompanySelector } from './CompanySelector';
 
 export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
@@ -35,7 +35,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
           onClick={onOpenSidebar}
           aria-label="Abrir menu"
         >
-          <Bars3Icon className="h-6 w-6" />
+          <MenuIcon className="h-6 w-6" />
         </button>
         {/* Logo */}
         <div className="flex-shrink-0">
@@ -56,9 +56,9 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
             aria-label={isDarkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
           >
             {isDarkMode ? (
-              <SunIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+              <Sun className="h-4 w-4 sm:h-5 sm:w-5" />
             ) : (
-              <MoonIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+              <Moon className="h-4 w-4 sm:h-5 sm:w-5" />
             )}
           </button>
 
@@ -69,7 +69,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
                 <Menu.Button className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                   <span className="sr-only">Ver notificações</span>
                   <div className="relative">
-                    <BellIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
                     <span className="absolute -top-1 -right-1 h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-red-500 flex items-center justify-center text-[10px] sm:text-xs text-white">
                       2
                     </span>
@@ -129,7 +129,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
               <>
                 <Menu.Button className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                   <span className="sr-only">Abrir menu do usuário</span>
-                  <UserCircleIcon className="h-8 w-8 text-text dark:text-text-dark" />
+                  <CircleUser className="h-8 w-8 text-text dark:text-text-dark" />
                 </Menu.Button>
 
                 <Transition
@@ -152,7 +152,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
                               'flex w-full items-center px-4 py-2 text-sm text-text dark:text-text-dark',
                             )}
                           >
-                            <UserCircleIcon className="mr-3 h-5 w-5" />
+                            <CircleUser className="mr-3 h-5 w-5" />
                             Meu Perfil
                           </button>
                         )}
@@ -166,7 +166,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
                               'flex w-full items-center px-4 py-2 text-sm text-text dark:text-text-dark',
                             )}
                           >
-                            <Cog6ToothIcon className="mr-3 h-5 w-5" />
+                            <Settings className="mr-3 h-5 w-5" />
                             Configurações
                           </button>
                         )}
@@ -181,7 +181,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
                                 'flex w-full items-center px-4 py-2 text-sm text-text dark:text-text-dark',
                               )}
                             >
-                              <ArrowRightOnRectangleIcon className="mr-3 h-5 w-5" />
+                              <LogOut className="mr-3 h-5 w-5" />
                               Sair
                             </button>
                           )}

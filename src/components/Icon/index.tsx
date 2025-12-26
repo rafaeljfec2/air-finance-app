@@ -1,6 +1,6 @@
-import * as HeroIcons from '@heroicons/react/24/outline';
+import * as LucideIcons from 'lucide-react';
 
-type IconName = keyof typeof HeroIcons;
+type IconName = keyof typeof LucideIcons;
 
 interface IconProps {
   name: IconName;
@@ -9,12 +9,13 @@ interface IconProps {
 }
 
 export function Icon({ name, size = 24, className = '' }: Readonly<IconProps>) {
-  const IconComponent = HeroIcons[name];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const IconComponent = (LucideIcons as any)[name];
 
   if (!IconComponent) {
     console.warn(`Icon ${name} not found`);
     return null;
   }
 
-  return <IconComponent width={size} height={size} className={className} />;
-} 
+  return <IconComponent size={size} className={className} />;
+}

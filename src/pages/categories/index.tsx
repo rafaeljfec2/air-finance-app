@@ -1,42 +1,46 @@
-import { useState, useMemo } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { useCategories } from '@/hooks/useCategories';
-import { useCompanyStore } from '@/stores/company';
-import {
-  TagIcon,
-  TagIcon as TagIconHero,
-  ArrowTrendingDownIcon,
-  ArrowTrendingUpIcon,
-  BuildingLibraryIcon,
-  GiftIcon,
-  ShoppingCartIcon,
-  WalletIcon,
-} from '@heroicons/react/24/outline';
-import { Plus, Search, Edit, Trash2, Grid3x3, List } from 'lucide-react';
-import { Category, CreateCategory } from '@/services/categoryService';
 import { CategoryFormModal } from '@/components/categories/CategoryFormModal';
 import { Loading } from '@/components/Loading';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { useCategories } from '@/hooks/useCategories';
 import { useViewMode } from '@/hooks/useViewMode';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { cn } from '@/lib/utils';
+import { Category, CreateCategory } from '@/services/categoryService';
+import { useCompanyStore } from '@/stores/company';
+import {
+    Edit,
+    Gift,
+    Grid3x3,
+    Landmark,
+    List,
+    Plus,
+    Search,
+    ShoppingCart,
+    Tag,
+    Trash2,
+    TrendingDown,
+    TrendingUp,
+    Wallet,
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 const iconOptions = [
-  { value: 'TagIcon', icon: TagIconHero },
-  { value: 'ArrowTrendingUpIcon', icon: ArrowTrendingUpIcon },
-  { value: 'ArrowTrendingDownIcon', icon: ArrowTrendingDownIcon },
-  { value: 'WalletIcon', icon: WalletIcon },
-  { value: 'ShoppingCartIcon', icon: ShoppingCartIcon },
-  { value: 'GiftIcon', icon: GiftIcon },
-  { value: 'BuildingLibraryIcon', icon: BuildingLibraryIcon },
+  { value: 'TagIcon', icon: Tag },
+  { value: 'ArrowTrendingUpIcon', icon: TrendingUp },
+  { value: 'ArrowTrendingDownIcon', icon: TrendingDown },
+  { value: 'WalletIcon', icon: Wallet },
+  { value: 'ShoppingCartIcon', icon: ShoppingCart },
+  { value: 'GiftIcon', icon: Gift },
+  { value: 'BuildingLibraryIcon', icon: Landmark },
 ] as const;
 
 const categoryTypes = [
-  { value: 'income', label: 'Receita', icon: ArrowTrendingUpIcon },
-  { value: 'expense', label: 'Despesa', icon: ArrowTrendingDownIcon },
+  { value: 'income', label: 'Receita', icon: TrendingUp },
+  { value: 'expense', label: 'Despesa', icon: TrendingDown },
 ] as const;
 
 type CategoryType = (typeof categoryTypes)[number]['value'];
@@ -174,7 +178,7 @@ export function CategoriesPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <TagIcon className="h-8 w-8 text-primary-400" />
+                <Tag className="h-8 w-8 text-primary-400" />
                 <h1 className="text-2xl font-bold text-text dark:text-text-dark">Categorias</h1>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -259,7 +263,7 @@ export function CategoriesPage() {
           {filteredCategories.length === 0 ? (
             <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
               <div className="p-12 text-center">
-                <TagIcon className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <Tag className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
                 {(() => {
                   const hasFilters = searchTerm || filterType !== 'all';
                   const emptyTitle = hasFilters
@@ -297,9 +301,9 @@ export function CategoriesPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredCategories.map((category) => {
                     const Icon =
-                      iconOptions.find((t) => t.value === category.icon)?.icon || TagIconHero;
+                      iconOptions.find((t) => t.value === category.icon)?.icon || Tag;
                     const TypeIcon =
-                      categoryTypes.find((t) => t.value === category.type)?.icon || TagIconHero;
+                      categoryTypes.find((t) => t.value === category.type)?.icon || Tag;
                     return (
                       <Card
                         key={category.id}
@@ -363,9 +367,9 @@ export function CategoriesPage() {
                 <div className="space-y-4">
                   {filteredCategories.map((category) => {
                     const Icon =
-                      iconOptions.find((t) => t.value === category.icon)?.icon || TagIconHero;
+                      iconOptions.find((t) => t.value === category.icon)?.icon || Tag;
                     const TypeIcon =
-                      categoryTypes.find((t) => t.value === category.type)?.icon || TagIconHero;
+                      categoryTypes.find((t) => t.value === category.type)?.icon || Tag;
                     return (
                       <Card
                         key={category.id}

@@ -4,12 +4,12 @@ import { useDashboardSummary } from '@/hooks/useDashboard';
 import type { DashboardFilters } from '@/types/dashboard';
 import { formatCurrency } from '@/utils/formatters';
 import {
-  ArrowTrendingDownIcon,
-  ArrowTrendingUpIcon,
-  ChartPieIcon,
-  ClockIcon,
-  WalletIcon,
-} from '@heroicons/react/24/outline';
+    Clock,
+    PieChart,
+    TrendingDown,
+    TrendingUp,
+    Wallet,
+} from 'lucide-react';
 
 interface SummaryCardsRowProps {
   companyId: string;
@@ -93,11 +93,11 @@ export function SummaryCardsRow({ companyId, filters }: Readonly<SummaryCardsRow
             </p>
           </div>
           <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-full">
-            <WalletIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <Wallet className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
         </div>
         <div className="mt-4 flex items-center text-sm">
-          <ArrowTrendingUpIcon
+          <TrendingUp
             className={`h-4 w-4 mr-1 ${
               data.balanceChangePct !== null && data.balanceChangePct < 0
                 ? 'text-red-500 rotate-180'
@@ -118,11 +118,11 @@ export function SummaryCardsRow({ companyId, filters }: Readonly<SummaryCardsRow
             </p>
           </div>
           <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-full">
-            <ArrowTrendingUpIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
+            <TrendingUp className="h-6 w-6 text-green-600 dark:text-green-400" />
           </div>
         </div>
         <div className="mt-4 flex items-center text-sm">
-          <ClockIcon className="h-4 w-4 text-gray-500 mr-1" />
+          <Clock className="h-4 w-4 text-gray-500 mr-1" />
           <span className="text-gray-500">Última atualização: agora</span>
         </div>
       </Card>
@@ -137,11 +137,11 @@ export function SummaryCardsRow({ companyId, filters }: Readonly<SummaryCardsRow
             </p>
           </div>
           <div className="p-3 bg-red-100 dark:bg-red-900/20 rounded-full">
-            <ArrowTrendingDownIcon className="h-6 w-6 text-red-600 dark:text-red-400" />
+            <TrendingDown className="h-6 w-6 text-red-600 dark:text-red-400" />
           </div>
         </div>
         <div className="mt-4 flex items-center text-sm">
-          <ChartPieIcon className="h-4 w-4 text-gray-500 mr-1" />
+          <PieChart className="h-4 w-4 text-gray-500 mr-1" />
           <span className="text-gray-500">Ver distribuição</span>
         </div>
       </Card>

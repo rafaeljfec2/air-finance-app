@@ -1,21 +1,20 @@
-import { useState, useMemo } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { useGoals } from '@/hooks/useGoals';
-import { FlagIcon } from '@heroicons/react/24/outline';
-import { Plus, Search, Grid3x3, List } from 'lucide-react';
-import { CreateGoal, Goal } from '@/services/goalService';
-import { GoalFormModal } from '@/components/goals/GoalFormModal';
 import { GoalCard } from '@/components/goals/GoalCard';
+import { GoalFormModal } from '@/components/goals/GoalFormModal';
 import { Loading } from '@/components/Loading';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { useGoals } from '@/hooks/useGoals';
+import { useViewMode } from '@/hooks/useViewMode';
+import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
+import { CreateGoal, Goal } from '@/services/goalService';
 import { useCompanyStore } from '@/stores/company';
 import { AxiosError } from 'axios';
-import { useViewMode } from '@/hooks/useViewMode';
+import { Flag, Grid3x3, List, Plus, Search } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 const statusOptions = [
   { value: 'active', label: 'Ativa', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
@@ -176,7 +175,7 @@ export function GoalsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <FlagIcon className="h-8 w-8 text-primary-400" />
+                <Flag className="h-8 w-8 text-primary-400" />
                 <h1 className="text-2xl font-bold text-text dark:text-text-dark">Metas</h1>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -261,7 +260,7 @@ export function GoalsPage() {
           {filteredGoals.length === 0 ? (
             <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
               <div className="p-12 text-center">
-                <FlagIcon className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <Flag className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
                 {(() => {
                   const hasFilters = searchTerm || filterStatus !== 'all';
                   const emptyTitle = hasFilters

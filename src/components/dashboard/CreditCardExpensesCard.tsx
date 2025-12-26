@@ -4,8 +4,8 @@ import { useTransactions } from '@/hooks/useTransactions';
 import type { DashboardFilters } from '@/types/dashboard';
 import { formatDateToLocalISO } from '@/utils/date';
 import { formatCurrency } from '@/utils/formatters';
-import { CreditCardIcon } from '@heroicons/react/24/outline';
 import { endOfDay, endOfMonth, endOfWeek, endOfYear, startOfDay, startOfMonth, startOfWeek, startOfYear } from 'date-fns';
+import { CreditCard } from 'lucide-react';
 import { useMemo } from 'react';
 
 interface CreditCardExpensesCardProps {
@@ -93,7 +93,7 @@ export function CreditCardExpensesCard({ companyId, filters }: CreditCardExpense
           <h3 className="text-sm font-medium text-text dark:text-text-dark">
             Gastos com Cartão de Crédito
           </h3>
-          <CreditCardIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+          <CreditCard className="h-4 w-4 text-gray-500 dark:text-gray-400" />
         </div>
         
         {isLoading ? (

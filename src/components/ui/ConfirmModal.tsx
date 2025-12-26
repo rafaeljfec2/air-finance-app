@@ -1,4 +1,4 @@
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { AlertTriangle } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 import { Button } from './button';
 
@@ -39,7 +39,7 @@ export function ConfirmModal({
       >
         <div className="animate-bounce-in-delayed">
           {icon ?? (
-            <ExclamationTriangleIcon
+            <AlertTriangle
               className={`h-10 w-10 mb-3 ${danger ? 'text-red-500' : 'text-primary-500'}`}
             />
           )}

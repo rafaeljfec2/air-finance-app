@@ -3,7 +3,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useDashboardComparison } from '@/hooks/useDashboard';
 import type { DashboardComparison, DashboardFilters } from '@/types/dashboard';
 import { formatCurrency } from '@/utils/formatters';
-import { ArrowDownIcon, ArrowUpIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import { ArrowDown, ArrowUp, DollarSign } from 'lucide-react';
 
 interface MonthlyComparisonCardProps {
   companyId: string;
@@ -61,7 +61,7 @@ export function MonthlyComparisonCard({
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <ArrowUpIcon className="h-4 w-4 text-green-500" />
+                <ArrowUp className="h-4 w-4 text-green-500" />
                 <span className="text-xs text-gray-500">Receitas</span>
               </div>
               <div className="text-right">
@@ -74,7 +74,7 @@ export function MonthlyComparisonCard({
 
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <ArrowDownIcon className="h-4 w-4 text-red-500" />
+                <ArrowDown className="h-4 w-4 text-red-500" />
                 <span className="text-xs text-gray-500">Despesas</span>
               </div>
               <div className="text-right">
@@ -87,7 +87,7 @@ export function MonthlyComparisonCard({
 
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <CurrencyDollarIcon className="h-4 w-4 text-blue-500" />
+                <DollarSign className="h-4 w-4 text-blue-500" />
                 <span className="text-xs text-gray-500">Economia</span>
               </div>
               <div className="text-right">

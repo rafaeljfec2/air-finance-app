@@ -1,8 +1,20 @@
-import { useNavigate } from 'react-router-dom';
 import { useSettings } from '@/hooks/useSettings';
-import { Icon } from '@/components/Icon';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { Settings as SettingsIcon } from 'lucide-react';
+import {
+    Bell,
+    Calendar,
+    ChevronRight,
+    CreditCard,
+    DollarSign,
+    Download,
+    Fingerprint,
+    Flag,
+    Info,
+    Settings as SettingsIcon,
+    Sun,
+    Tag,
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export function Settings() {
   const navigate = useNavigate();
@@ -47,11 +59,7 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon
-                        name="SunIcon"
-                        className="text-gray-500 dark:text-gray-400 mr-3"
-                        size={20}
-                      />
+                      <Sun className="text-gray-500 dark:text-gray-400 mr-3 h-5 w-5" />
                       <div>
                         <p className="text-sm font-medium text-text dark:text-text-dark">Tema</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -76,11 +84,7 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon
-                        name="BellIcon"
-                        className="text-gray-500 dark:text-gray-400 mr-3"
-                        size={20}
-                      />
+                      <Bell className="text-gray-500 dark:text-gray-400 mr-3 h-5 w-5" />
                       <div>
                         <p className="text-sm font-medium text-text dark:text-text-dark">
                           Notificações
@@ -107,11 +111,7 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon
-                        name="CurrencyDollarIcon"
-                        className="text-gray-500 dark:text-gray-400 mr-3"
-                        size={20}
-                      />
+                      <DollarSign className="text-gray-500 dark:text-gray-400 mr-3 h-5 w-5" />
                       <div>
                         <p className="text-sm font-medium text-text dark:text-text-dark">Moeda</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">{currency}</p>
@@ -141,11 +141,7 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon
-                        name="FingerPrintIcon"
-                        className="text-gray-500 dark:text-gray-400 mr-3"
-                        size={20}
-                      />
+                      <Fingerprint className="text-gray-500 dark:text-gray-400 mr-3 h-5 w-5" />
                       <div>
                         <p className="text-sm font-medium text-text dark:text-text-dark">
                           Segurança
@@ -172,11 +168,7 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon
-                        name="ArrowDownTrayIcon"
-                        className="text-gray-500 dark:text-gray-400 mr-3"
-                        size={20}
-                      />
+                      <Download className="text-gray-500 dark:text-gray-400 mr-3 h-5 w-5" />
                       <div>
                         <p className="text-sm font-medium text-text dark:text-text-dark">
                           Exportar dados
@@ -211,20 +203,12 @@ export function Settings() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon
-                        name="TagIcon"
-                        className="text-gray-500 dark:text-gray-400 mr-3"
-                        size={20}
-                      />
+                      <Tag className="text-gray-500 dark:text-gray-400 mr-3 h-5 w-5" />
                       <p className="text-sm font-medium text-text dark:text-text-dark">
                         Categorias
                       </p>
                     </div>
-                    <Icon
-                      name="ChevronRightIcon"
-                      className="text-gray-500 dark:text-gray-400"
-                      size={20}
-                    />
+                    <ChevronRight className="text-gray-500 dark:text-gray-400 h-5 w-5" />
                   </div>
                 </div>
 
@@ -234,20 +218,12 @@ export function Settings() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon
-                        name="CreditCardIcon"
-                        className="text-gray-500 dark:text-gray-400 mr-3"
-                        size={20}
-                      />
+                      <CreditCard className="text-gray-500 dark:text-gray-400 mr-3 h-5 w-5" />
                       <p className="text-sm font-medium text-text dark:text-text-dark">
                         Contas bancárias
                       </p>
                     </div>
-                    <Icon
-                      name="ChevronRightIcon"
-                      className="text-gray-500 dark:text-gray-400"
-                      size={20}
-                    />
+                    <ChevronRight className="text-gray-500 dark:text-gray-400 h-5 w-5" />
                   </div>
                 </div>
 
@@ -257,20 +233,12 @@ export function Settings() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon
-                        name="CreditCardIcon"
-                        className="text-gray-500 dark:text-gray-400 mr-3"
-                        size={20}
-                      />
+                      <CreditCard className="text-gray-500 dark:text-gray-400 mr-3 h-5 w-5" />
                       <p className="text-sm font-medium text-text dark:text-text-dark">
                         Cartões de crédito
                       </p>
                     </div>
-                    <Icon
-                      name="ChevronRightIcon"
-                      className="text-gray-500 dark:text-gray-400"
-                      size={20}
-                    />
+                    <ChevronRight className="text-gray-500 dark:text-gray-400 h-5 w-5" />
                   </div>
                 </div>
 
@@ -280,20 +248,12 @@ export function Settings() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon
-                        name="FlagIcon"
-                        className="text-gray-500 dark:text-gray-400 mr-3"
-                        size={20}
-                      />
+                      <Flag className="text-gray-500 dark:text-gray-400 mr-3 h-5 w-5" />
                       <p className="text-sm font-medium text-text dark:text-text-dark">
                         Metas financeiras
                       </p>
                     </div>
-                    <Icon
-                      name="ChevronRightIcon"
-                      className="text-gray-500 dark:text-gray-400"
-                      size={20}
-                    />
+                    <ChevronRight className="text-gray-500 dark:text-gray-400 h-5 w-5" />
                   </div>
                 </div>
               </div>
@@ -312,11 +272,7 @@ export function Settings() {
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Icon
-                        name="CalendarIcon"
-                        className="text-gray-500 dark:text-gray-400 mr-3"
-                        size={20}
-                      />
+                      <Calendar className="text-gray-500 dark:text-gray-400 mr-3 h-5 w-5" />
                       <div>
                         <p className="text-sm font-medium text-text dark:text-text-dark">
                           Dia de fechamento
@@ -347,11 +303,7 @@ export function Settings() {
               <div className="px-4 py-5 sm:px-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <Icon
-                      name="InformationCircleIcon"
-                      className="text-gray-500 dark:text-gray-400 mr-3"
-                      size={20}
-                    />
+                    <Info className="text-gray-500 dark:text-gray-400 mr-3 h-5 w-5" />
                     <div>
                       <p className="text-sm font-medium text-text dark:text-text-dark">
                         Versão do aplicativo

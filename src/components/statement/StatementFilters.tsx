@@ -1,6 +1,6 @@
-import { MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
-import { useState } from 'react';
 import { Category } from '@/types/transaction';
+import { Filter, Search } from 'lucide-react';
+import { useState } from 'react';
 
 interface StatementFiltersProps {
   categories: Category[];
@@ -35,7 +35,7 @@ export function StatementFilters({
       <div className="flex gap-2">
         <div className="flex-1 relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <MagnifyingGlassIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            <Search className="h-5 w-5 text-gray-500 dark:text-gray-400" />
           </div>
           <input
             type="text"
@@ -54,7 +54,7 @@ export function StatementFilters({
                 : 'border-border dark:border-border-dark bg-background dark:bg-background-dark text-text dark:text-text-dark'
             } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
           >
-            <FunnelIcon className="h-5 w-5 mr-2" />
+            <Filter className="h-5 w-5 mr-2" />
             {selectedCategory ? 'Filtrado' : 'Filtrar'}
           </button>
 

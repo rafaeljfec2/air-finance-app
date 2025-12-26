@@ -1,34 +1,38 @@
-import { useState, useMemo } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { useAccounts } from '@/hooks/useAccounts';
-import { useCompanyStore } from '@/stores/company';
-import {
-  BanknotesIcon,
-  BanknotesIcon as BanknotesIconHero,
-  BuildingLibraryIcon,
-  CreditCardIcon,
-  WalletIcon,
-} from '@heroicons/react/24/outline';
-import { Plus, Search, Edit, Trash2, Grid3x3, List } from 'lucide-react';
-import { formatCurrency } from '@/utils/formatters';
-import { Account, CreateAccount } from '@/services/accountService';
 import { AccountFormModal } from '@/components/accounts/AccountFormModal';
 import { Loading } from '@/components/Loading';
-import { cn } from '@/lib/utils';
-import { AxiosError } from 'axios';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { useAccounts } from '@/hooks/useAccounts';
 import { useViewMode } from '@/hooks/useViewMode';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { cn } from '@/lib/utils';
+import { Account, CreateAccount } from '@/services/accountService';
+import { useCompanyStore } from '@/stores/company';
+import { formatCurrency } from '@/utils/formatters';
+import { AxiosError } from 'axios';
+import {
+    Banknote,
+    CreditCard,
+    Edit,
+    Grid3x3,
+    Landmark,
+    List,
+    Plus,
+    Search,
+    Trash2,
+    Wallet,
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 const accountTypes = [
-  { value: 'checking', label: 'Conta Corrente', icon: BanknotesIconHero },
-  { value: 'savings', label: 'Poupança', icon: WalletIcon },
-  { value: 'credit_card', label: 'Cartão de Crédito', icon: CreditCardIcon },
-  { value: 'digital_wallet', label: 'Carteira Digital', icon: WalletIcon },
-  { value: 'investment', label: 'Investimento', icon: BuildingLibraryIcon },
+  { value: 'checking', label: 'Conta Corrente', icon: Banknote },
+  { value: 'savings', label: 'Poupança', icon: Wallet },
+  { value: 'credit_card', label: 'Cartão de Crédito', icon: CreditCard },
+  { value: 'digital_wallet', label: 'Carteira Digital', icon: Wallet },
+  { value: 'investment', label: 'Investimento', icon: Landmark },
 ] as const;
 
 type AccountType = (typeof accountTypes)[number]['value'];
@@ -197,7 +201,7 @@ export function AccountsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <BanknotesIcon className="h-8 w-8 text-primary-400" />
+                <Banknote className="h-8 w-8 text-primary-400" />
                 <h1 className="text-2xl font-bold text-text dark:text-text-dark">
                   Contas Bancárias
                 </h1>
@@ -282,7 +286,7 @@ export function AccountsPage() {
           {filteredAccounts.length === 0 ? (
             <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
               <div className="p-12 text-center">
-                <BanknotesIcon className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <Banknote className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
                 {(() => {
                   const hasFilters = searchTerm || filterType !== 'all';
                   const emptyTitle = hasFilters
@@ -320,7 +324,7 @@ export function AccountsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredAccounts.map((account) => {
                     const Icon =
-                      accountTypes.find((t) => t.value === account.type)?.icon || BanknotesIconHero;
+                      accountTypes.find((t) => t.value === account.type)?.icon || Banknote;
                     return (
                       <Card
                         key={account.id}
@@ -413,7 +417,7 @@ export function AccountsPage() {
                 <div className="space-y-4">
                   {filteredAccounts.map((account) => {
                     const Icon =
-                      accountTypes.find((t) => t.value === account.type)?.icon || BanknotesIconHero;
+                      accountTypes.find((t) => t.value === account.type)?.icon || Banknote;
                     return (
                       <Card
                         key={account.id}

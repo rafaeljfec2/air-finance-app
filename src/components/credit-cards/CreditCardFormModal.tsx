@@ -7,24 +7,23 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import {
-    CreateCreditCardPayload,
-    CreditCard as CreditCardType,
+  CreateCreditCardPayload,
+  CreditCard as CreditCardType,
 } from '@/services/creditCardService';
 import { useCompanyStore } from '@/stores/company';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
-import { BanknotesIcon, BuildingLibraryIcon, CreditCardIcon } from '@heroicons/react/24/outline';
-import { Calendar, CreditCard, DollarSign, Palette, X } from 'lucide-react';
+import { Banknote, Calendar, CreditCard, DollarSign, Landmark, Palette, X } from 'lucide-react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 const bankTypes = [
-  { value: 'nubank', label: 'Nubank', icon: CreditCardIcon },
-  { value: 'itau', label: 'Itaú', icon: BanknotesIcon },
-  { value: 'bradesco', label: 'Bradesco', icon: BanknotesIcon },
-  { value: 'santander', label: 'Santander', icon: BanknotesIcon },
-  { value: 'bb', label: 'Banco do Brasil', icon: BanknotesIcon },
-  { value: 'caixa', label: 'Caixa Econômica', icon: BanknotesIcon },
-  { value: 'outro', label: 'Outro', icon: BuildingLibraryIcon },
+  { value: 'nubank', label: 'Nubank', icon: CreditCard, iconName: 'CreditCard' },
+  { value: 'itau', label: 'Itaú', icon: Banknote, iconName: 'Banknote' },
+  { value: 'bradesco', label: 'Bradesco', icon: Banknote, iconName: 'Banknote' },
+  { value: 'santander', label: 'Santander', icon: Banknote, iconName: 'Banknote' },
+  { value: 'bb', label: 'Banco do Brasil', icon: Banknote, iconName: 'Banknote' },
+  { value: 'caixa', label: 'Caixa Econômica', icon: Banknote, iconName: 'Banknote' },
+  { value: 'outro', label: 'Outro', icon: Landmark, iconName: 'Landmark' },
 ] as const;
 
 const dueDates = Array.from({ length: 31 }, (_, i) => ({
@@ -55,7 +54,7 @@ export function CreditCardFormModal({
       closingDay: 10,
       dueDay: 10,
       color: '#8A05BE',
-      icon: 'CreditCardIcon',
+      icon: 'CreditCard',
       companyId: activeCompany?.id || '',
     }),
     [activeCompany],
@@ -155,7 +154,7 @@ export function CreditCardFormModal({
               <h2 className="text-xl font-semibold text-text dark:text-text-dark">
                 {creditCard ? 'Editar Cartão' : 'Novo Cartão de Crédito'}
               </h2>
-              <p className="text-sm text-muted-foreground dark:text-gray-400 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground dark:text-gray-400">
                 {creditCard
                   ? 'Atualize as informações do cartão'
                   : 'Preencha os dados do novo cartão de crédito'}
@@ -193,11 +192,11 @@ export function CreditCardFormModal({
                       placeholder="Ex: Cartão Nubank"
                       required
                       className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                         errors.name && 'border-red-500 focus-visible:ring-red-500',
                       )}
                     />
-                    <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
+                    <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
                   </div>
                 </FormField>
 
@@ -219,11 +218,11 @@ export function CreditCardFormModal({
                       placeholder="R$ 0,00"
                       required
                       className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:text-gray-400 dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                         errors.limit && 'border-red-500 focus-visible:ring-red-500',
                       )}
                     />
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
                   </div>
                 </FormField>
               </div>
@@ -318,7 +317,7 @@ export function CreditCardFormModal({
                     value={form.icon}
                     onChange={handleIconChange}
                     options={bankTypes.map((t) => ({
-                      value: t.icon.displayName || t.icon.name || t.value,
+                      value: t.iconName,
                       icon: t.icon,
                     }))}
                   />

@@ -7,10 +7,9 @@ import { useGoals } from '@/hooks/useGoals';
 import { cn } from '@/lib/utils';
 import { Goal } from '@/services/goalService';
 import { formatCurrency } from '@/utils/formatters';
-import { ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, TrendingUp } from 'lucide-react';
 
 const statusOptions = [
   { value: 'active', label: 'Ativa', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
@@ -85,7 +84,7 @@ export function GoalCard({
                 className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: category.color }}
               >
-                <ArrowTrendingUpIcon className="h-5 w-5 text-white" />
+                <TrendingUp className="h-5 w-5 text-white" />
               </div>
             )}
           </div>
@@ -184,7 +183,7 @@ export function GoalCard({
                   className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                   style={{ backgroundColor: category.color }}
                 >
-                  <ArrowTrendingUpIcon className="h-5 w-5 text-white" />
+                  <TrendingUp className="h-5 w-5 text-white" />
                 </div>
               )}
               <div className="flex-1">

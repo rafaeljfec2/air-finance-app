@@ -1,22 +1,22 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
 import { StatementFilters } from '@/components/statement/StatementFilters';
-import { useStatementStore } from '@/stores/statement';
-import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import {
-  ExclamationTriangleIcon,
-  ChevronDownIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
-  DocumentTextIcon,
-} from '@heroicons/react/24/outline';
+    TransactionGrid,
+    type TransactionGridTransaction,
+} from '@/components/transactions/TransactionGrid';
 import { Card } from '@/components/ui/card';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
+import { useStatementStore } from '@/stores/statement';
 import { formatCurrency } from '@/utils/formatters';
 import {
-  TransactionGrid,
-  type TransactionGridTransaction,
-} from '@/components/transactions/TransactionGrid';
+    AlertTriangle,
+    ChevronDown,
+    FileText,
+    TrendingDown,
+    TrendingUp,
+} from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export function Statement() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -111,7 +111,7 @@ export function Statement() {
       <ViewDefault>
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] px-4">
           <div className="text-center max-w-md mx-auto p-4 sm:p-8">
-            <ExclamationTriangleIcon className="h-12 w-12 sm:h-16 sm:w-16 text-red-500 dark:text-red-400 mx-auto mb-4 sm:mb-6" />
+            <AlertTriangle className="h-12 w-12 sm:h-16 sm:w-16 text-red-500 dark:text-red-400 mx-auto mb-4 sm:mb-6" />
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
               Oops! Something went wrong
             </h2>
@@ -125,7 +125,7 @@ export function Statement() {
                 onClick={() => setShowErrorDetails(!showErrorDetails)}
                 className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               >
-                <ChevronDownIcon
+                <ChevronDown
                   className={`h-4 w-4 sm:h-5 sm:w-5 mr-1 transition-transform ${showErrorDetails ? 'transform rotate-180' : ''}`}
                 />
                 Technical Details
@@ -160,7 +160,7 @@ export function Statement() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <DocumentTextIcon className="h-8 w-8 text-primary-400" />
+                <FileText className="h-8 w-8 text-primary-400" />
                 <h1 className="text-2xl font-bold text-text dark:text-text-dark">
                   Financial Statement
                 </h1>
@@ -179,7 +179,7 @@ export function Statement() {
                   <h3 className="text-sm font-medium text-text dark:text-text-dark">
                     Total Income
                   </h3>
-                  <ArrowTrendingUpIcon className="h-5 w-5 text-green-400" />
+                  <TrendingUp className="h-5 w-5 text-green-400" />
                 </div>
                 <p className="text-xl sm:text-2xl font-semibold text-green-400">
                   {formatCurrency(income)}
@@ -198,7 +198,7 @@ export function Statement() {
                   <h3 className="text-sm font-medium text-text dark:text-text-dark">
                     Total Expenses
                   </h3>
-                  <ArrowTrendingDownIcon className="h-5 w-5 text-red-400" />
+                  <TrendingDown className="h-5 w-5 text-red-400" />
                 </div>
                 <p className="text-xl sm:text-2xl font-semibold text-red-400">
                   {formatCurrency(expenses)}
@@ -223,7 +223,7 @@ export function Statement() {
                       availableBalance >= 0 ? 'text-green-400' : 'text-red-400',
                     )}
                   >
-                    {availableBalance >= 0 ? <ArrowTrendingUpIcon /> : <ArrowTrendingDownIcon />}
+                    {availableBalance >= 0 ? <TrendingUp /> : <TrendingDown />}
                   </div>
                 </div>
                 <p

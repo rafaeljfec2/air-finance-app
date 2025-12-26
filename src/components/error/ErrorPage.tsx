@@ -1,7 +1,8 @@
-import { useNavigate } from 'react-router-dom';
-import { ExclamationTriangleIcon, ArrowPathIcon, HomeIcon } from '@heroicons/react/24/outline';
 import { Logo } from '@/components/Logo';
 import { ViewDefault } from '@/layouts/ViewDefault';
+import { AlertTriangle, Home, RefreshCcw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 interface ErrorPageProps {
   error?: Error | null;
   code?: number;
@@ -35,7 +36,7 @@ export function ErrorPage({ error, code = 404 }: Readonly<ErrorPageProps>) {
 
           {/* Ícone de Erro */}
           <div className="mx-auto h-24 w-24 text-yellow-500 mb-8">
-            <ExclamationTriangleIcon />
+            <AlertTriangle className="h-full w-full" />
           </div>
 
           {/* Código do Erro */}
@@ -64,7 +65,7 @@ export function ErrorPage({ error, code = 404 }: Readonly<ErrorPageProps>) {
               onClick={() => navigate('/dashboard')}
               className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900 w-full sm:w-auto"
             >
-              <HomeIcon className="h-5 w-5 mr-2" />
+              <Home className="h-5 w-5 mr-2" />
               Voltar ao início
             </button>
 
@@ -72,7 +73,7 @@ export function ErrorPage({ error, code = 404 }: Readonly<ErrorPageProps>) {
               onClick={() => window.location.reload()}
               className="flex items-center justify-center px-4 py-2 text-sm font-medium text-text dark:text-text-dark bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900 w-full sm:w-auto"
             >
-              <ArrowPathIcon className="h-5 w-5 mr-2" />
+              <RefreshCcw className="h-5 w-5 mr-2" />
               Tentar novamente
             </button>
           </div>
