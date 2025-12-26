@@ -16,9 +16,11 @@ export function ConfirmProcessing() {
     if (token) {
         // Redirect to backend for validation
        const baseUrl = env.VITE_API_URL || 'http://localhost:3000/api';
-       // Clean up URL if needed (remove trailing slash)
-       const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-       window.location.href = `${cleanBaseUrl}/auth/confirm?token=${token}`;
+       // Ensure base URL ends with /v1
+       const cleanBaseUrl = baseUrl.replace(/\/$/, '');
+       const finalUrl = cleanBaseUrl.endsWith('/v1') ? cleanBaseUrl : `${cleanBaseUrl}/v1`;
+       
+       window.location.href = `${finalUrl}/auth/confirm?token=${token}`;
     } else {
         // No token, invalid access
         navigate('/login');
