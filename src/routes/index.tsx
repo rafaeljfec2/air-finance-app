@@ -1,6 +1,7 @@
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { ErrorPage } from '@/components/error/ErrorPage';
+import { ConfirmError, ConfirmProcessing, ConfirmSuccess } from '@/pages/confirm-email';
 import { LandingPage } from '@/pages/landing';
 import { Login } from '@/pages/login';
 import { SignUpPage } from '@/pages/signup';
@@ -57,6 +58,18 @@ export const router = createBrowserRouter([
   {
     path: '/register',
     element: <SignUpPage />,
+  },
+  {
+    path: '/confirm',
+    element: <ConfirmProcessing />,
+  },
+  {
+    path: '/confirm/success',
+    element: <ConfirmSuccess />,
+  },
+  {
+    path: '/confirm/error',
+    element: <ConfirmError />,
   },
   {
     path: '/forgot-password',
