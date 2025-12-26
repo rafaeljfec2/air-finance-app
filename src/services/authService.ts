@@ -28,6 +28,12 @@ export const UserSchema = z.object({
     theme: z.enum(['light', 'dark', 'system']),
     dateFormat: z.enum(['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY-MM-DD']),
   }),
+  integrations: z
+    .object({
+      openaiApiKey: z.string().optional(),
+      openaiModel: z.enum(['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo']).optional(),
+    })
+    .optional(),
 });
 
 export const LoginSchema = z.object({

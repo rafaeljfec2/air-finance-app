@@ -29,9 +29,9 @@ export function UsersPage() {
   const [form, setForm] = useState<CreateUser>({
     name: '',
     email: '',
-    role: 'user',
-    status: 'active',
-    companyId: companyId || '',
+    role: 'user' as 'admin' | 'user',
+    status: 'active' as 'active' | 'inactive',
+    companyIds: companyId ? [companyId] : [],
   });
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -49,7 +49,7 @@ export function UsersPage() {
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (!form.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email))
       errs.email = 'E-mail inválido';
-    if (!form.companyId) errs.companyId = 'Empresa obrigatória';
+    if (!form.companyIds || form.companyIds.length === 0) errs.companyIds = 'Empresa obrigatória';
     return errs;
   };
 
@@ -71,7 +71,7 @@ export function UsersPage() {
         email: '',
         role: 'user',
         status: 'active',
-        companyId: companyId || '',
+        companyIds: companyId ? [companyId] : [],
       });
       setErrors({});
     } catch (error) {
@@ -87,7 +87,7 @@ export function UsersPage() {
         email: user.email,
         role: user.role,
         status: user.status,
-        companyId: user.companyId,
+        companyIds: user.companyIds,
       });
       setEditingId(id);
     }
@@ -226,7 +226,7 @@ export function UsersPage() {
                         email: '',
                         role: 'user',
                         status: 'active',
-                        companyId: companyId || '',
+                        companyIds: companyId ? [companyId] : [],
                       });
                       setEditingId(null);
                     }}

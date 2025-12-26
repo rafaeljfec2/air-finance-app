@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { getCurrentUser } from '@/services/authService';
+import { updateUser } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
 import { useTheme } from '@/stores/useTheme';
 import {
@@ -238,26 +239,33 @@ export function Profile() {
 
     setIsSaving(true);
     try {
-      // Simular salvamento
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (user.id) {
+        // Prepare data for update
+        const updateData: any = {
+          name: formData.name,
+          email: formData.email, // Email change might require verification logic, careful
+          phone: formData.phone,
+          location: formData.location,
+          bio: formData.bio,
+          notifications: formData.notifications,
+          preferences: formData.preferences,
+          integrations: formData.integrations,
+        };
 
-      // Atualizar o usuário no store
-      // NOTE: Em produção, isso viria do backend
-      setUser({
-        ...user,
-        ...formData,
-        avatar,
-        // @ts-ignore - integrations ainda não existe no tipo User do store, mas estamos simulando
-        integrations: formData.integrations,
-      });
-
-      setIsEditing(false);
-      toast({
-        title: 'Sucesso',
-        description: 'Perfil atualizado com sucesso!',
-        type: 'success',
-      });
+        const updatedUser = await updateUser(user.id, updateData);
+        
+        // Update local store
+        setUser(updatedUser);
+        
+        setIsEditing(false);
+        toast({
+          title: 'Sucesso',
+          description: 'Perfil atualizado com sucesso!',
+          type: 'success',
+        });
+      }
     } catch (error) {
+      console.error('Failed to update profile:', error);
       toast({
         title: 'Erro',
         description: 'Erro ao atualizar perfil',

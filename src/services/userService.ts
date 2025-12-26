@@ -4,7 +4,7 @@ import { apiClient } from './apiClient';
 // Validation schemas
 export const UserSchema = z.object({
   id: z.string(),
-  companyId: z.string(),
+  companyIds: z.array(z.string()),
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   email: z.string().email('E-mail inválido'),
   role: z.enum(['admin', 'user'], {
@@ -15,6 +15,12 @@ export const UserSchema = z.object({
   }),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
+  integrations: z
+    .object({
+      openaiApiKey: z.string().optional(),
+      openaiModel: z.enum(['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo']).optional(),
+    })
+    .optional(),
 });
 
 export const CreateUserSchema = UserSchema.omit({
