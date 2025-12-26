@@ -1,21 +1,21 @@
 import { NavigationSection } from '@/types/navigation';
 import {
-    ArrowRightLeft,
-    Banknote,
-    Bell,
-    Building2,
-    ChartBar,
-    CreditCard,
-    Flag,
-    Import,
-    Pencil,
-    Plus,
-    RefreshCcw,
-    Save,
-    Settings,
-    Tag,
-    User,
-    Wallet,
+  ArrowRightLeft,
+  Banknote,
+  Bell,
+  Building2,
+  ChartBar,
+  CreditCard,
+  Flag,
+  Import,
+  Pencil,
+  Plus,
+  RefreshCcw,
+  Save,
+  Settings,
+  Tag,
+  User,
+  Wallet,
 } from 'lucide-react';
 
 export const navigation: NavigationSection[] = [
@@ -24,7 +24,8 @@ export const navigation: NavigationSection[] = [
     items: [
       { name: 'Dashboard', href: '/dashboard', icon: ChartBar },
       { name: 'Meu Orçamento', href: '/budget', icon: Wallet },
-      /* { name: 'Meu Planner', href: '/planner', icon: Calendar }, 
+      /*{ name: 'Classificação Inteligente', href: '/ai/classification', icon: ChartBar },
+       { name: 'Meu Planner', href: '/planner', icon: Calendar }, 
        { name: 'Relatórios', href: '/reports', icon: ChartBar }, */
     ],
   },

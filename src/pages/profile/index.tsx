@@ -7,27 +7,30 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
 import { ViewDefault } from '@/layouts/ViewDefault';
+import { getCurrentUser } from '@/services/authService';
 import { useAuthStore } from '@/stores/auth';
 import { useTheme } from '@/stores/useTheme';
-import { getCurrentUser } from '@/services/authService';
-import { useEffect, useState } from 'react';
 import {
-  Bell,
-  Camera,
-  DollarSign,
-  Edit2,
-  Globe,
-  Mail,
-  MapPin,
-  Moon,
-  Palette,
-  Phone,
-  Save,
-  Shield,
-  Sun,
-  User,
-  X,
+    Bell,
+    Bot,
+    Camera,
+    DollarSign,
+    Edit2,
+    Eye,
+    EyeOff,
+    Globe,
+    Mail,
+    MapPin,
+    Moon,
+    Palette,
+    Phone,
+    Save,
+    Shield,
+    Sun,
+    User,
+    X,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 type ProfileFormData = {
   name: string;
@@ -48,6 +51,10 @@ type ProfileFormData = {
     theme: 'light' | 'dark' | 'system';
     dateFormat: 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
   };
+  integrations: {
+    openaiApiKey: string;
+    openaiModel: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo';
+  };
 };
 
 export function Profile() {
@@ -58,12 +65,13 @@ export function Profile() {
   const [, setIsLoadingUser] = useState(false);
   const [fullUserData, setFullUserData] = useState<typeof user | null>(null);
   const [avatar, setAvatar] = useState(user?.avatar || '/avatars/default.png');
-  
+  const [showApiKey, setShowApiKey] = useState(false);
+
   // Fetch full user data from server (includes email and other sensitive fields)
   useEffect(() => {
     const fetchFullUserData = async () => {
       if (!user?.id) return;
-      
+
       setIsLoadingUser(true);
       try {
         const fullUser = await getCurrentUser();
@@ -81,7 +89,7 @@ export function Profile() {
   }, [user?.id]);
 
   const displayUser = fullUserData || user;
-  
+
   const [formData, setFormData] = useState<ProfileFormData>({
     name: displayUser?.name || '',
     email: displayUser?.email || '',
@@ -100,6 +108,10 @@ export function Profile() {
       language: displayUser?.preferences?.language || 'pt-BR',
       theme: displayUser?.preferences?.theme || 'system',
       dateFormat: displayUser?.preferences?.dateFormat || 'DD/MM/YYYY',
+    },
+    integrations: {
+      openaiApiKey: (displayUser as any)?.integrations?.openaiApiKey || '',
+      openaiModel: (displayUser as any)?.integrations?.openaiModel || 'gpt-3.5-turbo',
     },
   });
 
@@ -124,6 +136,10 @@ export function Profile() {
           language: fullUserData.preferences?.language || 'pt-BR',
           theme: fullUserData.preferences?.theme || 'system',
           dateFormat: fullUserData.preferences?.dateFormat || 'DD/MM/YYYY',
+        },
+        integrations: {
+          openaiApiKey: (fullUserData as any)?.integrations?.openaiApiKey || '',
+          openaiModel: (fullUserData as any)?.integrations?.openaiModel || 'gpt-3.5-turbo',
         },
       });
       setAvatar(fullUserData.avatar || '/avatars/default.png');
@@ -158,6 +174,18 @@ export function Profile() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+
+    if (name === 'openaiApiKey') {
+      setFormData((prev) => ({
+        ...prev,
+        integrations: {
+          ...prev.integrations,
+          openaiApiKey: value,
+        },
+      }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -192,6 +220,19 @@ export function Profile() {
     }
   };
 
+  const handleIntegrationChange = <K extends keyof ProfileFormData['integrations']>(
+    key: K,
+    value: ProfileFormData['integrations'][K],
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      integrations: {
+        ...prev.integrations,
+        [key]: value,
+      },
+    }));
+  };
+
   const handleSave = async () => {
     if (!user) return;
 
@@ -201,10 +242,13 @@ export function Profile() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Atualizar o usuário no store
+      // NOTE: Em produção, isso viria do backend
       setUser({
         ...user,
         ...formData,
         avatar,
+        // @ts-ignore - integrations ainda não existe no tipo User do store, mas estamos simulando
+        integrations: formData.integrations,
       });
 
       setIsEditing(false);
@@ -246,6 +290,10 @@ export function Profile() {
         language: displayUser.preferences?.language || 'pt-BR',
         theme: displayUser.preferences?.theme || 'system',
         dateFormat: displayUser.preferences?.dateFormat || 'DD/MM/YYYY',
+      },
+      integrations: {
+        openaiApiKey: (displayUser as any)?.integrations?.openaiApiKey || '',
+        openaiModel: (displayUser as any)?.integrations?.openaiModel || 'gpt-3.5-turbo',
       },
     });
     setAvatar(displayUser.avatar || '/avatars/default.png');
@@ -458,6 +506,89 @@ export function Profile() {
                           className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                         />
                       </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Card de Integrações com IA */}
+              <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark">
+                <div className="p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Bot className="h-5 w-5 text-primary-400" />
+                    <h2 className="text-lg font-semibold text-text dark:text-text-dark">
+                      Tecnologia e IA
+                    </h2>
+                  </div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                    Configure suas chaves de API para permitir que a Inteligência Artificial
+                    analise e categorize suas finanças automaticamente.
+                  </p>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label
+                        htmlFor="openaiApiKey"
+                        className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
+                      >
+                        OpenAI API Key
+                      </label>
+                      <div className="relative">
+                        <Input
+                          id="openaiApiKey"
+                          type={showApiKey ? 'text' : 'password'}
+                          name="openaiApiKey"
+                          value={formData.integrations.openaiApiKey}
+                          onChange={handleChange}
+                          disabled={!isEditing}
+                          placeholder="sk-..."
+                          className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowApiKey(!showApiKey)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                          disabled={!isEditing}
+                        >
+                          {showApiKey ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Sua chave será armazenada de forma segura e usada apenas para
+                        funcionalidades de IA.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="openaiModel"
+                        className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
+                      >
+                        Modelo Padrão
+                      </label>
+                      <Select
+                        value={formData.integrations.openaiModel}
+                        onValueChange={(value) =>
+                          handleIntegrationChange(
+                            'openaiModel',
+                            value as 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo',
+                          )
+                        }
+                        disabled={!isEditing}
+                      >
+                        <SelectTrigger className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                          {formData.integrations.openaiModel}
+                        </SelectTrigger>
+                        <SelectContent className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
+                          <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo (Rápido e Econômico)</SelectItem>
+                          <SelectItem value="gpt-4">GPT-4 (Maior Precisão)</SelectItem>
+                          <SelectItem value="gpt-4-turbo">GPT-4 Turbo (Atualizado)</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </div>

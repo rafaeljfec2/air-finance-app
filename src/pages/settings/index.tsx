@@ -316,64 +316,7 @@ export function Settings() {
             </div>
           </section>
 
-          {/* Integrações */}
-          <section className="bg-card dark:bg-card-dark rounded-lg shadow mt-8">
-            <div className="px-4 py-5 sm:px-6">
-              <h2 className="text-lg font-medium text-text dark:text-text-dark">Integrações</h2>
-            </div>
-            <div className="border-t border-border dark:border-border-dark">
-              <div className="divide-y divide-border dark:divide-border-dark">
-                <div className="px-4 py-5 sm:px-6">
-                  <form
-                    className="flex flex-col gap-4 max-w-md"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      // TODO: Implementar lógica de salvamento seguro
-                    }}
-                  >
-                    <label
-                      className="text-sm font-medium text-text dark:text-text-dark"
-                      htmlFor="chatgpt-api-key"
-                    >
-                      API Key do ChatGPT
-                    </label>
-                    <input
-                      id="chatgpt-api-key"
-                      name="chatgptApiKey"
-                      type="password"
-                      autoComplete="off"
-                      className="input input-bordered w-full"
-                      placeholder="Insira sua chave da OpenAI"
-                      // TODO: value, onChange, state
-                    />
-                    <label
-                      className="text-sm font-medium text-text dark:text-text-dark"
-                      htmlFor="chatgpt-endpoint"
-                    >
-                      Endpoint (opcional)
-                    </label>
-                    <input
-                      id="chatgpt-endpoint"
-                      name="chatgptEndpoint"
-                      type="text"
-                      autoComplete="off"
-                      className="input input-bordered w-full"
-                      placeholder="https://api.openai.com/v1/chat/completions"
-                      // TODO: value, onChange, state
-                    />
-                    <button type="submit" className="btn btn-primary mt-2">
-                      Salvar configurações
-                    </button>
-                    {/* TODO: Adicionar feedback visual de sucesso/erro */}
-                  </form>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    Sua chave será usada apenas para conectar ao ChatGPT. Nunca compartilhe sua
-                    chave com terceiros.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
+
         </div>
       </div>
     </ViewDefault>

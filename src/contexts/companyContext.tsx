@@ -1,8 +1,8 @@
+import { Company } from '@/types/company';
+import { sanitizeCompany } from '@/utils/sanitize';
 import React, { createContext, useMemo } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Company } from '@/types/company';
-import { sanitizeCompany } from '@/utils/sanitize';
 
 interface CompanyState {
   companyId: string;
@@ -15,7 +15,7 @@ interface CompanyContextValue extends CompanyState {
   selectedCompany: Company | null;
 }
 
-const useCompanyStore = create<CompanyState>()(
+export const useCompanyStore = create<CompanyState>()(
   persist(
     (set) => ({
       companyId: '',
