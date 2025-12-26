@@ -1,4 +1,4 @@
-import { navigation } from '@/constants/natigation';
+import { navigation } from '@/constants/navigation';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebar';
 import { NavigationGroupItem, NavigationItem } from '@/types/navigation';
