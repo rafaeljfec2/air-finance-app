@@ -1,16 +1,17 @@
-declare const __APP_VERSION__: string;
 import { navigation } from '@/constants/natigation';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebar';
 import { NavigationGroupItem, NavigationItem } from '@/types/navigation';
 import {
-  ArrowDownIcon,
-  ChevronDoubleLeftIcon,
-  ChevronDoubleRightIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline';
+    ChevronDown,
+    ChevronsLeft,
+    ChevronsRight,
+    X,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+
+declare const __APP_VERSION__: string;
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -77,7 +78,7 @@ export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
           onClick={onClose}
           aria-label="Fechar menu"
         >
-          <XMarkIcon className="h-6 w-6" />
+          <X className="h-6 w-6" />
         </button>
         <div className="flex flex-col h-full pt-2">
           {/* Navigation */}
@@ -119,7 +120,7 @@ export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
                           {!isCollapsed && (
                             <>
                               <span className="ml-3 flex-1 text-left">{item.name}</span>
-                              <ArrowDownIcon
+                              <ChevronDown
                                 className={cn(
                                   'h-4 w-4 ml-auto transition-transform',
                                   isOpen ? 'rotate-180' : '',
@@ -201,15 +202,15 @@ export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
               onClick={toggleCollapse}
               className={cn(
                 'flex items-center justify-center w-full p-2 text-sm font-medium rounded-md',
-                'text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark',
+                'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
                 'transition-colors duration-200',
               )}
             >
               {isCollapsed ? (
-                <ChevronDoubleRightIcon className="h-5 w-5" />
+                <ChevronsRight className="h-5 w-5" />
               ) : (
                 <>
-                  <ChevronDoubleLeftIcon className="h-5 w-5" />
+                  <ChevronsLeft className="h-5 w-5" />
                   <span className="ml-2">Recolher</span>
                 </>
               )}

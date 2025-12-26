@@ -1,35 +1,39 @@
-import { useState, useMemo } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { Input } from '@/components/ui/input';
 import { useCreditCards } from '@/hooks/useCreditCards';
+import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
+import { useMemo, useState } from 'react';
 // eslint-disable-next-line sonarjs/no-duplicate-string
-import {
-  CreditCardIcon,
-  CreditCardIcon as CreditCardIconHero,
-  BanknotesIcon,
-  BuildingLibraryIcon,
-} from '@heroicons/react/24/outline';
-import { Plus, Search, Edit, Trash2, Grid3x3, List } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatters';
+import {
+    Banknote,
+    CreditCard as CreditCardIcon,
+    Edit,
+    Grid3x3,
+    Landmark,
+    List,
+    Plus,
+    Search,
+    Trash2,
+} from 'lucide-react';
 // eslint-disable-next-line sonarjs/no-duplicate-string
-import { CreditCard, CreateCreditCardPayload } from '@/services/creditCardService';
 import { CreditCardFormModal } from '@/components/credit-cards/CreditCardFormModal';
 import { Loading } from '@/components/Loading';
-import { cn } from '@/lib/utils';
 import { useViewMode } from '@/hooks/useViewMode';
+import { cn } from '@/lib/utils';
+import { CreateCreditCardPayload, CreditCard } from '@/services/creditCardService';
 
 const bankTypes = [
-  { value: 'nubank', label: 'Nubank', icon: CreditCardIconHero },
-  { value: 'itau', label: 'Itaú', icon: BanknotesIcon },
-  { value: 'bradesco', label: 'Bradesco', icon: BanknotesIcon },
-  { value: 'santander', label: 'Santander', icon: BanknotesIcon },
-  { value: 'bb', label: 'Banco do Brasil', icon: BanknotesIcon },
-  { value: 'caixa', label: 'Caixa Econômica', icon: BanknotesIcon },
-  { value: 'outro', label: 'Outro', icon: BuildingLibraryIcon },
+  { value: 'nubank', label: 'Nubank', icon: CreditCardIcon },
+  { value: 'itau', label: 'Itaú', icon: Banknote },
+  { value: 'bradesco', label: 'Bradesco', icon: Banknote },
+  { value: 'santander', label: 'Santander', icon: Banknote },
+  { value: 'bb', label: 'Banco do Brasil', icon: Banknote },
+  { value: 'caixa', label: 'Caixa Econômica', icon: Banknote },
+  { value: 'outro', label: 'Outro', icon: Landmark },
 ] as const;
 
 export function CreditCardsPage() {
@@ -260,7 +264,7 @@ export function CreditCardsPage() {
                   {filteredCreditCards.map((card) => {
                 const Icon =
                       bankTypes.find((t) => t.icon.displayName === card.icon)?.icon ||
-                      CreditCardIconHero;
+                      CreditCardIcon;
                 return (
                       <Card
                         key={card.id}
@@ -340,7 +344,7 @@ export function CreditCardsPage() {
                   {filteredCreditCards.map((card) => {
                     const Icon =
                       bankTypes.find((t) => t.icon.displayName === card.icon)?.icon ||
-                      CreditCardIconHero;
+                      CreditCardIcon;
                     return (
                       <Card
                         key={card.id}
@@ -408,7 +412,7 @@ export function CreditCardsPage() {
                       <Button
                         size="sm"
                                 variant="outline"
-                        onClick={() => handleDelete(card.id)}
+                                onClick={() => handleDelete(card.id)}
                         disabled={isDeleting}
                                 className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
                       >
