@@ -90,7 +90,7 @@ export const login = async (data: LoginData): Promise<AuthResponse> => {
     return response.data;
   } catch (error) {
     console.error('Erro ao fazer login:', error);
-    throw new Error('Falha ao fazer login');
+    throw error;
   }
 };
 
@@ -101,7 +101,7 @@ export const register = async (data: RegisterData): Promise<AuthResponse> => {
     return response.data;
   } catch (error) {
     console.error('Erro ao registrar:', error);
-    throw new Error('Falha ao registrar usuário');
+    throw error;
   }
 };
 

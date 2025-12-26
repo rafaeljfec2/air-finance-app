@@ -4,8 +4,9 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
+import { apiClient } from '@/services/apiClient';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { ChevronLeft, Eye, EyeOff, Lock, Mail, Send } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -20,6 +21,12 @@ export function Login() {
     rememberMe: false,
   });
   const [error, setError] = useState<string | null>(null);
+  
+  // Resend Confirmation State
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState<string | null>(null);
+  const [resendError, setResendError] = useState<string | null>(null);
 
   // Redireciona se já estiver autenticado (usando useEffect para evitar setState durante render)
   useEffect(() => {
@@ -32,6 +39,8 @@ export function Login() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setNeedsConfirmation(false);
+
     login(
       {
         email: formData.email,
@@ -40,11 +49,34 @@ export function Login() {
       },
       {
         onError: (err: any) => {
+          const status = err?.response?.status;
           const backendMsg = err?.response?.data?.message;
+
+          if (status === 403 && backendMsg?.includes('verificado')) {
+             setNeedsConfirmation(true);
+             setError(null); // Clear generic error
+             return;
+          }
+
           setError(backendMsg || err?.message || 'Erro ao fazer login');
         },
       },
     );
+  };
+
+  const handleResendEmail = async () => {
+    setIsResending(true);
+    setResendSuccess(null);
+    setResendError(null);
+    try {
+      await apiClient.post('/auth/resend-confirmation', { email: formData.email });
+      setResendSuccess('E-mail de verificação reenviado com sucesso! Verifique sua caixa de entrada.');
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Erro ao reenviar e-mail.';
+      setResendError(msg);
+    } finally {
+      setIsResending(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,13 +124,14 @@ export function Login() {
             <Logo showSlogan className="mx-auto" />
           </motion.div>
 
-          {/* Card de Login */}
+          {/* Card de Login ou Confirmação */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <Card className="bg-card/50 dark:bg-card-dark/50 border-border dark:border-border-dark backdrop-blur-sm">
+             {!needsConfirmation ? (
               <form onSubmit={handleSubmit} className="p-6 space-y-6">
                 <div className="space-y-4">
                   {/* Email */}
@@ -192,26 +225,7 @@ export function Login() {
                 >
                   {isLoggingIn ? (
                     <div className="flex items-center justify-center">
-                      <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
+                      <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
                       Entrando...
                     </div>
                   ) : (
@@ -219,6 +233,57 @@ export function Login() {
                   )}
                 </Button>
               </form>
+             ) : (
+                <div className="p-6 space-y-6 text-center">
+                    <div className="rounded-full bg-yellow-100 dark:bg-yellow-900/20 w-16 h-16 mx-auto flex items-center justify-center mb-4">
+                        <Mail className="h-8 w-8 text-yellow-600 dark:text-yellow-500" />
+                    </div>
+                    <h2 className="text-xl font-semibold text-text dark:text-text-dark">Verifique seu E-mail</h2>
+                    <p className="text-sm text-text/80 dark:text-text-dark/80">
+                        Sua conta ainda não foi ativada. Enviamos um link de confirmação para <strong>{formData.email}</strong>.
+                    </p>
+
+                    {resendSuccess && (
+                        <div className="p-3 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-sm rounded-md">
+                            {resendSuccess}
+                        </div>
+                    )}
+                     {resendError && (
+                        <div className="p-3 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-sm rounded-md">
+                            {resendError}
+                        </div>
+                    )}
+                    
+                    <div className="space-y-3 pt-4">
+                         <Button
+                            onClick={handleResendEmail}
+                            disabled={isResending}
+                            className={cn(
+                                'w-full h-11 bg-brand-arrow hover:bg-brand-arrow/90 dark:bg-brand-leaf dark:hover:bg-brand-leaf/90 text-white transition-colors gap-2',
+                            )}
+                         >
+                            {isResending ? (
+                                <>
+                                    <Loader2 className="animate-spin h-4 w-4" />
+                                    Enviando...
+                                </>
+                            ) : (
+                                <>
+                                    <Send className="h-4 w-4" />
+                                    Reenviar E-mail
+                                </>
+                            )}
+                         </Button>
+                         <Button
+                            variant="outline"
+                            onClick={() => setNeedsConfirmation(false)}
+                            className="w-full h-11"
+                         >
+                            Voltar para Login
+                         </Button>
+                    </div>
+                </div>
+             )}
             </Card>
           </motion.div>
 
@@ -255,3 +320,24 @@ export function Login() {
     </div>
   );
 }
+
+// Helper component for Loader2 since it wasn't imported in the original clip
+function Loader2(props: any) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+        </svg>
+    )
+}
+
