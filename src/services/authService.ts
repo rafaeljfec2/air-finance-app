@@ -33,7 +33,9 @@ export const UserSchema = z.object({
   integrations: z
     .object({
       openaiApiKey: z.string().optional(),
-      openaiModel: z.enum(['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo', 'gpt-5.2', 'gpt-5-mini']).optional(),
+      openaiModel: z
+        .enum(['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo', 'gpt-5.2', 'gpt-5-mini'])
+        .optional(),
     })
     .optional(),
 });
