@@ -26,10 +26,12 @@ import { formatCNPJ, formatCPF, unformatDocument } from '@/utils/formatDocument'
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  Banknote,
   Building2,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  CreditCard,
   Gift,
   Landmark,
   Loader2,
@@ -125,7 +127,9 @@ const CompanySchema = z
 
 const AccountSchema = z.object({
   name: z.string().min(3, 'Nome da conta deve ter pelo menos 3 caracteres'),
-  type: z.enum(['checking', 'savings', 'investment', 'digital_wallet']).default('checking'),
+  type: z
+    .enum(['checking', 'savings', 'investment', 'credit_card', 'digital_wallet'])
+    .default('checking'),
   initialBalance: z.coerce.number().default(0),
   institution: z.string().min(2, 'Informe a instituição'),
   agency: z.string().optional(),
@@ -691,7 +695,12 @@ export default function OnboardingPage() {
                       onValueChange={(v) =>
                         accountForm.setValue(
                           'type',
-                          v as 'checking' | 'savings' | 'investment' | 'digital_wallet',
+                          v as
+                            | 'checking'
+                            | 'savings'
+                            | 'investment'
+                            | 'credit_card'
+                            | 'digital_wallet',
                         )
                       }
                       defaultValue="checking"
@@ -704,25 +713,46 @@ export default function OnboardingPage() {
                           value="checking"
                           className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
                         >
-                          Conta Corrente
+                          <div className="flex items-center gap-2">
+                            <Banknote className="h-4 w-4" />
+                            Conta Corrente
+                          </div>
                         </SelectItem>
                         <SelectItem
                           value="savings"
                           className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
                         >
-                          Poupança
+                          <div className="flex items-center gap-2">
+                            <Wallet className="h-4 w-4" />
+                            Poupança
+                          </div>
                         </SelectItem>
                         <SelectItem
-                          value="investment"
+                          value="credit_card"
                           className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
                         >
-                          Investimento
+                          <div className="flex items-center gap-2">
+                            <CreditCard className="h-4 w-4" />
+                            Cartão de Crédito
+                          </div>
                         </SelectItem>
                         <SelectItem
                           value="digital_wallet"
                           className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
                         >
-                          Carteira Digital
+                          <div className="flex items-center gap-2">
+                            <Wallet className="h-4 w-4" />
+                            Carteira Digital
+                          </div>
+                        </SelectItem>
+                        <SelectItem
+                          value="investment"
+                          className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Landmark className="h-4 w-4" />
+                            Investimento
+                          </div>
                         </SelectItem>
                       </SelectContent>
                     </Select>
