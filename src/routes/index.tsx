@@ -1,3 +1,4 @@
+import { OnboardingGuard } from '@/components/auth/OnboardingGuard';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { ErrorPage } from '@/components/error/ErrorPage';
@@ -39,12 +40,14 @@ const Statement = lazy(() => import('@/pages/statement').then(m => ({ default: m
 const Transactions = lazy(() => import('@/pages/transactions').then(m => ({ default: m.Transactions })));
 const NewTransaction = lazy(() => import('@/pages/transactions/new').then(m => ({ default: m.NewTransaction })));
 const UsersPage = lazy(() => import('@/pages/users').then(m => ({ default: m.UsersPage })));
+const OnboardingPage = lazy(() => import('@/pages/onboarding').then(m => ({ default: m.default })));
 
 const SuspenseLoader = () => (
     <div className='flex h-screen items-center justify-center'>
         <Loader2 className='h-8 w-8 animate-spin text-primary-500' />
     </div>
 );
+
 
 export const router = createBrowserRouter([
   {
@@ -96,13 +99,29 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: '/onboarding',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <OnboardingGuard>
+            <Suspense fallback={<SuspenseLoader />}>
+              <OnboardingPage />
+            </Suspense>
+          </OnboardingGuard>
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+  },
+  {
     path: '/dashboard',
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-             <Dashboard />
-          </Suspense>
+          <OnboardingGuard>
+            <Suspense fallback={<SuspenseLoader />}>
+               <Dashboard />
+            </Suspense>
+          </OnboardingGuard>
         </ProtectedRoute>
       </ErrorBoundary>
     ),
@@ -232,10 +251,12 @@ export const router = createBrowserRouter([
     path: '/transactions',
     element: (
       <ErrorBoundary>
-        <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-             <Transactions />
-          </Suspense>
+      <ProtectedRoute>
+          <OnboardingGuard>
+            <Suspense fallback={<SuspenseLoader />}>
+              <Transactions />
+           </Suspense>
+          </OnboardingGuard>
         </ProtectedRoute>
       </ErrorBoundary>
     ),
@@ -245,10 +266,12 @@ export const router = createBrowserRouter([
     path: '/reports',
     element: (
       <ErrorBoundary>
-        <ProtectedRoute>
-         <Suspense fallback={<SuspenseLoader />}>
-             <Reports />
-          </Suspense>
+      <ProtectedRoute>
+          <OnboardingGuard>
+            <Suspense fallback={<SuspenseLoader />}>
+              <Reports />
+           </Suspense>
+          </OnboardingGuard>
         </ProtectedRoute>
       </ErrorBoundary>
     ),

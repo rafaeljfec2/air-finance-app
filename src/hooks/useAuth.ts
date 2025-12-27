@@ -26,8 +26,8 @@ export const useAuth = () => {
     queryKey: ['user'],
     queryFn: getCurrentUser,
     retry: false,
-    staleTime: 30 * 60 * 1000, // 30 minutos - evita refetch desnecessário
-    gcTime: 60 * 60 * 1000, // 1 hora - mantém cache por 1 hora
+    staleTime: 0, // Always fetch fresh data to avoid stale permissions/flags
+    gcTime: 10 * 60 * 1000, 
   });
 
   const loginMutation = useMutation({
