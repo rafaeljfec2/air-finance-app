@@ -51,6 +51,19 @@ export function StepIndicator({ currentStep, steps }: Readonly<StepIndicatorProp
           const isCurrent = index === currentStep;
           const isPending = index > currentStep;
 
+          // Determine the className for the step icon based on its state
+          let stepIconClassName =
+            'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ';
+          if (isCompleted) {
+            stepIconClassName +=
+              'bg-brand-leaf text-brand-arrow border-brand-leaf shadow-lg shadow-brand-leaf/30';
+          } else if (isCurrent) {
+            stepIconClassName +=
+              'bg-brand-leaf text-brand-arrow border-brand-leaf ring-2 sm:ring-4 ring-brand-leaf/20';
+          } else {
+            stepIconClassName += 'bg-card-dark border-border-dark text-gray-400';
+          }
+
           return (
             <motion.div
               key={`step-${index}-${step.label}`}
@@ -62,14 +75,7 @@ export function StepIndicator({ currentStep, steps }: Readonly<StepIndicatorProp
               transition={{ duration: 0.2 }}
             >
               <motion.div
-                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300
-                    ${
-                      isCompleted
-                        ? 'bg-brand-leaf text-brand-arrow border-brand-leaf shadow-lg shadow-brand-leaf/30'
-                        : isCurrent
-                          ? 'bg-brand-leaf text-brand-arrow border-brand-leaf ring-2 sm:ring-4 ring-brand-leaf/20'
-                          : 'bg-card-dark border-border-dark text-gray-400'
-                    }`}
+                className={stepIconClassName}
                 whileHover={isPending ? { scale: 1.05 } : {}}
               >
                 {isCompleted ? (
