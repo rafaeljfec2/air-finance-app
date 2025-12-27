@@ -1,7 +1,26 @@
-import { apiClient } from './apiClient';
-import { z } from 'zod';
 import { Company } from '@/types/company';
 import { parseApiError } from '@/utils/apiErrorHandler';
+import { z } from 'zod';
+import { apiClient } from './apiClient';
+
+// Helper function to normalize dates from backend (handles empty objects, Date objects, and strings)
+function normalizeDate(value: unknown): string {
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  if (value && typeof value === 'object' && Object.keys(value).length === 0) {
+    // Empty object - return current date as fallback
+    return new Date().toISOString();
+  }
+  if (value && typeof value === 'object' && 'toISOString' in value) {
+    return (value as Date).toISOString();
+  }
+  // Fallback to current date if value is null, undefined, or invalid
+  return new Date().toISOString();
+}
 
 // Validation schemas
 export const CompanySchema = z.object({
@@ -36,6 +55,22 @@ export const companyService = {
     try {
       const response = await apiClient.get<Company[]>('/companies');
       return CompanySchema.array().parse(response.data);
+    } catch (error) {
+      throw parseApiError(error);
+    }
+  },
+
+  getUserCompanies: async (): Promise<Company[]> => {
+    try {
+      const response = await apiClient.get<unknown>('/user/me/companies');
+      // Transform dates before validation to handle empty objects from backend
+      const data = response.data as Array<Record<string, unknown>>;
+      const transformedData = data.map((company) => ({
+        ...company,
+        createdAt: normalizeDate(company.createdAt),
+        updatedAt: normalizeDate(company.updatedAt),
+      }));
+      return CompanySchema.array().parse(transformedData);
     } catch (error) {
       throw parseApiError(error);
     }

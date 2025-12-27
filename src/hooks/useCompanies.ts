@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from '@/components/ui/toast';
 import { companyService } from '@/services/companyService';
 import { Company } from '@/types/company';
-import { toast } from '@/components/ui/toast';
-import { parseApiError, getUserFriendlyMessage, logApiError } from '@/utils/apiErrorHandler';
+import { getUserFriendlyMessage, logApiError, parseApiError } from '@/utils/apiErrorHandler';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export function useCompanies() {
   const queryClient = useQueryClient();
@@ -13,7 +13,7 @@ export function useCompanies() {
     error,
   } = useQuery<Company[]>({
     queryKey: ['companies'],
-    queryFn: companyService.getAll,
+    queryFn: companyService.getUserCompanies,
   });
 
   const { mutate: createCompany, isPending: isCreating } = useMutation({
