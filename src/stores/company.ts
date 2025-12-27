@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { Company } from '@/types';
 import { sanitizeCompany } from '@/utils/sanitize';
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface CompanyStore {
   activeCompany: Company | null;
@@ -56,7 +56,12 @@ export const useCompanyStore = create<CompanyStore>()(
       onRehydrateStorage: () => (state) => {
         // Re-sanitize on rehydration
         if (state?.activeCompany) {
-          state.activeCompany = sanitizeCompany(state.activeCompany);
+          // Validate that activeCompany has at least an id, otherwise clear it
+          if (!state.activeCompany.id) {
+            state.activeCompany = null;
+          } else {
+            state.activeCompany = sanitizeCompany(state.activeCompany);
+          }
         }
       },
     },

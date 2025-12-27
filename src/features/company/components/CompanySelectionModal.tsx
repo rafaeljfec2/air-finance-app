@@ -26,7 +26,10 @@ export function CompanySelectionModal() {
 
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
   const hasCompanies = Array.isArray(companies) && companies.length > 0;
-  const shouldShowModal = !!user && !activeCompany;
+  // Show modal if user is logged in and there's no valid active company
+  // Check for null, undefined, or invalid company (missing id)
+  const hasValidActiveCompany = activeCompany?.id;
+  const shouldShowModal = !!user && !hasValidActiveCompany;
 
   // Memoize first company ID to avoid unnecessary re-renders
   const firstCompanyId = useMemo(() => {
