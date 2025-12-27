@@ -17,7 +17,15 @@ import {
 } from '@/components/ui/select';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
-import { Banknote, ChevronLeft, ChevronRight, CreditCard, Landmark, Loader2, Wallet } from 'lucide-react';
+import {
+  Banknote,
+  ChevronLeft,
+  ChevronRight,
+  CreditCard,
+  Landmark,
+  Loader2,
+  Wallet,
+} from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { type AccountFormData, AccountSchema } from '../schemas';
 
@@ -69,12 +77,7 @@ export function AccountStep({ onNext, onBack, loading }: Readonly<AccountStepPro
                 onValueChange={(v) =>
                   accountForm.setValue(
                     'type',
-                    v as
-                      | 'checking'
-                      | 'savings'
-                      | 'investment'
-                      | 'credit_card'
-                      | 'digital_wallet',
+                    v as 'checking' | 'savings' | 'investment' | 'credit_card' | 'digital_wallet',
                   )
                 }
                 defaultValue="checking"
@@ -148,7 +151,7 @@ export function AccountStep({ onNext, onBack, loading }: Readonly<AccountStepPro
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="accountAgency" className="text-text-dark">
-                Agência
+                Agência{' '}
                 <span className="text-xs text-text-dark/50 ml-1 font-normal">(Opcional)</span>
               </Label>
               <Input
@@ -160,7 +163,7 @@ export function AccountStep({ onNext, onBack, loading }: Readonly<AccountStepPro
             </div>
             <div className="space-y-2">
               <Label htmlFor="accountNumber" className="text-text-dark">
-                Número da Conta
+                Número da Conta{' '}
                 <span className="text-xs text-text-dark/50 ml-1 font-normal">(Opcional)</span>
               </Label>
               <Input
@@ -173,7 +176,7 @@ export function AccountStep({ onNext, onBack, loading }: Readonly<AccountStepPro
           </div>
           <div className="space-y-2">
             <Label htmlFor="accountInitialBalance" className="text-text-dark">
-              Saldo Inicial
+              Saldo Inicial{' '}
               <span className="text-xs text-text-dark/50 ml-1 font-normal">
                 (Saldo atual da conta)
               </span>
