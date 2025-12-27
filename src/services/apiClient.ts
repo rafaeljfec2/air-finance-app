@@ -1,6 +1,6 @@
+import { env } from '@/utils/env';
 import axios from 'axios';
 import { authUtils } from '../utils/auth';
-import { env } from '@/utils/env';
 
 /**
  * Axios client principal da aplicação.
@@ -22,6 +22,16 @@ const refreshClient = axios.create({
 });
 
 const REFRESH_URL = '/auth/refresh-token';
+
+// Endpoints públicos que não devem tentar refresh token
+const PUBLIC_AUTH_ENDPOINTS = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+  '/auth/resend-confirmation',
+  '/auth/refresh-token',
+];
 
 interface RetryableRequestConfig {
   _retry?: boolean;
@@ -46,6 +56,11 @@ function redirectToLogin() {
   }
 }
 
+function isPublicAuthEndpoint(url: string | undefined): boolean {
+  if (!url) return false;
+  return PUBLIC_AUTH_ENDPOINTS.some((endpoint) => url.includes(endpoint));
+}
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -56,6 +71,11 @@ apiClient.interceptors.response.use(
     }
 
     const originalRequest: RetryableRequestConfig = (config ?? {}) as RetryableRequestConfig;
+
+    // Não tenta refresh token para endpoints públicos de autenticação
+    if (isPublicAuthEndpoint(originalRequest.url)) {
+      throw error;
+    }
 
     // Se o próprio refresh falhou, encerra sessão imediatamente
     if (originalRequest.url?.includes(REFRESH_URL)) {

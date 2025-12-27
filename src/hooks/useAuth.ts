@@ -22,12 +22,16 @@ export const useAuth = () => {
   const queryClient = useQueryClient();
   const { setUser, setToken } = useAuthStore();
 
+  // Só busca o usuário se houver um token armazenado
+  const hasToken = !!authUtils.getToken();
+
   const { data: user, isLoading: isLoadingUser } = useQuery<User>({
     queryKey: ['user'],
     queryFn: getCurrentUser,
     retry: false,
     staleTime: 0, // Always fetch fresh data to avoid stale permissions/flags
-    gcTime: 10 * 60 * 1000, 
+    gcTime: 10 * 60 * 1000,
+    enabled: hasToken, // Só executa se houver token
   });
 
   const loginMutation = useMutation({
