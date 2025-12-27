@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/services/apiClient';
+import { formatCNPJ, formatCPF, unformatDocument } from '@/utils/formatDocument';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Building2,
@@ -36,11 +37,78 @@ import { z } from 'zod';
 
 // --- Schemas ---
 
-const CompanySchema = z.object({
-  name: z.string().min(3, 'Nome da empresa deve ter pelo menos 3 caracteres'),
-  cnpj: z.string().optional(), // Optional for now to keep it simple
-  type: z.enum(['matriz', 'filial']).default('matriz'),
-});
+function validateCPF(cpf: string): boolean {
+  const digits = cpf.replace(/\D/g, '');
+  if (digits.length !== 11) return false;
+  if (/^(\d)\1+$/.test(digits)) return false;
+
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += Number.parseInt(digits.charAt(i), 10) * (10 - i);
+  }
+  let digit = 11 - (sum % 11);
+  if (digit >= 10) digit = 0;
+  if (digit !== Number.parseInt(digits.charAt(9), 10)) return false;
+
+  sum = 0;
+  for (let i = 0; i < 10; i++) {
+    sum += Number.parseInt(digits.charAt(i), 10) * (11 - i);
+  }
+  digit = 11 - (sum % 11);
+  if (digit >= 10) digit = 0;
+  if (digit !== Number.parseInt(digits.charAt(10), 10)) return false;
+
+  return true;
+}
+
+function validateCNPJ(cnpj: string): boolean {
+  const digits = cnpj.replace(/\D/g, '');
+  if (digits.length !== 14) return false;
+  if (/^(\d)\1+$/.test(digits)) return false;
+
+  let sum = 0;
+  let weight = 2;
+  for (let i = 11; i >= 0; i--) {
+    sum += Number.parseInt(digits.charAt(i), 10) * weight;
+    weight = weight === 9 ? 2 : weight + 1;
+  }
+  let digit = 11 - (sum % 11);
+  if (digit > 9) digit = 0;
+  if (digit !== Number.parseInt(digits.charAt(12), 10)) return false;
+
+  sum = 0;
+  weight = 2;
+  for (let i = 12; i >= 0; i--) {
+    sum += Number.parseInt(digits.charAt(i), 10) * weight;
+    weight = weight === 9 ? 2 : weight + 1;
+  }
+  digit = 11 - (sum % 11);
+  if (digit > 9) digit = 0;
+  if (digit !== Number.parseInt(digits.charAt(13), 10)) return false;
+
+  return true;
+}
+
+const CompanySchema = z
+  .object({
+    name: z.string().min(3, 'Nome da empresa deve ter pelo menos 3 caracteres'),
+    documentType: z.enum(['cnpj', 'cpf']).default('cnpj'),
+    document: z.string().min(1, 'CNPJ ou CPF é obrigatório'),
+    type: z.enum(['matriz', 'filial']).default('matriz'),
+  })
+  .refine(
+    (data) => {
+      if (!data.document) return true;
+      if (data.documentType === 'cpf') {
+        return validateCPF(data.document);
+      }
+      return validateCNPJ(data.document);
+    },
+    {
+      message: 'CNPJ ou CPF inválido',
+      path: ['document'],
+    },
+  );
 
 const AccountSchema = z.object({
   name: z.string().min(3, 'Nome da conta deve ter pelo menos 3 caracteres'),
@@ -136,8 +204,15 @@ export default function OnboardingPage() {
   ];
 
   // --- Forms ---
-  const companyForm = useForm<CompanyFormData>({ resolver: zodResolver(CompanySchema) });
+  const companyForm = useForm<CompanyFormData>({
+    resolver: zodResolver(CompanySchema),
+    defaultValues: {
+      documentType: 'cnpj',
+    },
+  });
   const accountForm = useForm<AccountFormData>({ resolver: zodResolver(AccountSchema) });
+
+  const documentType = companyForm.watch('documentType');
 
   // --- Handlers ---
 
@@ -160,9 +235,14 @@ export default function OnboardingPage() {
     try {
       setLoading(true);
 
+      // Remove formatting from document before submitting
+      const documentValue = companyData.document ? unformatDocument(companyData.document) : '';
+
       // Create company
       const companyResponse = await apiClient.post('/companies', {
-        ...companyData,
+        name: companyData.name,
+        cnpj: documentValue, // Backend uses cnpj field for both CPF and CNPJ
+        type: companyData.type,
         userIds: [user?.id],
         email: user?.email,
         foundationDate: new Date().toISOString(),
@@ -285,15 +365,57 @@ export default function OnboardingPage() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="cnpj" className="text-text-dark">
-                    CNPJ (Opcional)
+                  <Label htmlFor="documentType" className="text-text-dark">
+                    Tipo de Documento
+                  </Label>
+                  <Select
+                    value={documentType}
+                    onValueChange={(value) => {
+                      companyForm.setValue('documentType', value as 'cnpj' | 'cpf');
+                      companyForm.setValue('document', ''); // Clear document when type changes
+                    }}
+                  >
+                    <SelectTrigger className="bg-card-dark border-border-dark text-text-dark">
+                      <SelectValue placeholder="Selecione o tipo" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card-dark border-border-dark text-text-dark">
+                      <SelectItem
+                        value="cnpj"
+                        className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                      >
+                        CNPJ
+                      </SelectItem>
+                      <SelectItem
+                        value="cpf"
+                        className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                      >
+                        CPF
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="document" className="text-text-dark">
+                    {documentType === 'cnpj' ? 'CNPJ' : 'CPF'}
                   </Label>
                   <Input
-                    id="cnpj"
-                    placeholder="00.000.000/0000-00"
+                    id="document"
+                    placeholder={documentType === 'cnpj' ? '00.000.000/0000-00' : '000.000.000-00'}
                     className="bg-card-dark border-border-dark text-text-dark"
-                    {...companyForm.register('cnpj')}
+                    {...companyForm.register('document')}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const formatted =
+                        documentType === 'cnpj' ? formatCNPJ(value) : formatCPF(value);
+                      companyForm.setValue('document', formatted, { shouldValidate: true });
+                    }}
+                    value={companyForm.watch('document') ?? ''}
                   />
+                  {companyForm.formState.errors.document && (
+                    <p className="text-sm text-red-400">
+                      {String(companyForm.formState.errors.document.message)}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="type" className="text-text-dark">
