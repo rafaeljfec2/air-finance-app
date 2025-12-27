@@ -1,9 +1,8 @@
+import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { useAccounts } from '@/hooks/useAccounts';
-import type { Account } from '@/services/accountService';
 import { useEffect, useMemo, useState } from 'react';
 
 interface AccountEditModalProps {
@@ -25,6 +24,15 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
   const selectedAccount = useMemo(
     () => accounts?.find((account) => account.id === selectedId),
     [accounts, selectedId],
+  );
+
+  const accountOptions: ComboBoxOption<string>[] = useMemo(
+    () =>
+      accounts?.map((account) => ({
+        value: account.id,
+        label: `${account.name} • ${account.institution}`,
+      })) ?? [],
+    [accounts],
   );
 
   useEffect(() => {
@@ -83,28 +91,20 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
     }
   };
 
-  const renderOptionLabel = (account?: Account) => {
-    if (!account) return 'Selecione uma conta';
-    return `${account.name} • ${account.institution}`;
-  };
-
   return (
     <Modal open={open} onClose={onClose} title="Editar conta" className="max-w-xl">
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-1">
           <label className="text-xs text-muted-foreground dark:text-gray-400">Conta</label>
-          <Select value={selectedId} onValueChange={setSelectedId}>
-            <SelectTrigger className="w-full">
-              {renderOptionLabel(selectedAccount)}
-            </SelectTrigger>
-            <SelectContent>
-              {accounts?.map((account) => (
-                <SelectItem key={account.id} value={account.id}>
-                  {renderOptionLabel(account)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <ComboBox
+            options={accountOptions}
+            value={selectedId || null}
+            onValueChange={(value) => setSelectedId(value ?? '')}
+            placeholder="Selecione uma conta"
+            searchable
+            searchPlaceholder="Buscar conta..."
+            className="w-full"
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

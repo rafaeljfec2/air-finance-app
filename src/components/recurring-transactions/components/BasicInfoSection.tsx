@@ -1,11 +1,12 @@
+import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import type { Account } from '@/services/accountService';
 import type { Category } from '@/services/categoryService';
 import type { CreateRecurringTransaction } from '@/services/recurringTransactionService';
 import { DollarSign, FileText, Tag, Wallet } from 'lucide-react';
+import { useMemo } from 'react';
 import { TYPE_OPTIONS } from '../constants';
 
 interface BasicInfoSectionProps {
@@ -33,7 +34,33 @@ export function BasicInfoSection({
   onCategoryChange,
   onAccountChange,
 }: Readonly<BasicInfoSectionProps>) {
-  const TypeIcon = TYPE_OPTIONS.find((opt) => opt.value === form.type)?.icon;
+  const typeOptions: ComboBoxOption<'Income' | 'Expense'>[] = useMemo(
+    () =>
+      TYPE_OPTIONS.map((opt) => ({
+        value: opt.value,
+        label: opt.label,
+        icon: opt.icon,
+      })),
+    [],
+  );
+
+  const categoryOptions: ComboBoxOption<string>[] = useMemo(
+    () =>
+      categories?.map((cat) => ({
+        value: cat.id,
+        label: cat.name,
+      })) ?? [],
+    [categories],
+  );
+
+  const accountOptions: ComboBoxOption<string>[] = useMemo(
+    () =>
+      accounts?.map((acc) => ({
+        value: acc.id,
+        label: acc.name,
+      })) ?? [],
+    [accounts],
+  );
 
   return (
     <div className="space-y-4">
@@ -63,40 +90,26 @@ export function BasicInfoSection({
         </FormField>
 
         <FormField label="Tipo *" error={errors.type}>
-          <Select value={form.type} onValueChange={onTypeChange}>
-            <SelectTrigger
-              className={cn(
-                'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all',
-                errors.type && 'border-red-500 focus:ring-red-500',
-              )}
-            >
-              <div className="flex items-center gap-2">
-                {TypeIcon && (
-                  <TypeIcon className="h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
-                )}
-                <span>
-                  {TYPE_OPTIONS.find((opt) => opt.value === form.type)?.label || 'Selecione...'}
-                </span>
-              </div>
-            </SelectTrigger>
-            <SelectContent className="bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark">
-              {TYPE_OPTIONS.map((opt) => {
-                const Icon = opt.icon;
-                return (
-                  <SelectItem
-                    key={opt.value}
-                    value={opt.value}
-                    className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Icon className="h-4 w-4" />
-                      <span>{opt.label}</span>
-                    </div>
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
+          <ComboBox
+            options={typeOptions}
+            value={form.type}
+            onValueChange={(value) => onTypeChange(value ?? 'Income')}
+            placeholder="Selecione..."
+            error={errors.type}
+            renderItem={(option) => {
+              const Icon = option.icon;
+              return (
+                <div className="flex items-center gap-2">
+                  {Icon && <Icon className="h-4 w-4" />}
+                  <span>{option.label}</span>
+                </div>
+              );
+            }}
+            className={cn(
+              'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark',
+              errors.type && 'border-red-500',
+            )}
+          />
         </FormField>
 
         <FormField label="Valor *" error={errors.value}>
@@ -119,75 +132,39 @@ export function BasicInfoSection({
         </FormField>
 
         <FormField label="Categoria *" error={errors.category}>
-          <Select value={form.category} onValueChange={onCategoryChange}>
-            <SelectTrigger
-              className={cn(
-                'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all',
-                errors.category && 'border-red-500 focus:ring-red-500',
-              )}
-            >
-              <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
-                <span>
-                  {categories?.find((cat) => cat.id === form.category)?.name || 'Selecione...'}
-                </span>
-              </div>
-            </SelectTrigger>
-            <SelectContent className="bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark max-h-56 overflow-y-auto">
-              {categories && categories.length > 0 ? (
-                categories.map((cat) => (
-                  <SelectItem
-                    key={cat.id}
-                    value={cat.id}
-                    className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30"
-                  >
-                    {cat.name}
-                  </SelectItem>
-                ))
-              ) : (
-                <SelectItem value="no-categories" disabled>
-                  Nenhuma categoria disponível
-                </SelectItem>
-              )}
-            </SelectContent>
-          </Select>
+          <ComboBox
+            options={categoryOptions}
+            value={form.category || null}
+            onValueChange={(value) => onCategoryChange(value ?? '')}
+            placeholder="Selecione..."
+            error={errors.category}
+            searchable
+            searchPlaceholder="Buscar categoria..."
+            icon={Tag}
+            emptyMessage="Nenhuma categoria disponível"
+            className={cn(
+              'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark',
+              errors.category && 'border-red-500',
+            )}
+          />
         </FormField>
 
         <FormField label="Conta *" error={errors.accountId}>
-          <Select value={form.accountId} onValueChange={onAccountChange}>
-            <SelectTrigger
-              className={cn(
-                'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all',
-                errors.accountId && 'border-red-500 focus:ring-red-500',
-              )}
-            >
-              <div className="flex items-center gap-2">
-                <Wallet className="h-4 w-4 text-muted-foreground dark:text-gray-400 dark:text-gray-400" />
-                <span>
-                  {accounts && accounts.length > 0
-                    ? accounts.find((acc) => acc.id === form.accountId)?.name || 'Selecione...'
-                    : 'Nenhuma conta disponível'}
-                </span>
-              </div>
-            </SelectTrigger>
-            <SelectContent className="bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark max-h-56 overflow-y-auto">
-              {accounts && accounts.length > 0 ? (
-                accounts.map((acc) => (
-                  <SelectItem
-                    key={acc.id}
-                    value={acc.id}
-                    className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30"
-                  >
-                    {acc.name}
-                  </SelectItem>
-                ))
-              ) : (
-                <SelectItem value="no-accounts" disabled>
-                  Nenhuma conta disponível
-                </SelectItem>
-              )}
-            </SelectContent>
-          </Select>
+          <ComboBox
+            options={accountOptions}
+            value={form.accountId || null}
+            onValueChange={(value) => onAccountChange(value ?? '')}
+            placeholder="Selecione..."
+            error={errors.accountId}
+            searchable
+            searchPlaceholder="Buscar conta..."
+            icon={Wallet}
+            emptyMessage="Nenhuma conta disponível"
+            className={cn(
+              'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark',
+              errors.accountId && 'border-red-500',
+            )}
+          />
         </FormField>
       </div>
     </div>

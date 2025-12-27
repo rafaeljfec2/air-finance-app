@@ -25,7 +25,11 @@ export const useAuth = () => {
   // Só busca o usuário se houver um token armazenado
   const hasToken = !!authUtils.getToken();
 
-  const { data: user, isLoading: isLoadingUser } = useQuery<User>({
+  const {
+    data: user,
+    isLoading: isLoadingUser,
+    refetch,
+  } = useQuery<User>({
     queryKey: ['user'],
     queryFn: getCurrentUser,
     retry: false,
@@ -93,5 +97,6 @@ export const useAuth = () => {
     isLoggingOut: logoutMutation.isPending,
     isRecoveringPassword: passwordRecoveryMutation.isPending,
     isResettingPassword: resetPasswordMutation.isPending,
+    refetchUser: refetch,
   };
 };

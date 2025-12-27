@@ -1,0 +1,123 @@
+import { Button } from '@/components/ui/button';
+import {
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { motion } from 'framer-motion';
+import { Check, ChevronLeft, Loader2, PartyPopper } from 'lucide-react';
+
+interface FinishStepProps {
+  onComplete: () => void;
+  onBack: () => void;
+  summary: {
+    companyName: string;
+    accountName: string;
+    categoriesCount: number;
+    goalName?: string;
+    recurringCount?: number;
+  };
+  loading: boolean;
+}
+
+export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<FinishStepProps>) {
+  return (
+    <motion.div
+      key="step-6"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.3 }}
+    >
+      <CardHeader className="text-center">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1, rotate: 360 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+          className="mx-auto w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-4"
+        >
+          <PartyPopper className="h-12 w-12 text-green-600" />
+        </motion.div>
+        <CardTitle className="text-text-dark text-2xl">Tudo Pronto!</CardTitle>
+        <CardDescription className="text-text-dark/70 text-lg">
+          Configuramos seu ambiente com sucesso.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="bg-card-dark/50 p-6 rounded-lg border border-border-dark space-y-4">
+          <h4 className="font-semibold text-text-dark mb-4 border-b border-border-dark pb-2">
+            Resumo da Configuração
+          </h4>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <Check className="h-4 w-4 text-green-600" />
+              </div>
+              <span className="text-text-dark">
+                Empresa <strong>{summary.companyName}</strong> criada
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <Check className="h-4 w-4 text-green-600" />
+              </div>
+              <span className="text-text-dark">
+                Conta <strong>{summary.accountName}</strong> configurada
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <Check className="h-4 w-4 text-green-600" />
+              </div>
+              <span className="text-text-dark">
+                <strong>{summary.categoriesCount}</strong> categorias adicionadas
+              </span>
+            </div>
+            {summary.goalName && (
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Check className="h-4 w-4 text-green-600" />
+                </div>
+                <span className="text-text-dark">
+                  Meta <strong>{summary.goalName}</strong> definida
+                </span>
+              </div>
+            )}
+            {summary.recurringCount !== undefined && summary.recurringCount > 0 && (
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Check className="h-4 w-4 text-green-600" />
+                </div>
+                <span className="text-text-dark">Transação recorrente agendada</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <Button
+          variant="ghost"
+          type="button"
+          onClick={onBack}
+          className="text-text-dark hover:bg-border-dark"
+        >
+          <ChevronLeft className="mr-2 h-4 w-4" />
+          Voltar
+        </Button>
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Button
+            size="lg"
+            onClick={onComplete}
+            disabled={loading}
+            className="bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90 shadow-xl"
+          >
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Ir para o Dashboard
+          </Button>
+        </motion.div>
+      </CardFooter>
+    </motion.div>
+  );
+}

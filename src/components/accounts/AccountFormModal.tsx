@@ -1,3 +1,4 @@
+import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { FormField } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -5,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { Account, CreateAccount } from '@/services/accountService';
 import { useCompanyStore } from '@/stores/company';
@@ -70,6 +70,16 @@ export function AccountFormModal({
   const [form, setForm] = useState<CreateAccount>(initialFormState);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [initialBalanceInput, setInitialBalanceInput] = useState('');
+
+  const accountTypeOptions: ComboBoxOption<AccountType>[] = useMemo(
+    () =>
+      accountTypes.map((type) => ({
+        value: type.value,
+        label: type.label,
+        icon: type.icon,
+      })),
+    [],
+  );
 
   useEffect(() => {
     if (account) {
@@ -218,34 +228,28 @@ export function AccountFormModal({
                 </FormField>
 
                 <FormField label="Tipo de conta *" error={errors.type}>
-                  <Select
+                  <ComboBox
+                    options={accountTypeOptions}
                     value={form.type}
                     onValueChange={(value) =>
-                      setForm((prev) => ({ ...prev, type: value as AccountType }))
+                      setForm((prev) => ({ ...prev, type: (value as AccountType) ?? 'checking' }))
                     }
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all',
-                        errors.type && 'border-red-500 focus:ring-red-500',
-                      )}
-                    >
-                      <span>
-                        {accountTypes.find((t) => t.value === form.type)?.label || 'Selecione...'}
-                      </span>
-                    </SelectTrigger>
-                    <SelectContent className="bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark">
-                      {accountTypes.map((opt) => (
-                        <SelectItem
-                          key={opt.value}
-                          value={opt.value}
-                          className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30"
-                        >
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    placeholder="Selecione..."
+                    error={errors.type}
+                    renderItem={(option) => {
+                      const Icon = option.icon;
+                      return (
+                        <div className="flex items-center gap-2">
+                          {Icon && <Icon className="h-4 w-4" />}
+                          <span>{option.label}</span>
+                        </div>
+                      );
+                    }}
+                    className={cn(
+                      'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark',
+                      errors.type && 'border-red-500',
+                    )}
+                  />
                 </FormField>
 
                 <FormField label="Instituição *" error={errors.institution}>

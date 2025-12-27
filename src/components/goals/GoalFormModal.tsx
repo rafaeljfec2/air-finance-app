@@ -1,9 +1,9 @@
+import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { FormField } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCategories } from '@/hooks/useCategories';
 import { cn } from '@/lib/utils';
@@ -54,6 +54,24 @@ export function GoalFormModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [targetAmountInput, setTargetAmountInput] = useState('');
   const [currentAmountInput, setCurrentAmountInput] = useState('');
+
+  const categoryOptions: ComboBoxOption<string>[] = useMemo(
+    () =>
+      categories?.map((cat) => ({
+        value: cat.id,
+        label: cat.name,
+      })) ?? [],
+    [categories],
+  );
+
+  const accountOptions: ComboBoxOption<string>[] = useMemo(
+    () =>
+      accounts?.map((acc) => ({
+        value: acc.id,
+        label: acc.name,
+      })) ?? [],
+    [accounts],
+  );
 
   useEffect(() => {
     if (goal) {
@@ -211,84 +229,40 @@ export function GoalFormModal({
                 </FormField>
 
                 <FormField label="Categoria" error={errors.categoryId}>
-                  <Select
-                    value={form.categoryId || undefined}
+                  <ComboBox
+                    options={categoryOptions}
+                    value={form.categoryId || null}
                     onValueChange={(value) =>
                       setForm((prev) => ({ ...prev, categoryId: value || undefined }))
                     }
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all',
-                        errors.categoryId && 'border-red-500 focus:ring-red-500',
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Tag className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
-                        <span>
-                          {categories?.find((cat) => cat.id === form.categoryId)?.name ||
-                            'Selecione...'}
-                        </span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark max-h-56 overflow-y-auto">
-                      {categories && categories.length > 0 ? (
-                        categories.map((cat) => (
-                          <SelectItem
-                            key={cat.id}
-                            value={cat.id}
-                            className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30"
-                          >
-                            {cat.name}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="no-categories" disabled>
-                          Nenhuma categoria disponível
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
+                    placeholder="Selecione..."
+                    error={errors.categoryId}
+                    searchable
+                    searchPlaceholder="Buscar categoria..."
+                    icon={Tag}
+                    emptyMessage="Nenhuma categoria disponível"
+                    className={cn(
+                      'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark',
+                      errors.categoryId && 'border-red-500',
+                    )}
+                  />
                 </FormField>
                 <FormField label="Conta da meta *" error={errors.accountId}>
-                  <Select
-                    value={form.accountId || undefined}
-                    onValueChange={(value) => setForm((prev) => ({ ...prev, accountId: value }))}
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all',
-                        errors.accountId && 'border-red-500 focus:ring-red-500',
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Wallet className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
-                        <span>
-                          {accounts && accounts.length > 0
-                            ? accounts.find((acc) => acc.id === form.accountId)?.name ||
-                              'Selecione...'
-                            : 'Nenhuma conta disponível'}
-                        </span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark max-h-56 overflow-y-auto">
-                      {accounts && accounts.length > 0 ? (
-                        accounts.map((acc) => (
-                          <SelectItem
-                            key={acc.id}
-                            value={acc.id}
-                            className="hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:bg-primary-100 dark:focus:bg-primary-900/30"
-                          >
-                            {acc.name}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="no-accounts" disabled>
-                          Nenhuma conta disponível
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
+                  <ComboBox
+                    options={accountOptions}
+                    value={form.accountId || null}
+                    onValueChange={(value) => setForm((prev) => ({ ...prev, accountId: value ?? '' }))}
+                    placeholder="Selecione..."
+                    error={errors.accountId}
+                    searchable
+                    searchPlaceholder="Buscar conta..."
+                    icon={Wallet}
+                    emptyMessage="Nenhuma conta disponível"
+                    className={cn(
+                      'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark',
+                      errors.accountId && 'border-red-500',
+                    )}
+                  />
                 </FormField>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">

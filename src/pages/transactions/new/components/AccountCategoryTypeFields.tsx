@@ -1,5 +1,6 @@
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { cn } from '@/lib/utils';
+import { useMemo } from 'react';
 import type { Account, Category } from '@/types/transaction';
 
 interface AccountCategoryTypeFieldsProps {
@@ -25,13 +26,23 @@ export function AccountCategoryTypeFields({
   onCategoryChange,
   onTransactionKindChange,
 }: Readonly<AccountCategoryTypeFieldsProps>) {
-  const selectedAccountName = accountId
-    ? (accounts.find((acc) => acc.id === accountId)?.name ?? 'Selecione uma conta')
-    : 'Selecione uma conta';
+  const accountOptions: ComboBoxOption<string>[] = useMemo(
+    () =>
+      accounts.map((account) => ({
+        value: account.id,
+        label: account.name,
+      })),
+    [accounts],
+  );
 
-  const selectedCategoryName = categoryId
-    ? (categories.find((cat) => cat.id === categoryId)?.name ?? 'Selecione uma categoria')
-    : 'Selecione uma categoria';
+  const categoryOptions: ComboBoxOption<string>[] = useMemo(
+    () =>
+      categories.map((category) => ({
+        value: category.id,
+        label: category.name,
+      })),
+    [categories],
+  );
 
   return (
     <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
@@ -44,37 +55,21 @@ export function AccountCategoryTypeFields({
           >
             Conta <span className="text-red-500">*</span>
           </label>
-          <Select value={accountId} onValueChange={onAccountChange}>
-            <SelectTrigger
-              className={cn(
-                'w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors',
-                errors.accountId
-                  ? 'border-red-500 dark:border-red-500 focus:ring-red-500 focus:border-red-500'
-                  : 'border-border dark:border-border-dark',
-              )}
-              aria-invalid={errors.accountId ? 'true' : 'false'}
-              aria-describedby={errors.accountId ? 'accountId-error' : undefined}
-            >
-              <div className="px-3 py-2">{selectedAccountName}</div>
-            </SelectTrigger>
-            <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
-              {Array.isArray(accounts) &&
-                accounts.map((account) => (
-                  <SelectItem
-                    key={account.id}
-                    value={account.id}
-                    className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                  >
-                    {account.name}
-                  </SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
-          {errors.accountId && (
-            <span id="accountId-error" className="text-xs text-red-500 mt-1 block" role="alert">
-              {errors.accountId}
-            </span>
-          )}
+          <ComboBox
+            options={accountOptions}
+            value={accountId || null}
+            onValueChange={(value) => onAccountChange(value ?? '')}
+            placeholder="Selecione uma conta"
+            error={errors.accountId}
+            searchable
+            searchPlaceholder="Buscar conta..."
+            className={cn(
+              'w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border hover:bg-background dark:hover:bg-background-dark',
+              errors.accountId
+                ? 'border-red-500 dark:border-red-500'
+                : 'border-border dark:border-border-dark',
+            )}
+          />
         </div>
 
         {/* Categoria */}
@@ -85,36 +80,21 @@ export function AccountCategoryTypeFields({
           >
             Categoria <span className="text-red-500">*</span>
           </label>
-          <Select value={categoryId} onValueChange={onCategoryChange}>
-            <SelectTrigger
-              className={cn(
-                'w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors',
-                errors.categoryId
-                  ? 'border-red-500 dark:border-red-500 focus:ring-red-500 focus:border-red-500'
-                  : 'border-border dark:border-border-dark',
-              )}
-              aria-invalid={errors.categoryId ? 'true' : 'false'}
-              aria-describedby={errors.categoryId ? 'categoryId-error' : undefined}
-            >
-              <div className="px-3 py-2">{selectedCategoryName}</div>
-            </SelectTrigger>
-            <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
-              {categories.map((category) => (
-                <SelectItem
-                  key={category.id}
-                  value={category.id}
-                  className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                >
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.categoryId && (
-            <span id="categoryId-error" className="text-xs text-red-500 mt-1 block" role="alert">
-              {errors.categoryId}
-            </span>
-          )}
+          <ComboBox
+            options={categoryOptions}
+            value={categoryId || null}
+            onValueChange={(value) => onCategoryChange(value ?? '')}
+            placeholder="Selecione uma categoria"
+            error={errors.categoryId}
+            searchable
+            searchPlaceholder="Buscar categoria..."
+            className={cn(
+              'w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border hover:bg-background dark:hover:bg-background-dark',
+              errors.categoryId
+                ? 'border-red-500 dark:border-red-500'
+                : 'border-border dark:border-border-dark',
+            )}
+          />
         </div>
 
         {/* Tipo (toggle) */}
