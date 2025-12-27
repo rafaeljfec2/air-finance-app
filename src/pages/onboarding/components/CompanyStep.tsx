@@ -1,24 +1,31 @@
 import { Button } from '@/components/ui/button';
 import {
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { formatCNPJ, formatCPF, validateCNPJ, validateCPF } from '@/utils/formatDocument';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
-import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, Loader2, XCircle } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  XCircle,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { type CompanyFormData, CompanySchema } from '../schemas';
@@ -49,13 +56,13 @@ export function CompanyStep({ onNext, onBack, loading }: Readonly<CompanyStepPro
       transition={{ duration: 0.3 }}
     >
       <form onSubmit={companyForm.handleSubmit(onNext)}>
-        <CardHeader>
-          <CardTitle className="text-text-dark">Crie sua Empresa</CardTitle>
-          <CardDescription className="text-text-dark/70">
+        <CardHeader className="px-4 sm:px-6">
+          <CardTitle className="text-text-dark text-xl sm:text-2xl">Crie sua Empresa</CardTitle>
+          <CardDescription className="text-text-dark/70 text-sm sm:text-base">
             A empresa é a base para organizar suas finanças. Você poderá adicionar outras depois.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 px-4 sm:px-6">
           <div className="space-y-2">
             <Label htmlFor="companyName" className="text-text-dark">
               Nome da Empresa
@@ -198,12 +205,12 @@ export function CompanyStep({ onNext, onBack, loading }: Readonly<CompanyStepPro
             </Select>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 px-4 sm:px-6 pb-4 sm:pb-6">
           <Button
             variant="ghost"
             type="button"
             onClick={onBack}
-            className="text-text-dark hover:bg-border-dark"
+            className="text-text-dark hover:bg-border-dark w-full sm:w-auto order-2 sm:order-1"
           >
             <ChevronLeft className="mr-2 h-4 w-4" />
             Voltar
@@ -211,7 +218,7 @@ export function CompanyStep({ onNext, onBack, loading }: Readonly<CompanyStepPro
           <Button
             type="submit"
             disabled={loading}
-            className="bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90"
+            className="bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90 w-full sm:w-auto order-1 sm:order-2"
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Continuar

@@ -1,24 +1,36 @@
 import { Button } from '@/components/ui/button';
 import {
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Gift, Landmark, Plus, ShoppingCart, Tags, Trash2, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Gift,
+  Landmark,
+  Plus,
+  ShoppingCart,
+  Tags,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+  Wallet,
+} from 'lucide-react';
 import { useState } from 'react';
 import { type CategoryFormData } from '../schemas';
 
@@ -83,20 +95,18 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.3 }}
     >
-      <CardHeader>
-        <CardTitle className="text-text-dark">Categorias</CardTitle>
-        <CardDescription className="text-text-dark/70">
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="text-text-dark text-xl sm:text-2xl">Categorias</CardTitle>
+        <CardDescription className="text-text-dark/70 text-sm sm:text-base">
           Crie categorias para organizar suas transações. Você pode adicionar quantas quiser ou usar
           as categorias padrão.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
         {/* Categories List */}
         {categoriesData.length > 0 && (
           <div className="space-y-2">
-            <Label className="text-text-dark">
-              Categorias Criadas ({categoriesData.length})
-            </Label>
+            <Label className="text-text-dark">Categorias Criadas ({categoriesData.length})</Label>
             <div className="space-y-2 max-h-40 overflow-y-auto">
               {categoriesData.map((category, index) => {
                 const iconOption = iconOptions.find((opt) => opt.value === category.icon);
@@ -195,7 +205,7 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
               </Select>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-text-dark">Cor</Label>
                 <ColorPicker
@@ -247,7 +257,7 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
               setCategoriesData([]);
               onNext([]); // Pass empty or null? Logic in main was empty means skip/default
             }}
-            className="text-text-dark hover:bg-border-dark"
+            className="text-text-dark hover:bg-border-dark w-full sm:w-auto"
           >
             Pular
           </Button>
@@ -277,7 +287,7 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
                 onNext(defaultCategories);
               }
             }}
-            className="bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90"
+            className="bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90 w-full sm:w-auto"
           >
             {categoriesData.length > 0 ? 'Continuar' : 'Usar Categorias Padrão'}
             <ChevronRight className="ml-2 h-4 w-4" />

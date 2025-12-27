@@ -1,20 +1,20 @@
 import { Button } from '@/components/ui/button';
 import {
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { formatDateToLocalISO, parseLocalDate } from '@/utils/date';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
@@ -58,13 +58,15 @@ export function RecurringStep({ onNext, onBack, accountName }: Readonly<Recurrin
       transition={{ duration: 0.3 }}
     >
       <form onSubmit={recurringTransactionForm.handleSubmit((data) => onNext(data))}>
-        <CardHeader>
-          <CardTitle className="text-text-dark">Transações Recorrentes</CardTitle>
-          <CardDescription className="text-text-dark/70">
+        <CardHeader className="px-4 sm:px-6">
+          <CardTitle className="text-text-dark text-xl sm:text-2xl">
+            Transações Recorrentes
+          </CardTitle>
+          <CardDescription className="text-text-dark/70 text-sm sm:text-base">
             Configure transações que se repetem automaticamente. Você pode pular esta etapa.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 px-4 sm:px-6">
           <div className="space-y-2">
             <Label htmlFor="recurringDescription" className="text-text-dark">
               Descrição
@@ -81,7 +83,7 @@ export function RecurringStep({ onNext, onBack, accountName }: Readonly<Recurrin
               </p>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="recurringType" className="text-text-dark">
                 Tipo
@@ -153,7 +155,7 @@ export function RecurringStep({ onNext, onBack, accountName }: Readonly<Recurrin
               </p>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="recurringFrequency" className="text-text-dark">
                 Frequência
@@ -210,7 +212,7 @@ export function RecurringStep({ onNext, onBack, accountName }: Readonly<Recurrin
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="recurringStartDate" className="text-text-dark">
                 Data Inicial
@@ -256,35 +258,47 @@ export function RecurringStep({ onNext, onBack, accountName }: Readonly<Recurrin
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+        <CardFooter className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 px-4 sm:px-6 pb-4 sm:pb-6">
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full sm:w-auto order-3 sm:order-1"
+          >
             <Button
               variant="ghost"
               type="button"
               onClick={onBack}
-              className="text-text-dark hover:bg-border-dark"
+              className="text-text-dark hover:bg-border-dark w-full sm:w-auto"
               aria-label="Voltar para etapa anterior"
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Voltar
             </Button>
           </motion.div>
-          <div className="flex gap-2">
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto order-1 sm:order-2">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full sm:w-auto"
+            >
               <Button
                 variant="ghost"
                 type="button"
                 onClick={() => onNext(null)}
-                className="text-text-dark hover:bg-border-dark"
+                className="text-text-dark hover:bg-border-dark w-full sm:w-auto"
                 aria-label="Pular etapa de transações recorrentes"
               >
                 Pular
               </Button>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full sm:w-auto"
+            >
               <Button
                 type="submit"
-                className="bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90 shadow-lg hover:shadow-xl transition-all"
+                className="bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90 shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
                 aria-label="Continuar para próxima etapa"
               >
                 Continuar

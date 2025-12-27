@@ -1,19 +1,19 @@
 import { Button } from '@/components/ui/button';
 import {
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
@@ -39,13 +39,13 @@ export function AccountStep({ onNext, onBack, loading }: Readonly<AccountStepPro
       transition={{ duration: 0.3 }}
     >
       <form onSubmit={accountForm.handleSubmit(onNext)}>
-        <CardHeader>
-          <CardTitle className="text-text-dark">Adicione uma Conta</CardTitle>
-          <CardDescription className="text-text-dark/70">
+        <CardHeader className="px-4 sm:px-6">
+          <CardTitle className="text-text-dark text-xl sm:text-2xl">Adicione uma Conta</CardTitle>
+          <CardDescription className="text-text-dark/70 text-sm sm:text-base">
             Cadastre onde seu dinheiro está guardado (Banco ou Carteira).
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 px-4 sm:px-6">
           <div className="space-y-2">
             <Label htmlFor="accountName" className="text-text-dark">
               Nome da Conta
@@ -145,7 +145,7 @@ export function AccountStep({ onNext, onBack, loading }: Readonly<AccountStepPro
               )}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="accountAgency" className="text-text-dark">
                 Agência
@@ -188,12 +188,12 @@ export function AccountStep({ onNext, onBack, loading }: Readonly<AccountStepPro
             />
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 px-4 sm:px-6 pb-4 sm:pb-6">
           <Button
             variant="ghost"
             type="button"
             onClick={onBack}
-            className="text-text-dark hover:bg-border-dark"
+            className="text-text-dark hover:bg-border-dark w-full sm:w-auto order-2 sm:order-1"
           >
             <ChevronLeft className="mr-2 h-4 w-4" />
             Voltar
@@ -201,7 +201,7 @@ export function AccountStep({ onNext, onBack, loading }: Readonly<AccountStepPro
           <Button
             type="submit"
             disabled={loading}
-            className="bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90"
+            className="bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90 w-full sm:w-auto order-1 sm:order-2"
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Continuar
