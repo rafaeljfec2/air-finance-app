@@ -7,6 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { ColorPicker } from '@/components/ui/color-picker';
+import { DatePicker } from '@/components/ui/DatePicker';
+import { IconPicker } from '@/components/ui/icon-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -18,15 +21,25 @@ import {
 } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/services/apiClient';
+import { formatDateToLocalISO, parseLocalDate } from '@/utils/date';
 import { formatCNPJ, formatCPF, unformatDocument } from '@/utils/formatDocument';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Building2,
   CheckCircle2,
+  ChevronLeft,
   ChevronRight,
+  Gift,
+  Landmark,
   Loader2,
+  Plus,
+  Repeat,
+  ShoppingCart,
   Tags,
   Target,
+  Trash2,
+  TrendingDown,
   TrendingUp,
   Wallet,
 } from 'lucide-react';
@@ -119,6 +132,46 @@ const AccountSchema = z.object({
   accountNumber: z.string().optional(),
 });
 
+const CategorySchema = z.object({
+  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  type: z.enum(['income', 'expense']),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida'),
+  icon: z.string().min(1, 'Ícone é obrigatório'),
+});
+
+const GoalSchema = z.object({
+  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  description: z.string().optional(),
+  targetAmount: z.number().min(0.01, 'Valor alvo deve ser maior que zero'),
+  deadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data limite inválida'),
+  accountId: z.string().optional(), // Will be set on complete
+  categoryId: z.string().optional(),
+});
+
+const RecurringTransactionSchema = z
+  .object({
+    description: z.string().min(1, 'Descrição é obrigatória'),
+    value: z.number().min(0.01, 'Valor deve ser maior que zero'),
+    type: z.enum(['Income', 'Expense']),
+    category: z.string().min(1, 'Categoria é obrigatória'),
+    accountId: z.string().optional(), // Will be set on complete
+    startDate: z.string().min(1, 'Data inicial é obrigatória'),
+    frequency: z.enum(['daily', 'weekly', 'monthly', 'yearly']),
+    repeatUntil: z.string().min(1, 'Data final é obrigatória'),
+  })
+  .refine(
+    (data) => {
+      if (data.repeatUntil && data.startDate) {
+        return new Date(data.repeatUntil) >= new Date(data.startDate);
+      }
+      return true;
+    },
+    {
+      message: 'Data final deve ser posterior à data inicial',
+      path: ['repeatUntil'],
+    },
+  );
+
 // --- Components ---
 
 interface Step {
@@ -163,6 +216,9 @@ function StepIndicator({ currentStep, steps }: Readonly<{ currentStep: number; s
 
 type CompanyFormData = z.infer<typeof CompanySchema>;
 type AccountFormData = z.infer<typeof AccountSchema>;
+type CategoryFormData = z.infer<typeof CategorySchema>;
+type GoalFormData = z.infer<typeof GoalSchema>;
+type RecurringTransactionFormData = z.infer<typeof RecurringTransactionSchema>;
 
 export default function OnboardingPage() {
   const { user } = useAuth();
@@ -170,6 +226,10 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(false);
   const [companyData, setCompanyData] = useState<CompanyFormData | null>(null);
   const [accountData, setAccountData] = useState<AccountFormData | null>(null);
+  const [categoriesData, setCategoriesData] = useState<CategoryFormData[]>([]);
+  const [goalData, setGoalData] = useState<GoalFormData | null>(null);
+  const [recurringTransactionData, setRecurringTransactionData] =
+    useState<RecurringTransactionFormData | null>(null);
 
   // --- Checking existing state on mount ---
   useEffect(() => {
@@ -200,7 +260,10 @@ export default function OnboardingPage() {
     { icon: CheckCircle2, label: 'Boas-vindas' },
     { icon: Building2, label: 'Empresa' },
     { icon: Wallet, label: 'Conta' },
-    { icon: Tags, label: 'Conclusão' },
+    { icon: Tags, label: 'Categorias' },
+    { icon: Target, label: 'Metas' },
+    { icon: Repeat, label: 'Transações Recorrentes' },
+    { icon: CheckCircle2, label: 'Conclusão' },
   ];
 
   // --- Forms ---
@@ -211,8 +274,76 @@ export default function OnboardingPage() {
     },
   });
   const accountForm = useForm<AccountFormData>({ resolver: zodResolver(AccountSchema) });
+  const goalForm = useForm<GoalFormData>({
+    resolver: zodResolver(GoalSchema),
+    defaultValues: {
+      targetAmount: 0,
+    },
+  });
+  const recurringTransactionForm = useForm<RecurringTransactionFormData>({
+    resolver: zodResolver(RecurringTransactionSchema),
+    defaultValues: {
+      type: 'Expense',
+      frequency: 'monthly',
+      value: 0,
+      startDate: formatDateToLocalISO(new Date()),
+      repeatUntil: formatDateToLocalISO(
+        new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+      ),
+      category: '',
+      description: '',
+    },
+  });
 
   const documentType = companyForm.watch('documentType');
+  const [goalTargetAmountInput, setGoalTargetAmountInput] = useState('');
+  const [recurringTransactionValueInput, setRecurringTransactionValueInput] = useState('');
+
+  // Category form state
+  const [currentCategoryForm, setCurrentCategoryForm] = useState<CategoryFormData>({
+    name: '',
+    type: 'expense',
+    color: '#8A05BE',
+    icon: 'Tags',
+  });
+  const [categoryFormErrors, setCategoryFormErrors] = useState<Record<string, string>>({});
+
+  const iconOptions = [
+    { value: 'Tags', icon: Tags },
+    { value: 'TrendingUp', icon: TrendingUp },
+    { value: 'TrendingDown', icon: TrendingDown },
+    { value: 'Wallet', icon: Wallet },
+    { value: 'ShoppingCart', icon: ShoppingCart },
+    { value: 'Gift', icon: Gift },
+    { value: 'Landmark', icon: Landmark },
+  ] as const;
+
+  const categoryTypes = [
+    { value: 'income', label: 'Receita', icon: TrendingUp },
+    { value: 'expense', label: 'Despesa', icon: TrendingDown },
+  ] as const;
+
+  const handleAddCategory = () => {
+    const errors: Record<string, string> = {};
+    if (!currentCategoryForm.name.trim()) {
+      errors.name = 'Nome obrigatório';
+    }
+    setCategoryFormErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
+    setCategoriesData([...categoriesData, { ...currentCategoryForm }]);
+    setCurrentCategoryForm({
+      name: '',
+      type: 'expense',
+      color: '#8A05BE',
+      icon: 'Tags',
+    });
+    setCategoryFormErrors({});
+  };
+
+  const handleRemoveCategory = (index: number) => {
+    setCategoriesData(categoriesData.filter((_, i) => i !== index));
+  };
 
   // --- Handlers ---
 
@@ -224,6 +355,21 @@ export default function OnboardingPage() {
   const handleAccountNext = (data: AccountFormData) => {
     setAccountData(data);
     setCurrentStep(3);
+  };
+
+  const handleCategoriesNext = (data: CategoryFormData[]) => {
+    setCategoriesData(data);
+    setCurrentStep(4);
+  };
+
+  const handleGoalNext = (data: GoalFormData | null) => {
+    setGoalData(data);
+    setCurrentStep(5);
+  };
+
+  const handleRecurringTransactionNext = (data: RecurringTransactionFormData | null) => {
+    setRecurringTransactionData(data);
+    setCurrentStep(6);
   };
 
   const handleComplete = async () => {
@@ -251,13 +397,57 @@ export default function OnboardingPage() {
       const createdCompanyId = companyResponse.data.id;
 
       // Create account
-      await apiClient.post(`/companies/${createdCompanyId}/accounts`, {
+      const accountResponse = await apiClient.post(`/companies/${createdCompanyId}/accounts`, {
         ...accountData,
         color: '#000000', // Default
         icon: 'Wallet', // Default
         companyId: createdCompanyId,
         initialBalanceDate: new Date().toISOString(),
       });
+
+      const createdAccountId = accountResponse.data.id;
+
+      // Create categories
+      const createdCategoryIds: string[] = [];
+      if (categoriesData.length > 0) {
+        for (const category of categoriesData) {
+          const categoryResponse = await apiClient.post(
+            `/companies/${createdCompanyId}/categories`,
+            {
+              ...category,
+              companyId: createdCompanyId,
+            },
+          );
+          createdCategoryIds.push(categoryResponse.data.id);
+        }
+      }
+
+      // Create goal (if provided)
+      if (goalData) {
+        await apiClient.post(`/companies/${createdCompanyId}/goals`, {
+          name: goalData.name,
+          description: goalData.description,
+          targetAmount: goalData.targetAmount,
+          deadline: goalData.deadline,
+          accountId: createdAccountId,
+          companyId: createdCompanyId,
+          currentAmount: 0,
+          status: 'active',
+          categoryId: goalData.categoryId || createdCategoryIds[0] || undefined,
+        });
+      }
+
+      // Create recurring transaction (if provided)
+      // Note: category field expects category name (string), not ID
+      if (recurringTransactionData && recurringTransactionData.category) {
+        await apiClient.post(`/companies/${createdCompanyId}/recurring-transactions`, {
+          ...recurringTransactionData,
+          accountId: createdAccountId,
+          companyId: createdCompanyId,
+          startDate: new Date(recurringTransactionData.startDate).toISOString(),
+          repeatUntil: new Date(recurringTransactionData.repeatUntil).toISOString(),
+        });
+      }
 
       // Complete onboarding
       await apiClient.post('/user/onboarding/complete');
@@ -452,6 +642,7 @@ export default function OnboardingPage() {
                   onClick={() => setCurrentStep(0)}
                   className="text-text-dark hover:bg-border-dark"
                 >
+                  <ChevronLeft className="mr-2 h-4 w-4" />
                   Voltar
                 </Button>
                 <Button
@@ -461,6 +652,7 @@ export default function OnboardingPage() {
                 >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Continuar
+                  <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardFooter>
             </form>
@@ -563,13 +755,13 @@ export default function OnboardingPage() {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between">
-                {/* Cannot go back to step 1 properly without preserving state, but for MVP ok */}
                 <Button
                   variant="ghost"
                   type="button"
                   onClick={() => setCurrentStep(1)}
                   className="text-text-dark hover:bg-border-dark"
                 >
+                  <ChevronLeft className="mr-2 h-4 w-4" />
                   Voltar
                 </Button>
                 <Button
@@ -579,13 +771,575 @@ export default function OnboardingPage() {
                 >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Continuar
+                  <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardFooter>
             </form>
           )}
 
-          {/* STEP 3: FINISH */}
+          {/* STEP 3: CATEGORIES */}
           {currentStep === 3 && (
+            <>
+              <CardHeader>
+                <CardTitle className="text-text-dark">Categorias</CardTitle>
+                <CardDescription className="text-text-dark/70">
+                  Crie categorias para organizar suas transações. Você pode adicionar quantas quiser
+                  ou usar as categorias padrão.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Categories List */}
+                {categoriesData.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-text-dark">
+                      Categorias Criadas ({categoriesData.length})
+                    </Label>
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      {categoriesData.map((category, index) => {
+                        const iconOption = iconOptions.find((opt) => opt.value === category.icon);
+                        const IconComponent = iconOption?.icon ?? Tags;
+                        const typeOption = categoryTypes.find(
+                          (type) => type.value === category.type,
+                        );
+                        const TypeIcon = typeOption?.icon ?? TrendingDown;
+                        return (
+                          <div
+                            key={`category-${index}-${category.name}`}
+                            className="flex items-center justify-between p-3 bg-card-dark/50 border border-border-dark rounded-lg"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div
+                                className="w-8 h-8 rounded-full flex items-center justify-center"
+                                style={{ backgroundColor: category.color }}
+                              >
+                                <IconComponent className="h-4 w-4 text-white" />
+                              </div>
+                              <div>
+                                <div className="text-text-dark font-medium">{category.name}</div>
+                                <div className="flex items-center gap-1 text-xs text-text-dark/60">
+                                  <TypeIcon className="h-3 w-3" />
+                                  {categoryTypes.find((t) => t.value === category.type)?.label}
+                                </div>
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              type="button"
+                              size="sm"
+                              onClick={() => handleRemoveCategory(index)}
+                              className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Category Form */}
+                <div className="space-y-4 border-t border-border-dark pt-4">
+                  <Label className="text-text-dark">Adicionar Nova Categoria</Label>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="categoryName" className="text-text-dark">
+                        Nome da Categoria
+                      </Label>
+                      <Input
+                        id="categoryName"
+                        placeholder="Ex: Alimentação, Transporte..."
+                        className="bg-card-dark border-border-dark text-text-dark"
+                        value={currentCategoryForm.name}
+                        onChange={(e) =>
+                          setCurrentCategoryForm({ ...currentCategoryForm, name: e.target.value })
+                        }
+                      />
+                      {categoryFormErrors.name && (
+                        <p className="text-sm text-red-400">{categoryFormErrors.name}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-text-dark">Tipo</Label>
+                      <Select
+                        value={currentCategoryForm.type}
+                        onValueChange={(value) =>
+                          setCurrentCategoryForm({
+                            ...currentCategoryForm,
+                            type: value as 'income' | 'expense',
+                          })
+                        }
+                      >
+                        <SelectTrigger className="bg-card-dark border-border-dark text-text-dark">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-card-dark border-border-dark text-text-dark">
+                          {categoryTypes.map((opt) => {
+                            const TypeIcon = opt.icon;
+                            return (
+                              <SelectItem
+                                key={opt.value}
+                                value={opt.value}
+                                className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <TypeIcon className="h-4 w-4" />
+                                  {opt.label}
+                                </div>
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-text-dark">Cor</Label>
+                        <ColorPicker
+                          value={currentCategoryForm.color}
+                          onChange={(color) =>
+                            setCurrentCategoryForm({ ...currentCategoryForm, color })
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-text-dark">Ícone</Label>
+                        <IconPicker
+                          value={currentCategoryForm.icon}
+                          onChange={(icon) =>
+                            setCurrentCategoryForm({ ...currentCategoryForm, icon })
+                          }
+                          options={iconOptions.map((opt) => ({
+                            value: opt.value,
+                            icon: opt.icon,
+                          }))}
+                        />
+                      </div>
+                    </div>
+
+                    <Button
+                      type="button"
+                      onClick={handleAddCategory}
+                      variant="outline"
+                      className="w-full border-border-dark text-text-dark hover:bg-border-dark"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Adicionar Categoria
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => setCurrentStep(2)}
+                  className="text-text-dark hover:bg-border-dark"
+                >
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  Voltar
+                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    onClick={() => {
+                      setCategoriesData([]);
+                      setCurrentStep(4);
+                    }}
+                    className="text-text-dark hover:bg-border-dark"
+                  >
+                    Pular
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      if (categoriesData.length > 0) {
+                        handleCategoriesNext(categoriesData);
+                      } else {
+                        // Create default categories if none were added
+                        const defaultCategories: CategoryFormData[] = [
+                          { name: 'Alimentação', type: 'expense', color: '#EF4444', icon: 'Tags' },
+                          { name: 'Transporte', type: 'expense', color: '#3B82F6', icon: 'Tags' },
+                          { name: 'Moradia', type: 'expense', color: '#10B981', icon: 'Tags' },
+                          { name: 'Salário', type: 'income', color: '#22C55E', icon: 'TrendingUp' },
+                        ];
+                        handleCategoriesNext(defaultCategories);
+                      }
+                    }}
+                    className="bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90"
+                  >
+                    {categoriesData.length > 0 ? 'Continuar' : 'Usar Categorias Padrão'}
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </CardFooter>
+            </>
+          )}
+
+          {/* STEP 4: GOALS */}
+          {currentStep === 4 && (
+            <form onSubmit={goalForm.handleSubmit((data) => handleGoalNext(data))}>
+              <CardHeader>
+                <CardTitle className="text-text-dark">Metas</CardTitle>
+                <CardDescription className="text-text-dark/70">
+                  Defina uma meta financeira para acompanhar seu progresso. Você pode pular esta
+                  etapa.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="goalName" className="text-text-dark">
+                    Nome da Meta
+                  </Label>
+                  <Input
+                    id="goalName"
+                    placeholder="Ex: Reserva de emergência, Viagem..."
+                    className="bg-card-dark border-border-dark text-text-dark"
+                    {...goalForm.register('name')}
+                  />
+                  {goalForm.formState.errors.name && (
+                    <p className="text-sm text-red-400">
+                      {String(goalForm.formState.errors.name.message)}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="goalDescription" className="text-text-dark">
+                    Descrição (Opcional)
+                  </Label>
+                  <Input
+                    id="goalDescription"
+                    placeholder="Descreva sua meta..."
+                    className="bg-card-dark border-border-dark text-text-dark"
+                    {...goalForm.register('description')}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="goalTargetAmount" className="text-text-dark">
+                    Valor Alvo
+                  </Label>
+                  <Input
+                    id="goalTargetAmount"
+                    type="text"
+                    placeholder="R$ 0,00"
+                    value={goalTargetAmountInput}
+                    onChange={(e) => {
+                      const formatted = formatCurrencyInput(e.target.value);
+                      setGoalTargetAmountInput(formatted);
+                      goalForm.setValue('targetAmount', parseCurrency(formatted));
+                    }}
+                    className="bg-card-dark border-border-dark text-text-dark"
+                  />
+                  {goalForm.formState.errors.targetAmount && (
+                    <p className="text-sm text-red-400">
+                      {String(goalForm.formState.errors.targetAmount.message)}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="goalDeadline" className="text-text-dark">
+                    Data Limite
+                  </Label>
+                  <DatePicker
+                    value={goalForm.watch('deadline') || undefined}
+                    onChange={(date) => {
+                      const dateString = date ? formatDateToLocalISO(date) : '';
+                      goalForm.setValue('deadline', dateString);
+                    }}
+                    placeholder="Selecionar data limite"
+                    className="bg-card-dark border-border-dark text-text-dark"
+                  />
+                  {goalForm.formState.errors.deadline && (
+                    <p className="text-sm text-red-400">
+                      {String(goalForm.formState.errors.deadline.message)}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="goalAccountId" className="text-text-dark">
+                    Conta
+                  </Label>
+                  <Input
+                    id="goalAccountId"
+                    value={accountData?.name || 'Será usada a conta criada anteriormente'}
+                    disabled
+                    className="bg-card-dark/50 border-border-dark text-text-dark/50"
+                  />
+                </div>
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => setCurrentStep(3)}
+                  className="text-text-dark hover:bg-border-dark"
+                >
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  Voltar
+                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    onClick={() => handleGoalNext(null)}
+                    className="text-text-dark hover:bg-border-dark"
+                  >
+                    Pular
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90"
+                  >
+                    Continuar
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </CardFooter>
+            </form>
+          )}
+
+          {/* STEP 5: RECURRING TRANSACTIONS */}
+          {currentStep === 5 && (
+            <form
+              onSubmit={recurringTransactionForm.handleSubmit((data) =>
+                handleRecurringTransactionNext(data),
+              )}
+            >
+              <CardHeader>
+                <CardTitle className="text-text-dark">Transações Recorrentes</CardTitle>
+                <CardDescription className="text-text-dark/70">
+                  Configure transações que se repetem automaticamente. Você pode pular esta etapa.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="recurringDescription" className="text-text-dark">
+                    Descrição
+                  </Label>
+                  <Input
+                    id="recurringDescription"
+                    placeholder="Ex: Aluguel, Internet, Salário..."
+                    className="bg-card-dark border-border-dark text-text-dark"
+                    {...recurringTransactionForm.register('description')}
+                  />
+                  {recurringTransactionForm.formState.errors.description && (
+                    <p className="text-sm text-red-400">
+                      {String(recurringTransactionForm.formState.errors.description.message)}
+                    </p>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="recurringType" className="text-text-dark">
+                      Tipo
+                    </Label>
+                    <Select
+                      value={recurringTransactionForm.watch('type')}
+                      onValueChange={(value) =>
+                        recurringTransactionForm.setValue('type', value as 'Income' | 'Expense')
+                      }
+                    >
+                      <SelectTrigger className="bg-card-dark border-border-dark text-text-dark">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card-dark border-border-dark text-text-dark">
+                        <SelectItem
+                          value="Income"
+                          className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                        >
+                          Receita
+                        </SelectItem>
+                        <SelectItem
+                          value="Expense"
+                          className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                        >
+                          Despesa
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="recurringValue" className="text-text-dark">
+                      Valor
+                    </Label>
+                    <Input
+                      id="recurringValue"
+                      type="text"
+                      placeholder="R$ 0,00"
+                      value={recurringTransactionValueInput}
+                      onChange={(e) => {
+                        const formatted = formatCurrencyInput(e.target.value);
+                        setRecurringTransactionValueInput(formatted);
+                        recurringTransactionForm.setValue('value', parseCurrency(formatted));
+                      }}
+                      className="bg-card-dark border-border-dark text-text-dark"
+                    />
+                    {recurringTransactionForm.formState.errors.value && (
+                      <p className="text-sm text-red-400">
+                        {String(recurringTransactionForm.formState.errors.value.message)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="recurringCategory" className="text-text-dark">
+                    Categoria
+                  </Label>
+                  <Input
+                    id="recurringCategory"
+                    placeholder="Ex: Alimentação, Transporte..."
+                    className="bg-card-dark border-border-dark text-text-dark"
+                    {...recurringTransactionForm.register('category')}
+                  />
+                  <p className="text-xs text-text-dark/50">
+                    Nome da categoria (pode ser uma das categorias criadas anteriormente ou nova)
+                  </p>
+                  {recurringTransactionForm.formState.errors.category && (
+                    <p className="text-sm text-red-400">
+                      {String(recurringTransactionForm.formState.errors.category.message)}
+                    </p>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="recurringFrequency" className="text-text-dark">
+                      Frequência
+                    </Label>
+                    <Select
+                      value={recurringTransactionForm.watch('frequency')}
+                      onValueChange={(value) =>
+                        recurringTransactionForm.setValue(
+                          'frequency',
+                          value as 'daily' | 'weekly' | 'monthly' | 'yearly',
+                        )
+                      }
+                    >
+                      <SelectTrigger className="bg-card-dark border-border-dark text-text-dark">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card-dark border-border-dark text-text-dark">
+                        <SelectItem
+                          value="daily"
+                          className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                        >
+                          Diária
+                        </SelectItem>
+                        <SelectItem
+                          value="weekly"
+                          className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                        >
+                          Semanal
+                        </SelectItem>
+                        <SelectItem
+                          value="monthly"
+                          className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                        >
+                          Mensal
+                        </SelectItem>
+                        <SelectItem
+                          value="yearly"
+                          className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                        >
+                          Anual
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="recurringAccountId" className="text-text-dark">
+                      Conta
+                    </Label>
+                    <Input
+                      id="recurringAccountId"
+                      value={accountData?.name || 'Será usada a conta criada anteriormente'}
+                      disabled
+                      className="bg-card-dark/50 border-border-dark text-text-dark/50"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="recurringStartDate" className="text-text-dark">
+                      Data Inicial
+                    </Label>
+                    <DatePicker
+                      value={recurringTransactionForm.watch('startDate') || undefined}
+                      onChange={(date) => {
+                        const dateString = date ? formatDateToLocalISO(date) : '';
+                        recurringTransactionForm.setValue('startDate', dateString);
+                      }}
+                      placeholder="Selecionar data inicial"
+                      className="bg-card-dark border-border-dark text-text-dark"
+                    />
+                    {recurringTransactionForm.formState.errors.startDate && (
+                      <p className="text-sm text-red-400">
+                        {String(recurringTransactionForm.formState.errors.startDate.message)}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="recurringRepeatUntil" className="text-text-dark">
+                      Data Final
+                    </Label>
+                    <DatePicker
+                      value={recurringTransactionForm.watch('repeatUntil') || undefined}
+                      onChange={(date) => {
+                        const dateString = date ? formatDateToLocalISO(date) : '';
+                        recurringTransactionForm.setValue('repeatUntil', dateString);
+                      }}
+                      placeholder="Selecionar data final"
+                      minDate={
+                        recurringTransactionForm.watch('startDate')
+                          ? parseLocalDate(recurringTransactionForm.watch('startDate'))
+                          : undefined
+                      }
+                      className="bg-card-dark border-border-dark text-text-dark"
+                    />
+                    {recurringTransactionForm.formState.errors.repeatUntil && (
+                      <p className="text-sm text-red-400">
+                        {String(recurringTransactionForm.formState.errors.repeatUntil.message)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => setCurrentStep(4)}
+                  className="text-text-dark hover:bg-border-dark"
+                >
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  Voltar
+                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    onClick={() => handleRecurringTransactionNext(null)}
+                    className="text-text-dark hover:bg-border-dark"
+                  >
+                    Pular
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90"
+                  >
+                    Continuar
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </CardFooter>
+            </form>
+          )}
+
+          {/* STEP 6: FINISH */}
+          {currentStep === 6 && (
             <>
               <CardHeader className="text-center">
                 <div className="mx-auto w-16 h-16 bg-brand-leaf/20 rounded-full flex items-center justify-center mb-4">
@@ -602,12 +1356,21 @@ export default function OnboardingPage() {
                   Agora você pode explorar o painel, definir metas e criar transações recorrentes.
                 </p>
               </CardContent>
-              <CardFooter className="flex justify-center">
+              <CardFooter className="flex justify-between">
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => setCurrentStep(5)}
+                  className="text-text-dark hover:bg-border-dark"
+                >
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  Voltar
+                </Button>
                 <Button
                   size="lg"
                   onClick={handleComplete}
                   disabled={loading}
-                  className="w-full bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90"
+                  className="bg-brand-leaf text-brand-arrow hover:bg-brand-leaf/90"
                 >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Ir para o Dashboard
