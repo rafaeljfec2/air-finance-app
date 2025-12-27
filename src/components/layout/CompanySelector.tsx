@@ -1,33 +1,22 @@
 import { Loading } from '@/components/Loading';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { useActiveCompany } from '@/hooks/useActiveCompany';
-import { companyService } from '@/services/company';
+import { companyService } from '@/services/companyService';
 import { useAuthStore } from '@/stores/auth';
 import { Company } from '@/types/company';
 import { formatDocument } from '@/utils/formatDocument';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 export const CompanySelector = () => {
   const { user } = useAuthStore();
   const { activeCompany, changeActiveCompany } = useActiveCompany();
 
-  const {
-    data: companies,
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data: companies, isLoading } = useQuery({
     queryKey: ['companies', user?.id],
     queryFn: () => companyService.getUserCompanies(),
     enabled: !!user,
   });
-
-  // Garante que a query de empresas seja executada após login
-  useEffect(() => {
-    if (user) {
-      refetch();
-    }
-  }, [user, refetch]);
 
   // Convert companies to ComboBox options (must be before early returns)
   const companyOptions: ComboBoxOption<string>[] = useMemo(

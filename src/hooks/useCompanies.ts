@@ -1,5 +1,6 @@
 import { toast } from '@/components/ui/toast';
 import { companyService } from '@/services/companyService';
+import { useAuthStore } from '@/stores/auth';
 import { Company } from '@/types/company';
 import { getUserFriendlyMessage, logApiError, parseApiError } from '@/utils/apiErrorHandler';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -7,13 +8,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 export function useCompanies() {
   const queryClient = useQueryClient();
 
+  const { user } = useAuthStore();
+
   const {
     data: companies,
     isLoading,
     error,
   } = useQuery<Company[]>({
-    queryKey: ['companies'],
+    queryKey: ['companies', user?.id],
     queryFn: companyService.getUserCompanies,
+    enabled: !!user,
   });
 
   const { mutate: createCompany, isPending: isCreating } = useMutation({

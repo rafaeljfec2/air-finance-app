@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { Modal } from '@/components/ui/Modal';
 import { useActiveCompany } from '@/hooks/useActiveCompany';
-import { companyService } from '@/services/company';
+import { companyService } from '@/services/companyService';
 import { useAuthStore } from '@/stores/auth';
 import { formatDocument } from '@/utils/formatDocument';
 import { useQuery } from '@tanstack/react-query';

@@ -50,6 +50,8 @@ export const useAuth = () => {
       queryClient.setQueryData(['user'], data.user);
       setUser(data.user);
       setToken(data.token);
+      // Invalidate companies query to refetch after login
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
       return data;
     },
   });

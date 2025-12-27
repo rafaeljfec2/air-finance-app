@@ -1,9 +1,9 @@
+import heroImage from '@/assets/images/landing/hero.svg';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useParallax } from '../hooks/useParallax';
-import heroImage from '@/assets/images/landing/hero.svg';
 
 export function HeroSection() {
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ export function HeroSection() {
             >
               <Button
                 className="group bg-brand-arrow hover:bg-brand-arrow/90 text-white px-8 py-6 text-lg inline-flex items-center gap-2 glow-effect transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-brand-arrow focus:ring-offset-2"
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/register')}
                 aria-label="Começar a usar o Airfinance gratuitamente"
               >
                 Comece gratuitamente
@@ -90,4 +90,3 @@ export function HeroSection() {
     </motion.section>
   );
 }
-
