@@ -12,7 +12,7 @@ export const UserSchema = z.object({
   companyIds: z.array(z.string()),
   role: z.enum(['admin', 'user']),
   status: z.enum(['active', 'inactive']),
-  onboardingCompleted: z.boolean().optional().default(false),
+  onboardingCompleted: z.boolean().default(false),
   emailVerified: z.boolean().optional().default(false),
   phone: z.string().optional(),
   location: z.string().optional(),

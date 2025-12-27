@@ -9,6 +9,8 @@ export type User = {
   phone?: string;
   location?: string;
   bio?: string;
+  onboardingCompleted?: boolean;
+  emailVerified?: boolean;
   notifications?: {
     email: boolean;
     push: boolean;
