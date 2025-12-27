@@ -472,13 +472,27 @@ export default function OnboardingPage() {
 
       // Create account
       setLoadingMessage('Criando sua conta...');
-      const accountResponse = await apiClient.post(`/companies/${createdCompanyId}/accounts`, {
-        ...accountData,
+      const accountPayload: Record<string, unknown> = {
+        name: accountData.name,
+        type: accountData.type,
+        initialBalance: accountData.initialBalance || 0,
+        institution: accountData.institution,
         color: '#000000', // Default
         icon: 'Wallet', // Default
         companyId: createdCompanyId,
         initialBalanceDate: new Date().toISOString(),
-      });
+      };
+      // Only include optional fields if they have values
+      if (accountData.agency && accountData.agency.trim() !== '') {
+        accountPayload.agency = accountData.agency;
+      }
+      if (accountData.accountNumber && accountData.accountNumber.trim() !== '') {
+        accountPayload.accountNumber = accountData.accountNumber;
+      }
+      const accountResponse = await apiClient.post(
+        `/companies/${createdCompanyId}/accounts`,
+        accountPayload,
+      );
 
       const createdAccountId = accountResponse.data.id;
       toast.success('Conta criada com sucesso! ✓');
@@ -969,15 +983,49 @@ export default function OnboardingPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-text-dark">Saldo Inicial</Label>
+                        <Label htmlFor="accountAgency" className="text-text-dark">
+                          Agência
+                          <span className="text-xs text-text-dark/50 ml-1 font-normal">
+                            (Opcional)
+                          </span>
+                        </Label>
                         <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0,00"
-                          className="bg-card-dark border-border-dark text-text-dark"
-                          {...accountForm.register('initialBalance')}
+                          id="accountAgency"
+                          placeholder="Ex: 1234"
+                          className="bg-card-dark border-border-dark text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
+                          {...accountForm.register('agency')}
                         />
                       </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="accountNumber" className="text-text-dark">
+                          Número da Conta
+                          <span className="text-xs text-text-dark/50 ml-1 font-normal">
+                            (Opcional)
+                          </span>
+                        </Label>
+                        <Input
+                          id="accountNumber"
+                          placeholder="Ex: 12345-6"
+                          className="bg-card-dark border-border-dark text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
+                          {...accountForm.register('accountNumber')}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="accountInitialBalance" className="text-text-dark">
+                        Saldo Inicial
+                        <span className="text-xs text-text-dark/50 ml-1 font-normal">
+                          (Saldo atual da conta)
+                        </span>
+                      </Label>
+                      <Input
+                        id="accountInitialBalance"
+                        type="number"
+                        step="0.01"
+                        placeholder="Ex: 1000.00"
+                        className="bg-card-dark border-border-dark text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
+                        {...accountForm.register('initialBalance')}
+                      />
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-between">
