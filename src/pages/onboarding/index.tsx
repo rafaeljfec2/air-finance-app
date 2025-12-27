@@ -147,7 +147,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="bg-background-dark min-h-screen w-full flex items-center justify-center p-2 sm:p-4 py-4 sm:py-8 relative overflow-hidden">
+    <div className="bg-background dark:bg-background-dark min-h-screen w-full flex items-center justify-center p-2 sm:p-4 py-4 sm:py-8 relative overflow-hidden">
       <div className="max-w-4xl w-full z-10">
         <div className="mb-4 sm:mb-8">
           <StepIndicator currentStep={currentStep} steps={steps} />
