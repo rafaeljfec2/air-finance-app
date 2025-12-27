@@ -147,13 +147,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-background via-brand-leaf/5 to-brand-arrow/10 min-h-screen w-full flex items-center justify-center p-2 sm:p-4 py-4 sm:py-8 relative overflow-hidden">
-      {/* Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-leaf/10 rounded-full blur-3xl opacity-50" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-arrow/10 rounded-full blur-3xl opacity-50" />
-      </div>
-
+    <div className="bg-background-dark min-h-screen w-full flex items-center justify-center p-2 sm:p-4 py-4 sm:py-8 relative overflow-hidden">
       <div className="max-w-4xl w-full z-10">
         <div className="mb-4 sm:mb-8">
           <StepIndicator currentStep={currentStep} steps={steps} />
