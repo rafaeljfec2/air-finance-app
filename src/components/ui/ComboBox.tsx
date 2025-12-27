@@ -301,12 +301,10 @@ export function ComboBox<T extends string | number = string>({
         <SelectContent
           className={cn(
             'bg-white dark:bg-gray-900 text-text dark:text-text-dark border-border dark:border-gray-800 shadow-lg ring-1 ring-black/5 dark:ring-white/10',
-            maxHeight,
-            'flex flex-col',
             contentClassName,
           )}
         >
-          <div className="flex flex-col overflow-hidden h-full">
+          <div className={cn('flex flex-col', maxHeight)}>
             {searchable && (
               <div className="p-2 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
                 <input
@@ -360,10 +358,26 @@ export function ComboBox<T extends string | number = string>({
 
             <div
               className={cn(
-                'p-2 max-h-60 overflow-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 flex-1 min-h-0',
-                searchable && 'pt-0',
-                showSelectAll && (onSelectAll || onClearAll) && 'pt-0',
+                'overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600',
+                maxHeight,
+                searchable && 'p-2 pt-0',
+                showSelectAll && (onSelectAll || onClearAll) && 'p-2 pt-0',
+                !searchable && !(showSelectAll && (onSelectAll || onClearAll)) && 'p-2',
               )}
+              style={{ maxHeight: maxHeight === 'max-h-56' ? '14rem' : undefined }}
+              onWheel={(e) => {
+                const element = e.currentTarget;
+                const { scrollTop, scrollHeight, clientHeight } = element;
+                const isScrollingDown = e.deltaY > 0;
+                const isScrollingUp = e.deltaY < 0;
+                const isAtTop = scrollTop === 0;
+                const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+
+                // Only prevent page scroll if we're not at the boundaries
+                if ((isScrollingDown && !isAtBottom) || (isScrollingUp && !isAtTop)) {
+                  e.stopPropagation();
+                }
+              }}
             >
               {filteredOptions.length > 0
                 ? filteredOptions.map((option) => {
