@@ -4,11 +4,12 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { DeleteAllUserDataModal } from '@/components/users/DeleteAllUserDataModal';
 import { useUsers } from '@/hooks/useUsers';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { CreateUser } from '@/services/userService';
 import { useCompanyStore } from '@/stores/company';
-import { User } from 'lucide-react';
+import { Trash2, User } from 'lucide-react';
 import React, { useState } from 'react';
 
 export function UsersPage() {
@@ -37,6 +38,7 @@ export function UsersPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showDeleteAllDataModal, setShowDeleteAllDataModal] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -161,9 +163,20 @@ export function UsersPage() {
   return (
     <ViewDefault>
       <div className="container mx-auto px-2 sm:px-6 py-10">
-        <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark mb-6 flex items-center gap-2">
-          <User className="h-6 w-6 text-primary-500" /> Usuários
-        </h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark flex items-center gap-2">
+            <User className="h-6 w-6 text-primary-500" /> Usuários
+          </h1>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => setShowDeleteAllDataModal(true)}
+            className="flex items-center gap-2"
+          >
+            <Trash2 className="h-4 w-4" />
+            Deletar Todos os Dados
+          </Button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Formulário */}
           <Card className="p-6">
@@ -231,7 +244,12 @@ export function UsersPage() {
                       ...prev,
                       integrations: {
                         ...prev.integrations,
-                        openaiModel: value as any,
+                        openaiModel: value as
+                          | 'gpt-3.5-turbo'
+                          | 'gpt-4'
+                          | 'gpt-4-turbo'
+                          | 'gpt-5.2'
+                          | 'gpt-5-mini',
                       },
                     }))
                   }
@@ -313,7 +331,7 @@ export function UsersPage() {
                         </span>
                         {user.integrations?.openaiModel && (
                           <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-                             🤖 {user.integrations.openaiModel}
+                            🤖 {user.integrations.openaiModel}
                           </span>
                         )}
                       </div>
@@ -352,6 +370,10 @@ export function UsersPage() {
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
         danger
+      />
+      <DeleteAllUserDataModal
+        open={showDeleteAllDataModal}
+        onClose={() => setShowDeleteAllDataModal(false)}
       />
     </ViewDefault>
   );

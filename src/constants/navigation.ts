@@ -61,8 +61,8 @@ export const navigation: NavigationSection[] = [
           { name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCard },
           { name: 'Metas', href: '/goals', icon: Flag },
           { name: 'Transações Recorrentes', href: '/recurring-transactions', icon: RefreshCcw },
-          /* { name: 'Fontes de Receitas', href: '/income-sources', icon: DollarSign },
-          { name: 'Usuários', href: '/users', icon: User }, */
+          { name: 'Usuários', href: '/users', icon: User },
+          /* { name: 'Fontes de Receitas', href: '/income-sources', icon: DollarSign }, */
         ],
       },
       {

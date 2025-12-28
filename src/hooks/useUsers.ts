@@ -5,6 +5,8 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  deleteAllUserData,
+  deleteAllUserDataByEmail,
   type User,
   type CreateUser,
 } from '../services/userService';
@@ -52,6 +54,22 @@ export const useUsers = () => {
     },
   });
 
+  const deleteAllUserDataMutation = useMutation({
+    mutationFn: deleteAllUserData,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.removeQueries({ queryKey: ['user'] });
+    },
+  });
+
+  const deleteAllUserDataByEmailMutation = useMutation({
+    mutationFn: deleteAllUserDataByEmail,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.removeQueries({ queryKey: ['user'] });
+    },
+  });
+
   return {
     users,
     isLoading,
@@ -60,11 +78,17 @@ export const useUsers = () => {
     createUser: createMutation.mutate,
     updateUser: updateMutation.mutate,
     deleteUser: deleteMutation.mutate,
+    deleteAllUserData: deleteAllUserDataMutation.mutate,
+    deleteAllUserDataByEmail: deleteAllUserDataByEmailMutation.mutate,
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
+    isDeletingAllData: deleteAllUserDataMutation.isPending,
+    isDeletingAllDataByEmail: deleteAllUserDataByEmailMutation.isPending,
     createError: createMutation.error,
     updateError: updateMutation.error,
     deleteError: deleteMutation.error,
+    deleteAllDataError: deleteAllUserDataMutation.error,
+    deleteAllDataByEmailError: deleteAllUserDataByEmailMutation.error,
   };
 };
