@@ -25,6 +25,7 @@ export const AccountSchema = z.object({
     .nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
+  creditLimit: z.number().optional(),
 });
 
 export const CreateAccountSchema = AccountSchema.omit({

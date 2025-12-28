@@ -144,8 +144,8 @@ export function AccountFormModal({
     if (!form.institution.trim()) errs.institution = 'Instituição obrigatória';
     // For credit_card, agency and accountNumber are not required
     if (!isCreditCard) {
-      if (!form.agency.trim()) errs.agency = 'Agência obrigatória';
-      if (!form.accountNumber.trim()) errs.accountNumber = 'Número da conta obrigatório';
+      if (!(form.agency ?? '').trim()) errs.agency = 'Agência obrigatória';
+      if (!(form.accountNumber ?? '').trim()) errs.accountNumber = 'Número da conta obrigatório';
     }
     if (!form.companyId) errs.companyId = 'Selecione uma empresa';
     return errs;
@@ -162,11 +162,7 @@ export function AccountFormModal({
       // For credit_card, ensure agency and accountNumber are empty strings
       agency: isCreditCard ? '' : form.agency,
       accountNumber: isCreditCard ? '' : form.accountNumber,
-      initialBalanceDate: isCreditCard
-        ? null
-        : form.initialBalanceDate
-          ? form.initialBalanceDate
-          : null,
+      initialBalanceDate: form.initialBalanceDate || null,
     };
 
     onSubmit(payload);
@@ -314,7 +310,7 @@ export function AccountFormModal({
                   <FormField label="Agência *" error={errors.agency}>
                     <Input
                       name="agency"
-                      value={form.agency}
+                      value={form.agency ?? ''}
                       onChange={handleChange}
                       placeholder="0000"
                       required
@@ -328,7 +324,7 @@ export function AccountFormModal({
                   <FormField label="Número da conta *" error={errors.accountNumber}>
                     <Input
                       name="accountNumber"
-                      value={form.accountNumber}
+                      value={form.accountNumber ?? ''}
                       onChange={handleChange}
                       placeholder="00000-0"
                       required
@@ -352,8 +348,8 @@ export function AccountFormModal({
               </div>
 
               {isCreditCard ? (
-                <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                  <FormField label="Limite *" error={errors.initialBalance}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField label="Saldo Inicial *" error={errors.initialBalance}>
                     <div className="relative">
                       <Input
                         name="limit"
@@ -373,6 +369,46 @@ export function AccountFormModal({
                         className={cn(
                           'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                           errors.initialBalance && 'border-red-500 focus-visible:ring-red-500',
+                        )}
+                      />
+                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                    </div>
+                  </FormField>
+
+                  <FormField label="Data do saldo inicial *" error={errors.initialBalanceDate}>
+                    <DatePicker
+                      value={form.initialBalanceDate || undefined}
+                      onChange={(date) => {
+                        const dateString = date ? formatDateToLocalISO(date) : '';
+                        handleChange({
+                          target: { name: 'initialBalanceDate', value: dateString },
+                        } as ChangeEvent<HTMLInputElement>);
+                      }}
+                      placeholder="Selecionar data"
+                      error={errors.initialBalanceDate}
+                      className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                    />
+                  </FormField>
+
+                  <FormField label="Limite do Cartão" error={errors.creditLimit ? String(errors.creditLimit) : undefined}>
+                    <div className="relative">
+                      <Input
+                        name="creditLimit"
+                        type="text"
+                        inputMode="decimal"
+                        defaultValue={account?.creditLimit ? formatCurrencyInput(account.creditLimit.toFixed(2).replace('.', '')) : ''}
+                        onChange={(e) => {
+                          const formatted = formatCurrencyInput(e.target.value);
+                          e.target.value = formatted;
+                          setForm((prev) => ({
+                            ...prev,
+                            creditLimit: parseCurrency(formatted),
+                          }));
+                        }}
+                        placeholder="R$ 0,00"
+                        className={cn(
+                          'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                          errors.creditLimit && 'border-red-500 focus-visible:ring-red-500',
                         )}
                       />
                       <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />

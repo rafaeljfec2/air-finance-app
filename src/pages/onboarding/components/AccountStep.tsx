@@ -1,34 +1,34 @@
 import { Button } from '@/components/ui/button';
 import {
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from '@/components/ui/card';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import {
-  Banknote,
-  ChevronLeft,
-  ChevronRight,
-  CreditCard,
-  DollarSign,
-  Landmark,
-  Loader2,
-  Wallet,
+    Banknote,
+    ChevronLeft,
+    ChevronRight,
+    CreditCard,
+    DollarSign,
+    Landmark,
+    Loader2,
+    Wallet,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -55,6 +55,8 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
     defaultValues: initialData || {
       type: 'checking',
       initialBalance: 0,
+      initialBalanceDate: new Date().toISOString().split('T')[0],
+      creditLimit: 0,
       color: '#8A05BE',
       icon: 'Banknote',
     },
@@ -192,31 +194,72 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
           {isCreditCard ? (
             <>
               {/* Limite para cartão de crédito */}
-              <div className="space-y-2">
-                <Label htmlFor="limit" className="text-text dark:text-text-dark">
-                  Limite *
+              {/* Saldo Inicial e Data para Cartão de Crédito */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="initialBalance" className="text-text dark:text-text-dark">
+                    Saldo Inicial *
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="initialBalance"
+                      type="text"
+                      inputMode="decimal"
+                      value={limitInput}
+                      onChange={(e) => {
+                        const formatted = formatCurrencyInput(e.target.value);
+                        setLimitInput(formatted);
+                        accountForm.setValue('initialBalance', parseCurrency(formatted));
+                      }}
+                      placeholder="R$ 0,00"
+                      className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark pl-10"
+                    />
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                  </div>
+                  {accountForm.formState.errors.initialBalance && (
+                    <p className="text-sm text-red-400">
+                      {String(accountForm.formState.errors.initialBalance.message)}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="initialBalanceDate" className="text-text dark:text-text-dark">
+                    Data do Saldo *
+                  </Label>
+                  <Input
+                    id="initialBalanceDate"
+                    type="date"
+                    className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
+                    {...accountForm.register('initialBalanceDate')}
+                  />
+                  {accountForm.formState.errors.initialBalanceDate && (
+                    <p className="text-sm text-red-400">
+                      {String(accountForm.formState.errors.initialBalanceDate.message)}
+                    </p>
+                  )}
+                </div>
+              </div>
+              {/* Campo de Limite */}
+              <div className="space-y-2 mt-4">
+                <Label htmlFor="creditLimit" className="text-text dark:text-text-dark">
+                  Limite do Cartão
                 </Label>
                 <div className="relative">
                   <Input
-                    id="limit"
+                    id="creditLimit"
                     type="text"
                     inputMode="decimal"
-                    value={limitInput}
+                    defaultValue={accountForm.getValues('creditLimit') ? formatCurrencyInput(accountForm.getValues('creditLimit')!.toFixed(2).replace('.', '')) : ''}
                     onChange={(e) => {
-                      const formatted = formatCurrencyInput(e.target.value);
-                      setLimitInput(formatted);
-                      accountForm.setValue('initialBalance', parseCurrency(formatted));
+                       const formatted = formatCurrencyInput(e.target.value);
+                       e.target.value = formatted; 
+                       accountForm.setValue('creditLimit', parseCurrency(formatted));
                     }}
                     placeholder="R$ 0,00"
-                    className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark pl-10"
+                     className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark pl-10"
                   />
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
                 </div>
-                {accountForm.formState.errors.initialBalance && (
-                  <p className="text-sm text-red-400">
-                    {String(accountForm.formState.errors.initialBalance.message)}
-                  </p>
-                )}
               </div>
 
               {/* Cor e Ícone */}
@@ -271,21 +314,35 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="accountInitialBalance" className="text-text dark:text-text-dark">
-                  Saldo Inicial{' '}
-                  <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
-                    (Saldo atual da conta)
-                  </span>
-                </Label>
-                <Input
-                  id="accountInitialBalance"
-                  type="number"
-                  step="0.01"
-                  placeholder="Ex: 1000.00"
-                  className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
-                  {...accountForm.register('initialBalance', { valueAsNumber: true })}
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="accountInitialBalance" className="text-text dark:text-text-dark">
+                    Saldo Inicial{' '}
+                    <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
+                      (Saldo atual)
+                    </span>
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="accountInitialBalance"
+                      type="text"
+                      inputMode="decimal"
+                      className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
+                      {...accountForm.register('initialBalance', { valueAsNumber: true })}
+                    />
+                  </div>
+                </div>
+                 <div className="space-y-2">
+                  <Label htmlFor="accountInitialBalanceDate" className="text-text dark:text-text-dark">
+                    Data do Saldo *
+                  </Label>
+                  <Input
+                    id="accountInitialBalanceDate"
+                    type="date"
+                     className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
+                    {...accountForm.register('initialBalanceDate')}
+                  />
+                </div>
               </div>
             </>
           )}
