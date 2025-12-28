@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { getAccounts } from '@/services/accountService';
+import { getAccounts, type Account } from '@/services/accountService';
 import { getCategories } from '@/services/categoryService';
-import type { Account, Category, TransactionType } from '@/types/transaction';
+import type { Category, TransactionType } from '@/types/transaction';
 
 export function useTransactionData(companyId: string) {
   const [accounts, setAccounts] = useState<Account[]>([]);

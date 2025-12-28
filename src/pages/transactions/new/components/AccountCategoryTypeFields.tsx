@@ -1,6 +1,7 @@
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { cn } from '@/lib/utils';
-import type { Account, Category } from '@/types/transaction';
+import { Account } from '@/services/accountService';
+import type { Category } from '@/types/transaction';
 import { useMemo } from 'react';
 
 interface AccountCategoryTypeFieldsProps {
@@ -26,6 +27,13 @@ export function AccountCategoryTypeFields({
   onCategoryChange,
   onTransactionKindChange,
 }: Readonly<AccountCategoryTypeFieldsProps>) {
+  const selectedAccount = useMemo(
+    () => accounts.find((acc) => acc.id === accountId),
+    [accounts, accountId],
+  );
+
+  const isCreditCard = selectedAccount?.type === 'credit_card';
+
   const accountOptions: ComboBoxOption<string>[] = useMemo(
     () =>
       accounts.map((account) => ({
@@ -46,7 +54,9 @@ export function AccountCategoryTypeFields({
 
   return (
     <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div
+        className={`grid grid-cols-1 sm:grid-cols-2 ${isCreditCard ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4`}
+      >
         {/* Conta */}
         <div>
           <label
@@ -97,41 +107,43 @@ export function AccountCategoryTypeFields({
           />
         </div>
 
-        {/* Tipo (toggle) */}
-        <div>
-          <label
-            htmlFor="transactionKind"
-            className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
-          >
-            Tipo
-          </label>
-          <div id="transactionKind" className="flex gap-2">
-            <button
-              type="button"
-              className={cn(
-                'flex-1 px-4 py-2 rounded-lg border font-medium transition-colors',
-                transactionKind === 'VARIABLE'
-                  ? 'bg-card text-primary-500 border-primary-500 shadow'
-                  : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-400',
-              )}
-              onClick={() => onTransactionKindChange('VARIABLE')}
+        {/* Tipo (toggle) - Oculto quando for cartão de crédito */}
+        {!isCreditCard && (
+          <div>
+            <label
+              htmlFor="transactionKind"
+              className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
             >
-              Variável
-            </button>
-            <button
-              type="button"
-              className={cn(
-                'flex-1 px-4 py-2 rounded-lg border font-medium transition-colors',
-                transactionKind === 'FIXED'
-                  ? 'bg-card text-primary-500 border-primary-500 shadow'
-                  : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-400',
-              )}
-              onClick={() => onTransactionKindChange('FIXED')}
-            >
-              Recorrente
-            </button>
+              Tipo
+            </label>
+            <div id="transactionKind" className="flex gap-2">
+              <button
+                type="button"
+                className={cn(
+                  'flex-1 px-4 py-2 rounded-lg border font-medium transition-colors',
+                  transactionKind === 'VARIABLE'
+                    ? 'bg-card text-primary-500 border-primary-500 shadow'
+                    : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-400',
+                )}
+                onClick={() => onTransactionKindChange('VARIABLE')}
+              >
+                Variável
+              </button>
+              <button
+                type="button"
+                className={cn(
+                  'flex-1 px-4 py-2 rounded-lg border font-medium transition-colors',
+                  transactionKind === 'FIXED'
+                    ? 'bg-card text-primary-500 border-primary-500 shadow'
+                    : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-400',
+                )}
+                onClick={() => onTransactionKindChange('FIXED')}
+              >
+                Recorrente
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

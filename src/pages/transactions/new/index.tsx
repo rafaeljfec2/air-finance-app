@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
+import { formatDateToLocalISO } from '@/utils/date';
 import { ChevronLeft } from 'lucide-react';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -31,6 +32,11 @@ export function NewTransaction() {
     handleTypeChange,
     handleSubmit,
   } = useTransactionForm();
+
+  const selectedAccount = useMemo(
+    () => accounts.find((acc) => acc.id === formData.accountId),
+    [accounts, formData.accountId],
+  );
 
   const filteredCategories = useMemo(
     () =>
@@ -108,17 +114,31 @@ export function NewTransaction() {
               />
 
               <TransactionDetailsFields
+                selectedAccount={selectedAccount}
+                transactionKind={formData.transactionKind}
                 date={formData.date ?? ''}
                 amount={formData.amount ?? 0}
                 installmentCount={formData.installmentCount ?? 1}
-                repeatMonthly={formData.repeatMonthly ?? false}
+                recurrenceStartDate={formData.recurrenceStartDate}
+                recurrenceEndDate={formData.recurrenceEndDate}
+                recurrenceFrequency={formData.recurrenceFrequency}
                 errors={errors}
                 onDateChange={handleDateChange}
                 onAmountChange={handleChange}
                 onInstallmentCountChange={(value) =>
                   handleSelectChange('installmentCount', Number(value))
                 }
-                onRepeatMonthlyChange={(checked) => handleSelectChange('repeatMonthly', checked)}
+                onRecurrenceStartDateChange={(date) => {
+                  const dateString = date ? formatDateToLocalISO(date) : '';
+                  handleSelectChange('recurrenceStartDate', dateString);
+                }}
+                onRecurrenceEndDateChange={(date) => {
+                  const dateString = date ? formatDateToLocalISO(date) : '';
+                  handleSelectChange('recurrenceEndDate', dateString);
+                }}
+                onRecurrenceFrequencyChange={(frequency) =>
+                  handleSelectChange('recurrenceFrequency', frequency)
+                }
               />
 
               <NoteField value={formData.note ?? ''} onChange={handleChange} />

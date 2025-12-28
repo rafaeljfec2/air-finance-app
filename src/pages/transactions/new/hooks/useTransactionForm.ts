@@ -3,8 +3,8 @@ import { useTransactions } from '@/hooks/useTransactions';
 import { CreateTransactionPayload } from '@/services/transactionService';
 import { useCompanyStore } from '@/stores/company';
 import type { TransactionInput, TransactionType } from '@/types/transaction';
-import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { formatDateToLocalISO } from '@/utils/date';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { validateTransactionForm } from '../utils/transactionValidation';
@@ -12,6 +12,10 @@ import { validateTransactionForm } from '../utils/transactionValidation';
 export interface TransactionFormData extends TransactionInput {
   transactionKind: 'FIXED' | 'VARIABLE';
   repeatMonthly: boolean;
+  // Campos para recorrência
+  recurrenceStartDate?: string;
+  recurrenceEndDate?: string;
+  recurrenceFrequency?: 'daily' | 'weekly' | 'monthly' | 'yearly';
 }
 
 const INITIAL_FORM_DATA: TransactionFormData = {
@@ -25,8 +29,11 @@ const INITIAL_FORM_DATA: TransactionFormData = {
   dependent: '',
   installmentCount: 1,
   companyId: '',
-  transactionKind: 'FIXED',
+  transactionKind: 'VARIABLE',
   repeatMonthly: false,
+  recurrenceStartDate: undefined,
+  recurrenceEndDate: undefined,
+  recurrenceFrequency: 'monthly',
 };
 
 export function useTransactionForm() {
