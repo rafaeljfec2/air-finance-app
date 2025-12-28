@@ -1,6 +1,8 @@
 import { Card } from '@/components/ui/card';
+import { useActiveCompany } from '@/hooks/useActiveCompany';
 import { useAuth } from '@/hooks/useAuth';
 import { apiClient as api } from '@/services/apiClient';
+import { useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence } from 'framer-motion';
 import { Banknote, Building2, CheckCircle2, Flag, Repeat, Sparkles, Tags } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -35,6 +37,8 @@ const steps = [
 export default function OnboardingPage() {
   const { user, refetchUser } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { clearActiveCompany } = useActiveCompany();
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -219,6 +223,10 @@ export default function OnboardingPage() {
   const completeOnboarding = async (): Promise<void> => {
     const response = await api.post('/user/onboarding/complete');
     if (response.status === 201 || response.status === 200) {
+      // Clear active company to ensure user selects company after onboarding
+      clearActiveCompany();
+      // Invalidate companies query to ensure fresh data is fetched after onboarding
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
       await refetchUser();
       navigate('/dashboard');
     }
