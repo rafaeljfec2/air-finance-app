@@ -60,20 +60,20 @@ export function GoalsStep({
     >
       <form onSubmit={goalForm.handleSubmit((data) => onNext(data))}>
         <CardHeader className="px-4 sm:px-6">
-          <CardTitle className="text-text-dark text-xl sm:text-2xl">Metas</CardTitle>
-          <CardDescription className="text-text-dark/70 text-sm sm:text-base">
+          <CardTitle className="text-text dark:text-text-dark text-xl sm:text-2xl">Metas</CardTitle>
+          <CardDescription className="text-text dark:text-text-dark/70 text-sm sm:text-base">
             Defina uma meta financeira para acompanhar seu progresso. Você pode pular esta etapa.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 px-4 sm:px-6">
           <div className="space-y-2">
-            <Label htmlFor="goalName" className="text-text-dark">
+            <Label htmlFor="goalName" className="text-text dark:text-text-dark">
               Nome da Meta
             </Label>
             <Input
               id="goalName"
               placeholder="Ex: Reserva de emergência, Viagem..."
-              className="bg-card-dark border-border-dark text-text-dark"
+              className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
               {...goalForm.register('name')}
             />
             {goalForm.formState.errors.name && (
@@ -83,18 +83,18 @@ export function GoalsStep({
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="goalDescription" className="text-text-dark">
+            <Label htmlFor="goalDescription" className="text-text dark:text-text-dark">
               Descrição (Opcional)
             </Label>
             <Input
               id="goalDescription"
               placeholder="Descreva sua meta..."
-              className="bg-card-dark border-border-dark text-text-dark"
+              className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
               {...goalForm.register('description')}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="goalTargetAmount" className="text-text-dark">
+            <Label htmlFor="goalTargetAmount" className="text-text dark:text-text-dark">
               Valor Alvo
             </Label>
             <Input
@@ -107,7 +107,7 @@ export function GoalsStep({
                 setGoalTargetAmountInput(formatted);
                 goalForm.setValue('targetAmount', parseCurrency(formatted));
               }}
-              className="bg-card-dark border-border-dark text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
+              className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
               aria-label="Valor alvo da meta"
             />
             {goalForm.formState.errors.targetAmount && (
@@ -116,12 +116,12 @@ export function GoalsStep({
                 {String(goalForm.formState.errors.targetAmount.message)}
               </p>
             )}
-            <p className="text-xs text-text-dark/60">
+            <p className="text-xs text-text dark:text-text-dark/60">
               Valor que você deseja alcançar com esta meta
             </p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="goalDeadline" className="text-text-dark">
+            <Label htmlFor="goalDeadline" className="text-text dark:text-text-dark">
               Data Limite
             </Label>
             <DatePicker
@@ -131,7 +131,7 @@ export function GoalsStep({
                 goalForm.setValue('deadline', dateString);
               }}
               placeholder="Selecionar data limite"
-              className="bg-card-dark border-border-dark text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
+              className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
               aria-label="Data limite da meta"
             />
             {goalForm.formState.errors.deadline && (
@@ -140,19 +140,19 @@ export function GoalsStep({
                 {String(goalForm.formState.errors.deadline.message)}
               </p>
             )}
-            <p className="text-xs text-text-dark/60">
+            <p className="text-xs text-text dark:text-text-dark/60">
               Selecione uma data futura para o prazo da sua meta
             </p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="goalAccountId" className="text-text-dark">
+            <Label htmlFor="goalAccountId" className="text-text dark:text-text-dark">
               Conta
             </Label>
             <Input
               id="goalAccountId"
               value={accountName || 'Será usada a conta criada anteriormente'}
               disabled
-              className="bg-card-dark/50 border-border-dark text-text-dark/50"
+              className="bg-card dark:bg-card-dark/50 border-border dark:border-border-dark text-text dark:text-text-dark/50"
             />
           </div>
         </CardContent>
@@ -166,7 +166,7 @@ export function GoalsStep({
               variant="ghost"
               type="button"
               onClick={onBack}
-              className="text-text-dark hover:bg-border-dark w-full sm:w-auto"
+              className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark w-full sm:w-auto"
               aria-label="Voltar para etapa anterior"
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
@@ -178,7 +178,7 @@ export function GoalsStep({
               variant="ghost"
               type="button"
               onClick={() => onNext(null)}
-              className="text-text-dark hover:bg-border-dark w-full sm:w-auto"
+              className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark w-full sm:w-auto"
             >
               Pular
             </Button>

@@ -20,13 +20,13 @@ export function StepIndicator({ currentStep, steps }: Readonly<StepIndicatorProp
     <div className="space-y-3 sm:space-y-4">
       {/* Progress Bar */}
       <div className="space-y-1 sm:space-y-2">
-        <div className="flex justify-between items-center text-xs text-text-dark/60 px-1">
+        <div className="flex justify-between items-center text-xs text-text/60 dark:text-text-dark/60 px-1">
           <span className="font-medium">Progresso</span>
           <span className="font-medium">
             {completedSteps} de {steps.length}
           </span>
         </div>
-        <div className="w-full h-1.5 sm:h-2 bg-border-dark rounded-full overflow-hidden">
+        <div className="w-full h-1.5 sm:h-2 bg-border dark:bg-border-dark rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-brand-leaf rounded-full"
             initial={{ width: 0 }}
@@ -39,7 +39,7 @@ export function StepIndicator({ currentStep, steps }: Readonly<StepIndicatorProp
       {/* Step Icons */}
       <div className="flex items-center justify-between relative px-1 sm:px-0">
         <motion.div
-          className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 sm:h-1 bg-border-dark -z-10"
+          className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 sm:h-1 bg-border dark:bg-border-dark -z-10"
           initial={{ width: 0 }}
           animate={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
@@ -61,7 +61,7 @@ export function StepIndicator({ currentStep, steps }: Readonly<StepIndicatorProp
             stepIconClassName +=
               'bg-brand-leaf text-brand-arrow border-brand-leaf ring-2 sm:ring-4 ring-brand-leaf/20';
           } else {
-            stepIconClassName += 'bg-card-dark border-border-dark text-gray-400';
+            stepIconClassName += 'bg-card dark:bg-card-dark border-border dark:border-border-dark text-gray-400 dark:text-gray-500';
           }
 
           return (

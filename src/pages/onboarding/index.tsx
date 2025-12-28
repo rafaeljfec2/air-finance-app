@@ -286,7 +286,7 @@ export default function OnboardingPage() {
           <StepIndicator currentStep={currentStep} steps={steps} />
         </div>
 
-        <Card className="border border-border-dark/50 shadow-2xl bg-card/80 dark:bg-card-dark/80 backdrop-blur-md overflow-hidden relative min-h-[400px] sm:min-h-[500px] flex flex-col justify-center">
+        <Card className="border border-border dark:border-border-dark shadow-2xl bg-card/80 dark:bg-card-dark/80 backdrop-blur-md overflow-hidden relative min-h-[400px] sm:min-h-[500px] flex flex-col justify-center">
           <AnimatePresence mode="wait">
             {currentStep === 0 && <WelcomeStep onNext={handleNextStep} />}
 

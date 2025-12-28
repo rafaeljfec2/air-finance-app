@@ -31,10 +31,10 @@ export function WelcomeStep({ onNext }: Readonly<WelcomeStepProps>) {
         >
           <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 text-brand-leaf" />
         </motion.div>
-        <CardTitle className="text-2xl sm:text-3xl font-bold text-text-dark mb-2 sm:mb-3 px-2">
+        <CardTitle className="text-2xl sm:text-3xl font-bold text-text dark:text-text-dark mb-2 sm:mb-3 px-2">
           Bem-vindo ao AirFinance!
         </CardTitle>
-        <CardDescription className="text-base sm:text-lg mt-2 text-text-dark/80 max-w-md mx-auto px-2">
+        <CardDescription className="text-base sm:text-lg mt-2 text-text/80 dark:text-text-dark/80 max-w-md mx-auto px-2">
           Vamos configurar sua conta em apenas 2 minutos.
           <br className="hidden sm:block" />
           <span className="block sm:inline">
@@ -55,7 +55,7 @@ export function WelcomeStep({ onNext }: Readonly<WelcomeStepProps>) {
             <h3 className="font-semibold text-brand-leaf text-base sm:text-lg mb-1 sm:mb-2">
               Organização
             </h3>
-            <p className="text-xs sm:text-sm text-text-dark/80">
+            <p className="text-xs sm:text-sm text-text/80 dark:text-text-dark/80">
               Centralize suas empresas e contas em um só lugar.
             </p>
           </motion.div>
@@ -70,7 +70,7 @@ export function WelcomeStep({ onNext }: Readonly<WelcomeStepProps>) {
             <h3 className="font-semibold text-brand-leaf text-base sm:text-lg mb-1 sm:mb-2">
               Crescimento
             </h3>
-            <p className="text-xs sm:text-sm text-text-dark/80">
+            <p className="text-xs sm:text-sm text-text/80 dark:text-text-dark/80">
               Acompanhe métricas e tome decisões inteligentes.
             </p>
           </motion.div>
@@ -83,8 +83,8 @@ export function WelcomeStep({ onNext }: Readonly<WelcomeStepProps>) {
         >
           <div className="flex items-start gap-2 sm:gap-3">
             <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-brand-leaf mt-0.5 flex-shrink-0" />
-            <div className="text-xs sm:text-sm text-text-dark/80">
-              <p className="font-medium text-text-dark mb-1">Processo rápido e seguro</p>
+            <div className="text-xs sm:text-sm text-text/80 dark:text-text-dark/80">
+              <p className="font-medium text-text dark:text-text-dark mb-1">Processo rápido e seguro</p>
               <p>Configure sua empresa, contas e categorias em poucos passos</p>
             </div>
           </div>

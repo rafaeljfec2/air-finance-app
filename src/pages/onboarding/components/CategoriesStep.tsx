@@ -96,8 +96,8 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
       transition={{ duration: 0.3 }}
     >
       <CardHeader className="px-4 sm:px-6">
-        <CardTitle className="text-text-dark text-xl sm:text-2xl">Categorias</CardTitle>
-        <CardDescription className="text-text-dark/70 text-sm sm:text-base">
+        <CardTitle className="text-text dark:text-text-dark text-xl sm:text-2xl">Categorias</CardTitle>
+        <CardDescription className="text-text/70 dark:text-text-dark/70 text-sm sm:text-base">
           Crie categorias para organizar suas transações. Você pode adicionar quantas quiser ou usar
           as categorias padrão.
         </CardDescription>
@@ -106,7 +106,7 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
         {/* Categories List */}
         {categoriesData.length > 0 && (
           <div className="space-y-2">
-            <Label className="text-text-dark">Categorias Criadas ({categoriesData.length})</Label>
+            <Label className="text-text dark:text-text-dark">Categorias Criadas ({categoriesData.length})</Label>
             <div className="space-y-2 max-h-40 overflow-y-auto">
               {categoriesData.map((category, index) => {
                 const iconOption = iconOptions.find((opt) => opt.value === category.icon);
@@ -116,7 +116,7 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
                 return (
                   <div
                     key={`category-${index}-${category.name}`}
-                    className="flex items-center justify-between p-3 bg-card-dark/50 border border-border-dark rounded-lg"
+                    className="flex items-center justify-between p-3 bg-card/50 dark:bg-card-dark/50 border border-border dark:border-border-dark rounded-lg"
                   >
                     <div className="flex items-center gap-3">
                       <div
@@ -126,8 +126,8 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
                         <IconComponent className="h-4 w-4 text-white" />
                       </div>
                       <div>
-                        <div className="text-text-dark font-medium">{category.name}</div>
-                        <div className="flex items-center gap-1 text-xs text-text-dark/60">
+                        <div className="text-text dark:text-text-dark font-medium">{category.name}</div>
+                        <div className="flex items-center gap-1 text-xs text-text dark:text-text-dark/60">
                           <TypeIcon className="h-3 w-3" />
                           {categoryTypes.find((t) => t.value === category.type)?.label}
                         </div>
@@ -150,17 +150,17 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
         )}
 
         {/* Category Form */}
-        <div className="space-y-4 border-t border-border-dark pt-4">
-          <Label className="text-text-dark">Adicionar Nova Categoria</Label>
+        <div className="space-y-4 border-t border-border dark:border-border-dark pt-4">
+          <Label className="text-text dark:text-text-dark">Adicionar Nova Categoria</Label>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="categoryName" className="text-text-dark">
+              <Label htmlFor="categoryName" className="text-text dark:text-text-dark">
                 Nome da Categoria
               </Label>
               <Input
                 id="categoryName"
                 placeholder="Ex: Alimentação, Transporte..."
-                className="bg-card-dark border-border-dark text-text-dark"
+                className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
                 value={currentCategoryForm.name}
                 onChange={(e) =>
                   setCurrentCategoryForm({ ...currentCategoryForm, name: e.target.value })
@@ -172,7 +172,7 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
             </div>
 
             <div className="space-y-2">
-              <Label className="text-text-dark">Tipo</Label>
+              <Label className="text-text dark:text-text-dark">Tipo</Label>
               <Select
                 value={currentCategoryForm.type}
                 onValueChange={(value) =>
@@ -182,17 +182,17 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
                   })
                 }
               >
-                <SelectTrigger className="bg-card-dark border-border-dark text-text-dark">
+                <SelectTrigger className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-card-dark border-border-dark text-text-dark">
+                <SelectContent className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
                   {categoryTypes.map((opt) => {
                     const TypeIcon = opt.icon;
                     return (
                       <SelectItem
                         key={opt.value}
                         value={opt.value}
-                        className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                        className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
                       >
                         <div className="flex items-center gap-2">
                           <TypeIcon className="h-4 w-4" />
@@ -207,7 +207,7 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-text-dark">Cor</Label>
+                <Label className="text-text dark:text-text-dark">Cor</Label>
                 <ColorPicker
                   value={currentCategoryForm.color}
                   onChange={(color) => setCurrentCategoryForm({ ...currentCategoryForm, color })}
@@ -215,7 +215,7 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
               </div>
 
               <div className="space-y-2">
-                <Label className="text-text-dark">Ícone</Label>
+                <Label className="text-text dark:text-text-dark">Ícone</Label>
                 <IconPicker
                   value={currentCategoryForm.icon}
                   onChange={(icon) => setCurrentCategoryForm({ ...currentCategoryForm, icon })}
@@ -231,7 +231,7 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
               type="button"
               onClick={handleAddCategory}
               variant="outline"
-              className="w-full border-border-dark text-text-dark hover:bg-border-dark"
+              className="w-full border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark"
             >
               <Plus className="mr-2 h-4 w-4" />
               Adicionar Categoria
@@ -244,7 +244,7 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
           variant="ghost"
           type="button"
           onClick={onBack}
-          className="text-text-dark hover:bg-border-dark"
+          className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
           Voltar
@@ -257,7 +257,7 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
               setCategoriesData([]);
               onNext([]); // Pass empty or null? Logic in main was empty means skip/default
             }}
-            className="text-text-dark hover:bg-border-dark w-full sm:w-auto"
+            className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark w-full sm:w-auto"
           >
             Pular
           </Button>

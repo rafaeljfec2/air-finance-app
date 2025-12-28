@@ -40,14 +40,14 @@ export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<Fi
         >
           <PartyPopper className="h-8 w-8 sm:h-12 sm:w-12 text-green-600" />
         </motion.div>
-        <CardTitle className="text-text-dark text-xl sm:text-2xl">Tudo Pronto!</CardTitle>
-        <CardDescription className="text-text-dark/70 text-base sm:text-lg">
+        <CardTitle className="text-text dark:text-text-dark text-xl sm:text-2xl">Tudo Pronto!</CardTitle>
+        <CardDescription className="text-text/70 dark:text-text-dark/70 text-base sm:text-lg">
           Configuramos seu ambiente com sucesso.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 px-4 sm:px-6">
-        <div className="bg-card-dark/50 p-4 sm:p-6 rounded-lg border border-border-dark space-y-3 sm:space-y-4">
-          <h4 className="font-semibold text-text-dark mb-4 border-b border-border-dark pb-2">
+        <div className="bg-card dark:bg-card-dark/50 p-4 sm:p-6 rounded-lg border border-border dark:border-border-dark space-y-3 sm:space-y-4">
+          <h4 className="font-semibold text-text dark:text-text-dark mb-4 border-b border-border dark:border-border-dark pb-2">
             Resumo da Configuração
           </h4>
           <div className="space-y-3">
@@ -55,7 +55,7 @@ export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<Fi
               <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                 <Check className="h-4 w-4 text-green-600" />
               </div>
-              <span className="text-text-dark">
+              <span className="text-text dark:text-text-dark">
                 Empresa <strong>{summary.companyName}</strong> criada
               </span>
             </div>
@@ -63,7 +63,7 @@ export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<Fi
               <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                 <Check className="h-4 w-4 text-green-600" />
               </div>
-              <span className="text-text-dark">
+              <span className="text-text dark:text-text-dark">
                 Conta <strong>{summary.accountName}</strong> configurada
               </span>
             </div>
@@ -71,7 +71,7 @@ export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<Fi
               <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                 <Check className="h-4 w-4 text-green-600" />
               </div>
-              <span className="text-text-dark">
+              <span className="text-text dark:text-text-dark">
                 <strong>{summary.categoriesCount}</strong> categorias adicionadas
               </span>
             </div>
@@ -80,7 +80,7 @@ export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<Fi
                 <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                   <Check className="h-4 w-4 text-green-600" />
                 </div>
-                <span className="text-text-dark">
+                <span className="text-text dark:text-text-dark">
                   Meta <strong>{summary.goalName}</strong> definida
                 </span>
               </div>
@@ -90,7 +90,7 @@ export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<Fi
                 <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                   <Check className="h-4 w-4 text-green-600" />
                 </div>
-                <span className="text-text-dark">Transação recorrente agendada</span>
+                <span className="text-text dark:text-text-dark">Transação recorrente agendada</span>
               </div>
             )}
           </div>
@@ -101,7 +101,7 @@ export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<Fi
           variant="ghost"
           type="button"
           onClick={onBack}
-          className="text-text-dark hover:bg-border-dark w-full sm:w-auto order-2 sm:order-1"
+          className="text-text dark:text-text-dark hover:bg-border-dark w-full sm:w-auto order-2 sm:order-1"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
           Voltar

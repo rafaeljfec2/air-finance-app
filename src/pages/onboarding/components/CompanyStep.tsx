@@ -65,20 +65,20 @@ export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<C
     >
       <form onSubmit={companyForm.handleSubmit(onNext)}>
         <CardHeader className="px-4 sm:px-6">
-          <CardTitle className="text-text-dark text-xl sm:text-2xl">Crie sua Empresa</CardTitle>
-          <CardDescription className="text-text-dark/70 text-sm sm:text-base">
+          <CardTitle className="text-text dark:text-text dark:text-text-dark text-xl sm:text-2xl">Crie sua Empresa</CardTitle>
+          <CardDescription className="text-text/70 dark:text-text dark:text-text-dark/70 text-sm sm:text-base">
             A empresa é a base para organizar suas finanças. Você poderá adicionar outras depois.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 px-4 sm:px-6">
           <div className="space-y-2">
-            <Label htmlFor="companyName" className="text-text-dark">
+            <Label htmlFor="companyName" className="text-text dark:text-text-dark">
               Nome da Empresa
             </Label>
             <Input
               id="companyName"
               placeholder="Ex: Minha Loja Ltda, Empresa XYZ..."
-              className="bg-card-dark border-border-dark text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
+              className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
               aria-label="Nome da Empresa"
               {...companyForm.register('name')}
             />
@@ -90,7 +90,7 @@ export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<C
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="documentType" className="text-text-dark">
+            <Label htmlFor="documentType" className="text-text dark:text-text-dark">
               Tipo de Documento
             </Label>
             <Select
@@ -101,19 +101,19 @@ export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<C
                 setDocumentValid(null); // Reset validation
               }}
             >
-              <SelectTrigger className="bg-card-dark border-border-dark text-text-dark">
+              <SelectTrigger className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
                 <SelectValue placeholder="Selecione o tipo" />
               </SelectTrigger>
-              <SelectContent className="bg-card-dark border-border-dark text-text-dark">
+              <SelectContent className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
                 <SelectItem
                   value="cnpj"
-                  className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                  className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
                 >
                   CNPJ
                 </SelectItem>
                 <SelectItem
                   value="cpf"
-                  className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                  className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
                 >
                   CPF
                 </SelectItem>
@@ -121,9 +121,9 @@ export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<C
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="document" className="text-text-dark">
+            <Label htmlFor="document" className="text-text dark:text-text-dark">
               {documentType === 'cnpj' ? 'CNPJ' : 'CPF'}
-              <span className="text-xs text-text-dark/50 ml-1 font-normal">
+              <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
                 (Opcional, mas recomendado)
               </span>
             </Label>
@@ -133,7 +133,7 @@ export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<C
                 placeholder={
                   documentType === 'cnpj' ? 'Ex: 12.345.678/0001-90' : 'Ex: 123.456.789-00'
                 }
-                className={`bg-card-dark border-border-dark text-text-dark pr-10 ${
+                className={`bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark pr-10 ${
                   documentValid === true
                     ? 'border-green-400 ring-2 ring-green-400/20'
                     : documentValid === false
@@ -186,26 +186,26 @@ export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<C
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="type" className="text-text-dark">
+            <Label htmlFor="type" className="text-text dark:text-text-dark">
               Tipo
             </Label>
             <Select
               onValueChange={(v) => companyForm.setValue('type', v as 'matriz' | 'filial')}
               defaultValue="matriz"
             >
-              <SelectTrigger className="bg-card-dark border-border-dark text-text-dark">
+              <SelectTrigger className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
                 <SelectValue placeholder="Selecione o tipo" />
               </SelectTrigger>
-              <SelectContent className="bg-card-dark border-border-dark text-text-dark">
+              <SelectContent className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
                 <SelectItem
                   value="matriz"
-                  className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                  className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
                 >
                   Matriz
                 </SelectItem>
                 <SelectItem
                   value="filial"
-                  className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                  className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
                 >
                   Filial
                 </SelectItem>
@@ -218,7 +218,7 @@ export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<C
             variant="ghost"
             type="button"
             onClick={onBack}
-            className="text-text-dark hover:bg-border-dark w-full sm:w-auto order-2 sm:order-1"
+            className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark w-full sm:w-auto order-2 sm:order-1"
           >
             <ChevronLeft className="mr-2 h-4 w-4" />
             Voltar

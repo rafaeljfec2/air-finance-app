@@ -75,22 +75,22 @@ export function RecurringStep({
     >
       <form onSubmit={recurringTransactionForm.handleSubmit((data) => onNext(data))}>
         <CardHeader className="px-4 sm:px-6">
-          <CardTitle className="text-text-dark text-xl sm:text-2xl">
+          <CardTitle className="text-text dark:text-text-dark text-xl sm:text-2xl">
             Transações Recorrentes
           </CardTitle>
-          <CardDescription className="text-text-dark/70 text-sm sm:text-base">
+          <CardDescription className="text-text dark:text-text-dark/70 text-sm sm:text-base">
             Configure transações que se repetem automaticamente. Você pode pular esta etapa.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 px-4 sm:px-6">
           <div className="space-y-2">
-            <Label htmlFor="recurringDescription" className="text-text-dark">
+            <Label htmlFor="recurringDescription" className="text-text dark:text-text-dark">
               Descrição
             </Label>
             <Input
               id="recurringDescription"
               placeholder="Ex: Aluguel, Internet, Salário..."
-              className="bg-card-dark border-border-dark text-text-dark"
+              className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
               {...recurringTransactionForm.register('description')}
             />
             {recurringTransactionForm.formState.errors.description && (
@@ -101,7 +101,7 @@ export function RecurringStep({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="recurringType" className="text-text-dark">
+              <Label htmlFor="recurringType" className="text-text dark:text-text-dark">
                 Tipo
               </Label>
               <Select
@@ -110,19 +110,19 @@ export function RecurringStep({
                   recurringTransactionForm.setValue('type', value as 'Income' | 'Expense')
                 }
               >
-                <SelectTrigger className="bg-card-dark border-border-dark text-text-dark">
+                <SelectTrigger className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-card-dark border-border-dark text-text-dark">
+                <SelectContent className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
                   <SelectItem
                     value="Income"
-                    className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                    className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
                   >
                     Receita
                   </SelectItem>
                   <SelectItem
                     value="Expense"
-                    className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                    className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
                   >
                     Despesa
                   </SelectItem>
@@ -130,7 +130,7 @@ export function RecurringStep({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="recurringValue" className="text-text-dark">
+              <Label htmlFor="recurringValue" className="text-text dark:text-text-dark">
                 Valor
               </Label>
               <Input
@@ -143,7 +143,7 @@ export function RecurringStep({
                   setRecurringTransactionValueInput(formatted);
                   recurringTransactionForm.setValue('value', parseCurrency(formatted));
                 }}
-                className="bg-card-dark border-border-dark text-text-dark"
+                className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
               />
               {recurringTransactionForm.formState.errors.value && (
                 <p className="text-sm text-red-400">
@@ -153,16 +153,16 @@ export function RecurringStep({
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="recurringCategory" className="text-text-dark">
+            <Label htmlFor="recurringCategory" className="text-text dark:text-text-dark">
               Categoria
             </Label>
             <Input
               id="recurringCategory"
               placeholder="Ex: Alimentação, Transporte..."
-              className="bg-card-dark border-border-dark text-text-dark"
+              className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
               {...recurringTransactionForm.register('category')}
             />
-            <p className="text-xs text-text-dark/50">
+            <p className="text-xs text-text dark:text-text-dark/50">
               Nome da categoria (pode ser uma das categorias criadas anteriormente ou nova)
             </p>
             {recurringTransactionForm.formState.errors.category && (
@@ -173,7 +173,7 @@ export function RecurringStep({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="recurringFrequency" className="text-text-dark">
+              <Label htmlFor="recurringFrequency" className="text-text dark:text-text-dark">
                 Frequência
               </Label>
               <Select
@@ -185,31 +185,31 @@ export function RecurringStep({
                   )
                 }
               >
-                <SelectTrigger className="bg-card-dark border-border-dark text-text-dark">
+                <SelectTrigger className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-card-dark border-border-dark text-text-dark">
+                <SelectContent className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
                   <SelectItem
                     value="daily"
-                    className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                    className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
                   >
                     Diária
                   </SelectItem>
                   <SelectItem
                     value="weekly"
-                    className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                    className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
                   >
                     Semanal
                   </SelectItem>
                   <SelectItem
                     value="monthly"
-                    className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                    className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
                   >
                     Mensal
                   </SelectItem>
                   <SelectItem
                     value="yearly"
-                    className="text-text-dark hover:bg-border-dark focus:bg-border-dark"
+                    className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
                   >
                     Anual
                   </SelectItem>
@@ -217,20 +217,20 @@ export function RecurringStep({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="recurringAccountId" className="text-text-dark">
+              <Label htmlFor="recurringAccountId" className="text-text dark:text-text-dark">
                 Conta
               </Label>
               <Input
                 id="recurringAccountId"
                 value={accountName || 'Será usada a conta criada anteriormente'}
                 disabled
-                className="bg-card-dark/50 border-border-dark text-text-dark/50"
+                className="bg-card dark:bg-card-dark/50 border-border dark:border-border-dark text-text dark:text-text-dark/50"
               />
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="recurringStartDate" className="text-text-dark">
+              <Label htmlFor="recurringStartDate" className="text-text dark:text-text-dark">
                 Data Inicial
               </Label>
               <DatePicker
@@ -240,7 +240,7 @@ export function RecurringStep({
                   recurringTransactionForm.setValue('startDate', dateString);
                 }}
                 placeholder="Selecionar data inicial"
-                className="bg-card-dark border-border-dark text-text-dark"
+                className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
               />
               {recurringTransactionForm.formState.errors.startDate && (
                 <p className="text-sm text-red-400">
@@ -249,7 +249,7 @@ export function RecurringStep({
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="recurringRepeatUntil" className="text-text-dark">
+              <Label htmlFor="recurringRepeatUntil" className="text-text dark:text-text-dark">
                 Data Final
               </Label>
               <DatePicker
@@ -264,7 +264,7 @@ export function RecurringStep({
                     ? parseLocalDate(recurringTransactionForm.watch('startDate'))
                     : undefined
                 }
-                className="bg-card-dark border-border-dark text-text-dark"
+                className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
               />
               {recurringTransactionForm.formState.errors.repeatUntil && (
                 <p className="text-sm text-red-400">
@@ -284,7 +284,7 @@ export function RecurringStep({
               variant="ghost"
               type="button"
               onClick={onBack}
-              className="text-text-dark hover:bg-border-dark w-full sm:w-auto"
+              className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark w-full sm:w-auto"
               aria-label="Voltar para etapa anterior"
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
@@ -301,7 +301,7 @@ export function RecurringStep({
                 variant="ghost"
                 type="button"
                 onClick={() => onNext(null)}
-                className="text-text-dark hover:bg-border-dark w-full sm:w-auto"
+                className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark w-full sm:w-auto"
                 aria-label="Pular etapa de transações recorrentes"
               >
                 Pular
