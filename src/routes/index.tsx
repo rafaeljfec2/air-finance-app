@@ -2,52 +2,88 @@ import { OnboardingGuard } from '@/components/auth/OnboardingGuard';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { ErrorPage } from '@/components/error/ErrorPage';
+import { SuspenseLoader } from '@/components/SuspenseLoader';
 import { ConfirmError, ConfirmProcessing, ConfirmSuccess } from '@/pages/confirm-email';
+import { EmailPendingPage } from '@/pages/email-pending';
 import { LandingPage } from '@/pages/landing';
 import { Login } from '@/pages/login';
 import { SignUpPage } from '@/pages/signup';
-import { Loader2 } from 'lucide-react';
 import { Suspense, lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 
 // Lazy Components
-const AccountsPage = lazy(() => import('@/pages/accounts').then(m => ({ default: m.AccountsPage })));
-const AiClassificationPage = lazy(() => import('@/pages/ai-classification').then(m => ({ default: m.AiClassificationPage })));
-const AnnualResult = lazy(() => import('@/pages/annual-result').then(m => ({ default: m.AnnualResult })));
-const BudgetPage = lazy(() => import('@/pages/budget').then(m => ({ default: m.BudgetPage })));
-const BusinessLogsPage = lazy(() => import('@/pages/business-logs').then(m => ({ default: m.BusinessLogsPage })));
-const CategoriesPage = lazy(() => import('@/pages/categories').then(m => ({ default: m.CategoriesPage })));
-const CompaniesPage = lazy(() => import('@/pages/companies').then(m => ({ default: m.CompaniesPage })));
-const CreditCardsPage = lazy(() => import('@/pages/credit-cards').then(m => ({ default: m.CreditCardsPage })));
-const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard').then(m => ({ default: m.Dashboard })));
-const DependentsPage = lazy(() => import('@/pages/dependents').then(m => ({ default: m.DependentsPage })));
-const ForgotPasswordPage = lazy(() => import('@/pages/forgot-password').then(m => ({ default: m.ForgotPasswordPage })));
-const GoalsPage = lazy(() => import('@/pages/goals').then(m => ({ default: m.GoalsPage })));
-const ImportOfxPage = lazy(() => import('@/pages/import-ofx').then(m => ({ default: m.ImportOfxPage })));
-const IncomeSourcesPage = lazy(() => import('@/pages/income-sources').then(m => ({ default: m.IncomeSourcesPage })));
-const MonthlyClosing = lazy(() => import('@/pages/monthly-closing').then(m => ({ default: m.MonthlyClosing })));
-const NewPasswordPage = lazy(() => import('@/pages/new-password').then(m => ({ default: m.NewPasswordPage })));
-const Payables = lazy(() => import('@/pages/payables').then(m => ({ default: m.Payables })));
-const PlannerPage = lazy(() => import('@/pages/planner').then(m => ({ default: m.PlannerPage })));
-const Profile = lazy(() => import('@/pages/profile').then(m => ({ default: m.Profile })));
-const Receivables = lazy(() => import('@/pages/receivables').then(m => ({ default: m.Receivables })));
-const RecurringTransactionsPage = lazy(() => import('@/pages/recurring-transactions').then(m => ({ default: m.RecurringTransactionsPage })));
-const Reports = lazy(() => import('@/pages/reports').then(m => ({ default: m.Reports })));
-const Settings = lazy(() => import('@/pages/settings').then(m => ({ default: m.Settings })));
-const NotificationsPage = lazy(() => import('@/pages/settings/notifications').then(m => ({ default: m.NotificationsPage })));
-const PreferencesPage = lazy(() => import('@/pages/settings/preferences').then(m => ({ default: m.PreferencesPage })));
-const Statement = lazy(() => import('@/pages/statement').then(m => ({ default: m.Statement })));
-const Transactions = lazy(() => import('@/pages/transactions').then(m => ({ default: m.Transactions })));
-const NewTransaction = lazy(() => import('@/pages/transactions/new').then(m => ({ default: m.NewTransaction })));
-const UsersPage = lazy(() => import('@/pages/users').then(m => ({ default: m.UsersPage })));
-const OnboardingPage = lazy(() => import('@/pages/onboarding').then(m => ({ default: m.default })));
-
-const SuspenseLoader = () => (
-    <div className='flex h-screen items-center justify-center'>
-        <Loader2 className='h-8 w-8 animate-spin text-primary-500' />
-    </div>
+const AccountsPage = lazy(() =>
+  import('@/pages/accounts').then((m) => ({ default: m.AccountsPage })),
 );
-
+const AiClassificationPage = lazy(() =>
+  import('@/pages/ai-classification').then((m) => ({ default: m.AiClassificationPage })),
+);
+const AnnualResult = lazy(() =>
+  import('@/pages/annual-result').then((m) => ({ default: m.AnnualResult })),
+);
+const BudgetPage = lazy(() => import('@/pages/budget').then((m) => ({ default: m.BudgetPage })));
+const BusinessLogsPage = lazy(() =>
+  import('@/pages/business-logs').then((m) => ({ default: m.BusinessLogsPage })),
+);
+const CategoriesPage = lazy(() =>
+  import('@/pages/categories').then((m) => ({ default: m.CategoriesPage })),
+);
+const CompaniesPage = lazy(() =>
+  import('@/pages/companies').then((m) => ({ default: m.CompaniesPage })),
+);
+const CreditCardsPage = lazy(() =>
+  import('@/pages/credit-cards').then((m) => ({ default: m.CreditCardsPage })),
+);
+const Dashboard = lazy(() =>
+  import('@/pages/dashboard/Dashboard').then((m) => ({ default: m.Dashboard })),
+);
+const DependentsPage = lazy(() =>
+  import('@/pages/dependents').then((m) => ({ default: m.DependentsPage })),
+);
+const ForgotPasswordPage = lazy(() =>
+  import('@/pages/forgot-password').then((m) => ({ default: m.ForgotPasswordPage })),
+);
+const GoalsPage = lazy(() => import('@/pages/goals').then((m) => ({ default: m.GoalsPage })));
+const ImportOfxPage = lazy(() =>
+  import('@/pages/import-ofx').then((m) => ({ default: m.ImportOfxPage })),
+);
+const IncomeSourcesPage = lazy(() =>
+  import('@/pages/income-sources').then((m) => ({ default: m.IncomeSourcesPage })),
+);
+const MonthlyClosing = lazy(() =>
+  import('@/pages/monthly-closing').then((m) => ({ default: m.MonthlyClosing })),
+);
+const NewPasswordPage = lazy(() =>
+  import('@/pages/new-password').then((m) => ({ default: m.NewPasswordPage })),
+);
+const Payables = lazy(() => import('@/pages/payables').then((m) => ({ default: m.Payables })));
+const PlannerPage = lazy(() => import('@/pages/planner').then((m) => ({ default: m.PlannerPage })));
+const Profile = lazy(() => import('@/pages/profile').then((m) => ({ default: m.Profile })));
+const Receivables = lazy(() =>
+  import('@/pages/receivables').then((m) => ({ default: m.Receivables })),
+);
+const RecurringTransactionsPage = lazy(() =>
+  import('@/pages/recurring-transactions').then((m) => ({ default: m.RecurringTransactionsPage })),
+);
+const Reports = lazy(() => import('@/pages/reports').then((m) => ({ default: m.Reports })));
+const Settings = lazy(() => import('@/pages/settings').then((m) => ({ default: m.Settings })));
+const NotificationsPage = lazy(() =>
+  import('@/pages/settings/notifications').then((m) => ({ default: m.NotificationsPage })),
+);
+const PreferencesPage = lazy(() =>
+  import('@/pages/settings/preferences').then((m) => ({ default: m.PreferencesPage })),
+);
+const Statement = lazy(() => import('@/pages/statement').then((m) => ({ default: m.Statement })));
+const Transactions = lazy(() =>
+  import('@/pages/transactions').then((m) => ({ default: m.Transactions })),
+);
+const NewTransaction = lazy(() =>
+  import('@/pages/transactions/new').then((m) => ({ default: m.NewTransaction })),
+);
+const UsersPage = lazy(() => import('@/pages/users').then((m) => ({ default: m.UsersPage })));
+const OnboardingPage = lazy(() =>
+  import('@/pages/onboarding').then((m) => ({ default: m.default })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -75,27 +111,37 @@ export const router = createBrowserRouter([
     element: <ConfirmError />,
   },
   {
+    path: '/email-pending',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <EmailPendingPage />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+  },
+  {
     path: '/forgot-password',
     element: (
-        <Suspense fallback={<SuspenseLoader />}>
-             <ForgotPasswordPage />
-        </Suspense>
+      <Suspense fallback={<SuspenseLoader />}>
+        <ForgotPasswordPage />
+      </Suspense>
     ),
   },
   {
     path: '/new-password',
-     element: (
-        <Suspense fallback={<SuspenseLoader />}>
-             <NewPasswordPage />
-        </Suspense>
+    element: (
+      <Suspense fallback={<SuspenseLoader />}>
+        <NewPasswordPage />
+      </Suspense>
     ),
   },
   {
     path: '/reset-password/:token',
-     element: (
-        <Suspense fallback={<SuspenseLoader />}>
-             <ForgotPasswordPage />
-        </Suspense>
+    element: (
+      <Suspense fallback={<SuspenseLoader />}>
+        <ForgotPasswordPage />
+      </Suspense>
     ),
   },
   {
@@ -119,7 +165,7 @@ export const router = createBrowserRouter([
         <ProtectedRoute>
           <OnboardingGuard>
             <Suspense fallback={<SuspenseLoader />}>
-               <Dashboard />
+              <Dashboard />
             </Suspense>
           </OnboardingGuard>
         </ProtectedRoute>
@@ -131,9 +177,9 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-             <DependentsPage />
-            </Suspense>
+          <Suspense fallback={<SuspenseLoader />}>
+            <DependentsPage />
+          </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
     ),
@@ -145,7 +191,7 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <Suspense fallback={<SuspenseLoader />}>
-             <CategoriesPage />
+            <CategoriesPage />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -157,7 +203,7 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <Suspense fallback={<SuspenseLoader />}>
-             <AccountsPage />
+            <AccountsPage />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -170,7 +216,7 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <Suspense fallback={<SuspenseLoader />}>
-             <BusinessLogsPage />
+            <BusinessLogsPage />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -187,8 +233,8 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-             <Profile />
+          <Suspense fallback={<SuspenseLoader />}>
+            <Profile />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -200,8 +246,8 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-             <ImportOfxPage />
+          <Suspense fallback={<SuspenseLoader />}>
+            <ImportOfxPage />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -214,7 +260,7 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <Suspense fallback={<SuspenseLoader />}>
-             <BudgetPage />
+            <BudgetPage />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -227,7 +273,7 @@ export const router = createBrowserRouter([
       <ErrorBoundary>
         <ProtectedRoute>
           <Suspense fallback={<SuspenseLoader />}>
-             <Statement />
+            <Statement />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -239,8 +285,8 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-         <Suspense fallback={<SuspenseLoader />}>
-             <NewTransaction />
+          <Suspense fallback={<SuspenseLoader />}>
+            <NewTransaction />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -251,11 +297,11 @@ export const router = createBrowserRouter([
     path: '/transactions',
     element: (
       <ErrorBoundary>
-      <ProtectedRoute>
+        <ProtectedRoute>
           <OnboardingGuard>
             <Suspense fallback={<SuspenseLoader />}>
               <Transactions />
-           </Suspense>
+            </Suspense>
           </OnboardingGuard>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -266,11 +312,11 @@ export const router = createBrowserRouter([
     path: '/reports',
     element: (
       <ErrorBoundary>
-      <ProtectedRoute>
+        <ProtectedRoute>
           <OnboardingGuard>
             <Suspense fallback={<SuspenseLoader />}>
               <Reports />
-           </Suspense>
+            </Suspense>
           </OnboardingGuard>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -280,9 +326,9 @@ export const router = createBrowserRouter([
   {
     path: '/settings',
     element: (
-        <Suspense fallback={<SuspenseLoader />}>
-             <Settings />
-         </Suspense>
+      <Suspense fallback={<SuspenseLoader />}>
+        <Settings />
+      </Suspense>
     ),
   },
   {
@@ -322,7 +368,7 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-         <Suspense fallback={<SuspenseLoader />}>
+          <Suspense fallback={<SuspenseLoader />}>
             <AiClassificationPage />
           </Suspense>
         </ProtectedRoute>
@@ -336,7 +382,7 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
+          <Suspense fallback={<SuspenseLoader />}>
             <CreditCardsPage />
           </Suspense>
         </ProtectedRoute>
@@ -349,8 +395,8 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-              <GoalsPage />
+          <Suspense fallback={<SuspenseLoader />}>
+            <GoalsPage />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -362,8 +408,8 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-             <RecurringTransactionsPage />
+          <Suspense fallback={<SuspenseLoader />}>
+            <RecurringTransactionsPage />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -375,8 +421,8 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-             <IncomeSourcesPage />
+          <Suspense fallback={<SuspenseLoader />}>
+            <IncomeSourcesPage />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -388,8 +434,8 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-              <CompaniesPage />
+          <Suspense fallback={<SuspenseLoader />}>
+            <CompaniesPage />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -401,8 +447,8 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-              <UsersPage />
+          <Suspense fallback={<SuspenseLoader />}>
+            <UsersPage />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -414,8 +460,8 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-             <Payables />
+          <Suspense fallback={<SuspenseLoader />}>
+            <Payables />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -427,8 +473,8 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-              <Receivables />
+          <Suspense fallback={<SuspenseLoader />}>
+            <Receivables />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -440,8 +486,8 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-             <MonthlyClosing />
+          <Suspense fallback={<SuspenseLoader />}>
+            <MonthlyClosing />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -453,7 +499,7 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
+          <Suspense fallback={<SuspenseLoader />}>
             <AnnualResult />
           </Suspense>
         </ProtectedRoute>
@@ -466,8 +512,8 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-             <PlannerPage />
+          <Suspense fallback={<SuspenseLoader />}>
+            <PlannerPage />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -479,8 +525,8 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-           <Suspense fallback={<SuspenseLoader />}>
-             <PreferencesPage />
+          <Suspense fallback={<SuspenseLoader />}>
+            <PreferencesPage />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
@@ -492,9 +538,9 @@ export const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <ProtectedRoute>
-            <Suspense fallback={<SuspenseLoader />}>
-                <NotificationsPage />
-            </Suspense>
+          <Suspense fallback={<SuspenseLoader />}>
+            <NotificationsPage />
+          </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>
     ),
