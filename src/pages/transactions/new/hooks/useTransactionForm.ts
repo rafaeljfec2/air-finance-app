@@ -17,7 +17,6 @@ import { validateTransactionForm } from '../utils/transactionValidation';
 export interface TransactionFormData extends TransactionInput {
   transactionKind: 'FIXED' | 'VARIABLE';
   repeatMonthly: boolean;
-  // Campos para recorrência
   recurrenceStartDate?: string;
   recurrenceEndDate?: string;
   recurrenceFrequency?: 'daily' | 'weekly' | 'monthly' | 'yearly';
@@ -41,6 +40,58 @@ const INITIAL_FORM_DATA: TransactionFormData = {
   recurrenceFrequency: 'monthly',
 };
 
+/**
+ * Creates a recurring transaction payload from form data
+ */
+function createRecurringPayload(formData: TransactionFormData): CreateRecurringTransaction {
+  return {
+    description: formData.description,
+    type: formData.type === 'EXPENSE' ? 'Expense' : 'Income',
+    value: Number(formData.amount),
+    category: formData.categoryId,
+    accountId: formData.accountId,
+    startDate: formData.recurrenceStartDate ?? '',
+    frequency: formData.recurrenceFrequency || 'monthly',
+    repeatUntil: formData.recurrenceEndDate ?? '',
+    createdAutomatically: false,
+  };
+}
+
+/**
+ * Creates a regular transaction payload from form data
+ */
+function createTransactionPayload(formData: TransactionFormData): CreateTransactionPayload {
+  return {
+    description: formData.description,
+    launchType: formData.type === 'EXPENSE' ? 'expense' : 'revenue',
+    valueType: formData.transactionKind === 'FIXED' ? 'fixed' : 'variable',
+    companyId: formData.companyId,
+    accountId: formData.accountId,
+    categoryId: formData.categoryId,
+    value: Number(formData.amount),
+    paymentDate: formData.date,
+    issueDate: formData.date,
+    quantityInstallments: Number(formData.installmentCount),
+    repeatMonthly: !!formData.repeatMonthly,
+    observation: formData.note,
+    reconciled: true,
+  };
+}
+
+/**
+ * Checks if form data represents a recurring transaction
+ */
+function isRecurringTransaction(formData: TransactionFormData): boolean {
+  return (
+    formData.transactionKind === 'FIXED' &&
+    !!formData.recurrenceStartDate &&
+    !!formData.recurrenceEndDate
+  );
+}
+
+/**
+ * Hook for managing transaction form state and submission
+ */
 export function useTransactionForm() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -48,7 +99,16 @@ export function useTransactionForm() {
   const companyId = activeCompany?.id || '';
   const { createTransaction, isCreating } = useTransactions(companyId);
 
-  // Mutation para criar transação recorrente com controle de navegação
+  const [transactionType, setTransactionType] = useState<TransactionType>('EXPENSE');
+  const [formData, setFormData] = useState<TransactionFormData>({
+    ...INITIAL_FORM_DATA,
+    companyId,
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  /**
+   * Mutation for creating recurring transactions
+   */
   const createRecurringMutation = useMutation({
     mutationFn: (data: CreateRecurringTransaction) => createRecurringTransaction(companyId, data),
     onSuccess: () => {
@@ -71,14 +131,9 @@ export function useTransactionForm() {
     },
   });
 
-  const [transactionType, setTransactionType] = useState<TransactionType>('EXPENSE');
-  const [formData, setFormData] = useState<TransactionFormData>({
-    ...INITIAL_FORM_DATA,
-    companyId,
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // Load draft from sessionStorage on mount
+  /**
+   * Load draft from sessionStorage on mount
+   */
   useEffect(() => {
     try {
       const draft = sessionStorage.getItem('transaction_draft');
@@ -92,7 +147,9 @@ export function useTransactionForm() {
     }
   }, []);
 
-  // Save draft to sessionStorage
+  /**
+   * Save draft to sessionStorage when form data changes
+   */
   useEffect(() => {
     try {
       sessionStorage.setItem('transaction_draft', JSON.stringify(formData));
@@ -101,7 +158,9 @@ export function useTransactionForm() {
     }
   }, [formData]);
 
-  // Update companyId when activeCompany changes
+  /**
+   * Update companyId when activeCompany changes
+   */
   useEffect(() => {
     setFormData((prev) => ({ ...prev, companyId }));
   }, [companyId]);
@@ -148,10 +207,20 @@ export function useTransactionForm() {
     setFormData((prev) => ({ ...prev, type }));
   }, []);
 
+  /**
+   * Handles form submission
+   */
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      const validationErrors = validateTransactionForm(formData, companyId);
+
+      const validationErrors = validateTransactionForm(
+        {
+          ...formData,
+          transactionKind: formData.transactionKind,
+        },
+        companyId,
+      );
       setErrors(validationErrors as Record<string, string>);
 
       if (Object.keys(validationErrors).length > 0) {
@@ -164,66 +233,28 @@ export function useTransactionForm() {
         return;
       }
 
-      // Se for transação recorrente, criar usando o serviço de transações recorrentes
-      if (
-        formData.transactionKind === 'FIXED' &&
-        formData.recurrenceStartDate &&
-        formData.recurrenceEndDate
-      ) {
-        const recurringPayload: CreateRecurringTransaction = {
-          description: formData.description,
-          type: formData.type === 'EXPENSE' ? 'Expense' : 'Income',
-          value: Number(formData.amount),
-          category: formData.categoryId,
-          accountId: formData.accountId,
-          startDate: formData.recurrenceStartDate,
-          frequency: formData.recurrenceFrequency || 'monthly',
-          repeatUntil: formData.recurrenceEndDate,
-          createdAutomatically: false,
-        };
-
-        // Usar mutation local para ter controle sobre navegação e limpeza
+      // Handle recurring transaction
+      if (isRecurringTransaction(formData)) {
+        const recurringPayload = createRecurringPayload(formData);
         createRecurringMutation.mutate(recurringPayload);
         return;
       }
 
-      // Caso contrário, criar transação normal
-      const payload: CreateTransactionPayload = {
-        description: formData.description,
-        launchType: formData.type === 'EXPENSE' ? 'expense' : 'revenue',
-        valueType: formData.transactionKind === 'FIXED' ? 'fixed' : 'variable',
-        companyId: formData.companyId,
-        accountId: formData.accountId,
-        categoryId: formData.categoryId,
-        value: Number(formData.amount),
-        paymentDate: formData.date,
-        issueDate: formData.date,
-        quantityInstallments: Number(formData.installmentCount),
-        repeatMonthly: !!formData.repeatMonthly,
-        observation: formData.note,
-        reconciled: true,
-      };
-
-      try {
-        createTransaction(payload, {
-          onSuccess: () => {
-            toast({ type: 'success', description: 'Transação salva com sucesso!' });
-            sessionStorage.removeItem('transaction_draft');
-            navigate('/transactions');
-          },
-          onError: (error) => {
-            toast({
-              type: 'error',
-              description: error instanceof Error ? error.message : 'Erro ao salvar transação.',
-            });
-          },
-        });
-      } catch (error) {
-        toast({
-          type: 'error',
-          description: error instanceof Error ? error.message : 'Erro ao salvar transação.',
-        });
-      }
+      // Handle regular transaction
+      const payload = createTransactionPayload(formData);
+      createTransaction(payload, {
+        onSuccess: () => {
+          toast({ type: 'success', description: 'Transação salva com sucesso!' });
+          sessionStorage.removeItem('transaction_draft');
+          navigate('/transactions');
+        },
+        onError: (error) => {
+          toast({
+            type: 'error',
+            description: error instanceof Error ? error.message : 'Erro ao salvar transação.',
+          });
+        },
+      });
     },
     [formData, companyId, createTransaction, createRecurringMutation, navigate],
   );
