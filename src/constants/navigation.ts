@@ -1,21 +1,21 @@
 import { NavigationSection } from '@/types/navigation';
 import {
-    ArrowRightLeft,
-    Banknote,
-    Bell,
-    Building2,
-    ChartBar,
-    CreditCard,
-    Flag,
-    Import,
-    Pencil,
-    Plus,
-    RefreshCcw,
-    Save,
-    Settings,
-    Tag,
-    User,
-    Wallet,
+  ArrowRightLeft,
+  Banknote,
+  Bell,
+  Building2,
+  ChartBar,
+  CreditCard,
+  Flag,
+  Import,
+  Pencil,
+  Plus,
+  RefreshCcw,
+  Save,
+  Settings,
+  Tag,
+  User,
+  Wallet,
 } from 'lucide-react';
 
 export const navigation: NavigationSection[] = [
@@ -26,7 +26,7 @@ export const navigation: NavigationSection[] = [
       { name: 'Meu Orçamento', href: '/budget', icon: Wallet },
       /*{ name: 'Classificação Inteligente', href: '/ai/classification', icon: ChartBar },
        { name: 'Meu Planner', href: '/planner', icon: Calendar }, */
-       { name: 'Relatórios', href: '/reports', icon: ChartBar },
+      { name: 'Relatórios', href: '/reports', icon: ChartBar },
     ],
   },
   {
@@ -55,7 +55,7 @@ export const navigation: NavigationSection[] = [
         icon: Save,
         children: [
           { name: 'Empresas', href: '/companies', icon: Building2 },
-          { name: 'Contas Bancárias', href: '/accounts', icon: Banknote },
+          { name: 'Contas', href: '/accounts', icon: Banknote },
           { name: 'Categorias', href: '/categories', icon: Tag },
           /* { name: 'Dependentes', href: '/dependents', icon: Users }, */
           { name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCard },

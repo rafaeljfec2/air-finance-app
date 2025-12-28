@@ -4,24 +4,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { apiClient as api } from '@/services/apiClient';
 import { useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence } from 'framer-motion';
-import { Banknote, Building2, CheckCircle2, Flag, Repeat, Sparkles, Tags } from 'lucide-react';
+import { Banknote, Building2, CheckCircle2, Sparkles, Tags } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AccountStep } from './components/AccountStep';
 import { CategoriesStep } from './components/CategoriesStep';
 import { CompanyStep } from './components/CompanyStep';
 import { FinishStep } from './components/FinishStep';
-import { GoalsStep } from './components/GoalsStep';
-import { RecurringStep } from './components/RecurringStep';
 import { StepIndicator } from './components/StepIndicator';
 import { WelcomeStep } from './components/WelcomeStep';
-import type {
-  AccountFormData,
-  CategoryFormData,
-  CompanyFormData,
-  GoalFormData,
-  RecurringTransactionFormData,
-} from './schemas';
+import type { AccountFormData, CategoryFormData, CompanyFormData } from './schemas';
 
 // Define steps configuration
 const steps = [
@@ -29,8 +21,6 @@ const steps = [
   { icon: Building2, label: 'Empresa' },
   { icon: Banknote, label: 'Conta' },
   { icon: Tags, label: 'Categorias' },
-  { icon: Flag, label: 'Metas' },
-  { icon: Repeat, label: 'Recorrentes' },
   { icon: CheckCircle2, label: 'Conclusão' },
 ];
 
@@ -47,8 +37,6 @@ export default function OnboardingPage() {
     company: null as CompanyFormData | null,
     account: null as AccountFormData | null,
     categories: [] as CategoryFormData[],
-    goal: null as GoalFormData | null,
-    recurringTransaction: null as RecurringTransactionFormData | null,
   });
 
   // Ensure user has verified email and hasn't completed onboarding
@@ -85,16 +73,6 @@ export default function OnboardingPage() {
 
   const handleCategoriesSubmit = (data: CategoryFormData[]) => {
     setFormData((prev) => ({ ...prev, categories: data }));
-    handleNextStep();
-  };
-
-  const handleGoalSubmit = (data: GoalFormData | null) => {
-    setFormData((prev) => ({ ...prev, goal: data }));
-    handleNextStep();
-  };
-
-  const handleRecurringSubmit = (data: RecurringTransactionFormData | null) => {
-    setFormData((prev) => ({ ...prev, recurringTransaction: data }));
     handleNextStep();
   };
 
@@ -188,36 +166,6 @@ export default function OnboardingPage() {
   };
 
   /**
-   * Creates a goal if provided
-   */
-  const createGoal = async (
-    goal: GoalFormData,
-    companyId: string,
-    accountId?: string,
-  ): Promise<void> => {
-    await api.post('/goals', {
-      ...goal,
-      companyId,
-      accountId: accountId || undefined,
-    });
-  };
-
-  /**
-   * Creates a recurring transaction if provided
-   */
-  const createRecurringTransaction = async (
-    recurringTransaction: RecurringTransactionFormData,
-    companyId: string,
-    accountId?: string,
-  ): Promise<void> => {
-    await api.post('/recurring-transactions', {
-      ...recurringTransaction,
-      companyId,
-      accountId: accountId || undefined,
-    });
-  };
-
-  /**
    * Marks onboarding as complete and redirects to dashboard
    */
   const completeOnboarding = async (): Promise<void> => {
@@ -234,7 +182,7 @@ export default function OnboardingPage() {
 
   /**
    * Handles the final completion of the onboarding process
-   * Creates all entities in sequence: company, account, categories, goal, recurring transaction
+   * Creates all entities in sequence: company, account, categories
    */
   const handleFinalCompletion = async (): Promise<void> => {
     setIsLoading(true);
@@ -248,9 +196,8 @@ export default function OnboardingPage() {
       const companyId = await createCompany(formData.company);
 
       // 2. Create account (optional)
-      let accountId: string | undefined;
       if (formData.account) {
-        accountId = await createAccount(formData.account, companyId);
+        await createAccount(formData.account, companyId);
       }
 
       // 3. Create categories
@@ -258,17 +205,7 @@ export default function OnboardingPage() {
         await createCategories(formData.categories, companyId);
       }
 
-      // 4. Create goal (optional)
-      if (formData.goal) {
-        await createGoal(formData.goal, companyId, accountId);
-      }
-
-      // 5. Create recurring transaction (optional)
-      if (formData.recurringTransaction) {
-        await createRecurringTransaction(formData.recurringTransaction, companyId, accountId);
-      }
-
-      // 6. Complete onboarding
+      // 4. Complete onboarding
       await completeOnboarding();
     } catch (error) {
       console.error('Erro ao finalizar onboarding:', error);
@@ -317,24 +254,6 @@ export default function OnboardingPage() {
             )}
 
             {currentStep === 4 && (
-              <GoalsStep
-                onNext={handleGoalSubmit}
-                onBack={handlePrevStep}
-                accountName={formData.account?.name}
-                initialData={formData.goal}
-              />
-            )}
-
-            {currentStep === 5 && (
-              <RecurringStep
-                onNext={handleRecurringSubmit}
-                onBack={handlePrevStep}
-                accountName={formData.account?.name}
-                initialData={formData.recurringTransaction}
-              />
-            )}
-
-            {currentStep === 6 && (
               <FinishStep
                 onComplete={handleFinalCompletion}
                 onBack={handlePrevStep}
@@ -343,8 +262,6 @@ export default function OnboardingPage() {
                   companyName: formData.company?.name ?? '',
                   accountName: formData.account?.name ?? '',
                   categoriesCount: formData.categories.length,
-                  goalName: formData.goal?.name,
-                  recurringCount: formData.recurringTransaction ? 1 : 0,
                 }}
               />
             )}

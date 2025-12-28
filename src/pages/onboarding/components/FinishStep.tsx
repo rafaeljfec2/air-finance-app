@@ -16,8 +16,6 @@ interface FinishStepProps {
     companyName: string;
     accountName: string;
     categoriesCount: number;
-    goalName?: string;
-    recurringCount?: number;
   };
   loading: boolean;
 }
@@ -25,7 +23,7 @@ interface FinishStepProps {
 export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<FinishStepProps>) {
   return (
     <motion.div
-      key="step-6"
+      key="step-4"
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
@@ -75,24 +73,6 @@ export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<Fi
                 <strong>{summary.categoriesCount}</strong> categorias adicionadas
               </span>
             </div>
-            {summary.goalName && (
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <Check className="h-4 w-4 text-green-600" />
-                </div>
-                <span className="text-text dark:text-text-dark">
-                  Meta <strong>{summary.goalName}</strong> definida
-                </span>
-              </div>
-            )}
-            {summary.recurringCount !== undefined && summary.recurringCount > 0 && (
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <Check className="h-4 w-4 text-green-600" />
-                </div>
-                <span className="text-text dark:text-text-dark">Transação recorrente agendada</span>
-              </div>
-            )}
           </div>
         </div>
       </CardContent>
