@@ -145,7 +145,7 @@ export function TransactionDetailsFields({
         // Campos para transação recorrente
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {/* Data inicial */}
-          <div>
+          <div className="flex flex-col">
             <DatePicker
               label={
                 <>
@@ -163,7 +163,7 @@ export function TransactionDetailsFields({
           </div>
 
           {/* Data final */}
-          <div>
+          <div className="flex flex-col">
             <DatePicker
               label={
                 <>
@@ -181,7 +181,7 @@ export function TransactionDetailsFields({
           </div>
 
           {/* Frequência */}
-          <div>
+          <div className="flex flex-col">
             <label
               htmlFor="recurrenceFrequency"
               className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
@@ -221,7 +221,7 @@ export function TransactionDetailsFields({
           </div>
 
           {/* Valor */}
-          <div>
+          <div className="flex flex-col">
             <label
               htmlFor="amount"
               className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
@@ -259,7 +259,7 @@ export function TransactionDetailsFields({
         // Campos para transação variável
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Data */}
-          <div>
+          <div className="flex flex-col">
             <DatePicker
               label={
                 <>
@@ -277,7 +277,7 @@ export function TransactionDetailsFields({
           </div>
 
           {/* Valor */}
-          <div>
+          <div className="flex flex-col">
             <label
               htmlFor="amount"
               className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
