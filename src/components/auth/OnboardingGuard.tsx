@@ -1,8 +1,13 @@
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
-export function OnboardingGuard({ children }: { children: React.ReactNode }) {
+interface OnboardingGuardProps {
+  readonly children: React.ReactNode;
+}
+
+export function OnboardingGuard({ children }: OnboardingGuardProps) {
   const { user, isLoadingUser } = useAuth(); // Changed loading to isLoadingUser based on useAuth.ts
   const location = useLocation();
 
@@ -21,16 +26,28 @@ export function OnboardingGuard({ children }: { children: React.ReactNode }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Only redirect to onboarding if onboardingCompleted is explicitly false
-  // If onboardingCompleted is true or undefined/null (default), don't redirect
-  const needsOnboarding = user.onboardingCompleted === false;
+  // Check if user has verified their email
+  const isEmailVerified = user.emailVerified === true;
 
-  // If user hasn't completed onboarding and is not already on /onboarding
+  // User needs onboarding only if:
+  // 1. Email is verified (emailVerified === true)
+  // 2. Onboarding is not completed (onboardingCompleted === false)
+  const needsOnboarding = isEmailVerified && user.onboardingCompleted === false;
+
+  // If email is not verified, user cannot access onboarding
+  // Redirect them away from onboarding (to dashboard)
+  if (!isEmailVerified && location.pathname.startsWith('/onboarding')) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // If user needs onboarding (email verified + onboarding not completed) and is not already on /onboarding
+  // Redirect them to onboarding
   if (needsOnboarding && !location.pathname.startsWith('/onboarding')) {
     return <Navigate to="/onboarding" replace />;
   }
 
-  // If user HAS completed onboarding (true or undefined) and TRIES to go to /onboarding
+  // If user doesn't need onboarding (email not verified OR onboarding completed) and tries to access /onboarding
+  // Redirect them away from onboarding (to dashboard)
   if (!needsOnboarding && location.pathname.startsWith('/onboarding')) {
     return <Navigate to="/dashboard" replace />;
   }

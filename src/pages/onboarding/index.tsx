@@ -47,8 +47,15 @@ export default function OnboardingPage() {
     recurringTransaction: null as RecurringTransactionFormData | null,
   });
 
-  // Ensure user hasn't completed onboarding
+  // Ensure user has verified email and hasn't completed onboarding
   useEffect(() => {
+    // Redirect if email is not verified
+    if (user && user.emailVerified !== true) {
+      navigate('/dashboard');
+      return;
+    }
+
+    // Redirect if onboarding is already completed
     if (user?.onboardingCompleted) {
       navigate('/dashboard');
     }
