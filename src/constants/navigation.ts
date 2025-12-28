@@ -5,7 +5,6 @@ import {
   Bell,
   Building2,
   ChartBar,
-  CreditCard,
   Flag,
   Import,
   Pencil,
@@ -58,7 +57,7 @@ export const navigation: NavigationSection[] = [
           { name: 'Contas', href: '/accounts', icon: Banknote },
           { name: 'Categorias', href: '/categories', icon: Tag },
           /* { name: 'Dependentes', href: '/dependents', icon: Users }, */
-          { name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCard },
+          /*{ name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCard },*/
           { name: 'Metas', href: '/goals', icon: Flag },
           { name: 'Transações Recorrentes', href: '/recurring-transactions', icon: RefreshCcw },
           { name: 'Usuários', href: '/users', icon: User },
