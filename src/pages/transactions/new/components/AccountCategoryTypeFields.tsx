@@ -1,7 +1,7 @@
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { cn } from '@/lib/utils';
-import { useMemo } from 'react';
 import type { Account, Category } from '@/types/transaction';
+import { useMemo } from 'react';
 
 interface AccountCategoryTypeFieldsProps {
   accounts: Account[];
@@ -110,18 +110,6 @@ export function AccountCategoryTypeFields({
               type="button"
               className={cn(
                 'flex-1 px-4 py-2 rounded-lg border font-medium transition-colors',
-                transactionKind === 'FIXED'
-                  ? 'bg-card text-primary-500 border-primary-500 shadow'
-                  : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-400',
-              )}
-              onClick={() => onTransactionKindChange('FIXED')}
-            >
-              Fixa
-            </button>
-            <button
-              type="button"
-              className={cn(
-                'flex-1 px-4 py-2 rounded-lg border font-medium transition-colors',
                 transactionKind === 'VARIABLE'
                   ? 'bg-card text-primary-500 border-primary-500 shadow'
                   : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-400',
@@ -129,6 +117,18 @@ export function AccountCategoryTypeFields({
               onClick={() => onTransactionKindChange('VARIABLE')}
             >
               Variável
+            </button>
+            <button
+              type="button"
+              className={cn(
+                'flex-1 px-4 py-2 rounded-lg border font-medium transition-colors',
+                transactionKind === 'FIXED'
+                  ? 'bg-card text-primary-500 border-primary-500 shadow'
+                  : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-400',
+              )}
+              onClick={() => onTransactionKindChange('FIXED')}
+            >
+              Recorrente
             </button>
           </div>
         </div>
