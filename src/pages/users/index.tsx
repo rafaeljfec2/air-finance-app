@@ -14,7 +14,12 @@ import { UserCard } from './components/UserCard';
 import { UserEmptyState } from './components/UserEmptyState';
 import { UserFilters } from './components/UserFilters';
 import { UserTableRow } from './components/UserTableRow';
-import { getRoleBadgeColor, getStatusBadgeColor } from './utils/userHelpers';
+import {
+  getEmailVerifiedBadgeColor,
+  getOnboardingCompletedBadgeColor,
+  getRoleBadgeColor,
+  getStatusBadgeColor,
+} from './utils/userHelpers';
 
 export function UsersPage() {
   const {
@@ -176,6 +181,8 @@ export function UsersPage() {
                       isDeleting={isDeleting}
                       getRoleBadgeColor={getRoleBadgeColor}
                       getStatusBadgeColor={getStatusBadgeColor}
+                      getEmailVerifiedBadgeColor={getEmailVerifiedBadgeColor}
+                      getOnboardingCompletedBadgeColor={getOnboardingCompletedBadgeColor}
                     />
                   ))}
                 </div>
@@ -197,6 +204,12 @@ export function UsersPage() {
                           <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
                             Status
                           </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Email Verificado
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Onboarding
+                          </th>
                           <th className="text-right p-4 text-sm font-semibold text-text dark:text-text-dark">
                             Ações
                           </th>
@@ -213,6 +226,8 @@ export function UsersPage() {
                             isDeleting={isDeleting}
                             getRoleBadgeColor={getRoleBadgeColor}
                             getStatusBadgeColor={getStatusBadgeColor}
+                            getEmailVerifiedBadgeColor={getEmailVerifiedBadgeColor}
+                            getOnboardingCompletedBadgeColor={getOnboardingCompletedBadgeColor}
                           />
                         ))}
                       </tbody>

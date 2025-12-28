@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { User } from '@/services/userService';
-import { Edit, Trash2 } from 'lucide-react';
+import { CheckCircle2, Edit, Mail, Trash2, XCircle } from 'lucide-react';
 
 interface UserCardProps {
   user: User;
@@ -12,6 +12,8 @@ interface UserCardProps {
   isDeleting: boolean;
   getRoleBadgeColor: (role: 'admin' | 'user') => string;
   getStatusBadgeColor: (status: 'active' | 'inactive') => string;
+  getEmailVerifiedBadgeColor: (emailVerified: boolean | undefined) => string;
+  getOnboardingCompletedBadgeColor: (onboardingCompleted: boolean | undefined) => string;
 }
 
 export function UserCard({
@@ -22,6 +24,8 @@ export function UserCard({
   isDeleting,
   getRoleBadgeColor,
   getStatusBadgeColor,
+  getEmailVerifiedBadgeColor,
+  getOnboardingCompletedBadgeColor,
 }: Readonly<UserCardProps>) {
   return (
     <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow">
@@ -53,6 +57,33 @@ export function UserCard({
             )}
           >
             {user.status === 'active' ? 'Ativo' : 'Inativo'}
+          </span>
+          <span
+            className={cn(
+              'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border',
+              getEmailVerifiedBadgeColor(user.emailVerified),
+            )}
+          >
+            {user.emailVerified === true ? (
+              <CheckCircle2 className="h-3 w-3" />
+            ) : (
+              <XCircle className="h-3 w-3" />
+            )}
+            <Mail className="h-3 w-3" />
+            {user.emailVerified === true ? 'Email Verificado' : 'Email Não Verificado'}
+          </span>
+          <span
+            className={cn(
+              'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border',
+              getOnboardingCompletedBadgeColor(user.onboardingCompleted),
+            )}
+          >
+            {user.onboardingCompleted === true ? (
+              <CheckCircle2 className="h-3 w-3" />
+            ) : (
+              <XCircle className="h-3 w-3" />
+            )}
+            {user.onboardingCompleted === true ? 'Onboarding Completo' : 'Onboarding Pendente'}
           </span>
           {user.integrations?.openaiModel && (
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-blue-500/20 text-blue-400 border-blue-500/30">

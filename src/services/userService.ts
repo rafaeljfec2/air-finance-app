@@ -15,6 +15,8 @@ export const UserSchema = z.object({
   status: z.enum(['active', 'inactive'], {
     errorMap: () => ({ message: 'Status inválido' }),
   }),
+  emailVerified: z.boolean().optional(),
+  onboardingCompleted: z.boolean().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   integrations: z

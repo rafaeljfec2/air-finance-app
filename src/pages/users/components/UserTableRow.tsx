@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { User } from '@/services/userService';
-import { Edit, Trash2 } from 'lucide-react';
+import { CheckCircle2, Edit, Mail, Trash2, XCircle } from 'lucide-react';
 
 interface UserTableRowProps {
   user: User;
@@ -11,6 +11,8 @@ interface UserTableRowProps {
   isDeleting: boolean;
   getRoleBadgeColor: (role: 'admin' | 'user') => string;
   getStatusBadgeColor: (status: 'active' | 'inactive') => string;
+  getEmailVerifiedBadgeColor: (emailVerified: boolean | undefined) => string;
+  getOnboardingCompletedBadgeColor: (onboardingCompleted: boolean | undefined) => string;
 }
 
 export function UserTableRow({
@@ -21,6 +23,8 @@ export function UserTableRow({
   isDeleting,
   getRoleBadgeColor,
   getStatusBadgeColor,
+  getEmailVerifiedBadgeColor,
+  getOnboardingCompletedBadgeColor,
 }: Readonly<UserTableRowProps>) {
   return (
     <tr className="border-b border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark transition-colors">
@@ -48,6 +52,37 @@ export function UserTableRow({
           )}
         >
           {user.status === 'active' ? 'Ativo' : 'Inativo'}
+        </span>
+      </td>
+      <td className="p-4">
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border',
+            getEmailVerifiedBadgeColor(user.emailVerified),
+          )}
+        >
+          {user.emailVerified === true ? (
+            <CheckCircle2 className="h-3 w-3" />
+          ) : (
+            <XCircle className="h-3 w-3" />
+          )}
+          <Mail className="h-3 w-3" />
+          {user.emailVerified === true ? 'Verificado' : 'Não Verificado'}
+        </span>
+      </td>
+      <td className="p-4">
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border',
+            getOnboardingCompletedBadgeColor(user.onboardingCompleted),
+          )}
+        >
+          {user.onboardingCompleted === true ? (
+            <CheckCircle2 className="h-3 w-3" />
+          ) : (
+            <XCircle className="h-3 w-3" />
+          )}
+          {user.onboardingCompleted === true ? 'Completo' : 'Pendente'}
         </span>
       </td>
       <td className="p-4">
