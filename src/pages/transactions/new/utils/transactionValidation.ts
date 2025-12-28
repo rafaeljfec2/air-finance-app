@@ -9,6 +9,9 @@ export interface ValidationErrors {
   accountId?: string;
   date?: string;
   companyId?: string;
+  recurrenceStartDate?: string;
+  recurrenceEndDate?: string;
+  recurrenceFrequency?: string;
 }
 
 /**
@@ -57,6 +60,10 @@ export function validateTransactionForm(
     categoryId: string;
     accountId: string;
     date: string;
+    transactionKind?: 'FIXED' | 'VARIABLE';
+    recurrenceStartDate?: string;
+    recurrenceEndDate?: string;
+    recurrenceFrequency?: 'daily' | 'weekly' | 'monthly' | 'yearly';
   },
   companyId: string,
 ): ValidationErrors {
@@ -78,9 +85,44 @@ export function validateTransactionForm(
     errors.accountId = 'Conta é obrigatória';
   }
 
-  const dateError = validateDate(formData.date);
-  if (dateError) {
-    errors.date = dateError;
+  // Para transações variáveis, a data de pagamento é obrigatória
+  if (formData.transactionKind !== 'FIXED') {
+    const dateError = validateDate(formData.date);
+    if (dateError) {
+      errors.date = dateError;
+    }
+  }
+
+  // Para transações recorrentes, validar campos de recorrência
+  if (formData.transactionKind === 'FIXED') {
+    if (!formData.recurrenceStartDate) {
+      errors.recurrenceStartDate = 'Data inicial é obrigatória';
+    } else {
+      const startDateError = validateDate(formData.recurrenceStartDate);
+      if (startDateError) {
+        errors.recurrenceStartDate = startDateError;
+      }
+    }
+
+    if (!formData.recurrenceEndDate) {
+      errors.recurrenceEndDate = 'Data final é obrigatória';
+    } else {
+      const endDateError = validateDate(formData.recurrenceEndDate);
+      if (endDateError) {
+        errors.recurrenceEndDate = endDateError;
+      } else if (formData.recurrenceStartDate) {
+        // Verificar se data final é posterior à data inicial
+        const startDate = new Date(formData.recurrenceStartDate);
+        const endDate = new Date(formData.recurrenceEndDate);
+        if (endDate < startDate) {
+          errors.recurrenceEndDate = 'Data final deve ser posterior à data inicial';
+        }
+      }
+    }
+
+    if (!formData.recurrenceFrequency) {
+      errors.recurrenceFrequency = 'Frequência é obrigatória';
+    }
   }
 
   if (!companyId) {
@@ -89,4 +131,3 @@ export function validateTransactionForm(
 
   return errors;
 }
-
