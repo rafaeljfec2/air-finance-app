@@ -58,13 +58,10 @@ export const useAuth = () => {
 
   const registerMutation = useMutation({
     mutationFn: register,
-    onSuccess: async (data) => {
-      authUtils.setToken(data.token);
-      if (data.refreshToken) {
-        authUtils.setRefreshToken(data.refreshToken);
-      }
-      authUtils.setUser(data.user);
-      queryClient.setQueryData(['user'], data.user);
+    // Não faz login automático após registro
+    // Usuário precisa confirmar o email antes de poder fazer login
+    onSuccess: async () => {
+      // Não salva token nem user - usuário precisa confirmar email primeiro
     },
   });
 
