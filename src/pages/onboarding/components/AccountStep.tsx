@@ -6,6 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { ColorPicker } from '@/components/ui/color-picker';
+import { IconPicker } from '@/components/ui/icon-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -15,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import {
@@ -22,13 +25,22 @@ import {
   ChevronLeft,
   ChevronRight,
   CreditCard,
+  DollarSign,
   Landmark,
   Loader2,
   Wallet,
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { type AccountFormData, AccountSchema } from '../schemas';
+
+const accountTypes = [
+  { value: 'checking', label: 'Conta Corrente', icon: Banknote, iconName: 'Banknote' },
+  { value: 'savings', label: 'Poupança', icon: Wallet, iconName: 'Wallet' },
+  { value: 'credit_card', label: 'Cartão de Crédito', icon: CreditCard, iconName: 'CreditCard' },
+  { value: 'digital_wallet', label: 'Carteira Digital', icon: Wallet, iconName: 'Wallet' },
+  { value: 'investment', label: 'Investimento', icon: Landmark, iconName: 'Landmark' },
+] as const;
 
 interface AccountStepProps {
   onNext: (data: AccountFormData) => void;
@@ -48,12 +60,43 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
     },
   });
 
+  const accountType = accountForm.watch('type');
+  const isCreditCard = accountType === 'credit_card';
+  const [limitInput, setLimitInput] = useState('');
+
   // Initialize form when initialData changes
   useEffect(() => {
     if (initialData) {
       accountForm.reset(initialData);
+      if (initialData.type === 'credit_card' && initialData.initialBalance) {
+        setLimitInput(formatCurrencyInput(initialData.initialBalance.toFixed(2).replace('.', '')));
+      } else {
+        setLimitInput('');
+      }
     }
   }, [initialData, accountForm]);
+
+  // Reset limit input when type changes
+  useEffect(() => {
+    if (!isCreditCard) {
+      setLimitInput('');
+    }
+  }, [isCreditCard]);
+
+  const handleSubmit = (data: AccountFormData) => {
+    // For credit_card, ensure agency and accountNumber are empty strings
+    const submitData: AccountFormData = {
+      ...data,
+      agency: isCreditCard ? '' : (data.agency ?? ''),
+      accountNumber: isCreditCard ? '' : (data.accountNumber ?? ''),
+    };
+    onNext(submitData);
+  };
+
+  const iconOptions = accountTypes.map((type) => ({
+    value: type.iconName,
+    icon: type.icon,
+  }));
 
   return (
     <motion.div
@@ -63,23 +106,28 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.3 }}
     >
-      <form onSubmit={accountForm.handleSubmit(onNext)}>
+      <form onSubmit={accountForm.handleSubmit(handleSubmit)}>
         <CardHeader className="px-4 sm:px-6">
           <CardTitle className="text-text dark:text-text-dark text-xl sm:text-2xl">
-            Adicione uma Conta
+            {isCreditCard ? 'Adicione um Cartão de Crédito' : 'Adicione uma Conta'}
           </CardTitle>
           <CardDescription className="text-text dark:text-text-dark/70 text-sm sm:text-base">
-            Cadastre onde seu dinheiro está guardado (Banco ou Carteira).
+            {isCreditCard
+              ? 'Cadastre seu cartão de crédito para controle financeiro.'
+              : 'Cadastre onde seu dinheiro está guardado (Banco ou Carteira).'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 px-4 sm:px-6">
+          {/* Nome */}
           <div className="space-y-2">
             <Label htmlFor="accountName" className="text-text dark:text-text-dark">
-              Nome da Conta
+              {isCreditCard ? 'Nome do cartão *' : 'Nome da Conta *'}
             </Label>
             <Input
               id="accountName"
-              placeholder="Ex: Conta Principal ou Caixa Físico"
+              placeholder={
+                isCreditCard ? 'Ex: Cartão Nubank' : 'Ex: Conta Principal ou Caixa Físico'
+              }
               className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
               {...accountForm.register('name')}
             />
@@ -89,72 +137,44 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
               </p>
             )}
           </div>
+
+          {/* Tipo e Instituição */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-text dark:text-text-dark">Tipo</Label>
+              <Label className="text-text dark:text-text-dark">Tipo *</Label>
               <Select
+                value={accountForm.watch('type')}
                 onValueChange={(v) =>
                   accountForm.setValue(
                     'type',
                     v as 'checking' | 'savings' | 'investment' | 'credit_card' | 'digital_wallet',
                   )
                 }
-                defaultValue="checking"
               >
                 <SelectTrigger className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-                  <SelectItem
-                    value="checking"
-                    className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Banknote className="h-4 w-4" />
-                      Conta Corrente
-                    </div>
-                  </SelectItem>
-                  <SelectItem
-                    value="savings"
-                    className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Wallet className="h-4 w-4" />
-                      Poupança
-                    </div>
-                  </SelectItem>
-                  <SelectItem
-                    value="credit_card"
-                    className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
-                  >
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      Cartão de Crédito
-                    </div>
-                  </SelectItem>
-                  <SelectItem
-                    value="digital_wallet"
-                    className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Wallet className="h-4 w-4" />
-                      Carteira Digital
-                    </div>
-                  </SelectItem>
-                  <SelectItem
-                    value="investment"
-                    className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Landmark className="h-4 w-4" />
-                      Investimento
-                    </div>
-                  </SelectItem>
+                  {accountTypes.map((type) => {
+                    const Icon = type.icon;
+                    return (
+                      <SelectItem
+                        key={type.value}
+                        value={type.value}
+                        className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Icon className="h-4 w-4" />
+                          {type.label}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-text dark:text-text-dark">Instituição</Label>
+              <Label className="text-text dark:text-text-dark">Instituição *</Label>
               <Input
                 placeholder="Ex: Nubank, Itau..."
                 className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
@@ -167,52 +187,108 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
               )}
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="accountAgency" className="text-text dark:text-text-dark">
-                Agência{' '}
-                <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
-                  (Opcional)
-                </span>
-              </Label>
-              <Input
-                id="accountAgency"
-                placeholder="Ex: 1234"
-                className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
-                {...accountForm.register('agency')}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="accountNumber" className="text-text dark:text-text-dark">
-                Número da Conta{' '}
-                <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
-                  (Opcional)
-                </span>
-              </Label>
-              <Input
-                id="accountNumber"
-                placeholder="Ex: 12345-6"
-                className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
-                {...accountForm.register('accountNumber')}
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="accountInitialBalance" className="text-text dark:text-text-dark">
-              Saldo Inicial{' '}
-              <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
-                (Saldo atual da conta)
-              </span>
-            </Label>
-            <Input
-              id="accountInitialBalance"
-              type="number"
-              step="0.01"
-              placeholder="Ex: 1000.00"
-              className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
-              {...accountForm.register('initialBalance')}
-            />
-          </div>
+
+          {/* Campos específicos para cartão de crédito */}
+          {isCreditCard ? (
+            <>
+              {/* Limite para cartão de crédito */}
+              <div className="space-y-2">
+                <Label htmlFor="limit" className="text-text dark:text-text-dark">
+                  Limite *
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="limit"
+                    type="text"
+                    inputMode="decimal"
+                    value={limitInput}
+                    onChange={(e) => {
+                      const formatted = formatCurrencyInput(e.target.value);
+                      setLimitInput(formatted);
+                      accountForm.setValue('initialBalance', parseCurrency(formatted));
+                    }}
+                    placeholder="R$ 0,00"
+                    className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark pl-10"
+                  />
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                </div>
+                {accountForm.formState.errors.initialBalance && (
+                  <p className="text-sm text-red-400">
+                    {String(accountForm.formState.errors.initialBalance.message)}
+                  </p>
+                )}
+              </div>
+
+              {/* Cor e Ícone */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-text dark:text-text-dark">Cor</Label>
+                  <ColorPicker
+                    value={accountForm.watch('color')}
+                    onChange={(color) => accountForm.setValue('color', color)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-text dark:text-text-dark">Ícone</Label>
+                  <IconPicker
+                    value={accountForm.watch('icon')}
+                    onChange={(icon) => accountForm.setValue('icon', icon)}
+                    options={iconOptions}
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Campos para outros tipos de conta */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="accountAgency" className="text-text dark:text-text-dark">
+                    Agência{' '}
+                    <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
+                      (Opcional)
+                    </span>
+                  </Label>
+                  <Input
+                    id="accountAgency"
+                    placeholder="Ex: 1234"
+                    className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
+                    {...accountForm.register('agency')}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="accountNumber" className="text-text dark:text-text-dark">
+                    Número da Conta{' '}
+                    <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
+                      (Opcional)
+                    </span>
+                  </Label>
+                  <Input
+                    id="accountNumber"
+                    placeholder="Ex: 12345-6"
+                    className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
+                    {...accountForm.register('accountNumber')}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="accountInitialBalance" className="text-text dark:text-text-dark">
+                  Saldo Inicial{' '}
+                  <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
+                    (Saldo atual da conta)
+                  </span>
+                </Label>
+                <Input
+                  id="accountInitialBalance"
+                  type="number"
+                  step="0.01"
+                  placeholder="Ex: 1000.00"
+                  className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
+                  {...accountForm.register('initialBalance', { valueAsNumber: true })}
+                />
+              </div>
+            </>
+          )}
         </CardContent>
         <CardFooter className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 px-4 sm:px-6 pb-4 sm:pb-6">
           <Button

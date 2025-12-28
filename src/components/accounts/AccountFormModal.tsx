@@ -70,6 +70,8 @@ export function AccountFormModal({
   const [form, setForm] = useState<CreateAccount>(initialFormState);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [initialBalanceInput, setInitialBalanceInput] = useState('');
+  const [limitInput, setLimitInput] = useState('');
+  const isCreditCard = form.type === 'credit_card';
 
   const accountTypeOptions: ComboBoxOption<AccountType>[] = useMemo(
     () =>
@@ -97,17 +99,28 @@ export function AccountFormModal({
           ? account.initialBalanceDate.slice(0, 10)
           : formatDateToLocalISO(new Date()),
       });
-      setInitialBalanceInput(
-        account.initialBalance !== undefined && account.initialBalance !== null
-          ? formatCurrencyInput(account.initialBalance.toFixed(2).replace('.', ''), true)
-          : '',
-      );
+      if (account.type === 'credit_card') {
+        setLimitInput(
+          account.initialBalance !== undefined && account.initialBalance !== null
+            ? formatCurrencyInput(account.initialBalance.toFixed(2).replace('.', ''))
+            : '',
+        );
+        setInitialBalanceInput('');
+      } else {
+        setInitialBalanceInput(
+          account.initialBalance !== undefined && account.initialBalance !== null
+            ? formatCurrencyInput(account.initialBalance.toFixed(2).replace('.', ''), true)
+            : '',
+        );
+        setLimitInput('');
+      }
     } else {
       setForm({
         ...initialFormState,
         companyId: activeCompany?.id || '',
       });
       setInitialBalanceInput('');
+      setLimitInput('');
     }
     setErrors({});
   }, [account, open, initialFormState, activeCompany]);
@@ -129,8 +142,11 @@ export function AccountFormModal({
     const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (!form.institution.trim()) errs.institution = 'Instituição obrigatória';
-    if (!form.agency.trim()) errs.agency = 'Agência obrigatória';
-    if (!form.accountNumber.trim()) errs.accountNumber = 'Número da conta obrigatório';
+    // For credit_card, agency and accountNumber are not required
+    if (!isCreditCard) {
+      if (!form.agency.trim()) errs.agency = 'Agência obrigatória';
+      if (!form.accountNumber.trim()) errs.accountNumber = 'Número da conta obrigatório';
+    }
     if (!form.companyId) errs.companyId = 'Selecione uma empresa';
     return errs;
   };
@@ -143,9 +159,14 @@ export function AccountFormModal({
 
     const payload = {
       ...form,
-      initialBalanceDate: form.initialBalanceDate
-        ? form.initialBalanceDate
-        : null,
+      // For credit_card, ensure agency and accountNumber are empty strings
+      agency: isCreditCard ? '' : form.agency,
+      accountNumber: isCreditCard ? '' : form.accountNumber,
+      initialBalanceDate: isCreditCard
+        ? null
+        : form.initialBalanceDate
+          ? form.initialBalanceDate
+          : null,
     };
 
     onSubmit(payload);
@@ -153,12 +174,14 @@ export function AccountFormModal({
     setForm(initialFormState);
     setErrors({});
     setInitialBalanceInput('');
+    setLimitInput('');
   };
 
   const handleClose = () => {
     setForm(initialFormState);
     setErrors({});
     setInitialBalanceInput('');
+    setLimitInput('');
     onClose();
   };
 
@@ -179,12 +202,14 @@ export function AccountFormModal({
             </div>
             <div>
               <h2 className="text-xl font-semibold text-text dark:text-text-dark">
-                {account ? 'Editar Conta' : 'Nova Conta'}
+                {account ? 'Editar Conta' : isCreditCard ? 'Novo Cartão de Crédito' : 'Nova Conta'}
               </h2>
               <p className="text-sm text-muted-foreground dark:text-gray-400">
                 {account
                   ? 'Atualize as informações da conta'
-                  : 'Preencha os dados da nova conta bancária'}
+                  : isCreditCard
+                    ? 'Preencha os dados do novo cartão de crédito'
+                    : 'Preencha os dados da nova conta bancária'}
               </p>
             </div>
           </div>
@@ -210,13 +235,17 @@ export function AccountFormModal({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField label="Nome da conta *" error={errors.name} className="md:col-span-2">
+                <FormField
+                  label={isCreditCard ? 'Nome do cartão *' : 'Nome da conta *'}
+                  error={errors.name}
+                  className="md:col-span-2"
+                >
                   <div className="relative">
                     <Input
                       name="name"
                       value={form.name}
                       onChange={handleChange}
-                      placeholder="Ex: Conta Principal"
+                      placeholder={isCreditCard ? 'Ex: Cartão Nubank' : 'Ex: Conta Principal'}
                       required
                       className={cn(
                         'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
@@ -271,97 +300,129 @@ export function AccountFormModal({
               </div>
             </div>
 
-            {/* Seção: Dados Bancários */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
-                <Hash className="h-4 w-4 text-primary-500 dark:text-primary-400" />
-                <h3 className="text-sm font-semibold text-text dark:text-text-dark uppercase tracking-wide">
-                  Dados Bancários
-                </h3>
+            {/* Seção: Dados Bancários - Only for non-credit_card types */}
+            {!isCreditCard && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Hash className="h-4 w-4 text-primary-500 dark:text-primary-400" />
+                  <h3 className="text-sm font-semibold text-text dark:text-text-dark uppercase tracking-wide">
+                    Dados Bancários
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField label="Agência *" error={errors.agency}>
+                    <Input
+                      name="agency"
+                      value={form.agency}
+                      onChange={handleChange}
+                      placeholder="0000"
+                      required
+                      className={cn(
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
+                        errors.agency && 'border-red-500 focus-visible:ring-red-500',
+                      )}
+                    />
+                  </FormField>
+
+                  <FormField label="Número da conta *" error={errors.accountNumber}>
+                    <Input
+                      name="accountNumber"
+                      value={form.accountNumber}
+                      onChange={handleChange}
+                      placeholder="00000-0"
+                      required
+                      className={cn(
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
+                        errors.accountNumber && 'border-red-500 focus-visible:ring-red-500',
+                      )}
+                    />
+                  </FormField>
+                </div>
               </div>
+            )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField label="Agência *" error={errors.agency}>
-                  <Input
-                    name="agency"
-                    value={form.agency}
-                    onChange={handleChange}
-                    placeholder="0000"
-                    required
-                    className={cn(
-                      'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
-                      errors.agency && 'border-red-500 focus-visible:ring-red-500',
-                    )}
-                  />
-                </FormField>
-
-                <FormField label="Número da conta *" error={errors.accountNumber}>
-                  <Input
-                    name="accountNumber"
-                    value={form.accountNumber}
-                    onChange={handleChange}
-                    placeholder="00000-0"
-                    required
-                    className={cn(
-                      'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all',
-                      errors.accountNumber && 'border-red-500 focus-visible:ring-red-500',
-                    )}
-                  />
-                </FormField>
-              </div>
-            </div>
-
-            {/* Seção: Saldo Inicial */}
+            {/* Seção: Limite (Credit Card) ou Saldo Inicial (Other types) */}
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-4">
                 <DollarSign className="h-4 w-4 text-primary-500 dark:text-primary-400" />
                 <h3 className="text-sm font-semibold text-text dark:text-text-dark uppercase tracking-wide">
-                  Saldo Inicial
+                  {isCreditCard ? 'Limite' : 'Saldo Inicial'}
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField label="Valor do saldo inicial *" error={errors.initialBalance}>
-                  <div className="relative">
-                    <Input
-                      name="initialBalance"
-                      type="text"
-                      inputMode="decimal"
-                      value={initialBalanceInput}
-                      onChange={(e) => {
-                        const formatted = formatCurrencyInput(e.target.value, true);
-                        setInitialBalanceInput(formatted);
-                        setForm((prev) => ({
-                          ...prev,
-                          initialBalance: parseCurrency(formatted),
-                        }));
-                      }}
-                      placeholder="R$ 0,00"
-                      required
-                      className={cn(
-                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
-                        errors.initialBalance && 'border-red-500 focus-visible:ring-red-500',
-                      )}
-                    />
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
-                  </div>
-                </FormField>
+              {isCreditCard ? (
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                  <FormField label="Limite *" error={errors.initialBalance}>
+                    <div className="relative">
+                      <Input
+                        name="limit"
+                        type="text"
+                        inputMode="decimal"
+                        value={limitInput}
+                        onChange={(e) => {
+                          const formatted = formatCurrencyInput(e.target.value);
+                          setLimitInput(formatted);
+                          setForm((prev) => ({
+                            ...prev,
+                            initialBalance: parseCurrency(formatted),
+                          }));
+                        }}
+                        placeholder="R$ 0,00"
+                        required
+                        className={cn(
+                          'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                          errors.initialBalance && 'border-red-500 focus-visible:ring-red-500',
+                        )}
+                      />
+                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                    </div>
+                  </FormField>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField label="Valor do saldo inicial *" error={errors.initialBalance}>
+                    <div className="relative">
+                      <Input
+                        name="initialBalance"
+                        type="text"
+                        inputMode="decimal"
+                        value={initialBalanceInput}
+                        onChange={(e) => {
+                          const formatted = formatCurrencyInput(e.target.value, true);
+                          setInitialBalanceInput(formatted);
+                          setForm((prev) => ({
+                            ...prev,
+                            initialBalance: parseCurrency(formatted),
+                          }));
+                        }}
+                        placeholder="R$ 0,00"
+                        required
+                        className={cn(
+                          'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                          errors.initialBalance && 'border-red-500 focus-visible:ring-red-500',
+                        )}
+                      />
+                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                    </div>
+                  </FormField>
 
-                <FormField label="Data do saldo inicial *" error={errors.initialBalanceDate}>
-                  <DatePicker
-                    value={form.initialBalanceDate || undefined}
-                    onChange={(date) => {
-                      const dateString = date ? formatDateToLocalISO(date) : '';
-                      handleChange({
-                        target: { name: 'initialBalanceDate', value: dateString },
-                      } as ChangeEvent<HTMLInputElement>);
-                    }}
-                    placeholder="Selecionar data do saldo inicial"
-                    error={errors.initialBalanceDate}
-                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                  />
-                </FormField>
-              </div>
+                  <FormField label="Data do saldo inicial *" error={errors.initialBalanceDate}>
+                    <DatePicker
+                      value={form.initialBalanceDate || undefined}
+                      onChange={(date) => {
+                        const dateString = date ? formatDateToLocalISO(date) : '';
+                        handleChange({
+                          target: { name: 'initialBalanceDate', value: dateString },
+                        } as ChangeEvent<HTMLInputElement>);
+                      }}
+                      placeholder="Selecionar data do saldo inicial"
+                      error={errors.initialBalanceDate}
+                      className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                    />
+                  </FormField>
+                </div>
+              )}
             </div>
 
             {/* Seção: Personalização */}
