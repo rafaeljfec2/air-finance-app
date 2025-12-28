@@ -3,14 +3,14 @@ import { Button } from '@/components/ui/button';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { Modal } from '@/components/ui/Modal';
 import { useActiveCompany } from '@/hooks/useActiveCompany';
+import { useAuth } from '@/hooks/useAuth';
 import { companyService } from '@/services/companyService';
-import { useAuthStore } from '@/stores/auth';
 import { formatDocument } from '@/utils/formatDocument';
 import { useQuery } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export function CompanySelectionModal() {
-  const { user } = useAuthStore();
+  const { user, isLoadingUser } = useAuth();
   const { activeCompany, changeActiveCompany, clearActiveCompany } = useActiveCompany();
 
   const {
@@ -21,30 +21,27 @@ export function CompanySelectionModal() {
   } = useQuery({
     queryKey: ['companies', user?.id],
     queryFn: () => companyService.getUserCompanies(),
-    enabled: !!user,
+    enabled: !!user && !isLoadingUser,
   });
 
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
   const hasCompanies = Array.isArray(companies) && companies.length > 0;
-  // Show modal if user is logged in and there's no valid active company
-  // Check for null, undefined, or invalid company (missing id)
-  const hasValidActiveCompany = activeCompany?.id;
-  const shouldShowModal = !!user && !hasValidActiveCompany;
-
+  
   // Memoize first company ID to avoid unnecessary re-renders
   const firstCompanyId = useMemo(() => {
     return hasCompanies && companies[0]?.id ? companies[0].id : null;
   }, [hasCompanies, companies]);
 
-  // Stabilize clearActiveCompany callback to avoid infinite loops
-  const handleClearActiveCompany = useCallback(() => {
-    clearActiveCompany();
-  }, [clearActiveCompany]);
+  // Show modal if user is logged in and there's no valid active company
+  // Check for null, undefined, or invalid company (missing id)
+  // Don't show modal while user or companies are still loading
+  const hasValidActiveCompany = !!activeCompany?.id;
+  const shouldShowModal =
+    !!user && !isLoadingUser && !isLoading && !hasValidActiveCompany && hasCompanies;
 
+  // Set selected company ID when companies load or activeCompany changes
   useEffect(() => {
-    if (!user) {
-      setSelectedCompanyId('');
-      handleClearActiveCompany();
+    if (!user || isLoading || isLoadingUser) {
       return;
     }
 
@@ -53,10 +50,54 @@ export function CompanySelectionModal() {
       return;
     }
 
-    if (firstCompanyId) {
+    // Set first company as selected (for display in modal)
+    if (firstCompanyId && !activeCompany?.id) {
       setSelectedCompanyId(firstCompanyId);
     }
-  }, [user, activeCompany?.id, firstCompanyId, handleClearActiveCompany]);
+  }, [
+    user,
+    isLoading,
+    isLoadingUser,
+    activeCompany?.id,
+    firstCompanyId,
+  ]);
+
+  // Auto-select first company if there's only one and no active company is set
+  useEffect(() => {
+    if (!user || isLoading || isLoadingUser || !hasCompanies) {
+      return;
+    }
+
+    // Only auto-select if there's no active company
+    if (activeCompany?.id) {
+      return;
+    }
+
+    // If there's only one company, auto-select it immediately
+    if (companies.length === 1 && firstCompanyId) {
+      const singleCompany = companies[0];
+      if (singleCompany?.id) {
+        changeActiveCompany(singleCompany);
+      }
+    }
+  }, [
+    user,
+    isLoading,
+    isLoadingUser,
+    hasCompanies,
+    companies,
+    activeCompany?.id,
+    firstCompanyId,
+    changeActiveCompany,
+  ]);
+
+  // Clear active company if user logs out
+  useEffect(() => {
+    if (!user) {
+      setSelectedCompanyId('');
+      clearActiveCompany();
+    }
+  }, [user, clearActiveCompany]);
 
   const handleConfirmSelection = () => {
     if (!selectedCompanyId) return;

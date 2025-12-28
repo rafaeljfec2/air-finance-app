@@ -1,21 +1,21 @@
 import { Loading } from '@/components/Loading';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { useActiveCompany } from '@/hooks/useActiveCompany';
+import { useAuth } from '@/hooks/useAuth';
 import { companyService } from '@/services/companyService';
-import { useAuthStore } from '@/stores/auth';
 import { Company } from '@/types/company';
 import { formatDocument } from '@/utils/formatDocument';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 export const CompanySelector = () => {
-  const { user } = useAuthStore();
+  const { user, isLoadingUser } = useAuth();
   const { activeCompany, changeActiveCompany } = useActiveCompany();
 
   const { data: companies, isLoading } = useQuery({
     queryKey: ['companies', user?.id],
     queryFn: () => companyService.getUserCompanies(),
-    enabled: !!user,
+    enabled: !!user && !isLoadingUser,
   });
 
   // Convert companies to ComboBox options (must be before early returns)

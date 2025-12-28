@@ -1,6 +1,7 @@
 import { useAuthStore } from '@/stores/auth';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import {
   getCurrentUser,
   login,
@@ -38,6 +39,13 @@ export const useAuth = () => {
     enabled: hasToken, // Só executa se houver token
   });
 
+  // Sincronizar user do React Query com o Zustand store quando disponível
+  useEffect(() => {
+    if (user) {
+      setUser(user);
+    }
+  }, [user, setUser]);
+
   const loginMutation = useMutation({
     mutationFn: async (variables: LoginOptions & LoginData) => {
       const { rememberMe, ...loginData } = variables;
@@ -70,6 +78,9 @@ export const useAuth = () => {
     onSuccess: async () => {
       authUtils.clearAuth();
       queryClient.removeQueries({ queryKey: ['user'] });
+      queryClient.removeQueries({ queryKey: ['companies'] });
+      setUser(null);
+      setToken(null);
       navigate('/');
     },
   });
