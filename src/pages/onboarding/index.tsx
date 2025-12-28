@@ -87,60 +87,146 @@ export default function OnboardingPage() {
     handleNextStep();
   };
 
-  const handleFinalCompletion = async () => {
+  /**
+   * Maps company form data to backend API format
+   */
+  const mapCompanyPayload = (company: CompanyFormData): Record<string, unknown> => {
+    const payload: Record<string, unknown> = {
+      name: company.name,
+      type: company.type,
+      foundationDate: new Date().toISOString().split('T')[0],
+      cnpj: '00000000000000', // Default placeholder
+    };
+
+    // Remove formatting from document (dots, slashes, hyphens) before sending
+    if (company.document?.trim()) {
+      payload.cnpj = company.document.replace(/\D/g, '');
+    }
+
+    return payload;
+  };
+
+  /**
+   * Creates a company and returns its ID
+   */
+  const createCompany = async (company: CompanyFormData): Promise<string> => {
+    const companyPayload = mapCompanyPayload(company);
+    const response = await api.post('/companies', companyPayload);
+    return response.data._id;
+  };
+
+  /**
+   * Creates an account and returns its ID
+   */
+  const createAccount = async (account: AccountFormData, companyId: string): Promise<string> => {
+    const response = await api.post('/accounts', {
+      ...account,
+      companyId,
+      initialBalanceDate: new Date().toISOString(),
+    });
+    return response.data._id;
+  };
+
+  /**
+   * Creates all categories for the company
+   */
+  const createCategories = async (
+    categories: CategoryFormData[],
+    companyId: string,
+  ): Promise<void> => {
+    await Promise.all(
+      categories.map((category) =>
+        api.post('/categories', {
+          ...category,
+          companyId,
+        }),
+      ),
+    );
+  };
+
+  /**
+   * Creates a goal if provided
+   */
+  const createGoal = async (
+    goal: GoalFormData,
+    companyId: string,
+    accountId?: string,
+  ): Promise<void> => {
+    await api.post('/goals', {
+      ...goal,
+      companyId,
+      accountId: accountId || undefined,
+    });
+  };
+
+  /**
+   * Creates a recurring transaction if provided
+   */
+  const createRecurringTransaction = async (
+    recurringTransaction: RecurringTransactionFormData,
+    companyId: string,
+    accountId?: string,
+  ): Promise<void> => {
+    await api.post('/recurring-transactions', {
+      ...recurringTransaction,
+      companyId,
+      accountId: accountId || undefined,
+    });
+  };
+
+  /**
+   * Marks onboarding as complete and redirects to dashboard
+   */
+  const completeOnboarding = async (): Promise<void> => {
+    const response = await api.post('/user/onboarding/complete');
+    if (response.status === 201 || response.status === 200) {
+      await refetchUser();
+      navigate('/dashboard');
+    }
+  };
+
+  /**
+   * Handles the final completion of the onboarding process
+   * Creates all entities in sequence: company, account, categories, goal, recurring transaction
+   */
+  const handleFinalCompletion = async (): Promise<void> => {
     setIsLoading(true);
+
     try {
-      // 1. Create Company
-      if (!formData.company) throw new Error('Dados da empresa faltando');
-      const companyRes = await api.post('/companies', formData.company);
-      const companyId = companyRes.data._id;
+      if (!formData.company) {
+        throw new Error('Dados da empresa são obrigatórios');
+      }
 
-      // 2. Create Account
-      let accountId = '';
+      // 1. Create company
+      const companyId = await createCompany(formData.company);
+
+      // 2. Create account (optional)
+      let accountId: string | undefined;
       if (formData.account) {
-        const accountRes = await api.post('/accounts', {
-          ...formData.account,
-          companyId,
-          initialBalanceDate: new Date().toISOString(),
-        });
-        accountId = accountRes.data._id;
+        accountId = await createAccount(formData.account, companyId);
       }
 
-      // 3. Create Categories
-      for (const cat of formData.categories) {
-        await api.post(`/categories`, {
-          ...cat,
-          companyId,
-        });
+      // 3. Create categories
+      if (formData.categories.length > 0) {
+        await createCategories(formData.categories, companyId);
       }
 
-      // 4. Create Goal (Optional)
+      // 4. Create goal (optional)
       if (formData.goal) {
-        await api.post(`/goals`, {
-          ...formData.goal,
-          companyId,
-          accountId: accountId || undefined, // Attach to created account if exists
-        });
+        await createGoal(formData.goal, companyId, accountId);
       }
 
-      // 5. Create Recurring Transaction (Optional)
+      // 5. Create recurring transaction (optional)
       if (formData.recurringTransaction) {
-        await api.post(`/recurring-transactions`, {
-          ...formData.recurringTransaction,
-          companyId,
-          accountId: accountId || undefined,
-        });
+        await createRecurringTransaction(formData.recurringTransaction, companyId, accountId);
       }
 
-      // 6. Mark Onboarding as Complete
-      const completeRes = await api.post('/user/onboarding/complete');
-      if (completeRes.status === 201 || completeRes.status === 200) {
-        await refetchUser(); // Update local user state
-        navigate('/dashboard');
-      }
+      // 6. Complete onboarding
+      await completeOnboarding();
     } catch (error) {
       console.error('Erro ao finalizar onboarding:', error);
-      // Here you might want to show a toast error
+      // TODO: Show user-friendly error message (toast/alert)
+      throw error;
     } finally {
       setIsLoading(false);
     }
