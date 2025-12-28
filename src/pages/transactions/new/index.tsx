@@ -63,7 +63,7 @@ export function NewTransaction() {
         {/* Fixed Header */}
         <div className="sticky top-0 z-10 bg-background/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-border dark:border-border-dark">
           <div className="container mx-auto px-4">
-            <div className="flex items-center py-4">
+            <div className="flex items-center py-3">
               <button
                 onClick={() => navigate('/transactions')}
                 className="p-2 hover:bg-card dark:hover:bg-card-dark rounded-lg transition-colors"
@@ -83,7 +83,7 @@ export function NewTransaction() {
           </div>
         </div>
 
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-4 py-4">
           <Card className="bg-card dark:bg-card-dark border border-border dark:border-border-dark w-full sm:max-w-[60%] sm:mx-auto shadow-lgp-4 sm:p-6">
             <form
               id="transaction-form"
@@ -144,7 +144,7 @@ export function NewTransaction() {
               <NoteField value={formData.note ?? ''} onChange={handleChange} />
 
               {/* Submit Button */}
-              <div className="p-4 sm:p-6 bg-background dark:bg-background-dark rounded-b-lg">
+              <div className="p-3 sm:p-4 bg-background dark:bg-background-dark rounded-b-lg">
                 <div className="flex gap-3">
                   <Button
                     type="button"

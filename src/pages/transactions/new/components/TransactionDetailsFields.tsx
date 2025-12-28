@@ -66,8 +66,8 @@ export function TransactionDetailsFields({
   // Para cartão de crédito: mostrar apenas valor e parcelas
   if (isCreditCard) {
     return (
-      <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="p-3 sm:p-4 bg-background dark:bg-background-dark">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Valor */}
           <div>
             <label
@@ -140,10 +140,10 @@ export function TransactionDetailsFields({
 
   // Para outras contas: mostrar campos baseados em variável ou recorrente
   return (
-    <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
+    <div className="p-3 sm:p-4 bg-background dark:bg-background-dark">
       {isRecurring ? (
         // Campos para transação recorrente
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {/* Data inicial */}
           <div className="flex flex-col">
             <DatePicker
@@ -257,7 +257,7 @@ export function TransactionDetailsFields({
         </div>
       ) : (
         // Campos para transação variável
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Data */}
           <div className="flex flex-col">
             <DatePicker

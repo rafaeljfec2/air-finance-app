@@ -7,7 +7,7 @@ interface NoteFieldProps {
 
 export function NoteField({ value, onChange }: Readonly<NoteFieldProps>) {
   return (
-    <div className="p-4 sm:p-6 space-y-4 bg-background dark:bg-background-dark">
+    <div className="p-3 sm:p-4 space-y-2 bg-background dark:bg-background-dark">
       <div>
         <label
           htmlFor="note"

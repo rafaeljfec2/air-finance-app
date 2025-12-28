@@ -53,9 +53,9 @@ export function AccountCategoryTypeFields({
   );
 
   return (
-    <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
+    <div className="p-3 sm:p-4 bg-background dark:bg-background-dark">
       <div
-        className={`grid grid-cols-1 sm:grid-cols-2 ${isCreditCard ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4`}
+        className={`grid grid-cols-1 sm:grid-cols-2 ${isCreditCard ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-3`}
       >
         {/* Conta */}
         <div>

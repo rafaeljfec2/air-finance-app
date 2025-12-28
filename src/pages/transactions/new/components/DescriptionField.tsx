@@ -18,7 +18,7 @@ export function DescriptionField({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="p-4 sm:p-6 bg-background dark:bg-background-dark">
+    <div className="p-3 sm:p-4 bg-background dark:bg-background-dark">
       <label
         htmlFor="description"
         className="block text-sm font-medium text-text dark:text-text-dark mb-1"
