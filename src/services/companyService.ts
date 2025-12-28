@@ -3,23 +3,81 @@ import { parseApiError } from '@/utils/apiErrorHandler';
 import { z } from 'zod';
 import { apiClient } from './apiClient';
 
-// Helper function to normalize dates from backend (handles empty objects, Date objects, and strings)
+const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Normalizes a date value to ISO datetime string format
+ * Handles empty objects, Date objects, date-only strings (YYYY-MM-DD), and ISO datetime strings
+ */
 function normalizeDate(value: unknown): string {
+  // Handle string values
   if (typeof value === 'string') {
-    return value;
+    // Already a valid ISO datetime string
+    if (value.includes('T')) {
+      return value;
+    }
+    // Try to parse and convert
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed.toISOString();
+    }
   }
+
+  // Handle Date instances
   if (value instanceof Date) {
     return value.toISOString();
   }
-  if (value && typeof value === 'object' && Object.keys(value).length === 0) {
-    // Empty object - return current date as fallback
-    return new Date().toISOString();
-  }
+
+  // Handle objects with toISOString method
   if (value && typeof value === 'object' && 'toISOString' in value) {
     return (value as Date).toISOString();
   }
-  // Fallback to current date if value is null, undefined, or invalid
+
+  // Handle empty objects (common issue from backend)
+  if (value && typeof value === 'object' && Object.keys(value).length === 0) {
+    return new Date().toISOString();
+  }
+
+  // Fallback to current date
   return new Date().toISOString();
+}
+
+/**
+ * Normalizes foundationDate which can be date-only (YYYY-MM-DD) or datetime
+ * Converts date-only format to datetime by appending T00:00:00.000Z
+ */
+function normalizeFoundationDate(value: unknown): string {
+  // Handle string values
+  if (typeof value === 'string') {
+    // Already a valid ISO datetime string
+    if (value.includes('T')) {
+      return value;
+    }
+    // Date-only format (YYYY-MM-DD) - convert to datetime
+    if (DATE_ONLY_REGEX.exec(value)) {
+      return `${value}T00:00:00.000Z`;
+    }
+    // Try to parse and convert
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed.toISOString();
+    }
+  }
+
+  // Delegate to normalizeDate for other cases (Date instances, objects, etc)
+  return normalizeDate(value);
+}
+
+/**
+ * Transforms company data by normalizing date fields before validation
+ */
+function transformCompanyData(company: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...company,
+    createdAt: normalizeDate(company.createdAt),
+    updatedAt: normalizeDate(company.updatedAt),
+    foundationDate: normalizeFoundationDate(company.foundationDate),
+  };
 }
 
 // Validation schemas
@@ -50,69 +108,101 @@ export const CreateCompanySchema = CompanySchema.omit({
 
 export type CreateCompany = Omit<Company, 'id' | 'createdAt' | 'updatedAt'>;
 
+/**
+ * Prepares company data for API requests by converting foundationDate to ISO string
+ */
+function prepareCompanyPayload(
+  data: CreateCompany | Partial<CreateCompany>,
+): Record<string, unknown> {
+  return {
+    ...data,
+    foundationDate: data.foundationDate ? new Date(data.foundationDate).toISOString() : '',
+  };
+}
+
 export const companyService = {
+  /**
+   * Fetches all companies
+   */
   getAll: async (): Promise<Company[]> => {
     try {
-      const response = await apiClient.get<Company[]>('/companies');
-      return CompanySchema.array().parse(response.data);
-    } catch (error) {
-      throw parseApiError(error);
-    }
-  },
-
-  getUserCompanies: async (): Promise<Company[]> => {
-    try {
-      const response = await apiClient.get<unknown>('/user/me/companies');
-      // Transform dates before validation to handle empty objects from backend
+      const response = await apiClient.get<unknown>('/companies');
       const data = response.data as Array<Record<string, unknown>>;
-      const transformedData = data.map((company) => ({
-        ...company,
-        createdAt: normalizeDate(company.createdAt),
-        updatedAt: normalizeDate(company.updatedAt),
-      }));
+      const transformedData = data.map(transformCompanyData);
       return CompanySchema.array().parse(transformedData);
     } catch (error) {
       throw parseApiError(error);
     }
   },
 
+  /**
+   * Fetches companies associated with the current user
+   */
+  getUserCompanies: async (): Promise<Company[]> => {
+    try {
+      const response = await apiClient.get<unknown>('/user/me/companies');
+      const data = response.data as Array<Record<string, unknown>>;
+
+      if (!Array.isArray(data)) {
+        return [];
+      }
+
+      const transformedData = data.map(transformCompanyData);
+      return CompanySchema.array().parse(transformedData);
+    } catch (error) {
+      throw parseApiError(error);
+    }
+  },
+
+  /**
+   * Fetches a company by ID
+   */
   getById: async (companyId: string): Promise<Company> => {
     try {
-      const response = await apiClient.get<Company>(`/companies/${companyId}`);
-      return CompanySchema.parse(response.data);
+      const response = await apiClient.get<unknown>(`/companies/${companyId}`);
+      const company = response.data as Record<string, unknown>;
+      const transformedCompany = transformCompanyData(company);
+      return CompanySchema.parse(transformedCompany);
     } catch (error) {
       throw parseApiError(error);
     }
   },
 
+  /**
+   * Creates a new company
+   */
   create: async (data: CreateCompany): Promise<Company> => {
     try {
-      const dataToValidate = {
-        ...data,
-        foundationDate: data.foundationDate ? new Date(data.foundationDate).toISOString() : '',
-      };
-      const validatedData = CreateCompanySchema.parse(dataToValidate);
-      const response = await apiClient.post<Company>('/companies', validatedData);
-      return CompanySchema.parse(response.data);
+      const payload = prepareCompanyPayload(data);
+      const validatedData = CreateCompanySchema.parse(payload);
+      const response = await apiClient.post<unknown>('/companies', validatedData);
+      const company = response.data as Record<string, unknown>;
+      const transformedCompany = transformCompanyData(company);
+      return CompanySchema.parse(transformedCompany);
     } catch (error) {
       throw parseApiError(error);
     }
   },
 
+  /**
+   * Updates an existing company
+   */
   update: async (companyId: string, data: Partial<CreateCompany>): Promise<Company> => {
     try {
-      const dataToValidate = {
-        ...data,
-        foundationDate: data.foundationDate ? new Date(data.foundationDate).toISOString() : '',
-      };
-      const validatedData = CreateCompanySchema.partial().parse(dataToValidate);
-      const response = await apiClient.put<Company>(`/companies/${companyId}`, validatedData);
-      return CompanySchema.parse(response.data);
+      const payload = prepareCompanyPayload(data);
+      const validatedData = CreateCompanySchema.partial().parse(payload);
+      const response = await apiClient.put<unknown>(`/companies/${companyId}`, validatedData);
+      const company = response.data as Record<string, unknown>;
+      const transformedCompany = transformCompanyData(company);
+      return CompanySchema.parse(transformedCompany);
     } catch (error) {
       throw parseApiError(error);
     }
   },
 
+  /**
+   * Deletes a company
+   */
   delete: async (companyId: string): Promise<void> => {
     try {
       await apiClient.delete(`/companies/${companyId}`);
