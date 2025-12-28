@@ -21,7 +21,7 @@ import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { type RecurringTransactionFormData, RecurringTransactionSchema } from '../schemas';
 
@@ -29,12 +29,18 @@ interface RecurringStepProps {
   onNext: (data: RecurringTransactionFormData | null) => void;
   onBack: () => void;
   accountName?: string;
+  initialData?: RecurringTransactionFormData | null;
 }
 
-export function RecurringStep({ onNext, onBack, accountName }: Readonly<RecurringStepProps>) {
+export function RecurringStep({
+  onNext,
+  onBack,
+  accountName,
+  initialData,
+}: Readonly<RecurringStepProps>) {
   const recurringTransactionForm = useForm<RecurringTransactionFormData>({
     resolver: zodResolver(RecurringTransactionSchema),
-    defaultValues: {
+    defaultValues: initialData || {
       type: 'Expense',
       frequency: 'monthly',
       value: 0,
@@ -48,6 +54,16 @@ export function RecurringStep({ onNext, onBack, accountName }: Readonly<Recurrin
   });
 
   const [recurringTransactionValueInput, setRecurringTransactionValueInput] = useState('');
+
+  // Initialize form and local state when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      recurringTransactionForm.reset(initialData);
+      if (initialData.value) {
+        setRecurringTransactionValueInput(formatCurrencyInput(String(initialData.value)));
+      }
+    }
+  }, [initialData, recurringTransactionForm]);
 
   return (
     <motion.div

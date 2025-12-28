@@ -112,19 +112,51 @@ export default function OnboardingPage() {
   const createCompany = async (company: CompanyFormData): Promise<string> => {
     const companyPayload = mapCompanyPayload(company);
     const response = await api.post('/companies', companyPayload);
-    return response.data._id;
+    return response.data.id || response.data._id;
+  };
+
+  /**
+   * Maps account form data to backend API format
+   */
+  const mapAccountPayload = (
+    account: AccountFormData,
+    companyId: string,
+  ): Record<string, unknown> => {
+    const payload: Record<string, unknown> = {
+      companyId,
+      name: account.name,
+      type: account.type,
+      institution: account.institution,
+      initialBalance: account.initialBalance ?? 0,
+      initialBalanceDate: new Date().toISOString(),
+      color: account.color ?? '#8A05BE',
+      icon: account.icon ?? 'Banknote',
+    };
+
+    // Backend requires agency and accountNumber to be non-empty strings
+    // Use empty string as default if not provided
+    if (account.agency?.trim()) {
+      payload.agency = account.agency.trim();
+    } else {
+      payload.agency = '';
+    }
+
+    if (account.accountNumber?.trim()) {
+      payload.accountNumber = account.accountNumber.trim();
+    } else {
+      payload.accountNumber = '';
+    }
+
+    return payload;
   };
 
   /**
    * Creates an account and returns its ID
    */
   const createAccount = async (account: AccountFormData, companyId: string): Promise<string> => {
-    const response = await api.post('/accounts', {
-      ...account,
-      companyId,
-      initialBalanceDate: new Date().toISOString(),
-    });
-    return response.data._id;
+    const accountPayload = mapAccountPayload(account, companyId);
+    const response = await api.post(`/companies/${companyId}/accounts`, accountPayload);
+    return response.data.id || response.data._id;
   };
 
   /**
@@ -136,7 +168,7 @@ export default function OnboardingPage() {
   ): Promise<void> => {
     await Promise.all(
       categories.map((category) =>
-        api.post('/categories', {
+        api.post(`/companies/${companyId}/categories`, {
           ...category,
           companyId,
         }),
@@ -248,6 +280,7 @@ export default function OnboardingPage() {
                 onNext={handleCompanySubmit}
                 onBack={handlePrevStep}
                 loading={isLoading}
+                initialData={formData.company}
               />
             )}
 
@@ -256,6 +289,7 @@ export default function OnboardingPage() {
                 onNext={handleAccountSubmit}
                 onBack={handlePrevStep}
                 loading={isLoading}
+                initialData={formData.account}
               />
             )}
 
@@ -272,6 +306,7 @@ export default function OnboardingPage() {
                 onNext={handleGoalSubmit}
                 onBack={handlePrevStep}
                 accountName={formData.account?.name}
+                initialData={formData.goal}
               />
             )}
 
@@ -280,6 +315,7 @@ export default function OnboardingPage() {
                 onNext={handleRecurringSubmit}
                 onBack={handlePrevStep}
                 accountName={formData.account?.name}
+                initialData={formData.recurringTransaction}
               />
             )}
 

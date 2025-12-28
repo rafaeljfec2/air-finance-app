@@ -26,6 +26,7 @@ import {
   Loader2,
   Wallet,
 } from 'lucide-react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { type AccountFormData, AccountSchema } from '../schemas';
 
@@ -33,10 +34,26 @@ interface AccountStepProps {
   onNext: (data: AccountFormData) => void;
   onBack: () => void;
   loading: boolean;
+  initialData?: AccountFormData | null;
 }
 
-export function AccountStep({ onNext, onBack, loading }: Readonly<AccountStepProps>) {
-  const accountForm = useForm<AccountFormData>({ resolver: zodResolver(AccountSchema) });
+export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<AccountStepProps>) {
+  const accountForm = useForm<AccountFormData>({
+    resolver: zodResolver(AccountSchema),
+    defaultValues: initialData || {
+      type: 'checking',
+      initialBalance: 0,
+      color: '#8A05BE',
+      icon: 'Banknote',
+    },
+  });
+
+  // Initialize form when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      accountForm.reset(initialData);
+    }
+  }, [initialData, accountForm]);
 
   return (
     <motion.div

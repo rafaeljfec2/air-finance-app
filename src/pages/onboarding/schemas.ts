@@ -31,6 +31,8 @@ export const AccountSchema = z.object({
   institution: z.string().min(2, 'Informe a instituição'),
   agency: z.string().optional(),
   accountNumber: z.string().optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida').default('#8A05BE'),
+  icon: z.string().min(1, 'Ícone é obrigatório').default('Banknote'),
 });
 
 export const CategorySchema = z.object({

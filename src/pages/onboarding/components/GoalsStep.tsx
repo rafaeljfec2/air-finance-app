@@ -14,7 +14,7 @@ import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { type GoalFormData, GoalSchema } from '../schemas';
 
@@ -22,17 +22,33 @@ interface GoalsStepProps {
   onNext: (data: GoalFormData | null) => void;
   onBack: () => void;
   accountName?: string;
+  initialData?: GoalFormData | null;
 }
 
-export function GoalsStep({ onNext, onBack, accountName }: Readonly<GoalsStepProps>) {
+export function GoalsStep({
+  onNext,
+  onBack,
+  accountName,
+  initialData,
+}: Readonly<GoalsStepProps>) {
   const goalForm = useForm<GoalFormData>({
     resolver: zodResolver(GoalSchema),
-    defaultValues: {
+    defaultValues: initialData || {
       targetAmount: 0,
     },
   });
 
   const [goalTargetAmountInput, setGoalTargetAmountInput] = useState('');
+
+  // Initialize form and local state when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      goalForm.reset(initialData);
+      if (initialData.targetAmount) {
+        setGoalTargetAmountInput(formatCurrencyInput(String(initialData.targetAmount)));
+      }
+    }
+  }, [initialData, goalForm]);
 
   return (
     <motion.div

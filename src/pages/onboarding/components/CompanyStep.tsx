@@ -26,7 +26,7 @@ import {
   Loader2,
   XCircle,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { type CompanyFormData, CompanySchema } from '../schemas';
 
@@ -34,18 +34,26 @@ interface CompanyStepProps {
   onNext: (data: CompanyFormData) => void;
   onBack: () => void;
   loading: boolean;
+  initialData?: CompanyFormData | null;
 }
 
-export function CompanyStep({ onNext, onBack, loading }: Readonly<CompanyStepProps>) {
+export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<CompanyStepProps>) {
   const companyForm = useForm<CompanyFormData>({
     resolver: zodResolver(CompanySchema),
-    defaultValues: {
+    defaultValues: initialData || {
       documentType: 'cnpj',
     },
   });
 
   const [documentValid, setDocumentValid] = useState<boolean | null>(null);
   const documentType = companyForm.watch('documentType');
+
+  // Initialize form when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      companyForm.reset(initialData);
+    }
+  }, [initialData, companyForm]);
 
   return (
     <motion.div
