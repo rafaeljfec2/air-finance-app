@@ -8,7 +8,7 @@ interface OnboardingGuardProps {
 }
 
 export function OnboardingGuard({ children }: OnboardingGuardProps) {
-  const { user, isLoadingUser } = useAuth(); // Changed loading to isLoadingUser based on useAuth.ts
+  const { user, isLoadingUser } = useAuth();
   const location = useLocation();
 
   if (isLoadingUser) {
@@ -26,30 +26,19 @@ export function OnboardingGuard({ children }: OnboardingGuardProps) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Check if user has verified their email
   const isEmailVerified = user.emailVerified === true;
 
-  // User needs onboarding only if:
-  // 1. Email is verified (emailVerified === true)
-  // 2. Onboarding is not completed (onboardingCompleted !== true)
-  // We treat undefined/null/false as "not completed"
   const onboardingNotCompleted = user.onboardingCompleted !== true;
   const needsOnboarding = isEmailVerified && onboardingNotCompleted;
 
-  // If email is not verified, user cannot access onboarding
-  // Redirect them away from onboarding (to dashboard)
   if (!isEmailVerified && location.pathname.startsWith('/onboarding')) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // If user needs onboarding (email verified + onboarding not completed) and is not already on /onboarding
-  // Redirect them to onboarding
   if (needsOnboarding && !location.pathname.startsWith('/onboarding')) {
     return <Navigate to="/onboarding" replace />;
   }
 
-  // If user doesn't need onboarding (email not verified OR onboarding completed) and tries to access /onboarding
-  // Redirect them away from onboarding (to dashboard)
   if (!needsOnboarding && location.pathname.startsWith('/onboarding')) {
     return <Navigate to="/dashboard" replace />;
   }
