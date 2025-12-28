@@ -15,6 +15,7 @@ export interface ViewPreferences {
   'credit-cards-view-mode'?: 'grid' | 'list';
   'goals-view-mode'?: 'grid' | 'list';
   'recurring-transactions-view-mode'?: 'grid' | 'list';
+  'users-view-mode'?: 'grid' | 'list';
 }
 
 /**

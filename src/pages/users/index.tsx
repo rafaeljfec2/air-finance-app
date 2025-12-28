@@ -1,20 +1,44 @@
+import { Loading } from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { DeleteAllUserDataModal } from '@/components/users/DeleteAllUserDataModal';
+import { UserFormModal } from '@/components/users/UserFormModal';
 import { useUsers } from '@/hooks/useUsers';
+import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { CreateUser } from '@/services/userService';
-import { useCompanyStore } from '@/stores/company';
-import { Trash2, User } from 'lucide-react';
-import React, { useState } from 'react';
+import { cn } from '@/lib/utils';
+import { CreateUser, User } from '@/services/userService';
+import { Edit, Grid3x3, List, Plus, Search, Trash2, User as UserIcon } from 'lucide-react';
+import { useMemo, useState } from 'react';
+
+const roleOptions = [
+  { value: 'all', label: 'Todas as funções' },
+  { value: 'admin', label: 'Administrador' },
+  { value: 'user', label: 'Usuário' },
+] as const;
+
+const statusOptions = [
+  { value: 'all', label: 'Todos os status' },
+  { value: 'active', label: 'Ativo' },
+  { value: 'inactive', label: 'Inativo' },
+] as const;
+
+function getRoleBadgeColor(role: 'admin' | 'user'): string {
+  return role === 'admin'
+    ? 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+    : 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+}
+
+function getStatusBadgeColor(status: 'active' | 'inactive'): string {
+  return status === 'active'
+    ? 'bg-green-500/20 text-green-400 border-green-500/30'
+    : 'bg-red-500/20 text-red-400 border-red-500/30';
+}
 
 export function UsersPage() {
-  const { activeCompany } = useCompanyStore();
-  const companyId = activeCompany?.id || '';
   const {
     users,
     isLoading,
@@ -27,89 +51,46 @@ export function UsersPage() {
     isDeleting,
   } = useUsers();
 
-  const [form, setForm] = useState<CreateUser>({
-    name: '',
-    email: '',
-    role: 'user' as 'admin' | 'user',
-    status: 'active' as 'active' | 'inactive',
-    companyIds: companyId ? [companyId] : [],
-  });
-
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showDeleteAllDataModal, setShowDeleteAllDataModal] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterRole, setFilterRole] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [viewMode, setViewMode] = useViewMode('users-view-mode');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+  const filteredUsers = useMemo(() => {
+    if (!users) return [];
+    return users.filter((user) => {
+      const matchesSearch =
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesRole = filterRole === 'all' || user.role === filterRole;
+      const matchesStatus = filterStatus === 'all' || user.status === filterStatus;
+      return matchesSearch && matchesRole && matchesStatus;
+    });
+  }, [users, searchTerm, filterRole, filterStatus]);
+
+  const handleCreate = () => {
+    setEditingUser(null);
+    setShowFormModal(true);
   };
 
-  const validate = () => {
-    const errs: Record<string, string> = {};
-    if (!form.name.trim()) errs.name = 'Nome obrigatório';
-    if (!form.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email))
-      errs.email = 'E-mail inválido';
-    if (!form.companyIds || form.companyIds.length === 0) errs.companyIds = 'Empresa obrigatória';
-    return errs;
+  const handleEdit = (user: User) => {
+    setEditingUser(user);
+    setShowFormModal(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const errs = validate();
-    setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
-
-    try {
-      if (editingId) {
-        // Prepare data matching CreateUser structure
-        const updateData: CreateUser = {
-          name: form.name,
-          email: form.email,
-          role: form.role,
-          status: form.status,
-          companyIds: form.companyIds,
-          integrations: form.integrations,
-        };
-        updateUser({ id: editingId, data: updateData });
-        setEditingId(null);
-      } else {
-        createUser(form);
-      }
-      setForm({
-        name: '',
-        email: '',
-        role: 'user',
-        status: 'active',
-        companyIds: companyId ? [companyId] : [],
-        integrations: {
-          openaiApiKey: '',
-          openaiModel: 'gpt-3.5-turbo',
-        },
-      });
-      setErrors({});
-    } catch (error) {
-      console.error('Erro ao salvar usuário:', error);
+  const handleSubmit = (data: CreateUser) => {
+    if (editingUser) {
+      updateUser({ id: editingUser.id, data });
+    } else {
+      createUser(data);
     }
-  };
-
-  const handleEdit = (id: string) => {
-    const user = users?.find((u) => u.id === id);
-    if (user) {
-      setForm({
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        status: user.status,
-        companyIds: user.companyIds,
-        integrations: {
-          openaiApiKey: user.integrations?.openaiApiKey || '',
-          openaiModel: user.integrations?.openaiModel || 'gpt-3.5-turbo',
-        },
-      });
-      setEditingId(id);
-    }
+    setShowFormModal(false);
+    setEditingUser(null);
   };
 
   const handleDelete = (id: string) => {
@@ -117,13 +98,9 @@ export function UsersPage() {
     setDeleteId(id);
   };
 
-  const confirmDelete = async () => {
+  const confirmDelete = () => {
     if (deleteId) {
-      try {
-        await deleteUser(deleteId);
-      } catch (error) {
-        console.error('Erro ao deletar usuário:', error);
-      }
+      deleteUser(deleteId);
     }
     setShowConfirmDelete(false);
     setDeleteId(null);
@@ -137,14 +114,8 @@ export function UsersPage() {
   if (isLoading) {
     return (
       <ViewDefault>
-        <div className="container mx-auto px-2 sm:px-6 py-10">
-          <div className="animate-pulse">
-            <div className="h-8 w-48 bg-gray-200 rounded mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="h-96 bg-gray-200 rounded"></div>
-              <div className="h-96 bg-gray-200 rounded"></div>
-            </div>
-          </div>
+        <div className="container mx-auto px-4 sm:px-6 py-10">
+          <Loading size="large">Carregando usuários, por favor aguarde...</Loading>
         </div>
       </ViewDefault>
     );
@@ -153,7 +124,7 @@ export function UsersPage() {
   if (error) {
     return (
       <ViewDefault>
-        <div className="container mx-auto px-2 sm:px-6 py-10">
+        <div className="container mx-auto px-4 sm:px-6 py-10">
           <div className="text-red-500">Erro ao carregar usuários: {error.message}</div>
         </div>
       </ViewDefault>
@@ -162,205 +133,337 @@ export function UsersPage() {
 
   return (
     <ViewDefault>
-      <div className="container mx-auto px-2 sm:px-6 py-10">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark flex items-center gap-2">
-            <User className="h-6 w-6 text-primary-500" /> Usuários
-          </h1>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => setShowDeleteAllDataModal(true)}
-            className="flex items-center gap-2"
-          >
-            <Trash2 className="h-4 w-4" />
-            Deletar Todos os Dados
-          </Button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Formulário */}
-          <Card className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <FormField label="Nome" error={errors.name}>
-                <Input
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Nome completo"
-                  required
-                />
-              </FormField>
+      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <UserIcon className="h-8 w-8 text-primary-400" />
+                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Usuários</h1>
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Gerencie usuários do sistema
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => setShowDeleteAllDataModal(true)}
+                className="flex items-center gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                Deletar Dados
+              </Button>
+              <Button
+                onClick={handleCreate}
+                className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
+              >
+                <Plus className="h-5 w-5" />
+                Novo Usuário
+              </Button>
+            </div>
+          </div>
 
-              <FormField label="E-mail" error={errors.email}>
-                <Input
-                  name="email"
-                  type="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="exemplo@email.com"
-                  required
-                />
-              </FormField>
-
-              <FormField label="Função" error={errors.role}>
-                <Select
-                  value={form.role}
-                  onValueChange={(value) =>
-                    setForm((prev) => ({ ...prev, role: value as 'user' | 'admin' }))
-                  }
-                >
-                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
-                    {form.role === 'admin' ? 'Administrador' : 'Usuário'}
+          {/* Busca e Filtros */}
+          <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm mb-6">
+            <div className="p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] gap-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Buscar por nome ou email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                  />
+                </div>
+                <Select value={filterRole} onValueChange={setFilterRole}>
+                  <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
+                    <span>
+                      {(() => {
+                        if (filterRole === 'all') return 'Todas as funções';
+                        if (filterRole === 'admin') return 'Administrador';
+                        return 'Usuário';
+                      })()}
+                    </span>
                   </SelectTrigger>
-                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
-                    <SelectItem value="admin">Administrador</SelectItem>
-                    <SelectItem value="user">Usuário</SelectItem>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
+                    {roleOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
-              </FormField>
-
-              <FormField label="Status" error={errors.status}>
-                <Select
-                  value={form.status}
-                  onValueChange={(value) =>
-                    setForm((prev) => ({ ...prev, status: value as 'active' | 'inactive' }))
-                  }
-                >
-                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
-                    {form.status === 'active' ? 'Ativo' : 'Inativo'}
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
+                    <span>
+                      {(() => {
+                        if (filterStatus === 'all') return 'Todos os status';
+                        if (filterStatus === 'active') return 'Ativo';
+                        return 'Inativo';
+                      })()}
+                    </span>
                   </SelectTrigger>
-                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
-                    <SelectItem value="active">Ativo</SelectItem>
-                    <SelectItem value="inactive">Inativo</SelectItem>
+                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
+                    {statusOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
-              </FormField>
-
-              <FormField label="Modelo OpenAI (Padrão)">
-                <Select
-                  value={form.integrations?.openaiModel || 'gpt-3.5-turbo'}
-                  onValueChange={(value) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      integrations: {
-                        ...prev.integrations,
-                        openaiModel: value as
-                          | 'gpt-3.5-turbo'
-                          | 'gpt-4'
-                          | 'gpt-4-turbo'
-                          | 'gpt-5.2'
-                          | 'gpt-5-mini',
-                      },
-                    }))
-                  }
-                >
-                  <SelectTrigger className="bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark">
-                    {form.integrations?.openaiModel || 'gpt-3.5-turbo'}
-                  </SelectTrigger>
-                  <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
-                    <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                    <SelectItem value="gpt-4">GPT-4</SelectItem>
-                    <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
-                    <SelectItem value="gpt-5.2">GPT-5.2</SelectItem>
-                    <SelectItem value="gpt-5-mini">GPT-5 Mini</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormField>
-
-              <div className="flex gap-2 mt-4">
-                <Button
-                  type="submit"
-                  size="sm"
-                  className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-                  disabled={isCreating || isUpdating}
-                >
-                  {editingId ? 'Salvar Alterações' : 'Adicionar Usuário'}
-                </Button>
-                {editingId && (
+                <div className="flex gap-2 border border-border dark:border-border-dark rounded-md overflow-hidden bg-background dark:bg-background-dark">
                   <Button
                     type="button"
+                    variant="ghost"
                     size="sm"
-                    className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-                    onClick={() => {
-                      setForm({
-                        name: '',
-                        email: '',
-                        role: 'user',
-                        status: 'active',
-                        companyIds: companyId ? [companyId] : [],
-                        integrations: {
-                          openaiApiKey: '',
-                          openaiModel: 'gpt-3.5-turbo',
-                        },
-                      });
-                      setEditingId(null);
-                    }}
+                    onClick={() => setViewMode('grid')}
+                    className={cn(
+                      'flex-1 rounded-none border-0',
+                      viewMode === 'grid'
+                        ? 'bg-primary-500 text-white hover:bg-primary-600'
+                        : 'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
+                    )}
                   >
-                    Cancelar
+                    <Grid3x3 className="h-4 w-4" />
                   </Button>
-                )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    className={cn(
+                      'flex-1 rounded-none border-0',
+                      viewMode === 'list'
+                        ? 'bg-primary-500 text-white hover:bg-primary-600'
+                        : 'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
+                    )}
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-            </form>
+            </div>
           </Card>
 
-          {/* Listagem */}
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Usuários Cadastrados</h2>
-            <ul className="divide-y divide-border dark:divide-border-dark">
-              {users?.length === 0 && (
-                <li className="text-gray-400 text-sm">Nenhum usuário cadastrado.</li>
-              )}
-              {users?.map((user) => (
-                <li key={user.id} className="py-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="font-medium text-text dark:text-text-dark">{user.name}</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        <span className="text-xs px-2 py-1 rounded bg-primary-100 text-primary-800">
-                          {user.role === 'admin' ? 'Administrador' : 'Usuário'}
-                        </span>
-                        <span
-                          className={`text-xs px-2 py-1 rounded ${
-                            user.status === 'active'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}
+          {/* Lista de Usuários */}
+          {filteredUsers.length === 0 ? (
+            <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+              <div className="p-12 text-center">
+                <UserIcon className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                {(() => {
+                  const hasFilters = searchTerm || filterRole !== 'all' || filterStatus !== 'all';
+                  const emptyTitle = hasFilters
+                    ? 'Nenhum usuário encontrado'
+                    : 'Nenhum usuário cadastrado';
+                  const emptyDescription = hasFilters
+                    ? 'Tente ajustar os filtros de busca'
+                    : 'Comece criando seu primeiro usuário';
+
+                  return (
+                    <>
+                      <h3 className="text-lg font-semibold text-text dark:text-text-dark mb-2">
+                        {emptyTitle}
+                      </h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                        {emptyDescription}
+                      </p>
+                      {!hasFilters && (
+                        <Button
+                          onClick={handleCreate}
+                          className="bg-primary-500 hover:bg-primary-600 text-white"
                         >
-                          {user.status === 'active' ? 'Ativo' : 'Inativo'}
-                        </span>
-                        {user.integrations?.openaiModel && (
-                          <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-                            🤖 {user.integrations.openaiModel}
+                          <Plus className="h-4 w-4 mr-2" />
+                          Criar Primeiro Usuário
+                        </Button>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </Card>
+          ) : (
+            <>
+              {viewMode === 'grid' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredUsers.map((user) => (
+                    <Card
+                      key={user.id}
+                      className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow"
+                    >
+                      <div className="p-6">
+                        {/* Header do Card */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-lg font-semibold text-text dark:text-text-dark mb-2 truncate">
+                              {user.name}
+                            </h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                              {user.email}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Badges */}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          <span
+                            className={cn(
+                              'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+                              getRoleBadgeColor(user.role),
+                            )}
+                          >
+                            {user.role === 'admin' ? 'Administrador' : 'Usuário'}
                           </span>
-                        )}
+                          <span
+                            className={cn(
+                              'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+                              getStatusBadgeColor(user.status),
+                            )}
+                          >
+                            {user.status === 'active' ? 'Ativo' : 'Inativo'}
+                          </span>
+                          {user.integrations?.openaiModel && (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-blue-500/20 text-blue-400 border-blue-500/30">
+                              🤖 {user.integrations.openaiModel}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Ações */}
+                        <div className="flex gap-2 pt-4 border-t border-border dark:border-border-dark">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEdit(user)}
+                            disabled={isUpdating}
+                            className="flex-1 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Editar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDelete(user.id)}
+                            disabled={isDeleting}
+                            className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-                        onClick={() => handleEdit(user.id)}
-                        disabled={isUpdating}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-md px-6 py-2 transition-colors"
-                        onClick={() => handleDelete(user.id)}
-                        disabled={isDeleting}
-                      >
-                        Excluir
-                      </Button>
-                    </div>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border dark:border-border-dark">
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Nome
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Email
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Função
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Status
+                          </th>
+                          <th className="text-right p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Ações
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredUsers.map((user) => (
+                          <tr
+                            key={user.id}
+                            className="border-b border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark transition-colors"
+                          >
+                            <td className="p-4">
+                              <div className="font-medium text-text dark:text-text-dark">
+                                {user.name}
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                                {user.email}
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              <span
+                                className={cn(
+                                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+                                  getRoleBadgeColor(user.role),
+                                )}
+                              >
+                                {user.role === 'admin' ? 'Administrador' : 'Usuário'}
+                              </span>
+                            </td>
+                            <td className="p-4">
+                              <span
+                                className={cn(
+                                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+                                  getStatusBadgeColor(user.status),
+                                )}
+                              >
+                                {user.status === 'active' ? 'Ativo' : 'Inativo'}
+                              </span>
+                            </td>
+                            <td className="p-4">
+                              <div className="flex justify-end gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleEdit(user)}
+                                  disabled={isUpdating}
+                                  className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+                                >
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Editar
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleDelete(user.id)}
+                                  disabled={isDeleting}
+                                  className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                </li>
-              ))}
-            </ul>
-          </Card>
+                </Card>
+              )}
+            </>
+          )}
         </div>
       </div>
+
+      <UserFormModal
+        open={showFormModal}
+        onClose={() => {
+          setShowFormModal(false);
+          setEditingUser(null);
+        }}
+        onSubmit={handleSubmit}
+        user={editingUser}
+        isLoading={isCreating || isUpdating}
+      />
+
       <ConfirmModal
         open={showConfirmDelete}
         title="Confirmar exclusão"
@@ -371,6 +474,7 @@ export function UsersPage() {
         onCancel={cancelDelete}
         danger
       />
+
       <DeleteAllUserDataModal
         open={showDeleteAllDataModal}
         onClose={() => setShowDeleteAllDataModal(false)}

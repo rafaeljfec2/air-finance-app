@@ -122,19 +122,30 @@ export const deleteAllUserData = async (userId: string): Promise<void> => {
     try {
       await apiClient.delete(`/user/${userId}/all-data`);
       return;
-    } catch {
-      // If dedicated endpoint doesn't exist, manually delete companies then user
-      // This assumes the backend cascades deletions from companies
+    } catch (error) {
+      // Check if it's a 404 error (endpoint doesn't exist)
+      const apiError = parseApiError(error);
+      if (apiError.status === 404) {
+        // If dedicated endpoint doesn't exist (404), fall back to manual deletion
+        // Continue to the fallback logic below
+      } else {
+        // For any other error, re-throw it
+        throw error;
+      }
     }
 
-    // Get all companies for this user
-    // We need to fetch all companies and filter by userIds since there's no /user/:id/companies endpoint
+    // Fallback: manually delete companies then user
+    // This assumes the backend cascades deletions from companies
+
+    // Get all companies and filter by userIds since there's no /user/:id/companies endpoint
     const allCompanies = await companyService.getAll();
     const userCompanies = allCompanies.filter((company) => company.userIds.includes(userId));
 
     // Delete all companies owned by this user
     // This should cascade delete related entities (accounts, transactions, categories, goals, etc)
-    await Promise.all(userCompanies.map((company) => companyService.delete(company.id)));
+    if (userCompanies.length > 0) {
+      await Promise.all(userCompanies.map((company) => companyService.delete(company.id)));
+    }
 
     // Finally, delete the user account
     await apiClient.delete(`/user/${userId}`);
