@@ -1,16 +1,17 @@
 import { useAuthStore } from '@/stores/auth';
+import { useCompanyStore } from '@/stores/company';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
+  LoginData,
+  User,
   getCurrentUser,
   login,
-  LoginData,
   logout,
   register,
   requestPasswordRecovery,
   resetPassword,
-  User,
 } from '../services/authService';
 import { authUtils } from '../utils/auth';
 
@@ -81,6 +82,8 @@ export const useAuth = () => {
       queryClient.removeQueries({ queryKey: ['companies'] });
       setUser(null);
       setToken(null);
+      // Clear active company to force selection on next login
+      useCompanyStore.getState().clearActiveCompany();
       navigate('/');
     },
   });

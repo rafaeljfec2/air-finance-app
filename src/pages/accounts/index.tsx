@@ -80,8 +80,8 @@ export function AccountsPage() {
       const matchesSearch =
         account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         account.institution.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        account.agency.includes(searchTerm) ||
-        account.accountNumber.includes(searchTerm);
+        (account.agency && account.agency.includes(searchTerm)) ||
+        (account.accountNumber && account.accountNumber.includes(searchTerm));
       const matchesType = filterType === 'all' || account.type === filterType;
       return matchesSearch && matchesType;
     });

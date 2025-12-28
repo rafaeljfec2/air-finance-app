@@ -1,11 +1,11 @@
 import { ImportOfxModal } from '@/components/import-ofx/ImportOfxModal';
 import {
-  TransactionGrid,
-  TransactionGridTransaction,
+    TransactionGrid,
+    TransactionGridTransaction,
 } from '@/components/transactions/TransactionGrid';
 import {
-  calculateBalance,
-  createPreviousBalanceRow,
+    calculateBalance,
+    createPreviousBalanceRow,
 } from '@/components/transactions/TransactionGrid.utils';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -19,10 +19,10 @@ import { useExtracts } from '@/hooks/useExtracts';
 import { usePreviousBalance } from '@/hooks/useTransactions';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import {
-  createInstallments,
-  importOfx,
-  type ExtractTransaction,
-  type InstallmentTransaction,
+    createInstallments,
+    importOfx,
+    type ExtractTransaction,
+    type InstallmentTransaction,
 } from '@/services/transactionService';
 import { formatDateToLocalISO } from '@/utils/date';
 import { useMutation } from '@tanstack/react-query';
@@ -189,8 +189,8 @@ export function ImportOfxPage() {
     });
 
     return sortedAccounts.map((account) => ({
-      value: account.accountNumber,
-      label: `${account.name} ${account.accountNumber}`,
+      value: account.id || '',
+      label: `${account.name} (${account.type === 'credit_card' ? 'Cartão' : 'Conta'})`,
     }));
   }, [accounts]);
 
