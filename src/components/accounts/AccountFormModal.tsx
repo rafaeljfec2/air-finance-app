@@ -187,11 +187,11 @@ export function AccountFormModal({
       onClose={handleClose}
       title=""
       dismissible={false}
-      className="max-w-3xl bg-card dark:bg-card-dark p-0 flex flex-col h-[90vh] max-h-[90vh]"
+      className="max-w-3xl bg-card dark:bg-card-dark p-0 flex flex-col max-h-[90vh]"
     >
       <div className="flex flex-col flex-1 overflow-hidden min-h-0">
         {/* Header Customizado */}
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-border dark:border-border-dark flex-shrink-0">
+        <div className="flex items-center justify-between px-6 pt-4 pb-3 border-b border-border dark:border-border-dark flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary-500/10 dark:bg-primary-400/10">
               <CreditCard className="h-5 w-5 text-primary-500 dark:text-primary-400" />
@@ -202,10 +202,10 @@ export function AccountFormModal({
               </h2>
               <p className="text-sm text-muted-foreground dark:text-gray-400">
                 {account
-                  ? 'Atualize as informações da conta'
+                  ? 'Atualize as informações'
                   : isCreditCard
-                    ? 'Preencha os dados do novo cartão de crédito'
-                    : 'Preencha os dados da nova conta bancária'}
+                    ? 'Preencha os dados'
+                    : 'Preencha os dados da nova conta'}
               </p>
             </div>
           </div>
@@ -220,17 +220,18 @@ export function AccountFormModal({
 
         {/* Conteúdo com Scroll */}
         <div className="flex-1 overflow-y-auto px-6 min-h-0">
-          <form onSubmit={handleSubmit} id="account-form" className="space-y-6 py-4">
+          <form onSubmit={handleSubmit} id="account-form" className="space-y-3 py-2">
             {/* Seção: Informações Básicas */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 mb-2">
                 <CreditCard className="h-4 w-4 text-primary-500 dark:text-primary-400" />
                 <h3 className="text-sm font-semibold text-text dark:text-text-dark uppercase tracking-wide">
                   Informações Básicas
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <FormField
                   label={isCreditCard ? 'Nome do cartão *' : 'Nome da conta *'}
                   error={errors.name}
@@ -298,15 +299,15 @@ export function AccountFormModal({
 
             {/* Seção: Dados Bancários - Only for non-credit_card types */}
             {!isCreditCard && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 mb-2">
                   <Hash className="h-4 w-4 text-primary-500 dark:text-primary-400" />
                   <h3 className="text-sm font-semibold text-text dark:text-text-dark uppercase tracking-wide">
                     Dados Bancários
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <FormField label="Agência *" error={errors.agency}>
                     <Input
                       name="agency"
@@ -339,16 +340,16 @@ export function AccountFormModal({
             )}
 
             {/* Seção: Limite (Credit Card) ou Saldo Inicial (Other types) */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 mb-2">
                 <DollarSign className="h-4 w-4 text-primary-500 dark:text-primary-400" />
                 <h3 className="text-sm font-semibold text-text dark:text-text-dark uppercase tracking-wide">
-                  {isCreditCard ? 'Limite' : 'Saldo Inicial'}
+                  {isCreditCard ? 'Limite e Saldo' : 'Saldo Inicial'}
                 </h3>
               </div>
 
               {isCreditCard ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <FormField label="Saldo Inicial *" error={errors.initialBalance}>
                     <div className="relative">
                       <Input
@@ -416,7 +417,7 @@ export function AccountFormModal({
                   </FormField>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <FormField label="Valor do saldo inicial *" error={errors.initialBalance}>
                     <div className="relative">
                       <Input
@@ -462,15 +463,15 @@ export function AccountFormModal({
             </div>
 
             {/* Seção: Personalização */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 mb-2">
                 <Palette className="h-4 w-4 text-primary-500 dark:text-primary-400" />
                 <h3 className="text-sm font-semibold text-text dark:text-text-dark uppercase tracking-wide">
                   Personalização
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <FormField label="Cor">
                   <ColorPicker value={form.color} onChange={handleColorChange} />
                 </FormField>
@@ -479,10 +480,11 @@ export function AccountFormModal({
                   <IconPicker
                     value={form.icon}
                     onChange={handleIconChange}
-                    options={accountTypes.map((t) => ({
-                      value: t.iconName,
-                      icon: t.icon,
-                    }))}
+                    options={Array.from(
+                      new Map(
+                        accountTypes.map((t) => [t.iconName, { value: t.iconName, icon: t.icon }])
+                      ).values()
+                    )}
                   />
                 </FormField>
               </div>
@@ -491,7 +493,7 @@ export function AccountFormModal({
         </div>
 
         {/* Footer Fixo */}
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-border dark:border-border-dark bg-card dark:bg-card-dark flex-shrink-0">
+        <div className="flex justify-end gap-3 px-6 py-3 border-t border-border dark:border-border-dark bg-card dark:bg-card-dark flex-shrink-0">
           <Button
             type="button"
             variant="outline"
@@ -509,7 +511,7 @@ export function AccountFormModal({
           >
             {(() => {
               if (isLoading) return 'Salvando...';
-              return account ? 'Salvar Alterações' : 'Criar Conta';
+              return account ? 'Salvar' : 'Criar Conta';
             })()}
           </Button>
         </div>
