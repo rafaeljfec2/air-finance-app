@@ -1,4 +1,6 @@
+import { toast } from '@/components/ui/toast';
 import { useCompanyStore } from '@/stores/company';
+import { getUserFriendlyMessage, logApiError, parseApiError } from '@/utils/apiErrorHandler';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createAccount,
@@ -10,8 +12,6 @@ import {
   type Account,
   type CreateAccount,
 } from '../services/accountService';
-import { toast } from '@/components/ui/toast';
-import { parseApiError, getUserFriendlyMessage, logApiError } from '@/utils/apiErrorHandler';
 
 export const useAccounts = () => {
   const { activeCompany } = useCompanyStore();
@@ -79,8 +79,8 @@ export const useAccounts = () => {
       const previousAccount = queryClient.getQueryData<Account>(['account', companyId, id]);
 
       if (previousAccounts) {
-        queryClient.setQueryData<Account[]>(['accounts', companyId], prev =>
-          (prev ?? []).map(acc =>
+        queryClient.setQueryData<Account[]>(['accounts', companyId], (prev) =>
+          (prev ?? []).map((acc) =>
             acc.id === id ? { ...acc, ...data, updatedAt: new Date().toISOString() } : acc,
           ),
         );
@@ -98,8 +98,8 @@ export const useAccounts = () => {
     },
     onSuccess: (updatedAccount, { id }) => {
       if (updatedAccount) {
-        queryClient.setQueryData<Account[]>(['accounts', companyId], prev =>
-          (prev ?? []).map(acc => (acc.id === id ? updatedAccount : acc)),
+        queryClient.setQueryData<Account[]>(['accounts', companyId], (prev) =>
+          (prev ?? []).map((acc) => (acc.id === id ? updatedAccount : acc)),
         );
         queryClient.setQueryData<Account>(['account', companyId, id], updatedAccount);
       }
@@ -139,17 +139,51 @@ export const useAccounts = () => {
   const deleteMutation = useMutation({
     mutationFn: (id: string) =>
       companyId && id ? deleteAccount(companyId, id) : Promise.reject('No companyId or id'),
+    onMutate: async (id) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: ['accounts', companyId] });
+      await queryClient.cancelQueries({ queryKey: ['account', companyId, id] });
+      await queryClient.cancelQueries({ queryKey: ['account-balance', companyId, id] });
+
+      // Snapshot the previous value
+      const previousAccounts = queryClient.getQueryData<Account[]>(['accounts', companyId]);
+      const previousAccount = queryClient.getQueryData<Account>(['account', companyId, id]);
+
+      // Optimistically update to the new value by removing the account from the list
+      if (previousAccounts) {
+        queryClient.setQueryData<Account[]>(['accounts', companyId], (prev) =>
+          (prev ?? []).filter((acc) => acc.id !== id),
+        );
+      }
+
+      // Remove individual account query
+      queryClient.removeQueries({ queryKey: ['account', companyId, id] });
+      queryClient.removeQueries({ queryKey: ['account-balance', companyId, id] });
+
+      // Return a context object with the snapshotted value
+      return { previousAccounts, previousAccount };
+    },
     onSuccess: (_, id) => {
+      // Invalidate and refetch to ensure consistency
       queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
       queryClient.removeQueries({ queryKey: ['account', companyId, id] });
       queryClient.removeQueries({ queryKey: ['account-balance', companyId, id] });
+      // Also invalidate any queries that might reference accounts (transactions, etc.)
+      queryClient.invalidateQueries({ queryKey: ['transactions'], exact: false });
       toast({
         title: 'Sucesso',
         description: 'Conta excluída com sucesso!',
         type: 'success',
       });
     },
-    onError: (error) => {
+    onError: (error, id, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      if (context?.previousAccounts) {
+        queryClient.setQueryData(['accounts', companyId], context.previousAccounts);
+      }
+      if (context?.previousAccount) {
+        queryClient.setQueryData(['account', companyId, id], context.previousAccount);
+      }
       const apiError = parseApiError(error);
       logApiError(apiError);
       toast({
@@ -157,6 +191,12 @@ export const useAccounts = () => {
         description: getUserFriendlyMessage(apiError),
         type: 'error',
       });
+    },
+    onSettled: (_, _error, id) => {
+      // Always refetch after error or success to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+      queryClient.removeQueries({ queryKey: ['account', companyId, id] });
+      queryClient.removeQueries({ queryKey: ['account-balance', companyId, id] });
     },
   });
 

@@ -35,7 +35,7 @@ export function ConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in">
       <div
-        className={`bg-card dark:bg-card-dark rounded-2xl p-8 shadow-2xl max-w-sm mx-auto flex flex-col items-center border-2 animate-bounce-in ${danger ? 'border-red-500/30' : 'border-primary-500/20'}`}
+        className={`bg-card dark:bg-card-dark rounded-2xl p-8 shadow-2xl max-w-md mx-auto flex flex-col items-center border-2 animate-bounce-in ${danger ? 'border-red-500/30' : 'border-primary-500/20'}`}
       >
         <div className="animate-bounce-in-delayed">
           {icon ?? (
@@ -49,19 +49,23 @@ export function ConfirmModal({
         >
           {title}
         </h3>
-        <div className="text-sm mb-6 text-center text-text dark:text-text-dark animate-slide-in-delayed-2">
+        <div className="text-sm mb-6 text-left text-text dark:text-text-dark animate-slide-in-delayed-2 w-full">
           {description}
         </div>
         <div className="flex gap-2 justify-center w-full animate-slide-in-delayed-3">
           <Button
-            variant="destructive"
+            variant="outline"
             onClick={onCancel}
             ref={cancelRef}
-            className="bg-red-600 hover:bg-red-700"
+            className="border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
           >
             {cancelLabel}
           </Button>
-          <Button variant="success" onClick={onConfirm} className="bg-green-600 hover:bg-green-700">
+          <Button
+            variant="destructive"
+            onClick={onConfirm}
+            className={danger ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}
+          >
             {confirmLabel}
           </Button>
         </div>
