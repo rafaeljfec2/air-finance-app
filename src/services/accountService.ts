@@ -1,6 +1,6 @@
-import { apiClient } from './apiClient';
-import { z } from 'zod';
 import { parseApiError } from '@/utils/apiErrorHandler';
+import { z } from 'zod';
+import { apiClient } from './apiClient';
 
 export const AccountSchema = z.object({
   id: z.string(),
@@ -10,8 +10,8 @@ export const AccountSchema = z.object({
     errorMap: () => ({ message: 'Tipo de conta inválido' }),
   }),
   institution: z.string().min(2, 'Instituição deve ter pelo menos 2 caracteres'),
-  agency: z.string().min(4, 'Agência deve ter pelo menos 4 dígitos'),
-  accountNumber: z.string().min(5, 'Número da conta deve ter pelo menos 5 dígitos'),
+  agency: z.string().optional().nullable(),
+  accountNumber: z.string().optional().nullable(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida'),
   icon: z.string().min(1, 'Ícone é obrigatório'),
   balance: z.number().default(0),
