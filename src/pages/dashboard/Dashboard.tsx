@@ -2,6 +2,7 @@ import { BalanceEvolutionCard } from '@/components/dashboard/BalanceEvolutionCar
 import { CreditCardExpensesCard } from '@/components/dashboard/CreditCardExpensesCard';
 import { ExpensesDistributionCard } from '@/components/dashboard/ExpensesDistributionCard';
 import { FinancialGoalsCard } from '@/components/dashboard/FinancialGoalsCard';
+import { IndebtednessCard } from '@/components/dashboard/IndebtednessCard';
 import { MonthlyComparisonCard } from '@/components/dashboard/MonthlyComparisonCard';
 import { RecentTransactionsCard } from '@/components/dashboard/RecentTransactionsCard';
 import { SummaryCardsRow } from '@/components/dashboard/SummaryCardsRow';
@@ -22,12 +23,7 @@ import { formatCurrency } from '@/utils/formatters';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import {
-  Banknote,
-  BarChart3,
-  Calendar,
-  List,
-} from 'lucide-react';
+import { Banknote, BarChart3, Calendar, List } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 export function Dashboard() {
@@ -301,6 +297,9 @@ export function Dashboard() {
 
           {/* Financial Summary Cards */}
           <SummaryCardsRow companyId={companyId} filters={filters} />
+
+          {/* Indebtedness Metrics */}
+          <IndebtednessCard companyId={companyId} />
 
           {selectedView === 'overview' ? (
             /* Overview - Charts and Additional Info */
