@@ -31,8 +31,10 @@ export function OnboardingGuard({ children }: OnboardingGuardProps) {
 
   // User needs onboarding only if:
   // 1. Email is verified (emailVerified === true)
-  // 2. Onboarding is not completed (onboardingCompleted === false)
-  const needsOnboarding = isEmailVerified && user.onboardingCompleted === false;
+  // 2. Onboarding is not completed (onboardingCompleted !== true)
+  // We treat undefined/null/false as "not completed"
+  const onboardingNotCompleted = user.onboardingCompleted !== true;
+  const needsOnboarding = isEmailVerified && onboardingNotCompleted;
 
   // If email is not verified, user cannot access onboarding
   // Redirect them away from onboarding (to dashboard)
