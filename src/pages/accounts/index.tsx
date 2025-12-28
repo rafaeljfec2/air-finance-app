@@ -14,16 +14,16 @@ import { useCompanyStore } from '@/stores/company';
 import { formatCurrency } from '@/utils/formatters';
 import { AxiosError } from 'axios';
 import {
-    Banknote,
-    CreditCard,
-    Edit,
-    Grid3x3,
-    Landmark,
-    List,
-    Plus,
-    Search,
-    Trash2,
-    Wallet,
+  Banknote,
+  CreditCard,
+  Edit,
+  Grid3x3,
+  Landmark,
+  List,
+  Plus,
+  Search,
+  Trash2,
+  Wallet,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -366,24 +366,54 @@ export function AccountsPage() {
                                 {account.institution}
                               </span>
                             </div>
-                            <div className="text-sm">
-                              <span className="text-gray-500 dark:text-gray-400">Agência: </span>
-                              <span className="text-text dark:text-text-dark font-mono">
-                                {account.agency}
-                              </span>
-                            </div>
-                            <div className="text-sm">
-                              <span className="text-gray-500 dark:text-gray-400">Conta: </span>
-                              <span className="text-text dark:text-text-dark font-mono">
-                                {account.accountNumber}
-                              </span>
-                            </div>
-                            <div className="text-sm pt-2 border-t border-border dark:border-border-dark">
-                              <span className="text-gray-500 dark:text-gray-400">Saldo: </span>
-                              <span className="text-text dark:text-text-dark font-semibold text-lg">
-                                {formatCurrency(account.balance)}
-                              </span>
-                            </div>
+
+                            {account.type === 'credit_card' ? (
+                              <>
+                                <div className="text-sm">
+                                  <span className="text-gray-500 dark:text-gray-400">
+                                    Limite:{' '}
+                                  </span>
+                                  <span className="text-text dark:text-text-dark font-mono">
+                                    {formatCurrency(account.creditLimit || 0)}
+                                  </span>
+                                </div>
+                                <div className="text-sm pt-2 border-t border-border dark:border-border-dark">
+                                  <span className="text-gray-500 dark:text-gray-400">
+                                    Saldo Atual:{' '}
+                                  </span>
+                                  <span className="text-text dark:text-text-dark font-semibold text-lg">
+                                    {formatCurrency(account.balance)}
+                                  </span>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div className="text-sm">
+                                  <span className="text-gray-500 dark:text-gray-400">
+                                    Agência:{' '}
+                                  </span>
+                                  <span className="text-text dark:text-text-dark font-mono">
+                                    {account.agency}
+                                  </span>
+                                </div>
+                                <div className="text-sm">
+                                  <span className="text-gray-500 dark:text-gray-400">
+                                    Conta:{' '}
+                                  </span>
+                                  <span className="text-text dark:text-text-dark font-mono">
+                                    {account.accountNumber}
+                                  </span>
+                                </div>
+                                <div className="text-sm pt-2 border-t border-border dark:border-border-dark">
+                                  <span className="text-gray-500 dark:text-gray-400">
+                                    Saldo:{' '}
+                                  </span>
+                                  <span className="text-text dark:text-text-dark font-semibold text-lg">
+                                    {formatCurrency(account.balance)}
+                                  </span>
+                                </div>
+                              </>
+                            )}
                           </div>
 
                           {/* Ações */}
@@ -456,30 +486,55 @@ export function AccountsPage() {
                                       {account.institution}
                                     </span>
                                   </div>
-                                  <div>
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                      Agência:{' '}
-                                    </span>
-                                    <span className="text-text dark:text-text-dark font-mono">
-                                      {account.agency}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                      Conta:{' '}
-                                    </span>
-                                    <span className="text-text dark:text-text-dark font-mono">
-                                      {account.accountNumber}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                      Saldo:{' '}
-                                    </span>
-                                    <span className="text-text dark:text-text-dark font-semibold">
-                                      {formatCurrency(account.balance)}
-                                    </span>
-                                  </div>
+
+                                  {account.type === 'credit_card' ? (
+                                    <>
+                                      <div>
+                                        <span className="text-gray-500 dark:text-gray-400">
+                                          Limite:{' '}
+                                        </span>
+                                        <span className="text-text dark:text-text-dark font-mono">
+                                          {formatCurrency(account.creditLimit || 0)}
+                                        </span>
+                                      </div>
+                                      <div className="hidden lg:block"></div>
+                                      <div>
+                                        <span className="text-gray-500 dark:text-gray-400">
+                                          Saldo Atual:{' '}
+                                        </span>
+                                        <span className="text-text dark:text-text-dark font-semibold">
+                                          {formatCurrency(account.balance)}
+                                        </span>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <div>
+                                        <span className="text-gray-500 dark:text-gray-400">
+                                          Agência:{' '}
+                                        </span>
+                                        <span className="text-text dark:text-text-dark font-mono">
+                                          {account.agency}
+                                        </span>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500 dark:text-gray-400">
+                                          Conta:{' '}
+                                        </span>
+                                        <span className="text-text dark:text-text-dark font-mono">
+                                          {account.accountNumber}
+                                        </span>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500 dark:text-gray-400">
+                                          Saldo:{' '}
+                                        </span>
+                                        <span className="text-text dark:text-text-dark font-semibold">
+                                          {formatCurrency(account.balance)}
+                                        </span>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
