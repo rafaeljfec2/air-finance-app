@@ -12,7 +12,7 @@ export function TransactionTypeSelector({
   onTypeChange,
 }: Readonly<TransactionTypeSelectorProps>) {
   return (
-    <div className="p-3 pb-0 bg-background dark:bg-background-dark rounded-t-lg flex justify-center">
+    <div className="p-3 bg-background dark:bg-background-dark rounded-t-lg flex justify-center">
       <div className="grid grid-cols-2 gap-1 p-1 bg-muted dark:bg-muted/20 rounded-xl w-full max-w-sm border border-border/50">
         <button
           type="button"
