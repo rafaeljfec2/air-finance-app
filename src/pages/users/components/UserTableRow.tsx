@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { ComboBox } from '@/components/ui/ComboBox';
 import { cn } from '@/lib/utils';
 import { User } from '@/services/userService';
 import { CheckCircle2, Edit, Mail, Trash2, XCircle } from 'lucide-react';
@@ -13,6 +14,8 @@ interface UserTableRowProps {
   getStatusBadgeColor: (status: 'active' | 'inactive') => string;
   getEmailVerifiedBadgeColor: (emailVerified: boolean | undefined) => string;
   getOnboardingCompletedBadgeColor: (onboardingCompleted: boolean | undefined) => string;
+  activeCompanyId?: string | null;
+  onAssignRole?: (userId: string, role: string) => void;
 }
 
 export function UserTableRow({
@@ -25,6 +28,8 @@ export function UserTableRow({
   getStatusBadgeColor,
   getEmailVerifiedBadgeColor,
   getOnboardingCompletedBadgeColor,
+  activeCompanyId,
+  onAssignRole,
 }: Readonly<UserTableRowProps>) {
   return (
     <tr className="border-b border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark transition-colors">
@@ -35,18 +40,36 @@ export function UserTableRow({
         <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
       </td>
       <td className="p-4">
-        <span
-          className={cn(
-            'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-            getRoleBadgeColor(user.role),
-          )}
-        >
-          {(() => {
-            if (user.role === 'god') return 'God';
-            if (user.role === 'admin') return 'Administrador';
-            return 'Usuário';
-          })()}
-        </span>
+        {activeCompanyId ? (
+          <ComboBox
+            options={[
+              { value: 'owner', label: 'Dono' },
+              { value: 'admin', label: 'Administrador' },
+              { value: 'editor', label: 'Editor' },
+              { value: 'viewer', label: 'Visualizador' },
+            ]}
+            value={user.companyRoles?.[activeCompanyId] ?? 'viewer'}
+            onValueChange={(val: string | null) => {
+              if (val && onAssignRole) onAssignRole(user.id, val);
+            }}
+            disabled={!onAssignRole || user.role === 'god'}
+            className="h-7 w-[140px] text-xs bg-transparent border-gray-200 dark:border-gray-700"
+            searchable={false}
+          />
+        ) : (
+          <span
+            className={cn(
+              'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+              getRoleBadgeColor(user.role),
+            )}
+          >
+            {(() => {
+              if (user.role === 'god') return 'God';
+              if (user.role === 'admin') return 'Administrador';
+              return 'Usuário';
+            })()}
+          </span>
+        )}
       </td>
       <td className="p-4">
         <span

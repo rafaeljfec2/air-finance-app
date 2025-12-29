@@ -4,28 +4,31 @@ import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { DeleteAllUserDataModal } from '@/components/users/DeleteAllUserDataModal';
 import { UserFormModal } from '@/components/users/UserFormModal';
-import { useAuth } from '@/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
 import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { CreateUser, User } from '@/services/userService';
-import { Plus, ShieldAlert, Trash2, User as UserIcon } from 'lucide-react';
+import { CreateUser, User, assignCompanyRole } from '@/services/userService';
+import { useCompanyStore } from '@/stores/company';
+import { useQueryClient } from '@tanstack/react-query';
+import { Plus, Trash2, User as UserIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { UserCard } from './components/UserCard';
 import { UserEmptyState } from './components/UserEmptyState';
 import { UserFilters } from './components/UserFilters';
 import { UserTableRow } from './components/UserTableRow';
 import {
-  getEmailVerifiedBadgeColor,
-  getOnboardingCompletedBadgeColor,
-  getRoleBadgeColor,
-  getStatusBadgeColor,
+    getEmailVerifiedBadgeColor,
+    getOnboardingCompletedBadgeColor,
+    getRoleBadgeColor,
+    getStatusBadgeColor,
 } from './utils/userHelpers';
 
 export function UsersPage() {
-  const { user: currentUser } = useAuth();
-  const navigate = useNavigate();
+  // const { user: currentUser } = useAuth(); // Unused
+  // const navigate = useNavigate(); // Unused
+  const { activeCompany } = useCompanyStore();
+  const queryClient = useQueryClient();
+
   const {
     users,
     isLoading,
@@ -98,29 +101,16 @@ export function UsersPage() {
     setDeleteId(null);
   };
 
-  // Verificar se o usuário tem permissão (role "god")
-  const hasGodRole = currentUser?.role === 'god';
-  if (currentUser && !hasGodRole) {
-    return (
-      <ViewDefault>
-        <div className="container mx-auto px-4 sm:px-6 py-10">
-          <Card className="p-8 text-center">
-            <ShieldAlert className="h-16 w-16 mx-auto mb-4 text-red-500" />
-            <h2 className="text-2xl font-bold mb-2 text-text dark:text-text-dark">Acesso Negado</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Você não tem permissão para acessar esta página.
-            </p>
-            <Button
-              onClick={() => navigate('/dashboard')}
-              className="bg-primary-500 hover:bg-primary-600 text-white"
-            >
-              Voltar ao Dashboard
-            </Button>
-          </Card>
-        </div>
-      </ViewDefault>
-    );
-  }
+  const handleAssignRole = async (userId: string, role: string) => {
+    if (!activeCompany) return;
+    try {
+      await assignCompanyRole(userId, activeCompany.id, role);
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    } catch (error) {
+      console.error('Failed to update role', error);
+    }
+  };
+
 
   if (isLoading) {
     return (
@@ -256,6 +246,8 @@ export function UsersPage() {
                             getStatusBadgeColor={getStatusBadgeColor}
                             getEmailVerifiedBadgeColor={getEmailVerifiedBadgeColor}
                             getOnboardingCompletedBadgeColor={getOnboardingCompletedBadgeColor}
+                            activeCompanyId={activeCompany?.id}
+                            onAssignRole={handleAssignRole}
                           />
                         ))}
                       </tbody>

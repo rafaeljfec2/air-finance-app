@@ -19,6 +19,7 @@ export const UserSchema = z.object({
   onboardingCompleted: z.boolean().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
+  companyRoles: z.record(z.string()).optional(),
   integrations: z
     .object({
       openaiApiKey: z.string().optional(),
@@ -33,6 +34,7 @@ export const CreateUserSchema = UserSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+  companyRoles: true,
 });
 
 export type User = z.infer<typeof UserSchema>;
@@ -78,6 +80,19 @@ export const updateUser = async (id: string, data: Partial<CreateUser>): Promise
   } catch (error) {
     console.error('Erro ao atualizar usuário:', error);
     throw new Error('Falha ao atualizar usuário');
+  }
+};
+
+export const assignCompanyRole = async (
+  userId: string,
+  companyId: string,
+  role: string,
+): Promise<void> => {
+  try {
+    await apiClient.put(`/user/${userId}/company-role`, { companyId, role });
+  } catch (error) {
+    console.error('Erro ao atribuir papel na empresa:', error);
+    throw new Error('Falha ao atribuir papel na empresa');
   }
 };
 
