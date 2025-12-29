@@ -4,6 +4,7 @@ import { MonthNavigator } from '@/components/budget/MonthNavigator';
 import { useBudget } from '@/hooks/useBudget';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
+import { motion } from 'framer-motion';
 import { Wallet } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
@@ -62,11 +63,31 @@ export function BudgetPage() {
     setPayablesPage(1);
     setCardPage(1);
   }, [filter, activeCardTab]);
+  // Define variants
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 },
+  };
 
   return (
     <ViewDefault>
-      <div className="container mx-auto px-2 sm:px-6 pt-0 pb-10">
-        <div className="mb-8">
+      <motion.div 
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="container mx-auto px-2 sm:px-6 pt-0 pb-10"
+      >
+        <motion.div variants={item} className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="inline-flex items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900 p-2">
               <Wallet className="h-5 w-5 text-primary-600 dark:text-primary-400" />
@@ -78,53 +99,66 @@ export function BudgetPage() {
           <p className="text-sm text-gray-500 dark:text-gray-400 ml-11">
             Visão geral do seu orçamento, fluxo de caixa e contas a pagar/receber
           </p>
-        </div>
+        </motion.div>
+        
         {/* Filtro centralizado */}
-        <div className="flex justify-center mb-8">
+        <motion.div variants={item} className="flex justify-center mb-8">
           <MonthNavigator
             month={filter.month}
             year={filter.year}
             onChange={(month, year) => setFilter({ month, year })}
           />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
-          <CashFlowCard
-            cashFlow={cashFlow}
-            isLoading={isLoading}
-            onExpand={() => setExpandedCard('cashFlow')}
-          />
+        </motion.div>
 
-          <ReceivablesCard
-            receivables={receivables}
-            isLoading={isLoading}
-            currentPage={receivablesPage}
-            itemsPerPage={ITEMS_PER_PAGE}
-            onPageChange={setReceivablesPage}
-            onExpand={() => setExpandedCard('receivables')}
-          />
+        <motion.div 
+          variants={container} // Re-stagger for the grid if desired, or simpler just let them be items
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch"
+        >
+          <motion.div variants={item} className="h-full">
+            <CashFlowCard
+              cashFlow={cashFlow}
+              isLoading={isLoading}
+              onExpand={() => setExpandedCard('cashFlow')}
+            />
+          </motion.div>
 
-          <PayablesCard
-            payables={payables}
-            isLoading={isLoading}
-            currentPage={payablesPage}
-            itemsPerPage={ITEMS_PER_PAGE}
-            onPageChange={setPayablesPage}
-            onExpand={() => setExpandedCard('payables')}
-          />
+          <motion.div variants={item} className="h-full">
+            <ReceivablesCard
+              receivables={receivables}
+              isLoading={isLoading}
+              currentPage={receivablesPage}
+              itemsPerPage={ITEMS_PER_PAGE}
+              onPageChange={setReceivablesPage}
+              onExpand={() => setExpandedCard('receivables')}
+            />
+          </motion.div>
 
-          <CreditCardsCard
-            cards={cards}
-            isLoading={isLoading}
-            activeCardId={activeCardTab}
-            activeBill={activeBill}
-            currentPage={cardPage}
-            itemsPerPage={ITEMS_PER_PAGE}
-            onPageChange={setCardPage}
-            onChangeActiveCard={setActiveCardTab}
-            onExpand={() => setExpandedCard('creditCards')}
-          />
-        </div>
-      </div>
+          <motion.div variants={item} className="h-full">
+            <PayablesCard
+              payables={payables}
+              isLoading={isLoading}
+              currentPage={payablesPage}
+              itemsPerPage={ITEMS_PER_PAGE}
+              onPageChange={setPayablesPage}
+              onExpand={() => setExpandedCard('payables')}
+            />
+          </motion.div>
+
+          <motion.div variants={item} className="h-full">
+            <CreditCardsCard
+              cards={cards}
+              isLoading={isLoading}
+              activeCardId={activeCardTab}
+              activeBill={activeBill}
+              currentPage={cardPage}
+              itemsPerPage={ITEMS_PER_PAGE}
+              onPageChange={setCardPage}
+              onChangeActiveCard={setActiveCardTab}
+              onExpand={() => setExpandedCard('creditCards')}
+            />
+          </motion.div>
+        </motion.div>
+      </motion.div>
 
       <BudgetExpandedModal
         expandedCard={expandedCard}

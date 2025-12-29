@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React from 'react';
 
 interface CardContainerProps {
@@ -18,9 +19,10 @@ export const CardContainer: React.FC<CardContainerProps> = ({
   children,
   className,
 }) => (
-  <div
+  <motion.div
+    whileHover={{ y: -5, transition: { duration: 0.2 } }}
     className={`bg-card dark:bg-card-dark rounded-xl shadow-lg border-t-4 ${colorMap[color]} p-6 flex flex-col h-full flex-1 w-full max-w-full overflow-hidden ${className ?? ''}`}
   >
     {children}
-  </div>
+  </motion.div>
 );

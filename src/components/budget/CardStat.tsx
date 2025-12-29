@@ -1,4 +1,5 @@
-import React from 'react';
+import { motion, useSpring, useTransform } from 'framer-motion';
+import React, { useEffect } from 'react';
 
 interface CardStatProps {
   label: string;
@@ -6,6 +7,19 @@ interface CardStatProps {
   positive?: boolean;
   negative?: boolean;
   highlight?: boolean;
+}
+
+function AnimatedValue({ value }: { value: number }) {
+  const spring = useSpring(0, { bounce: 0, duration: 1000 });
+  const display = useTransform(spring, (current) =>
+    current.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+  );
+
+  useEffect(() => {
+    spring.set(value);
+  }, [spring, value]);
+
+  return <motion.span>{display}</motion.span>;
 }
 
 export const CardStat: React.FC<CardStatProps> = ({
@@ -30,7 +44,7 @@ export const CardStat: React.FC<CardStatProps> = ({
         {label}
       </span>
       <span className={valueClass}>
-        R$ {value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+        R$ <AnimatedValue value={value} />
       </span>
     </div>
   );
