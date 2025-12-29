@@ -1,4 +1,5 @@
 import { CompanyFormModal } from '@/components/companies/CompanyFormModal';
+import { CompanyTableRow } from '@/components/companies/CompanyTableRow';
 import { Loading } from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -355,108 +356,44 @@ export function CompaniesPage() {
                   ))}
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {filteredCompanies.map((company) => (
-                    <Card
-                      key={company.id}
-                      className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow"
-                    >
-                      <div className="p-6">
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                          {/* Informações principais */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start gap-4 mb-3">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                  <h3 className="text-lg font-semibold text-text dark:text-text-dark">
-                                    {company.name}
-                                  </h3>
-                                  <span
-                                    className={cn(
-                                      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-                                      getTypeBadgeColor(company.type),
-                                    )}
-                                  >
-                                    {getTypeLabel(company.type)}
-                                  </span>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-                                  <div>
-                                    <span className="text-gray-500 dark:text-gray-400">CNPJ/CPF: </span>
-                                    <span className="text-text dark:text-text-dark font-mono">
-                                      {formatDocument(company.cnpj)}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                      Fundação:{' '}
-                                    </span>
-                                    <span className="text-text dark:text-text-dark">
-                                      {formatDate(company.foundationDate)}
-                                    </span>
-                                  </div>
-                                  {company.email && (
-                                    <div>
-                                      <span className="text-gray-500 dark:text-gray-400">
-                                        E-mail:{' '}
-                                      </span>
-                                      <span className="text-text dark:text-text-dark truncate block">
-                                        {company.email}
-                                      </span>
-                                    </div>
-                                  )}
-                                  {company.phone && (
-                                    <div>
-                                      <span className="text-gray-500 dark:text-gray-400">
-                                        Telefone:{' '}
-                                      </span>
-                                      <span className="text-text dark:text-text-dark">
-                                        {company.phone}
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                                {company.address && (
-                                  <div className="text-sm mt-2">
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                      Endereço:{' '}
-                                    </span>
-                                    <span className="text-text dark:text-text-dark">
-                                      {company.address}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
 
-                          {/* Ações */}
-                          <div className="flex gap-2 md:flex-shrink-0">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleEdit(company)}
-                              disabled={isUpdating}
-                              className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
-                            >
-                              <Edit className="h-4 w-4 mr-2" />
-                              Editar
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleDelete(company.id)}
-                              disabled={isDeleting}
-                              className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
+                <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border dark:border-border-dark">
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Empresa
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Informações
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Contato
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Endereço
+                          </th>
+                          <th className="text-right p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Ações
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredCompanies.map((company) => (
+                          <CompanyTableRow
+                            key={company.id}
+                            company={company}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                            isUpdating={isUpdating}
+                            isDeleting={isDeleting}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
               )}
             </>
           )}

@@ -1,6 +1,7 @@
 import { Loading } from '@/components/Loading';
 import { RecurringTransactionCard } from '@/components/recurring-transactions/RecurringTransactionCard';
 import { RecurringTransactionFormModal } from '@/components/recurring-transactions/RecurringTransactionFormModal';
+import { RecurringTransactionTableRow } from '@/components/recurring-transactions/RecurringTransactionTableRow';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -11,8 +12,8 @@ import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
 import {
-  CreateRecurringTransaction,
-  RecurringTransaction,
+    CreateRecurringTransaction,
+    RecurringTransaction,
 } from '@/services/recurringTransactionService';
 import { useCompanyStore } from '@/stores/company';
 import { AxiosError } from 'axios';
@@ -346,19 +347,49 @@ export function RecurringTransactionsPage() {
                   ))}
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {filteredRecurringTransactions.map((rt) => (
-                    <RecurringTransactionCard
-                      key={rt.id}
-                      recurringTransaction={rt}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                      isUpdating={isUpdating}
-                      isDeleting={isDeleting}
-                      viewMode="list"
-                    />
-                  ))}
-                </div>
+                <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border dark:border-border-dark">
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Descrição
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Valor
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Frequência
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Data Início
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Categoria
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Conta
+                          </th>
+                          <th className="text-right p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Ações
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredRecurringTransactions.map((rt) => (
+                          <RecurringTransactionTableRow
+                            key={rt.id}
+                            recurringTransaction={rt}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                            isUpdating={isUpdating}
+                            isDeleting={isDeleting}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
               )}
             </>
           )}

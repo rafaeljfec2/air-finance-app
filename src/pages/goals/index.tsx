@@ -1,5 +1,6 @@
 import { GoalCard } from '@/components/goals/GoalCard';
 import { GoalFormModal } from '@/components/goals/GoalFormModal';
+import { GoalTableRow } from '@/components/goals/GoalTableRow';
 import { Loading } from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -309,19 +310,43 @@ export function GoalsPage() {
                   ))}
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {filteredGoals.map((goal) => (
-                    <GoalCard
-                      key={goal.id}
-                      goal={goal}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                      isUpdating={isUpdating}
-                      isDeleting={isDeleting}
-                      viewMode="list"
-                    />
-                  ))}
-                </div>
+                <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border dark:border-border-dark">
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Meta
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Progresso
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Valores
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Prazo
+                          </th>
+                          <th className="text-right p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Ações
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredGoals.map((goal) => (
+                          <GoalTableRow
+                            key={goal.id}
+                            goal={goal}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                            isUpdating={isUpdating}
+                            isDeleting={isDeleting}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
               )}
             </>
           )}

@@ -1,4 +1,5 @@
 import { CategoryFormModal } from '@/components/categories/CategoryFormModal';
+import { CategoryTableRow } from '@/components/categories/CategoryTableRow';
 import { Loading } from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -364,73 +365,38 @@ export function CategoriesPage() {
                   })}
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {filteredCategories.map((category) => {
-                    const Icon =
-                      iconOptions.find((t) => t.value === category.icon)?.icon || Tag;
-                    const TypeIcon =
-                      categoryTypes.find((t) => t.value === category.type)?.icon || Tag;
-                    return (
-                      <Card
-                        key={category.id}
-                        className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow"
-                      >
-                        <div className="p-6">
-                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                            {/* Informações principais */}
-                            <div className="flex items-center gap-4 flex-1 min-w-0">
-                              <div
-                                className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                                style={{ backgroundColor: category.color }}
-                              >
-                                <Icon className="h-6 w-6 text-white" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-3 mb-2">
-                                  <h3 className="text-lg font-semibold text-text dark:text-text-dark">
-                                    {category.name}
-                                  </h3>
-                                  <span
-                                    className={cn(
-                                      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-                                      getTypeBadgeColor(category.type),
-                                    )}
-                                  >
-                                    <TypeIcon className="h-3 w-3 mr-1" />
-                                    {getTypeLabel(category.type)}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
 
-                            {/* Ações */}
-                            <div className="flex gap-2 md:flex-shrink-0">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleEdit(category)}
-                                disabled={isUpdating}
-                                className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
-                              >
-                                <Edit className="h-4 w-4 mr-2" />
-                                Editar
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleDelete(category.id)}
-                                disabled={isDeleting}
-                                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    );
-                  })}
-                </div>
+                <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border dark:border-border-dark">
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Categoria
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Tipo
+                          </th>
+                          <th className="text-right p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Ações
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredCategories.map((category) => (
+                          <CategoryTableRow
+                            key={category.id}
+                            category={category}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                            isUpdating={isUpdating}
+                            isDeleting={isDeleting}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
               )}
             </>
           )}

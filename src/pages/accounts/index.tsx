@@ -1,4 +1,5 @@
 import { AccountFormModal } from '@/components/accounts/AccountFormModal';
+import { AccountTableRow } from '@/components/accounts/AccountTableRow';
 import { Loading } from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -444,129 +445,44 @@ export function AccountsPage() {
                   })}
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {filteredAccounts.map((account) => {
-                    const Icon =
-                      accountTypes.find((t) => t.value === account.type)?.icon || Banknote;
-                    return (
-                      <Card
-                        key={account.id}
-                        className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow"
-                      >
-                        <div className="p-6">
-                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                            {/* Informações principais */}
-                            <div className="flex items-center gap-4 flex-1 min-w-0">
-                              <div
-                                className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                                style={{ backgroundColor: account.color }}
-                              >
-                                <Icon className="h-6 w-6 text-white" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-3 mb-2">
-                                  <h3 className="text-lg font-semibold text-text dark:text-text-dark">
-                                    {account.name}
-                                  </h3>
-                                  <span
-                                    className={cn(
-                                      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-                                      getTypeBadgeColor(account.type),
-                                    )}
-                                  >
-                                    {getTypeLabel(account.type)}
-                                  </span>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-                                  <div>
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                      Instituição:{' '}
-                                    </span>
-                                    <span className="text-text dark:text-text-dark">
-                                      {account.institution}
-                                    </span>
-                                  </div>
 
-                                  {account.type === 'credit_card' ? (
-                                    <>
-                                      <div>
-                                        <span className="text-gray-500 dark:text-gray-400">
-                                          Limite:{' '}
-                                        </span>
-                                        <span className="text-text dark:text-text-dark font-mono">
-                                          {formatCurrency(account.creditLimit || 0)}
-                                        </span>
-                                      </div>
-                                      <div className="hidden lg:block"></div>
-                                      <div>
-                                        <span className="text-gray-500 dark:text-gray-400">
-                                          Saldo Atual:{' '}
-                                        </span>
-                                        <span className="text-text dark:text-text-dark font-semibold">
-                                          {formatCurrency(account.balance)}
-                                        </span>
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <div>
-                                        <span className="text-gray-500 dark:text-gray-400">
-                                          Agência:{' '}
-                                        </span>
-                                        <span className="text-text dark:text-text-dark font-mono">
-                                          {account.agency}
-                                        </span>
-                                      </div>
-                                      <div>
-                                        <span className="text-gray-500 dark:text-gray-400">
-                                          Conta:{' '}
-                                        </span>
-                                        <span className="text-text dark:text-text-dark font-mono">
-                                          {account.accountNumber}
-                                        </span>
-                                      </div>
-                                      <div>
-                                        <span className="text-gray-500 dark:text-gray-400">
-                                          Saldo:{' '}
-                                        </span>
-                                        <span className="text-text dark:text-text-dark font-semibold">
-                                          {formatCurrency(account.balance)}
-                                        </span>
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Ações */}
-                            <div className="flex gap-2 md:flex-shrink-0">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleEdit(account)}
-                                disabled={isUpdating}
-                                className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
-                              >
-                                <Edit className="h-4 w-4 mr-2" />
-                                Editar
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleDelete(account.id)}
-                                disabled={isDeleting}
-                                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    );
-                  })}
-                </div>
+                <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border dark:border-border-dark">
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Conta
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Instituição
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Detalhes
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Saldo
+                          </th>
+                          <th className="text-right p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Ações
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredAccounts.map((account) => (
+                          <AccountTableRow
+                            key={account.id}
+                            account={account}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                            isUpdating={isUpdating}
+                            isDeleting={isDeleting}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
               )}
             </>
           )}
