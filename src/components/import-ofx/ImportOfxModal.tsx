@@ -136,7 +136,7 @@ export function ImportOfxModal({
 
   return (
     <Modal open={open} onClose={onClose} title="Importar Extrato OFX" className="max-w-2xl">
-      <div className="space-y-6 p-6">
+      <div className="space-y-4 p-4">
         <AccountSelector
           accounts={accounts}
           selectedAccountId={selectedAccountId}
@@ -157,7 +157,7 @@ export function ImportOfxModal({
         />
 
         {/* Import to Cash Flow Option */}
-        <div className="flex items-center justify-between p-4 bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg">
+        <div className="flex items-center justify-between p-3 bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg">
           <div className="flex flex-col gap-1">
             <label
               htmlFor="import-to-cashflow"
@@ -180,7 +180,7 @@ export function ImportOfxModal({
 
         {/* Clear Cash Flow Option */}
         {importToCashFlow && (
-          <div className="flex items-center justify-between p-4 bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg">
             <div className="flex flex-col gap-1">
               <label
                 htmlFor="clear-cashflow"

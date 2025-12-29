@@ -36,7 +36,7 @@ export function FileUploadArea({
       <section
         aria-label="Área de upload de arquivo OFX"
         className={cn(
-          'relative border-2 border-dashed rounded-lg p-8 transition-colors',
+          'relative border-2 border-dashed rounded-lg p-6 transition-colors',
           isDragging
             ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
             : 'border-border dark:border-border-dark bg-background dark:bg-background-dark',
@@ -78,11 +78,11 @@ export function FileUploadArea({
           </div>
         ) : (
           <div className="text-center">
-            <Upload className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500 mb-4" />
-            <p className="text-sm text-text dark:text-text-dark mb-2">
+            <Upload className="h-10 w-10 mx-auto text-gray-400 dark:text-gray-500 mb-2" />
+            <p className="text-sm text-text dark:text-text-dark mb-1">
               Arraste e solte o arquivo OFX aqui
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">ou</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">ou</p>
             <Button
               type="button"
               variant="outline"
@@ -92,7 +92,7 @@ export function FileUploadArea({
               <Upload className="h-4 w-4 mr-2" />
               Selecionar arquivo
             </Button>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
               Apenas arquivos .ofx são aceitos
             </p>
           </div>
