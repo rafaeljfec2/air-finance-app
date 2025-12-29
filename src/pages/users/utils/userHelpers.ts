@@ -1,10 +1,17 @@
 /**
  * Get badge color class for user role
  */
-export function getRoleBadgeColor(role: 'admin' | 'user'): string {
-  return role === 'admin'
-    ? 'bg-purple-500/20 text-purple-400 border-purple-500/30'
-    : 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+export function getRoleBadgeColor(role: 'god' | 'admin' | 'user'): string {
+  switch (role) {
+    case 'god':
+      return 'bg-red-500/20 text-red-400 border-red-500/30';
+    case 'admin':
+      return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+    case 'user':
+      return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+    default:
+      return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+  }
 }
 
 /**
@@ -33,4 +40,3 @@ export function getOnboardingCompletedBadgeColor(onboardingCompleted: boolean | 
     ? 'bg-blue-500/20 text-blue-400 border-blue-500/30'
     : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
 }
-

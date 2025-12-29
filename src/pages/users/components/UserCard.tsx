@@ -10,7 +10,7 @@ interface UserCardProps {
   onDelete: (id: string) => void;
   isUpdating: boolean;
   isDeleting: boolean;
-  getRoleBadgeColor: (role: 'admin' | 'user') => string;
+  getRoleBadgeColor: (role: 'god' | 'admin' | 'user') => string;
   getStatusBadgeColor: (status: 'active' | 'inactive') => string;
   getEmailVerifiedBadgeColor: (emailVerified: boolean | undefined) => string;
   getOnboardingCompletedBadgeColor: (onboardingCompleted: boolean | undefined) => string;
@@ -48,7 +48,11 @@ export function UserCard({
               getRoleBadgeColor(user.role),
             )}
           >
-            {user.role === 'admin' ? 'Administrador' : 'Usuário'}
+            {(() => {
+              if (user.role === 'god') return 'God';
+              if (user.role === 'admin') return 'Administrador';
+              return 'Usuário';
+            })()}
           </span>
           <span
             className={cn(
@@ -118,4 +122,3 @@ export function UserCard({
     </Card>
   );
 }
-

@@ -44,8 +44,9 @@ export function UserFormModal({
   const [form, setForm] = useState<CreateUser>(initialFormState);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const roleOptions: ComboBoxOption<'admin' | 'user'>[] = useMemo(
+  const roleOptions: ComboBoxOption<'god' | 'admin' | 'user'>[] = useMemo(
     () => [
+      { value: 'god', label: 'God' },
       { value: 'admin', label: 'Administrador' },
       { value: 'user', label: 'Usuário' },
     ],
@@ -162,7 +163,7 @@ export function UserFormModal({
             <ComboBox
               options={roleOptions}
               value={form.role}
-              onValueChange={(value: 'admin' | 'user' | null) =>
+              onValueChange={(value: 'god' | 'admin' | 'user' | null) =>
                 setForm((prev) => ({ ...prev, role: value ?? 'user' }))
               }
               placeholder="Selecione a função"
