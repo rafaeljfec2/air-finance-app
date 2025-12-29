@@ -15,6 +15,7 @@ import { useMemo, useState } from 'react';
 import { UserCard } from './components/UserCard';
 import { UserEmptyState } from './components/UserEmptyState';
 import { UserFilters } from './components/UserFilters';
+import { UserPermissionsModal } from './components/UserPermissionsModal';
 import { UserTableRow } from './components/UserTableRow';
 import {
     getEmailVerifiedBadgeColor,
@@ -46,6 +47,7 @@ export function UsersPage() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showDeleteAllDataModal, setShowDeleteAllDataModal] = useState(false);
+  const [permissionsUser, setPermissionsUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -110,6 +112,11 @@ export function UsersPage() {
       console.error('Failed to update role', error);
     }
   };
+
+  const handleViewPermissions = (user: User) => {
+    setPermissionsUser(user);
+  };
+
 
 
   if (isLoading) {
@@ -248,6 +255,7 @@ export function UsersPage() {
                             getOnboardingCompletedBadgeColor={getOnboardingCompletedBadgeColor}
                             activeCompanyId={activeCompany?.id}
                             onAssignRole={handleAssignRole}
+                            onViewPermissions={handleViewPermissions}
                           />
                         ))}
                       </tbody>
@@ -286,6 +294,15 @@ export function UsersPage() {
         open={showDeleteAllDataModal}
         onClose={() => setShowDeleteAllDataModal(false)}
       />
+
+      {permissionsUser && (
+        <UserPermissionsModal
+          open={!!permissionsUser}
+          onClose={() => setPermissionsUser(null)}
+          role={activeCompany ? (permissionsUser.companyRoles?.[activeCompany.id] ?? 'viewer') : permissionsUser.role}
+          userName={permissionsUser.name}
+        />
+      )}
     </ViewDefault>
   );
 }
