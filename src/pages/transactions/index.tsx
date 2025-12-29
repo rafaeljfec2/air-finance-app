@@ -259,7 +259,7 @@ export function Transactions() {
   const confirmDelete = async () => {
     if (!transactionToDelete) return;
     try {
-      await Promise.resolve(deleteTransaction(transactionToDelete.id));
+      await deleteTransaction(transactionToDelete.id);
       toast({
         title: 'Transação excluída',
         description: 'A transação foi excluída com sucesso.',
@@ -267,10 +267,12 @@ export function Transactions() {
       });
       setShowConfirmDelete(false);
       setTransactionToDelete(null);
-    } catch {
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message || 'Não foi possível excluir a transação. Tente novamente.';
       toast({
         title: 'Erro ao excluir',
-        description: 'Não foi possível excluir a transação. Tente novamente.',
+        description: errorMessage,
         type: 'error',
       });
     }
