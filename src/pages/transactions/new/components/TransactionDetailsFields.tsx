@@ -143,7 +143,7 @@ export function TransactionDetailsFields({
     <div className="p-3 sm:p-4 bg-background dark:bg-background-dark">
       {isRecurring ? (
         // Campos para transação recorrente
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Data inicial */}
           <div className="flex flex-col">
             <DatePicker
