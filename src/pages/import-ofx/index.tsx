@@ -62,7 +62,7 @@ export function ImportOfxPage() {
     isFetching,
     refetch,
   } = useExtracts(companyId, startDate, endDate, selectedAccountId);
-  const { previousBalance = 0 } = usePreviousBalance(companyId, startDate, selectedAccountId);
+  const { previousBalance = 0 } = usePreviousBalance(companyId, startDate, selectedAccountId, 'extracts');
 
   const importMutation = useMutation({
     mutationFn: async ({

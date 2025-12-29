@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  createTransaction,
-  CreateTransactionPayload,
-  deleteTransaction,
-  getPreviousBalance,
-  getTransactions,
-  Transaction,
-  updateTransaction,
-  type TransactionFilters,
+    createTransaction,
+    CreateTransactionPayload,
+    deleteTransaction,
+    getPreviousBalance,
+    getTransactions,
+    Transaction,
+    updateTransaction,
+    type TransactionFilters,
 } from '../services/transactionService';
 
 export const useTransactions = (companyId: string, filters?: TransactionFilters) => {
@@ -72,18 +72,19 @@ export const usePreviousBalance = (
   companyId: string,
   startDate?: string,
   accountId?: string,
+  source: 'transactions' | 'extracts' = 'transactions',
 ) => {
   const {
     data: previousBalance,
     isLoading,
     error,
   } = useQuery<number>({
-    queryKey: ['previousBalance', companyId, startDate ?? null, accountId ?? null],
+    queryKey: ['previousBalance', companyId, startDate ?? null, accountId ?? null, source],
     queryFn: () => {
       if (!startDate) {
         return Promise.resolve(0);
       }
-      return getPreviousBalance(companyId, startDate, accountId);
+      return getPreviousBalance(companyId, startDate, accountId, source);
     },
     enabled: !!companyId && !!startDate,
   });

@@ -130,12 +130,13 @@ export const getPreviousBalance = async (
   companyId: string,
   startDate: string,
   accountId?: string,
+  source: 'transactions' | 'extracts' = 'transactions',
 ): Promise<number> => {
   try {
     const response = await apiClient.get<PreviousBalanceResponse>(
       `/companies/${companyId}/transactions/previous-balance`,
       {
-        params: { startDate, accountId },
+        params: { startDate, accountId, source },
       },
     );
     return response.data.previousBalance;
