@@ -1,10 +1,9 @@
 import { Card } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
 import { useDashboardSummary } from '@/hooks/useDashboard';
 import type { DashboardFilters } from '@/types/dashboard';
 import { formatCurrency } from '@/utils/formatters';
 import { motion, useSpring, useTransform } from 'framer-motion';
-import { Clock, PieChart, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
+import { TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { useEffect } from 'react';
 
 interface SummaryCardsRowProps {
@@ -12,19 +11,7 @@ interface SummaryCardsRowProps {
   filters: DashboardFilters;
 }
 
-function formatChangeLabel(pct: number | null): { text: string; className: string } {
-  if (pct === null) {
-    return { text: 'Sem comparação com período anterior', className: 'text-gray-500' };
-  }
 
-  const rounded = Number.isFinite(pct) ? pct.toFixed(1) : '0.0';
-  const sign = pct >= 0 ? '+' : '';
-  const isPositive = pct >= 0;
-  return {
-    text: `${sign}${rounded}% vs mês anterior`,
-    className: isPositive ? 'text-green-500' : 'text-red-500',
-  };
-}
 
 function AnimatedValue({ value }: { value: number }) {
   const spring = useSpring(0, { bounce: 0, duration: 1000 });
@@ -61,14 +48,9 @@ export function SummaryCardsRow({ companyId, filters }: Readonly<SummaryCardsRow
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[1, 2, 3].map((i) => (
-          <Card key={i} className="bg-white dark:bg-gray-800 p-6">
-            <div className="animate-pulse space-y-4">
-              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
-              <div className="h-7 w-32 bg-gray-200 dark:bg-gray-700 rounded" />
-            </div>
-          </Card>
+          <div key={i} className="h-32 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
         ))}
       </div>
     );
@@ -76,14 +58,12 @@ export function SummaryCardsRow({ companyId, filters }: Readonly<SummaryCardsRow
 
   if (error) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-white dark:bg-gray-800 p-6 col-span-3">
-          <div className="flex items-center gap-3 text-sm text-red-500">
-            <Spinner size="sm" className="text-red-500" />
-            <span>Erro ao carregar resumo financeiro do dashboard.</span>
-          </div>
-        </Card>
-      </div>
+      <Card className="bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/20 p-6">
+        <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
+          <TrendingDown className="h-5 w-5" />
+          <span>Erro ao carregar dados do dashboard. Tente atualizar a página.</span>
+        </div>
+      </Card>
     );
   }
 
@@ -91,82 +71,95 @@ export function SummaryCardsRow({ companyId, filters }: Readonly<SummaryCardsRow
     return null;
   }
 
-  const balanceChange = formatChangeLabel(data.balanceChangePct);
-
   return (
     <motion.div
       variants={container}
       initial="hidden"
       animate="show"
-      className="grid grid-cols-1 md:grid-cols-3 gap-4"
+      className="grid grid-cols-1 md:grid-cols-3 gap-6"
     >
-      {/* Saldo Total */}
-      <motion.div variants={item} whileHover={{ y: -5, transition: { duration: 0.2 } }}>
-        <Card className="bg-white dark:bg-card-dark p-6 h-full border-l-4 border-l-blue-500 shadow-md hover:shadow-xl transition-shadow duration-300">
-          <div className="flex items-center justify-between">
+      {/* Saldo Total - Theme Compliant Premium Card */}
+      <motion.div variants={item} whileHover={{ y: -5, transition: { duration: 0.2 } }} className="h-full">
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-card-dark p-6 shadow-md border border-gray-100 dark:border-border-dark group h-full flex flex-col justify-between">
+          <div className="absolute top-0 right-0 w-1.5 h-full bg-blue-500 rounded-r-2xl opacity-80 group-hover:opacity-100 transition-opacity" />
+          {/* Subtle gradient glow for premium feel without breaking theme */}
+          <div className="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all" />
+
+          <div className="px-1 relative z-10 flex flex-col h-full justify-between">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-2.5 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
+                <Wallet className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className={`flex items-center text-xs font-medium px-2.5 py-1 rounded-full ${data.balanceChangePct && data.balanceChangePct >= 0 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'}`}>
+                 <TrendingUp className={`h-3 w-3 mr-1 ${data.balanceChangePct && data.balanceChangePct < 0 ? 'rotate-180' : ''}`} />
+                 {data.balanceChangePct ? `${Math.abs(data.balanceChangePct).toFixed(1)}%` : '0%'}
+              </div>
+            </div>
+            
             <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Saldo Total</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Saldo Total Acumulado</p>
+              <h3 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                 <AnimatedValue value={data.balance} />
+              </h3>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 flex items-center gap-1">
+                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                 Saldo real atualizado
               </p>
             </div>
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full shadow-inner ring-1 ring-blue-500/10">
-              <Wallet className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-            </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <TrendingUp
-              className={`h-4 w-4 mr-1 ${
-                data.balanceChangePct !== null && data.balanceChangePct < 0
-                  ? 'text-red-500 rotate-180'
-                  : 'text-green-500'
-              }`}
-            />
-            <span className={balanceChange.className}>{balanceChange.text}</span>
-          </div>
-        </Card>
+        </div>
       </motion.div>
 
-      {/* Receitas */}
-      <motion.div variants={item} whileHover={{ y: -5, transition: { duration: 0.2 } }}>
-        <Card className="bg-white dark:bg-card-dark p-6 h-full border-l-4 border-l-green-500 shadow-md hover:shadow-xl transition-shadow duration-300">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Receitas</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
-                <AnimatedValue value={data.income} />
-              </p>
+      {/* Receitas - Theme Compliant Premium Card */}
+      <motion.div variants={item} whileHover={{ y: -5, transition: { duration: 0.2 } }} className="h-full">
+         <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-card-dark p-6 shadow-md border border-gray-100 dark:border-border-dark group h-full flex flex-col justify-between">
+            <div className="absolute top-0 right-0 w-1.5 h-full bg-emerald-500 rounded-r-2xl opacity-80 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all" />
+
+            <div className="px-1 relative z-10 flex flex-col h-full justify-between">
+              <div className="flex items-center justify-between mb-4">
+                 <div className="p-2.5 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
+                    <TrendingUp className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                 </div>
+                  <div className={`flex items-center text-xs font-medium px-2.5 py-1 rounded-full ${data.incomeChangePct && data.incomeChangePct >= 0 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'}`}>
+                   {data.incomeChangePct ? `${data.incomeChangePct > 0 ? '+' : ''}${data.incomeChangePct.toFixed(1)}%` : '-'}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Receitas do Período</p>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+                  <AnimatedValue value={data.income} />
+                </h3>
+              </div>
             </div>
-            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full shadow-inner ring-1 ring-green-500/10">
-              <TrendingUp className="h-6 w-6 text-green-600 dark:text-green-400" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-center text-sm">
-            <Clock className="h-4 w-4 text-gray-500 mr-1" />
-            <span className="text-gray-500">Última atualização: agora</span>
-          </div>
-        </Card>
+         </div>
       </motion.div>
 
-      {/* Despesas */}
-      <motion.div variants={item} whileHover={{ y: -5, transition: { duration: 0.2 } }}>
-        <Card className="bg-white dark:bg-card-dark p-6 h-full border-l-4 border-l-red-500 shadow-md hover:shadow-xl transition-shadow duration-300">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Despesas</p>
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
-                <AnimatedValue value={data.expenses} />
-              </p>
+      {/* Despesas - Theme Compliant Premium Card */}
+      <motion.div variants={item} whileHover={{ y: -5, transition: { duration: 0.2 } }} className="h-full">
+         <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-card-dark p-6 shadow-md border border-gray-100 dark:border-border-dark group h-full flex flex-col justify-between">
+            <div className="absolute top-0 right-0 w-1.5 h-full bg-rose-500 rounded-r-2xl opacity-80 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute -right-6 -top-6 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/20 transition-all" />
+
+            <div className="px-1 relative z-10 flex flex-col h-full justify-between">
+              <div className="flex items-center justify-between mb-4">
+                 <div className="p-2.5 bg-rose-50 dark:bg-rose-900/30 rounded-xl">
+                    <TrendingDown className="h-6 w-6 text-rose-600 dark:text-rose-400" />
+                 </div>
+                  <div className={`flex items-center text-xs font-medium px-2.5 py-1 rounded-full ${data.expensesChangePct && data.expensesChangePct > 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
+                   {data.expensesChangePct ? `${data.expensesChangePct > 0 ? '+' : ''}${data.expensesChangePct.toFixed(1)}%` : '-'}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Despesas do Período</p>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+                  <AnimatedValue value={data.expenses} />
+                </h3>
+              </div>
             </div>
-            <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-full shadow-inner ring-1 ring-red-500/10">
-              <TrendingDown className="h-6 w-6 text-red-600 dark:text-red-400" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-center text-sm">
-            <PieChart className="h-4 w-4 text-gray-500 mr-1" />
-            <span className="text-gray-500">Ver distribuição</span>
-          </div>
-        </Card>
+         </div>
       </motion.div>
     </motion.div>
   );

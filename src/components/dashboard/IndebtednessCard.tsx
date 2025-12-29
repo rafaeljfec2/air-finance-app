@@ -5,13 +5,13 @@ import { useIndebtedness } from '@/hooks/useIndebtedness';
 import type { IndebtednessMetrics } from '@/types/indebtedness';
 import { formatCurrency } from '@/utils/formatters';
 import {
-  AlertTriangle,
-  CreditCard,
-  DollarSign,
-  HelpCircle,
-  Lightbulb,
-  TrendingDown,
-  TrendingUp,
+    AlertTriangle,
+    CreditCard,
+    DollarSign,
+    HelpCircle,
+    Lightbulb,
+    TrendingDown,
+    TrendingUp,
 } from 'lucide-react';
 import React, { useMemo } from 'react';
 
@@ -396,8 +396,10 @@ interface DebtSummarySectionProps {
 
 function DebtSummarySection({ totalDebt, debtToRevenue }: Readonly<DebtSummarySectionProps>) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 pt-4 border-t border-border dark:border-border-dark">
-      <div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+      <div className="relative">
+        {/* Vertical separator for desktop */}
+        <div className="hidden md:block absolute right-0 top-2 bottom-2 w-px bg-gray-200 dark:bg-gray-700" />
         <MetricHeader
           icon={
             <div className="p-1.5 rounded-lg bg-red-100 dark:bg-red-900/20">
@@ -444,7 +446,7 @@ function AccountBalancesSection({ balances }: Readonly<AccountBalancesSectionPro
     balances.net >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
 
   return (
-    <div className="mt-4 pt-4 border-t border-border dark:border-border-dark">
+    <div>
       <MetricHeader
         icon={
           <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/20">
@@ -486,7 +488,7 @@ function SuggestionsSection({ suggestions }: Readonly<SuggestionsSectionProps>) 
   }
 
   return (
-    <div className="mt-4 pt-4 border-t border-border dark:border-border-dark">
+    <div className="mt-2">
       <div className="flex items-center gap-1.5 mb-2">
         <Lightbulb className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
         <span className="text-sm font-semibold text-text dark:text-text-dark">Recomendações</span>
@@ -550,22 +552,37 @@ export function IndebtednessCard({ companyId }: Readonly<IndebtednessCardProps>)
   }
 
   return (
-    <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark">
-      <div className="p-4">
-        <h3 className="text-base font-semibold text-text dark:text-text-dark mb-4">
-          Nível de Endividamento
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <CreditUtilizationSection data={data.creditUtilization} />
-          <LiquiditySection data={data.liquidity} />
+    <Card className="bg-white dark:bg-card-dark border-none shadow-md overflow-hidden">
+      <div className="p-4 space-y-3">
+        <div className="flex items-center justify-between">
+            <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <div className="p-1.5 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
+                 <AlertTriangle className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              Análise de Saúde Financeira
+            </h3>
         </div>
 
-        <DebtSummarySection totalDebt={data.totalDebt} debtToRevenue={data.debtToRevenue} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="bg-gray-50 dark:bg-background-dark rounded-xl p-3 border border-gray-100 dark:border-border-dark">
+             <CreditUtilizationSection data={data.creditUtilization} />
+          </div>
+          <div className="bg-gray-50 dark:bg-background-dark rounded-xl p-3 border border-gray-100 dark:border-border-dark">
+             <LiquiditySection data={data.liquidity} />
+          </div>
+        </div>
 
-        <AccountBalancesSection balances={data.accountBalances} />
+        <div className="bg-white dark:bg-background-dark rounded-xl border border-gray-100 dark:border-border-dark p-1">
+             <DebtSummarySection totalDebt={data.totalDebt} debtToRevenue={data.debtToRevenue} />
+        </div>
 
-        <SuggestionsSection suggestions={suggestions} />
+        <div className="bg-gray-50 dark:bg-background-dark rounded-xl p-3 border border-gray-100 dark:border-border-dark">
+             <AccountBalancesSection balances={data.accountBalances} />
+        </div>
+
+        {suggestions.length > 0 && (
+             <SuggestionsSection suggestions={suggestions} />
+        )}
       </div>
     </Card>
   );
