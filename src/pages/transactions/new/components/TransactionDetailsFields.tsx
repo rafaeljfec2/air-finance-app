@@ -146,12 +146,12 @@ export function TransactionDetailsFields({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Data inicial */}
           <div className="flex flex-col">
+            <label
+              className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+            >
+              Data inicial <span className="text-red-500">*</span>
+            </label>
             <DatePicker
-              label={
-                <>
-                  Data inicial <span className="text-red-500">*</span>
-                </>
-              }
               value={recurrenceStartDate}
               onChange={onRecurrenceStartDateChange}
               placeholder="Selecionar data inicial"
@@ -164,12 +164,12 @@ export function TransactionDetailsFields({
 
           {/* Data final */}
           <div className="flex flex-col">
+            <label
+              className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+            >
+              Data final <span className="text-red-500">*</span>
+            </label>
             <DatePicker
-              label={
-                <>
-                  Data final <span className="text-red-500">*</span>
-                </>
-              }
               value={recurrenceEndDate}
               onChange={onRecurrenceEndDateChange}
               placeholder="Selecionar data final"
@@ -260,12 +260,12 @@ export function TransactionDetailsFields({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Data */}
           <div className="flex flex-col">
+            <label
+              className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+            >
+              Data de pagamento <span className="text-red-500">*</span>
+            </label>
             <DatePicker
-              label={
-                <>
-                  Data de pagamento <span className="text-red-500">*</span>
-                </>
-              }
               value={date}
               onChange={onDateChange}
               placeholder="Selecionar data de pagamento"
