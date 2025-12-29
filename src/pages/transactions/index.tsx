@@ -1,7 +1,7 @@
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal';
 import {
-  TransactionGrid,
-  type TransactionGridTransaction,
+    TransactionGrid,
+    type TransactionGridTransaction,
 } from '@/components/transactions/TransactionGrid';
 import { createPreviousBalanceRow } from '@/components/transactions/TransactionGrid.utils';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -13,6 +13,7 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { BusinessLogsModal } from '@/pages/business-logs/components/BusinessLogsModal';
 import { TransactionFilters } from '@/pages/transactions/components/TransactionFilters';
 import { TransactionHeader } from '@/pages/transactions/components/TransactionHeader';
+import { TransactionSummary } from '@/pages/transactions/components/TransactionSummary';
 import { useCompanyStore } from '@/stores/company';
 import { formatDateToLocalISO } from '@/utils/date';
 import { useMemo, useState } from 'react';
@@ -55,7 +56,6 @@ export function Transactions() {
     transactions = [],
     isLoading,
     isFetching,
-    refetch,
     deleteTransaction,
   } = useTransactions(companyId, { startDate, endDate, accountId: selectedAccountId });
 
@@ -198,6 +198,33 @@ export function Transactions() {
     .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
     .filter(shouldIncludeTransaction);
 
+  const totals = useMemo(() => {
+    let totalCredits = 0;
+    let totalDebits = 0;
+    let finalBalance = 0;
+
+    filteredTransactions.forEach((transaction) => {
+      // Skip previous balance row for totals calculation
+      if (transaction.id === 'previous-balance') {
+        finalBalance = transaction.balance ?? 0;
+        return;
+      }
+
+      if (transaction.launchType === 'revenue') {
+        totalCredits += Math.abs(transaction.value);
+      } else if (transaction.launchType === 'expense') {
+        totalDebits += Math.abs(transaction.value);
+      }
+
+      // Update final balance with the last transaction balance
+      if (transaction.balance !== undefined) {
+        finalBalance = transaction.balance;
+      }
+    });
+
+    return { totalCredits, totalDebits, finalBalance };
+  }, [filteredTransactions]);
+
   const handleEdit = (transaction: TransactionGridTransaction) => {
     // Find the original transaction with IDs (not labels) from the original transactions array
     const originalTransaction = transactions.find((tx) => tx.id === transaction.id);
@@ -245,13 +272,20 @@ export function Transactions() {
   return (
     <ViewDefault>
       <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
-        <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="container mx-auto px-4 py-2 sm:py-4">
           {/* Header */}
           <TransactionHeader
             showFilters={showFilters}
             setShowFilters={setShowFilters}
             onNavigateToHistory={() => navigate('/business-logs')}
             onNavigateToNew={() => navigate('/transactions/new')}
+          />
+
+          {/* Totals Summary */}
+          <TransactionSummary
+            totalCredits={totals.totalCredits}
+            totalDebits={totals.totalDebits}
+            finalBalance={totals.finalBalance}
           />
 
           {/* Filters and Search */}
@@ -268,7 +302,6 @@ export function Transactions() {
             selectedType={selectedType}
             setSelectedType={setSelectedType}
             accounts={accounts}
-            onSearch={() => refetch()}
           />
 
           {/* Transactions Grid */}

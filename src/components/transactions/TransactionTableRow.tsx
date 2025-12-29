@@ -15,6 +15,8 @@ interface TableRowProps {
   onViewHistory?: (transaction: TransactionGridTransaction) => void;
 }
 
+import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
+
 export const TableRow = memo(
   ({ transaction, showActions, onActionClick, onEdit, onDelete, onViewHistory }: TableRowProps) => {
     const isPreviousBalance = transaction.id === 'previous-balance';
@@ -22,44 +24,53 @@ export const TableRow = memo(
     return (
       <tr
         className={cn(
-          'transition-colors',
+          'transition-colors border-b border-border/50 dark:border-border-dark/50 last:border-0',
           isPreviousBalance
-            ? 'bg-gray-100 dark:bg-gray-800 font-semibold'
-            : 'hover:bg-background/70 dark:hover:bg-background-dark/70',
+            ? 'bg-gray-50/80 dark:bg-gray-900/40 italic font-medium'
+            : 'hover:bg-muted/50 dark:hover:bg-muted/50',
         )}
       >
-        <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+        <td className="py-3 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
           {formatTransactionDate(transaction.paymentDate || transaction.createdAt, 'dd/MM/yyyy')}
         </td>
-        <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
-          <Tooltip content={transaction.categoryId || 'Sem categoria'}>
-            <span className="block overflow-hidden text-ellipsis">
-              {transaction.categoryId || 'Sem categoria'}
-            </span>
-          </Tooltip>
+        <td className="py-3 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
+          <div className="flex items-center gap-2">
+            {!isPreviousBalance && (
+              transaction.launchType === 'revenue' ? (
+                <ArrowUpCircle className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+              ) : (
+                <ArrowDownCircle className="h-3.5 w-3.5 text-red-500 flex-shrink-0" />
+              )
+            )}
+            <Tooltip content={transaction.categoryId || 'Sem categoria'}>
+              <span className="block overflow-hidden text-ellipsis">
+                {transaction.categoryId || 'Sem categoria'}
+              </span>
+            </Tooltip>
+          </div>
         </td>
-        <td className="py-2 px-4 text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis">
+        <td className="py-3 px-4 text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis">
           <Tooltip content={transaction.description || 'Sem descrição'}>
             <span className="block overflow-hidden text-ellipsis">
               {transaction.description || 'Sem descrição'}
             </span>
           </Tooltip>
         </td>
-        <td className="py-2 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
+        <td className="py-3 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
           <Tooltip content={transaction.accountId || 'Sem conta'}>
             <span className="block overflow-hidden text-ellipsis">
               {transaction.accountId || 'Sem conta'}
             </span>
           </Tooltip>
         </td>
-        <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-emerald-400 whitespace-nowrap">
+        <td className="py-3 pl-0 pr-8 text-xs font-medium text-right text-emerald-400 whitespace-nowrap">
           {isPreviousBalance
             ? '-'
             : transaction.launchType === 'revenue'
               ? formatCurrency(transaction.value)
               : '-'}
         </td>
-        <td className="py-2 pl-0 pr-8 text-xs font-medium text-right text-red-400 whitespace-nowrap">
+        <td className="py-3 pl-0 pr-8 text-xs font-medium text-right text-red-400 whitespace-nowrap">
           {isPreviousBalance
             ? '-'
             : transaction.launchType === 'expense'
@@ -68,7 +79,7 @@ export const TableRow = memo(
         </td>
         <td
           className={cn(
-            'py-2 pl-0 pr-8 text-xs font-medium text-right whitespace-nowrap',
+            'py-3 pl-0 pr-8 text-xs font-medium text-right whitespace-nowrap',
             (transaction.balance ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400',
           )}
         >
@@ -77,7 +88,7 @@ export const TableRow = memo(
             : formatCurrency(transaction.balance ?? 0)}
         </td>
         {showActions && !isPreviousBalance && (
-          <td className="py-2 px-4">
+          <td className="py-3 px-4">
             <TransactionActions
               transaction={transaction}
               onEdit={onEdit}
@@ -88,7 +99,7 @@ export const TableRow = memo(
             />
           </td>
         )}
-        {showActions && isPreviousBalance && <td className="py-2 px-4" />}
+        {showActions && isPreviousBalance && <td className="py-3 px-4" />}
       </tr>
     );
   },

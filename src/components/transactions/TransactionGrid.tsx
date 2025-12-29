@@ -1,24 +1,23 @@
-import { useNavigate } from 'react-router-dom';
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatCurrency } from '@/utils/formatters';
-import { TableRow } from './TransactionTableRow';
-import { MobileCard } from './TransactionMobileCard';
-import { SortableHeader } from './SortableHeader';
-import { PaginationControls } from './PaginationControls';
-import { useTransactionSorting } from './hooks/useTransactionSorting';
-import { useTransactionFilters } from './hooks/useTransactionFilters';
+import { Loader2, Receipt } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePagination } from './hooks/usePagination';
-import { calculateBalance, getFieldValues } from './TransactionGrid.utils';
+import { useTransactionFilters } from './hooks/useTransactionFilters';
+import { useTransactionSorting } from './hooks/useTransactionSorting';
+import { PaginationControls } from './PaginationControls';
+import { SortableHeader } from './SortableHeader';
 import type {
-  TransactionGridProps,
-  TransactionGridTransaction,
-  SortField,
-  SortDirection,
-  FilterValue,
+    FilterValue,
+    SortDirection,
+    SortField,
+    TransactionGridProps,
+    TransactionGridTransaction,
 } from './TransactionGrid.types';
+import { calculateBalance, getFieldValues } from './TransactionGrid.utils';
+import { MobileCard } from './TransactionMobileCard';
+import { TableRow } from './TransactionTableRow';
 
 export function TransactionGrid({
   transactions,
@@ -105,34 +104,6 @@ export function TransactionGrid({
     () => paginate(sortedAndFilteredTransactions),
     [paginate, sortedAndFilteredTransactions],
   );
-
-  // Calculate totals for footer
-  const totals = useMemo(() => {
-    let totalCredits = 0;
-    let totalDebits = 0;
-    let finalBalance = 0;
-
-    sortedAndFilteredTransactions.forEach((transaction) => {
-      // Skip previous balance row for totals calculation
-      if (transaction.id === 'previous-balance') {
-        finalBalance = transaction.balance ?? 0;
-        return;
-      }
-
-      if (transaction.launchType === 'revenue') {
-        totalCredits += Math.abs(transaction.value);
-      } else if (transaction.launchType === 'expense') {
-        totalDebits += Math.abs(transaction.value);
-      }
-
-      // Update final balance with the last transaction balance
-      if (transaction.balance !== undefined) {
-        finalBalance = transaction.balance;
-      }
-    });
-
-    return { totalCredits, totalDebits, finalBalance };
-  }, [sortedAndFilteredTransactions]);
 
   const handleActionClick = useCallback(
     (transaction: TransactionGridTransaction) => {
@@ -246,43 +217,21 @@ export function TransactionGrid({
                       <tr>
                         <td
                           colSpan={showActions ? 8 : 7}
-                          className="py-10 text-center text-sm text-gray-500 dark:text-gray-400"
+                          className="py-16 text-center"
                         >
-                          Nenhuma transação encontrada para o período selecionado.
+                          <div className="flex flex-col items-center justify-center gap-3">
+                            <div className="p-4 bg-muted/50 rounded-full">
+                              <Receipt className="h-8 w-8 text-muted-foreground/50" />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <p className="font-medium text-text dark:text-text-dark">Nenhuma transação encontrada</p>
+                              <p className="text-sm text-muted-foreground">Tente ajustar os filtros ou busque por outro termo.</p>
+                            </div>
+                          </div>
                         </td>
                       </tr>
                     )}
                   </tbody>
-                  {sortedAndFilteredTransactions.length > 0 && (
-                    <tfoot className="bg-background/50 dark:bg-background-dark/50 border-t-2 border-border dark:border-border-dark">
-                      <tr>
-                        <td className="py-2 px-4 text-xs font-semibold text-text dark:text-text-dark"></td>
-                        <td className="py-2 px-4 text-xs font-semibold text-text dark:text-text-dark"></td>
-                        <td className="py-2 px-4 text-xs font-semibold text-text dark:text-text-dark"></td>
-                        <td className="py-2 px-4 text-xs font-semibold text-text dark:text-text-dark text-right">
-                          TOTAL:
-                        </td>
-                        <td className="py-2 pl-0 pr-8 text-xs font-semibold text-green-500 dark:text-green-400 text-right whitespace-nowrap">
-                          {formatCurrency(totals.totalCredits)}
-                        </td>
-                        <td className="py-2 pl-0 pr-8 text-xs font-semibold text-red-500 dark:text-red-400 text-right whitespace-nowrap">
-                          -{formatCurrency(totals.totalDebits)}
-                        </td>
-                        <td
-                          className={cn(
-                            'py-2 pl-0 pr-8 text-xs font-semibold text-right whitespace-nowrap',
-                            totals.finalBalance >= 0
-                              ? 'text-green-500 dark:text-green-400'
-                              : 'text-red-500 dark:text-red-400',
-                          )}
-                        >
-                          {totals.finalBalance >= 0 ? '+' : ''}
-                          {formatCurrency(Math.abs(totals.finalBalance))}
-                        </td>
-                        {showActions && <td className="py-2 px-4"></td>}
-                      </tr>
-                    </tfoot>
-                  )}
                 </table>
               </div>
             </div>
@@ -302,10 +251,14 @@ export function TransactionGrid({
                   />
                 ))
               ) : (
-                <div className="flex h-full items-center justify-center py-8">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-                    Nenhuma transação encontrada para o período selecionado.
-                  </p>
+                <div className="flex flex-col h-full items-center justify-center py-12 px-4 gap-3 text-center bg-muted/10 rounded-lg border border-border/50 border-dashed">
+                   <div className="p-3 bg-muted/50 rounded-full">
+                      <Receipt className="h-6 w-6 text-muted-foreground/50" />
+                   </div>
+                   <div className="flex flex-col gap-1">
+                      <p className="font-medium text-text dark:text-text-dark">Nenhuma transação</p>
+                      <p className="text-sm text-muted-foreground">Não encontramos nada com os filtros atuais.</p>
+                   </div>
                 </div>
               )}
             </div>

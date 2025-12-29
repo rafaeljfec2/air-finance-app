@@ -24,7 +24,6 @@ interface TransactionFiltersProps {
   selectedType: string;
   setSelectedType: (type: string) => void;
   accounts: Account[] | undefined;
-  onSearch: () => void;
 }
 
 export function TransactionFilters({
@@ -40,7 +39,6 @@ export function TransactionFilters({
   selectedType,
   setSelectedType,
   accounts,
-  onSearch,
 }: TransactionFiltersProps) {
   // Convert date strings to Date objects for DatePicker
   const startDateObj = startDate ? parseLocalDate(startDate) : undefined;
@@ -135,14 +133,13 @@ export function TransactionFilters({
                     size="sm"
                     onClick={() => {
                       const now = new Date();
-                      const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
-                      setStartDate(formatDateToLocalISO(threeMonthsAgo));
+                      setStartDate(formatDateToLocalISO(now));
                       setEndDate(formatDateToLocalISO(now));
                     }}
                     className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
-                    title="Últimos 3 meses"
+                    title="Hoje"
                   >
-                    3 Meses
+                    Hoje
                   </Button>
                   <Button
                     type="button"
@@ -150,14 +147,31 @@ export function TransactionFilters({
                     size="sm"
                     onClick={() => {
                       const now = new Date();
-                      const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, 1);
-                      setStartDate(formatDateToLocalISO(sixMonthsAgo));
-                      setEndDate(formatDateToLocalISO(now));
+                      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+                      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                      setStartDate(formatDateToLocalISO(firstDay));
+                      setEndDate(formatDateToLocalISO(lastDay));
                     }}
                     className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
-                    title="Últimos 6 meses"
+                    title="Este mês"
                   >
-                    6 Meses
+                    Este Mês
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const now = new Date();
+                      const firstDay = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                      const lastDay = new Date(now.getFullYear(), now.getMonth(), 0);
+                      setStartDate(formatDateToLocalISO(firstDay));
+                      setEndDate(formatDateToLocalISO(lastDay));
+                    }}
+                    className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
+                    title="Mês passado"
+                  >
+                    Mês Passado
                   </Button>
                 </div>
               </div>
@@ -204,13 +218,6 @@ export function TransactionFilters({
                 </SelectContent>
               </Select>
             </div>
-            <Button
-              onClick={onSearch}
-              className="bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
-            >
-              <Search className="h-4 w-4" />
-              Pesquisar
-            </Button>
             <Button
               variant="outline"
               className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center justify-center gap-2"
