@@ -1,6 +1,7 @@
 import { CashFlowCard, CreditCardsCard, PayablesCard, ReceivablesCard } from '@/components/budget';
 import { BudgetExpandedModal, type ExpandedCard } from '@/components/budget/BudgetExpandedModal';
 import { MonthNavigator } from '@/components/budget/MonthNavigator';
+import { useAccounts } from '@/hooks/useAccounts';
 import { useBudget } from '@/hooks/useBudget';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
@@ -41,7 +42,13 @@ export function BudgetPage() {
     [activeCard, filter.year, filter.month],
   );
 
-  const activeCardLimit = activeCard?.limit ?? 0;
+  /* Hook de contas para buscar o limite real do banco */
+  const { accounts } = useAccounts();
+  // Assumindo que o ID do cartão retornado pelo budget service é o mesmo ID da conta
+  const activeCardAccount = accounts?.find((a) => a.id === activeCard?.id);
+
+  // Usa o creditLimit da conta se disponível, caso contrário fallback para o limite do cartão do budget service
+  const activeCardLimit = activeCardAccount?.creditLimit ?? activeCard?.limit ?? 0;
   const activeCardBillTotal = activeBill?.total ?? 0;
   const activeCardAvailable = activeCardLimit > 0 ? activeCardLimit - activeCardBillTotal : null;
 
@@ -85,34 +92,35 @@ export function BudgetPage() {
         variants={container}
         initial="hidden"
         animate="show"
-        className="container mx-auto px-2 sm:px-6 pt-0 pb-10"
+        className="container mx-auto px-2 sm:px-6 pt-0 pb-6"
       >
-        <motion.div variants={item} className="mb-8">
+        <motion.div variants={item} className="mb-4 relative z-10">
+          <div className="absolute top-[-20px] left-[-20px] right-[-20px] bottom-[-20px] bg-gradient-to-r from-primary-500/5 to-transparent rounded-3xl -z-10 blur-xl dark:from-primary-500/10" />
           <div className="flex items-center gap-3 mb-2">
-            <div className="inline-flex items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900 p-2">
+            <div className="inline-flex items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/50 p-2 shadow-sm ring-1 ring-primary-500/10">
               <Wallet className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark">
+            <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark tracking-tight">
               Meu Orçamento
             </h1>
           </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 ml-11">
-            Visão geral do seu orçamento, fluxo de caixa e contas a pagar/receber
+          <p className="text-sm text-gray-500 dark:text-gray-400 ml-11 max-w-2xl">
+            Visão geral do seu orçamento, fluxo de caixa e contas a pagar/receber para um planejamento financeiro eficiente.
           </p>
         </motion.div>
         
         {/* Filtro centralizado */}
-        <motion.div variants={item} className="flex justify-center mb-8">
-          <MonthNavigator
-            month={filter.month}
-            year={filter.year}
-            onChange={(month, year) => setFilter({ month, year })}
-          />
+        <motion.div variants={item} className="flex justify-center mb-6">
+            <MonthNavigator
+              month={filter.month}
+              year={filter.year}
+              onChange={(month, year) => setFilter({ month, year })}
+            />
         </motion.div>
 
         <motion.div 
-          variants={container} // Re-stagger for the grid if desired, or simpler just let them be items
-          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch"
+          variants={container} 
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start"
         >
           <motion.div variants={item} className="h-full">
             <CashFlowCard

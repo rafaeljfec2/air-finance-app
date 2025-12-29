@@ -51,9 +51,9 @@ export function BudgetExpandedModal({
       open={expandedCard !== null}
       onClose={onClose}
       title={getExpandedCardTitle(expandedCard)}
-      className="max-w-4xl max-h-[80vh] flex flex-col"
+      className="max-w-4xl max-h-[80vh] flex flex-col overflow-hidden"
     >
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1">
         {expandedCard === 'cashFlow' && (
           <CashFlowSection cashFlow={cashFlow} isLoading={isLoading} />
         )}

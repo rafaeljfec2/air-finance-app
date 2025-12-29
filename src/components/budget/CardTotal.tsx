@@ -2,7 +2,7 @@ import React from 'react';
 
 interface CardTotalProps {
   value: number;
-  color?: 'emerald' | 'amber' | 'rose' | 'violet';
+  color?: 'emerald' | 'amber' | 'rose' | 'violet' | 'blue';
   label?: string;
 }
 
@@ -11,6 +11,7 @@ const colorMap = {
   amber: 'text-amber-500 dark:text-amber-400',
   rose: 'text-red-600 dark:text-red-400',
   violet: 'text-primary-600 dark:text-primary-400',
+  blue: 'text-blue-600 dark:text-blue-400',
 };
 
 export const CardTotal: React.FC<CardTotalProps> = ({ value, color = 'emerald', label }) => (

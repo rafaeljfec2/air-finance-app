@@ -58,58 +58,60 @@ export function ReceivablesCard({
           </div>
         ) : (
           <>
-            <table className="w-full text-[11px]">
-              <thead>
-                <tr>
-                  <th className="px-2 py-1.5 text-left text-gray-400 w-[45%]">Descrição</th>
-                  <th className="px-2 py-1.5 text-right text-gray-400 w-[30%]">Valor</th>
-                  <th className="px-2 py-1.5 text-center text-gray-400 w-[25%]">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
-                {Array.from({ length: itemsPerPage }).map((_, idx) => {
-                  const r = paginatedReceivables[idx];
-                  const key = r ? r.id : `receivable-placeholder-${idx}`;
-                  return r ? (
-                    <tr key={key}>
-                      <td className="px-2 py-1.5 text-left text-text dark:text-text-dark truncate">
-                        {r.description}
-                      </td>
-                      <td className="px-2 py-1.5 text-right font-medium whitespace-nowrap">
-                        R$ {r.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </td>
-                      <td className="px-2 py-1.5 text-center">
-                        <BadgeStatus status={r.status === 'RECEIVED' ? 'success' : 'warning'}>
-                          {r.status === 'RECEIVED' ? 'Recebido' : 'Pendente'}
-                        </BadgeStatus>
-                      </td>
-                    </tr>
-                  ) : (
-                    <tr key={key}>
-                      <td className="px-2 py-1.5" colSpan={3}>
-                        &nbsp;
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto -mx-2">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-border dark:border-border-dark">
+                    <th className="px-3 py-2 text-left font-medium text-gray-500 dark:text-gray-400 w-[50%]">DESCRIÇÃO</th>
+                    <th className="px-3 py-2 text-center font-medium text-gray-500 dark:text-gray-400 w-[20%]">STATUS</th>
+                    <th className="px-3 py-2 text-right font-medium text-gray-500 dark:text-gray-400 w-[30%]">VALOR</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/30 dark:divide-border-dark/30">
+                  {Array.from({ length: itemsPerPage }).map((_, idx) => {
+                    const r = paginatedReceivables[idx];
+                    const key = r ? r.id : `receivable-placeholder-${idx}`;
+                    return r ? (
+                      <tr key={key} className="group hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+                        <td className="px-3 py-2.5 text-text dark:text-text-dark font-medium truncate max-w-[140px]">
+                          {r.description}
+                        </td>
+                        <td className="px-3 py-2.5 text-center">
+                          <BadgeStatus status={r.status === 'RECEIVED' ? 'success' : 'warning'}>
+                            {r.status === 'RECEIVED' ? 'Recebido' : 'Pendente'}
+                          </BadgeStatus>
+                        </td>
+                        <td className="px-3 py-2.5 text-right font-semibold text-text dark:text-text-dark whitespace-nowrap">
+                          R$ {r.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr key={key}>
+                        <td className="px-3 py-2.5" colSpan={3}>
+                          &nbsp;
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-2">
+              <div className="flex justify-between items-center mt-3 pt-2 border-t border-border/50 dark:border-border-dark/50">
                 <button
                   type="button"
-                  className="px-2 py-1 rounded border text-xs font-medium bg-background dark:bg-background-dark border-border dark:border-border-dark disabled:opacity-50"
+                  className="p-1 px-3 rounded-md text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 transition-colors"
                   onClick={handlePrev}
                   disabled={safePage === 1}
                 >
                   Anterior
                 </button>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  Página {safePage} de {totalPages}
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
+                  {safePage} / {totalPages}
                 </span>
                 <button
                   type="button"
-                  className="px-2 py-1 rounded border text-xs font-medium bg-background dark:bg-background-dark border-border dark:border-border-dark disabled:opacity-50"
+                  className="p-1 px-3 rounded-md text-xs font-medium text-text dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 transition-colors"
                   onClick={handleNext}
                   disabled={safePage === totalPages}
                 >

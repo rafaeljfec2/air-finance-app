@@ -7,12 +7,7 @@ interface CardContainerProps {
   className?: string;
 }
 
-const colorMap = {
-  emerald: 'border-emerald-500',
-  amber: 'border-amber-400',
-  rose: 'border-rose-500',
-  violet: 'border-violet-500',
-};
+
 
 export const CardContainer: React.FC<CardContainerProps> = ({
   color = 'emerald',
@@ -20,9 +15,18 @@ export const CardContainer: React.FC<CardContainerProps> = ({
   className,
 }) => (
   <motion.div
-    whileHover={{ y: -5, transition: { duration: 0.2 } }}
-    className={`bg-card dark:bg-card-dark rounded-xl shadow-lg border-t-4 ${colorMap[color]} p-6 flex flex-col h-full flex-1 w-full max-w-full overflow-hidden ${className ?? ''}`}
+    whileHover={{ y: -4, transition: { duration: 0.2 } }}
+    className={`
+      bg-card dark:bg-card-dark 
+      rounded-2xl shadow-sm hover:shadow-xl 
+      border border-border dark:border-border-dark 
+      transition-all duration-300
+      relative overflow-hidden
+      p-6 flex flex-col h-full w-full 
+      ${className ?? ''}
+    `}
   >
+    <div className={`absolute top-0 left-0 right-0 h-1 bg-${color}-500 opacity-80`} />
     {children}
   </motion.div>
 );

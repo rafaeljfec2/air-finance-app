@@ -37,8 +37,8 @@ export function PayablesSection({ payables, isLoading }: Readonly<PayablesSectio
       <thead>
         <tr>
           <th className="px-3 py-2 text-left text-gray-400 w-[45%]">Descrição</th>
-          <th className="px-3 py-2 text-right text-gray-400 w-[25%]">Valor</th>
           <th className="px-3 py-2 text-center text-gray-400 w-[30%]">Status</th>
+          <th className="px-3 py-2 text-right text-gray-400 w-[25%]">Valor</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-border/60 dark:divide-border-dark/60">
@@ -46,6 +46,11 @@ export function PayablesSection({ payables, isLoading }: Readonly<PayablesSectio
           <tr key={p.id}>
             <td className="px-3 py-2 text-left text-text dark:text-text-dark">
               {p.description}
+            </td>
+            <td className="px-3 py-2 text-center">
+              <BadgeStatus status={p.status === 'PAID' ? 'success' : 'danger'}>
+                {p.status === 'PAID' ? 'Pago' : 'Pendente'}
+              </BadgeStatus>
             </td>
             <td className="px-3 py-2 text-right font-medium whitespace-nowrap text-white dark:text-white">
               <EditableValueCell
@@ -69,11 +74,6 @@ export function PayablesSection({ payables, isLoading }: Readonly<PayablesSectio
                 }}
               />
             </td>
-            <td className="px-3 py-2 text-center">
-              <BadgeStatus status={p.status === 'PAID' ? 'success' : 'danger'}>
-                {p.status === 'PAID' ? 'Pago' : 'Pendente'}
-              </BadgeStatus>
-            </td>
           </tr>
         ))}
         {payables.length === 0 && (
@@ -91,10 +91,10 @@ export function PayablesSection({ payables, isLoading }: Readonly<PayablesSectio
             <td className="px-3 py-3 text-left font-semibold text-text dark:text-text-dark">
               Total
             </td>
+            <td className="px-3 py-3 text-center"></td>
             <td className="px-3 py-3 text-right font-bold text-rose-600 dark:text-rose-400 whitespace-nowrap">
               R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </td>
-            <td className="px-3 py-3 text-center"></td>
           </tr>
         )}
       </tbody>

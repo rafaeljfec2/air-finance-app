@@ -144,8 +144,8 @@ export function CreditCardsSection({
           <thead>
             <tr>
               <th className="px-3 py-2 text-left text-gray-400 w-[45%]">Descrição</th>
-              <th className="px-3 py-2 text-right text-gray-400 w-[25%]">Valor</th>
               <th className="px-3 py-2 text-center text-gray-400 w-[30%]">Categoria</th>
+              <th className="px-3 py-2 text-right text-gray-400 w-[25%]">Valor</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/60 dark:divide-border-dark/60">
@@ -193,13 +193,13 @@ export function CreditCardsSection({
                   <td className="px-3 py-2 text-left text-text dark:text-text-dark truncate">
                     {t.description}
                   </td>
-                  <td className="px-3 py-2 text-right font-medium whitespace-nowrap text-white dark:text-white">
-                    R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </td>
                   <td className="px-3 py-2 text-center">
                     <BadgeStatus status={t.category === 'Parcelado' ? 'success' : 'default'}>
                       {t.category}
                     </BadgeStatus>
+                  </td>
+                  <td className="px-3 py-2 text-right font-medium whitespace-nowrap text-white dark:text-white">
+                    R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </td>
                 </tr>
               ));

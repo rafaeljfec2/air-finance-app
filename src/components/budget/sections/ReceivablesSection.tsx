@@ -27,8 +27,8 @@ export function ReceivablesSection({
       <thead>
         <tr>
           <th className="px-3 py-2 text-left text-gray-400 w-[45%]">Descrição</th>
-          <th className="px-3 py-2 text-right text-gray-400 w-[25%]">Valor</th>
           <th className="px-3 py-2 text-center text-gray-400 w-[30%]">Status</th>
+          <th className="px-3 py-2 text-right text-gray-400 w-[25%]">Valor</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-border/60 dark:divide-border-dark/60">
@@ -37,13 +37,13 @@ export function ReceivablesSection({
             <td className="px-3 py-2 text-left text-text dark:text-text-dark">
               {r.description}
             </td>
-            <td className="px-3 py-2 text-right font-medium whitespace-nowrap text-white dark:text-white">
-              R$ {r.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-            </td>
             <td className="px-3 py-2 text-center">
               <BadgeStatus status={r.status === 'RECEIVED' ? 'success' : 'warning'}>
                 {r.status === 'RECEIVED' ? 'Recebido' : 'Pendente'}
               </BadgeStatus>
+            </td>
+            <td className="px-3 py-2 text-right font-medium whitespace-nowrap text-white dark:text-white">
+              R$ {r.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </td>
           </tr>
         ))}
@@ -62,10 +62,10 @@ export function ReceivablesSection({
             <td className="px-3 py-3 text-left font-semibold text-text dark:text-text-dark">
               Total
             </td>
+            <td className="px-3 py-3 text-center"></td>
             <td className="px-3 py-3 text-right font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
               R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </td>
-            <td className="px-3 py-3 text-center"></td>
           </tr>
         )}
       </tbody>

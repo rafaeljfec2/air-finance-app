@@ -106,83 +106,83 @@ export function CreditCardsCard({
           </div>
         ) : (
           <>
-            <div className="flex gap-1.5 mb-3 mt-3">
+            <div className="flex gap-2 mb-4 mt-2 overflow-x-auto pb-1 justify-center">
               {cards.map((card) => {
                 const isActive = activeCardId === card.id;
                 let activeClass = '';
                 if (isActive) {
-                  if (card.brand === 'nubank') {
-                    activeClass = 'bg-[#8A05BE] text-white border-[#8A05BE]';
+                 if (card.brand === 'nubank') {
+                    activeClass = 'bg-[#8A05BE] text-white border-[#8A05BE] shadow-md ring-1 ring-[#8A05BE]/20';
                   } else if (card.brand === 'itau') {
-                    activeClass = 'bg-[#FF6900] text-white border-[#FF6900]';
+                    activeClass = 'bg-[#FF6900] text-white border-[#FF6900] shadow-md ring-1 ring-[#FF6900]/20';
                   } else {
-                    activeClass = 'bg-primary-600 text-white dark:bg-primary-500';
+                    activeClass = 'bg-primary-600 text-white dark:bg-primary-500 shadow-md ring-1 ring-primary-500/20';
                   }
                 } else {
                   activeClass =
-                    'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-500';
+                    'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-transparent hover:bg-gray-200 dark:hover:bg-gray-700';
                 }
                 return (
                   <button
                     key={card.id}
                     type="button"
                     onClick={() => onChangeActiveCard(card.id)}
-                    className={`px-2 py-1 rounded font-medium border transition-colors text-[11px] ${activeClass}`}
+                    className={`px-3 py-1.5 rounded-full font-medium transition-all text-xs flex items-center gap-1.5 ${activeClass}`}
                   >
-                    <div className="flex items-center gap-1">
-                      <CreditCardBrandIcon brand={card.brand} />
-                      {card.name}
-                    </div>
+                    <CreditCardBrandIcon brand={card.brand} />
+                    {card.name}
                   </button>
                 );
               })}
             </div>
-            <table className="w-full text-[11px]">
-              <thead>
-                <tr>
-                  <th className="px-2 py-1.5 text-left text-gray-400 w-[45%]">Descrição</th>
-                  <th className="px-2 py-1.5 text-right text-gray-400 w-[30%]">Valor</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50 dark:divide-border-dark/50">
-                {Array.from({ length: itemsPerPage }).map((_, idx) => {
-                  const t = paginatedTransactions[idx];
-                  const key = t ? t.id : `card-placeholder-${idx}`;
-                  return t ? (
-                    <tr key={key}>
-                      <td className="px-2 py-1.5 text-left text-text dark:text-text-dark truncate">
-                        {t.description}
-                      </td>
-                      <td className="px-2 py-1.5 text-right font-medium whitespace-nowrap">
-                        R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </td>
-                    </tr>
-                  ) : (
-                    <tr key={key}>
-                      <td className="px-2 py-1.5" colSpan={3}>
-                        &nbsp;
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto -mx-2">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-border dark:border-border-dark">
+                    <th className="px-3 py-2 text-left font-medium text-gray-500 dark:text-gray-400 w-[60%]">DESCRIÇÃO</th>
+                    <th className="px-3 py-2 text-right font-medium text-gray-500 dark:text-gray-400 w-[40%]">VALOR</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/30 dark:divide-border-dark/30">
+                  {Array.from({ length: itemsPerPage }).map((_, idx) => {
+                    const t = paginatedTransactions[idx];
+                    const key = t ? t.id : `transaction-placeholder-${idx}`;
+                    return t ? (
+                      <tr key={key} className="group hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+                        <td className="px-3 py-2.5 text-text dark:text-text-dark font-medium truncate max-w-[160px]">
+                          {t.description}
+                        </td>
+                        <td className="px-3 py-2.5 text-right font-semibold text-text dark:text-text-dark whitespace-nowrap">
+                          R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr key={key}>
+                        <td className="px-3 py-2.5" colSpan={2}>
+                          &nbsp;
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-2">
+              <div className="flex justify-between items-center mt-3 pt-2 border-t border-border/50 dark:border-border-dark/50">
                 <button
                   type="button"
-                  className="px-2 py-1 rounded border text-xs font-medium bg-background dark:bg-background-dark border-border dark:border-border-dark disabled:opacity-50"
+                  className="p-1 px-3 rounded-md text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 transition-colors"
                   onClick={handlePrev}
                   disabled={safePage === 1}
                 >
                   Anterior
                 </button>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  Página {safePage} de {totalPages}
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
+                  {safePage} / {totalPages}
                 </span>
                 <button
                   type="button"
-                  className="px-2 py-1 rounded border text-xs font-medium bg-background dark:bg-background-dark border-border dark:border-border-dark disabled:opacity-50"
+                  className="p-1 px-3 rounded-md text-xs font-medium text-text dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 transition-colors"
                   onClick={handleNext}
                   disabled={safePage === totalPages}
                 >

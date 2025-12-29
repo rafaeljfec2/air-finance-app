@@ -25,7 +25,11 @@ export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlo
           Expandir
         </Button>
       </CardHeader>
-      <CardTotal value={cashFlow?.finalBalance ?? 0} color="emerald" label="Saldo Final" />
+      <CardTotal 
+        value={cashFlow?.finalBalance ?? 0} 
+        color={(cashFlow?.finalBalance ?? 0) >= 0 ? 'blue' : 'rose'} 
+        label="Saldo Final" 
+      />
       {isLoading && (
         <div className="mt-6 flex justify-center">
           <Spinner size="lg" className="text-emerald-500" />
@@ -39,7 +43,8 @@ export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlo
           <CardStat
             label="Saldo Final"
             value={cashFlow.finalBalance}
-            highlight={cashFlow.finalBalance >= 0}
+            blue={cashFlow.finalBalance >= 0}
+            negative={cashFlow.finalBalance < 0}
           />
         </div>
       )}
