@@ -38,7 +38,11 @@ export function PayablesCard({
 
   return (
     <CardContainer color="rose" className="min-h-[420px]">
-      <CardHeader icon={<TrendingDown size={24} />} title="Contas a Pagar">
+      <CardHeader
+        icon={<TrendingDown className="h-4 w-4 text-rose-600 dark:text-rose-400" />}
+        title="Contas a Pagar"
+        tooltip="Lista de todas as despesas e obrigações financeiras para este mês."
+      >
         <Button
           type="button"
           variant="ghost"

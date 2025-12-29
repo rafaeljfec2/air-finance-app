@@ -87,7 +87,11 @@ export function CreditCardsCard({
 
   return (
     <CardContainer color="violet" className="min-h-[420px]">
-      <CardHeader icon={<CreditCard size={20} />} title="Cartões de Crédito">
+      <CardHeader
+        icon={<CreditCard className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
+        title="Cartões de Crédito"
+        tooltip="Gerenciamento de faturas, limites e lançamentos dos seus cartões de crédito."
+      >
         <Button
           type="button"
           variant="ghost"

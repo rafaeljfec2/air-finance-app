@@ -2,7 +2,7 @@ import { CardContainer, CardEmpty, CardHeader, CardStat, CardTotal } from '@/com
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import type { CashFlow } from '@/types/budget';
-import { Maximize2, Wallet } from 'lucide-react';
+import { Activity, Maximize2 } from 'lucide-react';
 
 interface CashFlowCardProps {
   cashFlow: CashFlow | null;
@@ -13,7 +13,11 @@ interface CashFlowCardProps {
 export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlowCardProps>) {
   return (
     <CardContainer color="emerald" className="min-h-[420px]">
-      <CardHeader icon={<Wallet size={24} />} title="Previsão de Caixa">
+      <CardHeader
+        icon={<Activity className="h-4 w-4 text-primary-600 dark:text-primary-400" />}
+        title="Fluxo de Caixa"
+        tooltip="Comparativo entre o saldo inicial, previsão de entradas/saídas e o saldo final projetado para o mês."
+      >
         <Button
           type="button"
           variant="ghost"
@@ -25,7 +29,7 @@ export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlo
           Expandir
         </Button>
       </CardHeader>
-      <CardTotal 
+      <CardTotal
         value={cashFlow?.finalBalance ?? 0} 
         color={(cashFlow?.finalBalance ?? 0) >= 0 ? 'blue' : 'rose'} 
         label="Saldo Final" 

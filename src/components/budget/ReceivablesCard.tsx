@@ -38,7 +38,11 @@ export function ReceivablesCard({
 
   return (
     <CardContainer color="amber" className="min-h-[420px]">
-      <CardHeader icon={<TrendingUp size={24} />} title="Contas a Receber">
+      <CardHeader
+        icon={<TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />}
+        title="Contas a Receber"
+        tooltip="Lista de todas as receitas previstas e recebidas para este mês."
+      >
         <Button
           type="button"
           variant="ghost"

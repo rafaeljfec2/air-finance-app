@@ -1,9 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DashboardGoalSummary } from '@/types/dashboard';
 import { MonthlyReport } from '@/types/report';
 import { formatCurrency } from '@/utils/formatters';
 import { ArrowDownCircle, ArrowUpCircle, Wallet } from 'lucide-react';
 import { CashFlowChart } from './CashFlowChart';
 import { ExpenseParetoChart } from './ExpenseParetoChart';
+import { GoalsCard } from './GoalsCard';
 import { Insight, InsightsCard } from './InsightsCard';
 
 interface FinancialDashboardProps {
@@ -15,9 +17,10 @@ interface FinancialDashboardProps {
     balance: number;
   }>;
   insights: Insight[];
+  goals: DashboardGoalSummary[];
 }
 
-export function FinancialDashboard({ report, historicalData, insights }: Readonly<FinancialDashboardProps>) {
+export function FinancialDashboard({ report, historicalData, insights, goals }: Readonly<FinancialDashboardProps>) {
   // Safe default for historical data if empty
   const safeHistoricalData = historicalData.length > 0 ? historicalData : [];
   
@@ -106,12 +109,8 @@ export function FinancialDashboard({ report, historicalData, insights }: Readonl
              </CardContent>
          </Card>
          
-         {/* Future: Investment/Savings or another breakdown */}
-         <Card className="flex items-center justify-center p-6 border-dashed">
-            <div className="text-center space-y-2">
-                <p className="text-sm text-muted-foreground">Em breve: Análise de Investimentos e Metas</p>
-            </div>
-         </Card>
+         {/* Goals & Investments Tracker */}
+         <GoalsCard goals={goals} />
       </div>
     </div>
   );
