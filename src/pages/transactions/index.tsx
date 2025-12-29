@@ -3,7 +3,7 @@ import {
     TransactionGrid,
     type TransactionGridTransaction,
 } from '@/components/transactions/TransactionGrid';
-import { createPreviousBalanceRow } from '@/components/transactions/TransactionGrid.utils';
+import { calculateBalance, createPreviousBalanceRow } from '@/components/transactions/TransactionGrid.utils';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { toast } from '@/components/ui/toast';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -98,7 +98,8 @@ export function Transactions() {
       transactionsList = [previousBalanceRow, ...transactionsList];
     }
 
-    return transactionsList;
+    // Calculate running balance for all transactions
+    return calculateBalance(transactionsList);
   }, [transactionsWithLabels, previousBalance, startDate, selectedAccountId, accountMap]);
 
   // Helper function to check if transaction matches search term
@@ -195,18 +196,34 @@ export function Transactions() {
   };
 
   const filteredTransactions = [...transactionsWithPreviousBalance]
-    .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
+    .sort((a, b) => {
+      const dateA = new Date(a.paymentDate || a.createdAt).getTime();
+      const dateB = new Date(b.paymentDate || b.createdAt).getTime();
+      
+      if (dateA === dateB) {
+        const createdA = new Date(a.createdAt).getTime();
+        const createdB = new Date(b.createdAt).getTime();
+        return createdB - createdA; // Newest created first (DESC)
+      }
+      
+      return dateB - dateA; // Newest date first (DESC)
+    })
     .filter(shouldIncludeTransaction);
 
   const totals = useMemo(() => {
     let totalCredits = 0;
     let totalDebits = 0;
-    let finalBalance = 0;
+    
+    // finalBalance should be the balance of the most recent transaction (first in list)
+    // or the previous balance if no transactions match
+    // filteredTransactions is already sorted by date descending (Newest -> Oldest)
+    const finalBalance = filteredTransactions.length > 0 
+      ? (filteredTransactions[0].balance ?? 0)
+      : previousBalance;
 
     filteredTransactions.forEach((transaction) => {
       // Skip previous balance row for totals calculation
       if (transaction.id === 'previous-balance') {
-        finalBalance = transaction.balance ?? 0;
         return;
       }
 
@@ -215,15 +232,10 @@ export function Transactions() {
       } else if (transaction.launchType === 'expense') {
         totalDebits += Math.abs(transaction.value);
       }
-
-      // Update final balance with the last transaction balance
-      if (transaction.balance !== undefined) {
-        finalBalance = transaction.balance;
-      }
     });
 
     return { totalCredits, totalDebits, finalBalance };
-  }, [filteredTransactions]);
+  }, [filteredTransactions, previousBalance]);
 
   const handleEdit = (transaction: TransactionGridTransaction) => {
     // Find the original transaction with IDs (not labels) from the original transactions array

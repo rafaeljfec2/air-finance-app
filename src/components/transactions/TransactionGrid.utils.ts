@@ -118,6 +118,14 @@ export const calculateBalance = (
   const sortedByDateAsc = [...transactions].sort((a, b) => {
     const dateA = new Date(a.paymentDate || a.createdAt).getTime();
     const dateB = new Date(b.paymentDate || b.createdAt).getTime();
+    
+    // Stable sort: If dates are equal, sort by creation time
+    if (dateA === dateB) {
+      const createdA = new Date(a.createdAt).getTime();
+      const createdB = new Date(b.createdAt).getTime();
+      return createdA - createdB;
+    }
+    
     return dateA - dateB;
   });
 
