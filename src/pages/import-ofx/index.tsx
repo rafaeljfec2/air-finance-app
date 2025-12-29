@@ -170,10 +170,13 @@ export function ImportOfxPage() {
   };
 
   // 1. Process Raw Transactions
+  // 1. Process Raw Transactions
   const rawTransactions: TransactionGridTransaction[] = useMemo(() => {
     if (!extracts || extracts.length === 0) {
       return [];
     }
+
+    const seenFitIds = new Set<string>();
 
     return extracts.flatMap((extract, extractIndex) => {
       // Skip extracts with no transactions
@@ -199,7 +202,15 @@ export function ImportOfxPage() {
       // Ensure we have a consistent key for filtering
       const accountKey = matchedAccount?.id || extract.accountId || extract.header?.account || 'unknown';
 
-      return extract.transactions.map((tx: ExtractTransaction, index: number) => {
+      return extract.transactions.flatMap((tx: ExtractTransaction, index: number) => {
+        // Deduplication Logic
+        if (tx.fitId) {
+          if (seenFitIds.has(tx.fitId)) {
+            return []; // Skip duplicate
+          }
+          seenFitIds.add(tx.fitId);
+        }
+
         const isoDate = tx.date ? `${tx.date}T00:00:00` : new Date().toISOString();
         const amountNum = typeof tx.amount === 'number' ? tx.amount : Number(tx.amount) || 0;
         const isRevenue = amountNum >= 0;
@@ -211,7 +222,7 @@ export function ImportOfxPage() {
           ? `${tx.fitId}_${extractIndex}_${index}`
           : `${extract.id ?? 'extract'}_${extractIndex}_${index}`;
 
-        return {
+        return [{
           id: uniqueId,
           description: tx.description || 'Sem descrição',
           value: normalizedValue, 
@@ -229,7 +240,7 @@ export function ImportOfxPage() {
           reconciled: true,
           createdAt: isoDate,
           updatedAt: isoDate,
-        } as TransactionGridTransaction & { accountKey?: string };
+        } as TransactionGridTransaction & { accountKey?: string }];
       });
     });
   }, [companyId, extracts, accounts]); // Removed dependency on startDate/endDate/selectedAccountId here to process raw data first
@@ -315,10 +326,10 @@ export function ImportOfxPage() {
     let totalCredits = 0;
     let totalDebits = 0;
 
-    // finalBalance should be the balance of the most recent transaction (first in list)
+    // finalBalance should be the balance of the most recent transaction (last in list since it's sorted ASC)
     // or the previous balance if no transactions match
     const finalBalance = filteredTransactions.length > 0
-      ? (filteredTransactions[0].balance ?? 0)
+      ? (filteredTransactions[filteredTransactions.length - 1].balance ?? 0)
       : previousBalance;
 
     filteredTransactions.forEach((transaction) => {
