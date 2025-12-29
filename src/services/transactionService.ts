@@ -291,7 +291,11 @@ export const getExtracts = async (
 
     // Check if it's an array of transactions (without header)
     if (isTransactionsArray(data)) {
-      return [normalizeExtract(data)];
+      const normalized = normalizeExtract(data);
+      if (accountId) {
+        normalized.accountId = accountId;
+      }
+      return [normalized];
     }
 
     // Normalize each extract in the array

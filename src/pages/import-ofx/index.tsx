@@ -1,34 +1,31 @@
 import { ImportOfxModal } from '@/components/import-ofx/ImportOfxModal';
 import {
-    TransactionGrid,
-    TransactionGridTransaction,
+  TransactionGrid,
+  TransactionGridTransaction,
 } from '@/components/transactions/TransactionGrid';
 import {
-    calculateBalance,
-    createPreviousBalanceRow,
+  calculateBalance,
+  createPreviousBalanceRow,
 } from '@/components/transactions/TransactionGrid.utils';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { ComboBox, type ComboBoxOption } from '@/components/ui/ComboBox';
-import { DatePicker } from '@/components/ui/DatePicker';
-import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/toast';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useActiveCompany } from '@/hooks/useActiveCompany';
 import { useExtracts } from '@/hooks/useExtracts';
 import { usePreviousBalance } from '@/hooks/useTransactions';
 import { ViewDefault } from '@/layouts/ViewDefault';
+import { TransactionSummary } from '@/pages/transactions/components/TransactionSummary';
 import {
-    createInstallments,
-    importOfx,
-    type ExtractTransaction,
-    type InstallmentTransaction,
+  createInstallments,
+  importOfx,
+  type ExtractTransaction,
+  type InstallmentTransaction,
 } from '@/services/transactionService';
 import { formatDateToLocalISO } from '@/utils/date';
 import { useMutation } from '@tanstack/react-query';
 import { endOfMonth, startOfMonth } from 'date-fns';
-import { Download, Filter, Receipt, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { ImportOfxFilters } from './components/ImportOfxFilters';
+import { ImportOfxHeader } from './components/ImportOfxHeader';
 
 export function ImportOfxPage() {
   const { activeCompany } = useActiveCompany();
@@ -59,19 +56,13 @@ export function ImportOfxPage() {
 
   const { accounts } = useAccounts();
 
-  // Convert selectedAccountId (accountNumber) to accountId for API call
-  const selectedAccount = useMemo(() => {
-    if (!selectedAccountId || selectedAccountId === 'all') return undefined;
-    return accounts?.find((acc) => acc.accountNumber === selectedAccountId);
-  }, [selectedAccountId, accounts]);
-
   const {
     data: extracts = [],
     isLoading,
     isFetching,
     refetch,
-  } = useExtracts(companyId, startDate, endDate, selectedAccount?.id);
-  const { previousBalance = 0 } = usePreviousBalance(companyId, startDate, selectedAccount?.id);
+  } = useExtracts(companyId, startDate, endDate, selectedAccountId);
+  const { previousBalance = 0 } = usePreviousBalance(companyId, startDate, selectedAccountId);
 
   const importMutation = useMutation({
     mutationFn: async ({
@@ -178,22 +169,6 @@ export function ImportOfxPage() {
     await createInstallmentsMutation.mutateAsync({ installments, accountId, periodEnd });
   };
 
-  // List all registered accounts for the combo
-  const accountOptions: ComboBoxOption<string>[] = useMemo(() => {
-    if (!accounts || accounts.length === 0) return [];
-
-    const sortedAccounts = [...accounts].sort((a, b) => {
-      return a.name.localeCompare(b.name, 'pt-BR', {
-        sensitivity: 'base',
-      });
-    });
-
-    return sortedAccounts.map((account) => ({
-      value: account.id || '',
-      label: `${account.name} (${account.type === 'credit_card' ? 'Cartão' : 'Conta'})`,
-    }));
-  }, [accounts]);
-
   const transactions: TransactionGridTransaction[] = useMemo(() => {
     if (!extracts || extracts.length === 0) {
       return [];
@@ -205,15 +180,28 @@ export function ImportOfxPage() {
         return [];
       }
 
-      const extractAccountNumber =
-        extract.header?.account || extract.accountId || 'Conta não informada';
 
-      // Try to find a matching registered account by accountNumber
-      const matchedAccount = accounts?.find((acc) => acc.accountNumber === extractAccountNumber);
+      // Resolve account data
+      // 1. Try by internal accountId (if present on extract)
+      // 2. Try by header account number
+      let matchedAccount = undefined;
+      if (extract.accountId) {
+        matchedAccount = accounts?.find((acc) => acc.id === extract.accountId);
+      }
+      if (!matchedAccount && extract.header?.account) {
+        matchedAccount = accounts?.find((acc) => acc.accountNumber === extract.header?.account);
+      }
 
-      const accountName = matchedAccount?.name || extractAccountNumber;
-      const accountLabel = `${accountName} ${extractAccountNumber}`;
-      const accountKey = extractAccountNumber; // Use accountNumber as key for filtering
+      const accountName = matchedAccount?.name || 'Conta desconhecida';
+      const accountNumberDisplay = matchedAccount?.accountNumber || extract.header?.account || extract.accountId || '';
+      
+      const accountLabel = matchedAccount 
+        ? `${matchedAccount.name} (${matchedAccount.accountNumber})`
+        : accountNumberDisplay;
+
+      // Ensure we have a consistent key for filtering
+      // If we matched an account, use its ID. Otherwise use whatever ID/Number we have.
+      const accountKey = matchedAccount?.id || extract.accountId || extract.header?.account || 'unknown';
 
       return extract.transactions.map((tx: ExtractTransaction, index: number) => {
         const isoDate = tx.date ? `${tx.date}T00:00:00` : new Date().toISOString();
@@ -270,10 +258,19 @@ export function ImportOfxPage() {
       transactionsWithBalance = calculateBalance(transactionsWithBalance);
     }
 
-    // Sort descending by date (most recent first)
-    return transactionsWithBalance.sort(
-      (a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime(),
-    );
+    // Sort descending by date (most recent first) with stable sort
+    return transactionsWithBalance.sort((a, b) => {
+      const dateA = new Date(a.paymentDate || a.createdAt).getTime();
+      const dateB = new Date(b.paymentDate || b.createdAt).getTime();
+
+      if (dateA === dateB) {
+        const createdA = new Date(a.createdAt).getTime();
+        const createdB = new Date(b.createdAt).getTime();
+        return createdB - createdA; // Newest created first (DESC)
+      }
+
+      return dateB - dateA; // Newest date first (DESC)
+    });
   }, [companyId, extracts, previousBalance, startDate, selectedAccountId, accounts]);
 
   const filteredTransactions = useMemo(() => {
@@ -299,137 +296,61 @@ export function ImportOfxPage() {
     });
   }, [transactions, searchTerm]);
 
+  const totals = useMemo(() => {
+    let totalCredits = 0;
+    let totalDebits = 0;
+
+    // finalBalance should be the balance of the most recent transaction (first in list)
+    // or the previous balance if no transactions match
+    const finalBalance = filteredTransactions.length > 0
+      ? (filteredTransactions[0].balance ?? 0)
+      : previousBalance;
+
+    filteredTransactions.forEach((transaction) => {
+      // Skip previous balance row for totals calculation
+      if (transaction.id === 'previous-balance') {
+        return;
+      }
+
+      if (transaction.launchType === 'revenue') {
+        totalCredits += Math.abs(transaction.value);
+      } else if (transaction.launchType === 'expense') {
+        totalDebits += Math.abs(transaction.value);
+      }
+    });
+
+    return { totalCredits, totalDebits, finalBalance };
+  }, [filteredTransactions, previousBalance]);
+
   return (
     <ViewDefault>
       <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
-        <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="container mx-auto px-4 py-2 sm:py-4">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <Receipt className="h-8 w-8 text-primary-400" />
-                <h1 className="text-2xl font-bold text-text dark:text-text-dark">
-                  Extrato Bancário
-                </h1>
-              </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Visualize os extratos importados por período.
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Button
-                onClick={() => setShowImportModal(true)}
-                disabled={!companyId}
-                className="bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
-              >
-                Importar extrato (OFX)
-              </Button>
-            </div>
-          </div>
+          <ImportOfxHeader
+            onImportClick={() => setShowImportModal(true)}
+            disableImport={!companyId}
+          />
+
+          {/* Totals Summary */}
+          <TransactionSummary
+            totalCredits={totals.totalCredits}
+            totalDebits={totals.totalDebits}
+            finalBalance={totals.finalBalance}
+          />
 
           {/* Filters */}
-          <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm mb-6">
-            <div className="p-4">
-              <div className="grid grid-cols-1 sm:grid-cols-5 lg:grid-cols-[1fr_1fr_1fr_auto_auto] gap-4 items-center">
-                <DatePicker
-                  value={startDateObj}
-                  onChange={handleStartDateChange}
-                  placeholder="Data inicial"
-                  className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                  showIcon={false}
-                />
-                <DatePicker
-                  value={endDateObj}
-                  onChange={handleEndDateChange}
-                  placeholder="Data final"
-                  className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                  showIcon={false}
-                />
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                  <Input
-                    id="search-term"
-                    type="text"
-                    placeholder="Descrição, conta ou ID externo"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                  <ComboBox
-                    options={[{ value: 'all', label: 'Todas as contas' }, ...accountOptions]}
-                    value={selectedAccountId || 'all'}
-                    onValueChange={(value) =>
-                      setSelectedAccountId(value === 'all' ? undefined : (value ?? undefined))
-                    }
-                    placeholder="Todas as contas"
-                    searchable
-                    searchPlaceholder="Buscar conta..."
-                    className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500"
-                    maxHeight="max-h-56"
-                    renderItem={(option) => {
-                      if (option.value === 'all') {
-                        return <span>{option.label}</span>;
-                      }
-                      // option.value is the accountNumber, option.label is "accountName accountNumber"
-                      const accountNumber = option.value;
-                      const matchedAccount = accounts?.find(
-                        (acc) => acc.accountNumber === accountNumber,
-                      );
-                      const accountName = matchedAccount?.name || accountNumber;
-                      return (
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-sm">{accountName}</span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            {accountNumber}
-                          </span>
-                        </div>
-                      );
-                    }}
-                    renderTrigger={(option, displayValue) => {
-                      if (!option || option.value === 'all') {
-                        return <span>{displayValue}</span>;
-                      }
-                      // option.value is the accountNumber
-                      const accountNumber = option.value;
-                      const matchedAccount = accounts?.find(
-                        (acc) => acc.accountNumber === accountNumber,
-                      );
-                      const accountName = matchedAccount?.name || accountNumber;
-                      return (
-                        <div className="flex items-center gap-2 flex-1">
-                          <span className="font-medium text-text dark:text-text-dark text-sm">
-                            {accountName}
-                          </span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            {accountNumber}
-                          </span>
-                        </div>
-                      );
-                    }}
-                  />
-                </div>
-                <div className="flex gap-3 justify-end">
-                  <Button
-                    onClick={() => refetch()}
-                    className="bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
-                  >
-                    <Search className="h-4 w-4" />
-                    Pesquisar
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center justify-center gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    Exportar
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </Card>
+          <ImportOfxFilters
+            startDate={startDateObj}
+            setStartDate={handleStartDateChange}
+            endDate={endDateObj}
+            setEndDate={handleEndDateChange}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            selectedAccountId={selectedAccountId}
+            setSelectedAccountId={setSelectedAccountId}
+            accounts={accounts || []}
+          />
 
           {/* Grid */}
           <TransactionGrid
