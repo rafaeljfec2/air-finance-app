@@ -169,21 +169,19 @@ export function ImportOfxPage() {
     await createInstallmentsMutation.mutateAsync({ installments, accountId, periodEnd });
   };
 
-  const transactions: TransactionGridTransaction[] = useMemo(() => {
+  // 1. Process Raw Transactions
+  const rawTransactions: TransactionGridTransaction[] = useMemo(() => {
     if (!extracts || extracts.length === 0) {
       return [];
     }
 
-    const flattened = extracts.flatMap((extract, extractIndex) => {
+    return extracts.flatMap((extract, extractIndex) => {
       // Skip extracts with no transactions
       if (!extract?.transactions || extract.transactions.length === 0) {
         return [];
       }
 
-
       // Resolve account data
-      // 1. Try by internal accountId (if present on extract)
-      // 2. Try by header account number
       let matchedAccount = undefined;
       if (extract.accountId) {
         matchedAccount = accounts?.find((acc) => acc.id === extract.accountId);
@@ -192,7 +190,6 @@ export function ImportOfxPage() {
         matchedAccount = accounts?.find((acc) => acc.accountNumber === extract.header?.account);
       }
 
-      const accountName = matchedAccount?.name || 'Conta desconhecida';
       const accountNumberDisplay = matchedAccount?.accountNumber || extract.header?.account || extract.accountId || '';
       
       const accountLabel = matchedAccount 
@@ -200,25 +197,23 @@ export function ImportOfxPage() {
         : accountNumberDisplay;
 
       // Ensure we have a consistent key for filtering
-      // If we matched an account, use its ID. Otherwise use whatever ID/Number we have.
       const accountKey = matchedAccount?.id || extract.accountId || extract.header?.account || 'unknown';
 
       return extract.transactions.map((tx: ExtractTransaction, index: number) => {
         const isoDate = tx.date ? `${tx.date}T00:00:00` : new Date().toISOString();
         const amountNum = typeof tx.amount === 'number' ? tx.amount : Number(tx.amount) || 0;
         const isRevenue = amountNum >= 0;
-        // Normalize value: revenue = positive, expense = negative (same as backend)
         const normalizedValue = isRevenue ? Math.abs(amountNum) : -Math.abs(amountNum);
 
         return {
           id: tx.fitId || `${extract.id ?? 'extract'}-${extractIndex}-${index}`,
           description: tx.description || 'Sem descrição',
-          value: normalizedValue, // Already normalized: positive for revenue, negative for expense
+          value: normalizedValue, 
           launchType: isRevenue ? 'revenue' : 'expense',
           valueType: 'fixed',
           companyId: extract.companyId || companyId || 'sem-company',
           accountId: accountLabel,
-          accountKey, // Store the accountNumber for filtering
+          accountKey, 
           categoryId: 'Extrato bancário',
           paymentDate: isoDate,
           issueDate: isoDate,
@@ -231,17 +226,52 @@ export function ImportOfxPage() {
         } as TransactionGridTransaction & { accountKey?: string };
       });
     });
+  }, [companyId, extracts, accounts]); // Removed dependency on startDate/endDate/selectedAccountId here to process raw data first
 
-    // Filter by selected account if any
-    let filtered = flattened;
+  // 2. Filter and Calculate Balance
+  const filteredTransactions = useMemo(() => {
+    let filtered = rawTransactions;
+
+    // Filter by Date
+    if (startDate || endDate) {
+      filtered = filtered.filter((tx) => {
+        // tx.paymentDate is ISO string (YYYY-MM-DDTHH:mm:ss.sssZ) or similar
+        // We only care about YYYY-MM-DD part
+        if (!tx.paymentDate) return true;
+        
+        try {
+          const txDate = tx.paymentDate.split('T')[0];
+          
+          if (startDate && txDate < startDate) return false;
+          if (endDate && txDate > endDate) return false;
+          return true;
+        } catch (e) {
+          console.error("Invalid date format", tx.paymentDate);
+          return true;
+        }
+      });
+    }
+
+    // Filter by Account
     if (selectedAccountId && selectedAccountId !== 'all') {
-      filtered = flattened.filter((tx) => {
+      filtered = filtered.filter((tx) => {
         const txWithKey = tx as TransactionGridTransaction & { accountKey?: string };
         return txWithKey.accountKey === selectedAccountId;
       });
     }
 
-    // Use the same calculateBalance function as the transactions screen
+    // Sort Ascending by Date before calculating balance
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.paymentDate).getTime();
+      const dateB = new Date(b.paymentDate).getTime();
+       if (dateA === dateB) {
+        // Stable sort by creation or index ID
+        return (a.id > b.id) ? 1 : -1;
+      }
+      return dateA - dateB;
+    });
+
+    // Calculate Balance
     let transactionsWithBalance = calculateBalance(filtered);
 
     // Add previous balance row if startDate is set
@@ -253,48 +283,27 @@ export function ImportOfxPage() {
       } else {
         previousBalanceRow.accountId = 'Todas';
       }
+      // Prepend previous balance
       transactionsWithBalance = [previousBalanceRow, ...transactionsWithBalance];
       // Recalculate balance with previous balance included
       transactionsWithBalance = calculateBalance(transactionsWithBalance);
     }
 
-    // Sort descending by date (most recent first) with stable sort
-    return transactionsWithBalance.sort((a, b) => {
-      const dateA = new Date(a.paymentDate || a.createdAt).getTime();
-      const dateB = new Date(b.paymentDate || b.createdAt).getTime();
+    return transactionsWithBalance;
+  }, [rawTransactions, startDate, endDate, selectedAccountId, previousBalance, accounts]);
 
-      if (dateA === dateB) {
-        const createdA = new Date(a.createdAt).getTime();
-        const createdB = new Date(b.createdAt).getTime();
-        return createdB - createdA; // Newest created first (DESC)
-      }
-
-      return dateB - dateA; // Newest date first (DESC)
-    });
-  }, [companyId, extracts, previousBalance, startDate, selectedAccountId, accounts]);
-
-  const filteredTransactions = useMemo(() => {
-    if (!searchTerm.trim()) return transactions;
+  // 3. Search Filter (Text)
+  const searchingTransactions = useMemo(() => {
+    if (!searchTerm.trim()) return filteredTransactions;
     const term = searchTerm.toLowerCase();
-    return transactions.filter((tx) => {
-      // Always include previous balance row
-      if (tx.id === 'previous-balance') {
-        return true;
-      }
+    return filteredTransactions.filter((tx) => {
+      if (tx.id === 'previous-balance') return true;
       const desc = (tx.description ?? '').toLowerCase();
       const account = (tx.accountId ?? '').toLowerCase();
-      const obs = (tx.observation ?? '').toLowerCase();
-      const date = (tx.paymentDate ?? '').toLowerCase();
       const amount = tx.value.toString().toLowerCase();
-      return (
-        desc.includes(term) ||
-        account.includes(term) ||
-        obs.includes(term) ||
-        date.includes(term) ||
-        amount.includes(term)
-      );
+      return desc.includes(term) || account.includes(term) || amount.includes(term);
     });
-  }, [transactions, searchTerm]);
+  }, [filteredTransactions, searchTerm]);
 
   const totals = useMemo(() => {
     let totalCredits = 0;
@@ -354,10 +363,10 @@ export function ImportOfxPage() {
 
           {/* Grid */}
           <TransactionGrid
-            transactions={filteredTransactions}
+            transactions={searchingTransactions}
             isLoading={isLoading || isFetching}
             showActions={false}
-            resetPageKey={selectedAccountId}
+            resetPageKey={`${selectedAccountId}-${startDate}-${endDate}-${searchTerm}`} // Force reset on filter change
           />
         </div>
       </div>

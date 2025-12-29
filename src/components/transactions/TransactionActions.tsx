@@ -10,7 +10,7 @@ export function TransactionActions({
   onEdit,
   onDelete,
   onViewHistory,
-  variant = 'table',
+  // variant = 'table',
 }: TransactionActionsPropsReadonly) {
   
   // Mobile/Card view might prefer visible buttons or same menu. 
