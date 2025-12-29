@@ -10,7 +10,7 @@ export const UserSchema = z.object({
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   companyIds: z.array(z.string()),
-  role: z.enum(['admin', 'user']),
+  role: z.enum(['god', 'admin', 'user']),
   status: z.enum(['active', 'inactive']),
   onboardingCompleted: z.preprocess((val) => val ?? false, z.boolean()),
   emailVerified: z.preprocess((val) => val ?? false, z.boolean()),

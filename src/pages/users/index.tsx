@@ -4,12 +4,14 @@ import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { DeleteAllUserDataModal } from '@/components/users/DeleteAllUserDataModal';
 import { UserFormModal } from '@/components/users/UserFormModal';
+import { useAuth } from '@/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
 import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { CreateUser, User } from '@/services/userService';
-import { Plus, Trash2, User as UserIcon } from 'lucide-react';
+import { Plus, ShieldAlert, Trash2, User as UserIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UserCard } from './components/UserCard';
 import { UserEmptyState } from './components/UserEmptyState';
 import { UserFilters } from './components/UserFilters';
@@ -22,6 +24,8 @@ import {
 } from './utils/userHelpers';
 
 export function UsersPage() {
+  const { user: currentUser } = useAuth();
+  const navigate = useNavigate();
   const {
     users,
     isLoading,
@@ -93,6 +97,30 @@ export function UsersPage() {
     setShowConfirmDelete(false);
     setDeleteId(null);
   };
+
+  // Verificar se o usuário tem permissão (role "god")
+  const hasGodRole = currentUser?.role === 'god';
+  if (currentUser && !hasGodRole) {
+    return (
+      <ViewDefault>
+        <div className="container mx-auto px-4 sm:px-6 py-10">
+          <Card className="p-8 text-center">
+            <ShieldAlert className="h-16 w-16 mx-auto mb-4 text-red-500" />
+            <h2 className="text-2xl font-bold mb-2 text-text dark:text-text-dark">Acesso Negado</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Você não tem permissão para acessar esta página.
+            </p>
+            <Button
+              onClick={() => navigate('/dashboard')}
+              className="bg-primary-500 hover:bg-primary-600 text-white"
+            >
+              Voltar ao Dashboard
+            </Button>
+          </Card>
+        </div>
+      </ViewDefault>
+    );
+  }
 
   if (isLoading) {
     return (

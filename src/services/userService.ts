@@ -9,7 +9,7 @@ export const UserSchema = z.object({
   companyIds: z.array(z.string()),
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   email: z.string().email('E-mail inválido'),
-  role: z.enum(['admin', 'user'], {
+  role: z.enum(['god', 'admin', 'user'], {
     errorMap: () => ({ message: 'Função inválida' }),
   }),
   status: z.enum(['active', 'inactive'], {

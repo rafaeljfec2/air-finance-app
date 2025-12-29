@@ -7,6 +7,7 @@ import { Grid3x3, List, Search } from 'lucide-react';
 
 const roleOptions = [
   { value: 'all', label: 'Todas as funções' },
+  { value: 'god', label: 'God' },
   { value: 'admin', label: 'Administrador' },
   { value: 'user', label: 'Usuário' },
 ] as const;
@@ -123,4 +124,3 @@ export function UserFilters({
     </Card>
   );
 }
-
