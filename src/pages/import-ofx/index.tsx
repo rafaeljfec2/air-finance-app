@@ -176,7 +176,7 @@ export function ImportOfxPage() {
       return [];
     }
 
-    const seenFitIds = new Set<string>();
+    const seenKeys = new Set<string>();
 
     return extracts.flatMap((extract, extractIndex) => {
       // Skip extracts with no transactions
@@ -204,12 +204,17 @@ export function ImportOfxPage() {
 
       return extract.transactions.flatMap((tx: ExtractTransaction, index: number) => {
         // Deduplication Logic
-        if (tx.fitId) {
-          if (seenFitIds.has(tx.fitId)) {
-            return []; // Skip duplicate
-          }
-          seenFitIds.add(tx.fitId);
+        // Some banks reuse fitId for linked transactions (e.g. IOF and Credits).
+        // uniqueKey must consider amount and date to distinguish these valid collisions
+        // while still catching true duplicates (same file imported twice).
+        const compositeKey = tx.fitId 
+          ? `${tx.fitId}-${tx.amount}-${tx.date}` 
+          : `${extract.id}-${extractIndex}-${index}`; // Fallback for items without fitId
+
+        if (seenKeys.has(compositeKey)) {
+          return []; // Skip true duplicate
         }
+        seenKeys.add(compositeKey);
 
         const isoDate = tx.date ? `${tx.date}T00:00:00` : new Date().toISOString();
         const amountNum = typeof tx.amount === 'number' ? tx.amount : Number(tx.amount) || 0;
