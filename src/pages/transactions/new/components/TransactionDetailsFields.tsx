@@ -1,7 +1,6 @@
 import { ComboBox } from '@/components/ui/ComboBox';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { Account } from '@/services/accountService';
 import { formatCurrency } from '@/utils/formatters';
@@ -197,26 +196,20 @@ export function TransactionDetailsFields({
               <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
                 Repete a cada <span className="text-red-500">*</span>
               </label>
-              <Select
+              <ComboBox
+                options={[...FREQUENCY_OPTIONS]}
                 value={recurrenceFrequency ?? 'monthly'}
                 onValueChange={(value) => {
                   const frequency = value as RecurrenceFrequency;
                   onRecurrenceFrequencyChange?.(frequency);
                 }}
-              >
-                <SelectTrigger className="w-full h-9 bg-card dark:bg-card-dark border-border dark:border-border-dark rounded-lg">
-                  <div className="px-1 text-sm">
-                    {FREQUENCY_OPTIONS.find((opt) => opt.value === (recurrenceFrequency ?? 'monthly'))?.label ?? 'Mensal'}
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  {FREQUENCY_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value} className="py-2">
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="Selecione..."
+                searchable={false}
+                className={cn(
+                  'w-full h-9 bg-card dark:bg-card-dark text-foreground border rounded-lg hover:bg-accent/50 transition-all text-sm',
+                  'border-border dark:border-border-dark hover:border-primary-400'
+                )}
+              />
             </div>
 
             {/* Data final (Opcional) */}
