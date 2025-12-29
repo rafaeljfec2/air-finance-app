@@ -205,8 +205,14 @@ export function ImportOfxPage() {
         const isRevenue = amountNum >= 0;
         const normalizedValue = isRevenue ? Math.abs(amountNum) : -Math.abs(amountNum);
 
+        // Generate a truly unique ID for the grid to prevent React key collisions ("stuck data")
+        // combining fitId (if present) with extract index + transaction index
+        const uniqueId = tx.fitId 
+          ? `${tx.fitId}_${extractIndex}_${index}`
+          : `${extract.id ?? 'extract'}_${extractIndex}_${index}`;
+
         return {
-          id: tx.fitId || `${extract.id ?? 'extract'}-${extractIndex}-${index}`,
+          id: uniqueId,
           description: tx.description || 'Sem descrição',
           value: normalizedValue, 
           launchType: isRevenue ? 'revenue' : 'expense',
