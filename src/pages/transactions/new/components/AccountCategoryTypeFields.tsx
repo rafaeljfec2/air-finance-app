@@ -53,15 +53,13 @@ export function AccountCategoryTypeFields({
   );
 
   return (
-    <div className="p-3 sm:p-4 bg-background dark:bg-background-dark">
-      <div
-        className={`grid grid-cols-1 sm:grid-cols-2 ${isCreditCard ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-3`}
-      >
+    <div className="p-4 bg-background dark:bg-background-dark pt-2">
+      <div className={`grid grid-cols-1 sm:grid-cols-2 ${isCreditCard ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4`}>
         {/* Conta */}
         <div>
           <label
             htmlFor="accountId"
-            className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+            className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2"
           >
             Conta <span className="text-red-500">*</span>
           </label>
@@ -74,10 +72,10 @@ export function AccountCategoryTypeFields({
             searchable
             searchPlaceholder="Buscar conta..."
             className={cn(
-              'w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border hover:bg-background dark:hover:bg-background-dark',
+              'w-full h-11 bg-card dark:bg-card-dark text-foreground border rounded-xl hover:bg-accent/50 transition-all',
               errors.accountId
-                ? 'border-red-500 dark:border-red-500'
-                : 'border-border dark:border-border-dark',
+                ? 'border-red-500 dark:border-red-500 ring-red-500/20'
+                : 'border-border dark:border-border-dark hover:border-primary-400',
             )}
           />
         </div>
@@ -86,7 +84,7 @@ export function AccountCategoryTypeFields({
         <div>
           <label
             htmlFor="categoryId"
-            className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+            className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2"
           >
             Categoria <span className="text-red-500">*</span>
           </label>
@@ -99,10 +97,10 @@ export function AccountCategoryTypeFields({
             searchable
             searchPlaceholder="Buscar categoria..."
             className={cn(
-              'w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border hover:bg-background dark:hover:bg-background-dark',
+              'w-full h-11 bg-card dark:bg-card-dark text-foreground border rounded-xl hover:bg-accent/50 transition-all',
               errors.categoryId
-                ? 'border-red-500 dark:border-red-500'
-                : 'border-border dark:border-border-dark',
+                ? 'border-red-500 dark:border-red-500 ring-red-500/20'
+                : 'border-border dark:border-border-dark hover:border-primary-400',
             )}
           />
         </div>
@@ -112,18 +110,18 @@ export function AccountCategoryTypeFields({
           <div>
             <label
               htmlFor="transactionKind"
-              className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+              className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2"
             >
               Tipo
             </label>
-            <div id="transactionKind" className="flex gap-2">
+            <div id="transactionKind" className="flex bg-muted dark:bg-muted/20 p-1 rounded-xl border border-border/50">
               <button
                 type="button"
                 className={cn(
-                  'flex-1 px-4 py-2 rounded-lg border font-medium transition-colors',
+                  'flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all',
                   transactionKind === 'VARIABLE'
-                    ? 'bg-card text-primary-500 border-primary-500 shadow'
-                    : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-400',
+                    ? 'bg-background dark:bg-card text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-border'
+                    : 'text-muted-foreground hover:text-foreground',
                 )}
                 onClick={() => onTransactionKindChange('VARIABLE')}
               >
@@ -132,10 +130,10 @@ export function AccountCategoryTypeFields({
               <button
                 type="button"
                 className={cn(
-                  'flex-1 px-4 py-2 rounded-lg border font-medium transition-colors',
+                  'flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all',
                   transactionKind === 'FIXED'
-                    ? 'bg-card text-primary-500 border-primary-500 shadow'
-                    : 'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark hover:border-primary-400',
+                    ? 'bg-background dark:bg-card text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-border'
+                    : 'text-muted-foreground hover:text-foreground',
                 )}
                 onClick={() => onTransactionKindChange('FIXED')}
               >

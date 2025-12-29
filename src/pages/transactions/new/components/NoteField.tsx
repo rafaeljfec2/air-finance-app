@@ -7,11 +7,11 @@ interface NoteFieldProps {
 
 export function NoteField({ value, onChange }: Readonly<NoteFieldProps>) {
   return (
-    <div className="p-3 sm:p-4 space-y-2 bg-background dark:bg-background-dark">
+    <div className="p-3 bg-background dark:bg-background-dark">
       <div>
         <label
           htmlFor="note"
-          className="block text-sm font-medium text-text dark:text-text-dark mb-1"
+          className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1"
         >
           Observação
         </label>
@@ -21,7 +21,8 @@ export function NoteField({ value, onChange }: Readonly<NoteFieldProps>) {
           value={value}
           onChange={onChange}
           placeholder="Adicione uma observação (opcional)"
-          rows={3}
+          rows={2}
+          className="min-h-[60px] resize-none bg-background dark:bg-background-dark border-border dark:border-border-dark rounded-lg text-sm"
         />
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { ComboBox } from '@/components/ui/ComboBox';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
@@ -29,12 +30,21 @@ interface TransactionDetailsFieldsProps {
   onRecurrenceFrequencyChange?: (frequency: RecurrenceFrequency) => void;
 }
 
+// Opções de frequência para transações recorrentes
 const FREQUENCY_OPTIONS = [
-  { value: 'daily', label: 'Diária' },
   { value: 'weekly', label: 'Semanal' },
   { value: 'monthly', label: 'Mensal' },
   { value: 'yearly', label: 'Anual' },
-] as const;
+];
+
+// Opções de parcelamento (1x a 18x)
+const INSTALLMENT_OPTIONS = Array.from({ length: 18 }, (_, i) => {
+  const value = i + 1;
+  return {
+    value: String(value),
+    label: value === 1 ? 'À vista (1x)' : `${value}x`,
+  };
+});
 
 export function TransactionDetailsFields({
   selectedAccount,
@@ -66,38 +76,38 @@ export function TransactionDetailsFields({
   // Para cartão de crédito: mostrar apenas valor e parcelas
   if (isCreditCard) {
     return (
-      <div className="p-3 sm:p-4 bg-background dark:bg-background-dark">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* Valor */}
+      <div className="p-3 bg-background dark:bg-background-dark">
+        <div className="flex flex-col gap-3">
+          {/* Valor Prominente */}
           <div>
             <label
               htmlFor="amount"
-              className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+              className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1"
             >
-              Valor <span className="text-red-500">*</span>
+              Valor da Despesa <span className="text-red-500">*</span>
             </label>
-            <Input
-              id="amount"
-              name="amount"
-              type="text"
-              inputMode="decimal"
-              value={formatCurrency(amount)}
-              onChange={onAmountChange}
-              placeholder="R$ 0,00"
-              required
-              aria-required="true"
-              aria-invalid={errors.amount ? 'true' : 'false'}
-              aria-describedby={errors.amount ? 'amount-error' : undefined}
-              className={cn(
-                'bg-card dark:bg-card-dark text-text dark:text-text-dark border placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full',
-                errors.amount
-                  ? 'border-red-500 dark:border-red-500 focus-visible:ring-red-500 focus-visible:border-red-500'
-                  : 'border-border dark:border-border-dark',
-              )}
-              autoComplete="off"
-            />
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-muted-foreground font-medium">R$</span>
+              <Input
+                id="amount"
+                name="amount"
+                type="text"
+                inputMode="decimal"
+                value={formatCurrency(amount)}
+                onChange={onAmountChange}
+                placeholder="0,00"
+                required
+                className={cn(
+                  'pl-12 text-xl font-bold h-12 bg-background dark:bg-background-dark border-2 transition-all w-full rounded-lg',
+                  errors.amount
+                    ? 'border-red-500 focus-visible:ring-red-500'
+                    : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500'
+                )}
+                autoComplete="off"
+              />
+            </div>
             {errors.amount && (
-              <span id="amount-error" className="text-xs text-red-500 mt-1 block" role="alert">
+              <span className="text-xs text-red-500 mt-1 font-medium ml-1">
                 {errors.amount}
               </span>
             )}
@@ -106,30 +116,24 @@ export function TransactionDetailsFields({
           {/* Parcelas */}
           <div>
             <label
-              htmlFor="installmentCount"
-              className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+              className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1"
             >
-              Quantidade de parcelas
+              Parcelamento
             </label>
-            <Select value={String(installmentCount)} onValueChange={onInstallmentCountChange}>
-              <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
-                <div className="px-3 py-2">{installmentCount}x</div>
-              </SelectTrigger>
-              <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
-                {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
-                  <SelectItem
-                    key={num}
-                    value={String(num)}
-                    className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                  >
-                    {num}x
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ComboBox
+              options={INSTALLMENT_OPTIONS}
+              value={String(installmentCount)}
+              onValueChange={(value) => onInstallmentCountChange(value ?? '1')}
+              placeholder="Selecione..."
+              searchable={false}
+              className={cn(
+                'w-full h-10 bg-card dark:bg-card-dark text-foreground border rounded-lg hover:bg-accent/50 transition-all text-sm',
+                'border-border dark:border-border-dark hover:border-primary-400'
+              )}
+            />
             {installmentCount > 1 && amount > 0 && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                R$ {formatCurrency(installmentValue)} por parcela
+              <p className="text-xs text-primary-600 dark:text-primary-400 mt-2 font-medium bg-primary-50 dark:bg-primary-900/10 p-2 rounded-lg border border-primary-100 dark:border-primary-900/20">
+                {installmentCount}x de R$ {formatCurrency(installmentValue)}
               </p>
             )}
           </div>
@@ -140,175 +144,146 @@ export function TransactionDetailsFields({
 
   // Para outras contas: mostrar campos baseados em variável ou recorrente
   return (
-    <div className="p-3 sm:p-4 bg-background dark:bg-background-dark">
+    <div className="p-3 bg-background dark:bg-background-dark">
       {isRecurring ? (
         // Campos para transação recorrente
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* Data inicial */}
-          <div className="flex flex-col">
-            <label
-              className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
-            >
-              Data inicial <span className="text-red-500">*</span>
-            </label>
-            <DatePicker
-              value={recurrenceStartDate}
-              onChange={onRecurrenceStartDateChange}
-              placeholder="Selecionar data inicial"
-              error={errors.recurrenceStartDate}
-              minDate={new Date(1970, 0, 1)}
-              maxDate={new Date(2100, 11, 31)}
-              className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-            />
-          </div>
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Valor - Prominente para Recorrente também */}
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                Valor da Parcela <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-muted-foreground font-medium">R$</span>
+                <Input
+                  id="amount"
+                  name="amount"
+                  type="text"
+                  inputMode="decimal"
+                  value={formatCurrency(amount)}
+                  onChange={onAmountChange}
+                  placeholder="0,00"
+                  required
+                  className={cn(
+                  'pl-12 text-xl font-bold h-10 bg-background dark:bg-background-dark border-2 transition-all w-full rounded-lg',
+                  errors.amount
+                    ? 'border-red-500 focus-visible:ring-red-500'
+                    : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500'
+                )}
+                  autoComplete="off"
+                />
+              </div>
+            </div>
 
-          {/* Data final */}
-          <div className="flex flex-col">
-            <label
-              className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
-            >
-              Data final <span className="text-red-500">*</span>
-            </label>
-            <DatePicker
-              value={recurrenceEndDate}
-              onChange={onRecurrenceEndDateChange}
-              placeholder="Selecionar data final"
-              error={errors.recurrenceEndDate}
-              minDate={recurrenceStartDate ? new Date(recurrenceStartDate) : new Date(1970, 0, 1)}
-              maxDate={new Date(2100, 11, 31)}
-              className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-            />
-          </div>
+            {/* Data inicial */}
+            <div className="flex flex-col">
+              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                Começa em <span className="text-red-500">*</span>
+              </label>
+              <DatePicker
+                value={recurrenceStartDate}
+                onChange={onRecurrenceStartDateChange}
+                placeholder="Data de início"
+                error={errors.recurrenceStartDate}
+                minDate={new Date(1970, 0, 1)}
+                maxDate={new Date(2100, 11, 31)}
+                className="h-9 w-full bg-card dark:bg-card-dark border-border dark:border-border-dark rounded-lg"
+              />
+            </div>
 
-          {/* Frequência */}
-          <div className="flex flex-col">
-            <label
-              htmlFor="recurrenceFrequency"
-              className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
-            >
-              Frequência <span className="text-red-500">*</span>
-            </label>
-            <Select
-              value={recurrenceFrequency ?? 'monthly'}
-              onValueChange={(value) => {
-                const frequency = value as RecurrenceFrequency;
-                onRecurrenceFrequencyChange?.(frequency);
-              }}
-            >
-              <SelectTrigger className="w-full bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark p-0 hover:bg-background dark:hover:bg-background-dark focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
-                <div className="px-3 py-2">
-                  {FREQUENCY_OPTIONS.find((opt) => opt.value === (recurrenceFrequency ?? 'monthly'))
-                    ?.label ?? 'Mensal'}
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-lg">
-                {FREQUENCY_OPTIONS.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    className="hover:bg-background dark:hover:bg-background-dark focus:bg-primary-50 dark:focus:bg-primary-900/20 focus:text-primary-600 dark:focus:text-primary-300"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.recurrenceFrequency && (
-              <span className="text-xs text-red-500 mt-1 block" role="alert">
-                {errors.recurrenceFrequency}
-              </span>
-            )}
-          </div>
+            {/* Frequência */}
+            <div className="flex flex-col">
+              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                Repete a cada <span className="text-red-500">*</span>
+              </label>
+              <Select
+                value={recurrenceFrequency ?? 'monthly'}
+                onValueChange={(value) => {
+                  const frequency = value as RecurrenceFrequency;
+                  onRecurrenceFrequencyChange?.(frequency);
+                }}
+              >
+                <SelectTrigger className="w-full h-9 bg-card dark:bg-card-dark border-border dark:border-border-dark rounded-lg">
+                  <div className="px-1 text-sm">
+                    {FREQUENCY_OPTIONS.find((opt) => opt.value === (recurrenceFrequency ?? 'monthly'))?.label ?? 'Mensal'}
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  {FREQUENCY_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value} className="py-2">
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Valor */}
-          <div className="flex flex-col">
-            <label
-              htmlFor="amount"
-              className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
-            >
-              Valor <span className="text-red-500">*</span>
-            </label>
-            <Input
-              id="amount"
-              name="amount"
-              type="text"
-              inputMode="decimal"
-              value={formatCurrency(amount)}
-              onChange={onAmountChange}
-              placeholder="R$ 0,00"
-              required
-              aria-required="true"
-              aria-invalid={errors.amount ? 'true' : 'false'}
-              aria-describedby={errors.amount ? 'amount-error' : undefined}
-              className={cn(
-                'bg-card dark:bg-card-dark text-text dark:text-text-dark border placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full',
-                errors.amount
-                  ? 'border-red-500 dark:border-red-500 focus-visible:ring-red-500 focus-visible:border-red-500'
-                  : 'border-border dark:border-border-dark',
-              )}
-              autoComplete="off"
-            />
-            {errors.amount && (
-              <span id="amount-error" className="text-xs text-red-500 mt-1 block" role="alert">
-                {errors.amount}
-              </span>
-            )}
+            {/* Data final (Opcional) */}
+            <div className="flex flex-col sm:col-span-2">
+              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                Termina em (Opcional)
+              </label>
+              <DatePicker
+                value={recurrenceEndDate}
+                onChange={onRecurrenceEndDateChange}
+                placeholder="Indefinido"
+                error={errors.recurrenceEndDate}
+                minDate={recurrenceStartDate ? new Date(recurrenceStartDate) : new Date(1970, 0, 1)}
+                maxDate={new Date(2100, 11, 31)}
+                className="h-9 w-full bg-card dark:bg-card-dark border-border dark:border-border-dark rounded-lg"
+              />
+              <p className="text-[10px] text-muted-foreground mt-1 ml-1">Deixe em branco para repetir indefinidamente</p>
+            </div>
           </div>
         </div>
       ) : (
-        // Campos para transação variável
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* Data */}
-          <div className="flex flex-col">
+        // Campos para transação variável (Padrão)
+        <div className="flex flex-col gap-3">
+           {/* Valor Prominente */}
+           <div>
             <label
-              className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
+              htmlFor="amount"
+              className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1"
             >
+              Valor <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-muted-foreground font-medium">R$</span>
+              <Input
+                id="amount"
+                name="amount"
+                type="text"
+                inputMode="decimal"
+                value={formatCurrency(amount)}
+                onChange={onAmountChange}
+                placeholder="0,00"
+                required
+                className={cn(
+                  'pl-12 text-xl font-bold h-12 bg-background dark:bg-background-dark border-2 transition-all w-full rounded-lg',
+                  errors.amount
+                    ? 'border-red-500 focus-visible:ring-red-500'
+                    : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500'
+                )}
+                autoComplete="off"
+              />
+            </div>
+          </div>
+
+          {/* Data */}
+          <div>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
               Data de pagamento <span className="text-red-500">*</span>
             </label>
             <DatePicker
               value={date}
               onChange={onDateChange}
-              placeholder="Selecionar data de pagamento"
+              placeholder="Selecionar data"
               error={errors.date}
               minDate={new Date(1970, 0, 1)}
               maxDate={new Date(2100, 11, 31)}
-              className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+              className="h-10 w-full bg-card dark:bg-card-dark border-border dark:border-border-dark rounded-lg hover:bg-background/80"
             />
-          </div>
-
-          {/* Valor */}
-          <div className="flex flex-col">
-            <label
-              htmlFor="amount"
-              className="block text-sm font-medium text-text dark:text-text-dark mb-1 whitespace-nowrap"
-            >
-              Valor <span className="text-red-500">*</span>
-            </label>
-            <Input
-              id="amount"
-              name="amount"
-              type="text"
-              inputMode="decimal"
-              value={formatCurrency(amount)}
-              onChange={onAmountChange}
-              placeholder="R$ 0,00"
-              required
-              aria-required="true"
-              aria-invalid={errors.amount ? 'true' : 'false'}
-              aria-describedby={errors.amount ? 'amount-error' : undefined}
-              className={cn(
-                'bg-card dark:bg-card-dark text-text dark:text-text-dark border placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors w-full',
-                errors.amount
-                  ? 'border-red-500 dark:border-red-500 focus-visible:ring-red-500 focus-visible:border-red-500'
-                  : 'border-border dark:border-border-dark',
-              )}
-              autoComplete="off"
-            />
-            {errors.amount && (
-              <span id="amount-error" className="text-xs text-red-500 mt-1 block" role="alert">
-                {errors.amount}
-              </span>
-            )}
           </div>
         </div>
       )}
