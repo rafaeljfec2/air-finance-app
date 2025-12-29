@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { DeleteAllUserDataModal } from '@/components/users/DeleteAllUserDataModal';
 import { UserFormModal } from '@/components/users/UserFormModal';
+import { useAuth } from '@/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
 import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
@@ -25,8 +26,7 @@ import {
 } from './utils/userHelpers';
 
 export function UsersPage() {
-  // const { user: currentUser } = useAuth(); // Unused
-  // const navigate = useNavigate(); // Unused
+  const { user: currentUser } = useAuth();
   const { activeCompany } = useCompanyStore();
   const queryClient = useQueryClient();
 
@@ -155,15 +155,17 @@ export function UsersPage() {
               </p>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setShowDeleteAllDataModal(true)}
-                className="flex items-center gap-2"
-              >
-                <Trash2 className="h-4 w-4" />
-                Deletar Dados
-              </Button>
+              {currentUser?.role === 'god' && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setShowDeleteAllDataModal(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Deletar Dados
+                </Button>
+              )}
               <Button
                 onClick={handleCreate}
                 className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
