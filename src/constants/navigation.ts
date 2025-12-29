@@ -68,7 +68,7 @@ export const navigation: NavigationSection[] = [
         name: 'Configurações',
         icon: Settings,
         children: [
-          { name: 'Usuário', href: '/profile', icon: User },
+          { name: 'Perfil do Usuário', href: '/profile', icon: User },
           { name: 'Preferências', href: '/settings/preferences', icon: Pencil },
           { name: 'Notificações', href: '/settings/notifications', icon: Bell },
         ],
