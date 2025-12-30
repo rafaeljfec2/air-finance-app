@@ -9,6 +9,19 @@ import { CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
+function calculatePasswordStrength(password: string): number {
+  let score = 0;
+  if (!password) return 0;
+
+  if (password.length >= 8) score += 1;
+  if (/[A-Z]/.test(password)) score += 1;
+  if (/[0-9]/.test(password)) score += 1;
+  if (/[^A-Za-z0-9]/.test(password)) score += 1; // Special char
+
+  return score;
+}
+
 export function SignUpPage() {
   const navigate = useNavigate();
   const { register, isRegistering } = useAuth();
@@ -144,6 +157,37 @@ export function SignUpPage() {
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
+                  {/* Password Strength Indicator */}
+                  {form.password && (
+                    <div className="mt-2">
+                      <div className="flex gap-1 h-1 mb-1">
+                        {[1, 2, 3, 4].map((level) => {
+                           const strength = calculatePasswordStrength(form.password);
+                           let color = 'bg-gray-200 dark:bg-gray-700';
+                           if (strength >= level) {
+                             if (strength <= 1) color = 'bg-red-500';
+                             else if (strength === 2) color = 'bg-yellow-500';
+                             else if (strength === 3) color = 'bg-blue-500';
+                             else color = 'bg-green-500';
+                           }
+                           return (
+                             <div key={level} className={`flex-1 rounded-full h-full transition-colors duration-300 ${color}`} />
+                           );
+                        })}
+                      </div>
+                      <p className="text-xs text-right text-gray-500 dark:text-gray-400">
+                        Força: <span className="font-medium">
+                          {(() => {
+                            const s = calculatePasswordStrength(form.password);
+                            if (s <= 1) return 'Fraca';
+                            if (s === 2) return 'Média';
+                            if (s === 3) return 'Forte';
+                            return 'Muito Forte';
+                          })()}
+                        </span>
+                      </p>
+                    </div>
+                  )}
                   {errors.password && (
                     <span className="text-xs text-red-500 mt-1 block">{errors.password}</span>
                   )}
