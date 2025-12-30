@@ -4,10 +4,12 @@ import { MonthNavigator } from '@/components/budget/MonthNavigator';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBudget } from '@/hooks/useBudget';
 import { ViewDefault } from '@/layouts/ViewDefault';
+import { getPreviousBalance } from '@/services/transactionService';
 import { useCompanyStore } from '@/stores/company';
+import { useQueries } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Wallet } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export function BudgetPage() {
   // Estado único para filtro central
@@ -24,6 +26,13 @@ export function BudgetPage() {
   const cards = useMemo(() => data?.creditCards ?? [], [data?.creditCards]);
 
   const [activeCardTab, setActiveCardTab] = useState(cards[0]?.id || '');
+
+  // Effect to select first card when data loads if none selected
+  useEffect(() => {
+    if (!activeCardTab && cards.length > 0) {
+      setActiveCardTab(cards[0].id);
+    }
+  }, [cards, activeCardTab]);
 
   // Estados de página para cada grid
   const [receivablesPage, setReceivablesPage] = useState(1);
@@ -45,31 +54,89 @@ export function BudgetPage() {
   /* Hook de contas para buscar o limite real do banco */
   const { accounts } = useAccounts();
   // Assumindo que o ID do cartão retornado pelo budget service é o mesmo ID da conta
-  const activeCardAccount = accounts?.find((a) => a.id === activeCard?.id);
+  // Mapeamento de Cartão -> Conta
+  // Mapeamento de Cartão -> Conta
+  // Mapeamento de Cartão -> Conta
+  const cardsWithAccounts = useMemo(() => {
+    return cards.map(card => {
+        // Strict matching using the accountId provided by the backend
+        const account = accounts?.find(a => a.id === card.accountId);
+        return { card, account };
+    });
+  }, [cards, accounts]);
 
-  // Usa o creditLimit da conta se disponível, caso contrário fallback para o limite do cartão do budget service
-  const activeCardLimit = activeCardAccount?.creditLimit ?? activeCard?.limit ?? 0;
+  // Calcular data para buscar o saldo acumulado até o final do mês selecionado
+  // A estratégia é buscar o "Previous Balance" do dia 1 do mês seguinte.
+  const balanceDate = useMemo(() => {
+    const year = parseInt(filter.year);
+    const month = parseInt(filter.month);
+
+    const now = new Date();
+    // Check if selected month/year is the current one
+    // Note: filter.month is "1" to "12", JS getMonth is 0 to 11.
+    if ((month - 1) === now.getMonth() && year === now.getFullYear()) {
+        // If current month, use "Tomorrow" to get balance inclusive of Today (assuming getPreviousBalance is exclusive of provided date)
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return tomorrow.toISOString().split('T')[0];
+    }
+
+    // Data = Dia 1 do mês seguinte (standard logic for past/future months)
+    const date = new Date(year, month, 1); 
+    return date.toISOString().split('T')[0];
+  }, [filter.year, filter.month]);
+
+  // Busca o saldo de TODOS os cartões para exibir no contas a pagar
+  const cardBalancesQueries = useQueries({
+    queries: cardsWithAccounts.map(({ account }) => ({
+        queryKey: ['previousBalance', companyId, balanceDate, account?.id],
+        queryFn: async () => {
+            if (!companyId || !account?.id) return 0;
+            return getPreviousBalance(companyId, balanceDate, account.id);
+        },
+        enabled: !!companyId && !!account?.id,
+    }))
+  });
+
+  // Mapa de balances: { [cardName]: balance }
+  const realCardBalancesMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    cardBalancesQueries.forEach((query, index) => {
+        const cardName = cardsWithAccounts[index].card.name;
+        if (query.data !== undefined) {
+             // O saldo geralmente vem negativo se for dívida, ou positivo se for crédito.
+             // Para contas a pagar, queremos o valor da dívida (absoluto invertido ou absoluto).
+             // Se o saldo for -11000 (dívida), queremos mostrar 11000.
+             map[cardName] = Math.abs(query.data);
+        }
+    });
+    return map;
+  }, [cardBalancesQueries, cardsWithAccounts]);
+
+  // Sobrescreve os valores no array de payables
+  const finalPayables = useMemo(() => {
+     return payables.map(p => {
+        // Tenta encontrar um cartão correspondente.
+        // A convenção parece ser "NomeDoCartao Cartão"
+        const matchedCardName = Object.keys(realCardBalancesMap).find(name => 
+            p.description.toLowerCase().includes(name.toLowerCase()) && p.description.toLowerCase().includes('cartão')
+        );
+
+        if (matchedCardName) {
+            return { ...p, value: realCardBalancesMap[matchedCardName] };
+        }
+        return p;
+     });
+  }, [payables, realCardBalancesMap]);
+  
+  // Encontrar o account do cartão ativo (reusing logic or simplified)
+  const activeCardAccountEntry = cardsWithAccounts.find(x => x.card.id === activeCardTab);
+  const activeCardRealBalance = cardBalancesQueries.find((_, idx) => cardsWithAccounts[idx].card.id === activeCardTab)?.data;
+
+  const activeCardLimit = activeCardAccountEntry?.account?.creditLimit ?? activeCard?.limit ?? 0;
   const activeCardBillTotal = activeBill?.total ?? 0;
-  const activeCardAvailable = activeCardLimit > 0 ? activeCardLimit - activeCardBillTotal : null;
-
-  // Garante que sempre exista um cartão ativo (primeiro da lista) quando houver cartões
-  React.useEffect(() => {
-    if (cards.length === 0) {
-      return;
-    }
-
-    const hasActiveCard = cards.some((card) => card.id === activeCardTab);
-    if (!hasActiveCard) {
-      setActiveCardTab(cards[0].id);
-    }
-  }, [cards, activeCardTab]);
-
-  // Resetar página ao trocar de mês/ano ou cartão
-  React.useEffect(() => {
-    setReceivablesPage(1);
-    setPayablesPage(1);
-    setCardPage(1);
-  }, [filter, activeCardTab]);
+  const activeCardAvailable = activeCardLimit > 0 ? activeCardLimit - Math.abs(activeCardRealBalance ?? 0) : null; 
+ 
   // Define variants
   const container = {
     hidden: { opacity: 0 },
@@ -143,7 +210,7 @@ export function BudgetPage() {
 
           <motion.div variants={item} className="h-full">
             <PayablesCard
-              payables={payables}
+              payables={finalPayables}
               isLoading={isLoading}
               currentPage={payablesPage}
               itemsPerPage={ITEMS_PER_PAGE}
@@ -157,6 +224,7 @@ export function BudgetPage() {
               cards={cards}
               isLoading={isLoading}
               activeCardId={activeCardTab}
+              activeCardBalance={activeCardRealBalance}
               activeBill={activeBill}
               currentPage={cardPage}
               itemsPerPage={ITEMS_PER_PAGE}

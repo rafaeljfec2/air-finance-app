@@ -10,6 +10,7 @@ interface CreditCardsCardProps {
   cards: CreditCardType[];
   isLoading: boolean;
   activeCardId: string;
+  activeCardBalance?: number;
   activeBill: CreditCardBill | undefined;
   currentPage: number;
   itemsPerPage: number;
@@ -22,6 +23,7 @@ export function CreditCardsCard({
   cards,
   isLoading,
   activeCardId,
+  activeCardBalance,
   activeBill,
   currentPage,
   itemsPerPage,
@@ -139,6 +141,17 @@ export function CreditCardsCard({
                 );
               })}
             </div>
+
+            {/* Exibição do Saldo da Conta */}
+            {typeof activeCardBalance === 'number' && (
+                <div className="flex justify-center items-center gap-2 text-xs mb-2">
+                    <span className="text-gray-500 dark:text-gray-400">Saldo da Conta:</span>
+                    <span className={`font-semibold ${activeCardBalance < 0 ? 'text-red-500' : 'text-emerald-500'}`}>
+                        R$ {activeCardBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
+                </div>
+            )}
+            
             <div className="overflow-x-auto -mx-2">
               <table className="w-full text-xs">
                 <thead>

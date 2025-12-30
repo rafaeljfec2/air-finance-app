@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { ComboBox } from '@/components/ui/ComboBox';
 import { cn } from '@/lib/utils';
-import { User } from '@/services/userService';
+import { User, UserRole, UserStatus } from '@/services/userService';
 import { CheckCircle2, Edit, Mail, Shield, Trash2, XCircle } from 'lucide-react';
 
 export interface UserTableRowProps {
@@ -10,8 +10,8 @@ export interface UserTableRowProps {
   onDelete: (id: string) => void;
   isUpdating: boolean;
   isDeleting: boolean;
-  getRoleBadgeColor: (role: 'god' | 'admin' | 'user') => string;
-  getStatusBadgeColor: (status: 'active' | 'inactive') => string;
+  getRoleBadgeColor: (role: UserRole) => string;
+  getStatusBadgeColor: (status: UserStatus) => string;
   getEmailVerifiedBadgeColor: (emailVerified: boolean | undefined) => string;
   getOnboardingCompletedBadgeColor: (onboardingCompleted: boolean | undefined) => string;
   activeCompanyId?: string | null;
@@ -71,7 +71,12 @@ export function UserTableRow({
               >
                 {(() => {
                   if (user.role === 'god') return 'God';
-                  if (user.role === 'admin') return 'Administrador';
+                  if (user.role === 'sys_admin') return 'Admin Sistema';
+                  if (user.role === 'admin') return 'Admin Empresa';
+                  if (user.role === 'owner') return 'Dono';
+                  if (user.role === 'editor') return 'Editor';
+                  if (user.role === 'operator') return 'Operador';
+                  if (user.role === 'viewer') return 'Visualizador';
                   return 'Usuário';
                 })()}
               </span>

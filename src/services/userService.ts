@@ -39,6 +39,7 @@ export const CreateUserSchema = UserSchema.omit({
 
 export type User = z.infer<typeof UserSchema>;
 export type CreateUser = z.infer<typeof CreateUserSchema>;
+export type { UserRole, UserStatus } from '@/types/user';
 
 // Service functions
 export const getUsers = async (): Promise<User[]> => {

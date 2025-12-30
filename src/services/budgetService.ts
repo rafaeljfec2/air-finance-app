@@ -1,7 +1,7 @@
-import { apiClient } from './apiClient';
-import { z } from 'zod';
-import type { CashFlow, Receivable, Payable, CreditCard } from '@/types/budget';
+import type { CashFlow, CreditCard, Payable, Receivable } from '@/types/budget';
 import { parseApiError } from '@/utils/apiErrorHandler';
+import { z } from 'zod';
+import { apiClient } from './apiClient';
 
 const CashFlowSchema = z.object({
   month: z.string(),
@@ -47,6 +47,7 @@ const CreditCardBillSchema = z.object({
 
 const CreditCardSchema = z.object({
   id: z.string(),
+  accountId: z.string(),
   name: z.string(),
   brand: z.enum(['nubank', 'itau']),
   limit: z.number(),

@@ -1,4 +1,4 @@
-import { CashFlow, Receivable, Payable, CreditCard } from '@/types/budget';
+import { CashFlow, CreditCard, Payable, Receivable } from '@/types/budget';
 
 export const mockCashFlows: CashFlow[] = [
   {
@@ -51,6 +51,7 @@ export const mockPayables: Payable[] = [
 export const mockCreditCards: CreditCard[] = [
   {
     id: 'c1',
+    accountId: 'acc-1',
     name: 'Nubank',
     brand: 'nubank',
     limit: 8000,
@@ -144,6 +145,7 @@ export const mockCreditCards: CreditCard[] = [
   },
   {
     id: 'c2',
+    accountId: 'acc-2',
     name: 'Itaú',
     brand: 'itau',
     limit: 5000,
