@@ -28,6 +28,23 @@ export const UserSchema = z.object({
         .optional(),
     })
     .optional(),
+  notifications: z
+    .object({
+      email: z.boolean(),
+      push: z.boolean(),
+      updates: z.boolean(),
+      marketing: z.boolean(),
+      security: z.boolean(),
+    })
+    .optional(),
+  preferences: z
+    .object({
+      currency: z.enum(['BRL', 'USD', 'EUR']),
+      language: z.enum(['pt-BR', 'en-US', 'es-ES']),
+      theme: z.enum(['light', 'dark', 'system']),
+      dateFormat: z.enum(['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY-MM-DD']),
+    })
+    .optional(),
 });
 
 export const CreateUserSchema = UserSchema.omit({
