@@ -3,12 +3,8 @@ import {
   TransactionGrid,
   type TransactionGridTransaction,
 } from '@/components/transactions/TransactionGrid';
-import { calculateBalance, createPreviousBalanceRow } from '@/components/transactions/TransactionGrid.utils';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { toast } from '@/components/ui/toast';
-import { useAccounts } from '@/hooks/useAccounts';
-import { useCategories } from '@/hooks/useCategories';
-import { usePreviousBalance, useTransactions } from '@/hooks/useTransactions';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { BusinessLogsModal } from '@/pages/business-logs/components/BusinessLogsModal';
 import { TransactionFilters } from '@/pages/transactions/components/TransactionFilters';
@@ -16,8 +12,9 @@ import { TransactionHeader } from '@/pages/transactions/components/TransactionHe
 import { TransactionSummary } from '@/pages/transactions/components/TransactionSummary';
 import { useCompanyStore } from '@/stores/company';
 import { formatDateToLocalISO } from '@/utils/date';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTransactionLogic } from './hooks/useTransactionLogic';
 
 export function Transactions() {
   const navigate = useNavigate();
@@ -32,7 +29,6 @@ export function Transactions() {
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     return formatDateToLocalISO(lastDay);
   });
-
 
   const [selectedType, setSelectedType] = useState('all');
   const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>(undefined);
@@ -50,218 +46,28 @@ export function Transactions() {
 
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
-  const { accounts } = useAccounts();
-  const { categories } = useCategories(companyId);
+
   const {
-    transactions = [],
-    isLoading,
-    isFetching,
-    deleteTransaction,
-  } = useTransactions(companyId, { startDate, endDate, accountId: selectedAccountId });
-
-  const { previousBalance = 0 } = usePreviousBalance(companyId, startDate, selectedAccountId);
-
-  const categoryMap = useMemo(() => {
-    const map = new Map<string, string>();
-    categories?.forEach((c) => map.set(c.id, c.name));
-    return map;
-  }, [categories]);
-
-  const accountMap = useMemo(() => {
-    const map = new Map<string, string>();
-    accounts?.forEach((a) => map.set(a.id, a.name));
-    return map;
-  }, [accounts]);
-
-  const transactionsWithLabels = useMemo(
-    () =>
-      [...transactions].map((tx) => ({
-        ...tx,
-        rawAccountId: tx.accountId, // Inject raw ID for filtering
-        categoryId: categoryMap.get(tx.categoryId) ?? tx.categoryId,
-        accountId: accountMap.get(tx.accountId) ?? tx.accountId,
-      })),
-    [transactions, categoryMap, accountMap],
-  );
-
-  // Add previous balance row if startDate is set
-  const transactionsWithPreviousBalance = useMemo(() => {
-    let transactionsList = [...transactionsWithLabels];
-
-    // Insert SALDO ANTERIOR if startDate exists
-    if (startDate) {
-      const previousBalanceRow = createPreviousBalanceRow(previousBalance, startDate);
-      // Map labels for the previous balance row
-      previousBalanceRow.categoryId = 'Saldo Anterior';
-      previousBalanceRow.accountId = selectedAccountId
-        ? (accountMap.get(selectedAccountId) ?? 'Todas')
-        : 'Todas';
-      transactionsList = [{ ...previousBalanceRow, rawAccountId: 'previous-balance' } as any, ...transactionsList];
-    }
-
-    // Calculate running balance for all transactions
-    return calculateBalance(transactionsList);
-  }, [transactionsWithLabels, previousBalance, startDate, selectedAccountId, accountMap]);
-
-  // Helper function to check if transaction matches search term
-  const matchesSearchTerm = (description: string, search: string): boolean => {
-    return description.toLowerCase().includes(search.toLowerCase());
-  };
-
-  // Helper function to check if transaction matches selected type
-  const matchesTransactionType = (type: string, launchType: string): boolean => {
-    if (type === 'all') {
-      return true;
-    }
-    if (type === 'RECEITA' && launchType === 'revenue') {
-      return true;
-    }
-    if (type === 'DESPESA' && launchType === 'expense') {
-      return true;
-    }
-    return false;
-  };
-
-  // Helper function to check if transaction matches date period
-  const matchesDatePeriod = (
-    paymentDate: string,
-    start: string | null,
-    end: string | null,
-  ): boolean => {
-    if (!start && !end) {
-      return true;
-    }
-
-    // Parse paymentDate as UTC (backend stores dates in UTC)
-    const transactionDate = new Date(paymentDate);
-    
-    // Normalize transaction date to start of day in UTC for comparison
-    const txDateUTC = new Date(Date.UTC(
-      transactionDate.getUTCFullYear(),
-      transactionDate.getUTCMonth(),
-      transactionDate.getUTCDate(),
-      0, 0, 0, 0
-    ));
-
-    if (start) {
-      // Parse date string "YYYY-MM-DD" and create date in UTC
-      const [year, month, day] = start.split('-').map(Number);
-      const startDateUTC = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
-      if (txDateUTC < startDateUTC) {
-        return false;
-      }
-    }
-
-    if (end) {
-      // Parse date string "YYYY-MM-DD" and create date in UTC at end of day
-      const [year, month, day] = end.split('-').map(Number);
-      const endDateUTC = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
-      if (txDateUTC > endDateUTC) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-
-  // Helper function to filter transactions
-  const shouldIncludeTransaction = (transaction: TransactionGridTransaction): boolean => {
-    // Always include previous balance row
-    if (transaction.id === 'previous-balance') {
-      return true;
-    }
-
-    const matchesSearch = matchesSearchTerm(transaction.description, searchTerm);
-    const matchesType = matchesTransactionType(selectedType, transaction.launchType);
-    const matchesPeriod = matchesDatePeriod(transaction.paymentDate, startDate, endDate);
-
-    // Debug log for transactions that don't match
-    if (!matchesSearch || !matchesType || !matchesPeriod) {
-      console.debug('[Transaction Filter] Transaction excluded:', {
-        id: transaction.id,
-        description: transaction.description,
-        paymentDate: transaction.paymentDate,
-        launchType: transaction.launchType,
-        value: transaction.value,
-        matchesSearch,
-        matchesType,
-        matchesPeriod,
-        searchTerm,
-        selectedType,
-        startDate,
-        endDate,
-      });
-    }
-
-    return matchesSearch && matchesType && matchesPeriod;
-  };
-
-  const filteredTransactions = [...transactionsWithPreviousBalance]
-    .sort((a, b) => {
-      const dateA = new Date(a.paymentDate || a.createdAt).getTime();
-      const dateB = new Date(b.paymentDate || b.createdAt).getTime();
-      
-      if (dateA === dateB) {
-        const createdA = new Date(a.createdAt).getTime();
-        const createdB = new Date(b.createdAt).getTime();
-        return createdB - createdA; // Newest created first (DESC)
-      }
-      
-      return dateB - dateA; // Newest date first (DESC)
-    })
-    .filter(shouldIncludeTransaction);
-
-  const totals = useMemo(() => {
-    let totalCredits = 0;
-    let totalDebits = 0;
-    
-    // Calucalate period balance (Revenue - Expenses)
-    // We want the NET flow for the period, not the accumulated account balance
-
-    const liquidAccountIds = new Set(
-        accounts
-          ?.filter((a) => ['checking', 'digital_wallet'].includes(a.type))
-          .map((a) => a.id)
-    );
-
-    filteredTransactions.forEach((transaction) => {
-      // Skip previous balance row for totals calculation
-      if (transaction.id === 'previous-balance') {
-        return;
-      }
-
-      // If viewing "All Accounts", only include checking and digital_wallet in the totals
-      // If a specific account is selected, include it regardless of type
-      if (!selectedAccountId) {
-         // We need the original account ID.
-         // Since filteredTransactions has the Name mapped, we look for the rawAccountId 
-         // which we injected in transactionsWithLabels
-         const rawId = (transaction as any).rawAccountId;
-         if (rawId && !liquidAccountIds.has(rawId)) {
-             return; 
-         }
-      }
-
-      if (transaction.launchType === 'revenue') {
-        totalCredits += Math.abs(transaction.value);
-      } else if (transaction.launchType === 'expense') {
-        totalDebits += Math.abs(transaction.value);
-      }
-    });
-
-    // Re-calculate period balance after loop
-    const netPeriodBalance = totalCredits - totalDebits;
-
-    return { totalCredits, totalDebits, finalBalance: netPeriodBalance };
-  }, [filteredTransactions, accounts, selectedAccountId]);
+      transactions: filteredTransactions,
+      totals,
+      isLoading,
+      isFetching,
+      accounts,
+      categories,
+      deleteTransaction,
+  } = useTransactionLogic({
+      companyId,
+      startDate,
+      endDate,
+      selectedAccountId,
+      searchTerm,
+      selectedType,
+  });
 
   const handleEdit = (transaction: TransactionGridTransaction) => {
-    // Find the original transaction with IDs (not labels) from the original transactions array
-    const originalTransaction = transactions.find((tx) => tx.id === transaction.id);
-    if (originalTransaction) {
-      setTransactionToEdit(originalTransaction);
-      setShowEditModal(true);
-    }
+    const txForEdit = { ...transaction, accountId: (transaction as any).rawAccountId || transaction.accountId };
+    setTransactionToEdit(txForEdit);
+    setShowEditModal(true);
   };
 
   const handleDelete = (transaction: TransactionGridTransaction) => {
