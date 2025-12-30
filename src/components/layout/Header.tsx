@@ -1,11 +1,11 @@
 import { Logo } from '@/components/Logo';
+import { NotificationsMenu } from '@/components/notifications/NotificationsMenu';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/stores/useTheme';
 import { Menu, Transition } from '@headlessui/react';
 import {
     ArrowRightLeft,
-    Bell,
     ChartBar,
     CircleUser,
     Import,
@@ -14,7 +14,7 @@ import {
     Moon,
     Plus,
     Settings,
-    Sun,
+    Sun
 } from 'lucide-react';
 import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -99,65 +99,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
           </button>
 
           {/* Notificações */}
-          <Menu as="div" className="relative">
-            {() => (
-              <>
-                <Menu.Button className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                  <span className="sr-only">Ver notificações</span>
-                  <div className="relative">
-                    <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
-                    <span className="absolute -top-1 -right-1 h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-red-500 flex items-center justify-center text-[10px] sm:text-xs text-white">
-                      2
-                    </span>
-                  </div>
-                </Menu.Button>
-
-                <Transition
-                  as={Fragment}
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
-                >
-                  <Menu.Items className="absolute right-0 mt-2 w-80 origin-top-right rounded-md bg-card dark:bg-card-dark shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <div className="py-1">
-                      <div className="px-4 py-2 text-sm text-text dark:text-text-dark">
-                        Notificações
-                      </div>
-                      <div className="border-t border-border dark:border-border-dark">
-                        <Menu.Item>
-                          {({ active }) => (
-                            <button
-                              className={cn(
-                                active ? 'bg-background dark:bg-background-dark' : '',
-                                'block w-full text-left px-4 py-2 text-sm text-text dark:text-text-dark',
-                              )}
-                            >
-                              Nova transação registrada
-                            </button>
-                          )}
-                        </Menu.Item>
-                        <Menu.Item>
-                          {({ active }) => (
-                            <button
-                              className={cn(
-                                active ? 'bg-background dark:bg-background-dark' : '',
-                                'block w-full text-left px-4 py-2 text-sm text-text dark:text-text-dark',
-                              )}
-                            >
-                              Lembrete de fatura
-                            </button>
-                          )}
-                        </Menu.Item>
-                      </div>
-                    </div>
-                  </Menu.Items>
-                </Transition>
-              </>
-            )}
-          </Menu>
+          <NotificationsMenu />
 
           {/* Menu do Usuário */}
           <Menu as="div" className="relative">
