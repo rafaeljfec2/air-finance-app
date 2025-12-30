@@ -4,11 +4,15 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/stores/useTheme';
 import { Menu, Transition } from '@headlessui/react';
 import {
+    ArrowRightLeft,
     Bell,
+    ChartBar,
     CircleUser,
+    Import,
     LogOut,
     Menu as MenuIcon,
     Moon,
+    Plus,
     Settings,
     Sun,
 } from 'lucide-react';
@@ -47,6 +51,38 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
           {/* Company Selector */}
           <div className="hidden lg:block">
             <CompanySelector />
+          </div>
+
+          {/* Atalhos Rápidos */}
+          <div className="hidden md:flex items-center border-l dark:border-gray-700 pl-4 space-x-1">
+             <button
+                onClick={() => navigate('/transactions/new')}
+                className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                title="Novo Lançamento"
+              >
+                <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
+              </button>
+              <button
+                onClick={() => navigate('/transactions')}
+                className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                title="Fluxo de Caixa"
+              >
+                <ArrowRightLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+              </button>
+              <button
+                onClick={() => navigate('/import-ofx')}
+                className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                title="Importar Extrato"
+              >
+                <Import className="h-4 w-4 sm:h-5 sm:w-5" />
+              </button>
+              <button
+                onClick={() => navigate('/reports')}
+                className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                title="Relatórios"
+              >
+                <ChartBar className="h-4 w-4 sm:h-5 sm:w-5" />
+              </button>
           </div>
 
           {/* Botão de Tema */}
