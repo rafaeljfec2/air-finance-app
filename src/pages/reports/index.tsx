@@ -1,10 +1,10 @@
+import { MonthNavigator } from '@/components/budget/MonthNavigator';
 import { FinancialDashboard } from '@/components/reports/FinancialDashboard';
 import { Insight } from '@/components/reports/InsightsCard';
-import { Button } from '@/components/ui/button';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { formatCurrency, formatMonthYear } from '@/utils/formatters';
-import { ArrowLeft, ArrowRight, PieChart } from 'lucide-react';
+import { formatCurrency } from '@/utils/formatters';
+import { PieChart } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 export function Reports() {
@@ -78,13 +78,7 @@ export function Reports() {
     return list;
   }, [summary, reportStructure, history]);
 
-  const previousMonth = () => {
-    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1));
-  };
-
-  const nextMonth = () => {
-    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1));
-  };
+  // Removed previousMonth and nextMonth helpers as they are handled by MonthNavigator now
 
   if (loading) {
       return (
@@ -126,21 +120,15 @@ export function Reports() {
           </div>
 
           {/* Month Selector */}
-          <div className="flex items-center justify-between sm:justify-end space-x-2">
-            <Button
-              variant="outline"
-              onClick={previousMonth}
-              className="p-2"
-              aria-label="Mês anterior"
-            >
-              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
-            <span className="min-w-[120px] text-center text-base sm:text-lg font-medium text-gray-900 dark:text-white">
-              {formatMonthYear(currentDate)}
-            </span>
-            <Button variant="outline" onClick={nextMonth} className="p-2" aria-label="Próximo mês">
-              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
+          <div className="flex justify-center sm:justify-end">
+             <MonthNavigator
+                month={(currentDate.getMonth() + 1).toString().padStart(2, '0')}
+                year={currentDate.getFullYear().toString()}
+                onChange={(m: string, y: string) => {
+                    const newDate = new Date(Number(y), Number(m) - 1, 1);
+                    setCurrentDate(newDate);
+                }}
+             />
           </div>
         </div>
 
