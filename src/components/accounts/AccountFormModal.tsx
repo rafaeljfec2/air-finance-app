@@ -358,12 +358,17 @@ export function AccountFormModal({
                         inputMode="decimal"
                         value={limitInput}
                         onChange={(e) => {
-                          const formatted = formatCurrencyInput(e.target.value);
-                          setLimitInput(formatted);
-                          setForm((prev) => ({
-                            ...prev,
-                            initialBalance: parseCurrency(formatted),
-                          }));
+                          const rawValue = e.target.value;
+                          const formatted = formatCurrencyInput(rawValue);
+                          const numericValue = parseCurrency(formatted);
+                          
+                          if (numericValue <= 999999999999) {
+                            setLimitInput(formatted);
+                            setForm((prev) => ({
+                              ...prev,
+                              initialBalance: numericValue,
+                            }));
+                          }
                         }}
                         placeholder="R$ 0,00"
                         required
@@ -399,12 +404,20 @@ export function AccountFormModal({
                         inputMode="decimal"
                         defaultValue={account?.creditLimit ? formatCurrencyInput(account.creditLimit.toFixed(2).replace('.', '')) : ''}
                         onChange={(e) => {
-                          const formatted = formatCurrencyInput(e.target.value);
-                          e.target.value = formatted;
-                          setForm((prev) => ({
-                            ...prev,
-                            creditLimit: parseCurrency(formatted),
-                          }));
+                          const rawValue = e.target.value;
+                          const formatted = formatCurrencyInput(rawValue);
+                          const numericValue = parseCurrency(formatted);
+
+                          if (numericValue <= 999999999999) {
+                            e.target.value = formatted;
+                            setForm((prev) => ({
+                              ...prev,
+                              creditLimit: numericValue,
+                            }));
+                          } else {
+                            // Revert to previous valid value if possible or just don't update
+                             e.target.value = formatCurrencyInput(form.creditLimit?.toFixed(2).replace('.', '') || '');
+                          }
                         }}
                         placeholder="R$ 0,00"
                         className={cn(
@@ -426,12 +439,17 @@ export function AccountFormModal({
                         inputMode="decimal"
                         value={initialBalanceInput}
                         onChange={(e) => {
-                          const formatted = formatCurrencyInput(e.target.value, true);
-                          setInitialBalanceInput(formatted);
-                          setForm((prev) => ({
-                            ...prev,
-                            initialBalance: parseCurrency(formatted),
-                          }));
+                          const rawValue = e.target.value;
+                          const formatted = formatCurrencyInput(rawValue, true);
+                          const numericValue = parseCurrency(formatted);
+
+                          if (numericValue <= 999999999999) {
+                             setInitialBalanceInput(formatted);
+                             setForm((prev) => ({
+                               ...prev,
+                               initialBalance: numericValue,
+                             }));
+                          }
                         }}
                         placeholder="R$ 0,00"
                         required
