@@ -37,7 +37,7 @@ export function ReceivablesCard({
   };
 
   return (
-    <CardContainer color="amber" className="min-h-[420px]">
+    <CardContainer color="amber" className="min-h-[250px]">
       <CardHeader
         icon={<TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />}
         title="Contas a Receber"
@@ -55,7 +55,7 @@ export function ReceivablesCard({
         </Button>
       </CardHeader>
       <CardTotal value={totalValue} color="amber" label="Total Receber" />
-      <div className="mt-3 flex flex-col justify-between min-h-[320px]">
+      <div className="mt-2 flex flex-col justify-between min-h-[180px]">
         {isLoading ? (
           <div className="flex flex-1 items-center justify-center">
             <Spinner size="md" className="text-amber-500" />
@@ -77,21 +77,21 @@ export function ReceivablesCard({
                     const key = r ? r.id : `receivable-placeholder-${idx}`;
                     return r ? (
                       <tr key={key} className="group hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-                        <td className="px-3 py-2.5 text-text dark:text-text-dark font-medium truncate max-w-[140px]">
+                        <td className="px-3 py-1 text-text dark:text-text-dark font-medium truncate max-w-[140px]">
                           {r.description}
                         </td>
-                        <td className="px-3 py-2.5 text-center">
+                        <td className="px-3 py-1 text-center">
                           <BadgeStatus status={r.status === 'RECEIVED' ? 'success' : 'warning'}>
                             {r.status === 'RECEIVED' ? 'Recebido' : 'Pendente'}
                           </BadgeStatus>
                         </td>
-                        <td className="px-3 py-2.5 text-right font-semibold text-text dark:text-text-dark whitespace-nowrap">
+                        <td className="px-3 py-1 text-right font-semibold text-text dark:text-text-dark whitespace-nowrap">
                           R$ {r.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </td>
                       </tr>
                     ) : (
                       <tr key={key}>
-                        <td className="px-3 py-2.5" colSpan={3}>
+                        <td className="px-3 py-1" colSpan={3}>
                           &nbsp;
                         </td>
                       </tr>

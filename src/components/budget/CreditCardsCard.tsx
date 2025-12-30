@@ -88,7 +88,7 @@ export function CreditCardsCard({
   };
 
   return (
-    <CardContainer color="violet" className="min-h-[420px]">
+    <CardContainer color="violet" className="min-h-[250px]">
       <CardHeader
         icon={<CreditCard className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
         title="Cartões de Crédito"
@@ -105,14 +105,14 @@ export function CreditCardsCard({
           Expandir
         </Button>
       </CardHeader>
-      <div className="mt-3 flex flex-col justify-between min-h-[320px]">
+      <div className="mt-2 flex flex-col justify-between min-h-[180px]">
         {isLoading ? (
           <div className="mt-6 flex justify-center">
             <Spinner size="md" className="text-violet-500" />
           </div>
         ) : (
           <>
-            <div className="flex gap-2 mb-4 mt-2 overflow-x-auto pb-1 justify-center">
+            <div className="flex gap-2 mb-2 mt-1 overflow-x-auto pb-1 justify-center">
               {cards.map((card) => {
                 const isActive = activeCardId === card.id;
                 let activeClass = '';
@@ -166,16 +166,16 @@ export function CreditCardsCard({
                     const key = t ? t.id : `transaction-placeholder-${idx}`;
                     return t ? (
                       <tr key={key} className="group hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-                        <td className="px-3 py-2.5 text-text dark:text-text-dark font-medium truncate max-w-[160px]">
+                        <td className="px-3 py-1 text-text dark:text-text-dark font-medium truncate max-w-[160px]">
                           {t.description}
                         </td>
-                        <td className="px-3 py-2.5 text-right font-semibold text-text dark:text-text-dark whitespace-nowrap">
+                        <td className="px-3 py-1 text-right font-semibold text-text dark:text-text-dark whitespace-nowrap">
                           R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </td>
                       </tr>
                     ) : (
                       <tr key={key}>
-                        <td className="px-3 py-2.5" colSpan={2}>
+                        <td className="px-3 py-1" colSpan={2}>
                           &nbsp;
                         </td>
                       </tr>

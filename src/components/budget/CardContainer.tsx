@@ -22,7 +22,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
       border border-border dark:border-border-dark 
       transition-all duration-300
       relative overflow-hidden
-      p-6 flex flex-col h-full w-full 
+      p-3 flex flex-col h-full w-full 
       ${className ?? ''}
     `}
   >

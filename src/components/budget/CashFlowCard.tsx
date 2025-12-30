@@ -12,7 +12,7 @@ interface CashFlowCardProps {
 
 export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlowCardProps>) {
   return (
-    <CardContainer color="emerald" className="min-h-[420px]">
+    <CardContainer color="emerald" className="min-h-[250px]">
       <CardHeader
         icon={<Activity className="h-4 w-4 text-primary-600 dark:text-primary-400" />}
         title="Fluxo de Caixa"
@@ -35,12 +35,12 @@ export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlo
         label="Saldo Final" 
       />
       {isLoading && (
-        <div className="mt-6 flex justify-center">
+        <div className="mt-4 flex justify-center">
           <Spinner size="lg" className="text-emerald-500" />
         </div>
       )}
       {!isLoading && cashFlow && (
-        <div className="flex flex-col gap-3 mt-3">
+        <div className="flex flex-col gap-2 mt-2">
           <CardStat label="Entradas" value={cashFlow.totalIncome} positive />
           <CardStat label="Saídas" value={cashFlow.totalExpense} negative />
           <div className="border-t border-border dark:border-border-dark my-2" />

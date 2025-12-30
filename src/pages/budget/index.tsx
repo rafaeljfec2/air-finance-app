@@ -38,7 +38,7 @@ export function BudgetPage() {
   const [receivablesPage, setReceivablesPage] = useState(1);
   const [payablesPage, setPayablesPage] = useState(1);
   const [cardPage, setCardPage] = useState(1);
-  const ITEMS_PER_PAGE = 10;
+  const ITEMS_PER_PAGE = 6;
 
   const [expandedCard, setExpandedCard] = useState<ExpandedCard>(null);
 
