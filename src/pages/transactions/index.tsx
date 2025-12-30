@@ -1,7 +1,7 @@
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal';
 import {
-    TransactionGrid,
-    type TransactionGridTransaction,
+  TransactionGrid,
+  type TransactionGridTransaction,
 } from '@/components/transactions/TransactionGrid';
 import { calculateBalance, createPreviousBalanceRow } from '@/components/transactions/TransactionGrid.utils';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -77,6 +77,7 @@ export function Transactions() {
     () =>
       [...transactions].map((tx) => ({
         ...tx,
+        rawAccountId: tx.accountId, // Inject raw ID for filtering
         categoryId: categoryMap.get(tx.categoryId) ?? tx.categoryId,
         accountId: accountMap.get(tx.accountId) ?? tx.accountId,
       })),
@@ -95,7 +96,7 @@ export function Transactions() {
       previousBalanceRow.accountId = selectedAccountId
         ? (accountMap.get(selectedAccountId) ?? 'Todas')
         : 'Todas';
-      transactionsList = [previousBalanceRow, ...transactionsList];
+      transactionsList = [{ ...previousBalanceRow, rawAccountId: 'previous-balance' } as any, ...transactionsList];
     }
 
     // Calculate running balance for all transactions
@@ -214,17 +215,31 @@ export function Transactions() {
     let totalCredits = 0;
     let totalDebits = 0;
     
-    // finalBalance should be the balance of the most recent transaction (first in list)
-    // or the previous balance if no transactions match
-    // filteredTransactions is already sorted by date descending (Newest -> Oldest)
-    const finalBalance = filteredTransactions.length > 0 
-      ? (filteredTransactions[0].balance ?? 0)
-      : previousBalance;
+    // Calucalate period balance (Revenue - Expenses)
+    // We want the NET flow for the period, not the accumulated account balance
+
+    const liquidAccountIds = new Set(
+        accounts
+          ?.filter((a) => ['checking', 'digital_wallet'].includes(a.type))
+          .map((a) => a.id)
+    );
 
     filteredTransactions.forEach((transaction) => {
       // Skip previous balance row for totals calculation
       if (transaction.id === 'previous-balance') {
         return;
+      }
+
+      // If viewing "All Accounts", only include checking and digital_wallet in the totals
+      // If a specific account is selected, include it regardless of type
+      if (!selectedAccountId) {
+         // We need the original account ID.
+         // Since filteredTransactions has the Name mapped, we look for the rawAccountId 
+         // which we injected in transactionsWithLabels
+         const rawId = (transaction as any).rawAccountId;
+         if (rawId && !liquidAccountIds.has(rawId)) {
+             return; 
+         }
       }
 
       if (transaction.launchType === 'revenue') {
@@ -234,8 +249,11 @@ export function Transactions() {
       }
     });
 
-    return { totalCredits, totalDebits, finalBalance };
-  }, [filteredTransactions, previousBalance]);
+    // Re-calculate period balance after loop
+    const netPeriodBalance = totalCredits - totalDebits;
+
+    return { totalCredits, totalDebits, finalBalance: netPeriodBalance };
+  }, [filteredTransactions, accounts, selectedAccountId]);
 
   const handleEdit = (transaction: TransactionGridTransaction) => {
     // Find the original transaction with IDs (not labels) from the original transactions array
