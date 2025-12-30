@@ -162,6 +162,23 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     Permission.INDEBTEDNESS_READ,
   ],
 
+  operator: [
+    Permission.COMPANIES_READ,
+    Permission.ACCOUNTS_READ,
+    // Transactions (Full Access)
+    Permission.TRANSACTIONS_CREATE,
+    Permission.TRANSACTIONS_READ,
+    Permission.TRANSACTIONS_UPDATE,
+    // Categories (Full Access)
+    Permission.CATEGORIES_CREATE,
+    Permission.CATEGORIES_READ,
+    Permission.CATEGORIES_UPDATE,
+    // Users (Read only for listing)
+    Permission.USERS_READ,
+    // Recurring (Read only)
+    Permission.RECURRING_TRANSACTIONS_READ,
+  ],
+
   // God has everything implicitly, but we can map it too
   god: Object.values(Permission),
 };

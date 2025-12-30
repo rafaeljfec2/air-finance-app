@@ -1,14 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  getUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser,
-  deleteAllUserData,
-  deleteAllUserDataByEmail,
-  type User,
-  type CreateUser,
+    createUser,
+    deleteAllUserData,
+    deleteAllUserDataByEmail,
+    deleteUser,
+    getUserById,
+    getUsers,
+    updateUser,
+    type CreateUser,
+    type User,
 } from '../services/userService';
 
 export const useUsers = () => {
@@ -75,8 +75,8 @@ export const useUsers = () => {
     isLoading,
     error,
     getUser,
-    createUser: createMutation.mutate,
-    updateUser: updateMutation.mutate,
+    createUser: createMutation.mutateAsync,
+    updateUser: updateMutation.mutateAsync,
     deleteUser: deleteMutation.mutate,
     deleteAllUserData: deleteAllUserDataMutation.mutate,
     deleteAllUserDataByEmail: deleteAllUserDataByEmailMutation.mutate,

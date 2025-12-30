@@ -75,14 +75,72 @@ export function UsersPage() {
     setShowFormModal(true);
   };
 
-  const handleSubmit = (data: CreateUser) => {
-    if (editingUser) {
-      updateUser({ id: editingUser.id, data });
-    } else {
-      createUser(data);
+  const handleSubmit = async (data: CreateUser) => {
+    try {
+      // Separamos o papel (role) do restante dos dados do usuário
+      // Se tivermos uma empresa ativa, o papel será atribuído especificamente para ela
+      const { role, ...userData } = data;
+
+      let targetUserId = editingUser?.id;
+
+      if (editingUser) {
+        // Atualizamos os dados do usuário (Nome, Email, etc)
+        // Se for edição, mantemos o papel global original envio data.role seria sobrescrever globalmente
+        // Para evitar isso, enviamos apenas userData. 
+        // Mas se a API exigir role, enviamos 'user' ou o original.
+        // A CreateUserSchema exige role? Sim.
+        // Então enviamos o role original do usuário se existir, ou 'user'.
+        const globalRole = editingUser.role; 
+        
+        await updateUser({ 
+            id: editingUser.id, 
+            data: { ...userData, role: globalRole } 
+        });
+      } else {
+        // Criação de usuário
+        // Criamos com o papel global 'user' por padrão se estivermos em contexto de empresa
+        // Ou usamos o papel selecionado se quisermos dar permissão global (mas a UI sugere contexto de empresa)
+        // Vamos assumir que criamos como 'user' global e damos permissão na empresa
+        const userToCreate = {
+            ...userData,
+            role: 'user', // Default global role
+            companyIds: activeCompany ? [activeCompany.id] : [],
+        } as CreateUser;
+        
+        const newUser = await createUser(userToCreate);
+        targetUserId = newUser.id;
+      }
+
+      // Se temos uma empresa ativa e um papel selecionado, atribuímos o papel na empresa
+      if (activeCompany && targetUserId && role) {
+        await handleAssignRole(targetUserId, role);
+      }
+      
+      // Se não tem empresa ativa (admin global gerenciando), talvez devêssemos atualizar o role global? 
+      // O Modal atual mostra Dropdown de papéis mistos (Globais e de Empresa).
+      // Se o admin selecionou "God", ele quer transformar o cara em God.
+      // Se selecionou "Visualizador", quer dar acesso 'viewer' na empresa (se tiver empresa).
+      // Precisamos distinguir.
+      // Os papéis 'god', 'admin', 'user' são globais. 
+      // 'owner', 'editor', 'viewer' são de empresa.
+      
+      const globalRoles = ['god', 'sys_admin', 'user'];
+      const isGlobalRole = globalRoles.includes(role);
+
+      if (!activeCompany && isGlobalRole && targetUserId) {
+          // Estamos no contexto global, atualizando papel global
+           await updateUser({ 
+            id: targetUserId, 
+            data: { ...userData, role: role as any } 
+          });
+      }
+
+      setShowFormModal(false);
+      setEditingUser(null);
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    } catch (error) {
+      console.error('Falha ao salvar usuário', error);
     }
-    setShowFormModal(false);
-    setEditingUser(null);
   };
 
   const handleDelete = (id: string) => {

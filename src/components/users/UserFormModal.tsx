@@ -44,11 +44,16 @@ export function UserFormModal({
   const [form, setForm] = useState<CreateUser>(initialFormState);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const roleOptions: ComboBoxOption<'god' | 'admin' | 'user'>[] = useMemo(
+  const roleOptions: ComboBoxOption<'god' | 'sys_admin' | 'user' | 'owner' | 'admin' | 'editor' | 'operator' | 'viewer'>[] = useMemo(
     () => [
-      { value: 'god', label: 'God' },
-      { value: 'admin', label: 'Administrador' },
-      { value: 'user', label: 'Usuário' },
+      { value: 'god', label: 'God (SuperUser)' },
+      { value: 'sys_admin', label: 'Administrador (Sistema)' },
+      { value: 'user', label: 'Usuário Comum (Sistema)' },
+      { value: 'owner', label: 'Dono (Empresa)' },
+      { value: 'admin', label: 'Administrador (Empresa)' },
+      { value: 'editor', label: 'Editor (Empresa)' },
+      { value: 'operator', label: 'Operador (Empresa)' },
+      { value: 'viewer', label: 'Visualizador (Empresa)' },
     ],
     [],
   );
@@ -76,10 +81,15 @@ export function UserFormModal({
 
   useEffect(() => {
     if (user) {
+        // Se temos uma empresa ativa, tentamos pegar o papel específico da empresa
+        const companyRole = activeCompany && user.companyRoles ? user.companyRoles[activeCompany.id] : undefined;
+        // Se não tiver papel na empresa, usa o papel global
+        const displayRole = (companyRole || user.role) as any;
+
       setForm({
         name: user.name,
         email: user.email,
-        role: user.role,
+        role: displayRole,
         status: user.status,
         companyIds: user.companyIds,
         integrations: {
@@ -91,7 +101,7 @@ export function UserFormModal({
       setForm(initialFormState);
     }
     setErrors({});
-  }, [user, initialFormState]);
+  }, [user, initialFormState, activeCompany]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -163,7 +173,7 @@ export function UserFormModal({
             <ComboBox
               options={roleOptions}
               value={form.role}
-              onValueChange={(value: 'god' | 'admin' | 'user' | null) =>
+              onValueChange={(value: 'god' | 'sys_admin' | 'user' | 'owner' | 'admin' | 'editor' | 'operator' | 'viewer' | null) =>
                 setForm((prev) => ({ ...prev, role: value ?? 'user' }))
               }
               placeholder="Selecione a função"
