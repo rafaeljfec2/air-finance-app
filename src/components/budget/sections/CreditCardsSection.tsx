@@ -198,7 +198,7 @@ export function CreditCardsSection({
                       {t.category}
                     </BadgeStatus>
                   </td>
-                  <td className="px-3 py-2 text-right font-medium whitespace-nowrap text-white dark:text-white">
+                  <td className="px-3 py-2 text-right font-medium whitespace-nowrap text-text dark:text-text-dark">
                     R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </td>
                 </tr>
