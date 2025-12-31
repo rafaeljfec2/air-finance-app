@@ -89,6 +89,12 @@ const UsersPage = lazy(() => import('@/pages/users').then((m) => ({ default: m.U
 const OnboardingPage = lazy(() =>
   import('@/pages/onboarding').then((m) => ({ default: m.default })),
 );
+const PricingPage = lazy(() =>
+  import('@/pages/pricing').then((m) => ({ default: m.PricingPage })),
+);
+const SubscriptionManagementPage = lazy(() =>
+  import('@/pages/settings/subscription').then((m) => ({ default: m.SubscriptionManagementPage })),
+);
 
 
 export const router = createBrowserRouter([
@@ -334,6 +340,22 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<SuspenseLoader />}>
         <Settings />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/pricing',
+    element: (
+      <Suspense fallback={<SuspenseLoader />}>
+        <PricingPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/settings/subscription',
+    element: (
+      <Suspense fallback={<SuspenseLoader />}>
+        <SubscriptionManagementPage />
       </Suspense>
     ),
   },

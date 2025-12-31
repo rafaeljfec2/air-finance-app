@@ -9,9 +9,12 @@ import { formatDocument } from '@/utils/formatDocument';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 
+import { useLocation } from 'react-router-dom';
+
 export function CompanySelectionModal() {
   const { user, isLoadingUser } = useAuth();
   const { activeCompany, changeActiveCompany, clearActiveCompany } = useActiveCompany();
+  const location = useLocation();
 
   const {
     data: companies = [],
@@ -35,9 +38,12 @@ export function CompanySelectionModal() {
   // Show modal if user is logged in and there's no valid active company
   // Check for null, undefined, or invalid company (missing id)
   // Don't show modal while user or companies are still loading
+  // Also don't show on pricing or subscription pages
   const hasValidActiveCompany = !!activeCompany?.id;
+  const isSubscriptionPage = location.pathname.startsWith('/pricing') || location.pathname.startsWith('/settings/subscription');
+  
   const shouldShowModal =
-    !!user && !isLoadingUser && !isLoading && !hasValidActiveCompany && hasCompanies;
+    !isSubscriptionPage && !!user && !isLoadingUser && !isLoading && !hasValidActiveCompany && hasCompanies;
 
   // Set selected company ID when companies load or activeCompany changes
   useEffect(() => {

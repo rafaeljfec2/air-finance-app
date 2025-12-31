@@ -12,9 +12,10 @@ import {
   RefreshCcw,
   Save,
   Settings,
+  SubscriptIcon,
   Tag,
   User,
-  Wallet,
+  Wallet
 } from 'lucide-react';
 
 export const navigation: NavigationSection[] = [
@@ -72,6 +73,7 @@ export const navigation: NavigationSection[] = [
           { name: 'Preferências', href: '/settings/preferences', icon: Pencil },
           { name: 'Notificações', href: '/settings/notifications', icon: Bell },
           { name: 'Logs OpenAI', href: '/admin/openai-logs', icon: ChartBar, roles: ['god'] },
+          { name: 'Assinatura', href: '/settings/subscription', icon: SubscriptIcon },
         ],
       },
     ],

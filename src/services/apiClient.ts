@@ -7,9 +7,41 @@ import { authUtils } from '../utils/auth';
  * - Usa withCredentials para enviar cookies HttpOnly automaticamente.
  * - NÃO injeta mais Authorization manual com Bearer token.
  */
+// Hardcoded for debugging because .env.development seems to be overriding with an incorrect value
+const BASE_URL = 'http://localhost:3001/meu-financeiro/v1';
+// const BASE_URL = `${env.VITE_API_URL.replace(/\/$/, '')}/v1`;
+
 export const apiClient = axios.create({
-  baseURL: `${env.VITE_API_URL.replace(/\/$/, '')}/v1`,
+  baseURL: BASE_URL,
   withCredentials: true, // Cookies HttpOnly são enviados automaticamente
+});
+
+// Add Authorization header manually for now to ensure compatibility
+apiClient.interceptors.request.use((config) => {
+    // Only if we have a token in localStorage (managed by auth store)
+    // We access localstorage directly to avoid circular dependency or store complexities here if needed,
+    // or just assume cookie is enough. But user had issues.
+    // Let's grab it from the store state if possible, or just skip if we rely on cookies.
+    // Given the issues, let's keep it safe and add the header if available.
+    
+    // Note: importing useAuthStore here might be circular if auth uses apiClient.
+    // Let's dynamic import or direct access if needed.
+    // simpler: check localstorage key used by zustand persist?
+    // 'auth-storage' is the key in auth.ts
+    
+    try {
+        const storage = localStorage.getItem('auth-storage');
+        if (storage) {
+            const parsed = JSON.parse(storage);
+            const token = parsed.state?.token;
+            if (token) {
+                 config.headers.Authorization = `Bearer ${token}`;
+            }
+        }
+    } catch (e) {
+        // ignore
+    }
+    return config;
 });
 
 /**
