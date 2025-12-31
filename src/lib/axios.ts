@@ -1,9 +1,10 @@
 import { useAuthStore } from '@/stores/auth';
+import { env } from '@/utils/env';
 import axios from 'axios';
 
-// Hardcoded for debugging because .env.development seems to be overriding with an incorrect value
-const baseURL = 'http://localhost:3001/meu-financeiro/v1'; 
-// const baseURL = env.VITE_API_URL || 'http://localhost:3000/api';
+const baseURL = env.VITE_API_URL.endsWith('/v1')
+  ? env.VITE_API_URL
+  : `${env.VITE_API_URL.replace(/\/$/, '')}/v1`;
 
 export const api = axios.create({
   baseURL,

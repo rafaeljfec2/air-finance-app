@@ -1,13 +1,15 @@
+import { SupportModal } from '@/components/support/SupportModal';
 import { navigation } from '@/constants/navigation';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth';
 import { useSidebarStore } from '@/stores/sidebar';
 import { NavigationGroupItem, NavigationItem } from '@/types/navigation';
 import {
-    ChevronDown,
-    ChevronsLeft,
-    ChevronsRight,
-    X,
+  ChevronDown,
+  ChevronsLeft,
+  ChevronsRight,
+  LifeBuoy,
+  X,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -67,6 +69,8 @@ export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
     }
     return null;
   });
+
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
 
   const handleMenuClick = (itemName: string) => {
     // Se o menu clicado já está aberto, fecha ele
@@ -224,28 +228,43 @@ export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
           <div className="w-full py-2 border-t border-border dark:border-border-dark text-center text-xs text-gray-500 dark:text-gray-400 select-none">
             v{__APP_VERSION__}
           </div>
-          {/* Toggle button */}
-          <div className="p-4 border-t border-border dark:border-border-dark">
-            <button
-              onClick={toggleCollapse}
-              className={cn(
-                'flex items-center justify-center w-full p-2 text-sm font-medium rounded-md',
-                'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
-                'transition-colors duration-200',
-              )}
-            >
-              {isCollapsed ? (
-                <ChevronsRight className="h-5 w-5" />
-              ) : (
-                <>
-                  <ChevronsLeft className="h-5 w-5" />
-                  <span className="ml-2">Recolher</span>
-                </>
-              )}
-            </button>
+            {/* Toggle button */}
+            <div className="p-4 pt-2 border-t border-border dark:border-border-dark space-y-3">
+               {/* Support Button */}
+               <button
+                  onClick={() => setIsSupportOpen(true)}
+                  className={cn(
+                    'flex items-center w-full px-2 py-2 text-sm font-medium rounded-md text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors',
+                    isCollapsed ? 'justify-center' : 'justify-start'
+                  )}
+                  title="Suporte Especializado"
+               >
+                  <LifeBuoy className="h-5 w-5" />
+                  {!isCollapsed && <span className="ml-3">Suporte Especializado</span>}
+               </button>
+
+              <button
+                onClick={toggleCollapse}
+                className={cn(
+                  'flex items-center justify-center w-full p-2 text-sm font-medium rounded-md',
+                  'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
+                  'transition-colors duration-200',
+                )}
+              >
+                {isCollapsed ? (
+                  <ChevronsRight className="h-5 w-5" />
+                ) : (
+                  <>
+                    <ChevronsLeft className="h-5 w-5" />
+                    <span className="ml-2">Recolher</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+
+      <SupportModal isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
     </>
   );
 }
