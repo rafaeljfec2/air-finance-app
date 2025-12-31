@@ -1,5 +1,6 @@
 import { navigation } from '@/constants/navigation';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/stores/auth';
 import { useSidebarStore } from '@/stores/sidebar';
 import { NavigationGroupItem, NavigationItem } from '@/types/navigation';
 import {
@@ -25,9 +26,36 @@ function isGroupItem(item: NavigationItem): item is NavigationGroupItem {
 export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
   const location = useLocation();
   const { isCollapsed, toggleCollapse } = useSidebarStore();
+  const user = useAuthStore((state) => state.user);
+
+  const filteredNavigation = navigation.map(group => ({
+    ...group,
+    items: group.items.filter(item => {
+      if (!item.roles) return true;
+      return user && item.roles.includes(user.role);
+    }).map(item => {
+        if ('children' in item && item.children) {
+            return {
+                ...item,
+                children: item.children.filter(child => {
+                    if (!child.roles) return true;
+                    return user && child.roles.includes(user.role);
+                })
+            }
+        }
+        return item;
+    }).filter(item => {
+        // Remove groups that became empty after filtering children
+         if ('children' in item && item.children && item.children.length === 0) {
+             return false;
+         }
+         return true;
+    })
+  })).filter(group => group.items.length > 0);
+
   const [openMenu, setOpenMenu] = useState<string | null>(() => {
     // Encontra o menu pai do item ativo
-    for (const group of navigation) {
+    for (const group of filteredNavigation) {
       for (const item of group.items) {
         if ('children' in item && item.children) {
           const isAnyChildActive = item.children.some((child) => location.pathname === child.href);
@@ -83,7 +111,7 @@ export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
         <div className="flex flex-col h-full pt-2">
           {/* Navigation */}
           <nav className="flex-1 space-y-1 px-2 py-4 overflow-y-auto">
-            {navigation.map((group, idx) => (
+            {filteredNavigation.map((group, idx) => (
               <div key={group.section} className={cn('mb-2', idx !== 0 && 'mt-6')}>
                 {!isCollapsed && (
                   <div className="text-[10px] font-semibold text-gray-500 tracking-widest uppercase mb-1 pl-2">

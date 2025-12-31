@@ -61,7 +61,7 @@ export const navigation: NavigationSection[] = [
           { name: 'Metas', href: '/goals', icon: Flag },
           { name: 'Transações Recorrentes', href: '/recurring-transactions', icon: RefreshCcw },
           { name: 'Usuários', href: '/users', icon: User },
-          /* { name: 'Fontes de Receitas', href: '/income-sources', icon: DollarSign }, */
+          /* { name: 'Fontes de Receitas', href: '/income-sources', icon: DollarSign }, */          
         ],
       },
       {
@@ -71,6 +71,7 @@ export const navigation: NavigationSection[] = [
           { name: 'Perfil do Usuário', href: '/profile', icon: User },
           { name: 'Preferências', href: '/settings/preferences', icon: Pencil },
           { name: 'Notificações', href: '/settings/notifications', icon: Bell },
+          { name: 'Logs OpenAI', href: '/admin/openai-logs', icon: ChartBar, roles: ['god'] },
         ],
       },
     ],
