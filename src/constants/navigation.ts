@@ -1,21 +1,22 @@
 import { NavigationSection } from '@/types/navigation';
 import {
-    ArrowRightLeft,
-    Banknote,
-    Bell,
-    Building2,
-    ChartBar,
-    CreditCard,
-    Flag,
-    Import,
-    Pencil,
-    Plus,
-    RefreshCcw,
-    Save,
-    Settings,
-    Tag,
-    User,
-    Wallet
+  ArrowRightLeft,
+  Banknote,
+  Bell,
+  Building2,
+  ChartBar,
+  CreditCard,
+  Flag,
+  Import,
+  LayoutDashboard,
+  Pencil,
+  Plus,
+  RefreshCcw,
+  Save,
+  Settings,
+  Tag,
+  User,
+  Wallet
 } from 'lucide-react';
 
 
@@ -24,7 +25,7 @@ export const navigation: NavigationSection[] = [
   {
     section: '📊 Análise e Planejamento',
     items: [
-      { name: 'Dashboard', href: '/dashboard', icon: ChartBar },
+      { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
       { name: 'Meu Orçamento', href: '/budget', icon: Wallet },
       /*{ name: 'Classificação Inteligente', href: '/ai/classification', icon: ChartBar },
        { name: 'Meu Planner', href: '/planner', icon: Calendar }, */
@@ -38,7 +39,7 @@ export const navigation: NavigationSection[] = [
         name: 'Financeiro',
         icon: ArrowRightLeft,
         children: [
-          { name: 'Novo Lançamento', href: '/transactions/new', icon: Plus },
+          { name: 'Nova Transação', href: '/transactions/new', icon: Plus },
           { name: 'Fluxo de Caixa', href: '/transactions', icon: ArrowRightLeft },
           { name: 'Extrato Bancário', href: '/import-ofx', icon: Import },
           /* { name: 'Contas a Pagar', href: '/payables', icon: ArrowDown },
