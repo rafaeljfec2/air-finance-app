@@ -111,11 +111,11 @@ export function SupportModal({ isOpen, onClose }: SupportModalProps) {
                />
             </div>
 
-            <div className="flex justify-end pt-2">
-              <Button type="button" variant="outline" onClick={onClose} className="mr-2">
+            <div className="flex justify-end pt-2 gap-2">
+              <Button type="button" variant="outline" onClick={onClose}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={loading || !formData.subject || !formData.message}>
+              <Button type="submit" variant="success" disabled={loading || !formData.subject || !formData.message}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Enviar Solicitação
               </Button>

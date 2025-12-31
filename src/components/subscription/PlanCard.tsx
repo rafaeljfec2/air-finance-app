@@ -36,7 +36,7 @@ export function PlanCard({ plan, onSelect, isLoading, currentPlanId }: PlanCardP
         
         {/* Recommended Badge */}
         {isHighlight && (
-          <div className="absolute top-0 inset-x-0 flex justify-center -mt-3">
+          <div className="absolute top-0 inset-x-0 flex justify-center pt-2">
              <div className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg tracking-wide uppercase">
                 Recomendado
              </div>
