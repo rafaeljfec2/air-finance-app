@@ -59,7 +59,7 @@ export function SupportModal({ isOpen, onClose }: SupportModalProps) {
     <Modal
       open={isOpen}
       onClose={onClose}
-      title="Suporte Especializado"
+      title="Suporte"
     >
       <div className="space-y-4">
         <p className="text-sm text-gray-500 dark:text-gray-400 -mt-2 mb-4">
@@ -112,7 +112,12 @@ export function SupportModal({ isOpen, onClose }: SupportModalProps) {
             </div>
 
             <div className="flex justify-end pt-2 gap-2">
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={onClose}
+                className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
                 Cancelar
               </Button>
               <Button type="submit" variant="success" disabled={loading || !formData.subject || !formData.message}>

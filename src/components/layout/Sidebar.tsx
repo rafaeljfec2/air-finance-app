@@ -234,13 +234,12 @@ export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
                <button
                   onClick={() => setIsSupportOpen(true)}
                   className={cn(
-                    'flex items-center w-full px-2 py-2 text-sm font-medium rounded-md text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors',
-                    isCollapsed ? 'justify-center' : 'justify-start'
+                    'flex items-center justify-center w-full px-2 py-2 text-sm font-medium rounded-md text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors'
                   )}
-                  title="Suporte Especializado"
+                  title="Suporte"
                >
                   <LifeBuoy className="h-5 w-5" />
-                  {!isCollapsed && <span className="ml-3">Suporte Especializado</span>}
+                  {!isCollapsed && <span className="ml-3">Suporte</span>}
                </button>
 
               <button
