@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
+import { ComboBox } from '@/components/ui/ComboBox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Modal } from '@/components/ui/Modal';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { supportService } from '@/services/supportService';
 import { Loader2, Send } from 'lucide-react';
@@ -12,6 +12,14 @@ interface SupportModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const CATEGORY_OPTIONS = [
+    { value: 'question', label: 'Dúvida Geral' },
+    { value: 'bug', label: 'Relatar Problema (Bug)' },
+    { value: 'feature', label: 'Sugestão de Melhoria' },
+    { value: 'billing', label: 'Financeiro / Assinatura' },
+    { value: 'other', label: 'Outros' },
+];
 
 export function SupportModal({ isOpen, onClose }: SupportModalProps) {
   const [loading, setLoading] = useState(false);
@@ -71,22 +79,13 @@ export function SupportModal({ isOpen, onClose }: SupportModalProps) {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid gap-2">
-              <Label htmlFor="category">Categoria</Label>
-              <Select
+              <ComboBox
+                label="Categoria"
+                options={CATEGORY_OPTIONS}
                 value={formData.category}
-                onValueChange={(val) => setFormData({ ...formData, category: val })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o tipo de ajuda" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="question">Dúvida Geral</SelectItem>
-                  <SelectItem value="bug">Relatar Problema (Bug)</SelectItem>
-                  <SelectItem value="feature">Sugestão de Melhoria</SelectItem>
-                  <SelectItem value="billing">Financeiro / Assinatura</SelectItem>
-                  <SelectItem value="other">Outros</SelectItem>
-                </SelectContent>
-              </Select>
+                onValueChange={(val) => setFormData({ ...formData, category: val || 'question' })}
+                placeholder="Selecione o tipo de ajuda"
+              />
             </div>
 
             <div className="grid gap-2">
