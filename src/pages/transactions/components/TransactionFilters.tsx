@@ -133,6 +133,22 @@ export function TransactionFilters({
                     size="sm"
                     onClick={() => {
                       const now = new Date();
+                      const firstDay = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                      const lastDay = new Date(now.getFullYear(), now.getMonth(), 0);
+                      setStartDate(formatDateToLocalISO(firstDay));
+                      setEndDate(formatDateToLocalISO(lastDay));
+                    }}
+                    className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
+                    title="Mês passado"
+                  >
+                    Mês Passado
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const now = new Date();
                       setStartDate(formatDateToLocalISO(now));
                       setEndDate(formatDateToLocalISO(now));
                     }}
@@ -163,15 +179,15 @@ export function TransactionFilters({
                     size="sm"
                     onClick={() => {
                       const now = new Date();
-                      const firstDay = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-                      const lastDay = new Date(now.getFullYear(), now.getMonth(), 0);
+                      const firstDay = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+                      const lastDay = new Date(now.getFullYear(), now.getMonth() + 2, 0);
                       setStartDate(formatDateToLocalISO(firstDay));
                       setEndDate(formatDateToLocalISO(lastDay));
                     }}
                     className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
-                    title="Mês passado"
+                    title="Mês seguinte"
                   >
-                    Mês Passado
+                    Mês Seguinte
                   </Button>
                 </div>
               </div>

@@ -1,5 +1,6 @@
 import { OnboardingGuard } from '@/components/auth/OnboardingGuard';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { RequireGod } from '@/components/auth/RequireGod';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { SuspenseLoader } from '@/components/SuspenseLoader';
@@ -73,6 +74,10 @@ const NotificationsPage = lazy(() =>
 const PreferencesPage = lazy(() =>
   import('@/pages/settings/preferences').then((m) => ({ default: m.PreferencesPage })),
 );
+// ... existing imports ...
+const OpenAILogsPage = lazy(() =>
+  import('@/pages/admin/openai-logs').then((m) => ({ default: m.OpenAILogsPage })),
+);
 const Statement = lazy(() => import('@/pages/statement').then((m) => ({ default: m.Statement })));
 const Transactions = lazy(() =>
   import('@/pages/transactions').then((m) => ({ default: m.Transactions })),
@@ -84,6 +89,7 @@ const UsersPage = lazy(() => import('@/pages/users').then((m) => ({ default: m.U
 const OnboardingPage = lazy(() =>
   import('@/pages/onboarding').then((m) => ({ default: m.default })),
 );
+
 
 export const router = createBrowserRouter([
   {
@@ -541,6 +547,21 @@ export const router = createBrowserRouter([
           <Suspense fallback={<SuspenseLoader />}>
             <NotificationsPage />
           </Suspense>
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/admin/openai-logs',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <RequireGod>
+            <Suspense fallback={<SuspenseLoader />}>
+              <OpenAILogsPage />
+            </Suspense>
+          </RequireGod>
         </ProtectedRoute>
       </ErrorBoundary>
     ),
