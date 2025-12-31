@@ -1,7 +1,7 @@
+import { notificationService } from '@/services/notificationService';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
-export type NotificationType = 'system' | 'budget' | 'bill' | 'security' | 'success' | 'warning' | 'error' | 'info';
+export type NotificationType = 'INFO' | 'WARNING' | 'SUCCESS' | 'ERROR' | 'SYSTEM' | 'BUDGET' | 'BILL' | 'SECURITY';
 
 export interface Notification {
   id: string;
@@ -16,105 +16,86 @@ export interface Notification {
 interface NotificationsState {
   notifications: Notification[];
   unreadCount: number;
-  addNotification: (notification: Omit<Notification, 'id' | 'createdAt' | 'read'>) => void;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
-  removeNotification: (id: string) => void;
+  isLoading: boolean;
+  
+  fetchNotifications: (userId: string) => Promise<void>;
+  markAsRead: (id: string, userId: string) => Promise<void>;
+  markAllAsRead: (userId: string) => Promise<void>;
+  addNotification: (notification: Notification) => void; 
 }
 
-// Mock Data
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: '1',
-    type: 'budget',
-    title: 'Limite atingido',
-    message: 'Você atingiu 90% do limite do cartão Nubank.',
-    read: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 min ago
-  },
-  {
-    id: '2',
-    type: 'bill',
-    title: 'Fatura próxima do vencimento',
-    message: 'Sua fatura do Itaú vence amanhã. Valor: R$ 3.049,18',
-    read: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-  },
-  {
-    id: '3',
-    type: 'system',
-    title: 'Bem-vindo ao AirFinance!',
-    message: 'Seu perfil foi configurado com sucesso. Aproveite todas as funcionalidades.',
-    read: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
-  },
-  {
-    id: '4',
-    type: 'security',
-    title: 'Novo acesso detectado',
-    message: 'Um novo login foi realizado via Chrome em São Paulo, BR.',
-    read: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 days ago
-  },
-];
+export const useNotificationsStore = create<NotificationsState>((set) => ({
+  notifications: [],
+  unreadCount: 0,
+  isLoading: false,
 
-export const useNotificationsStore = create<NotificationsState>()(
-  persist(
-    (set, get) => ({
-      notifications: MOCK_NOTIFICATIONS,
-      unreadCount: MOCK_NOTIFICATIONS.filter((n) => !n.read).length,
+  fetchNotifications: async (userId: string) => {
+    set({ isLoading: true });
+    try {
+      const [data, count] = await Promise.all([
+        notificationService.getAll(userId),
+        notificationService.getUnreadCount(userId)
+      ]);
+      
+      const mappedNotifications = data.map(n => ({
+        id: n._id,
+        type: n.type,
+        title: n.title,
+        message: n.message,
+        read: n.read,
+        createdAt: n.createdAt,
+        data: n.data
+      }));
 
-      addNotification: (data) => {
-        const newNotification: Notification = {
-          id: Math.random().toString(36).substr(2, 9),
-          createdAt: new Date().toISOString(),
-          read: false,
-          ...data,
-        };
-
-        set((state) => {
-          const updatedNotifications = [newNotification, ...state.notifications];
-          return {
-            notifications: updatedNotifications,
-            unreadCount: updatedNotifications.filter((n) => !n.read).length,
-          };
-        });
-      },
-
-      markAsRead: (id) => {
-        set((state) => {
-          const updatedNotifications = state.notifications.map((n) =>
-            n.id === id ? { ...n, read: true } : n
-          );
-          return {
-            notifications: updatedNotifications,
-            unreadCount: updatedNotifications.filter((n) => !n.read).length,
-          };
-        });
-      },
-
-      markAllAsRead: () => {
-        set((state) => {
-          const updatedNotifications = state.notifications.map((n) => ({ ...n, read: true }));
-          return {
-            notifications: updatedNotifications,
-            unreadCount: 0,
-          };
-        });
-      },
-
-      removeNotification: (id) => {
-         set((state) => {
-          const updatedNotifications = state.notifications.filter((n) => n.id !== id);
-          return {
-            notifications: updatedNotifications,
-            unreadCount: updatedNotifications.filter((n) => !n.read).length,
-          };
-        });
-      },
-    }),
-    {
-      name: 'airfinance-notifications-storage',
+      set({ notifications: mappedNotifications, unreadCount: count });
+    } catch (error) {
+      console.error('Failed to fetch notifications', error);
+    } finally {
+      set({ isLoading: false });
     }
-  )
-);
+  },
+
+  markAsRead: async (id: string, userId: string) => {
+    // Optimistic update
+    set((state) => {
+      const updatedNotifications = state.notifications.map((n) =>
+        n.id === id ? { ...n, read: true } : n
+      );
+      return {
+        notifications: updatedNotifications,
+        unreadCount: Math.max(0, state.unreadCount - 1),
+      };
+    });
+
+    try {
+      await notificationService.markAsRead(id, userId);
+    } catch (error) {
+      // Revert if failed (optional, but good practice)
+      console.error('Failed to mark as read', error);
+    }
+  },
+
+  markAllAsRead: async (userId: string) => {
+    // Optimistic update
+    set((state) => {
+      const updatedNotifications = state.notifications.map((n) => ({ ...n, read: true }));
+      return {
+        notifications: updatedNotifications,
+        unreadCount: 0,
+      };
+    });
+
+    try {
+      await notificationService.markAllAsRead(userId);
+    } catch (error) {
+      console.error('Failed to mark all as read', error);
+    }
+  },
+
+  addNotification: (notification) => {
+    set((state) => ({
+      notifications: [notification, ...state.notifications],
+      unreadCount: state.unreadCount + 1,
+    }));
+  }
+}));

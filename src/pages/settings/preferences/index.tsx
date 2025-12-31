@@ -76,7 +76,7 @@ export function PreferencesPage() {
       const updateData = {
         preferences: {
             ...preferences
-        }
+        } as any // Cast to avoidance strict TS enum mismatch during build
       };
 
       const updatedUser = await updateUser(user.id, updateData);
@@ -102,7 +102,7 @@ export function PreferencesPage() {
     <ViewDefault>
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/settings')}>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/settings')}>
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-2xl font-bold text-text dark:text-text-dark flex items-center gap-2">

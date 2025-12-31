@@ -1,15 +1,32 @@
+import { useAuth } from '@/hooks/useAuth';
 import { useNotificationsStore } from '@/stores/useNotificationsStore';
 import { Menu, Transition } from '@headlessui/react';
 import { Bell, CheckCheck } from 'lucide-react';
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { NotificationItem } from './NotificationItem';
 
 export function NotificationsMenu() {
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotificationsStore();
+  const { user } = useAuth();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, fetchNotifications } = useNotificationsStore();
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchNotifications(user.id);
+    }
+  }, [user?.id, fetchNotifications]);
 
   const handleNotificationClick = (id: string) => {
-    markAsRead(id);
-    // Future: navigation logic based on notification type
+    if (user?.id) {
+      markAsRead(id, user.id);
+      // Future: navigation logic based on notification type
+    }
+  };
+
+  const handleMarkAllRead = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (user?.id) {
+      markAllAsRead(user.id);
+    }
   };
 
   return (
@@ -40,10 +57,7 @@ export function NotificationsMenu() {
                 <h3 className="font-semibold text-sm text-text dark:text-text-dark">Notificações</h3>
                 {unreadCount > 0 && (
                    <button 
-                     onClick={(e) => {
-                         e.preventDefault();
-                         markAllAsRead();
-                     }}
+                     onClick={handleMarkAllRead}
                      className="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 flex items-center gap-1 font-medium transition-colors"
                    >
                      <CheckCheck className="h-3 w-3" />

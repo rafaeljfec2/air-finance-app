@@ -3,12 +3,12 @@ import { Notification, NotificationType } from '@/stores/useNotificationsStore';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
-    AlertTriangle,
-    CheckCircle,
-    Info,
-    Shield,
-    Wallet,
-    XCircle
+  AlertTriangle,
+  CheckCircle,
+  Info,
+  Shield,
+  Wallet,
+  XCircle
 } from 'lucide-react';
 import React from 'react';
 
@@ -19,17 +19,17 @@ interface NotificationItemProps {
 
 const getIcon = (type: NotificationType) => {
   switch (type) {
-    case 'warning':
+    case 'WARNING':
       return <AlertTriangle className="h-5 w-5 text-amber-500" />;
-    case 'success':
+    case 'SUCCESS':
       return <CheckCircle className="h-5 w-5 text-green-500" />;
-    case 'error':
+    case 'ERROR':
       return <XCircle className="h-5 w-5 text-red-500" />;
-    case 'budget':
+    case 'BUDGET':
       return <Wallet className="h-5 w-5 text-primary-500" />;
-    case 'bill':
+    case 'BILL':
       return <Wallet className="h-5 w-5 text-red-500" />;
-    case 'security':
+    case 'SECURITY':
       return <Shield className="h-5 w-5 text-blue-500" />;
     default:
       return <Info className="h-5 w-5 text-gray-500" />;
