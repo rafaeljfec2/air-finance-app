@@ -67,14 +67,22 @@ export function Reports() {
     periodEnd: currentDate.toISOString(),
   };
 
-  const history = historyQuery.data ?? [];
+  const historyRaw = historyQuery.data ?? [];
   const expenses = expensesQuery.data ?? [];
   const goals = goalsQuery.data ?? [];
+
+  // Transform history to match component interface (add revenue/expenses)
+  const history = historyRaw.map((point) => ({
+    date: point.date,
+    balance: point.balance,
+    revenue: 0, // Backend doesn't provide revenue in balance-history
+    expenses: 0, // Backend doesn't provide expenses in balance-history
+  }));
 
   // Build report structure from real data
   const reportStructure = useMemo(() => {
     const expensesTotal = summary.expenses;
-    const expensesWithPct = expenses.map((e, i) => ({
+    const expensesWithPct = expenses.map((e) => ({
       name: e.name,
       value: e.value,
       percentage: expensesTotal > 0 ? (e.value / expensesTotal) * 100 : 0,
@@ -158,20 +166,9 @@ export function Reports() {
       }
     }
 
-    // 3. Trend Check (vs Last Month) - simplified using historicalData
-    if (history.length >= 2) {
-      const currentMonthData = history[history.length - 1];
-      const lastMonthData = history[history.length - 2];
-
-      if (currentMonthData.expenses > lastMonthData.expenses * 1.2) {
-        list.push({
-          id: 'expense-spike',
-          type: 'negative',
-          title: 'Aumento de Gastos',
-          description: 'Seus gastos aumentaram mais de 20% em comparação ao mês passado.',
-        });
-      }
-    }
+    // 3. Trend Check (vs Last Month) - simplified using balance history
+    // Note: balance-history endpoint doesn't provide expenses breakdown
+    // Trend analysis would require additional data from summary or expenses endpoints
 
     return list;
   }, [summary, expenses, history, expensesTotal]);
