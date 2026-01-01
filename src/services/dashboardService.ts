@@ -29,13 +29,11 @@ const DashboardSummarySchema = z.object({
 const BalanceHistoryPointSchema = z.object({
   date: z.string(),
   balance: z.number(),
-  income: z.number(),
-  expenses: z.number(),
 }).transform(data => ({
   date: data.date,
   balance: data.balance,
-  revenue: data.income,
-  expenses: data.expenses,
+  revenue: 0, // Backend não retorna income/expenses no balance-history endpoint
+  expenses: 0, // Backend não retorna income/expenses no balance-history endpoint
 }));
 
 const ExpenseByCategorySchema = z.object({

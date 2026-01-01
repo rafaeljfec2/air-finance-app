@@ -22,7 +22,7 @@ export function useBudgetPageController() {
 
   const cashFlow = data?.cashFlow ?? null;
   const receivables = data?.receivables ?? [];
-  const payables = data?.payables ?? [];
+  const payables = useMemo(() => data?.payables ?? [], [data?.payables]);
   const cards = useMemo(() => data?.creditCards ?? [], [data?.creditCards]);
 
   const [activeCardTab, setActiveCardTab] = useState(cards[0]?.id || '');
