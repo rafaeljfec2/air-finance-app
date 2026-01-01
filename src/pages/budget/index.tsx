@@ -13,7 +13,13 @@ import { useEffect, useMemo, useState } from 'react';
 
 export function BudgetPage() {
   // Estado único para filtro central
-  const [filter, setFilter] = useState({ month: '12', year: '2025' });
+  const [filter, setFilter] = useState(() => {
+    const today = new Date();
+    return {
+      month: (today.getMonth() + 1).toString().padStart(2, '0'),
+      year: today.getFullYear().toString(),
+    };
+  });
 
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? null;

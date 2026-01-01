@@ -1,11 +1,11 @@
 import type {
-  BalanceHistoryPoint,
-  DashboardComparison,
-  DashboardFilters,
-  DashboardGoalSummary,
-  DashboardSummary,
-  DashboardTimeRange,
-  ExpenseByCategory,
+    BalanceHistoryPoint,
+    DashboardComparison,
+    DashboardFilters,
+    DashboardGoalSummary,
+    DashboardSummary,
+    DashboardTimeRange,
+    ExpenseByCategory,
 } from '@/types/dashboard';
 import { parseApiError } from '@/utils/apiErrorHandler';
 import { z } from 'zod';
@@ -29,7 +29,14 @@ const DashboardSummarySchema = z.object({
 const BalanceHistoryPointSchema = z.object({
   date: z.string(),
   balance: z.number(),
-});
+  income: z.number(),
+  expenses: z.number(),
+}).transform(data => ({
+  date: data.date,
+  balance: data.balance,
+  revenue: data.income,
+  expenses: data.expenses,
+}));
 
 const ExpenseByCategorySchema = z.object({
   categoryId: z.string(),
