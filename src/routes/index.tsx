@@ -89,13 +89,15 @@ const UsersPage = lazy(() => import('@/pages/users').then((m) => ({ default: m.U
 const OnboardingPage = lazy(() =>
   import('@/pages/onboarding').then((m) => ({ default: m.default })),
 );
-const PricingPage = lazy(() =>
-  import('@/pages/pricing').then((m) => ({ default: m.PricingPage })),
-);
+const PricingPage = lazy(() => import('@/pages/pricing').then((m) => ({ default: m.PricingPage })));
 const SubscriptionManagementPage = lazy(() =>
   import('@/pages/settings/subscription').then((m) => ({ default: m.SubscriptionManagementPage })),
 );
-
+const FinancialHealthPage = lazy(() =>
+  import('@/pages/financial-health/FinancialHealthPage').then((m) => ({
+    default: m.FinancialHealthPage,
+  })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -178,6 +180,20 @@ export const router = createBrowserRouter([
           <OnboardingGuard>
             <Suspense fallback={<SuspenseLoader />}>
               <Dashboard />
+            </Suspense>
+          </OnboardingGuard>
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/financial-health',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <OnboardingGuard>
+            <Suspense fallback={<SuspenseLoader />}>
+              <FinancialHealthPage />
             </Suspense>
           </OnboardingGuard>
         </ProtectedRoute>

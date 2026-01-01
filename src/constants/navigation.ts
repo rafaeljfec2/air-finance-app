@@ -9,6 +9,7 @@ import {
   Flag,
   Import,
   LayoutDashboard,
+  LineChart,
   Pencil,
   Plus,
   RefreshCcw,
@@ -16,16 +17,19 @@ import {
   Settings,
   Tag,
   User,
-  Wallet
+  Wallet,
 } from 'lucide-react';
-
-
 
 export const navigation: NavigationSection[] = [
   {
     section: '📊 Análise e Planejamento',
     items: [
       { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+      {
+        name: 'Saúde Financeira',
+        href: '/financial-health',
+        icon: LineChart,
+      },
       { name: 'Meu Orçamento', href: '/budget', icon: Wallet },
       /*{ name: 'Classificação Inteligente', href: '/ai/classification', icon: ChartBar },
        { name: 'Meu Planner', href: '/planner', icon: Calendar }, */
@@ -65,7 +69,7 @@ export const navigation: NavigationSection[] = [
           { name: 'Metas', href: '/goals', icon: Flag },
           { name: 'Transações Recorrentes', href: '/recurring-transactions', icon: RefreshCcw },
           { name: 'Usuários', href: '/users', icon: User },
-          /* { name: 'Fontes de Receitas', href: '/income-sources', icon: DollarSign }, */          
+          /* { name: 'Fontes de Receitas', href: '/income-sources', icon: DollarSign }, */
         ],
       },
       {

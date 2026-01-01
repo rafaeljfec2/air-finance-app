@@ -2,7 +2,6 @@ import { BalanceEvolutionCard } from '@/components/dashboard/BalanceEvolutionCar
 import { CreditCardExpensesCard } from '@/components/dashboard/CreditCardExpensesCard';
 import { ExpensesDistributionCard } from '@/components/dashboard/ExpensesDistributionCard';
 import { FinancialGoalsCard } from '@/components/dashboard/FinancialGoalsCard';
-import { IndebtednessCard } from '@/components/dashboard/IndebtednessCard';
 import { MonthlyComparisonCard } from '@/components/dashboard/MonthlyComparisonCard';
 import { RecentTransactionsCard } from '@/components/dashboard/RecentTransactionsCard';
 import { SummaryCardsRow } from '@/components/dashboard/SummaryCardsRow';
@@ -46,6 +45,7 @@ export function Dashboard() {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showCategoriesModal, setShowCategoriesModal] = useState(false);
   const [showGoalsModal, setShowGoalsModal] = useState(false);
+
   const queryClient = useQueryClient();
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id || '';
@@ -82,6 +82,10 @@ export function Dashboard() {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    await balanceHistoryQuery.refetch();
+    await expensesByCategoryQuery.refetch();
+    await goalsSummaryQuery.refetch();
+    await recentTransactionsQuery.refetch();
     setIsRefreshing(false);
   };
 
@@ -218,38 +222,6 @@ export function Dashboard() {
         </div>
       </Modal>
 
-      <Modal
-        open={showGoalsModal}
-        onClose={() => setShowGoalsModal(false)}
-        title="Metas Financeiras"
-      >
-        {/* ... content ... */}
-        <div className="space-y-6">
-          {goalsSummary.map((goal) => (
-            <div key={goal.id} className="mb-2">
-              <div className="flex items-center justify-between mb-1">
-                <span className="font-medium text-purple-600 dark:text-purple-400">
-                  {goal.name}
-                </span>
-                <span className="text-xs text-gray-500">{goal.progressPct}%</span>
-              </div>
-              <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full mb-1">
-                <div
-                  className="h-2 rounded-full bg-purple-500"
-                  style={{ width: `${goal.progressPct}%` }}
-                />
-              </div>
-              <div className="flex justify-between text-xs text-gray-500">
-                <span>{goal.description}</span>
-                <span>Alvo: {formatCurrency(goal.targetAmount)}</span>
-                <span>Atual: {formatCurrency(goal.currentAmount)}</span>
-                <span>Até: {format(new Date(goal.deadline), 'MM/yyyy')}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Modal>
-
       <PullToRefresh onRefresh={handleRefresh} isRefreshing={isRefreshing}>
         <motion.div
           variants={container}
@@ -342,11 +314,6 @@ export function Dashboard() {
             <SummaryCardsRow companyId={companyId} filters={filters} />
           </motion.div>
 
-          {/* Indebtedness Metrics */}
-          <motion.div variants={item}>
-            <IndebtednessCard companyId={companyId} />
-          </motion.div>
-
           {selectedView === 'overview' ? (
             /* Overview - Charts and Additional Info */
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -393,6 +360,35 @@ export function Dashboard() {
           )}
         </motion.div>
       </PullToRefresh>
+
+      <Modal
+        open={showGoalsModal}
+        onClose={() => setShowGoalsModal(false)}
+        title="Metas Financeiras"
+      >
+        <div className="space-y-6">
+          {goalsSummary.map((goal) => (
+            <div key={goal.id} className="mb-2">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-medium text-purple-600 dark:text-purple-400">
+                  {goal.name}
+                </span>
+                <span className="text-sm text-gray-500">
+                  {formatCurrency(goal.currentAmount)} de {formatCurrency(goal.targetAmount)}
+                </span>
+              </div>
+              <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full">
+                <div
+                  className="h-2 bg-purple-500 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${Math.min((goal.currentAmount / goal.targetAmount) * 100, 100)}%`,
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Modal>
     </ViewDefault>
   );
 }
