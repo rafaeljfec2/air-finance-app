@@ -11,6 +11,17 @@ import globals from 'globals';
 export default [
   eslint.configs.recommended,
   {
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      '.eslintrc.js',
+      '.prettierrc.js',
+      'commitlint.config.js',
+      'vite.config.ts',
+      'vitest.config.ts',
+      'tailwind.config.*',
+      'postcss.config.*',
+    ],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       parser: tseslintParser,

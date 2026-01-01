@@ -5,6 +5,17 @@ module.exports = {
     es2021: true,
     node: true,
   },
+  ignorePatterns: [
+    'dist',
+    'node_modules',
+    '.eslintrc.js',
+    '.prettierrc.js',
+    'commitlint.config.js',
+    'vite.config.ts',
+    'vitest.config.ts',
+    'tailwind.config.*',
+    'postcss.config.*',
+  ],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -13,7 +24,7 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:import/typescript',
     'plugin:jsx-a11y/recommended',
-    'prettier',
+    'plugin:prettier/recommended',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -29,7 +40,7 @@ module.exports = {
     'react/prop-types': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': 'off', // Turn off base rule to use unused-imports instead
     'import/order': [
       'error',
       {
@@ -38,11 +49,20 @@ module.exports = {
         alphabetize: { order: 'asc', caseInsensitive: true },
       },
     ],
+    // Remove unused imports automatically
     'unused-imports/no-unused-imports': 'error',
+    // Warn about unused variables (but don't auto-remove them)
     'unused-imports/no-unused-vars': [
       'warn',
-      { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
+      {
+        vars: 'all',
+        varsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+      },
     ],
+    // Prettier integration
+    'prettier/prettier': 'error',
   },
   settings: {
     react: {

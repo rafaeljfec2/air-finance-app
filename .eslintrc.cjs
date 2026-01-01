@@ -1,23 +1,75 @@
 module.exports = {
   root: true,
-  env: { browser: true, es2020: true },
+  env: {
+    browser: true,
+    es2021: true,
+    node: true,
+  },
+  ignorePatterns: [
+    'dist',
+    'node_modules',
+    '.eslintrc.cjs',
+    '.prettierrc.js',
+    'commitlint.config.js',
+    'vite.config.ts',
+    'vitest.config.ts',
+    'tailwind.config.*',
+    'postcss.config.*',
+  ],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:react-hooks/recommended',
     'plugin:react/recommended',
-    'plugin:react/jsx-runtime',
+    'plugin:react-hooks/recommended',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
+    'plugin:jsx-a11y/recommended',
+    'plugin:prettier/recommended',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
-  plugins: ['react-refresh'],
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 12,
+    sourceType: 'module',
+  },
+  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'import', 'jsx-a11y', 'unused-imports'],
   rules: {
-    'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-    '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/no-unused-vars': 'error',
+    'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',
-    // SonarQube rules - alguns avisos são falsos positivos ou não críticos
-    'sonarjs/no-duplicate-string': ['warn', { threshold: 5 }],
-    'sonarjs/prefer-replace-all': 'off', // replace() com regex é necessário em alguns casos
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-unused-vars': 'off', // Turn off base rule to use unused-imports instead
+    'import/order': [
+      'error',
+      {
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+        'newlines-between': 'always',
+        alphabetize: { order: 'asc', caseInsensitive: true },
+      },
+    ],
+    // Remove unused imports automatically
+    'unused-imports/no-unused-imports': 'error',
+    // Warn about unused variables (but don't auto-remove them)
+    'unused-imports/no-unused-vars': [
+      'warn',
+      {
+        vars: 'all',
+        varsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+      },
+    ],
+    // Prettier integration
+    'prettier/prettier': 'error',
+  },
+  settings: {
+    react: {
+      version: 'detect',
+    },
+    'import/resolver': {
+      typescript: {},
+    },
   },
 };
