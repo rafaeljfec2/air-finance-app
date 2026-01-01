@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { Account, CreateAccount } from '@/services/accountService';
 import { useCompanyStore } from '@/stores/company';
@@ -63,6 +64,8 @@ export function AccountFormModal({
       companyId: activeCompany?.id || '',
       initialBalance: 0,
       initialBalanceDate: formatDateToLocalISO(new Date()),
+      useInitialBalanceInExtract: true,
+      useInitialBalanceInCashFlow: true,
     }),
     [activeCompany],
   );
@@ -98,6 +101,8 @@ export function AccountFormModal({
         initialBalanceDate: account.initialBalanceDate
           ? account.initialBalanceDate.slice(0, 10)
           : formatDateToLocalISO(new Date()),
+        useInitialBalanceInExtract: account.useInitialBalanceInExtract ?? true,
+        useInitialBalanceInCashFlow: account.useInitialBalanceInCashFlow ?? true,
       });
       if (account.type === 'credit_card') {
         setLimitInput(
@@ -475,6 +480,49 @@ export function AccountFormModal({
                       error={errors.initialBalanceDate}
                       className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
                     />
+                  </FormField>
+                </div>
+              )}
+
+              {/* Toggles para uso do saldo inicial */}
+              {!isCreditCard && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <FormField label="Usar saldo inicial no extrato">
+                    <div className="flex items-center gap-3">
+                      <Switch
+                        checked={form.useInitialBalanceInExtract ?? true}
+                        onCheckedChange={(checked) => {
+                          setForm((prev) => ({
+                            ...prev,
+                            useInitialBalanceInExtract: checked,
+                          }));
+                        }}
+                      />
+                      <span className="text-sm text-muted-foreground dark:text-gray-400">
+                        {form.useInitialBalanceInExtract ?? true
+                          ? 'Sim'
+                          : 'Não'}
+                      </span>
+                    </div>
+                  </FormField>
+
+                  <FormField label="Usar saldo inicial no fluxo de caixa">
+                    <div className="flex items-center gap-3">
+                      <Switch
+                        checked={form.useInitialBalanceInCashFlow ?? true}
+                        onCheckedChange={(checked) => {
+                          setForm((prev) => ({
+                            ...prev,
+                            useInitialBalanceInCashFlow: checked,
+                          }));
+                        }}
+                      />
+                      <span className="text-sm text-muted-foreground dark:text-gray-400">
+                        {form.useInitialBalanceInCashFlow ?? true
+                          ? 'Sim'
+                          : 'Não'}
+                      </span>
+                    </div>
                   </FormField>
                 </div>
               )}

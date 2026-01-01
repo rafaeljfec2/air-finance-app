@@ -23,6 +23,8 @@ export const AccountSchema = z.object({
       return new Date(date).toISOString();
     })
     .nullable(),
+  useInitialBalanceInExtract: z.boolean().optional().default(true),
+  useInitialBalanceInCashFlow: z.boolean().optional().default(true),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   creditLimit: z.number().optional(),

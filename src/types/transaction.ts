@@ -18,6 +18,8 @@ export interface Account {
   balance: number;
   initialBalance: number;
   initialBalanceDate: string | null;
+  useInitialBalanceInExtract?: boolean;
+  useInitialBalanceInCashFlow?: boolean;
   createdAt: string;
   updatedAt: string;
 }
