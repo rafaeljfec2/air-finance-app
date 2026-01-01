@@ -1,4 +1,4 @@
-export type DashboardTimeRange = 'day' | 'week' | 'month' | 'year';
+export type DashboardTimeRange = 'day' | 'week' | 'month' | '6months' | 'year';
 
 export interface DashboardSummary {
   income: number;
@@ -17,6 +17,8 @@ export interface DashboardSummary {
 export interface BalanceHistoryPoint {
   date: string;
   balance: number;
+  income: number;
+  expenses: number;
 }
 
 export interface ExpenseByCategory {

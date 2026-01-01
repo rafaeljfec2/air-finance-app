@@ -1,11 +1,11 @@
 import type {
-    BalanceHistoryPoint,
-    DashboardComparison,
-    DashboardFilters,
-    DashboardGoalSummary,
-    DashboardSummary,
-    DashboardTimeRange,
-    ExpenseByCategory,
+  BalanceHistoryPoint,
+  DashboardComparison,
+  DashboardFilters,
+  DashboardGoalSummary,
+  DashboardSummary,
+  DashboardTimeRange,
+  ExpenseByCategory,
 } from '@/types/dashboard';
 import { parseApiError } from '@/utils/apiErrorHandler';
 import { z } from 'zod';
@@ -29,12 +29,9 @@ const DashboardSummarySchema = z.object({
 const BalanceHistoryPointSchema = z.object({
   date: z.string(),
   balance: z.number(),
-}).transform(data => ({
-  date: data.date,
-  balance: data.balance,
-  revenue: 0, // Backend não retorna income/expenses no balance-history endpoint
-  expenses: 0, // Backend não retorna income/expenses no balance-history endpoint
-}));
+  income: z.number(),
+  expenses: z.number(),
+});
 
 const ExpenseByCategorySchema = z.object({
   categoryId: z.string(),
@@ -64,7 +61,13 @@ const DashboardGoalSummarySchema = z.object({
   deadline: z.string(),
 });
 
-export const DASHBOARD_TIME_RANGES: DashboardTimeRange[] = ['day', 'week', 'month', 'year'];
+export const DASHBOARD_TIME_RANGES: DashboardTimeRange[] = [
+  'day',
+  'week',
+  'month',
+  '6months',
+  'year',
+];
 
 function buildParams(filters: DashboardFilters) {
   const params: Record<string, string> = {

@@ -29,20 +29,33 @@ export function Reports() {
   );
 
   // Use React Query hooks for real data
+  const historyFilters: DashboardFilters = useMemo(
+    () => ({
+      timeRange: '6months', // Force 6 months for the chart
+      referenceDate: currentDate.toISOString(),
+    }),
+    [currentDate],
+  );
+
+  // Use React Query hooks for real data
   const summaryQuery = useDashboardSummary(companyId, filters);
-  const historyQuery = useDashboardBalanceHistory(companyId, filters);
+  const historyQuery = useDashboardBalanceHistory(companyId, historyFilters);
   const expensesQuery = useDashboardExpensesByCategory(companyId, filters);
   const goalsQuery = useDashboardGoalsSummary(companyId, 10); // Increase limit to show more goals
 
-  const loading = summaryQuery.isLoading || historyQuery.isLoading || expensesQuery.isLoading || goalsQuery.isLoading;
-  
+  const loading =
+    summaryQuery.isLoading ||
+    historyQuery.isLoading ||
+    expensesQuery.isLoading ||
+    goalsQuery.isLoading;
+
   // Get first error if any
   const error = summaryQuery.error ?? historyQuery.error ?? expensesQuery.error ?? goalsQuery.error;
-  
+
   // Extract error message using apiErrorHandler
   const errorMessage = useMemo(() => {
     if (!error) return null;
-    
+
     try {
       const apiError = parseApiError(error);
       return getUserFriendlyMessage(apiError);
@@ -75,8 +88,8 @@ export function Reports() {
   const history = historyRaw.map((point) => ({
     date: point.date,
     balance: point.balance,
-    revenue: 0, // Backend doesn't provide revenue in balance-history
-    expenses: 0, // Backend doesn't provide expenses in balance-history
+    revenue: point.income,
+    expenses: point.expenses,
   }));
 
   // Build report structure from real data
@@ -102,7 +115,7 @@ export function Reports() {
       },
       expenses: {
         total: expensesTotal,
-        categories: expensesWithPct.map(e => ({
+        categories: expensesWithPct.map((e) => ({
           name: e.name,
           value: e.value,
           percentage: e.percentage,
@@ -180,7 +193,9 @@ export function Reports() {
     return (
       <ViewDefault>
         <div className="flex items-center justify-center h-full min-h-[400px]">
-          <p className="text-muted-foreground">Selecione uma empresa para visualizar os relatórios.</p>
+          <p className="text-muted-foreground">
+            Selecione uma empresa para visualizar os relatórios.
+          </p>
         </div>
       </ViewDefault>
     );
