@@ -24,7 +24,7 @@ const typeOptions = [
 type CompanyType = 'matriz' | 'filial' | 'holding' | 'prestadora' | 'outra';
 
 function removeNonDigits(value: string): string {
-  // eslint-disable-next-line
+  // eslint-disable-next-line sonarqube/typescript:S7781
   return value.replace(/\D/g, '');
 }
 

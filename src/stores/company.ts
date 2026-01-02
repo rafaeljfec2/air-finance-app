@@ -42,14 +42,10 @@ export const useCompanyStore = create<CompanyStore>()(
           : null,
       }),
       onRehydrateStorage: () => (state) => {
-        // Re-sanitize on rehydration
-        if (state?.activeCompany) {
-          // Validate that activeCompany has at least an id, otherwise clear it
-          if (!state.activeCompany.id) {
-            state.activeCompany = null;
-          } else {
-            state.activeCompany = sanitizeCompany(state.activeCompany);
-          }
+        if (state?.activeCompany?.id) {
+          state.activeCompany = sanitizeCompany(state.activeCompany);
+        } else if (state?.activeCompany) {
+          state.activeCompany = null;
         }
       },
     },

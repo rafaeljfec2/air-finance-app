@@ -24,7 +24,7 @@ import {
   X,
 } from 'lucide-react';
 import type { ChangeEvent, FormEvent } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const accountTypes = [
   { value: 'checking', label: 'Conta Corrente', icon: Banknote, iconName: 'Banknote' },
@@ -35,6 +35,18 @@ const accountTypes = [
 ] as const;
 
 type AccountType = (typeof accountTypes)[number]['value'];
+
+function getModalTitle(account: Account | null | undefined, isCreditCard: boolean): string {
+  if (account) return 'Editar Conta';
+  if (isCreditCard) return 'Novo Cartão de Crédito';
+  return 'Nova Conta';
+}
+
+function getModalDescription(account: Account | null | undefined, isCreditCard: boolean): string {
+  if (account) return 'Atualize as informações';
+  if (isCreditCard) return 'Preencha os dados';
+  return 'Preencha os dados da nova conta';
+}
 
 interface AccountFormModalProps {
   open: boolean;
@@ -86,103 +98,186 @@ export function AccountFormModal({
     [],
   );
 
-  useEffect(() => {
-    if (account) {
-      setForm({
-        name: account.name,
-        type: account.type,
-        institution: account.institution,
-        agency: account.agency,
-        accountNumber: account.accountNumber,
-        color: account.color,
-        icon: account.icon,
-        companyId: account.companyId,
-        initialBalance: account.initialBalance,
-        initialBalanceDate: account.initialBalanceDate
-          ? account.initialBalanceDate.slice(0, 10)
-          : formatDateToLocalISO(new Date()),
-        useInitialBalanceInExtract: account.useInitialBalanceInExtract ?? true,
-        useInitialBalanceInCashFlow: account.useInitialBalanceInCashFlow ?? true,
-      });
-      if (account.type === 'credit_card') {
-        setLimitInput(
-          account.initialBalance !== undefined && account.initialBalance !== null
-            ? formatCurrencyInput(account.initialBalance.toFixed(2).replace('.', ''))
-            : '',
-        );
-        setInitialBalanceInput('');
-      } else {
-        setInitialBalanceInput(
-          account.initialBalance !== undefined && account.initialBalance !== null
-            ? formatCurrencyInput(account.initialBalance.toFixed(2).replace('.', ''), true)
-            : '',
-        );
-        setLimitInput('');
-      }
-    } else {
-      setForm({
-        ...initialFormState,
-        companyId: activeCompany?.id || '',
-      });
-      setInitialBalanceInput('');
-      setLimitInput('');
-    }
-    setErrors({});
-  }, [account, open, initialFormState, activeCompany]);
+  const formatBalanceValue = useCallback((balance: number, withSign: boolean): string => {
+    if (balance === 0) return '';
+    return formatCurrencyInput(balance.toFixed(2).replace('.', ''), withSign);
+  }, []);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const initializeBalanceInputs = useCallback(
+    (accountData: Account, isCard: boolean) => {
+      const balance = accountData.initialBalance ?? 0;
+      if (isCard) {
+        setLimitInput(formatBalanceValue(balance, false));
+        setInitialBalanceInput('');
+        return;
+      }
+      setInitialBalanceInput(formatBalanceValue(balance, true));
+      setLimitInput('');
+    },
+    [formatBalanceValue],
+  );
+
+  const mapAccountToForm = useCallback((accountData: Account): CreateAccount => {
+    return {
+      name: accountData.name,
+      type: accountData.type,
+      institution: accountData.institution,
+      agency: accountData.agency,
+      accountNumber: accountData.accountNumber,
+      color: accountData.color,
+      icon: accountData.icon,
+      companyId: accountData.companyId,
+      initialBalance: accountData.initialBalance,
+      initialBalanceDate: accountData.initialBalanceDate
+        ? accountData.initialBalanceDate.slice(0, 10)
+        : formatDateToLocalISO(new Date()),
+      useInitialBalanceInExtract: accountData.useInitialBalanceInExtract ?? true,
+      useInitialBalanceInCashFlow: accountData.useInitialBalanceInCashFlow ?? true,
+    };
+  }, []);
+
+  const resetFormState = useCallback(() => {
+    setForm({
+      ...initialFormState,
+      companyId: activeCompany?.id || '',
+    });
+    setInitialBalanceInput('');
+    setLimitInput('');
+    setErrors({});
+  }, [initialFormState, activeCompany]);
+
+  const initializeFormFromAccount = useCallback(() => {
+    if (account) {
+      setForm(mapAccountToForm(account));
+      initializeBalanceInputs(account, account.type === 'credit_card');
+    } else {
+      resetFormState();
+    }
+  }, [account, mapAccountToForm, initializeBalanceInputs, resetFormState]);
+
+  useEffect(() => {
+    initializeFormFromAccount();
+  }, [account, open, initializeFormFromAccount]);
+
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const handleColorChange = (color: string) => {
+  const handleColorChange = useCallback((color: string) => {
     setForm((prev) => ({ ...prev, color }));
-  };
+  }, []);
 
-  const handleIconChange = (icon: string) => {
+  const handleIconChange = useCallback((icon: string) => {
     setForm((prev) => ({ ...prev, icon }));
-  };
+  }, []);
 
-  const validate = () => {
+  const handleLimitInputChange = useCallback((rawValue: string) => {
+    const formatted = formatCurrencyInput(rawValue);
+    const numericValue = parseCurrency(formatted);
+    if (numericValue <= 999999999999) {
+      setLimitInput(formatted);
+      setForm((prev) => ({ ...prev, initialBalance: numericValue }));
+    }
+  }, []);
+
+  const handleInitialBalanceChange = useCallback((rawValue: string) => {
+    const formatted = formatCurrencyInput(rawValue, true);
+    const numericValue = parseCurrency(formatted);
+    if (numericValue <= 999999999999) {
+      setInitialBalanceInput(formatted);
+      setForm((prev) => ({ ...prev, initialBalance: numericValue }));
+    }
+  }, []);
+
+  const handleCreditLimitChange = useCallback(
+    (rawValue: string, inputElement: HTMLInputElement) => {
+      const formatted = formatCurrencyInput(rawValue);
+      const numericValue = parseCurrency(formatted);
+      if (numericValue <= 999999999999) {
+        inputElement.value = formatted;
+        setForm((prev) => ({ ...prev, creditLimit: numericValue }));
+      } else {
+        inputElement.value = formatCurrencyInput(
+          form.creditLimit?.toFixed(2).replace('.', '') || '',
+        );
+      }
+    },
+    [form.creditLimit],
+  );
+
+  const handleDateChange = useCallback((date: Date | undefined, fieldName: string) => {
+    const dateString = date ? formatDateToLocalISO(date) : '';
+    setForm((prev) => ({ ...prev, [fieldName]: dateString }));
+  }, []);
+
+  const handleTypeChange = useCallback((value: string | null) => {
+    setForm((prev) => ({ ...prev, type: (value as AccountType) ?? 'checking' }));
+  }, []);
+
+  const handleSwitchChange = useCallback(
+    (field: 'useInitialBalanceInExtract' | 'useInitialBalanceInCashFlow', checked: boolean) => {
+      setForm((prev) => ({ ...prev, [field]: checked }));
+    },
+    [],
+  );
+
+  const validateBankingFields = useCallback(
+    (errors: Record<string, string>) => {
+      if (!(form.agency ?? '').trim()) {
+        errors.agency = 'Agência obrigatória';
+      }
+      if (!(form.accountNumber ?? '').trim()) {
+        errors.accountNumber = 'Número da conta obrigatório';
+      }
+    },
+    [form.agency, form.accountNumber],
+  );
+
+  const validate = useCallback(() => {
     const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (!form.institution.trim()) errs.institution = 'Instituição obrigatória';
     if (!isCreditCard) {
-      if (!(form.agency ?? '').trim()) errs.agency = 'Agência obrigatória';
-      if (!(form.accountNumber ?? '').trim()) errs.accountNumber = 'Número da conta obrigatório';
+      validateBankingFields(errs);
     }
     if (!form.companyId) errs.companyId = 'Selecione uma empresa';
     return errs;
-  };
+  }, [form.name, form.institution, form.companyId, isCreditCard, validateBankingFields]);
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    const errs = validate();
-    setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
-
-    const payload = {
+  const buildSubmitPayload = useCallback((): CreateAccount => {
+    return {
       ...form,
       agency: isCreditCard ? '' : form.agency,
       accountNumber: isCreditCard ? '' : form.accountNumber,
       initialBalanceDate: form.initialBalanceDate || null,
     };
+  }, [form, isCreditCard]);
 
-    onSubmit(payload);
-    onClose();
-    setForm(initialFormState);
-    setErrors({});
-    setInitialBalanceInput('');
-    setLimitInput('');
-  };
+  const handleSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault();
+      const errs = validate();
+      setErrors(errs);
+      if (Object.keys(errs).length > 0) return;
 
-  const handleClose = () => {
-    setForm(initialFormState);
-    setErrors({});
-    setInitialBalanceInput('');
-    setLimitInput('');
+      onSubmit(buildSubmitPayload());
+      onClose();
+      resetFormState();
+    },
+    [validate, buildSubmitPayload, onSubmit, onClose, resetFormState],
+  );
+
+  const handleClose = useCallback(() => {
+    resetFormState();
     onClose();
-  };
+  }, [resetFormState, onClose]);
+
+  const modalTitle = useMemo(() => getModalTitle(account, isCreditCard), [account, isCreditCard]);
+  const modalDescription = useMemo(
+    () => getModalDescription(account, isCreditCard),
+    [account, isCreditCard],
+  );
 
   return (
     <Modal
@@ -200,16 +295,8 @@ export function AccountFormModal({
               <CreditCard className="h-5 w-5 text-primary-500 dark:text-primary-400" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-text dark:text-text-dark">
-                {account ? 'Editar Conta' : isCreditCard ? 'Novo Cartão de Crédito' : 'Nova Conta'}
-              </h2>
-              <p className="text-sm text-muted-foreground dark:text-gray-400">
-                {account
-                  ? 'Atualize as informações'
-                  : isCreditCard
-                    ? 'Preencha os dados'
-                    : 'Preencha os dados da nova conta'}
-              </p>
+              <h2 className="text-xl font-semibold text-text dark:text-text-dark">{modalTitle}</h2>
+              <p className="text-sm text-muted-foreground dark:text-gray-400">{modalDescription}</p>
             </div>
           </div>
           <button
@@ -259,9 +346,7 @@ export function AccountFormModal({
                   <ComboBox
                     options={accountTypeOptions}
                     value={form.type}
-                    onValueChange={(value) =>
-                      setForm((prev) => ({ ...prev, type: (value as AccountType) ?? 'checking' }))
-                    }
+                    onValueChange={handleTypeChange}
                     placeholder="Selecione..."
                     error={errors.type}
                     renderItem={(option) => {
@@ -359,19 +444,7 @@ export function AccountFormModal({
                         type="text"
                         inputMode="decimal"
                         value={limitInput}
-                        onChange={(e) => {
-                          const rawValue = e.target.value;
-                          const formatted = formatCurrencyInput(rawValue);
-                          const numericValue = parseCurrency(formatted);
-
-                          if (numericValue <= 999999999999) {
-                            setLimitInput(formatted);
-                            setForm((prev) => ({
-                              ...prev,
-                              initialBalance: numericValue,
-                            }));
-                          }
-                        }}
+                        onChange={(e) => handleLimitInputChange(e.target.value)}
                         placeholder="R$ 0,00"
                         required
                         className={cn(
@@ -386,12 +459,7 @@ export function AccountFormModal({
                   <FormField label="Data do saldo inicial *" error={errors.initialBalanceDate}>
                     <DatePicker
                       value={form.initialBalanceDate || undefined}
-                      onChange={(date) => {
-                        const dateString = date ? formatDateToLocalISO(date) : '';
-                        handleChange({
-                          target: { name: 'initialBalanceDate', value: dateString },
-                        } as ChangeEvent<HTMLInputElement>);
-                      }}
+                      onChange={(date) => handleDateChange(date, 'initialBalanceDate')}
                       placeholder="Selecionar data"
                       error={errors.initialBalanceDate}
                       className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
@@ -412,23 +480,7 @@ export function AccountFormModal({
                             ? formatCurrencyInput(account.creditLimit.toFixed(2).replace('.', ''))
                             : ''
                         }
-                        onChange={(e) => {
-                          const rawValue = e.target.value;
-                          const formatted = formatCurrencyInput(rawValue);
-                          const numericValue = parseCurrency(formatted);
-
-                          if (numericValue <= 999999999999) {
-                            e.target.value = formatted;
-                            setForm((prev) => ({
-                              ...prev,
-                              creditLimit: numericValue,
-                            }));
-                          } else {
-                            e.target.value = formatCurrencyInput(
-                              form.creditLimit?.toFixed(2).replace('.', '') || '',
-                            );
-                          }
-                        }}
+                        onChange={(e) => handleCreditLimitChange(e.target.value, e.target)}
                         placeholder="R$ 0,00"
                         className={cn(
                           'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
@@ -448,19 +500,7 @@ export function AccountFormModal({
                         type="text"
                         inputMode="decimal"
                         value={initialBalanceInput}
-                        onChange={(e) => {
-                          const rawValue = e.target.value;
-                          const formatted = formatCurrencyInput(rawValue, true);
-                          const numericValue = parseCurrency(formatted);
-
-                          if (numericValue <= 999999999999) {
-                            setInitialBalanceInput(formatted);
-                            setForm((prev) => ({
-                              ...prev,
-                              initialBalance: numericValue,
-                            }));
-                          }
-                        }}
+                        onChange={(e) => handleInitialBalanceChange(e.target.value)}
                         placeholder="R$ 0,00"
                         required
                         className={cn(
@@ -475,12 +515,7 @@ export function AccountFormModal({
                   <FormField label="Data do saldo inicial *" error={errors.initialBalanceDate}>
                     <DatePicker
                       value={form.initialBalanceDate || undefined}
-                      onChange={(date) => {
-                        const dateString = date ? formatDateToLocalISO(date) : '';
-                        handleChange({
-                          target: { name: 'initialBalanceDate', value: dateString },
-                        } as ChangeEvent<HTMLInputElement>);
-                      }}
+                      onChange={(date) => handleDateChange(date, 'initialBalanceDate')}
                       placeholder="Selecionar data do saldo inicial"
                       error={errors.initialBalanceDate}
                       className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
@@ -513,12 +548,9 @@ export function AccountFormModal({
                     <div className="flex items-center gap-3">
                       <Switch
                         checked={form.useInitialBalanceInCashFlow ?? true}
-                        onCheckedChange={(checked) => {
-                          setForm((prev) => ({
-                            ...prev,
-                            useInitialBalanceInCashFlow: checked,
-                          }));
-                        }}
+                        onCheckedChange={(checked) =>
+                          handleSwitchChange('useInitialBalanceInCashFlow', checked)
+                        }
                       />
                       <span className="text-sm text-muted-foreground dark:text-gray-400">
                         {(form.useInitialBalanceInCashFlow ?? true) ? 'Sim' : 'Não'}

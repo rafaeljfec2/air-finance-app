@@ -64,8 +64,8 @@ export function useBudgetPageController() {
 
   // Calcular data para buscar o saldo acumulado até o final do mês selecionado
   const balanceDate = useMemo(() => {
-    const year = parseInt(filter.year);
-    const month = parseInt(filter.month);
+    const year = Number.parseInt(filter.year);
+    const month = Number.parseInt(filter.month);
 
     const now = new Date();
     // Check if selected month/year is the current one
