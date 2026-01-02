@@ -1,6 +1,7 @@
 import { Logo } from '@/components/Logo';
 import { MessageSquare, Headphones } from 'lucide-react';
 import { ScrollReveal } from './ScrollReveal';
+import { Link } from 'react-router-dom';
 
 const footerLinks = {
   produto: [
@@ -16,10 +17,10 @@ const footerLinks = {
     { name: 'Contato', href: '#' },
   ],
   legal: [
-    { name: 'Privacidade', href: '#' },
-    { name: 'Termos', href: '#' },
-    { name: 'Cookies', href: '#' },
-    { name: 'LGPD', href: '#' },
+    { name: 'Privacidade', href: '/privacy' },
+    { name: 'Termos', href: '/terms' },
+    { name: 'Cookies', href: '/privacy' }, // Linking to privacy for cookies for now
+    { name: 'LGPD', href: '/privacy' }, // Linking to privacy for LGPD for now
   ],
 };
 
@@ -95,12 +96,21 @@ export function Footer() {
               <ul className="space-y-3">
                 {footerLinks.legal.map((link) => (
                   <li key={link.name}>
-                    <a
-                      href={link.href}
-                      className="text-text/60 hover:text-brand-arrow transition-colors"
-                    >
-                      {link.name}
-                    </a>
+                    {link.href.startsWith('/') ? (
+                      <Link
+                        to={link.href}
+                        className="text-text/60 hover:text-brand-arrow transition-colors"
+                      >
+                        {link.name}
+                      </Link>
+                    ) : (
+                      <a
+                        href={link.href}
+                        className="text-text/60 hover:text-brand-arrow transition-colors"
+                      >
+                        {link.name}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -116,4 +126,3 @@ export function Footer() {
     </footer>
   );
 }
-

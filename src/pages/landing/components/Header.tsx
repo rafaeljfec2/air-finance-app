@@ -1,12 +1,28 @@
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 
 export function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
+    e.preventDefault();
+    if (location.pathname !== '/') {
+      navigate('/');
+      // Small timeout to allow navigation to complete before scrolling
+      setTimeout(() => {
+        const element = document.querySelector(hash);
+        element?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      const element = document.querySelector(hash);
+      element?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,6 +53,7 @@ export function Header() {
         >
           <a
             href="#features"
+            onClick={(e) => handleNavClick(e, '#features')}
             className="text-text/80 hover:text-brand-arrow transition-colors"
             aria-label="Ir para seção de Recursos"
           >
@@ -44,6 +61,7 @@ export function Header() {
           </a>
           <a
             href="#security"
+            onClick={(e) => handleNavClick(e, '#security')}
             className="text-text/80 hover:text-brand-arrow transition-colors"
             aria-label="Ir para seção de Segurança"
           >
@@ -51,6 +69,7 @@ export function Header() {
           </a>
           <a
             href="#pricing"
+            onClick={(e) => handleNavClick(e, '#pricing')}
             className="text-text/80 hover:text-brand-arrow transition-colors"
             aria-label="Ir para seção de Planos"
           >
@@ -75,4 +94,3 @@ export function Header() {
     </motion.header>
   );
 }
-

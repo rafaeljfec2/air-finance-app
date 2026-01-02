@@ -8,7 +8,7 @@ import { apiClient } from '@/services/apiClient';
 import { motion } from 'framer-motion';
 import { ChevronLeft, Eye, EyeOff, Lock, Mail, Send } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export function Login() {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ export function Login() {
     rememberMe: false,
   });
   const [error, setError] = useState<string | null>(null);
-  
+
   // Resend Confirmation State
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -53,9 +53,9 @@ export function Login() {
           const backendMsg = err?.response?.data?.message;
 
           if (status === 403 && backendMsg?.includes('verificado')) {
-             setNeedsConfirmation(true);
-             setError(null); // Clear generic error
-             return;
+            setNeedsConfirmation(true);
+            setError(null); // Clear generic error
+            return;
           }
 
           setError(backendMsg || err?.message || 'Erro ao fazer login');
@@ -70,7 +70,9 @@ export function Login() {
     setResendError(null);
     try {
       await apiClient.post('/auth/resend-confirmation', { email: formData.email });
-      setResendSuccess('E-mail de verificação reenviado com sucesso! Verifique sua caixa de entrada.');
+      setResendSuccess(
+        'E-mail de verificação reenviado com sucesso! Verifique sua caixa de entrada.',
+      );
     } catch (err: any) {
       const msg = err?.response?.data?.message || 'Erro ao reenviar e-mail.';
       setResendError(msg);
@@ -131,159 +133,162 @@ export function Login() {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <Card className="bg-card/50 dark:bg-card-dark/50 border-border dark:border-border-dark backdrop-blur-sm">
-             {!needsConfirmation ? (
-              <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                <div className="space-y-4">
-                  {/* Email */}
-                  <div>
-                    <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
-                      Email
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Mail className="h-5 w-5 text-brand-arrow dark:text-brand-leaf" />
+              {!needsConfirmation ? (
+                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                  <div className="space-y-4">
+                    {/* Email */}
+                    <div>
+                      <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
+                        Email
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Mail className="h-5 w-5 text-brand-arrow dark:text-brand-leaf" />
+                        </div>
+                        <Input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          required
+                          className="pl-10 bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf"
+                          placeholder="seu@email.com"
+                        />
                       </div>
-                      <Input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        className="pl-10 bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf"
-                        placeholder="seu@email.com"
-                      />
+                    </div>
+
+                    {/* Senha */}
+                    <div>
+                      <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
+                        Senha
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Lock className="h-5 w-5 text-brand-arrow dark:text-brand-leaf" />
+                        </div>
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          name="password"
+                          value={formData.password}
+                          onChange={handleChange}
+                          required
+                          className="pl-10 pr-10 bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf"
+                          placeholder="••••••••"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-5 w-5 text-brand-arrow dark:text-brand-leaf hover:opacity-80" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-brand-arrow dark:text-brand-leaf hover:opacity-80" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Senha */}
-                  <div>
-                    <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
-                      Senha
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Lock className="h-5 w-5 text-brand-arrow dark:text-brand-leaf" />
-                      </div>
-                      <Input
-                        type={showPassword ? 'text' : 'password'}
-                        name="password"
-                        value={formData.password}
+                  {/* Lembrar-me e Esqueci a senha */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        name="rememberMe"
+                        checked={formData.rememberMe}
                         onChange={handleChange}
-                        required
-                        className="pl-10 pr-10 bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-brand-arrow dark:focus:border-brand-leaf"
-                        placeholder="••••••••"
+                        className="h-4 w-4 rounded border-border dark:border-border-dark bg-card dark:bg-card-dark text-brand-arrow dark:text-brand-leaf focus:ring-brand-arrow dark:focus:ring-brand-leaf"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-5 w-5 text-brand-arrow dark:text-brand-leaf hover:opacity-80" />
-                        ) : (
-                          <Eye className="h-5 w-5 text-brand-arrow dark:text-brand-leaf hover:opacity-80" />
-                        )}
-                      </button>
+                      <label className="ml-2 block text-sm text-text dark:text-text-dark">
+                        Lembrar-me
+                      </label>
                     </div>
+                    <button
+                      type="button"
+                      className="text-sm font-medium text-brand-arrow hover:text-brand-arrow/80 dark:text-brand-leaf dark:hover:text-brand-leaf/80"
+                      onClick={() => navigate('/forgot-password')}
+                    >
+                      Esqueceu a senha?
+                    </button>
                   </div>
-                </div>
 
-                {/* Lembrar-me e Esqueci a senha */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="rememberMe"
-                      checked={formData.rememberMe}
-                      onChange={handleChange}
-                      className="h-4 w-4 rounded border-border dark:border-border-dark bg-card dark:bg-card-dark text-brand-arrow dark:text-brand-leaf focus:ring-brand-arrow dark:focus:ring-brand-leaf"
-                    />
-                    <label className="ml-2 block text-sm text-text dark:text-text-dark">
-                      Lembrar-me
-                    </label>
-                  </div>
-                  <button
-                    type="button"
-                    className="text-sm font-medium text-brand-arrow hover:text-brand-arrow/80 dark:text-brand-leaf dark:hover:text-brand-leaf/80"
-                    onClick={() => navigate('/forgot-password')}
+                  {/* Feedback de erro */}
+                  {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+
+                  {/* Botão de Login */}
+                  <Button
+                    type="submit"
+                    disabled={isLoggingIn}
+                    className={cn(
+                      'w-full h-11 bg-brand-arrow hover:bg-brand-arrow/90 dark:bg-brand-leaf dark:hover:bg-brand-leaf/90 text-white transition-colors',
+                      isLoggingIn && 'opacity-70 cursor-not-allowed',
+                    )}
                   >
-                    Esqueceu a senha?
-                  </button>
-                </div>
-
-                {/* Feedback de erro */}
-                {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-
-                {/* Botão de Login */}
-                <Button
-                  type="submit"
-                  disabled={isLoggingIn}
-                  className={cn(
-                    'w-full h-11 bg-brand-arrow hover:bg-brand-arrow/90 dark:bg-brand-leaf dark:hover:bg-brand-leaf/90 text-white transition-colors',
-                    isLoggingIn && 'opacity-70 cursor-not-allowed',
-                  )}
-                >
-                  {isLoggingIn ? (
-                    <div className="flex items-center justify-center">
-                      <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
-                      Entrando...
-                    </div>
-                  ) : (
-                    'Entrar'
-                  )}
-                </Button>
-              </form>
-             ) : (
+                    {isLoggingIn ? (
+                      <div className="flex items-center justify-center">
+                        <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
+                        Entrando...
+                      </div>
+                    ) : (
+                      'Entrar'
+                    )}
+                  </Button>
+                </form>
+              ) : (
                 <div className="p-6 space-y-6 text-center">
-                    <div className="rounded-full bg-yellow-100 dark:bg-yellow-900/20 w-16 h-16 mx-auto flex items-center justify-center mb-4">
-                        <Mail className="h-8 w-8 text-yellow-600 dark:text-yellow-500" />
-                    </div>
-                    <h2 className="text-xl font-semibold text-text dark:text-text-dark">Verifique seu E-mail</h2>
-                    <p className="text-sm text-text/80 dark:text-text-dark/80">
-                        Sua conta ainda não foi ativada. Enviamos um link de confirmação para <strong>{formData.email}</strong>.
-                    </p>
+                  <div className="rounded-full bg-yellow-100 dark:bg-yellow-900/20 w-16 h-16 mx-auto flex items-center justify-center mb-4">
+                    <Mail className="h-8 w-8 text-yellow-600 dark:text-yellow-500" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-text dark:text-text-dark">
+                    Verifique seu E-mail
+                  </h2>
+                  <p className="text-sm text-text/80 dark:text-text-dark/80">
+                    Sua conta ainda não foi ativada. Enviamos um link de confirmação para{' '}
+                    <strong>{formData.email}</strong>.
+                  </p>
 
-                    {resendSuccess && (
-                        <div className="p-3 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-sm rounded-md">
-                            {resendSuccess}
-                        </div>
-                    )}
-                     {resendError && (
-                        <div className="p-3 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-sm rounded-md">
-                            {resendError}
-                        </div>
-                    )}
-                    
-                    <div className="space-y-3 pt-4">
-                         <Button
-                            onClick={handleResendEmail}
-                            disabled={isResending}
-                            className={cn(
-                                'w-full h-11 bg-brand-arrow hover:bg-brand-arrow/90 dark:bg-brand-leaf dark:hover:bg-brand-leaf/90 text-white transition-colors gap-2',
-                            )}
-                         >
-                            {isResending ? (
-                                <>
-                                    <Loader2 className="animate-spin h-4 w-4" />
-                                    Enviando...
-                                </>
-                            ) : (
-                                <>
-                                    <Send className="h-4 w-4" />
-                                    Reenviar E-mail
-                                </>
-                            )}
-                         </Button>
-                         <Button
-                            variant="outline"
-                            onClick={() => setNeedsConfirmation(false)}
-                            className="w-full h-11"
-                         >
-                            Voltar para Login
-                         </Button>
+                  {resendSuccess && (
+                    <div className="p-3 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-sm rounded-md">
+                      {resendSuccess}
                     </div>
+                  )}
+                  {resendError && (
+                    <div className="p-3 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-sm rounded-md">
+                      {resendError}
+                    </div>
+                  )}
+
+                  <div className="space-y-3 pt-4">
+                    <Button
+                      onClick={handleResendEmail}
+                      disabled={isResending}
+                      className={cn(
+                        'w-full h-11 bg-brand-arrow hover:bg-brand-arrow/90 dark:bg-brand-leaf dark:hover:bg-brand-leaf/90 text-white transition-colors gap-2',
+                      )}
+                    >
+                      {isResending ? (
+                        <>
+                          <Loader2 className="animate-spin h-4 w-4" />
+                          Enviando...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="h-4 w-4" />
+                          Reenviar E-mail
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setNeedsConfirmation(false)}
+                      className="w-full h-11"
+                    >
+                      Voltar para Login
+                    </Button>
+                  </div>
                 </div>
-             )}
+              )}
             </Card>
           </motion.div>
 
@@ -306,13 +311,19 @@ export function Login() {
             </div>
             <p className="text-xs text-text/60 dark:text-text-dark/60">
               Ao continuar, você concorda com nossos{' '}
-              <button className="text-brand-arrow hover:text-brand-arrow/80 dark:text-brand-leaf dark:hover:text-brand-leaf/80">
+              <Link
+                to="/terms"
+                className="text-brand-arrow hover:text-brand-arrow/80 dark:text-brand-leaf dark:hover:text-brand-leaf/80"
+              >
                 Termos de Serviço
-              </button>{' '}
+              </Link>{' '}
               e{' '}
-              <button className="text-brand-arrow hover:text-brand-arrow/80 dark:text-brand-leaf dark:hover:text-brand-leaf/80">
+              <Link
+                to="/privacy"
+                className="text-brand-arrow hover:text-brand-arrow/80 dark:text-brand-leaf dark:hover:text-brand-leaf/80"
+              >
                 Política de Privacidade
-              </button>
+              </Link>
             </p>
           </motion.div>
         </div>
@@ -323,21 +334,20 @@ export function Login() {
 
 // Helper component for Loader2 since it wasn't imported in the original clip
 function Loader2(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-        </svg>
-    )
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+  );
 }
-

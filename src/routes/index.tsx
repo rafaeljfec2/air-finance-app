@@ -99,6 +99,10 @@ const FinancialHealthPage = lazy(() =>
   })),
 );
 
+// Legal Pages
+import { TermsOfService } from '@/pages/legal/TermsOfService';
+import { PrivacyPolicy } from '@/pages/legal/PrivacyPolicy';
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -604,6 +608,14 @@ export const router = createBrowserRouter([
       </ErrorBoundary>
     ),
     errorElement: <ErrorPage />,
+  },
+  {
+    path: '/terms',
+    element: <TermsOfService />,
+  },
+  {
+    path: '/privacy',
+    element: <PrivacyPolicy />,
   },
   {
     path: '*',
