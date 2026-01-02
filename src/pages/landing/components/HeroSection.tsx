@@ -17,11 +17,11 @@ export function HeroSection() {
       className="relative overflow-hidden min-h-screen flex items-center"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-brand-arrow/5 via-transparent to-transparent" />
-      <div className="relative max-w-7xl mx-auto px-6 pt-40 pb-32 w-full">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-32 md:pt-40 pb-16 sm:pb-24 md:pb-32 w-full">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="text-left z-10">
             <h1
-              className="text-5xl md:text-7xl font-bold mb-6 text-brand-arrow leading-tight"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 sm:mb-6 text-brand-arrow leading-tight"
               aria-label="Transforme sua vida financeira com inteligência"
             >
               Transforme sua vida
@@ -34,7 +34,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-xl md:text-2xl mb-12 text-text/80 leading-relaxed"
+              className="text-base sm:text-lg md:text-xl lg:text-2xl mb-8 sm:mb-12 text-text/80 leading-relaxed"
             >
               O Airfinance revoluciona a forma como você gerencia seu dinheiro, oferecendo insights
               poderosos e uma experiência única de controle financeiro.

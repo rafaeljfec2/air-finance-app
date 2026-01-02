@@ -35,7 +35,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
       <div className="h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Botão hambúrguer mobile */}
         <button
-          className="lg:hidden mr-2 p-2 rounded-md text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="lg:hidden mr-2 min-h-[44px] min-w-[44px] p-2 rounded-md text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary-500 flex items-center justify-center"
           onClick={onOpenSidebar}
           aria-label="Abrir menu"
         >
@@ -57,44 +57,44 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
           <div className="hidden md:flex items-center border-l dark:border-gray-700 pl-4 space-x-1">
              <button
                 onClick={() => navigate('/transactions/new')}
-                className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center"
                 title="Nova Transação"
               >
-                <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
+                <Plus className="h-5 w-5" />
               </button>
               <button
                 onClick={() => navigate('/transactions')}
-                className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center"
                 title="Fluxo de Caixa"
               >
-                <ArrowRightLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                <ArrowRightLeft className="h-5 w-5" />
               </button>
               <button
                 onClick={() => navigate('/import-ofx')}
-                className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center"
                 title="Importar Extrato"
               >
-                <Import className="h-4 w-4 sm:h-5 sm:w-5" />
+                <Import className="h-5 w-5" />
               </button>
               <button
                 onClick={() => navigate('/reports')}
-                className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center"
                 title="Relatórios"
               >
-                <ChartBar className="h-4 w-4 sm:h-5 sm:w-5" />
+                <ChartBar className="h-5 w-5" />
               </button>
           </div>
 
           {/* Botão de Tema */}
           <button
             onClick={toggleTheme}
-            className="p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center justify-center"
             aria-label={isDarkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
           >
             {isDarkMode ? (
-              <Sun className="h-4 w-4 sm:h-5 sm:w-5" />
+              <Sun className="h-5 w-5" />
             ) : (
-              <Moon className="h-4 w-4 sm:h-5 sm:w-5" />
+              <Moon className="h-5 w-5" />
             )}
           </button>
 
@@ -105,7 +105,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
           <Menu as="div" className="relative">
             {() => (
               <>
-                <Menu.Button className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <Menu.Button className="flex items-center justify-center min-h-[44px] min-w-[44px] text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 p-2">
                   <span className="sr-only">Abrir menu do usuário</span>
                   <CircleUser className="h-8 w-8 text-text dark:text-text-dark" />
                 </Menu.Button>

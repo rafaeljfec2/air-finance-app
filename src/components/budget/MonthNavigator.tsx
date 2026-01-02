@@ -79,7 +79,7 @@ export const MonthNavigator: React.FC<MonthNavigatorProps> = ({ month, year, onC
     <div className="flex items-center justify-center gap-3 select-none bg-card dark:bg-card-dark rounded-xl shadow-md px-4 py-2 border border-border dark:border-border-dark">
       <button
         onClick={handlePrev}
-        className="rounded-full bg-background dark:bg-background-dark border border-border dark:border-border-dark p-2 hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors active:scale-95 flex-shrink-0"
+        className="rounded-full bg-background dark:bg-background-dark border border-border dark:border-border-dark min-h-[44px] min-w-[44px] p-2 hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors active:scale-95 flex-shrink-0 flex items-center justify-center"
         aria-label="Mês anterior"
         type="button"
       >
@@ -100,7 +100,7 @@ export const MonthNavigator: React.FC<MonthNavigatorProps> = ({ month, year, onC
 
       <button
         onClick={handleNext}
-        className="rounded-full bg-background dark:bg-background-dark border border-border dark:border-border-dark p-2 hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors active:scale-95 flex-shrink-0"
+        className="rounded-full bg-background dark:bg-background-dark border border-border dark:border-border-dark min-h-[44px] min-w-[44px] p-2 hover:bg-primary-100 dark:hover:bg-primary-900/30 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors active:scale-95 flex-shrink-0 flex items-center justify-center"
         aria-label="Próximo mês"
         type="button"
       >

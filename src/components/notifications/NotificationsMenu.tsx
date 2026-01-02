@@ -33,9 +33,9 @@ export function NotificationsMenu() {
     <Menu as="div" className="relative">
       {() => (
         <>
-          <Menu.Button className="relative p-1.5 sm:p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+          <Menu.Button className="relative min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center">
             <span className="sr-only">Ver notificações</span>
-            <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
+            <Bell className="h-5 w-5" />
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-red-500 flex items-center justify-center text-[10px] sm:text-xs text-white font-bold animate-in zoom-in duration-200">
                 {unreadCount > 9 ? '9+' : unreadCount}
@@ -91,7 +91,7 @@ export function NotificationsMenu() {
               </div>
               
               <div className="p-2 border-t border-border dark:border-border-dark bg-gray-50/50 dark:bg-gray-800/50 text-center">
-                  <button className="text-xs text-gray-500 hover:text-primary-500 transition-colors w-full py-1">
+                  <button className="text-xs text-gray-500 hover:text-primary-500 transition-colors w-full min-h-[44px] py-2.5">
                       Ver histórico completo
                   </button>
               </div>

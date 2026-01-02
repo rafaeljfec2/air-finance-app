@@ -250,7 +250,7 @@ export function Dashboard() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <div className="bg-muted/30 p-1 rounded-full flex items-center gap-1 overflow-x-auto scrollbar-none border border-border/50">
+              <div className="bg-muted/30 p-1 rounded-full flex items-center justify-center gap-1 overflow-x-auto scrollbar-none border border-border/50">
                 {last6Months.map((date) => {
                   const isSelected = isSameMonth(date, selectedDate) && timeRange === 'month';
                   return (
@@ -263,7 +263,7 @@ export function Dashboard() {
                         setTimeRange('month');
                       }}
                       className={`
-                        relative h-9 min-w-[3.5rem] rounded-full text-xs font-semibold
+                        relative min-h-[44px] min-w-[44px] px-3 rounded-full text-xs font-semibold
                         transition-all duration-300 ease-in-out
                         ${
                           isSelected

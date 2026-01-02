@@ -97,7 +97,7 @@ export function TransactionDetailsFields({
                 placeholder="0,00"
                 required
                 className={cn(
-                  'pl-12 text-xl font-bold h-12 bg-background dark:bg-background-dark border-2 transition-all w-full rounded-lg',
+                  'pl-12 text-xl font-bold min-h-[44px] bg-background dark:bg-background-dark border-2 transition-all w-full rounded-lg',
                   errors.amount
                     ? 'border-red-500 focus-visible:ring-red-500'
                     : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500'
@@ -165,7 +165,7 @@ export function TransactionDetailsFields({
                   placeholder="0,00"
                   required
                   className={cn(
-                  'pl-12 text-xl font-bold h-10 bg-background dark:bg-background-dark border-2 transition-all w-full rounded-lg',
+                  'pl-12 text-xl font-bold min-h-[44px] bg-background dark:bg-background-dark border-2 transition-all w-full rounded-lg',
                   errors.amount
                     ? 'border-red-500 focus-visible:ring-red-500'
                     : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500'
@@ -253,7 +253,7 @@ export function TransactionDetailsFields({
                 placeholder="0,00"
                 required
                 className={cn(
-                  'pl-12 text-xl font-bold h-12 bg-background dark:bg-background-dark border-2 transition-all w-full rounded-lg',
+                  'pl-12 text-xl font-bold min-h-[44px] bg-background dark:bg-background-dark border-2 transition-all w-full rounded-lg',
                   errors.amount
                     ? 'border-red-500 focus-visible:ring-red-500'
                     : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500'
@@ -275,7 +275,7 @@ export function TransactionDetailsFields({
               error={errors.date}
               minDate={new Date(1970, 0, 1)}
               maxDate={new Date(2100, 11, 31)}
-              className="h-10 w-full bg-card dark:bg-card-dark border-border dark:border-border-dark rounded-lg hover:bg-background/80"
+              className="min-h-[44px] w-full bg-card dark:bg-card-dark border-border dark:border-border-dark rounded-lg hover:bg-background/80"
             />
           </div>
         </div>

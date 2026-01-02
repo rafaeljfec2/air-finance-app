@@ -174,7 +174,7 @@ export function GoalFormModal({
           </div>
           <button
             onClick={handleClose}
-            className="p-2 rounded-lg hover:bg-card dark:hover:bg-card-dark text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            className="min-h-[44px] min-w-[44px] p-2 rounded-lg hover:bg-card dark:hover:bg-card-dark text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-500"
             aria-label="Fechar"
           >
             <X className="h-5 w-5" />

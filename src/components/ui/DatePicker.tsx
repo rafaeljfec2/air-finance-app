@@ -675,7 +675,7 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
             placeholder={placeholder}
             disabled={disabled}
             className={cn(
-              'w-full min-w-[140px] h-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark text-sm',
+              'w-full min-w-[140px] min-h-[44px] bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark text-sm',
               showIcon && 'pl-9',
               clearable && selectedDate && !disabled && 'pr-9',
               error && 'border-red-500 dark:border-red-500',
