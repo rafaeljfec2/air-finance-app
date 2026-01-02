@@ -38,14 +38,24 @@ export function Header() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`sticky top-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
           ? 'bg-white/80 backdrop-blur-md shadow-sm'
           : 'bg-white/80 backdrop-blur-md shadow-sm'
       }`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
-        <Logo />
+        <button
+          type="button"
+          onClick={() => {
+            navigate('/');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="cursor-pointer hover:opacity-80 transition-opacity bg-transparent border-none p-0 focus:outline-none"
+          aria-label="Ir para a página inicial"
+        >
+          <Logo />
+        </button>
         <nav
           className="hidden md:flex items-center space-x-8"
           role="navigation"

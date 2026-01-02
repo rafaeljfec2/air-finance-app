@@ -17,7 +17,7 @@ export function HeroSection() {
       className="relative overflow-hidden min-h-screen flex items-center"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-brand-arrow/5 via-transparent to-transparent" />
-      <div className="relative max-w-7xl mx-auto px-6 py-32 w-full">
+      <div className="relative max-w-7xl mx-auto px-6 pt-40 pb-32 w-full">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="text-left z-10">
             <motion.h1

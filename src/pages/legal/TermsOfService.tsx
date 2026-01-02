@@ -15,7 +15,7 @@ export function TermsOfService() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      <main className="flex-grow pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+      <main className="flex-grow pt-36 pb-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
         <div className="bg-white shadow-sm rounded-lg p-8 md:p-12">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Termos de Serviço</h1>
 

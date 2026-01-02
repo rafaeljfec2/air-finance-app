@@ -103,6 +103,40 @@ const FinancialHealthPage = lazy(() =>
 import { TermsOfService } from '@/pages/legal/TermsOfService';
 import { PrivacyPolicy } from '@/pages/legal/PrivacyPolicy';
 
+// SEO Pages
+const GestaoFinanceiraCPFPage = lazy(() =>
+  import('@/pages/seo/gestao-financeira-cpf').then((m) => ({
+    default: m.GestaoFinanceiraCPFPage,
+  })),
+);
+const ControleFinanceiroPessoalPage = lazy(() =>
+  import('@/pages/seo/gestao-financeira-cpf/controle-financeiro-pessoal').then((m) => ({
+    default: m.ControleFinanceiroPessoalPage,
+  })),
+);
+const OrganizacaoFinanceiraPessoalPage = lazy(() =>
+  import('@/pages/seo/gestao-financeira-cpf/organizacao-financeira-pessoal').then((m) => ({
+    default: m.OrganizacaoFinanceiraPessoalPage,
+  })),
+);
+const CategorizacaoAutomaticaGastosPage = lazy(() =>
+  import('@/pages/seo/gestao-financeira-cpf/categorizacao-automatica-gastos').then((m) => ({
+    default: m.CategorizacaoAutomaticaGastosPage,
+  })),
+);
+const GestaoFinanceiraComIAPage = lazy(() =>
+  import('@/pages/seo/gestao-financeira-cpf/gestao-financeira-com-inteligencia-artificial').then(
+    (m) => ({
+      default: m.GestaoFinanceiraComIAPage,
+    }),
+  ),
+);
+const ScoreCreditoFinancasPessoaisPage = lazy(() =>
+  import('@/pages/seo/gestao-financeira-cpf/score-credito-e-financas-pessoais').then((m) => ({
+    default: m.ScoreCreditoFinancasPessoaisPage,
+  })),
+);
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -368,6 +402,54 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<SuspenseLoader />}>
         <PricingPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/gestao-financeira-cpf',
+    element: (
+      <Suspense fallback={<SuspenseLoader />}>
+        <GestaoFinanceiraCPFPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/gestao-financeira-cpf/controle-financeiro-pessoal',
+    element: (
+      <Suspense fallback={<SuspenseLoader />}>
+        <ControleFinanceiroPessoalPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/gestao-financeira-cpf/organizacao-financeira-pessoal',
+    element: (
+      <Suspense fallback={<SuspenseLoader />}>
+        <OrganizacaoFinanceiraPessoalPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/gestao-financeira-cpf/categorizacao-automatica-gastos',
+    element: (
+      <Suspense fallback={<SuspenseLoader />}>
+        <CategorizacaoAutomaticaGastosPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/gestao-financeira-cpf/gestao-financeira-com-inteligencia-artificial',
+    element: (
+      <Suspense fallback={<SuspenseLoader />}>
+        <GestaoFinanceiraComIAPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/gestao-financeira-cpf/score-credito-e-financas-pessoais',
+    element: (
+      <Suspense fallback={<SuspenseLoader />}>
+        <ScoreCreditoFinancasPessoaisPage />
       </Suspense>
     ),
   },

@@ -10,17 +10,22 @@ const footerLinks = {
     { name: 'Segurança', href: '#security' },
     { name: 'Integrações', href: '#' },
   ],
+  conteudo: [
+    { name: 'Gestão Financeira CPF', href: '/gestao-financeira-cpf' },
+    { name: 'Controle Financeiro Pessoal', href: '/gestao-financeira-cpf/controle-financeiro-pessoal' },
+    { name: 'Organização Financeira', href: '/gestao-financeira-cpf/organizacao-financeira-pessoal' },
+    { name: 'Categorização Automática', href: '/gestao-financeira-cpf/categorizacao-automatica-gastos' },
+  ],
   empresa: [
     { name: 'Sobre nós', href: '#' },
-    { name: 'Blog', href: '#' },
     { name: 'Carreiras', href: '#' },
     { name: 'Contato', href: '#' },
   ],
   legal: [
     { name: 'Privacidade', href: '/privacy' },
     { name: 'Termos', href: '/terms' },
-    { name: 'Cookies', href: '/privacy' }, // Linking to privacy for cookies for now
-    { name: 'LGPD', href: '/privacy' }, // Linking to privacy for LGPD for now
+    { name: 'Cookies', href: '/privacy' },
+    { name: 'LGPD', href: '/privacy' },
   ],
 };
 
@@ -28,7 +33,7 @@ export function Footer() {
   return (
     <footer className="bg-background border-t border-border py-16 relative z-10">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid md:grid-cols-4 gap-12">
+        <div className="grid md:grid-cols-5 gap-12">
           <ScrollReveal variant="fade">
             <div>
               <Logo className="mb-6" />
@@ -74,6 +79,24 @@ export function Footer() {
 
           <ScrollReveal variant="fade" delay={0.2}>
             <div>
+              <h5 className="font-semibold mb-6 text-brand-arrow">Conteúdo</h5>
+              <ul className="space-y-3">
+                {footerLinks.conteudo.map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      to={link.href}
+                      className="text-text/60 hover:text-brand-arrow transition-colors"
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal variant="fade" delay={0.3}>
+            <div>
               <h5 className="font-semibold mb-6 text-brand-arrow">Empresa</h5>
               <ul className="space-y-3">
                 {footerLinks.empresa.map((link) => (
@@ -90,7 +113,7 @@ export function Footer() {
             </div>
           </ScrollReveal>
 
-          <ScrollReveal variant="fade" delay={0.3}>
+          <ScrollReveal variant="fade" delay={0.4}>
             <div>
               <h5 className="font-semibold mb-6 text-brand-arrow">Legal</h5>
               <ul className="space-y-3">
@@ -117,7 +140,7 @@ export function Footer() {
             </div>
           </ScrollReveal>
         </div>
-        <ScrollReveal variant="fade" delay={0.4}>
+        <ScrollReveal variant="fade" delay={0.5}>
           <div className="mt-12 pt-8 border-t border-border text-center text-sm text-text/60">
             <p>© {new Date().getFullYear()} Airfinance. Todos os direitos reservados.</p>
           </div>
