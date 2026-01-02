@@ -20,10 +20,7 @@ export function HeroSection() {
       <div className="relative max-w-7xl mx-auto px-6 pt-40 pb-32 w-full">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="text-left z-10">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+            <h1
               className="text-5xl md:text-7xl font-bold mb-6 text-brand-arrow leading-tight"
               aria-label="Transforme sua vida financeira com inteligência"
             >
@@ -32,7 +29,7 @@ export function HeroSection() {
               <span className="bg-gradient-to-r from-brand-arrow to-brand-arrow/60 bg-clip-text text-transparent">
                 financeira com inteligência
               </span>
-            </motion.h1>
+            </h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

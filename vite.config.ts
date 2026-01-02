@@ -28,6 +28,8 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       sourcemap: mode !== 'production',
       minify: 'terser',
+      cssCodeSplit: true,
+      cssMinify: mode === 'production',
       terserOptions: {
         compress: {
           drop_console: mode === 'production',
