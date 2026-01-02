@@ -1,6 +1,9 @@
 import { SEOHead } from '@/components/seo/SEOHead';
 import { InternalLink } from '@/components/seo/InternalLink';
 import { useEffect } from 'react';
+import { ChevronRight, Home } from 'lucide-react';
+import { Header } from '@/pages/landing/components/Header';
+import { Footer } from '@/pages/landing/components/Footer';
 
 export function GestaoFinanceiraCPFPage() {
   useEffect(() => {
@@ -54,19 +57,26 @@ export function GestaoFinanceiraCPFPage() {
         faqSchema={faqItems}
       />
       <div className="min-h-screen bg-background text-text">
-        <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-40">
-          <div className="mx-auto max-w-4xl px-6 py-4">
-            <nav className="text-sm text-text/60">
-              <InternalLink to="/" className="hover:text-brand-arrow transition-colors">
-                Início
-              </InternalLink>{' '}
-              / <span className="text-text">Gestão Financeira CPF</span>
-            </nav>
-          </div>
-        </header>
+        <Header />
+        <div className="pt-24">
+          <header className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-16 z-30">
+            <div className="mx-auto max-w-4xl px-6 py-4">
+              <nav className="flex items-center gap-2 text-sm text-text/70">
+                <InternalLink
+                  to="/"
+                  className="flex items-center gap-1 hover:text-brand-arrow transition-colors"
+                >
+                  <Home className="w-4 h-4" />
+                  <span>Início</span>
+                </InternalLink>
+                <ChevronRight className="w-4 h-4 text-text/40" />
+                <span className="text-text font-medium">Gestão Financeira CPF</span>
+              </nav>
+            </div>
+          </header>
 
-        <main className="mx-auto max-w-4xl px-6 py-12 pb-24">
-          <article className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-text dark:prose-headings:text-text prose-headings:font-bold prose-p:text-text/80 dark:prose-p:text-text/80 prose-a:text-brand-arrow prose-a:no-underline hover:prose-a:underline prose-strong:text-text dark:prose-strong:text-text prose-li:text-text/80 dark:prose-li:text-text/80 prose-ul:text-text/80 dark:prose-ul:text-text/80 prose-ol:text-text/80 dark:prose-ol:text-text/80">
+          <main className="mx-auto max-w-4xl px-6 py-12 pb-24">
+            <article className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-text dark:prose-headings:text-text prose-headings:font-bold prose-headings:tracking-tight prose-h1:text-4xl prose-h1:mb-6 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-text/80 dark:prose-p:text-text/80 prose-p:leading-relaxed prose-a:text-brand-arrow prose-a:no-underline hover:prose-a:underline prose-a:font-medium prose-strong:text-text dark:prose-strong:text-text prose-strong:font-semibold prose-li:text-text/80 dark:prose-li:text-text/80 prose-ul:text-text/80 dark:prose-ul:text-text/80 prose-ol:text-text/80 dark:prose-ol:text-text/80 prose-li:my-2">
             <h1>Gestão financeira pessoal: como organizar suas finanças de forma inteligente</h1>
 
             <section>
@@ -301,15 +311,20 @@ export function GestaoFinanceiraCPFPage() {
               </p>
             </section>
 
-            <section>
-              <h2>Perguntas frequentes</h2>
-              {faqItems.map((item) => (
-                <div key={item.question} className="mb-6">
-                  <h3>{item.question}</h3>
-                  <p>{item.answer}</p>
+              <section className="mt-16">
+                <h2 className="text-3xl font-bold mb-8">Perguntas Frequentes</h2>
+                <div className="space-y-6">
+                  {faqItems.map((item) => (
+                    <div
+                      key={item.question}
+                      className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
+                    >
+                      <h3 className="text-xl font-semibold text-text mb-3">{item.question}</h3>
+                      <p className="text-text/80 leading-relaxed">{item.answer}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </section>
+              </section>
 
             <section>
               <h2>Links relacionados</h2>
@@ -342,27 +357,29 @@ export function GestaoFinanceiraCPFPage() {
               </ul>
             </section>
 
-            <section className="mt-12 border-t border-border pt-8">
-              <h2>Comece a organizar suas finanças hoje</h2>
-              <p>
-                Gestão financeira pessoal eficiente requer método e ferramentas adequadas. Comece
-                registrando seus gastos por 30 dias. Depois, use uma plataforma que automatize o
-                processo e forneça insights baseados em seus dados reais.
-              </p>
-              <p>
-                <InternalLink to="/register" className="font-semibold">
-                  Experimente gratuitamente →
-                </InternalLink>
-              </p>
-            </section>
-          </article>
-        </main>
-
-        <footer className="border-t border-border mt-16 bg-background">
-          <div className="mx-auto max-w-4xl px-6 py-8 text-sm text-text/60">
-            <p>Última atualização: Janeiro 2024</p>
-          </div>
-        </footer>
+              <section className="mt-16 border-t border-border pt-12">
+                <div className="bg-gradient-to-r from-brand-arrow/5 to-transparent rounded-2xl p-8 border border-border/50">
+                  <h2 className="text-2xl font-bold text-text mb-4">
+                    Comece a organizar suas finanças hoje
+                  </h2>
+                  <p className="text-text/80 mb-6 text-lg">
+                    Gestão financeira pessoal eficiente requer método e ferramentas adequadas.
+                    Comece registrando seus gastos por 30 dias. Depois, use uma plataforma que
+                    automatize o processo e forneça insights baseados em seus dados reais.
+                  </p>
+                  <InternalLink
+                    to="/register"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-brand-arrow text-white rounded-lg font-semibold hover:bg-brand-arrow/90 transition-colors shadow-lg hover:shadow-xl"
+                  >
+                    Experimente gratuitamente
+                    <ChevronRight className="w-5 h-5" />
+                  </InternalLink>
+                </div>
+              </section>
+            </article>
+          </main>
+        </div>
+        <Footer />
       </div>
     </>
   );
