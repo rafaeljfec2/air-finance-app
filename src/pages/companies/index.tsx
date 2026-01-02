@@ -264,8 +264,9 @@ export function CompaniesPage() {
             </Card>
           ) : (
             <>
-              {viewMode === 'grid' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Grid View - Always visible on mobile, visible on desktop when viewMode === 'grid' */}
+              <div className={viewMode === 'grid' ? 'block' : 'block md:hidden'}>
+                <div className="grid grid-cols-1 gap-6">
                   {filteredCompanies.map((company) => (
                     <Card
                       key={company.id}
@@ -353,7 +354,10 @@ export function CompaniesPage() {
                     </Card>
                   ))}
                 </div>
-              ) : (
+              </div>
+
+              {/* List View - Only visible on desktop when viewMode === 'list' */}
+              <div className={viewMode === 'list' ? 'hidden md:block' : 'hidden'}>
                 <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
                   <div className="overflow-x-auto">
                     <table className="w-full">
@@ -391,7 +395,7 @@ export function CompaniesPage() {
                     </table>
                   </div>
                 </Card>
-              )}
+              </div>
             </>
           )}
         </div>

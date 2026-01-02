@@ -24,7 +24,7 @@ export interface ViewPreferences {
 export const getViewMode = (page: keyof ViewPreferences): 'grid' | 'list' => {
   const preferences = getStorageItem<ViewPreferences>(VIEW_PREFERENCES_KEY, localStorage) ?? {};
 
-  return preferences[page] ?? 'grid';
+  return preferences[page] ?? 'list';
 };
 
 /**

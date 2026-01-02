@@ -321,8 +321,9 @@ export function AccountsPage() {
             </Card>
           ) : (
             <>
-              {viewMode === 'grid' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Grid View - Mobile only, Desktop when selected */}
+              <div className={viewMode === 'grid' ? 'block' : 'block md:hidden'}>
+                <div className="grid grid-cols-1 gap-6">
                   {filteredAccounts.map((account) => {
                     const Icon =
                       accountTypes.find((t) => t.value === account.type)?.icon || Banknote;
@@ -444,8 +445,10 @@ export function AccountsPage() {
                     );
                   })}
                 </div>
-              ) : (
+              </div>
 
+              {/* List View - Only visible on desktop when viewMode === 'list' */}
+              <div className={viewMode === 'list' ? 'hidden md:block' : 'hidden'}>
                 <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
                   <div className="overflow-x-auto">
                     <table className="w-full">
@@ -483,7 +486,7 @@ export function AccountsPage() {
                     </table>
                   </div>
                 </Card>
-              )}
+              </div>
             </>
           )}
         </div>

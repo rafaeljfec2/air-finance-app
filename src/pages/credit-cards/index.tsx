@@ -259,8 +259,9 @@ export function CreditCardsPage() {
             </Card>
           ) : (
             <>
-              {viewMode === 'grid' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Grid View - Always visible on mobile, visible on desktop when viewMode === 'grid' */}
+              <div className={viewMode === 'grid' ? 'block' : 'block md:hidden'}>
+                <div className="grid grid-cols-1 gap-6">
                   {filteredCreditCards.map((card) => {
                 const Icon =
                       bankTypes.find((t) => t.icon.displayName === card.icon)?.icon ||
@@ -339,7 +340,10 @@ export function CreditCardsPage() {
                     );
                   })}
                 </div>
-              ) : (
+              </div>
+
+              {/* List View - Only visible on desktop when viewMode === 'list' */}
+              <div className={viewMode === 'list' ? 'hidden md:block' : 'hidden'}>
                 <div className="space-y-4">
                   {filteredCreditCards.map((card) => {
                     const Icon =
@@ -425,7 +429,7 @@ export function CreditCardsPage() {
                 );
               })}
                 </div>
-              )}
+              </div>
             </>
           )}
         </div>
