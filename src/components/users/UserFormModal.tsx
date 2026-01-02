@@ -32,6 +32,7 @@ export function UserFormModal({
       email: '',
       role: 'user',
       status: 'active',
+      plan: 'free',
       companyIds: companyId ? [companyId] : [],
       integrations: {
         openaiApiKey: '',
@@ -91,6 +92,7 @@ export function UserFormModal({
         email: user.email,
         role: displayRole,
         status: user.status,
+        plan: user.plan || 'free',
         companyIds: user.companyIds,
         integrations: {
           openaiApiKey: user.integrations?.openaiApiKey || '',

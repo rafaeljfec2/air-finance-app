@@ -26,7 +26,7 @@ export function SEOHead({
   faqSchema,
 }: Readonly<SEOHeadProps>) {
   const fullTitle = `${title} | Air Finance`;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+   
   const isBrowser = typeof globalThis.window !== 'undefined';
   const siteUrl = isBrowser ? globalThis.window.location.origin : 'https://airfinance.com.br';
   const canonicalUrl = canonical || (isBrowser ? globalThis.window.location.href : siteUrl);

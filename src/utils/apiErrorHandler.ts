@@ -269,7 +269,7 @@ export function getUserFriendlyMessage(error: ApiError): string {
 // Helper function to log error details (for development/debugging)
 export function logApiError(error: ApiError): void {
   if (process.env.NODE_ENV !== 'production') {
-    // eslint-disable-next-line no-console
+     
     console.error('API Error:', {
       status: error.status,
       error: error.error,

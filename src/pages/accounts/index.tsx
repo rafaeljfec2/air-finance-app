@@ -7,6 +7,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { useAccounts } from '@/hooks/useAccounts';
+import { usePlanLimits } from '@/hooks/usePlanLimits';
 import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
@@ -66,6 +67,7 @@ export function AccountsPage() {
     isDeleting,
   } = useAccounts();
   const { activeCompany } = useCompanyStore();
+  const { canCreateAccount } = usePlanLimits();
 
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
@@ -211,13 +213,15 @@ export function AccountsPage() {
                 Gerencie suas contas bancárias e investimentos
               </p>
             </div>
-            <Button
-              onClick={handleCreate}
-              className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
-            >
-              <Plus className="h-5 w-5" />
-              Nova Conta
-            </Button>
+            {canCreateAccount && (
+              <Button
+                onClick={handleCreate}
+                className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
+              >
+                <Plus className="h-5 w-5" />
+                Nova Conta
+              </Button>
+            )}
           </div>
 
           {/* Busca e Filtros */}

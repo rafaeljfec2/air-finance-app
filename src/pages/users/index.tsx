@@ -19,10 +19,10 @@ import { UserFilters } from './components/UserFilters';
 import { UserPermissionsModal } from './components/UserPermissionsModal';
 import { UserTableRow } from './components/UserTableRow';
 import {
-    getEmailVerifiedBadgeColor,
-    getOnboardingCompletedBadgeColor,
-    getRoleBadgeColor,
-    getStatusBadgeColor,
+  getEmailVerifiedBadgeColor,
+  getOnboardingCompletedBadgeColor,
+  getRoleBadgeColor,
+  getStatusBadgeColor,
 } from './utils/userHelpers';
 
 export function UsersPage() {
@@ -86,15 +86,15 @@ export function UsersPage() {
       if (editingUser) {
         // Atualizamos os dados do usuário (Nome, Email, etc)
         // Se for edição, mantemos o papel global original envio data.role seria sobrescrever globalmente
-        // Para evitar isso, enviamos apenas userData. 
+        // Para evitar isso, enviamos apenas userData.
         // Mas se a API exigir role, enviamos 'user' ou o original.
         // A CreateUserSchema exige role? Sim.
         // Então enviamos o role original do usuário se existir, ou 'user'.
-        const globalRole = editingUser.role; 
-        
-        await updateUser({ 
-            id: editingUser.id, 
-            data: { ...userData, role: globalRole } 
+        const globalRole = editingUser.role;
+
+        await updateUser({
+          id: editingUser.id,
+          data: { ...userData, role: globalRole },
         });
       } else {
         // Criação de usuário
@@ -102,11 +102,11 @@ export function UsersPage() {
         // Ou usamos o papel selecionado se quisermos dar permissão global (mas a UI sugere contexto de empresa)
         // Vamos assumir que criamos como 'user' global e damos permissão na empresa
         const userToCreate = {
-            ...userData,
-            role: 'user', // Default global role
-            companyIds: activeCompany ? [activeCompany.id] : [],
+          ...userData,
+          role: 'user', // Default global role
+          companyIds: activeCompany ? [activeCompany.id] : [],
         } as CreateUser;
-        
+
         const newUser = await createUser(userToCreate);
         targetUserId = newUser.id;
       }
@@ -115,24 +115,24 @@ export function UsersPage() {
       if (activeCompany && targetUserId && role) {
         await handleAssignRole(targetUserId, role);
       }
-      
-      // Se não tem empresa ativa (admin global gerenciando), talvez devêssemos atualizar o role global? 
+
+      // Se não tem empresa ativa (admin global gerenciando), talvez devêssemos atualizar o role global?
       // O Modal atual mostra Dropdown de papéis mistos (Globais e de Empresa).
       // Se o admin selecionou "God", ele quer transformar o cara em God.
       // Se selecionou "Visualizador", quer dar acesso 'viewer' na empresa (se tiver empresa).
       // Precisamos distinguir.
-      // Os papéis 'god', 'admin', 'user' são globais. 
+      // Os papéis 'god', 'admin', 'user' são globais.
       // 'owner', 'editor', 'viewer' são de empresa.
-      
+
       const globalRoles = ['god', 'sys_admin', 'user'];
       const isGlobalRole = globalRoles.includes(role);
 
       if (!activeCompany && isGlobalRole && targetUserId) {
-          // Estamos no contexto global, atualizando papel global
-           await updateUser({ 
-            id: targetUserId, 
-            data: { ...userData, role: role as any } 
-          });
+        // Estamos no contexto global, atualizando papel global
+        await updateUser({
+          id: targetUserId,
+          data: { ...userData, role: role as any },
+        });
       }
 
       setShowFormModal(false);
@@ -174,8 +174,6 @@ export function UsersPage() {
   const handleViewPermissions = (user: User) => {
     setPermissionsUser(user);
   };
-
-
 
   if (isLoading) {
     return (
@@ -291,6 +289,9 @@ export function UsersPage() {
                             Função
                           </th>
                           <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Plano
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
                             Status
                           </th>
                           <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
@@ -363,7 +364,11 @@ export function UsersPage() {
         <UserPermissionsModal
           open={!!permissionsUser}
           onClose={() => setPermissionsUser(null)}
-          role={activeCompany ? (permissionsUser.companyRoles?.[activeCompany.id] ?? 'viewer') : permissionsUser.role}
+          role={
+            activeCompany
+              ? (permissionsUser.companyRoles?.[activeCompany.id] ?? 'viewer')
+              : permissionsUser.role
+          }
           userName={permissionsUser.name}
         />
       )}

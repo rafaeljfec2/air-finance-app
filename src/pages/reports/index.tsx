@@ -1,4 +1,5 @@
 import { MonthNavigator } from '@/components/budget/MonthNavigator';
+import { Loading } from '@/components/Loading';
 import { FinancialDashboard } from '@/components/reports/FinancialDashboard';
 import { Insight } from '@/components/reports/InsightsCard';
 import {
@@ -187,9 +188,7 @@ export function Reports() {
   if (loading) {
     return (
       <ViewDefault>
-        <div className="flex items-center justify-center h-full min-h-[400px]">
-          <p className="text-muted-foreground">Carregando dados do relatório...</p>
-        </div>
+        <Loading size="large" className="min-h-[400px]" />
       </ViewDefault>
     );
   }

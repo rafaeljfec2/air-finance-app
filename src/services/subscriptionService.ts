@@ -12,6 +12,16 @@ export interface SubscriptionDetails {
   amount?: number;
 }
 
+export interface PlanPermissions {
+  plan: 'free' | 'pro' | 'business';
+  canCreateMultipleCompanies: boolean;
+  canUseAI: boolean;
+  canUseBankIntegration: boolean;
+  canUseMultiUser: boolean;
+  maxAccounts: number; // -1 for unlimited
+  maxCards: number; // -1 for unlimited
+}
+
 export const subscriptionService = {
   async createCheckoutSession(userId: string, planId: string): Promise<CheckoutResponse> {
     console.log('subscriptionService sending checkout:', { userId, planId });
@@ -46,5 +56,10 @@ export const subscriptionService = {
 
   async cancelSubscription(subscriptionId: string): Promise<void> {
     await apiClient.post('/subscription/cancel', { subscriptionId });
+  },
+
+  async getMyPermissions(): Promise<PlanPermissions> {
+    const { data } = await apiClient.get<PlanPermissions>('/subscription/permissions');
+    return data;
   },
 };

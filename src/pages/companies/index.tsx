@@ -7,6 +7,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { useCompanies } from '@/hooks/useCompanies';
+import { usePlanLimits } from '@/hooks/usePlanLimits';
 import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
@@ -59,6 +60,7 @@ export function CompaniesPage() {
     isUpdating,
     isDeleting,
   } = useCompanies();
+  const { canCreateCompany } = usePlanLimits();
 
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
@@ -152,13 +154,15 @@ export function CompaniesPage() {
                 Gerencie suas empresas e filiais
               </p>
             </div>
-            <Button
-              onClick={handleCreate}
-              className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
-            >
-              <Plus className="h-5 w-5" />
-              Nova Empresa
-            </Button>
+            {canCreateCompany && (
+              <Button
+                onClick={handleCreate}
+                className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
+              >
+                <Plus className="h-5 w-5" />
+                Nova Empresa
+              </Button>
+            )}
           </div>
 
           {/* Busca e Filtros */}

@@ -30,10 +30,16 @@ export const CompanySelector = () => {
 
   if (!user) return null;
 
+  // Ocultar seletor no plano Free (apenas uma empresa permitida)
+  if (user.plan === 'free') {
+    return null;
+  }
+
   if (isLoading) {
     return <Loading size="small" />;
   }
 
+  // Mostrar seletor para planos Pro e Business quando houver empresas
   if (!companies?.length) {
     return <div className="text-sm text-gray-500">Nenhuma empresa cadastrada</div>;
   }

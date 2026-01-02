@@ -35,12 +35,15 @@ export interface UserIntegrations {
   openaiModel?: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo' | 'gpt-5.2' | 'gpt-5-mini';
 }
 
+export type UserPlan = 'free' | 'pro' | 'business';
+
 export type User = {
   id: string;
   name: string;
   email: string;
   role: UserRole;
   status: UserStatus;
+  plan: UserPlan;
   companyIds: string[];
   avatar?: string;
   phone?: string;
