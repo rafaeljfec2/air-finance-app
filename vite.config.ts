@@ -44,22 +44,27 @@ export default defineConfig(({ mode }) => {
               return 'vendor-react';
             }
 
-            const chunkMap: Record<string, string> = {
-              '@tanstack/react-query': 'vendor-react-query',
-              'react-router': 'vendor-router',
-              recharts: 'vendor-recharts',
-              'framer-motion': 'vendor-framer-motion',
-              axios: 'vendor-axios',
-              '@radix-ui': 'vendor-radix-ui',
-              zod: 'vendor-zod',
-              'date-fns': 'vendor-date',
-            };
-
-            for (const [key, chunk] of Object.entries(chunkMap)) {
-              if (id.includes(key)) return chunk;
+            if (id.includes('@tanstack/react-query')) {
+              return 'vendor-react-query';
             }
 
-            return 'vendor-other';
+            if (id.includes('react-router')) {
+              return 'vendor-router';
+            }
+
+            if (id.includes('recharts')) {
+              return 'vendor-recharts';
+            }
+
+            if (id.includes('@radix-ui')) {
+              return 'vendor-radix-ui';
+            }
+
+            if (id.includes('framer-motion')) {
+              return 'vendor-framer-motion';
+            }
+
+            return undefined;
           },
           chunkFileNames: 'assets/js/[name]-[hash].js',
           entryFileNames: 'assets/js/[name]-[hash].js',
