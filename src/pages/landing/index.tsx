@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { CTASection } from './components/CTASection';
 import { FeaturesSection } from './components/FeaturesSection';
@@ -9,20 +8,11 @@ import { PricingSection } from './components/PricingSection';
 import { SecuritySection } from './components/SecuritySection';
 import { SEOHead } from './components/SEOHead';
 import { TestimonialsSection } from './components/TestimonialsSection';
+import { usePageScroll } from '@/hooks/usePageScroll';
 import './landing.css';
 
 export function LandingPage() {
-  useEffect(() => {
-    // Enable scrolling for landing page
-    document.documentElement.style.overflow = 'auto';
-    document.body.style.overflow = 'auto';
-
-    return () => {
-      // Restore default overflow when leaving landing page
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-    };
-  }, []);
+  usePageScroll();
 
   return (
     <>

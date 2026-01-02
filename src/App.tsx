@@ -4,12 +4,16 @@ import { HelmetProvider } from 'react-helmet-async';
 import { router } from './routes';
 import { ThemeProvider } from './components/ThemeProvider';
 import { Toaster } from 'sonner';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { CompanyProvider } from '@/contexts/companyContext';
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { initStorageCleanup } from '@/utils/storageCleanup';
 
-// Criando uma instância do QueryClient
+const ReactQueryDevtools = lazy(() =>
+  import('@tanstack/react-query-devtools').then((d) => ({
+    default: d.ReactQueryDevtools,
+  })),
+);
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -20,10 +24,11 @@ const queryClient = new QueryClient({
 });
 
 export function App() {
-  // Initialize storage cleanup on app start
   useEffect(() => {
     initStorageCleanup();
   }, []);
+
+  const isDevelopment = import.meta.env.DEV;
 
   return (
     <HelmetProvider>
@@ -38,7 +43,11 @@ export function App() {
                 duration: 3000,
               }}
             />
-            <ReactQueryDevtools initialIsOpen={false} />
+            {isDevelopment && (
+              <Suspense fallback={null}>
+                <ReactQueryDevtools initialIsOpen={false} />
+              </Suspense>
+            )}
           </ThemeProvider>
         </CompanyProvider>
       </QueryClientProvider>

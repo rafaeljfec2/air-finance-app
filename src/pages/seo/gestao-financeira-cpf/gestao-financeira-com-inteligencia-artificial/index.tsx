@@ -1,19 +1,12 @@
-import { useEffect } from 'react';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { InternalLink } from '@/components/seo/InternalLink';
 import { ChevronRight, Home } from 'lucide-react';
 import { Header } from '@/pages/landing/components/Header';
 import { Footer } from '@/pages/landing/components/Footer';
+import { usePageScroll } from '@/hooks/usePageScroll';
 
 export function GestaoFinanceiraComIAPage() {
-  useEffect(() => {
-    document.documentElement.style.overflow = 'auto';
-    document.body.style.overflow = 'auto';
-    return () => {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-    };
-  }, []);
+  usePageScroll();
     const faqItems = [
     {
       question: 'O que a inteligência artificial faz na gestão financeira pessoal?',

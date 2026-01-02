@@ -1,14 +1,12 @@
 import react from '@vitejs/plugin-react';
-import { readFileSync } from 'fs';
-import path from 'path';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { defineConfig, loadEnv } from 'vite';
 import svgr from 'vite-plugin-svgr';
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
-// https://vitejs.dev/config/
+
 export default defineConfig(({ mode }) => {
-  // Load env file based on `mode` in the current working directory.
-  // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
@@ -28,13 +26,45 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: 'dist',
-      sourcemap: true,
+      sourcemap: mode !== 'production',
       minify: 'terser',
       terserOptions: {
         compress: {
-          drop_console: true,
+          drop_console: mode === 'production',
+          drop_debugger: mode === 'production',
+          pure_funcs: mode === 'production' ? ['console.log', 'console.info'] : [],
         },
       },
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            if (!id.includes('node_modules')) return;
+
+            const chunkMap: Record<string, string> = {
+              '@tanstack/react-query': 'vendor-react-query',
+              'react-router': 'vendor-router',
+              'react-dom': 'vendor-react-dom',
+              react: 'vendor-react',
+              recharts: 'vendor-recharts',
+              'framer-motion': 'vendor-framer-motion',
+              axios: 'vendor-axios',
+              '@radix-ui': 'vendor-radix-ui',
+              zod: 'vendor-zod',
+              'date-fns': 'vendor-date',
+            };
+
+            for (const [key, chunk] of Object.entries(chunkMap)) {
+              if (id.includes(key)) return chunk;
+            }
+
+            return 'vendor-other';
+          },
+          chunkFileNames: 'assets/js/[name]-[hash].js',
+          entryFileNames: 'assets/js/[name]-[hash].js',
+          assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+        },
+      },
+      chunkSizeWarningLimit: 1000,
     },
     server: {
       port: 3000,

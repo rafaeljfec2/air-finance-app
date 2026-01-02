@@ -1,16 +1,9 @@
 import { Header } from '@/pages/landing/components/Header';
 import { Footer } from '@/pages/landing/components/Footer';
-import { useEffect } from 'react';
+import { usePageScroll } from '@/hooks/usePageScroll';
 
 export function PrivacyPolicy() {
-  useEffect(() => {
-    document.documentElement.style.overflow = 'auto';
-    document.body.style.overflow = 'auto';
-    return () => {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-    };
-  }, []);
+  usePageScroll();
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
