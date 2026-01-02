@@ -6,80 +6,75 @@ import { InteractiveCard } from './InteractiveCard';
 const plans = [
   {
     id: 'free',
-    name: 'Gratuito',
+    name: 'Free',
     description: 'Ideal para começar',
-    price: 'R$ 0',
+    price: 'R$ 0,00',
     period: '/mês',
-    features: [
-      'Dashboard básico',
-      'Até 100 transações/mês',
-      'Backup local',
-      'Suporte por email',
-    ],
+    features: ['Controle manual', 'Dashboard básico', 'Até 2 contas', 'Até 2 cartões'],
     cta: 'Começar agora',
     popular: false,
   },
   {
     id: 'pro',
     name: 'Pro',
-    description: 'Para usuários exigentes',
-    price: 'R$ 19,90',
+    description: 'O favorito dos freelancers',
+    price: 'R$ 29,90',
     period: '/mês',
     features: [
-      'Tudo do plano Gratuito',
-      'Transações ilimitadas',
-      'Relatórios avançados',
-      'Sincronização em nuvem',
-      'Suporte prioritário',
+      'Tudo do Free',
+      'IA Ilimitada',
+      'Contas ilimitadas',
+      'Cartões ilimitados',
+      'Importação OFX',
     ],
-    cta: 'Assinar agora',
+    cta: 'Começar Agora',
     popular: true,
   },
   {
     id: 'business',
     name: 'Business',
-    description: 'Para empresas',
-    price: 'Personalizado',
-    period: '',
+    description: 'Para empresas em crescimento',
+    price: 'R$ 79,90',
+    period: '/mês',
     features: [
       'Tudo do plano Pro',
-      'Múltiplos usuários',
-      'API personalizada',
-      'Suporte dedicado',
-      'Treinamento da equipe',
+      'Integração Bancária Automática (Inter)',
+      'Gestão Multi-empresas (CNPJ)',
+      'Múltiplos usuários e permissões',
+      'Conciliação bancária automática',
+      'Suporte prioritário',
     ],
-    cta: 'Fale conosco',
+    cta: 'Escolher este plano',
     popular: false,
   },
 ];
 
 export function PricingSection() {
   return (
-    <section id="pricing" className="py-32 px-6 bg-white relative z-10" aria-labelledby="pricing-heading">
+    <section
+      id="pricing"
+      className="py-32 px-6 bg-white relative z-10"
+      aria-labelledby="pricing-heading"
+    >
       <div className="max-w-7xl mx-auto">
         <ScrollReveal variant="fade" className="text-center mb-20">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-brand-arrow" id="pricing-heading">
             Planos para todos os perfis
           </h2>
           <p className="text-xl text-text/80 max-w-3xl mx-auto">
-            Escolha o plano ideal para suas necessidades e comece a transformar sua vida
-            financeira hoje
+            Escolha o plano ideal para suas necessidades e comece a transformar sua vida financeira
+            hoje
           </p>
         </ScrollReveal>
 
         <div className="grid md:grid-cols-3 gap-8">
           {plans.map((plan, index) => (
-            <ScrollReveal
-              key={plan.id}
-              variant="scale"
-              delay={index * 0.2}
-              className={plan.popular ? 'md:-mt-4 md:mb-4' : ''}
-            >
-              <InteractiveCard>
+            <ScrollReveal key={plan.id} variant="scale" delay={index * 0.2} className="h-full">
+              <InteractiveCard className="h-full">
                 <div
                   className={`rounded-2xl p-8 h-full flex flex-col transition-all duration-300 ${
                     plan.popular
-                      ? 'bg-brand-arrow text-white relative transform scale-105 shadow-2xl'
+                      ? 'bg-brand-arrow text-white shadow-2xl'
                       : 'bg-background border border-border hover:border-brand-arrow/30'
                   }`}
                 >
@@ -147,4 +142,3 @@ export function PricingSection() {
     </section>
   );
 }
-
