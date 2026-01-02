@@ -18,8 +18,8 @@ export function CategorizacaoAutomaticaGastosPage() {
   return (
     <>
       <SEOHead
-        title="Categorização Automática de Gastos: Como Funciona"
-        description="Aprenda como funciona a categorização automática de gastos com IA. Por que manual não escala, como IA classifica transações, limitações e benefícios reais."
+        title="Categorização automática de gastos: como funciona e por que usar"
+        description="Entenda como funciona a categorização automática de gastos, seus benefícios e limitações para finanças pessoais."
         canonical="https://airfinance.com.br/gestao-financeira-cpf/categorizacao-automatica-gastos"
         articleSchema={{
           headline: 'Categorização Automática de Gastos: Como Funciona',

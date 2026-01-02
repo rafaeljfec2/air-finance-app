@@ -17,8 +17,8 @@ export function OrganizacaoFinanceiraPessoalPage() {
   return (
     <>
       <SEOHead
-        title="Organização Financeira Pessoal: Guia Completo"
-        description="Aprenda como organizar suas finanças pessoais. Organização mensal, separação de gastos fixos e variáveis, visualização de despesas e disciplina financeira baseada em dados."
+        title="Organização financeira pessoal: método simples para o dia a dia"
+        description="Saiba como organizar suas finanças pessoais, separar gastos e criar uma rotina financeira sustentável."
         canonical="https://airfinance.com.br/gestao-financeira-cpf/organizacao-financeira-pessoal"
         articleSchema={{
           headline: 'Organização Financeira Pessoal: Guia Completo',

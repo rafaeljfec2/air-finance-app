@@ -18,8 +18,8 @@ export function ControleFinanceiroPessoalPage() {
   return (
     <>
       <SEOHead
-        title="Controle Financeiro Pessoal: Como Fazer na Prática"
-        description="Guia prático de controle financeiro pessoal. Métodos, ferramentas e técnicas para controlar gastos, criar orçamento e alcançar metas financeiras."
+        title="Controle financeiro pessoal: como acompanhar gastos de forma eficiente"
+        description="Veja como fazer controle financeiro pessoal na prática, evitar erros comuns e entender quando a automação faz diferença."
         canonical="https://airfinance.com.br/gestao-financeira-cpf/controle-financeiro-pessoal"
         articleSchema={{
           headline: 'Controle Financeiro Pessoal: Como Fazer na Prática',

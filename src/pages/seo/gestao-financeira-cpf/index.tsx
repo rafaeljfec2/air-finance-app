@@ -45,8 +45,8 @@ export function GestaoFinanceiraCPFPage() {
   return (
     <>
       <SEOHead
-        title="Gestão Financeira Pessoal: Organize Suas Finanças"
-        description="Aprenda como fazer gestão financeira pessoal eficiente. Controle de gastos, organização financeira, automação e inteligência artificial. Guia completo e prático."
+        title="Gestão financeira pessoal: organize suas finanças com inteligência"
+        description="Aprenda como organizar suas finanças pessoais, controlar gastos e usar automação e IA para ter clareza financeira no dia a dia."
         canonical="https://airfinance.com.br/gestao-financeira-cpf"
         articleSchema={{
           headline: 'Gestão financeira pessoal: como organizar suas finanças de forma inteligente',

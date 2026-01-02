@@ -26,8 +26,8 @@ export function ScoreCreditoFinancasPessoaisPage() {
   return (
     <>
       <SEOHead
-        title="Score de Crédito e Finanças Pessoais: Relação Prática"
-        description="Entenda a relação entre organização financeira e score de crédito. Comportamentos que afetam score e como controle financeiro ajuda indiretamente."
+        title="Score de crédito e finanças pessoais: qual é a relação?"
+        description="Entenda como a organização financeira influencia o score de crédito e quais hábitos fazem diferença no longo prazo."
         canonical="https://airfinance.com.br/gestao-financeira-cpf/score-credito-e-financas-pessoais"
         articleSchema={{
           headline: 'Score de Crédito e Finanças Pessoais: Relação Prática',

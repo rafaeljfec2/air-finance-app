@@ -26,8 +26,8 @@ export function GestaoFinanceiraComIAPage() {
   return (
     <>
       <SEOHead
-        title="Gestão Financeira com IA: O Que Funciona na Prática"
-        description="Como usar inteligência artificial na gestão financeira pessoal. O que IA faz de verdade, onde ajuda e onde não ajuda, exemplos práticos sem promessas milagrosas."
+        title="Gestão financeira com inteligência artificial: uso real no dia a dia"
+        description="Veja como a inteligência artificial pode ajudar na gestão financeira pessoal sem promessas irreais."
         canonical="https://airfinance.com.br/gestao-financeira-cpf/gestao-financeira-com-inteligencia-artificial"
         articleSchema={{
           headline: 'Gestão Financeira com IA: O Que Funciona na Prática',
