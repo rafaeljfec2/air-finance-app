@@ -40,11 +40,13 @@ export default defineConfig(({ mode }) => {
           manualChunks: (id) => {
             if (!id.includes('node_modules')) return;
 
+            if (id.includes('react-dom') || id.includes('/react/')) {
+              return 'vendor-react';
+            }
+
             const chunkMap: Record<string, string> = {
               '@tanstack/react-query': 'vendor-react-query',
               'react-router': 'vendor-router',
-              'react-dom': 'vendor-react-dom',
-              react: 'vendor-react',
               recharts: 'vendor-recharts',
               'framer-motion': 'vendor-framer-motion',
               axios: 'vendor-axios',
