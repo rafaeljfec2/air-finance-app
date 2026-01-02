@@ -12,9 +12,23 @@ const footerLinks = {
   ],
   conteudo: [
     { name: 'Gestão Financeira CPF', href: '/gestao-financeira-cpf' },
-    { name: 'Controle Financeiro Pessoal', href: '/gestao-financeira-cpf/controle-financeiro-pessoal' },
-    { name: 'Organização Financeira', href: '/gestao-financeira-cpf/organizacao-financeira-pessoal' },
-    { name: 'Categorização Automática', href: '/gestao-financeira-cpf/categorizacao-automatica-gastos' },
+    {
+      name: 'Controle Financeiro Pessoal',
+      href: '/gestao-financeira-cpf/controle-financeiro-pessoal',
+    },
+    {
+      name: 'Organização Financeira',
+      href: '/gestao-financeira-cpf/organizacao-financeira-pessoal',
+    },
+    {
+      name: 'Categorização Automática',
+      href: '/gestao-financeira-cpf/categorizacao-automatica-gastos',
+    },
+    {
+      name: 'Gestão Financeira com IA',
+      href: '/gestao-financeira-cpf/gestao-financeira-com-inteligencia-artificial',
+    },
+    { name: 'Score de Crédito', href: '/gestao-financeira-cpf/score-credito-e-financas-pessoais' },
   ],
   empresa: [
     { name: 'Sobre nós', href: '#' },
