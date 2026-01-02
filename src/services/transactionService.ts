@@ -7,10 +7,6 @@ import {
 } from './types/extract.types';
 import { normalizeExtract } from './utils/extractNormalizer';
 
-// ============================================================================
-// Validation Schemas
-// ============================================================================
-
 export const TransactionSchema = z.object({
   id: z.string(),
   description: z.string(),
@@ -57,16 +53,11 @@ const ImportOfxResponseSchema = z.object({
   accountId: z.string().optional().nullable(),
 });
 
-// ============================================================================
-// Type Exports
-// ============================================================================
-
 export type Transaction = z.infer<typeof TransactionSchema>;
 export type CreateTransaction = z.infer<typeof CreateTransactionSchema>;
 export type ImportOfxResponse = z.infer<typeof ImportOfxResponseSchema>;
 export type InstallmentTransaction = z.infer<typeof InstallmentTransactionSchema>;
 
-// Re-export extract types for convenience
 export type { ExtractHeader, ExtractResponse, ExtractTransaction } from './types/extract.types';
 
 export interface CreateTransactionPayload {
@@ -106,10 +97,6 @@ export interface CreateInstallmentsPayload {
   fitId?: string;
   periodEnd?: string;
 }
-
-// ============================================================================
-// Transaction CRUD Operations
-// ============================================================================
 
 export const getTransactions = async (
   companyId: string,
@@ -178,10 +165,6 @@ export const deleteTransaction = async (companyId: string, id: string): Promise<
   }
 };
 
-// ============================================================================
-// OFX Import Operations
-// ============================================================================
-
 export const importOfx = async (
   companyId: string,
   file: File,
@@ -230,10 +213,6 @@ export const createInstallments = async (
   return z.array(TransactionSchema).parse(response.data);
 };
 
-// ============================================================================
-// Extract Operations
-// ============================================================================
-
 /**
  * Checks if data looks like an array of transactions (without header)
  */
@@ -279,12 +258,10 @@ export const getExtracts = async (
 
   const data = response.data;
 
-  // Handle single extract object
   if (isSingleExtractObject(data)) {
     return [normalizeExtract(data)];
   }
 
-  // Handle array of extracts or transactions
   if (Array.isArray(data)) {
     if (data.length === 0) {
       return [];

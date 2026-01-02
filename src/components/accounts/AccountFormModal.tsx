@@ -147,7 +147,6 @@ export function AccountFormModal({
     const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (!form.institution.trim()) errs.institution = 'Instituição obrigatória';
-    // For credit_card, agency and accountNumber are not required
     if (!isCreditCard) {
       if (!(form.agency ?? '').trim()) errs.agency = 'Agência obrigatória';
       if (!(form.accountNumber ?? '').trim()) errs.accountNumber = 'Número da conta obrigatório';
@@ -164,7 +163,6 @@ export function AccountFormModal({
 
     const payload = {
       ...form,
-      // For credit_card, ensure agency and accountNumber are empty strings
       agency: isCreditCard ? '' : form.agency,
       accountNumber: isCreditCard ? '' : form.accountNumber,
       initialBalanceDate: form.initialBalanceDate || null,
@@ -234,7 +232,6 @@ export function AccountFormModal({
                   Informações Básicas
                 </h3>
               </div>
-
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <FormField
@@ -366,7 +363,7 @@ export function AccountFormModal({
                           const rawValue = e.target.value;
                           const formatted = formatCurrencyInput(rawValue);
                           const numericValue = parseCurrency(formatted);
-                          
+
                           if (numericValue <= 999999999999) {
                             setLimitInput(formatted);
                             setForm((prev) => ({
@@ -401,13 +398,20 @@ export function AccountFormModal({
                     />
                   </FormField>
 
-                  <FormField label="Limite do Cartão" error={errors.creditLimit ? String(errors.creditLimit) : undefined}>
+                  <FormField
+                    label="Limite do Cartão"
+                    error={errors.creditLimit ? String(errors.creditLimit) : undefined}
+                  >
                     <div className="relative">
                       <Input
                         name="creditLimit"
                         type="text"
                         inputMode="decimal"
-                        defaultValue={account?.creditLimit ? formatCurrencyInput(account.creditLimit.toFixed(2).replace('.', '')) : ''}
+                        defaultValue={
+                          account?.creditLimit
+                            ? formatCurrencyInput(account.creditLimit.toFixed(2).replace('.', ''))
+                            : ''
+                        }
                         onChange={(e) => {
                           const rawValue = e.target.value;
                           const formatted = formatCurrencyInput(rawValue);
@@ -420,8 +424,9 @@ export function AccountFormModal({
                               creditLimit: numericValue,
                             }));
                           } else {
-                            // Revert to previous valid value if possible or just don't update
-                             e.target.value = formatCurrencyInput(form.creditLimit?.toFixed(2).replace('.', '') || '');
+                            e.target.value = formatCurrencyInput(
+                              form.creditLimit?.toFixed(2).replace('.', '') || '',
+                            );
                           }
                         }}
                         placeholder="R$ 0,00"
@@ -449,11 +454,11 @@ export function AccountFormModal({
                           const numericValue = parseCurrency(formatted);
 
                           if (numericValue <= 999999999999) {
-                             setInitialBalanceInput(formatted);
-                             setForm((prev) => ({
-                               ...prev,
-                               initialBalance: numericValue,
-                             }));
+                            setInitialBalanceInput(formatted);
+                            setForm((prev) => ({
+                              ...prev,
+                              initialBalance: numericValue,
+                            }));
                           }
                         }}
                         placeholder="R$ 0,00"
@@ -499,9 +504,7 @@ export function AccountFormModal({
                         }}
                       />
                       <span className="text-sm text-muted-foreground dark:text-gray-400">
-                        {form.useInitialBalanceInExtract ?? true
-                          ? 'Sim'
-                          : 'Não'}
+                        {(form.useInitialBalanceInExtract ?? true) ? 'Sim' : 'Não'}
                       </span>
                     </div>
                   </FormField>
@@ -518,9 +521,7 @@ export function AccountFormModal({
                         }}
                       />
                       <span className="text-sm text-muted-foreground dark:text-gray-400">
-                        {form.useInitialBalanceInCashFlow ?? true
-                          ? 'Sim'
-                          : 'Não'}
+                        {(form.useInitialBalanceInCashFlow ?? true) ? 'Sim' : 'Não'}
                       </span>
                     </div>
                   </FormField>
@@ -548,8 +549,8 @@ export function AccountFormModal({
                     onChange={handleIconChange}
                     options={Array.from(
                       new Map(
-                        accountTypes.map((t) => [t.iconName, { value: t.iconName, icon: t.icon }])
-                      ).values()
+                        accountTypes.map((t) => [t.iconName, { value: t.iconName, icon: t.icon }]),
+                      ).values(),
                     )}
                   />
                 </FormField>

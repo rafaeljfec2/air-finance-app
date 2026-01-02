@@ -27,9 +27,6 @@ const typeOptions = [
 
 type CompanyType = 'matriz' | 'filial' | 'holding' | 'prestadora' | 'outra';
 
-// Helper function to remove non-digit characters using regex
-// Note: replaceAll() doesn't support regex, so replace() with global flag is required
-// eslint-disable-next-line sonarjs/prefer-replace-all
 function removeNonDigits(value: string): string {
   return value.replace(/\D/g, '');
 }
@@ -356,7 +353,6 @@ export function CompaniesPage() {
                   ))}
                 </div>
               ) : (
-
                 <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
                   <div className="overflow-x-auto">
                     <table className="w-full">

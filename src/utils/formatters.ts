@@ -11,10 +11,8 @@ export function formatCurrency(value: number): string {
 export function parseCurrency(value: string): number {
   if (!value) return 0;
 
-  // Remove todos os caracteres não numéricos exceto vírgula e ponto
   const cleanValue = value.replace(/[^\d,.-]/g, '');
 
-  // Se não houver números, retorna 0
   if (!cleanValue.match(/\d/)) return 0;
 
   // Se houver mais de uma vírgula ou ponto, mantém apenas o último

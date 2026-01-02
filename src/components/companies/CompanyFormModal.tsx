@@ -23,8 +23,6 @@ const typeOptions = [
 
 type CompanyType = 'matriz' | 'filial' | 'holding' | 'prestadora' | 'outra';
 
-// Helper function to remove non-digit characters using regex
-// Note: replaceAll() doesn't support regex, so replace() with global flag is required
 function removeNonDigits(value: string): string {
   // eslint-disable-next-line
   return value.replace(/\D/g, '');

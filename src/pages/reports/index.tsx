@@ -28,7 +28,6 @@ export function Reports() {
     [currentDate],
   );
 
-  // Use React Query hooks for real data
   const historyFilters: DashboardFilters = useMemo(
     () => ({
       timeRange: '6months', // Force 6 months for the chart
@@ -37,7 +36,6 @@ export function Reports() {
     [currentDate],
   );
 
-  // Use React Query hooks for real data
   const summaryQuery = useDashboardSummary(companyId, filters);
   const historyQuery = useDashboardBalanceHistory(companyId, historyFilters);
   const expensesQuery = useDashboardExpensesByCategory(companyId, filters);
@@ -49,10 +47,8 @@ export function Reports() {
     expensesQuery.isLoading ||
     goalsQuery.isLoading;
 
-  // Get first error if any
   const error = summaryQuery.error ?? historyQuery.error ?? expensesQuery.error ?? goalsQuery.error;
 
-  // Extract error message using apiErrorHandler
   const errorMessage = useMemo(() => {
     if (!error) return null;
 
@@ -60,12 +56,10 @@ export function Reports() {
       const apiError = parseApiError(error);
       return getUserFriendlyMessage(apiError);
     } catch {
-      // Fallback if parsing fails
       return error instanceof Error ? error.message : 'Erro ao carregar dados';
     }
   }, [error]);
 
-  // Get data with safe defaults
   const summary = summaryQuery.data ?? {
     income: 0,
     expenses: 0,
@@ -84,7 +78,6 @@ export function Reports() {
   const expenses = expensesQuery.data ?? [];
   const goals = goalsQuery.data ?? [];
 
-  // Transform history to match component interface (add revenue/expenses)
   const history = historyRaw.map((point) => ({
     date: point.date,
     balance: point.balance,
@@ -92,7 +85,6 @@ export function Reports() {
     expenses: point.expenses,
   }));
 
-  // Build report structure from real data
   const reportStructure = useMemo(() => {
     const expensesTotal = summary.expenses;
     const expensesWithPct = expenses.map((e) => ({
@@ -142,11 +134,9 @@ export function Reports() {
 
   const expensesTotal = summary.expenses;
 
-  // Generate Insights based on the real data
   const insights = useMemo<Insight[]>(() => {
     const list: Insight[] = [];
 
-    // 1. Balance Check
     if (summary.balance < 0) {
       list.push({
         id: 'negative-balance',
@@ -163,7 +153,6 @@ export function Reports() {
       });
     }
 
-    // 2. High Expense Alert (Pareto top category)
     if (expenses.length > 0) {
       const sortedCats = [...expenses].sort((a, b) => b.value - a.value);
       const top = sortedCats[0];
@@ -179,16 +168,9 @@ export function Reports() {
       }
     }
 
-    // 3. Trend Check (vs Last Month) - simplified using balance history
-    // Note: balance-history endpoint doesn't provide expenses breakdown
-    // Trend analysis would require additional data from summary or expenses endpoints
-
     return list;
   }, [summary, expenses, history, expensesTotal]);
 
-  // Removed previousMonth and nextMonth helpers as they are handled by MonthNavigator now
-
-  // Check companyId first
   if (!companyId) {
     return (
       <ViewDefault>

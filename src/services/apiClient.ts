@@ -120,18 +120,15 @@ async function handleUnauthorizedError(
   error: AxiosError,
   originalRequest: RetryableRequestConfig,
 ): Promise<unknown> {
-  // Don't retry public auth endpoints
   if (isPublicAuthEndpoint(originalRequest.url)) {
     throw error;
   }
 
-  // Don't retry if this is already the refresh request that failed
   if (originalRequest.url?.includes(REFRESH_URL)) {
     redirectToLogin();
     throw error;
   }
 
-  // Avoid infinite refresh loop
   if (originalRequest._retry) {
     redirectToLogin();
     throw error;
@@ -170,10 +167,8 @@ const refreshClient = axios.create({
   withCredentials: true,
 });
 
-// Request interceptor: Add Authorization header if token is available
 apiClient.interceptors.request.use(addAuthorizationHeader);
 
-// Response interceptor: Handle 401 errors with token refresh
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {

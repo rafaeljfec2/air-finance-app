@@ -41,16 +41,7 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: 'auth-storage',
-      // Security: Sanitization is applied, expiration will be added via periodic cleanup
-      // Temporarily using default storage to avoid serialization issues
-      // TODO: Re-enable secure storage after fixing serialization issues
-      // storage: createSecureStorage('auth-storage', {
-      //   encrypt: false,
-      //   ttl: STORAGE_CONFIG.AUTH_TTL,
-      //   monitor: true,
-      // }),
       onRehydrateStorage: () => (state) => {
-        // Atualiza isAuthenticated ao recarregar a página
         if (state) {
           state.isAuthenticated = !!state.user && !!state.token;
           // Re-sanitize on rehydration

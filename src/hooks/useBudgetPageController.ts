@@ -79,7 +79,6 @@ export function useBudgetPageController() {
     return date.toISOString().split('T')[0];
   }, [filter.year, filter.month]);
 
-  // Busca o saldo de TODOS os cartões para exibir no contas a pagar
   const cardBalancesQueries = useQueries({
     queries: cardsWithAccounts.map(({ account }) => ({
       queryKey: ['previousBalance', companyId, balanceDate, account?.id],
