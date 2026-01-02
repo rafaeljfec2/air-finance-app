@@ -32,7 +32,18 @@ export default defineConfig(({ mode }) => {
         compress: {
           drop_console: mode === 'production',
           drop_debugger: mode === 'production',
-          pure_funcs: mode === 'production' ? ['console.log', 'console.info'] : [],
+          pure_funcs:
+            mode === 'production'
+              ? ['console.log', 'console.info', 'console.debug', 'console.trace']
+              : [],
+          passes: 2,
+          unsafe: false,
+          unsafe_comps: false,
+          unsafe_math: false,
+          unsafe_methods: false,
+        },
+        format: {
+          comments: false,
         },
       },
       rollupOptions: {
@@ -70,8 +81,14 @@ export default defineConfig(({ mode }) => {
           entryFileNames: 'assets/js/[name]-[hash].js',
           assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
         },
+        treeshake: {
+          moduleSideEffects: 'no-external',
+          propertyReadSideEffects: false,
+          tryCatchDeoptimization: false,
+        },
       },
       chunkSizeWarningLimit: 1000,
+      reportCompressedSize: false,
     },
     server: {
       port: 3000,
