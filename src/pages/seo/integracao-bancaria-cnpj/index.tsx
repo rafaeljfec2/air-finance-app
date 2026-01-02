@@ -1,5 +1,8 @@
 import { SEOHead } from '@/components/seo/SEOHead';
 import { InternalLink } from '@/components/seo/InternalLink';
+import { ChevronRight, Home } from 'lucide-react';
+import { Header } from '@/pages/landing/components/Header';
+import { Footer } from '@/pages/landing/components/Footer';
 
 export function IntegracaoBancariaCNPJPage() {
   const faqItems = [
@@ -44,29 +47,38 @@ export function IntegracaoBancariaCNPJPage() {
         }}
         faqSchema={faqItems}
       />
-      <div className="min-h-screen bg-white dark:bg-gray-900">
-        <header className="border-b border-gray-200 dark:border-gray-800">
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
-            <nav className="text-sm text-gray-600 dark:text-gray-400">
-              <InternalLink to="/">Início</InternalLink> /{' '}
-              <span className="text-gray-900 dark:text-gray-100">
-                Integração Bancária CNPJ
-              </span>
-            </nav>
-          </div>
-        </header>
+      <div className="min-h-screen bg-background text-text">
+        <Header />
+        <div className="pt-24">
+          <header className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-16 z-30">
+            <div className="mx-auto max-w-4xl px-6 py-4">
+              <nav className="flex items-center gap-2 text-sm text-text/70">
+                <InternalLink
+                  to="/"
+                  className="flex items-center gap-1 hover:text-brand-arrow transition-colors"
+                >
+                  <Home className="w-4 h-4" />
+                  <span>Início</span>
+                </InternalLink>
+                <ChevronRight className="w-4 h-4 text-text/40 text-white" />
+                <span className="text-text font-medium">Integração Bancária CNPJ</span>
+              </nav>
+            </div>
+          </header>
 
-        <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-          <article className="prose prose-lg dark:prose-invert max-w-none">
+          <main className="mx-auto max-w-4xl px-6 py-12 pb-24">
+            <article className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-text dark:prose-headings:text-text prose-headings:font-bold prose-headings:tracking-tight prose-h1:text-4xl prose-h1:mb-6 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-text/80 dark:prose-p:text-text/80 prose-p:leading-relaxed prose-a:text-brand-arrow prose-a:no-underline hover:prose-a:underline prose-a:font-medium prose-strong:text-text dark:prose-strong:text-text prose-strong:font-semibold prose-li:text-text/80 dark:prose-li:text-text/80 prose-ul:text-text/80 dark:prose-ul:text-text/80 prose-ol:text-text/80 dark:prose-ol:text-text/80 prose-li:my-2">
             <h1>Integração Bancária CNPJ: Automatize a Gestão Financeira Empresarial</h1>
 
-            <section>
-              <p className="lead">
-                Integração bancária para empresas elimina trabalho manual de importação de
+            <section className="mb-12">
+                <div className="prose-lg text-text/90 leading-relaxed bg-brand-arrow/5 rounded-xl p-6 border-l-4 border-brand-arrow">
+                  <p className="m-0 text-lg font-medium">
+                    Integração bancária para empresas elimina trabalho manual de importação de
                 extratos, conciliação e sincronização de dados. Este guia técnico explica como
                 funciona, tecnologias envolvidas, benefícios e cuidados de segurança.
-              </p>
-            </section>
+                  </p>
+                </div>
+              </section>
 
             <section>
               <h2>O Que é Integração Bancária para CNPJ</h2>
@@ -310,27 +322,24 @@ export function IntegracaoBancariaCNPJPage() {
               ))}
             </section>
 
-            <section className="mt-12 border-t border-gray-200 dark:border-gray-800 pt-8">
-              <h2>Implemente Integração Bancária na Sua Empresa</h2>
-              <p>
-                A integração bancária automatizada reduz custos operacionais, aumenta precisão e
-                fornece dados atualizados para decisões financeiras. Escolha uma solução segura,
-                compatível com LGPD e com suporte técnico adequado.
-              </p>
-              <p>
-                <InternalLink to="/register" className="font-semibold">
-                  Experimente gratuitamente →
-                </InternalLink>
-              </p>
-            </section>
-          </article>
-        </main>
-
-        <footer className="border-t border-gray-200 dark:border-gray-800 mt-16">
-          <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 text-sm text-gray-600 dark:text-gray-400">
-            <p>Última atualização: Janeiro 2024</p>
-          </div>
-        </footer>
+              <section className="mt-16 border-t border-border pt-12">
+                <div className="bg-gradient-to-r from-brand-arrow/5 to-transparent rounded-2xl p-8 border border-border/50">
+                  <p className="text-text/80 mb-6 text-lg">
+                    Pronto para automatizar a gestão financeira da sua empresa?
+                  </p>
+                  <InternalLink
+                    to="/register"
+                    className="group inline-flex items-center gap-2 px-8 py-4 bg-brand-arrow text-white rounded-xl font-semibold hover:bg-brand-arrow/90 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-brand-arrow/25 focus:outline-none focus:ring-2 focus:ring-brand-arrow focus:ring-offset-2 transform hover:-translate-y-0.5 [&>*]:text-white"
+                  >
+                    <span className="text-white">Comece agora</span>
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform text-white" />
+                  </InternalLink>
+                </div>
+              </section>
+            </article>
+          </main>
+        </div>
+        <Footer />
       </div>
     </>
   );

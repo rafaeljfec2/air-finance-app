@@ -1,5 +1,8 @@
 import { SEOHead } from '@/components/seo/SEOHead';
 import { InternalLink } from '@/components/seo/InternalLink';
+import { ChevronRight, Home } from 'lucide-react';
+import { Header } from '@/pages/landing/components/Header';
+import { Footer } from '@/pages/landing/components/Footer';
 
 export function InteligenciaArtificialFinancasPage() {
   const faqItems = [
@@ -44,28 +47,37 @@ export function InteligenciaArtificialFinancasPage() {
         }}
         faqSchema={faqItems}
       />
-      <div className="min-h-screen bg-white dark:bg-gray-900">
-        <header className="border-b border-gray-200 dark:border-gray-800">
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
-            <nav className="text-sm text-gray-600 dark:text-gray-400">
-              <InternalLink to="/">Início</InternalLink> /{' '}
-              <span className="text-gray-900 dark:text-gray-100">
-                Inteligência Artificial em Finanças
-              </span>
-            </nav>
+      <div className="min-h-screen bg-background text-text">
+        <Header />
+        <div className="pt-24">
+          <header className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-16 z-30">
+            <div className="mx-auto max-w-4xl px-6 py-4">
+              <nav className="flex items-center gap-2 text-sm text-text/70">
+                <InternalLink
+                  to="/"
+                  className="flex items-center gap-1 hover:text-brand-arrow transition-colors"
+                >
+                  <Home className="w-4 h-4" />
+                  <span>Início</span>
+                </InternalLink>
+                <ChevronRight className="w-4 h-4 text-text/40 text-white" />
+                <span className="text-text font-medium">Inteligência Artificial em Finanças</span>
+              </nav>
             </div>
           </header>
 
-          <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-            <article className="prose prose-lg dark:prose-invert max-w-none">
+          <main className="mx-auto max-w-4xl px-6 py-12 pb-24">
+            <article className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-text dark:prose-headings:text-text prose-headings:font-bold prose-headings:tracking-tight prose-h1:text-4xl prose-h1:mb-6 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-text/80 dark:prose-p:text-text/80 prose-p:leading-relaxed prose-a:text-brand-arrow prose-a:no-underline hover:prose-a:underline prose-a:font-medium prose-strong:text-text dark:prose-strong:text-text prose-strong:font-semibold prose-li:text-text/80 dark:prose-li:text-text/80 prose-ul:text-text/80 dark:prose-ul:text-text/80 prose-ol:text-text/80 dark:prose-ol:text-text/80 prose-li:my-2">
               <h1>Inteligência Artificial em Finanças: O Que Funciona na Prática</h1>
 
-              <section>
-                <p className="lead">
-                  A inteligência artificial em finanças não é ficção científica, mas automação
+              <section className="mb-12">
+                <div className="prose-lg text-text/90 leading-relaxed bg-brand-arrow/5 rounded-xl p-6 border-l-4 border-brand-arrow">
+                  <p className="m-0 text-lg font-medium">
+                    A inteligência artificial em finanças não é ficção científica, mas automação
                   prática de tarefas repetitivas e análise de dados. Este guia explica o que a IA
                   faz de verdade, onde ela erra e como é usada na gestão financeira.
-                </p>
+                  </p>
+                </div>
               </section>
 
               <section>
@@ -325,28 +337,25 @@ export function InteligenciaArtificialFinancasPage() {
                 ))}
               </section>
 
-              <section className="mt-12 border-t border-gray-200 dark:border-gray-800 pt-8">
-                <h2>Use IA para Otimizar Suas Finanças</h2>
-                <p>
-                  A inteligência artificial não substitui julgamento humano, mas automatiza tarefas
-                  repetitivas e fornece insights baseados em dados. Escolha soluções transparentes
-                  sobre como a IA funciona e que permitem controle humano quando necessário.
-                </p>
-                <p>
-                  <InternalLink to="/register" className="font-semibold">
-                    Experimente IA em gestão financeira →
+              <section className="mt-16 border-t border-border pt-12">
+                <div className="bg-gradient-to-r from-brand-arrow/5 to-transparent rounded-2xl p-8 border border-border/50">
+                  <p className="text-text/80 mb-6 text-lg">
+                    Pronto para melhorar sua gestão financeira com inteligência artificial?
+                  </p>
+                  <InternalLink
+                    to="/register"
+                    className="group inline-flex items-center gap-2 px-8 py-4 bg-brand-arrow text-white rounded-xl font-semibold hover:bg-brand-arrow/90 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-brand-arrow/25 focus:outline-none focus:ring-2 focus:ring-brand-arrow focus:ring-offset-2 transform hover:-translate-y-0.5 [&>*]:text-white"
+                  >
+                    <span className="text-white">Experimente agora</span>
+                    <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
                   </InternalLink>
-                </p>
+                </div>
               </section>
             </article>
           </main>
-
-          <footer className="border-t border-gray-200 dark:border-gray-800 mt-16">
-            <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 text-sm text-gray-600 dark:text-gray-400">
-              <p>Última atualização: Janeiro 2024</p>
-            </div>
-          </footer>
         </div>
+        <Footer />
+      </div>
       </>
     );
   }

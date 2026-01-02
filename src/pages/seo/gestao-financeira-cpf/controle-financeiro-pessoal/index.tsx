@@ -272,10 +272,10 @@ export function ControleFinanceiroPessoalPage() {
                   </p>
                   <InternalLink
                     to="/register"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-brand-arrow text-white rounded-lg font-semibold hover:bg-brand-arrow/90 transition-colors shadow-lg hover:shadow-xl"
+                    className="group inline-flex items-center gap-2 px-8 py-4 bg-brand-arrow text-white rounded-xl font-semibold hover:bg-brand-arrow/90 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-brand-arrow/25 focus:outline-none focus:ring-2 focus:ring-brand-arrow focus:ring-offset-2 transform hover:-translate-y-0.5 [&>*]:text-white"
                   >
-                    Comece agora
-                    <ChevronRight className="w-5 h-5" />
+                    <span className="text-white">Comece agora</span>
+                    <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform text-white" />
                   </InternalLink>
                 </div>
               </section>
