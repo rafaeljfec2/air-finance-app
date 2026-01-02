@@ -14,6 +14,25 @@ export function OrganizacaoFinanceiraPessoalPage() {
       document.body.style.overflow = '';
     };
   }, []);
+
+  const faqItems = [
+    {
+      question: 'Como organizar finanças pessoais do zero?',
+      answer:
+        'Comece listando todas as fontes de renda, mapeie gastos fixos e variáveis e use uma visão mensal para entender seu fluxo financeiro.',
+    },
+    {
+      question: 'Qual a diferença entre organização financeira e controle financeiro?',
+      answer:
+        'Organização é estruturar suas finanças; controle é acompanhar e analisar continuamente o que foi organizado.',
+    },
+    {
+      question: 'Quanto tempo leva para organizar a vida financeira?',
+      answer:
+        'Com dados claros e automação, os primeiros resultados aparecem em poucos meses.',
+    },
+  ];
+
   return (
     <>
       <SEOHead
@@ -26,6 +45,7 @@ export function OrganizacaoFinanceiraPessoalPage() {
           datePublished: '2024-01-01',
           dateModified: '2024-01-01',
         }}
+        faqSchema={faqItems}
       />
       <div className="min-h-screen bg-background text-text">
         <Header />
@@ -247,7 +267,22 @@ export function OrganizacaoFinanceiraPessoalPage() {
                 </li>
               </ul>
             </section>
-                          <section className="mt-16 border-t border-border pt-12">
+                                       <section className="mt-16">
+                <h2 className="text-3xl font-bold mb-8">Perguntas Frequentes</h2>
+                <div className="space-y-6">
+                  {faqItems.map((item) => (
+                    <div
+                      key={item.question}
+                      className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
+                    >
+                      <h3 className="text-xl font-semibold text-text mb-3">{item.question}</h3>
+                      <p className="text-text/80 leading-relaxed">{item.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="mt-16 border-t border-border pt-12">
                 <div className="bg-gradient-to-r from-brand-arrow/5 to-transparent rounded-2xl p-8 border border-border/50">
                   <p className="text-text/80 mb-6 text-lg">
                     Pronto para melhorar sua gestão financeira?

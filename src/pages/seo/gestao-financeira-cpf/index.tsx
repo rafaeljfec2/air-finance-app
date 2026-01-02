@@ -18,27 +18,27 @@ export function GestaoFinanceiraCPFPage() {
     {
       question: 'O que é gestão financeira pessoal?',
       answer:
-        'Gestão financeira pessoal é o processo de planejar, organizar, controlar e monitorar os recursos financeiros de um indivíduo ou família. Envolve o controle de receitas, despesas, investimentos e planejamento de metas financeiras de curto, médio e longo prazo.',
+        'Gestão financeira pessoal é o controle consciente de entradas e saídas de dinheiro, permitindo entender gastos, planejar objetivos e tomar decisões financeiras com base em dados reais.',
     },
     {
-      question: 'Por que é importante controlar as finanças pessoais?',
+      question: 'Qual a melhor forma de organizar finanças pessoais?',
       answer:
-        'O controle financeiro pessoal permite tomar decisões conscientes sobre gastos, identificar padrões de consumo, evitar dívidas desnecessárias, construir reserva de emergência e planejar objetivos como compra de imóvel, aposentadoria ou viagens.',
+        'A melhor forma é acompanhar receitas e despesas regularmente, categorizar gastos e usar ferramentas que automatizam esse processo para evitar erros manuais.',
     },
     {
-      question: 'Como começar a organizar minhas finanças?',
+      question: 'Planilha ainda funciona para controle financeiro?',
       answer:
-        'O primeiro passo é registrar todas as receitas e despesas por pelo menos 30 dias. Depois, categorize os gastos, identifique desperdícios, estabeleça um orçamento realista e defina metas financeiras claras. Utilize ferramentas de controle financeiro para facilitar o processo.',
+        'Planilhas funcionam no início, mas tendem a falhar com o tempo por dependerem de preenchimento manual e não refletirem gastos recorrentes automaticamente.',
     },
     {
-      question: 'A tecnologia realmente ajuda na gestão financeira?',
+      question: 'Automação financeira é segura para pessoa física?',
       answer:
-        'Sim. Aplicativos e plataformas de gestão financeira automatizam o registro de transações, categorização de gastos, geração de relatórios e alertas. A inteligência artificial pode identificar padrões e sugerir otimizações, economizando tempo e reduzindo erros manuais.',
+        'Sim, desde que utilize plataformas que sigam boas práticas de segurança, criptografia e proteção de dados conforme a LGPD.',
     },
     {
-      question: 'Meus dados financeiros estão seguros?',
+      question: 'Inteligência artificial pode ajudar na gestão financeira pessoal?',
       answer:
-        'Plataformas sérias utilizam criptografia de ponta a ponta, autenticação multifator, conformidade com LGPD e não compartilham dados com terceiros sem autorização. Sempre verifique a política de privacidade antes de usar qualquer ferramenta.',
+        'Pode sim, especialmente na categorização automática de gastos, identificação de padrões e geração de alertas financeiros.',
     },
   ];
 

@@ -15,6 +15,23 @@ export function ControleFinanceiroPessoalPage() {
     };
   }, []);
 
+  const faqItems = [
+    {
+      question: 'Como controlar gastos pessoais de forma eficiente?',
+      answer:
+        'O controle eficiente acontece quando os gastos são registrados automaticamente e organizados por categoria, evitando esquecimentos e distorções.',
+    },
+    {
+      question: 'Por que é difícil manter controle financeiro manual?',
+      answer:
+        'Porque exige disciplina constante e depende da memória do usuário, o que gera falhas e perda de consistência ao longo do tempo.',
+    },
+    {
+      question: 'Controle financeiro pessoal precisa ser diário?',
+      answer:
+        'Não necessariamente. Com automação, o acompanhamento pode ser semanal ou mensal sem perda de precisão.',
+    },
+  ];
   return (
     <>
       <SEOHead
@@ -27,6 +44,7 @@ export function ControleFinanceiroPessoalPage() {
           datePublished: '2024-01-01',
           dateModified: '2024-01-01',
         }}
+        faqSchema={faqItems}
       />
       <div className="min-h-screen bg-background text-text">
         <Header />
@@ -263,6 +281,21 @@ export function ControleFinanceiroPessoalPage() {
                     </InternalLink>
                   </li>
                 </ul>
+              </section>
+
+              <section className="mt-16">
+                <h2 className="text-3xl font-bold mb-8">Perguntas Frequentes</h2>
+                <div className="space-y-6">
+                  {faqItems.map((item) => (
+                    <div
+                      key={item.question}
+                      className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
+                    >
+                      <h3 className="text-xl font-semibold text-text mb-3">{item.question}</h3>
+                      <p className="text-text/80 leading-relaxed">{item.answer}</p>
+                    </div>
+                  ))}
+                </div>
               </section>
 
               <section className="mt-16 border-t border-border pt-12">

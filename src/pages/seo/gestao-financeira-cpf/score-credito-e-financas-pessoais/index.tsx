@@ -14,14 +14,23 @@ export function ScoreCreditoFinancasPessoaisPage() {
       document.body.style.overflow = '';
     };
   }, []);
-  useEffect(() => {
-    document.documentElement.style.overflow = 'auto';
-    document.body.style.overflow = 'auto';
-    return () => {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-    };
-  }, []);
+    const faqItems = [
+    {
+      question: 'Organização financeira melhora o score de crédito?',
+      answer:
+        'Indiretamente, sim. Organizar finanças ajuda a evitar atrasos, uso excessivo de crédito e inadimplência.',
+    },
+    {
+      question: 'Controlar gastos aumenta score automaticamente?',
+      answer:
+        'Não automaticamente, mas contribui para hábitos financeiros que influenciam positivamente o score.',
+    },
+    {
+      question: 'Score baixo significa desorganização financeira?',
+      answer:
+        'Nem sempre, mas muitas vezes indica histórico de atrasos ou uso inadequado de crédito.',
+    },
+  ];
 
   return (
     <>
@@ -35,6 +44,7 @@ export function ScoreCreditoFinancasPessoaisPage() {
           datePublished: '2024-01-01',
           dateModified: '2024-01-01',
         }}
+        faqSchema={faqItems}
       />
       <div className="min-h-screen bg-background text-text">
         <Header />
@@ -311,7 +321,22 @@ export function ScoreCreditoFinancasPessoaisPage() {
               </ul>
             </section>
 
-                          <section className="mt-16 border-t border-border pt-12">
+                                       <section className="mt-16">
+                <h2 className="text-3xl font-bold mb-8">Perguntas Frequentes</h2>
+                <div className="space-y-6">
+                  {faqItems.map((item) => (
+                    <div
+                      key={item.question}
+                      className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
+                    >
+                      <h3 className="text-xl font-semibold text-text mb-3">{item.question}</h3>
+                      <p className="text-text/80 leading-relaxed">{item.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="mt-16 border-t border-border pt-12">
                 <div className="bg-gradient-to-r from-brand-arrow/5 to-transparent rounded-2xl p-8 border border-border/50">
                   <p className="text-text/80 mb-6 text-lg">
                     Pronto para melhorar sua gestão financeira?

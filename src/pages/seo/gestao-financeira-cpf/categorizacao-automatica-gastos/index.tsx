@@ -15,6 +15,29 @@ export function CategorizacaoAutomaticaGastosPage() {
     };
   }, []);
 
+  const faqItems = [
+    {
+      question: 'O que é categorização automática de gastos?',
+      answer:
+        'É o processo de classificar despesas automaticamente com base em dados bancários, descrições e padrões de consumo.',
+    },
+    {
+      question: 'A categorização automática funciona bem?',
+      answer:
+        'Funciona bem na maioria dos casos, mas pode cometer erros pontuais, especialmente em descrições bancárias genéricas.',
+    },
+    {
+      question: 'Por que a categorização manual não escala?',
+      answer:
+        'Porque exige tempo, atenção e repetição, tornando-se insustentável no longo prazo.',
+    },
+    {
+      question: 'A IA aprende com meus gastos?',
+      answer:
+        'Sim, modelos de IA podem aprender padrões de consumo para melhorar a classificação ao longo do tempo.',
+    },
+  ];
+
   return (
     <>
       <SEOHead
@@ -27,6 +50,7 @@ export function CategorizacaoAutomaticaGastosPage() {
           datePublished: '2024-01-01',
           dateModified: '2024-01-01',
         }}
+        faqSchema={faqItems}
       />
       <div className="min-h-screen bg-background text-text">
         <Header />
@@ -280,7 +304,22 @@ export function CategorizacaoAutomaticaGastosPage() {
               </ul>
             </section>
 
-                          <section className="mt-16 border-t border-border pt-12">
+              <section className="mt-16">
+                <h2 className="text-3xl font-bold mb-8">Perguntas Frequentes</h2>
+                <div className="space-y-6">
+                  {faqItems.map((item) => (
+                    <div
+                      key={item.question}
+                      className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
+                    >
+                      <h3 className="text-xl font-semibold text-text mb-3">{item.question}</h3>
+                      <p className="text-text/80 leading-relaxed">{item.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="mt-16 border-t border-border pt-12">
                 <div className="bg-gradient-to-r from-brand-arrow/5 to-transparent rounded-2xl p-8 border border-border/50">
                   <p className="text-text/80 mb-6 text-lg">
                     Pronto para melhorar sua gestão financeira?
