@@ -80,110 +80,103 @@ export function GestaoFinanceiraCPFPage() {
               <h1>Gestão financeira pessoal: como organizar suas finanças de forma inteligente</h1>
 
               <section>
-                <p className="lead">
-                  Você sabe exatamente quanto gasta por mês? Consegue identificar para onde vai seu
-                  dinheiro? Se a resposta é não, você não está sozinho. A maioria das pessoas
-                  físicas lida com desorganização financeira, falta de visão clara dos gastos e
-                  despesas que aparecem sem serem percebidas. Este guia explica como resolver isso
-                  na prática.
+                <p className="lead border-l-4 border-brand-arrow pl-4 bg-brand-arrow/5 rounded-r-lg py-2">
+                  No fim do mês, você olha o saldo bancário e não entende para onde foi o dinheiro.
+                  Receitas conhecidas, gastos que pareciam controlados, mas o resultado não fecha.
+                  Essa falta de clareza financeira acontece porque o dinheiro se move de forma
+                  invisível: pequenas despesas se acumulam, assinaturas se renovam automaticamente,
+                  e gastos recorrentes passam despercebidos. Este guia mostra como ter visibilidade
+                  real sobre suas finanças pessoais.
                 </p>
               </section>
 
               <section>
                 <h2>O que é gestão financeira pessoal na prática</h2>
                 <p>
-                  Gestão financeira pessoal não é teoria, é fluxo. Um processo que começa quando o
-                  dinheiro entra e termina quando você toma uma decisão consciente sobre ele.
+                  Gestão financeira pessoal é o controle do fluxo de dinheiro que entra e sai. Não é
+                  teoria de investimentos ou planejamento complexo. É registrar, categorizar e
+                  analisar o que acontece com seu dinheiro no dia a dia.
                 </p>
-                <p>O fluxo funciona assim:</p>
+                <p>O fluxo funciona em três etapas:</p>
                 <ol>
                   <li>
-                    <strong>Entrada:</strong> Receitas (salário, freelances, investimentos,
-                    rendimentos)
+                    <strong>Entrada:</strong> Todo dinheiro que chega (salário, rendimentos, vendas,
+                    aluguéis recebidos)
                   </li>
                   <li>
-                    <strong>Saída:</strong> Todas as despesas, desde o aluguel até o café da manhã
+                    <strong>Saída:</strong> Todo dinheiro que sai (despesas fixas, variáveis,
+                    compras, pagamentos)
                   </li>
                   <li>
-                    <strong>Categorização:</strong> Classificar cada gasto (alimentação, transporte,
-                    saúde, lazer)
-                  </li>
-                  <li>
-                    <strong>Análise:</strong> Entender padrões, identificar excessos, encontrar
-                    oportunidades
+                    <strong>Análise:</strong> Comparar entradas e saídas, identificar padrões e
+                    tomar decisões baseadas em dados reais
                   </li>
                 </ol>
                 <p>
-                  Sem esse fluxo organizado, você trabalha às cegas. Com ele, cada decisão
-                  financeira é baseada em dados reais, não em suposições.
+                  Sem esse controle, você toma decisões financeiras baseadas em sensação. Com ele,
+                  você sabe exatamente quanto pode gastar, onde está desperdiçando e quais ajustes
+                  fazer.
                 </p>
               </section>
 
               <section>
-                <h2>Principais erros na gestão financeira de pessoas físicas</h2>
+                <h2>Erros comuns na gestão financeira de CPF</h2>
 
-                <h3>1. Falta de controle</h3>
+                <h3>Gastos invisíveis</h3>
                 <p>
-                  O erro mais comum é não saber quanto se gasta realmente. Muitas pessoas têm uma
-                  ideia aproximada, mas quando começam a registrar tudo, descobrem que gastam 20% a
-                  30% mais do que imaginavam.
+                  Pequenos gastos que passam despercebidos: cafezinho diário (R$ 5), delivery
+                  esporádico (R$ 30), compras por impulso na farmácia (R$ 20). Individualmente
+                  parecem insignificantes, mas somados podem representar 15% a 20% do orçamento
+                  mensal. Sem registro, você não vê esse consumo.
                 </p>
 
-                <h3>2. Gastos recorrentes esquecidos</h3>
+                <h3>Falta de categorização</h3>
                 <p>
-                  Assinaturas que você não usa mais, serviços que se renovam automaticamente, taxas
-                  bancárias que crescem sem você perceber. Esses gastos recorrentes consomem uma
-                  parte significativa do orçamento e passam despercebidos.
+                  Registrar gastos sem categorizar (alimentação, transporte, lazer, saúde) impede
+                  identificar onde o dinheiro está indo de fato. Você pode achar que gasta muito em
+                  restaurantes, mas descobrir que a maior parte vai para transporte ou para
+                  farmácias/hospitais. Sem categorização, não há como analisar padrões.
                 </p>
 
-                <h3>3. Decisão sem dados</h3>
+                <h3>Decisão baseada em sensação</h3>
                 <p>
-                  Decidir cortar gastos sem saber quais gastos são realmente altos, ou fazer uma
-                  compra grande sem entender o impacto no orçamento mensal. Decisões financeiras
-                  baseadas em intuição, não em números.
-                </p>
-
-                <h3>4. Misturar necessidades e desejos</h3>
-                <p>
-                  Classificar um gasto como necessário quando é opcional, ou vice-versa. Isso
-                  distorce completamente a análise financeira e leva a orçamentos irreais.
+                  Tomar decisões financeiras sem consultar dados reais: cortar gastos
+                  aleatoriamente, fazer uma compra grande porque &quot;parece que sobra
+                  dinheiro&quot;, assumir dívidas sem calcular o impacto no orçamento mensal.
+                  Sensação é subjetiva; dados são objetivos.
                 </p>
               </section>
 
               <section>
                 <h2>Como organizar finanças pessoais de forma eficiente</h2>
-                <p>Organização financeira eficiente é mensal, não teórica. Passo a passo:</p>
+                <p>Organização financeira eficiente é rotina mensal, não processo complexo:</p>
 
-                <h3>Semana 1: Registro completo</h3>
+                <h3>Mês 1: Registro completo</h3>
                 <p>
-                  Registre absolutamente tudo que você ganha e gasta durante uma semana completa.
-                  Desde o salário até o café. Use um aplicativo, planilha ou até um caderno. O
-                  importante é não esquecer nada.
+                  Registre todas as receitas e todas as despesas durante um mês inteiro. Use uma
+                  planilha simples, aplicativo ou até caderno. O importante é não esquecer nada:
+                  desde o aluguel até o cafezinho. Ao final do mês, você terá um panorama real do
+                  seu fluxo financeiro.
                 </p>
 
-                <h3>Semana 2-4: Identificação de padrões</h3>
+                <h3>Mês 2: Categorização e análise</h3>
                 <p>
-                  Após um mês de registro, você terá dados suficientes para identificar padrões:
-                  quanto gasta em alimentação, transporte, lazer. Quais dias da semana gasta mais.
-                  Quais gastos são recorrentes e quais são pontuais.
+                  Categorize todos os gastos do mês anterior (alimentação, transporte, moradia,
+                  saúde, lazer, educação). Some cada categoria. Identifique as três categorias que
+                  mais consomem seu orçamento. Compare receitas totais com despesas totais. Se
+                  estiver negativo, você está gastando mais do que ganha.
                 </p>
 
-                <h3>Mês 2: Criação do orçamento</h3>
+                <h3>Mês 3 em diante: Orçamento e ajustes</h3>
                 <p>
-                  Com dados reais em mãos, crie um orçamento mensal. Não baseie em estimativas, use
-                  seus próprios números. Separe gastos fixos (que não mudam) de variáveis (que
-                  mudam).
-                </p>
-
-                <h3>Mês 3 em diante: Ajustes e disciplina</h3>
-                <p>
-                  Compare seu orçamento planejado com o que realmente aconteceu. Ajuste o que não
-                  funcionou. Mantenha o registro constante. A disciplina vem do hábito, não da força
-                  de vontade.
+                  Com dados reais, crie um orçamento mensal. Defina quanto pode gastar em cada
+                  categoria com base no histórico real, não em estimativas. Acompanhe semanalmente
+                  se está dentro do orçamento. Ajuste categorias que estão acima do planejado.
+                  Mantenha o registro constante para manter a visibilidade.
                 </p>
 
                 <p>
-                  Para facilitar esse processo, veja nosso guia completo sobre{' '}
+                  Para detalhes práticos, consulte{' '}
                   <InternalLink to="/gestao-financeira-cpf/organizacao-financeira-pessoal">
                     organização financeira pessoal
                   </InternalLink>
@@ -192,44 +185,42 @@ export function GestaoFinanceiraCPFPage() {
               </section>
 
               <section>
-                <h2>Automação financeira para CPF</h2>
-                <p>
-                  Planilhas funcionam, mas têm limitações práticas que fazem muitas pessoas
-                  desistirem:
-                </p>
-                <ul>
-                  <li>
-                    <strong>Esquecimento:</strong> É fácil esquecer de anotar um gasto quando você
-                    está fora de casa
-                  </li>
-                  <li>
-                    <strong>Tempo:</strong> Manter planilha atualizada consome tempo que poderia ser
-                    usado para análise
-                  </li>
-                  <li>
-                    <strong>Erros:</strong> Erros de digitação distorcem os dados
-                  </li>
-                  <li>
-                    <strong>Análise limitada:</strong> Planilhas não mostram padrões complexos
-                    facilmente
-                  </li>
-                </ul>
+                <h2>Automação financeira para pessoas físicas</h2>
+                <p>A automação financeira resolve problemas práticos do controle manual:</p>
 
-                <p>A automação resolve esses problemas:</p>
+                <h3>Onde a automação ajuda</h3>
                 <ul>
                   <li>
                     <strong>Importação automática:</strong> Extratos bancários são importados
-                    automaticamente
+                    automaticamente, eliminando a necessidade de digitar transações manualmente
                   </li>
                   <li>
-                    <strong>Sem esforço manual:</strong> Você não precisa lembrar de anotar nada
+                    <strong>Registro sem esforço:</strong> Transações aparecem automaticamente no
+                    sistema, sem risco de esquecimento
                   </li>
                   <li>
-                    <strong>Precisão:</strong> Dados vêm direto da fonte, sem erros de digitação
+                    <strong>Precisão:</strong> Dados vêm direto do banco, sem erros de digitação ou
+                    omissões
                   </li>
                   <li>
                     <strong>Análise automática:</strong> Gráficos e relatórios são gerados
-                    automaticamente
+                    automaticamente, mostrando padrões que você não identificaria manualmente
+                  </li>
+                </ul>
+
+                <h3>Onde a automação não ajuda</h3>
+                <ul>
+                  <li>
+                    <strong>Decisões financeiras:</strong> Automação não decide por você. Ela
+                    fornece dados; você decide o que fazer com eles
+                  </li>
+                  <li>
+                    <strong>Gastos em dinheiro:</strong> Se você gasta muito em dinheiro físico,
+                    ainda precisa registrar manualmente ou usar métodos de pagamento rastreáveis
+                  </li>
+                  <li>
+                    <strong>Disciplina:</strong> Automação facilita o controle, mas não cria
+                    disciplina automaticamente. Você ainda precisa revisar dados e tomar decisões
                   </li>
                 </ul>
 
@@ -245,32 +236,42 @@ export function GestaoFinanceiraCPFPage() {
               <section>
                 <h2>Uso de inteligência artificial na gestão financeira pessoal</h2>
                 <p>
-                  Inteligência artificial em finanças pessoais não é ficção, é realidade prática que
-                  já funciona hoje:
+                  Inteligência artificial aplicada a finanças pessoais resolve tarefas repetitivas e
+                  identifica padrões, mas tem limitações claras:
                 </p>
 
                 <h3>Categorização automática</h3>
                 <p>
                   <InternalLink to="/gestao-financeira-cpf/categorizacao-automatica-gastos">
-                    Sistemas com IA categorizam transações automaticamente
+                    Sistemas com IA categorizam transações bancárias automaticamente
                   </InternalLink>
-                  . Uma compra em um supermercado é classificada como &quot;alimentação&quot; sem
-                  você precisar fazer nada. A IA aprende com suas categorizações anteriores e
-                  melhora com o tempo.
+                  . Uma compra no supermercado é classificada como &quot;alimentação&quot;, um
+                  pagamento em posto como &quot;transporte&quot;. A IA aprende com suas
+                  categorizações anteriores e melhora com o tempo, reduzindo trabalho manual em 80%
+                  a 90%.
                 </p>
 
-                <h3>Identificação de padrões</h3>
+                <h3>Detecção de padrões</h3>
                 <p>
-                  IA identifica padrões que você não perceberia: gastos que aumentam em determinados
-                  dias da semana, sazonalidade nos seus gastos, correlações entre eventos e
-                  despesas.
+                  IA identifica padrões nos seus gastos que você não perceberia facilmente: aumentos
+                  sazonais (dezembro costuma ser mais caro), correlações (quando gasta mais em
+                  lazer, gasta menos em alimentação), ou ciclos (gastos maiores em determinados dias
+                  da semana).
                 </p>
 
-                <h3>Alertas e previsões simples</h3>
+                <h3>Alertas financeiros</h3>
                 <p>
-                  Sistema pode alertar quando um gasto está muito acima do normal, ou prever quanto
-                  você terá disponível no fim do mês baseado em histórico. Não são previsões
-                  complexas, mas projeções simples e úteis.
+                  Sistemas podem alertar quando um gasto está acima da média histórica, quando você
+                  está próximo do limite do orçamento em uma categoria, ou quando há transações
+                  suspeitas. São alertas simples baseados em regras, não previsões complexas.
+                </p>
+
+                <h3>Limitações da IA</h3>
+                <p>
+                  IA pode errar na categorização (especialmente em descrições bancárias genéricas),
+                  não entende contexto pessoal (um gasto que para você é &quot;necessário&quot; pode
+                  ser classificado como &quot;opcional&quot;), e não toma decisões financeiras por
+                  você. Ela automatiza tarefas, mas análise e decisão continuam sendo humanas.
                 </p>
 
                 <p>
@@ -283,33 +284,42 @@ export function GestaoFinanceiraCPFPage() {
               </section>
 
               <section>
-                <h2>Segurança de dados financeiros</h2>
-                <p>Quando você compartilha dados financeiros, segurança é prioridade:</p>
+                <h2>Segurança e privacidade de dados financeiros</h2>
+                <p>
+                  Ao compartilhar dados financeiros com sistemas de gestão, segurança e privacidade
+                  são essenciais:
+                </p>
 
                 <h3>Criptografia</h3>
                 <p>
-                  Dados devem ser criptografados em trânsito (quando trafegam pela internet) e em
-                  repouso (quando estão armazenados). Criptografia de ponta a ponta garante que
-                  apenas você tenha acesso aos dados.
+                  Dados devem ser criptografados em trânsito (HTTPS/TLS quando trafegam pela
+                  internet) e em repouso (quando armazenados em servidores). Criptografia garante
+                  que mesmo que dados sejam interceptados, não podem ser lidos sem a chave de
+                  descriptografia.
                 </p>
 
                 <h3>Autenticação</h3>
                 <p>
-                  Autenticação multifator (senha + código enviado por SMS ou aplicativo) adiciona
-                  uma camada extra de segurança. Mesmo que alguém descubra sua senha, não consegue
-                  acessar sem o segundo fator.
+                  Autenticação multifator (senha + código SMS ou aplicativo autenticador) adiciona
+                  camada extra de segurança. Mesmo que alguém descubra sua senha, precisa do segundo
+                  fator para acessar sua conta.
                 </p>
 
-                <h3>Privacidade</h3>
+                <h3>Conformidade com LGPD</h3>
                 <p>
-                  Verifique a política de privacidade. Dados não devem ser vendidos para terceiros.
-                  Processamento de dados deve ser transparente. Conformidade com LGPD é essencial.
+                  Sistemas devem estar em conformidade com a Lei Geral de Proteção de Dados (LGPD).
+                  Isso significa: transparência sobre coleta e uso de dados, direito de acesso e
+                  exclusão, notificação de vazamentos, e consentimento explícito para
+                  compartilhamento com terceiros. Verifique a política de privacidade antes de usar
+                  qualquer plataforma.
                 </p>
 
-                <h3>Controle de acesso</h3>
+                <h3>Boas práticas de uso</h3>
                 <p>
-                  Você deve poder revogar acesso a qualquer momento. Dados devem ser deletados
-                  permanentemente quando você solicitar. Sem armazenamento indefinido.
+                  Use senhas fortes e únicas, ative autenticação multifator quando disponível,
+                  revise permissões de acesso periodicamente, e desative contas que não usa mais.
+                  Não compartilhe credenciais bancárias diretamente; use APIs seguras ou importação
+                  de extratos quando possível.
                 </p>
               </section>
 
