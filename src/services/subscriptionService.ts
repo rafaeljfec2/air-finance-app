@@ -62,4 +62,25 @@ export const subscriptionService = {
     const { data } = await apiClient.get<PlanPermissions>('/subscription/permissions');
     return data;
   },
+
+  async updatePlan(planName: 'free' | 'pro' | 'business', updateData: UpdatePlanData): Promise<Plan> {
+    const { data } = await apiClient.put<Plan>(`/subscription/plans/${planName}`, updateData);
+    return data;
+  },
 };
+
+export interface UpdatePlanData {
+  priceMonthly?: number;
+  displayPrice?: string;
+  stripePriceId?: string;
+  features?: string[];
+  limits?: {
+    maxAccounts: number;
+    maxCards: number;
+    aiEnabled: boolean;
+    bankIntegrationEnabled: boolean;
+    multiUser: boolean;
+    multiCompany: boolean;
+  };
+  highlight?: boolean;
+}

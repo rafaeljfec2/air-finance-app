@@ -12,7 +12,8 @@ interface PlanCardProps {
 }
 
 export function PlanCard({ plan, onSelect, isLoading, currentPlanId }: PlanCardProps) {
-  const isCurrent = currentPlanId === plan.id;
+  const planId = plan.id || plan.name;
+  const isCurrent = currentPlanId === planId;
   const isHighlight = plan.highlight;
 
   // Refined styling for a more premium look
@@ -94,7 +95,7 @@ export function PlanCard({ plan, onSelect, isLoading, currentPlanId }: PlanCardP
                         ? "bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500 shadow-none border border-transparent"
                         : "bg-white dark:bg-transparent border-2 border-gray-200 dark:border-gray-700 hover:border-gray-900 dark:hover:border-gray-400 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
             )}
-            onClick={() => !isCurrent && onSelect(plan.id)}
+            onClick={() => !isCurrent && planId && onSelect(planId)}
             disabled={isLoading || isCurrent}
           >
             {isLoading ? (

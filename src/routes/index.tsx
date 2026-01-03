@@ -78,6 +78,9 @@ const PreferencesPage = lazy(() =>
 const OpenAILogsPage = lazy(() =>
   import('@/pages/admin/openai-logs').then((m) => ({ default: m.OpenAILogsPage })),
 );
+const PlansAdminPage = lazy(() =>
+  import('@/pages/admin/plans').then((m) => ({ default: m.PlansAdminPage })),
+);
 const Statement = lazy(() => import('@/pages/statement').then((m) => ({ default: m.Statement })));
 const Transactions = lazy(() =>
   import('@/pages/transactions').then((m) => ({ default: m.Transactions })),
@@ -684,6 +687,21 @@ export const router = createBrowserRouter([
           <RequireGod>
             <Suspense fallback={<SuspenseLoader />}>
               <OpenAILogsPage />
+            </Suspense>
+          </RequireGod>
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/admin/plans',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <RequireGod>
+            <Suspense fallback={<SuspenseLoader />}>
+              <PlansAdminPage />
             </Suspense>
           </RequireGod>
         </ProtectedRoute>

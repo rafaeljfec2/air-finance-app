@@ -10,10 +10,13 @@ export interface PlanLimits {
 }
 
 export interface Plan {
-  id: PlanName;
+  id?: PlanName;
+  _id?: string;
   name: string;
-  price: number; // Monthly price
+  price?: number; // Monthly price (deprecated, use priceMonthly)
+  priceMonthly?: number; // Monthly price
   displayPrice: string;
+  stripePriceId?: string;
   features: string[];
   limits: PlanLimits;
   highlight?: boolean;
