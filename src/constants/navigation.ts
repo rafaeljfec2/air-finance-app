@@ -7,6 +7,7 @@ import {
   ChartBar,
   CreditCard,
   Flag,
+  Home,
   Import,
   LayoutDashboard,
   LineChart,
@@ -24,8 +25,8 @@ export const navigation: NavigationSection[] = [
   {
     section: '📊 Análise e Planejamento',
     items: [
-      { name: 'Home', href: '/home', icon: LayoutDashboard },
-      { name: 'Dashboard', href: '/dashboard', icon: ChartBar },
+      { name: 'Home', href: '/home', icon: Home },
+      { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
       {
         name: 'Saúde Financeira',
         href: '/financial-health',
