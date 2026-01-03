@@ -202,9 +202,11 @@ export function Dashboard() {
                     className="inline-block w-3 h-3 rounded-full"
                     style={{ background: cat.color }}
                   />
-                  <span className="font-medium">{cat.name}</span>
+                  <span className="font-medium text-base text-gray-900 dark:text-gray-100">
+                    {cat.name}
+                  </span>
                 </div>
-                <div className="flex-1 mx-2">
+                <div className="flex-1 mx-4">
                   <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full">
                     <div
                       className="h-2 rounded-full"
@@ -212,10 +214,12 @@ export function Dashboard() {
                     />
                   </div>
                 </div>
-                <span className="font-medium text-gray-700 dark:text-gray-200">
+                <span className="font-medium text-base text-gray-700 dark:text-gray-200">
                   {formatCurrency(cat.value)}
                 </span>
-                <span className="ml-2 text-xs text-gray-500">{percentage.toFixed(1)}%</span>
+                <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
+                  {percentage.toFixed(1)}%
+                </span>
               </div>
             );
           })}
