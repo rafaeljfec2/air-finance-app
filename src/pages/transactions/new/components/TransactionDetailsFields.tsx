@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Account } from '@/services/accountService';
 import { formatCurrency } from '@/utils/formatters';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 type RecurrenceFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
 type TransactionKind = 'FIXED' | 'VARIABLE';
@@ -64,6 +64,15 @@ export function TransactionDetailsFields({
 }: Readonly<TransactionDetailsFieldsProps>) {
   const isCreditCard = selectedAccount?.type === 'credit_card';
   const isRecurring = !isCreditCard && transactionKind === 'FIXED';
+  const amountRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Focus with a small timeout to ensure component is fully mounted/transitioned
+    const timer = setTimeout(() => {
+      amountRef.current?.focus();
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [isCreditCard, isRecurring]);
 
   const installmentValue = useMemo(() => {
     if (installmentCount > 1 && amount > 0) {
@@ -91,6 +100,7 @@ export function TransactionDetailsFields({
               </span>
               <Input
                 id="amount"
+                ref={amountRef}
                 name="amount"
                 type="text"
                 inputMode="decimal"
@@ -105,7 +115,6 @@ export function TransactionDetailsFields({
                     : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500',
                 )}
                 autoComplete="off"
-                autoFocus
               />
             </div>
             {errors.amount && (
@@ -164,6 +173,7 @@ export function TransactionDetailsFields({
                 </span>
                 <Input
                   id="amount"
+                  ref={amountRef}
                   name="amount"
                   type="text"
                   inputMode="decimal"
@@ -178,7 +188,6 @@ export function TransactionDetailsFields({
                       : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500',
                   )}
                   autoComplete="off"
-                  autoFocus
                 />
               </div>
             </div>
@@ -263,6 +272,7 @@ export function TransactionDetailsFields({
               </span>
               <Input
                 id="amount"
+                ref={amountRef}
                 name="amount"
                 type="text"
                 inputMode="decimal"
@@ -277,7 +287,6 @@ export function TransactionDetailsFields({
                     : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500',
                 )}
                 autoComplete="off"
-                autoFocus
               />
             </div>
           </div>
