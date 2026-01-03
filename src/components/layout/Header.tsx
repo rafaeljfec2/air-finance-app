@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/stores/useTheme';
 import { Menu, Transition } from '@headlessui/react';
 import {
+  ArrowLeft,
   ArrowRightLeft,
   ChartBar,
   CircleUser,
@@ -14,14 +15,15 @@ import {
   Moon,
   Plus,
   Settings,
-  Sun
+  Sun,
 } from 'lucide-react';
 import { Fragment } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CompanySelector } from './CompanySelector';
 
 export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
 
@@ -41,6 +43,19 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
         >
           <MenuIcon className="h-6 w-6" />
         </button>
+
+        {/* Back Button */}
+        {location.pathname !== '/home' &&
+          location.pathname !== '/' &&
+          location.pathname !== '/login' && (
+            <button
+              onClick={() => navigate(-1)}
+              className="lg:hidden mr-2 min-h-[44px] min-w-[44px] p-2 rounded-full text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary-500 flex items-center justify-center"
+              aria-label="Voltar"
+            >
+              <ArrowLeft className="h-6 w-6" />
+            </button>
+          )}
         {/* Logo */}
         <div className="flex-shrink-0">
           <Logo />
@@ -55,34 +70,34 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
 
           {/* Atalhos Rápidos */}
           <div className="hidden md:flex items-center border-l dark:border-gray-700 pl-4 space-x-1">
-             <button
-                onClick={() => navigate('/transactions/new')}
-                className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center"
-                title="Nova Transação"
-              >
-                <Plus className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => navigate('/transactions')}
-                className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center"
-                title="Fluxo de Caixa"
-              >
-                <ArrowRightLeft className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => navigate('/import-ofx')}
-                className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center"
-                title="Importar Extrato"
-              >
-                <Import className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => navigate('/reports')}
-                className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center"
-                title="Relatórios"
-              >
-                <ChartBar className="h-5 w-5" />
-              </button>
+            <button
+              onClick={() => navigate('/transactions/new')}
+              className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center"
+              title="Nova Transação"
+            >
+              <Plus className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => navigate('/transactions')}
+              className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center"
+              title="Fluxo de Caixa"
+            >
+              <ArrowRightLeft className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => navigate('/import-ofx')}
+              className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center"
+              title="Importar Extrato"
+            >
+              <Import className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => navigate('/reports')}
+              className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center"
+              title="Relatórios"
+            >
+              <ChartBar className="h-5 w-5" />
+            </button>
           </div>
 
           {/* Botão de Tema */}
@@ -91,11 +106,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
             className="min-h-[44px] min-w-[44px] p-2 text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center justify-center"
             aria-label={isDarkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
           >
-            {isDarkMode ? (
-              <Sun className="h-5 w-5" />
-            ) : (
-              <Moon className="h-5 w-5" />
-            )}
+            {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </button>
 
           {/* Notificações */}
