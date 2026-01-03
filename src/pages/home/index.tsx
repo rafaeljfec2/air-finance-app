@@ -44,7 +44,7 @@ export function HomePage() {
 
   const balance =
     balanceQuery.data && balanceQuery.data.length > 0
-      ? balanceQuery.data[balanceQuery.data.length - 1].balance
+      ? (balanceQuery.data.at(-1)?.balance ?? 0)
       : 0;
 
   const quickActions = [
@@ -81,13 +81,13 @@ export function HomePage() {
               </p>
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {!isPrivacyModeEnabled ? formatCurrency(balance) : 'R$ ••••••'}
+                  {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(balance)}
                 </h1>
                 <button
                   onClick={togglePrivacyMode}
                   className="text-gray-400 hover:text-primary-500"
                 >
-                  {!isPrivacyModeEnabled ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {isPrivacyModeEnabled ? <Eye size={20} /> : <EyeOff size={20} />}
                 </button>
               </div>
             </div>

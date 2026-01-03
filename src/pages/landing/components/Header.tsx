@@ -2,47 +2,33 @@ import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [scrolled, setScrolled] = useState(false);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
     e.preventDefault();
-    if (location.pathname !== '/') {
+    if (location.pathname === '/') {
+      const element = document.querySelector(hash);
+      element?.scrollIntoView({ behavior: 'smooth' });
+    } else {
       navigate('/');
       // Small timeout to allow navigation to complete before scrolling
       setTimeout(() => {
         const element = document.querySelector(hash);
         element?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
-    } else {
-      const element = document.querySelector(hash);
-      element?.scrollIntoView({ behavior: 'smooth' });
     }
   };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-white/80 backdrop-blur-md shadow-sm'
-          : 'bg-white/80 backdrop-blur-md shadow-sm'
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/80 backdrop-blur-md shadow-sm"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
         <button

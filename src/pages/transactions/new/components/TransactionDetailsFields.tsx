@@ -105,6 +105,7 @@ export function TransactionDetailsFields({
                     : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500',
                 )}
                 autoComplete="off"
+                autoFocus
               />
             </div>
             {errors.amount && (
@@ -177,6 +178,7 @@ export function TransactionDetailsFields({
                       : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500',
                   )}
                   autoComplete="off"
+                  autoFocus
                 />
               </div>
             </div>
@@ -275,6 +277,7 @@ export function TransactionDetailsFields({
                     : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500',
                 )}
                 autoComplete="off"
+                autoFocus
               />
             </div>
           </div>

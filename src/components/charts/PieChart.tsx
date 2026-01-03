@@ -42,8 +42,8 @@ export function PieChart({ data }: Readonly<PieChartProps>) {
             paddingAngle={5}
             dataKey="value"
           >
-            {data.map((_, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            {data.map((entry, index) => (
+              <Cell key={`cell-${entry.name}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
           <Tooltip
