@@ -122,7 +122,7 @@ export function HomePage() {
                 key={action.label}
                 {...action}
                 className={
-                  index === 0
+                  index === 0 || action.label === 'Fluxo de Caixa'
                     ? 'col-span-2 aspect-[2/1] flex-row gap-3'
                     : 'aspect-square col-span-1'
                 }
