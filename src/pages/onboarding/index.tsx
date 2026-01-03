@@ -43,13 +43,13 @@ export default function OnboardingPage() {
   useEffect(() => {
     // Redirect if email is not verified
     if (user && user.emailVerified !== true) {
-      navigate('/dashboard');
+      navigate('/home');
       return;
     }
 
     // Redirect if onboarding is already completed
     if (user?.onboardingCompleted) {
-      navigate('/dashboard');
+      navigate('/home');
     }
   }, [user, navigate]);
 
@@ -176,7 +176,7 @@ export default function OnboardingPage() {
       // Invalidate companies query to ensure fresh data is fetched after onboarding
       queryClient.invalidateQueries({ queryKey: ['companies'] });
       await refetchUser();
-      navigate('/dashboard');
+      navigate('/home');
     }
   };
 

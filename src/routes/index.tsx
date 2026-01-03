@@ -6,11 +6,10 @@ import { ErrorPage } from '@/components/error/ErrorPage';
 import { SuspenseLoader } from '@/components/SuspenseLoader';
 import { ConfirmError, ConfirmProcessing, ConfirmSuccess } from '@/pages/confirm-email';
 import { EmailPendingPage } from '@/pages/email-pending';
-import { LandingPage } from '@/pages/landing';
 import { Login } from '@/pages/login';
 import { SignUpPage } from '@/pages/signup';
 import { Suspense, lazy } from 'react';
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 // Lazy Components
 const AccountsPage = lazy(() =>
@@ -144,7 +143,11 @@ const ScoreCreditoFinancasPessoaisPage = lazy(() =>
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <LandingPage />,
+    element: (
+      <ProtectedRoute>
+        <Navigate to="/home" replace />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/login',

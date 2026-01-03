@@ -7,6 +7,7 @@ interface QuickActionCardProps {
   href: string;
   color?: string;
   className?: string;
+  onClick?: () => void;
 }
 
 export function QuickActionCard({
@@ -15,11 +16,18 @@ export function QuickActionCard({
   href,
   color = 'bg-primary-500',
   className,
+  onClick,
 }: QuickActionCardProps) {
   return (
     <Link
       to={href}
-      className={`flex flex-col items-center justify-center p-2 bg-white dark:bg-card-dark rounded-xl shadow-sm border border-border dark:border-border-dark hover:shadow-md transition-all active:scale-95 ${className}`}
+      onClick={(e) => {
+        if (onClick) {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      className={`flex flex-col items-center justify-center p-4 bg-white dark:bg-card-dark rounded-xl shadow-sm border border-border dark:border-border-dark hover:shadow-md transition-all active:scale-95 ${className}`}
     >
       <div className={`p-3 rounded-full ${color} bg-opacity-10 mb-1`}>
         <Icon className={`w-6 h-6 ${color.replace('bg-', 'text-')}`} />

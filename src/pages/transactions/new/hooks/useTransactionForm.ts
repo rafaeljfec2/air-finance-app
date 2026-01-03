@@ -11,7 +11,7 @@ import { formatDateToLocalISO } from '@/utils/date';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { validateTransactionForm } from '../utils/transactionValidation';
 
 export interface TransactionFormData extends TransactionInput {
@@ -94,14 +94,20 @@ function isRecurringTransaction(formData: TransactionFormData): boolean {
  */
 export function useTransactionForm() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const queryType = searchParams.get('type');
+  const initialType: TransactionType =
+    queryType === 'REVENUE' || queryType === 'INCOME' ? 'INCOME' : 'EXPENSE';
+
   const queryClient = useQueryClient();
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id || '';
   const { createTransaction, isCreating } = useTransactions(companyId);
 
-  const [transactionType, setTransactionType] = useState<TransactionType>('EXPENSE');
+  const [transactionType, setTransactionType] = useState<TransactionType>(initialType);
   const [formData, setFormData] = useState<TransactionFormData>({
     ...INITIAL_FORM_DATA,
+    type: initialType,
     companyId,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});

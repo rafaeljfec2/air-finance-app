@@ -2,7 +2,7 @@ import { User } from '@/types/user';
 
 /**
  * Centralized authentication and onboarding redirect rules
- * 
+ *
  * Rules:
  * 1. After account creation: User must confirm email via link
  * 2. While email not verified: Email pending screen always appears
@@ -18,16 +18,23 @@ export interface UserRedirectInfo {
 
 /**
  * Determines where a user should be redirected based on their authentication status
- * 
+ *
  * @param user - The current user object
  * @param currentPath - The current route path
  * @returns Redirect information or null if no redirect is needed
  */
-export function getUserRedirectInfo(user: User | null | undefined, currentPath: string): UserRedirectInfo | null {
+export function getUserRedirectInfo(
+  user: User | null | undefined,
+  currentPath: string,
+): UserRedirectInfo | null {
   // Rule 1: User not authenticated -> Login
   // Don't check email verification if user is not authenticated
   if (!user) {
-    if (currentPath !== '/login' && !currentPath.startsWith('/register') && !currentPath.startsWith('/confirm')) {
+    if (
+      currentPath !== '/login' &&
+      !currentPath.startsWith('/register') &&
+      !currentPath.startsWith('/confirm')
+    ) {
       return {
         shouldRedirect: true,
         redirectTo: '/login',
@@ -71,7 +78,7 @@ export function getUserRedirectInfo(user: User | null | undefined, currentPath: 
   if (!needsOnboarding && currentPath.startsWith('/onboarding')) {
     return {
       shouldRedirect: true,
-      redirectTo: '/dashboard',
+      redirectTo: '/home',
       reason: 'Onboarding already completed',
     };
   }
@@ -106,4 +113,3 @@ export function hasCompletedOnboarding(user: User | null | undefined): boolean {
   if (!user) return false;
   return user.onboardingCompleted === true;
 }
-

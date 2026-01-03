@@ -31,8 +31,9 @@ export function Login() {
   // Redireciona se já estiver autenticado (usando useEffect para evitar setState durante render)
   useEffect(() => {
     if (isAuthenticated) {
-      const from = location.state?.from?.pathname || '/dashboard';
-      navigate(from);
+      const from = location.state?.from?.pathname;
+      const target = from && from !== '/dashboard' ? from : '/home';
+      navigate(target);
     }
   }, [isAuthenticated, location.state?.from?.pathname, navigate]);
 
