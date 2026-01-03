@@ -2,6 +2,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useDashboardBalanceHistory, useDashboardRecentTransactions } from '@/hooks/useDashboard';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
+import { usePreferencesStore } from '@/stores/preferences';
 import { formatCurrency } from '@/utils/formatters';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -24,7 +25,7 @@ import { TransactionTypeModal } from '@/components/transactions/TransactionTypeM
 export function HomePage() {
   const { user } = useAuth();
   const { activeCompany } = useCompanyStore();
-  const [showBalance, setShowBalance] = useState(true);
+  const { isPrivacyModeEnabled, togglePrivacyMode } = usePreferencesStore();
   const [isTypeModalOpen, setIsTypeModalOpen] = useState(false);
 
   // Data fetching
@@ -80,13 +81,13 @@ export function HomePage() {
               </p>
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {showBalance ? formatCurrency(balance) : 'R$ ••••••'}
+                  {!isPrivacyModeEnabled ? formatCurrency(balance) : 'R$ ••••••'}
                 </h1>
                 <button
-                  onClick={() => setShowBalance(!showBalance)}
+                  onClick={togglePrivacyMode}
                   className="text-gray-400 hover:text-primary-500"
                 >
-                  {showBalance ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {!isPrivacyModeEnabled ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>

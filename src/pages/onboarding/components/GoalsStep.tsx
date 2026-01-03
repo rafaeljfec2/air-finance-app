@@ -25,12 +25,7 @@ interface GoalsStepProps {
   initialData?: GoalFormData | null;
 }
 
-export function GoalsStep({
-  onNext,
-  onBack,
-  accountName,
-  initialData,
-}: Readonly<GoalsStepProps>) {
+export function GoalsStep({ onNext, onBack, accountName, initialData }: Readonly<GoalsStepProps>) {
   const goalForm = useForm<GoalFormData>({
     resolver: zodResolver(GoalSchema),
     defaultValues: initialData || {
@@ -100,6 +95,7 @@ export function GoalsStep({
             <Input
               id="goalTargetAmount"
               type="text"
+              inputMode="decimal"
               placeholder="R$ 0,00"
               value={goalTargetAmountInput}
               onChange={(e) => {

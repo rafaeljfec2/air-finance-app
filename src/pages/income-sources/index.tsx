@@ -271,6 +271,7 @@ export function IncomeSourcesPage() {
               <FormField label="Valor" error={errors.amount}>
                 <Input
                   name="amount"
+                  inputMode="decimal"
                   value={formatCurrency(form.amount)}
                   onChange={handleChange}
                   placeholder="R$ 0,00"

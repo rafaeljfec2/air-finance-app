@@ -136,6 +136,7 @@ export function RecurringStep({
               <Input
                 id="recurringValue"
                 type="text"
+                inputMode="decimal"
                 placeholder="R$ 0,00"
                 value={recurringTransactionValueInput}
                 onChange={(e) => {
