@@ -114,7 +114,10 @@ export function TransactionDetailsFields({
 
           {/* Parcelas */}
           <div>
-            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+            <label
+              htmlFor="installmentCount"
+              className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1"
+            >
               Parcelamento
             </label>
             <ComboBox
@@ -148,7 +151,10 @@ export function TransactionDetailsFields({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Valor - Prominente para Recorrente também */}
             <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+              <label
+                htmlFor="amount"
+                className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1"
+              >
                 Valor da Parcela <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -177,7 +183,10 @@ export function TransactionDetailsFields({
 
             {/* Data inicial */}
             <div className="flex flex-col">
-              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+              <label
+                htmlFor="recurrenceStartDate"
+                className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1"
+              >
                 Começa em <span className="text-red-500">*</span>
               </label>
               <DatePicker
@@ -193,7 +202,10 @@ export function TransactionDetailsFields({
 
             {/* Frequência */}
             <div className="flex flex-col">
-              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+              <label
+                htmlFor="recurrenceFrequency"
+                className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1"
+              >
                 Repete a cada <span className="text-red-500">*</span>
               </label>
               <ComboBox

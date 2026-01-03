@@ -212,6 +212,7 @@ export const router = createBrowserRouter([
         </ProtectedRoute>
       </ErrorBoundary>
     ),
+    errorElement: <ErrorPage code={500} />,
   },
   {
     path: '/dashboard',
@@ -226,6 +227,7 @@ export const router = createBrowserRouter([
         </ProtectedRoute>
       </ErrorBoundary>
     ),
+    errorElement: <ErrorPage code={500} />,
   },
   {
     path: '/financial-health',
@@ -240,6 +242,7 @@ export const router = createBrowserRouter([
         </ProtectedRoute>
       </ErrorBoundary>
     ),
+    errorElement: <ErrorPage code={500} />,
   },
   {
     path: '/dependents',
@@ -252,7 +255,7 @@ export const router = createBrowserRouter([
         </ProtectedRoute>
       </ErrorBoundary>
     ),
-    errorElement: <ErrorPage />,
+    errorElement: <ErrorPage code={500} />,
   },
   {
     path: '/categories',
@@ -265,6 +268,7 @@ export const router = createBrowserRouter([
         </ProtectedRoute>
       </ErrorBoundary>
     ),
+    errorElement: <ErrorPage code={500} />,
   },
   {
     path: '/accounts',
