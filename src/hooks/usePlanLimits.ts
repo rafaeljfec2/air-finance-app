@@ -19,7 +19,7 @@ export function usePlanLimits() {
 
   const currentCompanyCount = companies?.length ?? 0;
   const currentAccountCount = accounts?.length ?? 0;
-  const currentCreditCardCount = creditCards?.length ?? 0;
+  const currentCreditCardCount = Array.isArray(creditCards) ? creditCards.length : 0;
 
   const canCreateCompany = useMemo(() => {
     if (permissions.canCreateMultipleCompanies) {

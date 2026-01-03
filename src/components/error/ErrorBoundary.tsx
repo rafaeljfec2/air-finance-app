@@ -21,7 +21,14 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Erro capturado:', error, errorInfo);
+    console.error('Erro capturado pelo ErrorBoundary:', error);
+    console.error('Detalhes do erro:', errorInfo);
+    console.error('Stack trace:', error.stack);
+    
+    // Log adicional para ajudar no debug
+    if (error.message) {
+      console.error('Mensagem do erro:', error.message);
+    }
   }
 
   public render() {
