@@ -18,7 +18,7 @@ export function PricingPage() {
 
   const handleSelectPlan = async (planId: string) => {
     if (!user) {
-        window.location.href = '/login';
+        window.location.href = '/register';
         return;
     }
 

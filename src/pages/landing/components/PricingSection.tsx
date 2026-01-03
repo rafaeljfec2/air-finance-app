@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { ScrollReveal } from './ScrollReveal';
 import { InteractiveCard } from './InteractiveCard';
 
@@ -123,16 +124,18 @@ export function PricingSection() {
                       </li>
                     ))}
                   </ul>
-                  <Button
-                    className={`w-full py-6 text-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                      plan.popular
-                        ? 'bg-white text-brand-arrow hover:bg-white/90 focus:ring-white'
-                        : 'bg-brand-arrow hover:bg-brand-arrow/90 text-white focus:ring-brand-arrow'
-                    }`}
-                    aria-label={`${plan.cta} - Plano ${plan.name}`}
-                  >
-                    {plan.cta}
-                  </Button>
+                  <Link to="/register" className="w-full">
+                    <Button
+                      className={`w-full py-6 text-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                        plan.popular
+                          ? 'bg-white text-brand-arrow hover:bg-white/90 focus:ring-white'
+                          : 'bg-brand-arrow hover:bg-brand-arrow/90 text-white focus:ring-brand-arrow'
+                      }`}
+                      aria-label={`${plan.cta} - Plano ${plan.name}`}
+                    >
+                      {plan.cta}
+                    </Button>
+                  </Link>
                 </div>
               </InteractiveCard>
             </ScrollReveal>
