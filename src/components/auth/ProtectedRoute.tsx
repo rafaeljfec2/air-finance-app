@@ -1,13 +1,14 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Loading } from '@/components/Loading';
+import React from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAuth?: boolean;
 }
 
-export function ProtectedRoute({ children, requireAuth = true }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, requireAuth = true }: Readonly<ProtectedRouteProps>) {
   const { user, isLoadingUser } = useAuth();
   const location = useLocation();
 
