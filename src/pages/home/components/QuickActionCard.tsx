@@ -1,0 +1,32 @@
+import { LucideIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+interface QuickActionCardProps {
+  label: string;
+  icon: LucideIcon;
+  href: string;
+  color?: string;
+  className?: string;
+}
+
+export function QuickActionCard({
+  label,
+  icon: Icon,
+  href,
+  color = 'bg-primary-500',
+  className,
+}: QuickActionCardProps) {
+  return (
+    <Link
+      to={href}
+      className={`flex flex-col items-center justify-center p-4 bg-white dark:bg-card-dark rounded-xl shadow-sm border border-border dark:border-border-dark hover:shadow-md transition-all active:scale-95 ${className}`}
+    >
+      <div className={`p-3 rounded-full ${color} bg-opacity-10 mb-2`}>
+        <Icon className={`w-6 h-6 ${color.replace('bg-', 'text-')}`} />
+      </div>
+      <span className="text-xs font-medium text-center text-gray-700 dark:text-gray-300">
+        {label}
+      </span>
+    </Link>
+  );
+}

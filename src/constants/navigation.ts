@@ -24,7 +24,8 @@ export const navigation: NavigationSection[] = [
   {
     section: '📊 Análise e Planejamento',
     items: [
-      { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+      { name: 'Home', href: '/home', icon: LayoutDashboard },
+      { name: 'Dashboard', href: '/dashboard', icon: ChartBar },
       {
         name: 'Saúde Financeira',
         href: '/financial-health',

@@ -38,6 +38,7 @@ const CreditCardsPage = lazy(() =>
 const Dashboard = lazy(() =>
   import('@/pages/dashboard/Dashboard').then((m) => ({ default: m.Dashboard })),
 );
+const HomePage = lazy(() => import('@/pages/home').then((m) => ({ default: m.HomePage })));
 const DependentsPage = lazy(() =>
   import('@/pages/dependents').then((m) => ({ default: m.DependentsPage })),
 );
@@ -207,6 +208,21 @@ export const router = createBrowserRouter([
           <OnboardingGuard>
             <Suspense fallback={<SuspenseLoader />}>
               <OnboardingPage />
+            </Suspense>
+          </OnboardingGuard>
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage code={500} />,
+  },
+  {
+    path: '/home',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <OnboardingGuard>
+            <Suspense fallback={<SuspenseLoader />}>
+              <HomePage />
             </Suspense>
           </OnboardingGuard>
         </ProtectedRoute>
