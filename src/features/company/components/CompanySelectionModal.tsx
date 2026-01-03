@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { companyService } from '@/services/companyService';
 import { formatDocument } from '@/utils/formatDocument';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 
 import { useLocation } from 'react-router-dom';
 
@@ -15,6 +15,8 @@ export function CompanySelectionModal() {
   const { user, isLoadingUser } = useAuth();
   const { activeCompany, changeActiveCompany, clearActiveCompany } = useActiveCompany();
   const location = useLocation();
+  const hasBeenShownRef = useRef(false);
+  const hasConfirmedSelectionRef = useRef(false);
 
   const {
     data: companies = [],
@@ -29,21 +31,34 @@ export function CompanySelectionModal() {
 
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
   const hasCompanies = Array.isArray(companies) && companies.length > 0;
-  
+
   // Memoize first company ID to avoid unnecessary re-renders
   const firstCompanyId = useMemo(() => {
     return hasCompanies && companies[0]?.id ? companies[0].id : null;
   }, [hasCompanies, companies]);
 
-  // Show modal if user is logged in and there's no valid active company
-  // Check for null, undefined, or invalid company (missing id)
-  // Don't show modal while user or companies are still loading
-  // Also don't show on pricing or subscription pages
   const hasValidActiveCompany = !!activeCompany?.id;
-  const isSubscriptionPage = location.pathname.startsWith('/pricing') || location.pathname.startsWith('/settings/subscription');
-  
+  const isSubscriptionPage =
+    location.pathname.startsWith('/pricing') ||
+    location.pathname.startsWith('/settings/subscription');
+
+  // Reset flags when user logs out
+  useEffect(() => {
+    if (!user) {
+      hasBeenShownRef.current = false;
+      hasConfirmedSelectionRef.current = false;
+    }
+  }, [user]);
+
   const shouldShowModal =
-    !isSubscriptionPage && !!user && !isLoadingUser && !isLoading && !hasValidActiveCompany && hasCompanies;
+    !isSubscriptionPage &&
+    !!user &&
+    !isLoadingUser &&
+    !isLoading &&
+    !hasValidActiveCompany &&
+    hasCompanies &&
+    !hasBeenShownRef.current &&
+    !hasConfirmedSelectionRef.current;
 
   // Set selected company ID when companies load or activeCompany changes
   useEffect(() => {
@@ -60,29 +75,25 @@ export function CompanySelectionModal() {
     if (firstCompanyId && !activeCompany?.id) {
       setSelectedCompanyId(firstCompanyId);
     }
-  }, [
-    user,
-    isLoading,
-    isLoadingUser,
-    activeCompany?.id,
-    firstCompanyId,
-  ]);
+  }, [user, isLoading, isLoadingUser, activeCompany?.id, firstCompanyId]);
 
-  // Auto-select first company if there's only one and no active company is set
   useEffect(() => {
     if (!user || isLoading || isLoadingUser || !hasCompanies) {
       return;
     }
 
-    // Only auto-select if there's no active company
     if (activeCompany?.id) {
       return;
     }
 
-    // If there's only one company, auto-select it immediately
+    if (hasBeenShownRef.current || hasConfirmedSelectionRef.current) {
+      return;
+    }
+
     if (companies.length === 1 && firstCompanyId) {
       const singleCompany = companies[0];
       if (singleCompany?.id) {
+        hasConfirmedSelectionRef.current = true;
         changeActiveCompany(singleCompany);
       }
     }
@@ -97,7 +108,6 @@ export function CompanySelectionModal() {
     changeActiveCompany,
   ]);
 
-  // Clear active company if user logs out
   useEffect(() => {
     if (!user) {
       setSelectedCompanyId('');
@@ -110,6 +120,7 @@ export function CompanySelectionModal() {
     if (!Array.isArray(companies) || companies.length === 0) return;
     const selectedCompany = companies.find((company) => company?.id === selectedCompanyId);
     if (!selectedCompany) return;
+    hasConfirmedSelectionRef.current = true;
     changeActiveCompany(selectedCompany);
   };
 

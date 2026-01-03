@@ -16,6 +16,7 @@ export const useDashboardSummary = (companyId: string, filters: DashboardFilters
     queryFn: () => dashboardService.fetchDashboardSummary(companyId, filters),
     enabled: !!companyId,
     staleTime: 0,
+    gcTime: 0,
   });
 
 export const useDashboardBalanceHistory = (companyId: string, filters: DashboardFilters) =>
@@ -30,6 +31,7 @@ export const useDashboardBalanceHistory = (companyId: string, filters: Dashboard
     queryFn: () => dashboardService.fetchBalanceHistory(companyId, filters),
     enabled: !!companyId,
     staleTime: 0,
+    gcTime: 0,
   });
 
 export const useDashboardExpensesByCategory = (companyId: string, filters: DashboardFilters) =>
@@ -44,6 +46,7 @@ export const useDashboardExpensesByCategory = (companyId: string, filters: Dashb
     queryFn: () => dashboardService.fetchExpensesByCategory(companyId, filters),
     enabled: !!companyId,
     staleTime: 0,
+    gcTime: 0,
   });
 
 export const useDashboardComparison = (companyId: string, filters: DashboardFilters) =>
@@ -58,6 +61,7 @@ export const useDashboardComparison = (companyId: string, filters: DashboardFilt
     queryFn: () => dashboardService.fetchComparison(companyId, filters),
     enabled: !!companyId,
     staleTime: 0,
+    gcTime: 0,
   });
 
 export const useDashboardGoalsSummary = (companyId: string, limit = 3) =>
@@ -66,6 +70,7 @@ export const useDashboardGoalsSummary = (companyId: string, limit = 3) =>
     queryFn: () => dashboardService.fetchGoalsSummary(companyId, limit),
     enabled: !!companyId,
     staleTime: 0,
+    gcTime: 0,
   });
 
 export const useDashboardRecentTransactions = (
@@ -85,4 +90,5 @@ export const useDashboardRecentTransactions = (
     queryFn: () => dashboardService.fetchRecentTransactions(companyId, filters, limit),
     enabled: !!companyId,
     staleTime: 0,
+    gcTime: 0,
   });
