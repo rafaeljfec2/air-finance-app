@@ -1,5 +1,12 @@
 import { useTheme } from '@/stores/useTheme';
-import { Cell, Legend, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import {
+  Cell,
+  Legend,
+  Pie,
+  PieChart as RechartsPieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from 'recharts';
 
 interface PieChartData {
   name: string;
@@ -55,6 +62,12 @@ export function PieChart({ data }: Readonly<PieChartProps>) {
             iconType="circle"
             wrapperStyle={{
               paddingTop: '1rem',
+              fontSize: '12px',
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              gap: '4px',
             }}
           />
         </RechartsPieChart>
