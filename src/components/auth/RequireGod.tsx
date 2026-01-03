@@ -21,10 +21,14 @@ export function RequireGod({ children }: { children?: React.ReactNode }) {
       // If strict check is needed or user not fully loaded, fetch fresh
       try {
         if (isAuthenticated) {
-            const freshUser = await getCurrentUser();
-            setIsGod(freshUser.role === 'god');
+          const freshUser = await getCurrentUser();
+          setIsGod(freshUser.role === 'god');
+        } else {
+          setIsGod(false);
         }
       } catch (e) {
+        // If there's an error (including 500), user is not god
+        console.error('Error checking god role:', e);
         setIsGod(false);
       } finally {
         setIsChecking(false);

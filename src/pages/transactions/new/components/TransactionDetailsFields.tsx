@@ -86,7 +86,9 @@ export function TransactionDetailsFields({
               Valor da Despesa <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-muted-foreground font-medium">R$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-muted-foreground font-medium">
+                R$
+              </span>
               <Input
                 id="amount"
                 name="amount"
@@ -100,23 +102,19 @@ export function TransactionDetailsFields({
                   'pl-12 text-xl font-bold min-h-[44px] bg-background dark:bg-background-dark border-2 transition-all w-full rounded-lg',
                   errors.amount
                     ? 'border-red-500 focus-visible:ring-red-500'
-                    : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500'
+                    : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500',
                 )}
                 autoComplete="off"
               />
             </div>
             {errors.amount && (
-              <span className="text-xs text-red-500 mt-1 font-medium ml-1">
-                {errors.amount}
-              </span>
+              <span className="text-xs text-red-500 mt-1 font-medium ml-1">{errors.amount}</span>
             )}
           </div>
 
           {/* Parcelas */}
           <div>
-            <label
-              className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1"
-            >
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
               Parcelamento
             </label>
             <ComboBox
@@ -127,7 +125,7 @@ export function TransactionDetailsFields({
               searchable={false}
               className={cn(
                 'w-full h-10 bg-card dark:bg-card-dark text-foreground border rounded-lg hover:bg-accent/50 transition-all text-sm',
-                'border-border dark:border-border-dark hover:border-primary-400'
+                'border-border dark:border-border-dark hover:border-primary-400',
               )}
             />
             {installmentCount > 1 && amount > 0 && (
@@ -154,7 +152,9 @@ export function TransactionDetailsFields({
                 Valor da Parcela <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-muted-foreground font-medium">R$</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-muted-foreground font-medium">
+                  R$
+                </span>
                 <Input
                   id="amount"
                   name="amount"
@@ -165,11 +165,11 @@ export function TransactionDetailsFields({
                   placeholder="0,00"
                   required
                   className={cn(
-                  'pl-12 text-xl font-bold min-h-[44px] bg-background dark:bg-background-dark border-2 transition-all w-full rounded-lg',
-                  errors.amount
-                    ? 'border-red-500 focus-visible:ring-red-500'
-                    : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500'
-                )}
+                    'pl-12 text-xl font-bold min-h-[44px] bg-background dark:bg-background-dark border-2 transition-all w-full rounded-lg',
+                    errors.amount
+                      ? 'border-red-500 focus-visible:ring-red-500'
+                      : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500',
+                  )}
                   autoComplete="off"
                 />
               </div>
@@ -183,7 +183,7 @@ export function TransactionDetailsFields({
               <DatePicker
                 value={recurrenceStartDate}
                 onChange={onRecurrenceStartDateChange}
-                placeholder="Data de início"
+                placeholder="Selecionar data inicial"
                 error={errors.recurrenceStartDate}
                 minDate={new Date(1970, 0, 1)}
                 maxDate={new Date(2100, 11, 31)}
@@ -207,34 +207,36 @@ export function TransactionDetailsFields({
                 searchable={false}
                 className={cn(
                   'w-full h-9 bg-card dark:bg-card-dark text-foreground border rounded-lg hover:bg-accent/50 transition-all text-sm',
-                  'border-border dark:border-border-dark hover:border-primary-400'
+                  'border-border dark:border-border-dark hover:border-primary-400',
                 )}
               />
             </div>
 
             {/* Data final (Opcional) */}
             <div className="flex flex-col sm:col-span-2">
-              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                Termina em (Opcional)
+              <label
+                htmlFor="recurrenceEndDate"
+                className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1"
+              >
+                Termina em <span className="text-red-500">*</span>
               </label>
               <DatePicker
                 value={recurrenceEndDate}
                 onChange={onRecurrenceEndDateChange}
-                placeholder="Indefinido"
+                placeholder="Selecionar data final"
                 error={errors.recurrenceEndDate}
                 minDate={recurrenceStartDate ? new Date(recurrenceStartDate) : new Date(1970, 0, 1)}
                 maxDate={new Date(2100, 11, 31)}
                 className="h-9 w-full bg-card dark:bg-card-dark border-border dark:border-border-dark rounded-lg"
               />
-              <p className="text-[10px] text-muted-foreground mt-1 ml-1">Deixe em branco para repetir indefinidamente</p>
             </div>
           </div>
         </div>
       ) : (
         // Campos para transação variável (Padrão)
         <div className="flex flex-col gap-3">
-           {/* Valor Prominente */}
-           <div>
+          {/* Valor Prominente */}
+          <div>
             <label
               htmlFor="amount"
               className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1"
@@ -242,7 +244,9 @@ export function TransactionDetailsFields({
               Valor <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-muted-foreground font-medium">R$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-muted-foreground font-medium">
+                R$
+              </span>
               <Input
                 id="amount"
                 name="amount"
@@ -256,7 +260,7 @@ export function TransactionDetailsFields({
                   'pl-12 text-xl font-bold min-h-[44px] bg-background dark:bg-background-dark border-2 transition-all w-full rounded-lg',
                   errors.amount
                     ? 'border-red-500 focus-visible:ring-red-500'
-                    : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500'
+                    : 'border-border dark:border-border-dark focus-visible:border-primary-500 focus-visible:ring-primary-500',
                 )}
                 autoComplete="off"
               />
@@ -265,7 +269,10 @@ export function TransactionDetailsFields({
 
           {/* Data */}
           <div>
-            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+            <label
+              htmlFor="date"
+              className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1"
+            >
               Data de pagamento <span className="text-red-500">*</span>
             </label>
             <DatePicker
