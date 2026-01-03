@@ -33,6 +33,18 @@ interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
+interface AuthError extends Error {
+  isAuthError: boolean;
+}
+
+// Flag to prevent multiple simultaneous refresh attempts
+let isRefreshing = false;
+// Queue of requests waiting for token refresh
+let failedQueue: Array<{
+  resolve: (value?: unknown) => void;
+  reject: (error?: unknown) => void;
+}> = [];
+
 /**
  * Builds the base URL for API requests
  * Handles both cases: URL with or without /v1 suffix
@@ -97,13 +109,21 @@ function isPublicRoute(pathname: string): boolean {
 
 /**
  * Clears authentication and redirects to login if not on a public route
+ * Returns a special error that won't cause React Query to throw
  */
-function redirectToLogin(): void {
+function redirectToLogin(): Error {
   authUtils.clearAuth();
   const currentPath = globalThis.location.pathname;
   if (!isPublicRoute(currentPath)) {
-    globalThis.location.href = '/login';
+    // Use setTimeout to ensure redirect happens after error handling
+    setTimeout(() => {
+      globalThis.location.href = '/login';
+    }, 0);
   }
+  // Return a special error that indicates auth failure (won't cause unhandled errors)
+  const authError = new Error('Authentication required') as AuthError;
+  authError.isAuthError = true;
+  return authError;
 }
 
 /**
@@ -111,6 +131,20 @@ function redirectToLogin(): void {
  */
 async function refreshAccessToken(): Promise<void> {
   await refreshClient.post(REFRESH_URL);
+}
+
+/**
+ * Processes the queue of failed requests after token refresh
+ */
+function processQueue(error: Error | null): void {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve();
+    }
+  });
+  failedQueue = [];
 }
 
 /**
@@ -125,24 +159,47 @@ async function handleUnauthorizedError(
   }
 
   if (originalRequest.url?.includes(REFRESH_URL)) {
-    redirectToLogin();
-    throw error;
+    const authError = redirectToLogin();
+    throw authError;
   }
 
   if (originalRequest._retry) {
-    redirectToLogin();
-    throw error;
+    const authError = redirectToLogin();
+    throw authError;
+  }
+
+  // If we're already refreshing, queue this request
+  if (isRefreshing) {
+    return new Promise((resolve, reject) => {
+      failedQueue.push({ resolve, reject });
+    })
+      .then(() => {
+        return apiClient(originalRequest);
+      })
+      .catch((err) => {
+        throw err;
+      });
   }
 
   originalRequest._retry = true;
+  isRefreshing = true;
 
   try {
     await refreshAccessToken();
+    isRefreshing = false;
+    processQueue(null);
     return apiClient(originalRequest);
   } catch (refreshError) {
-    console.warn('Token refresh via cookies failed', refreshError);
-    redirectToLogin();
-    throw refreshError;
+    // Refresh token failed - user needs to re-authenticate
+    // Log the error for debugging but throw a user-friendly auth error instead
+    if (refreshError instanceof Error) {
+      console.warn('Token refresh failed:', refreshError.message);
+    }
+    isRefreshing = false;
+    const authError = redirectToLogin();
+    processQueue(authError);
+    // Don't throw the original refresh error, throw the auth error instead
+    throw authError;
   }
 }
 
