@@ -25,6 +25,13 @@ const PLAN_LABELS: Record<string, string> = {
   free: 'Gratuito',
 };
 
+const PLAN_STYLES: Record<string, string> = {
+  pro: 'bg-purple-100/50 text-purple-700 dark:bg-purple-900/10 dark:text-purple-400 border-purple-200 dark:border-purple-800',
+  business:
+    'bg-amber-100/50 text-amber-700 dark:bg-amber-900/10 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+  free: 'bg-green-100/50 text-green-700 dark:bg-green-900/10 dark:text-green-400 border-green-200 dark:border-green-800',
+};
+
 export function UserTableRow({
   user,
   onEdit,
@@ -102,11 +109,7 @@ export function UserTableRow({
         <span
           className={cn(
             'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-            user.plan === 'pro'
-              ? 'bg-purple-100/50 text-purple-700 dark:bg-purple-900/10 dark:text-purple-400 border-purple-200 dark:border-purple-800'
-              : user.plan === 'business'
-                ? 'bg-amber-100/50 text-amber-700 dark:bg-amber-900/10 dark:text-amber-400 border-amber-200 dark:border-amber-800'
-                : 'bg-green-100/50 text-green-700 dark:bg-green-900/10 dark:text-green-400 border-green-200 dark:border-green-800', // Free
+            PLAN_STYLES[user.plan] || PLAN_STYLES.free,
           )}
         >
           {PLAN_LABELS[user.plan] || 'Gratuito'}
