@@ -140,13 +140,19 @@ const ScoreCreditoFinancasPessoaisPage = lazy(() =>
   })),
 );
 
+const LandingPage = lazy(() =>
+  import('@/pages/landing').then((m) => ({
+    default: m.LandingPage,
+  })),
+);
+
 export const router = createBrowserRouter([
   {
     path: '/',
     element: (
-      <ProtectedRoute>
-        <Navigate to="/home" replace />
-      </ProtectedRoute>
+      <Suspense fallback={<SuspenseLoader />}>
+        <LandingPage />
+      </Suspense>
     ),
   },
   {

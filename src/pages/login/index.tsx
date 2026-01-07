@@ -104,16 +104,20 @@ export function Login() {
       </div>
 
       {/* Botão Voltar */}
-      <motion.button
+      <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
-        onClick={() => navigate('/')}
-        className="absolute top-8 left-8 flex items-center gap-2 text-text/60 hover:text-brand-arrow dark:text-text-dark/60 dark:hover:text-brand-leaf transition-colors z-10"
+        className="absolute top-8 left-8 z-10"
       >
-        <ChevronLeft className="w-5 h-5" />
-        <span>Voltar para o início</span>
-      </motion.button>
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-text/60 hover:text-brand-arrow dark:text-text-dark/60 dark:hover:text-brand-leaf transition-colors cursor-pointer"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          <span>Voltar para o início</span>
+        </Link>
+      </motion.div>
 
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-md space-y-8">
