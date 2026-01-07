@@ -9,7 +9,7 @@ import { EmailPendingPage } from '@/pages/email-pending';
 import { Login } from '@/pages/login';
 import { SignUpPage } from '@/pages/signup';
 import { Suspense, lazy } from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 
 // Lazy Components
 const AccountsPage = lazy(() =>
