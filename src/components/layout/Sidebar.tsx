@@ -4,13 +4,7 @@ import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth';
 import { useSidebarStore } from '@/stores/sidebar';
 import { NavigationGroupItem, NavigationItem } from '@/types/navigation';
-import {
-  ChevronDown,
-  ChevronsLeft,
-  ChevronsRight,
-  LifeBuoy,
-  X,
-} from 'lucide-react';
+import { ChevronDown, ChevronsLeft, ChevronsRight, LifeBuoy, X, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -30,30 +24,35 @@ export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
   const { isCollapsed, toggleCollapse } = useSidebarStore();
   const user = useAuthStore((state) => state.user);
 
-  const filteredNavigation = navigation.map(group => ({
-    ...group,
-    items: group.items.filter(item => {
-      if (!item.roles) return true;
-      return user && item.roles.includes(user.role);
-    }).map(item => {
-        if ('children' in item && item.children) {
+  const filteredNavigation = navigation
+    .map((group) => ({
+      ...group,
+      items: group.items
+        .filter((item) => {
+          if (!item.roles) return true;
+          return user && item.roles.includes(user.role);
+        })
+        .map((item) => {
+          if ('children' in item && item.children) {
             return {
-                ...item,
-                children: item.children.filter(child => {
-                    if (!child.roles) return true;
-                    return user && child.roles.includes(user.role);
-                })
-            }
-        }
-        return item;
-    }).filter(item => {
-        // Remove groups that became empty after filtering children
-         if ('children' in item && item.children && item.children.length === 0) {
-             return false;
-         }
-         return true;
-    })
-  })).filter(group => group.items.length > 0);
+              ...item,
+              children: item.children.filter((child) => {
+                if (!child.roles) return true;
+                return user && child.roles.includes(user.role);
+              }),
+            };
+          }
+          return item;
+        })
+        .filter((item) => {
+          // Remove groups that became empty after filtering children
+          if ('children' in item && item.children && item.children.length === 0) {
+            return false;
+          }
+          return true;
+        }),
+    }))
+    .filter((group) => group.items.length > 0);
 
   const [openMenu, setOpenMenu] = useState<string | null>(() => {
     // Encontra o menu pai do item ativo
@@ -228,40 +227,54 @@ export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
           <div className="w-full py-2 border-t border-border dark:border-border-dark text-center text-xs text-gray-500 dark:text-gray-400 select-none">
             v{__APP_VERSION__}
           </div>
-            {/* Toggle button */}
-            <div className="p-4 pt-2 border-t border-border dark:border-border-dark space-y-3">
-               {/* Support Button */}
-               <button
-                  onClick={() => setIsSupportOpen(true)}
-                  className={cn(
-                    'flex items-center justify-center w-full px-2 py-2 text-sm font-medium rounded-md text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors'
-                  )}
-                  title="Suporte"
-               >
-                  <LifeBuoy className="h-5 w-5" />
-                  {!isCollapsed && <span className="ml-3">Suporte</span>}
-               </button>
+          {/* Toggle button */}
+          <div className="p-4 pt-2 border-t border-border dark:border-border-dark space-y-3">
+            {/* Support Button */}
+            <button
+              onClick={() => setIsSupportOpen(true)}
+              className={cn(
+                'flex items-center justify-center w-full px-2 py-2 text-sm font-medium rounded-md text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors',
+              )}
+              title="Suporte"
+            >
+              <LifeBuoy className="h-5 w-5" />
+              {!isCollapsed && <span className="ml-3">Suporte</span>}
+            </button>
 
-              <button
-                onClick={toggleCollapse}
-                className={cn(
-                  'flex items-center justify-center w-full p-2 text-sm font-medium rounded-md',
-                  'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
-                  'transition-colors duration-200',
-                )}
-              >
-                {isCollapsed ? (
-                  <ChevronsRight className="h-5 w-5" />
-                ) : (
-                  <>
-                    <ChevronsLeft className="h-5 w-5" />
-                    <span className="ml-2">Recolher</span>
-                  </>
-                )}
-              </button>
-            </div>
+            {/* Reddit Link */}
+            <a
+              href="https://www.reddit.com/r/airfinance_app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                'flex items-center justify-center w-full px-2 py-2 text-sm font-medium rounded-md text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors',
+              )}
+              title="Comunidade Reddit"
+            >
+              <ExternalLink className="h-5 w-5" />
+              {!isCollapsed && <span className="ml-3">Comunidade Reddit</span>}
+            </a>
+
+            <button
+              onClick={toggleCollapse}
+              className={cn(
+                'flex items-center justify-center w-full p-2 text-sm font-medium rounded-md',
+                'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
+                'transition-colors duration-200',
+              )}
+            >
+              {isCollapsed ? (
+                <ChevronsRight className="h-5 w-5" />
+              ) : (
+                <>
+                  <ChevronsLeft className="h-5 w-5" />
+                  <span className="ml-2">Recolher</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
+      </div>
 
       <SupportModal isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
     </>
