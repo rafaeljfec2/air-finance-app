@@ -13,6 +13,7 @@ import {
   Eye,
   EyeOff,
   Import,
+  LifeBuoy,
   LogOut,
   Menu as MenuIcon,
   Moon,
@@ -20,9 +21,10 @@ import {
   Settings,
   Sun,
 } from 'lucide-react';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CompanySelector } from './CompanySelector';
+import { SupportModal } from '@/components/support/SupportModal';
 
 export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
   const navigate = useNavigate();
@@ -30,6 +32,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
   const { logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
   const { isHeaderVisible, toggleHeaderVisibility } = usePreferencesStore();
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -164,6 +167,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
                           </button>
                         )}
                       </Menu.Item>
+
                       <Menu.Item>
                         {({ active }) => (
                           <button
@@ -184,6 +188,20 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
                                 Mostrar Header
                               </>
                             )}
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            onClick={() => setIsSupportOpen(true)}
+                            className={cn(
+                              active ? 'bg-background dark:bg-background-dark' : '',
+                              'flex w-full items-center px-4 py-2 text-sm text-emerald-600 dark:text-emerald-400',
+                            )}
+                          >
+                            <LifeBuoy className="mr-3 h-5 w-5" />
+                            Suporte
                           </button>
                         )}
                       </Menu.Item>
@@ -211,6 +229,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
           </Menu>
         </div>
       </div>
+      <SupportModal isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
     </header>
   );
 }
