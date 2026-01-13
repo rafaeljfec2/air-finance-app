@@ -96,62 +96,17 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
       transition={{ duration: 0.3 }}
     >
       <CardHeader className="px-4 sm:px-6">
-        <CardTitle className="text-text dark:text-text-dark text-xl sm:text-2xl">Categorias</CardTitle>
+        <CardTitle className="text-text dark:text-text-dark text-xl sm:text-2xl">
+          Categorias
+        </CardTitle>
         <CardDescription className="text-text/70 dark:text-text-dark/70 text-sm sm:text-base">
           Crie categorias para organizar suas transações. Você pode adicionar quantas quiser ou usar
           as categorias padrão.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
-        {/* Categories List */}
-        {categoriesData.length > 0 && (
-          <div className="space-y-2">
-            <Label className="text-text dark:text-text-dark">Categorias Criadas ({categoriesData.length})</Label>
-            <div className="space-y-2 max-h-40 overflow-y-auto">
-              {categoriesData.map((category, index) => {
-                const iconOption = iconOptions.find((opt) => opt.value === category.icon);
-                const IconComponent = iconOption?.icon ?? Tags;
-                const typeOption = categoryTypes.find((type) => type.value === category.type);
-                const TypeIcon = typeOption?.icon ?? TrendingDown;
-                return (
-                  <div
-                    key={`category-${index}-${category.name}`}
-                    className="flex items-center justify-between p-3 bg-card/50 dark:bg-card-dark/50 border border-border dark:border-border-dark rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: category.color }}
-                      >
-                        <IconComponent className="h-4 w-4 text-white" />
-                      </div>
-                      <div>
-                        <div className="text-text dark:text-text-dark font-medium">{category.name}</div>
-                        <div className="flex items-center gap-1 text-xs text-text dark:text-text-dark/60">
-                          <TypeIcon className="h-3 w-3" />
-                          {categoryTypes.find((t) => t.value === category.type)?.label}
-                        </div>
-                      </div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      type="button"
-                      size="sm"
-                      onClick={() => handleRemoveCategory(index)}
-                      className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
         {/* Category Form */}
         <div className="space-y-4 border-t border-border dark:border-border-dark pt-4">
-          <Label className="text-text dark:text-text-dark">Adicionar Nova Categoria</Label>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="categoryName" className="text-text dark:text-text-dark">
@@ -236,6 +191,55 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
               <Plus className="mr-2 h-4 w-4" />
               Adicionar Categoria
             </Button>
+            {/* Categories List */}
+            {categoriesData.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-text dark:text-text-dark">
+                  Categorias Criadas ({categoriesData.length})
+                </Label>
+                <div className="space-y-0.5 max-h-28 overflow-y-auto">
+                  {categoriesData.map((category, index) => {
+                    const iconOption = iconOptions.find((opt) => opt.value === category.icon);
+                    const IconComponent = iconOption?.icon ?? Tags;
+                    const typeOption = categoryTypes.find((type) => type.value === category.type);
+                    const TypeIcon = typeOption?.icon ?? TrendingDown;
+                    return (
+                      <div
+                        key={`category-${index}-${category.name}`}
+                        className="flex items-center justify-between px-2 py-1.5 bg-card/50 dark:bg-card-dark/50 border border-border dark:border-border-dark rounded"
+                      >
+                        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                          <div
+                            className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{ backgroundColor: category.color }}
+                          >
+                            <IconComponent className="h-2.5 w-2.5 text-white" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-text dark:text-text-dark font-medium text-xs truncate leading-tight">
+                              {category.name}
+                            </div>
+                            <div className="flex items-center gap-0.5 text-[10px] text-text dark:text-text-dark/60 leading-tight">
+                              <TypeIcon className="h-2 w-2" />
+                              {categoryTypes.find((t) => t.value === category.type)?.label}
+                            </div>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          type="button"
+                          size="sm"
+                          onClick={() => handleRemoveCategory(index)}
+                          className="text-red-400 hover:text-red-300 hover:bg-red-400/10 h-6 w-6 p-0 flex-shrink-0"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
