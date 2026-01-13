@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Header } from './Header';
-import { Sidebar } from './Sidebar';
+import { Sidebar } from '@/components/layout/Sidebar';
 import { cn } from '@/lib/utils';
 import { usePreferencesStore } from '@/stores/preferences';
 import { Eye } from 'lucide-react';
