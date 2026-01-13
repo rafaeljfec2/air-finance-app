@@ -14,6 +14,7 @@ interface UserCardProps {
   getStatusBadgeColor: (status: UserStatus) => string;
   getEmailVerifiedBadgeColor: (emailVerified: boolean | undefined) => string;
   getOnboardingCompletedBadgeColor: (onboardingCompleted: boolean | undefined) => string;
+  canDelete?: boolean;
 }
 
 export function UserCard({
@@ -26,6 +27,7 @@ export function UserCard({
   getStatusBadgeColor,
   getEmailVerifiedBadgeColor,
   getOnboardingCompletedBadgeColor,
+  canDelete = true,
 }: Readonly<UserCardProps>) {
   return (
     <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow">
@@ -113,15 +115,17 @@ export function UserCard({
             <Edit className="h-4 w-4 mr-2" />
             Editar
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onDelete(user.id)}
-            disabled={isDeleting}
-            className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {canDelete && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onDelete(user.id)}
+              disabled={isDeleting}
+              className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
     </Card>

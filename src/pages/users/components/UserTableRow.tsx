@@ -17,6 +17,7 @@ export interface UserTableRowProps {
   activeCompanyId?: string | null;
   onAssignRole?: (userId: string, role: string) => void;
   onViewPermissions: (user: User) => void;
+  canDelete?: boolean;
 }
 
 const PLAN_LABELS: Record<string, string> = {
@@ -45,6 +46,7 @@ export function UserTableRow({
   activeCompanyId,
   onAssignRole,
   onViewPermissions,
+  canDelete = true,
 }: Readonly<UserTableRowProps>) {
   const currentRole = activeCompanyId
     ? (user.companyRoles?.[activeCompanyId] ?? 'viewer')
@@ -168,15 +170,17 @@ export function UserTableRow({
             <Edit className="h-4 w-4 mr-2" />
             Editar
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onDelete(user.id)}
-            disabled={isDeleting}
-            className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {canDelete && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onDelete(user.id)}
+              disabled={isDeleting}
+              className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </td>
     </tr>
