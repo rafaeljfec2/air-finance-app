@@ -314,7 +314,7 @@ export function ScoreCreditoFinancasPessoaisPage() {
               </ul>
             </section>
 
-                                       <section className="mt-16">
+            <section className="mt-16">
                 <h2 className="text-3xl font-bold mb-8">Perguntas Frequentes</h2>
                 <div className="space-y-6">
                   {faqItems.map((item) => (
