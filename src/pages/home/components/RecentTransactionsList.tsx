@@ -5,8 +5,12 @@ import { ArrowRightLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Transaction } from '@/services/transactionService';
 
+interface TransactionWithAccount extends Transaction {
+  accountName?: string;
+}
+
 interface RecentTransactionsListProps {
-  transactions: Transaction[];
+  transactions: TransactionWithAccount[];
 }
 
 export function RecentTransactionsList({
@@ -57,32 +61,41 @@ export function RecentTransactionsList({
 }
 
 interface TransactionItemProps {
-  transaction: Transaction;
+  transaction: TransactionWithAccount;
 }
 
 function TransactionItem({ transaction: tx }: Readonly<TransactionItemProps>) {
   const isRevenue = tx.launchType === 'revenue';
   const iconBgClass = isRevenue
-    ? 'bg-emerald-100 text-emerald-600'
-    : 'bg-red-100 text-red-600';
-  const valueColorClass = isRevenue ? 'text-emerald-600' : 'text-red-600';
+    ? 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
+    : 'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400';
+  const valueColorClass = isRevenue
+    ? 'text-emerald-600 dark:text-emerald-400'
+    : 'text-red-600 dark:text-red-400';
 
   return (
     <div className="bg-white dark:bg-card-dark p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-full ${iconBgClass}`}>
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className={`p-2 rounded-full ${iconBgClass} flex-shrink-0`}>
           <ArrowRightLeft size={16} />
         </div>
-        <div>
-          <h3 className="font-medium text-gray-900 dark:text-white line-clamp-1">
-            {tx.description}
-          </h3>
-          <p className="text-xs text-gray-500">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-medium text-gray-900 dark:text-white line-clamp-1 flex-1">
+              {tx.description}
+            </h3>
+            {tx.accountName && (
+              <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex-shrink-0">
+                {tx.accountName}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             {format(new Date(tx.paymentDate), "d 'de' MMM", { locale: ptBR })}
           </p>
         </div>
       </div>
-      <span className={`font-semibold ${valueColorClass}`}>
+      <span className={`font-semibold ${valueColorClass} ml-3 flex-shrink-0`}>
         {isRevenue ? '+' : '-'}
         {formatCurrency(Math.abs(tx.value))}
       </span>
