@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { apiClient } from '@/services/apiClient';
+import { parseApiError, getUserFriendlyMessage } from '@/utils/apiErrorHandler';
 import { motion } from 'framer-motion';
 import { ChevronLeft, Eye, EyeOff, Lock, Mail, Send } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
@@ -50,16 +51,19 @@ export function Login() {
       },
       {
         onError: (err: any) => {
-          const status = err?.response?.status;
-          const backendMsg = err?.response?.data?.message;
+          // Parseia o erro usando o handler centralizado
+          const apiError = parseApiError(err);
+          const friendlyMessage = getUserFriendlyMessage(apiError);
 
-          if (status === 403 && backendMsg?.includes('verificado')) {
+          // Trata caso especial de email não verificado
+          if (apiError.status === 403 && friendlyMessage.includes('verificado')) {
             setNeedsConfirmation(true);
             setError(null); // Clear generic error
             return;
           }
 
-          setError(backendMsg || err?.message || 'Erro ao fazer login');
+          // Exibe mensagem amigável traduzida
+          setError(friendlyMessage);
         },
       },
     );
@@ -75,8 +79,9 @@ export function Login() {
         'E-mail de verificação reenviado com sucesso! Verifique sua caixa de entrada.',
       );
     } catch (err: any) {
-      const msg = err?.response?.data?.message || 'Erro ao reenviar e-mail.';
-      setResendError(msg);
+      const apiError = parseApiError(err);
+      const friendlyMessage = getUserFriendlyMessage(apiError);
+      setResendError(friendlyMessage);
     } finally {
       setIsResending(false);
     }

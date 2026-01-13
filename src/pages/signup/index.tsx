@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
-import { ApiError } from '@/utils/apiErrorHandler';
+import { parseApiError, getUserFriendlyMessage } from '@/utils/apiErrorHandler';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import React, { useState } from 'react';
@@ -68,8 +68,9 @@ export function SignUpPage() {
           // Não navega automaticamente - mostra mensagem de confirmação
         },
         onError: (err: unknown) => {
-          const backendMsg = (err as ApiError)?.message;
-          setError(backendMsg || 'Erro ao criar conta');
+          const apiError = parseApiError(err);
+          const friendlyMessage = getUserFriendlyMessage(apiError);
+          setError(friendlyMessage);
         },
       },
     );
