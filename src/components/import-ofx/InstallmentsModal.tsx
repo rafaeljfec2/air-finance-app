@@ -52,7 +52,7 @@ export function InstallmentsModal({
       open={open}
       onClose={onClose}
       title="Transações Parceladas Detectadas"
-      className="max-w-3xl"
+      className="max-w-3xl overflow-hidden"
     >
       <div className="space-y-4 p-6">
         <div className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
@@ -177,7 +177,7 @@ export function InstallmentsModal({
             variant="outline"
             onClick={onClose}
             disabled={isCreating}
-            className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+            className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark min-w-[120px] h-10"
           >
             Cancelar
           </Button>
@@ -185,7 +185,7 @@ export function InstallmentsModal({
             type="button"
             onClick={handleConfirm}
             disabled={isCreating}
-            className="bg-primary-500 hover:bg-primary-600 text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="bg-primary-500 hover:bg-primary-600 text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-[120px] h-10 justify-center"
           >
             {isCreating ? (
               <>

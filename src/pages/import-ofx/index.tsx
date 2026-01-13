@@ -99,6 +99,8 @@ export function ImportOfxPage() {
         description: error.message || 'Não foi possível importar o arquivo OFX. Tente novamente.',
         type: 'error',
       });
+      // Ensure modal can be closed after error
+      setShowImportModal(false);
     },
   });
 

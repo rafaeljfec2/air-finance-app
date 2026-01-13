@@ -52,7 +52,8 @@ export function Modal({
         ref={modalRef}
         open={open}
         className={cn(
-          'relative z-10 w-full max-w-lg mx-auto rounded-xl bg-white dark:bg-gray-900 shadow-xl p-4 sm:p-6 pb-safe sm:pb-6 focus:outline-none border-0 max-h-[calc(100dvh-2rem)] overflow-y-auto',
+          'relative z-10 w-full max-w-lg mx-auto rounded-xl bg-white dark:bg-gray-900 shadow-xl p-4 sm:p-6 pb-safe sm:pb-6 focus:outline-none border-0 max-h-[calc(100dvh-2rem)]',
+          className?.includes('overflow-hidden') ? '' : 'overflow-y-auto',
           className,
         )}
         aria-label={title}

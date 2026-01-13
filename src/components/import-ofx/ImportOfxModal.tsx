@@ -61,7 +61,7 @@ export function ImportOfxModal({
   });
 
   const handleImport = async () => {
-    if (!selectedFile || !selectedAccountId) return;
+    if (!selectedFile || !selectedAccountId || isImporting) return;
 
     try {
       const result = await onImport(
@@ -91,7 +91,10 @@ export function ImportOfxModal({
       }
     } catch (error: unknown) {
       // Error handling is done in the parent component
+      // Don't reset state here - let the parent handle the error and reset isImporting
       console.error('Import error:', error);
+      // The parent component will handle showing the error toast
+      // The isImporting state will be reset by the mutation's onError handler
     }
   };
 
@@ -132,10 +135,30 @@ export function ImportOfxModal({
     onClose();
   };
 
-  const canImport = selectedFile && selectedAccountId && !isImporting;
+  const canImport = selectedFile && selectedAccountId && !isImporting && !isCreatingInstallments;
+
+  // Reset form when modal closes
+  const handleModalClose = () => {
+    if (!isImporting && !isCreatingInstallments) {
+      resetFileUpload();
+      setSelectedAccountId(null);
+      setImportToCashFlow(true);
+      setClearCashFlow(false);
+      setDetectedInstallments([]);
+      setShowInstallmentsModal(false);
+      setLastImportedAccountId(null);
+      setLastImportedPeriodEnd(null);
+    }
+    onClose();
+  };
 
   return (
-    <Modal open={open} onClose={onClose} title="Importar Extrato OFX" className="max-w-2xl">
+    <Modal
+      open={open}
+      onClose={handleModalClose}
+      title="Importar Extrato OFX"
+      className="max-w-2xl overflow-hidden"
+    >
       <div className="space-y-4 p-4">
         <AccountSelector
           accounts={accounts}
@@ -207,19 +230,19 @@ export function ImportOfxModal({
           <Button
             type="button"
             variant="outline"
-            onClick={onClose}
-            disabled={isImporting}
-            className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+            onClick={handleModalClose}
+            disabled={isImporting || isCreatingInstallments}
+            className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark min-w-[120px] h-10"
           >
             Cancelar
           </Button>
           <Button
             type="button"
             onClick={handleImport}
-            disabled={!canImport}
-            className="bg-primary-500 hover:bg-primary-600 text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            disabled={!canImport || isImporting || isCreatingInstallments}
+            className="bg-primary-500 hover:bg-primary-600 text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-[120px] h-10 justify-center"
           >
-            {isImporting ? (
+            {isImporting || isCreatingInstallments ? (
               <>
                 <Loading size="small" />
                 Importando...
