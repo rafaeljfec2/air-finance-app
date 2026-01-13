@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Header } from './Header';
+import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { cn } from '@/lib/utils';
 import { usePreferencesStore } from '@/stores/preferences';
@@ -14,8 +14,6 @@ export function ViewDefault({ children, className }: ViewDefaultProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const isHeaderVisible = usePreferencesStore((state) => state.isHeaderVisible);
   const toggleHeaderVisibility = usePreferencesStore((state) => state.toggleHeaderVisibility);
-
-  console.log('isSidebarOpen:', isSidebarOpen);
 
   return (
     <div className="min-h-screen bg-background dark:bg-background-dark">
