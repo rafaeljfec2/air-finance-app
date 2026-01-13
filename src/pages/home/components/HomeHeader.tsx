@@ -1,5 +1,4 @@
 import { useAuth } from '@/hooks/useAuth';
-import { usePreferencesStore } from '@/stores/preferences';
 import { formatCurrency } from '@/utils/formatters';
 import { Bell, Eye, EyeOff } from 'lucide-react';
 
