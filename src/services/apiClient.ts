@@ -31,11 +31,15 @@ const AUTH_STORAGE_KEY = 'auth-storage';
 
 interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
+  _retryCount?: number;
 }
 
 interface AuthError extends Error {
   isAuthError: boolean;
 }
+
+const MAX_RETRY_ATTEMPTS = 2;
+const RETRY_DELAY_BASE = 500; // Base delay in milliseconds
 
 // Flag to prevent multiple simultaneous refresh attempts
 let isRefreshing = false;
@@ -130,7 +134,15 @@ function redirectToLogin(): Error {
  * Attempts to refresh the access token using the refresh token cookie
  */
 async function refreshAccessToken(): Promise<void> {
-  await refreshClient.post(REFRESH_URL);
+  try {
+    await refreshClient.post(REFRESH_URL);
+  } catch (error) {
+    // Log refresh token errors for debugging
+    if (error instanceof AxiosError && import.meta.env.DEV) {
+      logError(error, 'Refresh token failed');
+    }
+    throw error;
+  }
 }
 
 /**
@@ -145,6 +157,99 @@ function processQueue(error: Error | null): void {
     }
   });
   failedQueue = [];
+}
+
+/**
+ * Calculates delay for retry with exponential backoff
+ */
+function getRetryDelay(retryCount: number): number {
+  return RETRY_DELAY_BASE * Math.pow(2, retryCount);
+}
+
+/**
+ * Waits for a specified amount of time
+ */
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Logs error details for debugging
+ */
+function logError(error: AxiosError, context: string): void {
+  const status = error.response?.status;
+  const url = error.config?.url;
+  const method = error.config?.method?.toUpperCase();
+
+  if (import.meta.env.DEV) {
+    console.error(`[API Client] ${context}:`, {
+      method,
+      url,
+      status,
+      statusText: error.response?.statusText,
+      message: error.message,
+      data: error.response?.data,
+    });
+  }
+}
+
+/**
+ * Handles server errors (500-599) with retry logic
+ */
+async function handleServerError(
+  error: AxiosError,
+  originalRequest: RetryableRequestConfig,
+): Promise<unknown> {
+  const status = error.response?.status ?? 0;
+
+  // Only retry for 5xx errors (server errors)
+  if (status < 500 || status >= 600) {
+    throw error;
+  }
+
+  // Don't retry public auth endpoints
+  if (isPublicAuthEndpoint(originalRequest.url)) {
+    logError(error, 'Server error on public endpoint');
+    throw error;
+  }
+
+  const retryCount = originalRequest._retryCount ?? 0;
+
+  // Log first occurrence
+  if (retryCount === 0) {
+    logError(error, `Server error ${status}`);
+  }
+
+  // Max retries reached
+  if (retryCount >= MAX_RETRY_ATTEMPTS) {
+    console.error(
+      `[API Client] Max retries (${MAX_RETRY_ATTEMPTS}) reached for ${originalRequest.url}. Status: ${status}`,
+    );
+    throw error;
+  }
+
+  // Increment retry count
+  originalRequest._retryCount = retryCount + 1;
+  originalRequest._retry = true;
+
+  const delay = getRetryDelay(retryCount);
+  console.warn(
+    `[API Client] Server error ${status} on ${originalRequest.url}. Retrying in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRY_ATTEMPTS})`,
+  );
+
+  // Wait before retrying
+  await wait(delay);
+
+  // Retry the request
+  try {
+    return await apiClient(originalRequest);
+  } catch (retryError) {
+    // If retry also fails, log and throw
+    if (retryError instanceof Error && 'response' in retryError) {
+      logError(retryError as AxiosError, 'Retry failed');
+    }
+    throw retryError;
+  }
 }
 
 /**
@@ -174,6 +279,8 @@ async function handleUnauthorizedError(
       failedQueue.push({ resolve, reject });
     })
       .then(() => {
+        // Remove retry flag to allow retry after token refresh
+        delete originalRequest._retry;
         return apiClient(originalRequest);
       })
       .catch((err) => {
@@ -230,11 +337,35 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const { response, config } = error;
+    const status = response?.status;
 
-    if (response?.status !== 401) {
+    // Network errors or errors without status
+    if (!status) {
+      if (import.meta.env.DEV) {
+        console.error('[API Client] Network error or no status:', {
+          message: error.message,
+          url: config?.url,
+          code: error.code,
+        });
+      }
       throw error;
     }
 
-    return handleUnauthorizedError(error, config as RetryableRequestConfig);
+    // Handle 401 Unauthorized (token refresh)
+    if (status === 401) {
+      return handleUnauthorizedError(error, config as RetryableRequestConfig);
+    }
+
+    // Handle 5xx Server Errors (retry with backoff)
+    if (status >= 500 && status < 600) {
+      return handleServerError(error, config as RetryableRequestConfig);
+    }
+
+    // For other errors (4xx), log and throw directly
+    if (import.meta.env.DEV && status >= 400 && status < 500) {
+      logError(error, `Client error ${status}`);
+    }
+
+    throw error;
   },
 );

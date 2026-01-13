@@ -17,10 +17,22 @@ const ReactQueryDevtools = lazy(() =>
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: false,
+      retry: (failureCount, error) => {
+        // Retry only for 5xx server errors (up to 1 time)
+        if (error && typeof error === 'object' && 'response' in error) {
+          const axiosError = error as { response?: { status?: number } };
+          const status = axiosError.response?.status;
+          if (status && status >= 500 && status < 600) {
+            return failureCount < 1; // Retry once for server errors
+          }
+        }
+        return false; // Don't retry for other errors
+      },
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
       refetchOnWindowFocus: false,
-      staleTime: 0,
-      gcTime: 0,
+      refetchOnMount: true, // Refetch on mount to ensure fresh data
+      staleTime: 30 * 1000, // Consider data stale after 30 seconds
+      gcTime: 5 * 60 * 1000, // Keep unused data in cache for 5 minutes
     },
   },
 });

@@ -1,12 +1,12 @@
 import { dashboardService } from '@/services/dashboardService';
 import type { Transaction } from '@/services/transactionService';
 import type {
-    BalanceHistoryPoint,
-    DashboardComparison,
-    DashboardFilters,
-    DashboardGoalSummary,
-    DashboardSummary,
-    ExpenseByCategory,
+  BalanceHistoryPoint,
+  DashboardComparison,
+  DashboardFilters,
+  DashboardGoalSummary,
+  DashboardSummary,
+  ExpenseByCategory,
 } from '@/types/dashboard';
 import { useQuery } from '@tanstack/react-query';
 
@@ -15,8 +15,8 @@ export const useDashboardSummary = (companyId: string, filters: DashboardFilters
     queryKey: ['dashboard', 'summary', companyId, filters.timeRange, filters.referenceDate ?? null],
     queryFn: () => dashboardService.fetchDashboardSummary(companyId, filters),
     enabled: !!companyId,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 30 * 1000, // Consider stale after 30 seconds
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
 
 export const useDashboardBalanceHistory = (companyId: string, filters: DashboardFilters) =>
@@ -30,8 +30,8 @@ export const useDashboardBalanceHistory = (companyId: string, filters: Dashboard
     ],
     queryFn: () => dashboardService.fetchBalanceHistory(companyId, filters),
     enabled: !!companyId,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 30 * 1000, // Consider stale after 30 seconds
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
 
 export const useDashboardExpensesByCategory = (companyId: string, filters: DashboardFilters) =>
@@ -45,8 +45,8 @@ export const useDashboardExpensesByCategory = (companyId: string, filters: Dashb
     ],
     queryFn: () => dashboardService.fetchExpensesByCategory(companyId, filters),
     enabled: !!companyId,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 30 * 1000, // Consider stale after 30 seconds
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
 
 export const useDashboardComparison = (companyId: string, filters: DashboardFilters) =>
@@ -60,8 +60,8 @@ export const useDashboardComparison = (companyId: string, filters: DashboardFilt
     ],
     queryFn: () => dashboardService.fetchComparison(companyId, filters),
     enabled: !!companyId,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 30 * 1000, // Consider stale after 30 seconds
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
 
 export const useDashboardGoalsSummary = (companyId: string, limit = 3) =>
@@ -69,8 +69,8 @@ export const useDashboardGoalsSummary = (companyId: string, limit = 3) =>
     queryKey: ['dashboard', 'goals-summary', companyId, limit],
     queryFn: () => dashboardService.fetchGoalsSummary(companyId, limit),
     enabled: !!companyId,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 30 * 1000, // Consider stale after 30 seconds
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
 
 export const useDashboardRecentTransactions = (
@@ -89,6 +89,6 @@ export const useDashboardRecentTransactions = (
     ],
     queryFn: () => dashboardService.fetchRecentTransactions(companyId, filters, limit),
     enabled: !!companyId,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 30 * 1000, // Consider stale after 30 seconds
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
