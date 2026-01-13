@@ -223,10 +223,7 @@ export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
               </div>
             ))}
           </nav>
-          {/* Footer com versão do sistema */}
-          <div className="w-full py-2 border-t border-border dark:border-border-dark text-center text-xs text-gray-500 dark:text-gray-400 select-none">
-            v{__APP_VERSION__}
-          </div>
+
           {/* Toggle button */}
           <div className="p-4 pt-2 border-t border-border dark:border-border-dark space-y-3">
             {/* Support Button */}
@@ -249,10 +246,10 @@ export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
               className={cn(
                 'flex items-center justify-center w-full px-2 py-2 text-sm font-medium rounded-md text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors',
               )}
-              title="Comunidade Reddit"
+              title="Comunidade"
             >
               <ExternalLink className="h-5 w-5" />
-              {!isCollapsed && <span className="ml-3">Comunidade Reddit</span>}
+              {!isCollapsed && <span className="ml-3">Comunidade</span>}
             </a>
 
             <button

@@ -65,11 +65,11 @@ export const navigation: NavigationSection[] = [
         children: [
           { name: 'Empresas', href: '/companies', icon: Building2 },
           { name: 'Contas', href: '/accounts', icon: Banknote },
+          { name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCard },
           { name: 'Categorias', href: '/categories', icon: Tag },
           /* { name: 'Dependentes', href: '/dependents', icon: Users }, */
-          /*{ name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCard },*/
           { name: 'Metas', href: '/goals', icon: Flag },
-          { name: 'Transações Recorrentes', href: '/recurring-transactions', icon: RefreshCcw },
+          { name: 'Recorrências', href: '/recurring-transactions', icon: RefreshCcw },
           { name: 'Usuários', href: '/users', icon: User },
           /* { name: 'Fontes de Receitas', href: '/income-sources', icon: DollarSign }, */
         ],

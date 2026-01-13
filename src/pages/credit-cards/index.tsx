@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 // eslint-disable-next-line sonarjs/no-duplicate-string
 import { CreditCardFormModal } from '@/components/credit-cards/CreditCardFormModal';
+import { CreditCardTableRow } from '@/components/credit-cards/CreditCardTableRow';
 import { Loading } from '@/components/Loading';
 import { useViewMode } from '@/hooks/useViewMode';
 import { cn } from '@/lib/utils';
@@ -348,93 +349,43 @@ export function CreditCardsPage() {
 
               {/* List View - Only visible on desktop when viewMode === 'list' */}
               <div className={viewMode === 'list' ? 'hidden md:block' : 'hidden'}>
-                <div className="space-y-4">
-                  {filteredCreditCards.map((card) => {
-                    const Icon =
-                      bankTypes.find((t) => t.icon.displayName === card.icon)?.icon ||
-                      CreditCardIcon;
-                    return (
-                      <Card
-                        key={card.id}
-                        className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow"
-                      >
-                        <div className="p-6">
-                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                            {/* Informações principais */}
-                            <div className="flex items-center gap-4 flex-1 min-w-0">
-                              <div
-                                className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                                style={{ backgroundColor: card.color }}
-                              >
-                                <Icon className="h-6 w-6 text-white" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-3 mb-2">
-                                  <h3 className="text-lg font-semibold text-text dark:text-text-dark">
-                                    {card.name}
-                                  </h3>
-                                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                                    {bankTypes.find((t) => t.icon.displayName === card.icon)
-                                      ?.label || 'Cartão'}
-                                  </span>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                                  <div>
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                      Limite:{' '}
-                                    </span>
-                                    <span className="text-text dark:text-text-dark font-semibold">
-                                      {formatCurrency(card.limit)}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                      Fechamento:{' '}
-                                    </span>
-                                    <span className="text-text dark:text-text-dark">
-                                      {card.closingDay}º dia
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                      Vencimento:{' '}
-                                    </span>
-                                    <span className="text-text dark:text-text-dark">
-                                      {card.dueDay}º dia
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Ações */}
-                            <div className="flex gap-2 md:flex-shrink-0">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleEdit(card)}
-                                disabled={isUpdating}
-                                className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
-                              >
-                                <Edit className="h-4 w-4 mr-2" />
-                                Editar
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleDelete(card.id)}
-                                disabled={isDeleting}
-                                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    );
-                  })}
-                </div>
+                <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border dark:border-border-dark">
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Cartão
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Limite
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Fechamento
+                          </th>
+                          <th className="text-left p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Vencimento
+                          </th>
+                          <th className="text-right p-4 text-sm font-semibold text-text dark:text-text-dark">
+                            Ações
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredCreditCards.map((card) => (
+                          <CreditCardTableRow
+                            key={card.id}
+                            creditCard={card}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                            isUpdating={isUpdating}
+                            isDeleting={isDeleting}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
               </div>
             </>
           )}

@@ -6,7 +6,7 @@ import type { CreateAccount } from '@/services/accountService';
 import { Building2, CreditCard } from 'lucide-react';
 import React from 'react';
 
-type AccountType = 'checking' | 'savings' | 'credit_card' | 'digital_wallet' | 'investment';
+type AccountType = 'checking' | 'savings' | 'digital_wallet' | 'investment';
 
 interface BasicInfoSectionProps {
   form: CreateAccount;

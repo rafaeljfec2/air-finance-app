@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Account } from '@/services/accountService';
 import { formatCurrency } from '@/utils/formatters';
-import { Banknote, CreditCard, Edit, Landmark, Trash2, Wallet } from 'lucide-react';
+import { Banknote, Edit, Landmark, Trash2, Wallet } from 'lucide-react';
 
 interface AccountTableRowProps {
   account: Account;
@@ -15,7 +15,6 @@ interface AccountTableRowProps {
 const accountTypes = [
   { value: 'checking', label: 'Conta Corrente', icon: Banknote },
   { value: 'savings', label: 'Poupança', icon: Wallet },
-  { value: 'credit_card', label: 'Cartão de Crédito', icon: CreditCard },
   { value: 'digital_wallet', label: 'Carteira Digital', icon: Wallet },
   { value: 'investment', label: 'Investimento', icon: Landmark },
 ] as const;
@@ -30,7 +29,6 @@ function getTypeBadgeColor(type: AccountType): string {
   const colors: Record<AccountType, string> = {
     checking: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     savings: 'bg-green-500/20 text-green-400 border-green-500/30',
-    credit_card: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
     digital_wallet: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
     investment: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
   };
@@ -44,7 +42,13 @@ export function AccountTableRow({
   isUpdating,
   isDeleting,
 }: Readonly<AccountTableRowProps>) {
+  // Filter out credit_card type as it has its own page
+  if (account.type === 'credit_card') {
+    return null;
+  }
+
   const Icon = accountTypes.find((t) => t.value === account.type)?.icon || Banknote;
+  const accountType = account.type as AccountType;
 
   return (
     <tr className="border-b border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark transition-colors">
@@ -61,10 +65,10 @@ export function AccountTableRow({
             <span
               className={cn(
                 'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border mt-1',
-                getTypeBadgeColor(account.type),
+                getTypeBadgeColor(accountType),
               )}
             >
-              {getTypeLabel(account.type)}
+              {getTypeLabel(accountType)}
             </span>
           </div>
         </div>
@@ -76,29 +80,18 @@ export function AccountTableRow({
       </td>
       <td className="p-4">
         <div className="space-y-1">
-          {account.type === 'credit_card' ? (
-              <div className="text-sm">
-                <span className="text-gray-500 dark:text-gray-400 text-xs">Limite: </span>
-                <span className="text-text dark:text-text-dark font-mono text-xs">
-                  {formatCurrency(account.creditLimit || 0)}
-                </span>
-              </div>
-          ) : (
-            <>
-              <div className="text-sm">
-                <span className="text-gray-500 dark:text-gray-400 text-xs">Ag: </span>
-                <span className="text-text dark:text-text-dark font-mono text-xs">
-                  {account.agency}
-                </span>
-              </div>
-              <div className="text-sm">
-                <span className="text-gray-500 dark:text-gray-400 text-xs">Cc: </span>
-                <span className="text-text dark:text-text-dark font-mono text-xs">
-                  {account.accountNumber}
-                </span>
-              </div>
-            </>
-          )}
+          <div className="text-sm">
+            <span className="text-gray-500 dark:text-gray-400 text-xs">Ag: </span>
+            <span className="text-text dark:text-text-dark font-mono text-xs">
+              {account.agency}
+            </span>
+          </div>
+          <div className="text-sm">
+            <span className="text-gray-500 dark:text-gray-400 text-xs">Cc: </span>
+            <span className="text-text dark:text-text-dark font-mono text-xs">
+              {account.accountNumber}
+            </span>
+          </div>
         </div>
       </td>
        <td className="p-4">

@@ -5,7 +5,7 @@ import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-type AccountType = 'checking' | 'savings' | 'credit_card' | 'digital_wallet' | 'investment';
+type AccountType = 'checking' | 'savings' | 'digital_wallet' | 'investment';
 
 interface UseAccountFormModalProps {
   account?: Account | null;
@@ -38,7 +38,6 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [initialBalanceInput, setInitialBalanceInput] = useState('');
   const [limitInput, setLimitInput] = useState('');
-  const isCreditCard = form.type === 'credit_card';
 
   const formatBalanceValue = useCallback((balance: number, withSign: boolean): string => {
     if (balance === 0) return '';
@@ -46,13 +45,8 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
   }, []);
 
   const initializeBalanceInputs = useCallback(
-    (accountData: Account, isCard: boolean) => {
+    (accountData: Account) => {
       const balance = accountData.initialBalance ?? 0;
-      if (isCard) {
-        setLimitInput(formatBalanceValue(balance, false));
-        setInitialBalanceInput('');
-        return;
-      }
       setInitialBalanceInput(formatBalanceValue(balance, true));
       setLimitInput('');
     },
@@ -91,7 +85,7 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
   const initializeFormFromAccount = useCallback(() => {
     if (account) {
       setForm(mapAccountToForm(account));
-      initializeBalanceInputs(account, account.type === 'credit_card');
+      initializeBalanceInputs(account);
     } else {
       resetFormState();
     }
@@ -180,21 +174,19 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
     const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (!form.institution.trim()) errs.institution = 'Instituição obrigatória';
-    if (!isCreditCard) {
-      validateBankingFields(errs);
-    }
+    validateBankingFields(errs);
     if (!form.companyId) errs.companyId = 'Selecione uma empresa';
     return errs;
-  }, [form.name, form.institution, form.companyId, isCreditCard, validateBankingFields]);
+  }, [form.name, form.institution, form.companyId, validateBankingFields]);
 
   const buildSubmitPayload = useCallback((): CreateAccount => {
     return {
       ...form,
-      agency: isCreditCard ? '' : form.agency,
-      accountNumber: isCreditCard ? '' : form.accountNumber,
+      agency: form.agency,
+      accountNumber: form.accountNumber,
       initialBalanceDate: form.initialBalanceDate || null,
     };
-  }, [form, isCreditCard]);
+  }, [form]);
 
   const handleSubmit = useCallback(
     (e: FormEvent) => {
@@ -220,7 +212,6 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
     errors,
     initialBalanceInput,
     limitInput,
-    isCreditCard,
     handleChange,
     handleColorChange,
     handleIconChange,

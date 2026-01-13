@@ -17,7 +17,6 @@ import { formatCurrency } from '@/utils/formatters';
 import { AxiosError } from 'axios';
 import {
   Banknote,
-  CreditCard,
   Edit,
   Grid3x3,
   Landmark,
@@ -32,7 +31,6 @@ import { useMemo, useState } from 'react';
 const accountTypes = [
   { value: 'checking', label: 'Conta Corrente', icon: Banknote },
   { value: 'savings', label: 'Poupança', icon: Wallet },
-  { value: 'credit_card', label: 'Cartão de Crédito', icon: CreditCard },
   { value: 'digital_wallet', label: 'Carteira Digital', icon: Wallet },
   { value: 'investment', label: 'Investimento', icon: Landmark },
 ] as const;
@@ -47,7 +45,6 @@ function getTypeBadgeColor(type: AccountType): string {
   const colors: Record<AccountType, string> = {
     checking: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     savings: 'bg-green-500/20 text-green-400 border-green-500/30',
-    credit_card: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
     digital_wallet: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
     investment: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
   };
@@ -80,6 +77,10 @@ export function AccountsPage() {
   const filteredAccounts = useMemo(() => {
     if (!accounts) return [];
     return accounts.filter((account) => {
+      // Excluir cartões de crédito - eles têm sua própria tela
+      if (account.type === 'credit_card') {
+        return false;
+      }
       const matchesSearch =
         account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         account.institution.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -210,7 +211,7 @@ export function AccountsPage() {
                 </h1>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Gerencie suas contas bancárias e investimentos
+                Gerencie suas contas bancárias e investimentos. Para gerenciar cartões de crédito, acesse a seção de Cartões.
               </p>
             </div>
             {canCreateAccount && (
@@ -329,8 +330,13 @@ export function AccountsPage() {
               <div className={viewMode === 'grid' ? 'block' : 'block md:hidden'}>
                 <div className="grid grid-cols-1 gap-6">
                   {filteredAccounts.map((account) => {
+                    // Skip credit_card type as it has its own page
+                    if (account.type === 'credit_card') {
+                      return null;
+                    }
                     const Icon =
                       accountTypes.find((t) => t.value === account.type)?.icon || Banknote;
+                    const accountType = account.type as AccountType;
                     return (
                       <Card
                         key={account.id}
@@ -353,10 +359,10 @@ export function AccountsPage() {
                                 <span
                                   className={cn(
                                     'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-                                    getTypeBadgeColor(account.type),
+                                    getTypeBadgeColor(accountType),
                                   )}
                                 >
-                                  {getTypeLabel(account.type)}
+                                  {getTypeLabel(accountType)}
                                 </span>
                               </div>
                             </div>
@@ -373,27 +379,7 @@ export function AccountsPage() {
                               </span>
                             </div>
 
-                            {account.type === 'credit_card' ? (
-                              <>
-                                <div className="text-sm">
-                                  <span className="text-gray-500 dark:text-gray-400">
-                                    Limite:{' '}
-                                  </span>
-                                  <span className="text-text dark:text-text-dark font-mono">
-                                    {formatCurrency(account.creditLimit || 0)}
-                                  </span>
-                                </div>
-                                <div className="text-sm pt-2 border-t border-border dark:border-border-dark">
-                                  <span className="text-gray-500 dark:text-gray-400">
-                                    Saldo Atual:{' '}
-                                  </span>
-                                  <span className="text-text dark:text-text-dark font-semibold text-lg">
-                                    {formatCurrency(account.balance)}
-                                  </span>
-                                </div>
-                              </>
-                            ) : (
-                              <>
+                            <>
                                 <div className="text-sm">
                                   <span className="text-gray-500 dark:text-gray-400">
                                     Agência:{' '}
@@ -419,7 +405,6 @@ export function AccountsPage() {
                                   </span>
                                 </div>
                               </>
-                            )}
                           </div>
 
                           {/* Ações */}

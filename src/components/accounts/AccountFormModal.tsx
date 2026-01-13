@@ -11,15 +11,13 @@ import { CustomizationSection } from './components/CustomizationSection';
 import { accountTypes, type AccountType } from './constants';
 import { useAccountFormModal } from './hooks/useAccountFormModal';
 
-function getModalTitle(account: Account | null | undefined, isCreditCard: boolean): string {
+function getModalTitle(account: Account | null | undefined): string {
   if (account) return 'Editar Conta';
-  if (isCreditCard) return 'Novo Cartão de Crédito';
   return 'Nova Conta';
 }
 
-function getModalDescription(account: Account | null | undefined, isCreditCard: boolean): string {
+function getModalDescription(account: Account | null | undefined): string {
   if (account) return 'Atualize as informações';
-  if (isCreditCard) return 'Preencha os dados';
   return 'Preencha os dados da nova conta';
 }
 
@@ -43,7 +41,6 @@ export function AccountFormModal({
     errors,
     initialBalanceInput,
     limitInput,
-    isCreditCard,
     handleChange,
     handleColorChange,
     handleIconChange,
@@ -67,11 +64,8 @@ export function AccountFormModal({
     [],
   );
 
-  const modalTitle = useMemo(() => getModalTitle(account, isCreditCard), [account, isCreditCard]);
-  const modalDescription = useMemo(
-    () => getModalDescription(account, isCreditCard),
-    [account, isCreditCard],
-  );
+  const modalTitle = useMemo(() => getModalTitle(account), [account]);
+  const modalDescription = useMemo(() => getModalDescription(account), [account]);
 
   const getSubmitButtonText = (): string => {
     if (isLoading) return 'Salvando...';
@@ -112,20 +106,18 @@ export function AccountFormModal({
             <BasicInfoSection
               form={form}
               errors={errors}
-              isCreditCard={isCreditCard}
+              isCreditCard={false}
               accountTypeOptions={accountTypeOptions}
               onNameChange={handleChange}
               onTypeChange={handleTypeChange}
             />
 
-            {!isCreditCard && (
-              <BankingFieldsSection form={form} errors={errors} onFieldChange={handleChange} />
-            )}
+            <BankingFieldsSection form={form} errors={errors} onFieldChange={handleChange} />
 
             <BalanceSection
               form={form}
               errors={errors}
-              isCreditCard={isCreditCard}
+              isCreditCard={false}
               account={account}
               initialBalanceInput={initialBalanceInput}
               limitInput={limitInput}
