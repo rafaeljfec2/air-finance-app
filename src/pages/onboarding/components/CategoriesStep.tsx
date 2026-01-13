@@ -6,32 +6,21 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ColorPicker } from '@/components/ui/color-picker';
-import { IconPicker } from '@/components/ui/icon-picker';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { motion } from 'framer-motion';
 import {
   ChevronLeft,
   ChevronRight,
   Gift,
   Landmark,
-  Plus,
   ShoppingCart,
   Tags,
-  Trash2,
   TrendingDown,
   TrendingUp,
   Wallet,
 } from 'lucide-react';
 import { useState } from 'react';
+import { CategoriesList } from './CategoriesList';
+import { CategoryForm } from './CategoryForm';
 import { type CategoryFormData } from '../schemas';
 
 interface CategoriesStepProps {
@@ -105,142 +94,24 @@ export function CategoriesStep({ onNext, onBack, initialData }: Readonly<Categor
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
-        {/* Category Form */}
         <div className="space-y-4 border-t border-border dark:border-border-dark pt-4">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="categoryName" className="text-text dark:text-text-dark">
-                Nome da Categoria
-              </Label>
-              <Input
-                id="categoryName"
-                placeholder="Ex: Alimentação, Transporte..."
-                className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
-                value={currentCategoryForm.name}
-                onChange={(e) =>
-                  setCurrentCategoryForm({ ...currentCategoryForm, name: e.target.value })
-                }
-              />
-              {categoryFormErrors.name && (
-                <p className="text-sm text-red-400">{categoryFormErrors.name}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-text dark:text-text-dark">Tipo</Label>
-              <Select
-                value={currentCategoryForm.type}
-                onValueChange={(value) =>
-                  setCurrentCategoryForm({
-                    ...currentCategoryForm,
-                    type: value as 'income' | 'expense',
-                  })
-                }
-              >
-                <SelectTrigger className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-                  {categoryTypes.map((opt) => {
-                    const TypeIcon = opt.icon;
-                    return (
-                      <SelectItem
-                        key={opt.value}
-                        value={opt.value}
-                        className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
-                      >
-                        <div className="flex items-center gap-2">
-                          <TypeIcon className="h-4 w-4" />
-                          {opt.label}
-                        </div>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-text dark:text-text-dark">Cor</Label>
-                <ColorPicker
-                  value={currentCategoryForm.color}
-                  onChange={(color) => setCurrentCategoryForm({ ...currentCategoryForm, color })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-text dark:text-text-dark">Ícone</Label>
-                <IconPicker
-                  value={currentCategoryForm.icon}
-                  onChange={(icon) => setCurrentCategoryForm({ ...currentCategoryForm, icon })}
-                  options={iconOptions.map((opt) => ({
-                    value: opt.value,
-                    icon: opt.icon,
-                  }))}
-                />
-              </div>
-            </div>
-
-            <Button
-              type="button"
-              onClick={handleAddCategory}
-              variant="outline"
-              className="w-full border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Adicionar Categoria
-            </Button>
-            {/* Categories List */}
-            {categoriesData.length > 0 && (
-              <div className="space-y-2">
-                <Label className="text-text dark:text-text-dark">
-                  Categorias Criadas ({categoriesData.length})
-                </Label>
-                <div className="space-y-0.5 max-h-28 overflow-y-auto">
-                  {categoriesData.map((category, index) => {
-                    const iconOption = iconOptions.find((opt) => opt.value === category.icon);
-                    const IconComponent = iconOption?.icon ?? Tags;
-                    const typeOption = categoryTypes.find((type) => type.value === category.type);
-                    const TypeIcon = typeOption?.icon ?? TrendingDown;
-                    return (
-                      <div
-                        key={`category-${index}-${category.name}`}
-                        className="flex items-center justify-between px-2 py-1.5 bg-card/50 dark:bg-card-dark/50 border border-border dark:border-border-dark rounded"
-                      >
-                        <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                          <div
-                            className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                            style={{ backgroundColor: category.color }}
-                          >
-                            <IconComponent className="h-2.5 w-2.5 text-white" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="text-text dark:text-text-dark font-medium text-xs truncate leading-tight">
-                              {category.name}
-                            </div>
-                            <div className="flex items-center gap-0.5 text-[10px] text-text dark:text-text-dark/60 leading-tight">
-                              <TypeIcon className="h-2 w-2" />
-                              {categoryTypes.find((t) => t.value === category.type)?.label}
-                            </div>
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          type="button"
-                          size="sm"
-                          onClick={() => handleRemoveCategory(index)}
-                          className="text-red-400 hover:text-red-300 hover:bg-red-400/10 h-6 w-6 p-0 flex-shrink-0"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
+          <CategoryForm
+            formData={currentCategoryForm}
+            errors={categoryFormErrors}
+            iconOptions={iconOptions}
+            categoryTypes={categoryTypes}
+            onNameChange={(name) => setCurrentCategoryForm({ ...currentCategoryForm, name })}
+            onTypeChange={(type) => setCurrentCategoryForm({ ...currentCategoryForm, type })}
+            onColorChange={(color) => setCurrentCategoryForm({ ...currentCategoryForm, color })}
+            onIconChange={(icon) => setCurrentCategoryForm({ ...currentCategoryForm, icon })}
+            onSubmit={handleAddCategory}
+          />
+          <CategoriesList
+            categories={categoriesData}
+            onRemove={handleRemoveCategory}
+            iconOptions={iconOptions}
+            categoryTypes={categoryTypes}
+          />
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
