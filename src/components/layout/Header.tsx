@@ -2,6 +2,7 @@ import { Logo } from '@/components/Logo';
 import { NotificationsMenu } from '@/components/notifications/NotificationsMenu';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
+import { usePreferencesStore } from '@/stores/preferences';
 import { useTheme } from '@/stores/useTheme';
 import { Menu, Transition } from '@headlessui/react';
 import {
@@ -9,6 +10,8 @@ import {
   ArrowRightLeft,
   ChartBar,
   CircleUser,
+  Eye,
+  EyeOff,
   Import,
   LogOut,
   Menu as MenuIcon,
@@ -26,6 +29,7 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
   const location = useLocation();
   const { logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
+  const { isHeaderVisible, toggleHeaderVisibility } = usePreferencesStore();
 
   const handleLogout = () => {
     logout();
@@ -157,6 +161,29 @@ export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
                           >
                             <Settings className="mr-3 h-5 w-5" />
                             Configurações
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            onClick={toggleHeaderVisibility}
+                            className={cn(
+                              active ? 'bg-background dark:bg-background-dark' : '',
+                              'flex w-full items-center px-4 py-2 text-sm text-text dark:text-text-dark',
+                            )}
+                          >
+                            {isHeaderVisible ? (
+                              <>
+                                <EyeOff className="mr-3 h-5 w-5" />
+                                Esconder Header
+                              </>
+                            ) : (
+                              <>
+                                <Eye className="mr-3 h-5 w-5" />
+                                Mostrar Header
+                              </>
+                            )}
                           </button>
                         )}
                       </Menu.Item>

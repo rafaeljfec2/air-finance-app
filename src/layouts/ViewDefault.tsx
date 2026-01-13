@@ -3,8 +3,9 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
 import { CompanySelectionModal } from '@/features/company/components/CompanySelectionModal';
 import { cn } from '@/lib/utils';
+import { usePreferencesStore } from '@/stores/preferences';
 import { useSidebarStore } from '@/stores/sidebar';
-import { Plus } from 'lucide-react';
+import { Eye, Plus } from 'lucide-react';
 import { ReactNode, useCallback, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -14,6 +15,8 @@ interface ViewDefaultProps {
 
 export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
   const isCollapsed = useSidebarStore((state) => state.isCollapsed);
+  const isHeaderVisible = usePreferencesStore((state) => state.isHeaderVisible);
+  const toggleHeaderVisibility = usePreferencesStore((state) => state.toggleHeaderVisibility);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFabModalOpen, setIsFabModalOpen] = useState(false);
   const location = useLocation();
@@ -28,9 +31,23 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
 
   return (
     <div className="min-h-screen bg-background dark:bg-background-dark relative">
-      <Header onOpenSidebar={handleOpenSidebar} />
+      {isHeaderVisible && <Header onOpenSidebar={handleOpenSidebar} />}
       <CompanySelectionModal />
       <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
+
+      {/* Botão flutuante para mostrar header quando estiver escondido */}
+      {!isHeaderVisible && (
+        <div className="fixed top-4 right-4 z-50">
+          <button
+            onClick={toggleHeaderVisibility}
+            className="p-3 bg-primary-600 text-white rounded-full shadow-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-transform active:scale-95 flex items-center justify-center"
+            aria-label="Mostrar Header"
+            title="Mostrar Header"
+          >
+            <Eye className="h-5 w-5" />
+          </button>
+        </div>
+      )}
 
       {/* Floating Action Button (FAB) - Mobile Only */}
       {/* Hide FAB on routes where it obstructs actions (like forms) */}
@@ -84,7 +101,14 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
          This is a standard pattern.
       */}
 
-      <div className="flex h-[calc(100vh-4rem)] md:h-[calc(100dvh-4rem)]">
+      <div
+        className={cn(
+          'flex transition-all duration-300',
+          isHeaderVisible
+            ? 'h-[calc(100vh-4rem)] md:h-[calc(100dvh-4rem)]'
+            : 'h-screen md:h-[100dvh]',
+        )}
+      >
         <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} />
         <main
           className={cn(
