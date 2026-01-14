@@ -14,7 +14,7 @@ interface ImportOfxFiltersProps {
   setSearchTerm: (term: string) => void;
   selectedAccountId: string | undefined;
   setSelectedAccountId: (id: string | undefined) => void;
-  accounts: any[]; // Using any[] to simplify as we just need basic props, but ideally should be typed
+  accounts: Array<{ id: string; name: string; accountNumber?: string; agency?: string | null }>;
 }
 
 export function ImportOfxFilters({
@@ -27,8 +27,7 @@ export function ImportOfxFilters({
   selectedAccountId,
   setSelectedAccountId,
   accounts,
-}: ImportOfxFiltersProps) {
-
+}: Readonly<ImportOfxFiltersProps>) {
   const setDateRange = (start: Date, end: Date) => {
     setStartDate(start);
     setEndDate(end);
@@ -64,7 +63,7 @@ export function ImportOfxFilters({
         {/* Date Range Filter */}
         <div className="flex flex-col gap-2 sm:col-span-2 lg:w-auto lg:flex-row lg:items-center">
           <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1 lg:mb-0">
-             {/* Icon could be added here if desired, e.g. Calendar */}
+            {/* Icon could be added here if desired, e.g. Calendar */}
             <span className="text-sm font-medium lg:hidden">Período</span>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
@@ -86,25 +85,25 @@ export function ImportOfxFilters({
               />
             </div>
             <div className="flex gap-2 justify-end sm:justify-start">
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleToday}
                 className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 Hoje
               </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleThisMonth}
                 className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 Este Mês
               </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleLastMonth}
                 className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
               >
@@ -127,44 +126,46 @@ export function ImportOfxFilters({
 
         {/* Accounts */}
         <div className="flex items-center gap-2">
-           <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-           <div className="w-full lg:w-auto min-w-[200px]">
-              <ComboBox
-                options={[{ value: 'all', label: 'Todas as contas' }, ...accountOptions]}
-                value={selectedAccountId || 'all'}
-                onValueChange={(value) =>
-                  setSelectedAccountId(value === 'all' ? undefined : (value ?? undefined))
+          <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+          <div className="w-full lg:w-auto min-w-[200px]">
+            <ComboBox
+              options={[{ value: 'all', label: 'Todas as contas' }, ...accountOptions]}
+              value={selectedAccountId || 'all'}
+              onValueChange={(value) =>
+                setSelectedAccountId(value === 'all' ? undefined : (value ?? undefined))
+              }
+              placeholder="Todas as contas"
+              searchable
+              searchPlaceholder="Buscar conta..."
+              className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark"
+              maxHeight="max-h-56"
+              renderItem={(option) => {
+                if (option.value === 'all') return <span>{option.label}</span>;
+
+                const accountId = option.value;
+                const account = accounts?.find((acc) => acc.id === accountId);
+
+                let subtitle = '';
+                if (account) {
+                  const parts = [];
+                  if (account.agency) parts.push(`Ag: ${account.agency}`);
+                  if (account.accountNumber) parts.push(`CC: ${account.accountNumber}`);
+                  subtitle = parts.join(' • ');
                 }
-                placeholder="Todas as contas"
-                searchable
-                searchPlaceholder="Buscar conta..."
-                className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark"
-                maxHeight="max-h-56"
-                renderItem={(option) => {
-                  if (option.value === 'all') return <span>{option.label}</span>;
-                  
-                  const accountId = option.value;
-                  const account = accounts?.find((acc) => acc.id === accountId);
-                  
-                  let subtitle = '';
-                  if (account) {
-                    const parts = [];
-                    if (account.agency) parts.push(`Ag: ${account.agency}`);
-                    if (account.accountNumber) parts.push(`CC: ${account.accountNumber}`);
-                    subtitle = parts.join(' • ');
-                  }
-                  
-                  return (
-                    <div className="flex flex-col">
-                       <span className="font-medium text-sm">{option.label.split('(')[0].trim()}</span>
-                       <span className="text-xs text-muted-foreground">{subtitle || 'Sem dados bancários'}</span>
-                    </div>
-                  );
-                }}
-              />
-           </div>
+
+                return (
+                  <div className="flex flex-col">
+                    <span className="font-medium text-sm">{option.label.split('(')[0].trim()}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {subtitle || 'Sem dados bancários'}
+                    </span>
+                  </div>
+                );
+              }}
+            />
+          </div>
         </div>
-        
+
         {/* Export */}
         <Button
           variant="outline"

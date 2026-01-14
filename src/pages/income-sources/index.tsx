@@ -33,7 +33,7 @@ export function IncomeSourcesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setForm((prev) => ({ ...prev, companyId: companyId || '' }));
@@ -50,7 +50,7 @@ export function IncomeSourcesPage() {
   };
 
   const validate = () => {
-    const errs: any = {};
+    const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (form.amount <= 0) errs.amount = 'Valor deve ser maior que zero';
     if (!form.startDate) errs.startDate = 'Data de início obrigatória';

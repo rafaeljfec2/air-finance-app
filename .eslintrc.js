@@ -21,6 +21,13 @@ module.exports = {
         node: true,
         browser: false,
       },
+      globals: {
+        module: 'readonly',
+        require: 'readonly',
+        process: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+      },
       rules: {
         'no-undef': 'off',
       },

@@ -61,8 +61,10 @@ export function NewPasswordPage() {
         type: 'success',
       });
       navigate('/login');
-    } catch (error: any) {
-      const message = error?.response?.data?.message ?? 'Erro ao alterar senha';
+    } catch (error: unknown) {
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        'Erro ao alterar senha';
       toast({
         title: 'Erro',
         description: message,

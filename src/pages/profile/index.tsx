@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { getCurrentUser } from '@/services/authService';
-import { updateUser } from '@/services/userService';
+import { updateUser, type CreateUser } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
 import { Camera, Edit2, Mail, MapPin, Phone, Save, Shield, User, X } from 'lucide-react';
 
@@ -92,7 +92,7 @@ export function Profile() {
     } catch (error) {
       toast({
         title: 'Erro',
-        description: 'Erro ao fazer upload do avatar',
+        description: error instanceof Error ? error.message : 'Erro ao fazer upload do avatar',
         type: 'error',
       });
     }
@@ -113,7 +113,7 @@ export function Profile() {
     try {
       if (user.id) {
         // Prepare data for update
-        const updateData: any = {
+        const updateData: Partial<CreateUser> & Record<string, unknown> = {
           name: formData.name,
           email: formData.email, // Email change might require verification logic, careful
           phone: formData.phone,

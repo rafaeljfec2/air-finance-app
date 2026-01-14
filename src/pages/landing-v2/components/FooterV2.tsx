@@ -54,20 +54,20 @@ export function FooterV2() {
               Simplificando suas finanças com tecnologia e segurança.
             </p>
             <div className="flex space-x-4">
-              <a
-                href="#"
+              <button
+                type="button"
                 className="text-gray-600 hover:text-[#10b981] transition-colors"
                 aria-label="Chat"
               >
                 <MessageSquare className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
+              </button>
+              <button
+                type="button"
                 className="text-gray-600 hover:text-[#10b981] transition-colors"
                 aria-label="Suporte"
               >
                 <Headphones className="w-5 h-5" />
-              </a>
+              </button>
             </div>
           </div>
 

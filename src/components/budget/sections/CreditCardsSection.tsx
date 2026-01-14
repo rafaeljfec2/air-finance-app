@@ -21,7 +21,7 @@ export function CreditCardsSection({
   activeBill,
   activeCardLimit,
   activeCardBillTotal,
-  activeCardAvailable: _activeCardAvailable,
+  activeCardAvailable: _activeCardAvailable, // eslint-disable-line @typescript-eslint/no-unused-vars
   activeCardTab,
   isLoading,
   onActiveCardChange,

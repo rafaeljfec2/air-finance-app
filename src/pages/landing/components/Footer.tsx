@@ -55,20 +55,20 @@ export function Footer() {
                 Simplificando suas finanças com tecnologia e segurança.
               </p>
               <div className="flex space-x-4">
-                <a
-                  href="#"
+                <button
+                  type="button"
                   className="text-text/60 hover:text-brand-arrow transition-colors"
                   aria-label="LinkedIn"
                 >
                   <MessageSquare className="w-5 h-5" />
-                </a>
-                <a
-                  href="#"
+                </button>
+                <button
+                  type="button"
                   className="text-text/60 hover:text-brand-arrow transition-colors"
                   aria-label="Suporte"
                 >
                   <Headphones className="w-5 h-5" />
-                </a>
+                </button>
               </div>
             </div>
           </ScrollReveal>

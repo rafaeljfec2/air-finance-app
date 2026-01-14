@@ -20,7 +20,7 @@ export function InstallmentsModal({
   open,
   onClose,
   installments,
-  accountId: _accountId, // Unused but kept for API compatibility
+  accountId: _accountId, // eslint-disable-line @typescript-eslint/no-unused-vars // Unused but kept for API compatibility
   periodEnd,
   onConfirm,
   isCreating = false,
@@ -37,12 +37,12 @@ export function InstallmentsModal({
   const sortedInstallments = [...installments].sort((a, b) => {
     const remainingA = a.installmentInfo.total - a.installmentInfo.current;
     const remainingB = b.installmentInfo.total - b.installmentInfo.current;
-    
+
     // First: those with fewer remaining installments (finishing first)
     if (remainingA !== remainingB) {
       return remainingA - remainingB;
     }
-    
+
     // If same remaining, sort by current installment (higher current first)
     return b.installmentInfo.current - a.installmentInfo.current;
   });
@@ -71,7 +71,7 @@ export function InstallmentsModal({
             {periodEnd && (
               <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
                 💡 As parcelas começarão em{' '}
-                {format(new Date(periodEnd), "01/MM/yyyy", { locale: ptBR })} (primeiro dia do mês
+                {format(new Date(periodEnd), '01/MM/yyyy', { locale: ptBR })} (primeiro dia do mês
                 de fechamento)
               </p>
             )}
@@ -153,15 +153,12 @@ export function InstallmentsModal({
                           </span>
                           {periodEnd && (
                             <span className="text-xs text-gray-500 dark:text-gray-400">
-                              A partir de{' '}
-                              {format(new Date(periodEnd), 'MM/yyyy', { locale: ptBR })}
+                              A partir de {format(new Date(periodEnd), 'MM/yyyy', { locale: ptBR })}
                             </span>
                           )}
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          Completa
-                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Completa</span>
                       )}
                     </td>
                   </tr>
