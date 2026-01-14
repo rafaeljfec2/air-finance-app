@@ -63,12 +63,12 @@ export function FeaturesV2() {
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-baseline gap-3 mb-3">
-                      <span className="text-4xl font-bold text-[#10b981]">{feature.stat}</span>
-                      <span className="text-sm font-medium text-gray-500">{feature.statLabel}</span>
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="text-3xl font-bold text-[#10b981]">{feature.stat}</span>
+                      <span className="text-xs font-medium text-gray-500">{feature.statLabel}</span>
                     </div>
-                    <h3 className="v2-h3 v2-mb-3">{feature.title}</h3>
-                    <p className="v2-body text-gray-600">{feature.description}</p>
+                    <h3 className="text-xl font-semibold v2-mb-2 text-gray-900">{feature.title}</h3>
+                    <p className="text-base text-gray-600 leading-relaxed">{feature.description}</p>
                   </div>
                 </div>
               </div>
