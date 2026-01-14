@@ -44,7 +44,7 @@ const footerLinks = {
 
 export function FooterV2() {
   return (
-    <footer className="bg-white border-t border-gray-100 py-20">
+    <footer className="bg-gray-50 border-t border-gray-200 py-20">
       <div className="v2-container">
         <div className="grid md:grid-cols-5 gap-12 mb-16">
           {/* Logo and Branding */}

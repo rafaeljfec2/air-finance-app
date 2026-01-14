@@ -52,7 +52,7 @@ const plans = [
 
 export function PricingV2() {
   return (
-    <section id="pricing" className="v2-section bg-gradient-to-b from-white to-[#fafafa]">
+    <section id="pricing" className="v2-section bg-gradient-to-b from-gray-50 to-gray-100">
       <div className="v2-container">
         <div className="v2-text-center v2-mb-12">
           <h2 className="v2-h2 v2-mb-6">Planos para todos os perfis</h2>

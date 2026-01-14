@@ -31,7 +31,7 @@ export function LandingPageV2() {
   return (
     <>
       <SEOHead />
-      <div className="landing-v2-page w-full bg-white text-gray-900 antialiased">
+      <div className="landing-v2-page w-full bg-gray-50 text-gray-900 antialiased">
         <HeaderV2 />
         <main className="relative w-full">
           <HeroV2 />

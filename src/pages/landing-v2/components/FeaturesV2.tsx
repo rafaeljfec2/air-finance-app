@@ -33,8 +33,8 @@ const features = [
 
 export function FeaturesV2() {
   return (
-    <section id="features" className="v2-section bg-white relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#fafafa] to-transparent" />
+    <section id="features" className="v2-section bg-gray-50 relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-100 to-transparent" />
       
       <div className="v2-container relative z-10">
         <div className="v2-text-center v2-mb-20">
