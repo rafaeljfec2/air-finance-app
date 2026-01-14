@@ -37,7 +37,7 @@ export function FeaturesV2() {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-100 to-transparent" />
       
       <div className="v2-container relative z-10">
-        <div className="v2-text-center v2-mb-20">
+        <div className="v2-text-center v2-mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#d1fae5] text-[#059669] text-sm font-semibold mb-6">
             <Sparkles className="w-4 h-4" />
             <span>Recursos Poderosos</span>

@@ -61,7 +61,7 @@ export function PricingV2() {
           </p>
           
           {/* Beta Banner */}
-          <div className="max-w-3xl mx-auto mb-12">
+          <div className="max-w-3xl mx-auto mb-8">
             <div className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-[#10b981]/10 via-[#10b981]/5 to-[#10b981]/10 border-2 border-[#10b981]/20">
               <div className="flex-shrink-0">
                 <div className="w-10 h-10 rounded-full bg-[#10b981] flex items-center justify-center">

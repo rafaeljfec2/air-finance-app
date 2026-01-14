@@ -5,7 +5,7 @@ export function CTAV2() {
   const navigate = useNavigate();
 
   return (
-    <section className="v2-section bg-gradient-to-br from-[#10b981] via-[#059669] to-[#047857] relative overflow-hidden py-32">
+    <section className="v2-section bg-gradient-to-br from-[#10b981] via-[#059669] to-[#047857] relative overflow-hidden py-20">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
@@ -33,7 +33,7 @@ export function CTAV2() {
           </h2>
           
           {/* Description */}
-          <p className="text-lg md:text-xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
             Comece hoje mesmo a organizar suas finanças. É gratuito e leva apenas alguns minutos.
           </p>
           

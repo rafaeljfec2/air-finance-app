@@ -6,7 +6,7 @@ export function HeroV2() {
   const navigate = useNavigate();
 
   return (
-    <section className="v2-section min-h-screen flex items-center bg-gradient-to-b from-gray-50 via-gray-100 to-gray-50 pt-32 relative overflow-hidden">
+    <section className="v2-section min-h-[85vh] flex items-center bg-gradient-to-b from-gray-50 via-gray-100 to-gray-50 pt-24 relative overflow-hidden">
       <div className="absolute top-20 left-10 w-72 h-72 bg-[#10b981]/5 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#10b981]/3 rounded-full blur-3xl" />
 
@@ -26,7 +26,7 @@ export function HeroV2() {
               </span>
             </h1>
 
-            <p className="v2-body v2-mb-12 max-w-xl text-gray-600 leading-relaxed">
+            <p className="v2-body v2-mb-8 max-w-xl text-gray-600 leading-relaxed">
               Reúna todas as suas despesas em um único aplicativo e simplifique suas finanças com o
               nosso gerenciador inteligente.
             </p>
