@@ -1,3 +1,4 @@
+import React from 'react';
 import { Textarea } from '@/components/ui/textarea';
 
 interface NoteFieldProps {
@@ -28,4 +29,3 @@ export function NoteField({ value, onChange }: Readonly<NoteFieldProps>) {
     </div>
   );
 }
-

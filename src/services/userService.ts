@@ -118,11 +118,14 @@ export const assignCompanyRole = async (
 export const deleteUser = async (id: string): Promise<void> => {
   try {
     await apiClient.delete(`/user/${id}`);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao deletar usuário:', error);
     // Extract error message from API response
     const errorMessage =
-      error?.response?.data?.message || error?.message || 'Falha ao deletar usuário';
+      (error as { response?: { data?: { message?: string } }; message?: string })?.response?.data
+        ?.message ||
+      (error as { message?: string })?.message ||
+      'Falha ao deletar usuário';
     throw new Error(errorMessage);
   }
 };

@@ -1,3 +1,4 @@
+/* eslint-env node */
 module.exports = {
   root: true,
   env: {
@@ -6,15 +7,24 @@ module.exports = {
     node: true,
   },
   ignorePatterns: [
-    'dist',
+    'dist/**',
     'node_modules',
-    '.eslintrc.js',
-    '.prettierrc.js',
-    'commitlint.config.js',
     'vite.config.ts',
     'vitest.config.ts',
     'tailwind.config.*',
     'postcss.config.*',
+  ],
+  overrides: [
+    {
+      files: ['.eslintrc.js', '.prettierrc.js', 'commitlint.config.js'],
+      env: {
+        node: true,
+        browser: false,
+      },
+      rules: {
+        'no-undef': 'off',
+      },
+    },
   ],
   extends: [
     'eslint:recommended',

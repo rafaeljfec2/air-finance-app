@@ -38,20 +38,20 @@ export const subscriptionService = {
   },
 
   async getPlans(): Promise<Plan[]> {
-    const response = await apiClient.get<any[]>('/subscription/plans');
+    const response = await apiClient.get<Array<Record<string, unknown>>>('/subscription/plans');
     console.log('subscriptionService getPlans raw response:', response);
     if (response.data && response.data.length > 0) {
-        console.log('First plan item raw:', response.data[0]);
+      console.log('First plan item raw:', response.data[0]);
     }
     // Map backend DB objects (where id is ObjectId) to Frontend expectations (where id is the slug 'free', 'pro')
     // This ensures PlanCard 'isCurrent' check works and 'onSelect' sends the slug to backend.
-    const mappedPlans = response.data.map((plan: any) => ({
-        ...plan,
-        id: plan.name || plan._id, // Fallback if name is missing
-        originalId: plan.id || plan._id,
-        features: Array.isArray(plan.features) ? plan.features : [], // Guard against undefined features
+    const mappedPlans = response.data.map((plan: Record<string, unknown>) => ({
+      ...plan,
+      id: plan.name || plan._id, // Fallback if name is missing
+      originalId: plan.id || plan._id,
+      features: Array.isArray(plan.features) ? plan.features : [], // Guard against undefined features
     }));
-    return mappedPlans as Plan[];
+    return mappedPlans as unknown as Plan[];
   },
 
   async cancelSubscription(subscriptionId: string): Promise<void> {
@@ -63,7 +63,10 @@ export const subscriptionService = {
     return data;
   },
 
-  async updatePlan(planName: 'free' | 'pro' | 'business', updateData: UpdatePlanData): Promise<Plan> {
+  async updatePlan(
+    planName: 'free' | 'pro' | 'business',
+    updateData: UpdatePlanData,
+  ): Promise<Plan> {
     const { data } = await apiClient.put<Plan>(`/subscription/plans/${planName}`, updateData);
     return data;
   },

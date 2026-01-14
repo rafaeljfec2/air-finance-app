@@ -1,8 +1,7 @@
 import { CategoryTableRow } from '@/components/categories/CategoryTableRow';
 import { Card } from '@/components/ui/card';
 import { RecordsGrid } from '@/components/ui/RecordsGrid';
-import { SortableColumn } from '@/components/ui/SortableColumn';
-import { SortConfig } from '@/components/ui/SortableColumn';
+import { SortableColumn , SortConfig } from '@/components/ui/SortableColumn';
 import { Category } from '@/services/categoryService';
 import { CategoryCard } from './CategoryCard';
 

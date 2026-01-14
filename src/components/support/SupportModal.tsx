@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ComboBox } from '@/components/ui/ComboBox';
 import { Input } from '@/components/ui/input';
@@ -6,7 +7,6 @@ import { Modal } from '@/components/ui/Modal';
 import { Textarea } from '@/components/ui/textarea';
 import { supportService } from '@/services/supportService';
 import { Loader2, Send } from 'lucide-react';
-import { useState } from 'react';
 
 interface SupportModalProps {
   isOpen: boolean;
@@ -14,11 +14,11 @@ interface SupportModalProps {
 }
 
 const CATEGORY_OPTIONS = [
-    { value: 'question', label: 'Dúvida Geral' },
-    { value: 'bug', label: 'Relatar Problema (Bug)' },
-    { value: 'feature', label: 'Sugestão de Melhoria' },
-    { value: 'billing', label: 'Financeiro / Assinatura' },
-    { value: 'other', label: 'Outros' },
+  { value: 'question', label: 'Dúvida Geral' },
+  { value: 'bug', label: 'Relatar Problema (Bug)' },
+  { value: 'feature', label: 'Sugestão de Melhoria' },
+  { value: 'billing', label: 'Financeiro / Assinatura' },
+  { value: 'other', label: 'Outros' },
 ];
 
 export function SupportModal({ isOpen, onClose }: SupportModalProps) {
@@ -37,9 +37,9 @@ export function SupportModal({ isOpen, onClose }: SupportModalProps) {
     try {
       await supportService.createTicket({
         subject: formData.subject,
-        category: formData.category as any,
+        category: formData.category as 'bug' | 'feature' | 'question' | 'billing' | 'other',
         message: formData.message,
-        priority: formData.priority as any,
+        priority: formData.priority as 'normal' | 'urgent' | undefined,
       });
       setSuccess(true);
       setTimeout(() => {
@@ -56,11 +56,7 @@ export function SupportModal({ isOpen, onClose }: SupportModalProps) {
   };
 
   return (
-    <Modal
-      open={isOpen}
-      onClose={onClose}
-      title="Suporte"
-    >
+    <Modal open={isOpen} onClose={onClose} title="Suporte">
       <div className="space-y-4">
         <p className="text-sm text-gray-500 dark:text-gray-400 -mt-2 mb-4">
           Como podemos ajudar? Nossa equipe responderá em breve.
@@ -70,11 +66,13 @@ export function SupportModal({ isOpen, onClose }: SupportModalProps) {
           <div className="py-8 text-center text-green-600 dark:text-green-400">
             <div className="flex justify-center mb-4">
               <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                 <Send className="h-6 w-6" />
+                <Send className="h-6 w-6" />
               </div>
             </div>
             <h3 className="text-lg font-semibold">Solicitação Enviada!</h3>
-            <p className="text-sm text-gray-500 mt-2">Recebemos sua mensagem e entraremos em contato.</p>
+            <p className="text-sm text-gray-500 mt-2">
+              Recebemos sua mensagem e entraremos em contato.
+            </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -100,27 +98,31 @@ export function SupportModal({ isOpen, onClose }: SupportModalProps) {
             </div>
 
             <div className="grid gap-2">
-               <Label htmlFor="message">Mensagem</Label>
-               <Textarea
-                 id="message"
-                 placeholder="Descreva detalhadamente o que aconteceu..."
-                 className="min-h-[120px]"
-                 value={formData.message}
-                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                 required
-               />
+              <Label htmlFor="message">Mensagem</Label>
+              <Textarea
+                id="message"
+                placeholder="Descreva detalhadamente o que aconteceu..."
+                className="min-h-[120px]"
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                required
+              />
             </div>
 
             <div className="flex justify-end pt-2 gap-2">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={onClose}
                 className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
               >
                 Cancelar
               </Button>
-              <Button type="submit" variant="success" disabled={loading || !formData.subject || !formData.message}>
+              <Button
+                type="submit"
+                variant="success"
+                disabled={loading || !formData.subject || !formData.message}
+              >
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Enviar Solicitação
               </Button>

@@ -2,8 +2,7 @@ import { CompanyTableRow } from '@/components/companies/CompanyTableRow';
 import { CompanyCard } from './CompanyCard';
 import { Card } from '@/components/ui/card';
 import { RecordsGrid } from '@/components/ui/RecordsGrid';
-import { SortableColumn } from '@/components/ui/SortableColumn';
-import { SortConfig } from '@/components/ui/SortableColumn';
+import { SortableColumn , SortConfig } from '@/components/ui/SortableColumn';
 import { Company } from '@/types/company';
 
 interface CompaniesListProps {

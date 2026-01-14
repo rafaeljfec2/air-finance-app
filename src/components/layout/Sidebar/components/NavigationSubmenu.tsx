@@ -3,11 +3,11 @@ import { cn } from '@/lib/utils';
 import { Link, useLocation } from 'react-router-dom';
 
 interface NavigationSubmenuProps {
-  children: NavigationLinkItem[];
+  items: NavigationLinkItem[];
   isOpen: boolean;
 }
 
-export function NavigationSubmenu({ children, isOpen }: Readonly<NavigationSubmenuProps>) {
+export function NavigationSubmenu({ items, isOpen }: Readonly<NavigationSubmenuProps>) {
   const location = useLocation();
 
   return (
@@ -18,7 +18,7 @@ export function NavigationSubmenu({ children, isOpen }: Readonly<NavigationSubme
       )}
     >
       <div className="py-1">
-        {children.map((child) => {
+        {items.map((child) => {
           const isActive = location.pathname === child.href;
           return (
             <Link

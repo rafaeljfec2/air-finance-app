@@ -13,7 +13,7 @@ import { clearExpiredItems, getStorageSize } from './storage';
 export const cleanupExpiredStorage = (): void => {
   try {
     clearExpiredItems(localStorage);
-    
+
     // Check storage usage
     const size = getStorageSize(localStorage);
     const maxSize = 5 * 1024 * 1024; // 5MB
@@ -47,7 +47,7 @@ export const initStorageCleanup = (): void => {
  * Manually clean specific store if it's expired
  * This can be used to check expiration before reading
  */
-export const checkAndCleanStore = (storeName: string, _ttl: number): boolean => {
+export const checkAndCleanStore = (storeName: string): boolean => {
   try {
     const item = localStorage.getItem(storeName);
     if (!item) return false;
@@ -70,4 +70,3 @@ export const checkAndCleanStore = (storeName: string, _ttl: number): boolean => 
     return false;
   }
 };
-

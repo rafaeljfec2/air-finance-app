@@ -8,10 +8,7 @@ interface OpenAILogDetailsModalProps {
   onClose: () => void;
 }
 
-export function OpenAILogDetailsModal({
-  log,
-  onClose,
-}: Readonly<OpenAILogDetailsModalProps>) {
+export function OpenAILogDetailsModal({ log, onClose }: Readonly<OpenAILogDetailsModalProps>) {
   if (!log) return null;
 
   const formatDate = (log: OpenAILog): string => {
@@ -28,8 +25,8 @@ export function OpenAILogDetailsModal({
       const idToUse = log._id || (log as unknown as { id?: string }).id;
       if (idToUse && typeof idToUse === 'string') {
         try {
-          const timestamp = parseInt(idToUse.substring(0, 8), 16) * 1000;
-          if (!isNaN(timestamp)) {
+          const timestamp = Number.parseInt(idToUse.substring(0, 8), 16) * 1000;
+          if (!Number.isNaN(timestamp)) {
             date = new Date(timestamp);
           }
         } catch {
@@ -66,27 +63,52 @@ export function OpenAILogDetailsModal({
         <div className="p-6 overflow-y-auto space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="p-3 bg-muted/50 rounded-lg">
-              <label className="text-xs font-medium text-gray-500 uppercase block mb-1">Status</label>
+              <label
+                htmlFor="status"
+                className="text-xs font-medium text-gray-500 uppercase block mb-1"
+              >
+                Status
+              </label>
               <Badge variant={log.status === 'success' ? 'success' : 'destructive'}>
                 {log.status}
               </Badge>
             </div>
             <div className="p-3 bg-muted/50 rounded-lg">
-              <label className="text-xs font-medium text-gray-500 uppercase block mb-1">Data</label>
+              <label
+                htmlFor="data"
+                className="text-xs font-medium text-gray-500 uppercase block mb-1"
+              >
+                Data
+              </label>
               <span className="text-sm font-mono">{formatDate(log)}</span>
             </div>
             <div className="p-3 bg-muted/50 rounded-lg">
-              <label className="text-xs font-medium text-gray-500 uppercase block mb-1">Modelo</label>
+              <label
+                htmlFor="modelo"
+                className="text-xs font-medium text-gray-500 uppercase block mb-1"
+              >
+                Modelo
+              </label>
               <span className="text-sm font-mono">{log.aiModel}</span>
             </div>
             <div className="p-3 bg-muted/50 rounded-lg">
-              <label className="text-xs font-medium text-gray-500 uppercase block mb-1">Latência</label>
-              <span className="text-sm font-mono">{log.metadata?.latencyMs ?? '-'}ms</span>
+              <label
+                htmlFor="latencia"
+                className="text-xs font-medium text-gray-500 uppercase block mb-1"
+              >
+                Latência
+              </label>
+              <span className="text-sm font-mono">
+                {log.metadata?.latencyMs ? `${log.metadata.latencyMs}ms` : '-'}
+              </span>
             </div>
           </div>
 
           <div>
-            <label className="text-sm font-semibold text-text dark:text-text-dark block mb-2">
+            <label
+              htmlFor="input"
+              className="text-sm font-semibold text-text dark:text-text-dark block mb-2"
+            >
               Input / Prompt
             </label>
             <div className="bg-muted dark:bg-black/30 p-4 rounded-lg overflow-x-auto">
@@ -95,7 +117,10 @@ export function OpenAILogDetailsModal({
           </div>
 
           <div>
-            <label className="text-sm font-semibold text-text dark:text-text-dark block mb-2">
+            <label
+              htmlFor="output"
+              className="text-sm font-semibold text-text dark:text-text-dark block mb-2"
+            >
               {log.status === 'success' ? 'Output / Response' : 'Error Message'}
             </label>
             <div
@@ -113,7 +138,10 @@ export function OpenAILogDetailsModal({
 
           {log.metadata && (
             <div>
-              <label className="text-sm font-semibold text-text dark:text-text-dark block mb-2">
+              <label
+                htmlFor="metadata"
+                className="text-sm font-semibold text-text dark:text-text-dark block mb-2"
+              >
                 Metadata Completo
               </label>
               <div className="bg-muted dark:bg-black/30 p-4 rounded-lg overflow-x-auto">

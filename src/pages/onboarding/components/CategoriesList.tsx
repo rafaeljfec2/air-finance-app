@@ -1,3 +1,4 @@
+import React from 'react';
 import { Label } from '@/components/ui/label';
 import { CategoryCard } from './CategoryCard';
 import { type CategoryFormData } from '../schemas';

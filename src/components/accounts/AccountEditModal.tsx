@@ -1,9 +1,9 @@
+import React, { useEffect, useMemo, useState } from 'react';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAccounts } from '@/hooks/useAccounts';
-import { useEffect, useMemo, useState } from 'react';
 
 interface AccountEditModalProps {
   open: boolean;
@@ -95,7 +95,9 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
     <Modal open={open} onClose={onClose} title="Editar conta" className="max-w-xl">
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-1">
-          <label className="text-xs text-muted-foreground dark:text-gray-400">Conta</label>
+          <label htmlFor="account" className="text-xs text-muted-foreground dark:text-gray-400">
+            Conta
+          </label>
           <ComboBox
             options={accountOptions}
             value={selectedId || null}
@@ -109,7 +111,9 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground dark:text-gray-400">Nome</label>
+            <label htmlFor="name" className="text-xs text-muted-foreground dark:text-gray-400">
+              Nome
+            </label>
             <Input
               value={form.name}
               onChange={(e) => handleChange('name', e.target.value)}
@@ -118,7 +122,12 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
             {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground dark:text-gray-400">Instituição</label>
+            <label
+              htmlFor="institution"
+              className="text-xs text-muted-foreground dark:text-gray-400"
+            >
+              Instituição
+            </label>
             <Input
               value={form.institution}
               onChange={(e) => handleChange('institution', e.target.value)}
@@ -130,7 +139,9 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground dark:text-gray-400">Agência</label>
+            <label htmlFor="agency" className="text-xs text-muted-foreground dark:text-gray-400">
+              Agência
+            </label>
             <Input
               value={form.agency}
               onChange={(e) => handleChange('agency', e.target.value)}
@@ -139,15 +150,18 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
             {errors.agency && <p className="text-xs text-red-500">{errors.agency}</p>}
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground dark:text-gray-400">Número da conta</label>
+            <label
+              htmlFor="accountNumber"
+              className="text-xs text-muted-foreground dark:text-gray-400"
+            >
+              Número da conta
+            </label>
             <Input
               value={form.accountNumber}
               onChange={(e) => handleChange('accountNumber', e.target.value)}
               placeholder="Número da conta"
             />
-            {errors.accountNumber && (
-              <p className="text-xs text-red-500">{errors.accountNumber}</p>
-            )}
+            {errors.accountNumber && <p className="text-xs text-red-500">{errors.accountNumber}</p>}
           </div>
         </div>
 
@@ -163,4 +177,3 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
     </Modal>
   );
 }
-

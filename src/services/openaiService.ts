@@ -6,7 +6,7 @@ export interface OpenAILog {
   response?: string;
   aiModel: string;
   status: 'success' | 'error';
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   errorMessage?: string;
   createdAt: string;
 }

@@ -74,8 +74,8 @@ export function InteligenciaArtificialFinancasPage() {
                 <div className="prose-lg text-text/90 leading-relaxed bg-brand-arrow/5 rounded-xl p-6 border-l-4 border-brand-arrow">
                   <p className="m-0 text-lg font-medium">
                     A inteligência artificial em finanças não é ficção científica, mas automação
-                  prática de tarefas repetitivas e análise de dados. Este guia explica o que a IA
-                  faz de verdade, onde ela erra e como é usada na gestão financeira.
+                    prática de tarefas repetitivas e análise de dados. Este guia explica o que a IA
+                    faz de verdade, onde ela erra e como é usada na gestão financeira.
                   </p>
                 </div>
               </section>
@@ -91,15 +91,15 @@ export function InteligenciaArtificialFinancasPage() {
                 </h3>
                 <p>
                   Sistemas com IA aprendem que compras em determinado estabelecimento são
-                  "alimentação" ou "transporte". Com histórico suficiente, categorizam
+                  &apos;alimentação&apos; ou &apos;transporte&apos;. Com histórico suficiente, categorizam
                   automaticamente novas transações, reduzindo trabalho manual.
                 </p>
 
                 <h3>Identificação de Padrões</h3>
                 <p>
-                  IA analisa grandes volumes de dados e identifica padrões que humanos não
-                  percebem: sazonalidade de gastos, correlações entre eventos e despesas, tendências
-                  de comportamento financeiro.
+                  IA analisa grandes volumes de dados e identifica padrões que humanos não percebem:
+                  sazonalidade de gastos, correlações entre eventos e despesas, tendências de
+                  comportamento financeiro.
                 </p>
 
                 <h3>
@@ -125,9 +125,9 @@ export function InteligenciaArtificialFinancasPage() {
 
                 <h3>Falta de Contexto</h3>
                 <p>
-                  IA vê apenas dados, não contexto. Uma compra em farmácia pode ser "saúde" ou
-                  "presente", e sem contexto adicional, a IA pode errar. Correções manuais ajudam
-                  o sistema a aprender.
+                  IA vê apenas dados, não contexto. Uma compra em farmácia pode ser &apos;saúde&apos; ou
+                  &apos;presente&apos;, e sem contexto adicional, a IA pode errar. Correções manuais ajudam o
+                  sistema a aprender.
                 </p>
 
                 <h3>Dados Insuficientes</h3>
@@ -232,20 +232,20 @@ export function InteligenciaArtificialFinancasPage() {
 
                 <h3>Reconciliação Inteligente</h3>
                 <p>
-                  Além de correspondência exata por valor/data, IA identifica correspondências
-                  mesmo com pequenas diferenças ou descrições diferentes, aprendendo padrões de
-                  cada empresa.
+                  Além de correspondência exata por valor/data, IA identifica correspondências mesmo
+                  com pequenas diferenças ou descrições diferentes, aprendendo padrões de cada
+                  empresa.
                 </p>
 
                 <h3>Sugestões Contextuais</h3>
                 <p>
-                  IA pode sugerir categorias para transações não categorizadas, alertar sobre
-                  gastos acima do padrão ou recomendar otimizações baseadas em histórico.
+                  IA pode sugerir categorias para transações não categorizadas, alertar sobre gastos
+                  acima do padrão ou recomendar otimizações baseadas em histórico.
                 </p>
 
                 <h3>Regras Adaptativas</h3>
                 <p>
-                  Ao invés de regras fixas (&quot;se valor &gt; X, então Y&quot;), IA aprende regras dinâmicas
+                  Ao invés de regras fixas (&apos;se valor &gt; X, então Y&apos;), IA aprende regras dinâmicas
                   que se adaptam a mudanças de comportamento.
                 </p>
               </section>
@@ -356,6 +356,6 @@ export function InteligenciaArtificialFinancasPage() {
         </div>
         <Footer />
       </div>
-      </>
-    );
-  }
+    </>
+  );
+}

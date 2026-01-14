@@ -1,3 +1,4 @@
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Tags, Trash2, TrendingDown } from 'lucide-react';
 import { type CategoryFormData } from '../schemas';

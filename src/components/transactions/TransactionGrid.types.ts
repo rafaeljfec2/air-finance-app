@@ -16,6 +16,7 @@ export type TransactionGridTransaction = {
   createdAt: string;
   updatedAt: string;
   balance?: number;
+  rawAccountId?: string;
 };
 
 export type SortField =

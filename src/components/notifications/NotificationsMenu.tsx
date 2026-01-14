@@ -1,8 +1,8 @@
+import React, { Fragment, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotificationsStore } from '@/stores/useNotificationsStore';
 import { Menu, Transition } from '@headlessui/react';
 import { Bell, CheckCheck } from 'lucide-react';
-import { Fragment, useEffect } from 'react';
 import { NotificationItem } from './NotificationItem';
 
 export function NotificationsMenu() {

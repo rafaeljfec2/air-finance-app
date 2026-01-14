@@ -16,28 +16,28 @@ describe('NewTransaction', () => {
       name: 'Food',
       type: 'EXPENSE',
       color: '#F44336',
-      icon: '🍽️'
+      icon: '🍽️',
     },
     {
       id: 'cat2',
       name: 'Salary',
       type: 'INCOME',
       color: '#4CAF50',
-      icon: '💰'
-    }
+      icon: '💰',
+    },
   ];
   const mockAccounts = [
     {
       id: 'acc1',
-      name: 'Main Account'
-    }
+      name: 'Main Account',
+    },
   ];
 
   beforeEach(() => {
     (useTransactionStore as unknown as jest.Mock).mockReturnValue({
       addTransaction: mockAddTransaction,
       categories: mockCategories,
-      accounts: mockAccounts
+      accounts: mockAccounts,
     });
   });
 
@@ -49,7 +49,7 @@ describe('NewTransaction', () => {
     render(
       <BrowserRouter>
         <NewTransaction />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByText('Nova Transação')).toBeInTheDocument();
@@ -67,27 +67,27 @@ describe('NewTransaction', () => {
     render(
       <BrowserRouter>
         <NewTransaction />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     // Fill in the form
     fireEvent.change(screen.getByLabelText('Descrição'), {
-      target: { value: 'Test Transaction' }
+      target: { value: 'Test Transaction' },
     });
     fireEvent.change(screen.getByLabelText('Valor'), {
-      target: { value: '100' }
+      target: { value: '100' },
     });
     fireEvent.change(screen.getByLabelText('Categoria'), {
-      target: { value: 'cat1' }
+      target: { value: 'cat1' },
     });
     fireEvent.change(screen.getByLabelText('Conta'), {
-      target: { value: 'acc1' }
+      target: { value: 'acc1' },
     });
     fireEvent.change(screen.getByLabelText('Data'), {
-      target: { value: '2024-03-20' }
+      target: { value: '2024-03-20' },
     });
     fireEvent.change(screen.getByLabelText('Observação'), {
-      target: { value: 'Test note' }
+      target: { value: 'Test note' },
     });
 
     // Submit the form
@@ -100,7 +100,7 @@ describe('NewTransaction', () => {
       categoryId: 'cat1',
       accountId: 'acc1',
       date: '2024-03-20',
-      note: 'Test note'
+      note: 'Test note',
     });
   });
 
@@ -108,7 +108,7 @@ describe('NewTransaction', () => {
     render(
       <BrowserRouter>
         <NewTransaction />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     // Initially should show expense categories
@@ -128,7 +128,7 @@ describe('NewTransaction', () => {
     render(
       <BrowserRouter>
         <NewTransaction />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     // Submit without filling required fields

@@ -12,19 +12,19 @@ export function useOpenAILogSorting() {
       switch (field) {
         case 'status':
           return log.status;
-        case 'createdAt':
+        case 'createdAt': {
           // Try to parse createdAt or extract from _id
           let date: Date | null = null;
           if (log.createdAt && typeof log.createdAt !== 'object') {
             const parsed = new Date(log.createdAt);
-            if (!isNaN(parsed.getTime())) {
+            if (!Number.isNaN(parsed.getTime())) {
               date = parsed;
             }
           }
           if (!date && log._id) {
             try {
-              const timestamp = parseInt(log._id.substring(0, 8), 16) * 1000;
-              if (!isNaN(timestamp)) {
+              const timestamp = Number.parseInt(log._id.substring(0, 8), 16) * 1000;
+              if (!Number.isNaN(timestamp)) {
                 date = new Date(timestamp);
               }
             } catch {
@@ -32,6 +32,7 @@ export function useOpenAILogSorting() {
             }
           }
           return date ?? new Date(0);
+        }
         case 'aiModel':
           return log.aiModel;
         case 'promptOrDescription':

@@ -1,8 +1,7 @@
 import { GoalTableRow } from '@/components/goals/GoalTableRow';
 import { Card } from '@/components/ui/card';
 import { RecordsGrid } from '@/components/ui/RecordsGrid';
-import { SortableColumn } from '@/components/ui/SortableColumn';
-import { SortConfig } from '@/components/ui/SortableColumn';
+import { SortableColumn , SortConfig } from '@/components/ui/SortableColumn';
 import { Goal } from '@/services/goalService';
 import { GoalCard } from './GoalCard';
 

@@ -57,24 +57,29 @@ export function Transactions() {
   const companyId = activeCompany?.id ?? '';
 
   const {
-      transactions: filteredTransactions,
-      totals,
-      isLoading,
-      isFetching,
-      accounts,
-      categories,
-      deleteTransaction,
+    transactions: filteredTransactions,
+    totals,
+    isLoading,
+    isFetching,
+    accounts,
+    categories,
+    deleteTransaction,
   } = useTransactionLogic({
-      companyId,
-      startDate,
-      endDate,
-      selectedAccountId,
-      searchTerm,
-      selectedType,
+    companyId,
+    startDate,
+    endDate,
+    selectedAccountId,
+    searchTerm,
+    selectedType,
   });
 
   const handleEdit = (transaction: TransactionGridTransaction) => {
-    const txForEdit = { ...transaction, accountId: (transaction as any).rawAccountId || transaction.accountId };
+    const txForEdit = {
+      ...transaction,
+      accountId:
+        (transaction as TransactionGridTransaction & { rawAccountId?: string }).rawAccountId ||
+        transaction.accountId,
+    };
     setTransactionToEdit(txForEdit);
     setShowEditModal(true);
   };
@@ -100,9 +105,10 @@ export function Transactions() {
       });
       setShowConfirmDelete(false);
       setTransactionToDelete(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage =
-        error?.response?.data?.message || 'Não foi possível excluir a transação. Tente novamente.';
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Não foi possível excluir a transação. Tente novamente.';
       toast({
         title: 'Erro ao excluir',
         description: errorMessage,

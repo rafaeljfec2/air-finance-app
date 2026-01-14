@@ -88,7 +88,7 @@ export function TransactionFilters({
           )}
           {searchTerm && (
             <span className="bg-background dark:bg-background-dark px-2 py-0.5 rounded border border-border dark:border-border-dark">
-              Busca: "{searchTerm}"
+              Busca: &quot;{searchTerm}&quot;
             </span>
           )}
         </div>

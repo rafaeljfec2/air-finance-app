@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,18 +9,7 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { getCurrentUser } from '@/services/authService';
 import { updateUser } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
-import {
-    Camera,
-    Edit2,
-    Mail,
-    MapPin,
-    Phone,
-    Save,
-    Shield,
-    User,
-    X,
-} from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Camera, Edit2, Mail, MapPin, Phone, Save, Shield, User, X } from 'lucide-react';
 
 type ProfileFormData = {
   name: string;
@@ -132,10 +122,10 @@ export function Profile() {
         };
 
         const updatedUser = await updateUser(user.id, updateData);
-        
+
         // Update local store
         setUser(updatedUser);
-        
+
         setIsEditing(false);
         toast({
           title: 'Sucesso',
@@ -397,7 +387,10 @@ export function Profile() {
                     <Button variant="outline" className="w-full justify-start">
                       Alterar Senha
                     </Button>
-                    <Button variant="outline" className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10"
+                    >
                       Encerrar Sessões
                     </Button>
                   </div>

@@ -33,11 +33,11 @@ export const authUtils = {
     sessionStorage.removeItem(REFRESH_TOKEN_KEY);
   },
 
-  setUser(user: any, persistent = false): void {
+  setUser(user: Record<string, unknown>, persistent = false): void {
     getStorage(persistent).setItem(USER_KEY, JSON.stringify(user));
   },
 
-  getUser(): any | null {
+  getUser(): Record<string, unknown> | null {
     const user = localStorage.getItem(USER_KEY) || sessionStorage.getItem(USER_KEY);
     return user ? JSON.parse(user) : null;
   },

@@ -60,7 +60,7 @@ export function NavigationGroup({
           </>
         )}
       </button>
-      {!isCollapsed && <NavigationSubmenu children={item.children} isOpen={isOpen} />}
+      {!isCollapsed && <NavigationSubmenu items={item.children} isOpen={isOpen} />}
     </div>
   );
 }

@@ -55,10 +55,10 @@ export default [
     },
     plugins: {
       '@typescript-eslint': tseslint,
-      'react': reactPlugin,
+      react: reactPlugin,
       'react-hooks': reactHooksPlugin,
       'react-refresh': reactRefreshPlugin,
-      'import': importPlugin,
+      import: importPlugin,
       'jsx-a11y': jsxA11yPlugin,
     },
     rules: {
@@ -77,6 +77,15 @@ export default [
       'import/no-named-as-default-member': 'off',
       'jsx-a11y/click-events-have-key-events': 'warn',
       'jsx-a11y/no-static-element-interactions': 'warn',
+    },
+  },
+  // Configuração específica para arquivos de teste
+  {
+    files: ['**/__tests__/**/*.{ts,tsx}', '**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+      },
     },
   },
 ];

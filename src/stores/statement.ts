@@ -12,7 +12,7 @@ interface StatementState {
   previousExpenses: number;
   isLoading: boolean;
   error: string | null;
-  errorDetails: any;
+  errorDetails: unknown;
   loadTransactions: () => Promise<void>;
   removeTransaction: (id: string) => Promise<void>;
 }

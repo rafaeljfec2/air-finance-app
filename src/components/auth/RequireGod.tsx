@@ -1,7 +1,7 @@
+import React, { useEffect, useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
 import { getCurrentUser } from '@/services/authService';
 import { useAuthStore } from '@/stores/auth';
-import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
 export function RequireGod({ children }: { children?: React.ReactNode }) {

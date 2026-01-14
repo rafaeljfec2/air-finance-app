@@ -10,7 +10,7 @@ export interface Notification {
   message: string;
   read: boolean;
   createdAt: string; // ISO Date
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 interface NotificationsState {

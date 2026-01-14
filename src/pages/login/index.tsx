@@ -50,7 +50,7 @@ export function Login() {
         rememberMe: formData.rememberMe,
       },
       {
-        onError: (err: any) => {
+        onError: (err: unknown) => {
           // Parseia o erro usando o handler centralizado
           const apiError = parseApiError(err);
           const friendlyMessage = getUserFriendlyMessage(apiError);
@@ -78,7 +78,7 @@ export function Login() {
       setResendSuccess(
         'E-mail de verificação reenviado com sucesso! Verifique sua caixa de entrada.',
       );
-    } catch (err: any) {
+    } catch (err: unknown) {
       const apiError = parseApiError(err);
       const friendlyMessage = getUserFriendlyMessage(apiError);
       setResendError(friendlyMessage);
@@ -148,7 +148,7 @@ export function Login() {
                   <div className="space-y-4">
                     {/* Email */}
                     <div>
-                      <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
+                      <label htmlFor="email" className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                         Email
                       </label>
                       <div className="relative">
@@ -156,6 +156,7 @@ export function Login() {
                           <Mail className="h-5 w-5 text-brand-arrow dark:text-brand-leaf" />
                         </div>
                         <Input
+                          id="email"
                           type="email"
                           name="email"
                           value={formData.email}
@@ -169,7 +170,7 @@ export function Login() {
 
                     {/* Senha */}
                     <div>
-                      <label className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
+                      <label htmlFor="password" className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
                         Senha
                       </label>
                       <div className="relative">
@@ -177,6 +178,7 @@ export function Login() {
                           <Lock className="h-5 w-5 text-brand-arrow dark:text-brand-leaf" />
                         </div>
                         <Input
+                          id="password"
                           type={showPassword ? 'text' : 'password'}
                           name="password"
                           value={formData.password}
@@ -204,13 +206,14 @@ export function Login() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <input
+                        id="rememberMe"
                         type="checkbox"
                         name="rememberMe"
                         checked={formData.rememberMe}
                         onChange={handleChange}
                         className="h-4 w-4 rounded border-border dark:border-border-dark bg-card dark:bg-card-dark text-brand-arrow dark:text-brand-leaf focus:ring-brand-arrow dark:focus:ring-brand-leaf"
                       />
-                      <label className="ml-2 block text-sm text-text dark:text-text-dark">
+                      <label htmlFor="rememberMe" className="ml-2 block text-sm text-text dark:text-text-dark">
                         Lembrar-me
                       </label>
                     </div>
@@ -343,7 +346,7 @@ export function Login() {
 }
 
 // Helper component for Loader2 since it wasn't imported in the original clip
-function Loader2(props: any) {
+function Loader2(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

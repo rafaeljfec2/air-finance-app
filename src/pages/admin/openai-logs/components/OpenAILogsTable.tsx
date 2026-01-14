@@ -1,8 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { SortableColumn } from '@/components/ui/SortableColumn';
-import { SortConfig } from '@/components/ui/SortableColumn';
+import { SortableColumn, SortConfig } from '@/components/ui/SortableColumn';
 import { OpenAILog } from '@/services/openaiService';
 import { Eye, Terminal } from 'lucide-react';
 
@@ -70,11 +69,7 @@ export function OpenAILogsTable({
               <SortableColumn field="aiModel" currentSort={sortConfig} onSort={onSort}>
                 Modelo
               </SortableColumn>
-              <SortableColumn
-                field="promptOrDescription"
-                currentSort={sortConfig}
-                onSort={onSort}
-              >
+              <SortableColumn field="promptOrDescription" currentSort={sortConfig} onSort={onSort}>
                 Input
               </SortableColumn>
               <th className="text-left p-3 text-sm font-semibold text-text dark:text-text-dark whitespace-nowrap">
@@ -125,7 +120,7 @@ export function OpenAILogsTable({
                     >
                       <Terminal className="h-4 w-4" />
                       {log.metadata.latencyMs ? (
-                        <span>{log.metadata.latencyMs}ms</span>
+                        <span>{log.metadata?.latencyMs ? `${log.metadata.latencyMs}ms` : '-'}</span>
                       ) : (
                         <span>Info</span>
                       )}

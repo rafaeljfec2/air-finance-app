@@ -1,3 +1,4 @@
+import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { useTransactionForm } from '../useTransactionForm';
 import { useNavigate } from 'react-router-dom';
@@ -119,7 +120,7 @@ describe('useTransactionForm', () => {
         type: 'EXPENSE',
         category: expect.objectContaining({ id: '1' }),
         date: expect.any(Date),
-      })
+      }),
     );
     expect(result.current.showSuccessTooltip).toBe(true);
     expect(mockNavigate).toHaveBeenCalledWith('/statement');

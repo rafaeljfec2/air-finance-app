@@ -1,5 +1,5 @@
 export interface ReportCategory {
-  percentage: any;
+  percentage: number;
   name: string;
   value: number;
 }
@@ -31,8 +31,8 @@ export interface Report {
     color: string;
     percentage: number;
   }>;
-  historicalIncome: any[];
-  historicalExpenses: any[];
+  historicalIncome: Array<{ month: string; value: number }>;
+  historicalExpenses: Array<{ month: string; value: number }>;
   income: ReportSummary;
   expenses: ReportSummary;
   balance: ReportBalance;

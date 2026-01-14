@@ -27,9 +27,7 @@ export function CreditCardsSection({
   onActiveCardChange,
 }: Readonly<CreditCardsSectionProps>) {
   // Extract installment info from description
-  const extractInstallment = (
-    desc: string,
-  ): { current: number; total: number } | null => {
+  const extractInstallment = (desc: string): { current: number; total: number } | null => {
     const regex1 = /parcela\s+(\d+)\/(\d+)/i;
     const regex2 = /(?:^|\s|-)(\d+)\/(\d+)(?:\s|$)/;
     let match = regex1.exec(desc);

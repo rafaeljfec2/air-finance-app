@@ -1,5 +1,8 @@
 import { TransactionGridTransaction } from '@/components/transactions/TransactionGrid.types';
-import { calculateBalance, createPreviousBalanceRow } from '@/components/transactions/TransactionGrid.utils';
+import {
+  calculateBalance,
+  createPreviousBalanceRow,
+} from '@/components/transactions/TransactionGrid.utils';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCategories } from '@/hooks/useCategories';
 import { usePreviousBalance, useTransactions } from '@/hooks/useTransactions';
@@ -24,7 +27,7 @@ export function useTransactionLogic({
 }: UseTransactionLogicProps) {
   const { accounts } = useAccounts();
   const { categories } = useCategories(companyId);
-  
+
   const {
     transactions = [],
     isLoading,
@@ -46,14 +49,18 @@ export function useTransactionLogic({
     return map;
   }, [accounts]);
 
+  type TransactionWithRawAccount = TransactionGridTransaction & { rawAccountId: string };
+
   const transactionsWithLabels = useMemo(
     () =>
-      [...transactions].map((tx) => ({
-        ...tx,
-        rawAccountId: tx.accountId,
-        categoryId: categoryMap.get(tx.categoryId) ?? tx.categoryId,
-        accountId: accountMap.get(tx.accountId) ?? tx.accountId,
-      })),
+      [...transactions].map(
+        (tx): TransactionWithRawAccount => ({
+          ...tx,
+          rawAccountId: tx.accountId,
+          categoryId: categoryMap.get(tx.categoryId) ?? tx.categoryId,
+          accountId: accountMap.get(tx.accountId) ?? tx.accountId,
+        }),
+      ),
     [transactions, categoryMap, accountMap],
   );
 
@@ -84,13 +91,18 @@ export function useTransactionLogic({
     }
 
     const transactionDate = new Date(paymentDate);
-    
-    const txDateUTC = new Date(Date.UTC(
-      transactionDate.getUTCFullYear(),
-      transactionDate.getUTCMonth(),
-      transactionDate.getUTCDate(),
-      0, 0, 0, 0
-    ));
+
+    const txDateUTC = new Date(
+      Date.UTC(
+        transactionDate.getUTCFullYear(),
+        transactionDate.getUTCMonth(),
+        transactionDate.getUTCDate(),
+        0,
+        0,
+        0,
+        0,
+      ),
+    );
 
     if (start) {
       const [year, month, day] = start.split('-').map(Number);
@@ -128,11 +140,13 @@ export function useTransactionLogic({
 
     if (startDate) {
       const previousBalanceRow = createPreviousBalanceRow(previousBalance, startDate);
-      previousBalanceRow.categoryId = 'Saldo Anterior';
-      previousBalanceRow.accountId = selectedAccountId
-        ? (accountMap.get(selectedAccountId) ?? 'Todas')
-        : 'Todas';
-      transactionsList = [{ ...previousBalanceRow, rawAccountId: 'previous-balance' } as any, ...transactionsList];
+      const previousBalanceWithRaw = {
+        ...previousBalanceRow,
+        rawAccountId: 'previous-balance',
+        categoryId: 'Saldo Anterior',
+        accountId: selectedAccountId ? (accountMap.get(selectedAccountId) ?? 'Todas') : 'Todas',
+      };
+      transactionsList = [previousBalanceWithRaw as TransactionWithRawAccount, ...transactionsList];
     }
 
     return calculateBalance(transactionsList);
@@ -140,29 +154,27 @@ export function useTransactionLogic({
 
   const filteredTransactions = useMemo(() => {
     return [...transactionsWithPreviousBalance]
-    .sort((a, b) => {
-      const dateA = new Date(a.paymentDate || a.createdAt).getTime();
-      const dateB = new Date(b.paymentDate || b.createdAt).getTime();
-      
-      if (dateA === dateB) {
-        const createdA = new Date(a.createdAt).getTime();
-        const createdB = new Date(b.createdAt).getTime();
-        return createdB - createdA; // Newest created first (DESC)
-      }
-      
-      return dateB - dateA; // Newest date first (DESC)
-    })
-    .filter(shouldIncludeTransaction);
+      .sort((a, b) => {
+        const dateA = new Date(a.paymentDate || a.createdAt).getTime();
+        const dateB = new Date(b.paymentDate || b.createdAt).getTime();
+
+        if (dateA === dateB) {
+          const createdA = new Date(a.createdAt).getTime();
+          const createdB = new Date(b.createdAt).getTime();
+          return createdB - createdA; // Newest created first (DESC)
+        }
+
+        return dateB - dateA; // Newest date first (DESC)
+      })
+      .filter(shouldIncludeTransaction);
   }, [transactionsWithPreviousBalance, searchTerm, selectedType, startDate, endDate]);
 
   const totals = useMemo(() => {
     let totalCredits = 0;
     let totalDebits = 0;
-    
+
     const liquidAccountIds = new Set(
-        accounts
-          ?.filter((a) => ['checking', 'digital_wallet'].includes(a.type))
-          .map((a) => a.id)
+      accounts?.filter((a) => ['checking', 'digital_wallet'].includes(a.type)).map((a) => a.id),
     );
 
     filteredTransactions.forEach((transaction) => {
@@ -171,10 +183,11 @@ export function useTransactionLogic({
       }
 
       if (!selectedAccountId) {
-         const rawId = (transaction as any).rawAccountId;
-         if (rawId && !liquidAccountIds.has(rawId)) {
-             return; 
-         }
+        const rawId = (transaction as TransactionGridTransaction & { rawAccountId?: string })
+          .rawAccountId;
+        if (rawId && !liquidAccountIds.has(rawId)) {
+          return;
+        }
       }
 
       if (transaction.launchType === 'revenue') {

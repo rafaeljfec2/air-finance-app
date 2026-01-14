@@ -47,7 +47,7 @@ interface CategoryChartsProps {
 
 interface CustomTooltipProps {
   active?: boolean;
-  payload?: any[];
+  payload?: Array<{ name: string; value: number; color?: string }>;
   label?: string;
 }
 
@@ -127,7 +127,7 @@ export function CategoryCharts({ report }: CategoryChartsProps) {
             </BarChart>
           </ResponsiveContainer>
         );
-      case 'line':
+      case 'line': {
         const historicalData = title.includes('Income') ? report.historicalIncome : report.historicalExpenses;
         return (
           <ResponsiveContainer width="100%" height={300}>
@@ -149,6 +149,7 @@ export function CategoryCharts({ report }: CategoryChartsProps) {
             </LineChart>
           </ResponsiveContainer>
         );
+      }
     }
   };
 

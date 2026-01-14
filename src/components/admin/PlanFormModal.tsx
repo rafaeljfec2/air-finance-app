@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +7,6 @@ import { Switch } from '@/components/ui/switch';
 import { Plan } from '@/types/subscription';
 import { UpdatePlanData } from '@/services/subscriptionService';
 import { Loader2, X, CreditCard, DollarSign, Settings, Sparkles, Trash2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
 
 interface PlanFormModalProps {
   open: boolean;
@@ -45,7 +45,8 @@ export function PlanFormModal({
     if (plan) {
       setFormData({
         priceMonthly: plan.priceMonthly ?? plan.price ?? 0,
-        displayPrice: plan.displayPrice || `R$ ${(plan.priceMonthly ?? plan.price ?? 0).toFixed(2)}`,
+        displayPrice:
+          plan.displayPrice || `R$ ${(plan.priceMonthly ?? plan.price ?? 0).toFixed(2)}`,
         stripePriceId: plan.stripePriceId,
         features: plan.features || [],
         limits: {
@@ -90,8 +91,14 @@ export function PlanFormModal({
   };
 
   const handleLimitChange = (
-    key: 'maxAccounts' | 'maxCards' | 'aiEnabled' | 'bankIntegrationEnabled' | 'multiUser' | 'multiCompany',
-    value: any,
+    key:
+      | 'maxAccounts'
+      | 'maxCards'
+      | 'aiEnabled'
+      | 'bankIntegrationEnabled'
+      | 'multiUser'
+      | 'multiCompany',
+    value: number | boolean,
   ) => {
     if (!formData.limits) return;
     setFormData({
@@ -324,10 +331,10 @@ export function PlanFormModal({
                   }}
                   className="min-h-[44px] flex-1"
                 />
-                <Button 
-                  type="button" 
-                  onClick={addFeature} 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  onClick={addFeature}
+                  variant="outline"
                   className="min-h-[44px] text-sm font-medium bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
                 >
                   Adicionar
@@ -376,7 +383,7 @@ export function PlanFormModal({
                     Destacar Plano
                   </span>
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    Marcar como "Recomendado" na página de preços
+                    Marcar como &quot;Recomendado&quot; na página de preços
                   </span>
                 </div>
                 <Switch
@@ -390,11 +397,11 @@ export function PlanFormModal({
 
         {/* Footer */}
         <div className="flex justify-end gap-3 px-6 py-4 border-t border-border dark:border-border-dark flex-shrink-0 bg-card dark:bg-card-dark">
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={handleClose} 
-            disabled={isLoading} 
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleClose}
+            disabled={isLoading}
             className="min-h-[44px] text-sm font-medium bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
           >
             Cancelar

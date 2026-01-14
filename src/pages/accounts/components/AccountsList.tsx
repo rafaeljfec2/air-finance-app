@@ -1,8 +1,7 @@
 import { AccountTableRow } from '@/components/accounts/AccountTableRow';
 import { Card } from '@/components/ui/card';
 import { RecordsGrid } from '@/components/ui/RecordsGrid';
-import { SortableColumn } from '@/components/ui/SortableColumn';
-import { SortConfig } from '@/components/ui/SortableColumn';
+import { SortableColumn , SortConfig } from '@/components/ui/SortableColumn';
 import { Account } from '@/services/accountService';
 import { AccountCard } from './AccountCard';
 
