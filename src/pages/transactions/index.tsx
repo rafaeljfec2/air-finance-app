@@ -12,12 +12,13 @@ import { TransactionHeader } from '@/pages/transactions/components/TransactionHe
 import { TransactionSummary } from '@/pages/transactions/components/TransactionSummary';
 import { useCompanyStore } from '@/stores/company';
 import { formatDateToLocalISO } from '@/utils/date';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTransactionLogic } from './hooks/useTransactionLogic';
 
 export function Transactions() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState(() => {
     const now = new Date();
@@ -31,7 +32,15 @@ export function Transactions() {
   });
 
   const [selectedType, setSelectedType] = useState('all');
-  const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>(undefined);
+  const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>(
+    searchParams.get('accountId') ?? undefined,
+  );
+
+  // Atualizar selectedAccountId quando a URL mudar
+  useEffect(() => {
+    const accountIdFromUrl = searchParams.get('accountId');
+    setSelectedAccountId(accountIdFromUrl ?? undefined);
+  }, [searchParams]);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<TransactionGridTransaction | null>(
     null,

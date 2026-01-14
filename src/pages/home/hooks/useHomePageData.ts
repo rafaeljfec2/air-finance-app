@@ -71,6 +71,7 @@ export function useHomePageData() {
       .map((tx): TransactionWithAccount => ({
         ...tx,
         accountName: accountMap.get(tx.accountId) ?? 'Conta não encontrada',
+        accountId: tx.accountId, // Garantir que accountId está disponível
       }))
       .sort((a, b) => {
         // Ordenar por paymentDate DESC (mais recente primeiro)

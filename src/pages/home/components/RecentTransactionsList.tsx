@@ -13,9 +13,7 @@ interface RecentTransactionsListProps {
   transactions: TransactionWithAccount[];
 }
 
-export function RecentTransactionsList({
-  transactions,
-}: Readonly<RecentTransactionsListProps>) {
+export function RecentTransactionsList({ transactions }: Readonly<RecentTransactionsListProps>) {
   if (transactions.length === 0) {
     return (
       <div className="px-6 flex-1 md:px-0 md:col-span-1">
@@ -40,9 +38,7 @@ export function RecentTransactionsList({
   return (
     <div className="px-6 flex-1 md:px-0 md:col-span-1">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Últimas Transações
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Últimas Transações</h2>
         <Link
           to="/transactions"
           className="text-sm text-primary-600 dark:text-primary-400 font-medium hover:underline"
@@ -84,10 +80,16 @@ function TransactionItem({ transaction: tx }: Readonly<TransactionItemProps>) {
             <h3 className="font-medium text-gray-900 dark:text-white line-clamp-1 flex-1">
               {tx.description}
             </h3>
-            {tx.accountName && (
-              <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex-shrink-0">
+            {tx.accountName && tx.accountId && (
+              <Link
+                to={`/transactions?accountId=${tx.accountId}`}
+                className="px-2.5 py-1 text-xs font-medium rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-colors flex-shrink-0 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
                 {tx.accountName}
-              </span>
+              </Link>
             )}
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400">
