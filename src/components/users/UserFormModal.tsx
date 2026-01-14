@@ -4,6 +4,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CreateUser, User } from '@/services/userService';
+import { UserRole } from '@/types/user';
 import { useCompanyStore } from '@/stores/company';
 import { Loader2 } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -45,7 +46,9 @@ export function UserFormModal({
   const [form, setForm] = useState<CreateUser>(initialFormState);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const roleOptions: ComboBoxOption<'god' | 'sys_admin' | 'user' | 'owner' | 'admin' | 'editor' | 'operator' | 'viewer'>[] = useMemo(
+  const roleOptions: ComboBoxOption<
+    'god' | 'sys_admin' | 'user' | 'owner' | 'admin' | 'editor' | 'operator' | 'viewer'
+  >[] = useMemo(
     () => [
       { value: 'god', label: 'God (SuperUser)' },
       { value: 'sys_admin', label: 'Administrador (Sistema)' },
@@ -82,10 +85,11 @@ export function UserFormModal({
 
   useEffect(() => {
     if (user) {
-        // Se temos uma empresa ativa, tentamos pegar o papel específico da empresa
-        const companyRole = activeCompany && user.companyRoles ? user.companyRoles[activeCompany.id] : undefined;
-        // Se não tiver papel na empresa, usa o papel global
-        const displayRole = (companyRole || user.role) as any;
+      // Se temos uma empresa ativa, tentamos pegar o papel específico da empresa
+      const companyRole =
+        activeCompany && user.companyRoles ? user.companyRoles[activeCompany.id] : undefined;
+      // Se não tiver papel na empresa, usa o papel global
+      const displayRole = (companyRole || user.role) as UserRole;
 
       setForm({
         name: user.name,
@@ -175,9 +179,18 @@ export function UserFormModal({
             <ComboBox
               options={roleOptions}
               value={form.role}
-              onValueChange={(value: 'god' | 'sys_admin' | 'user' | 'owner' | 'admin' | 'editor' | 'operator' | 'viewer' | null) =>
-                setForm((prev) => ({ ...prev, role: value ?? 'user' }))
-              }
+              onValueChange={(
+                value:
+                  | 'god'
+                  | 'sys_admin'
+                  | 'user'
+                  | 'owner'
+                  | 'admin'
+                  | 'editor'
+                  | 'operator'
+                  | 'viewer'
+                  | null,
+              ) => setForm((prev) => ({ ...prev, role: value ?? 'user' }))}
               placeholder="Selecione a função"
               disabled={isLoading}
               className="w-full"
