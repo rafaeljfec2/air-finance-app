@@ -1,3 +1,4 @@
+import { RecordCard } from '@/components/ui/RecordCard';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -143,102 +144,82 @@ export function RecurringTransactionCard({
   }
 
   return (
-    <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow">
-      <div className="p-6">
-        {/* Header do Card */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div
+    <RecordCard
+      onEdit={() => onEdit(recurringTransaction)}
+      onDelete={() => onDelete(recurringTransaction.id)}
+      isUpdating={isUpdating}
+      isDeleting={isDeleting}
+    >
+      {/* Header do Card */}
+      <div className="flex items-start justify-between mb-2">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div
+            className={cn(
+              'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
+              isIncome ? 'bg-emerald-500/20' : 'bg-red-500/20',
+            )}
+          >
+            {isIncome ? (
+              <ArrowUpCircle className="h-4 w-4 text-emerald-400" />
+            ) : (
+              <ArrowDownCircle className="h-4 w-4 text-red-400" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-semibold text-text dark:text-text-dark mb-0.5 truncate leading-tight">
+              {recurringTransaction.description}
+            </h3>
+            <span
               className={cn(
-                'w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0',
-                isIncome ? 'bg-emerald-500/20' : 'bg-red-500/20',
+                'inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-medium border',
+                isIncome
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                  : 'bg-red-500/20 text-red-400 border-red-500/30',
               )}
             >
-              {isIncome ? (
-                <ArrowUpCircle className="h-6 w-6 text-emerald-400" />
-              ) : (
-                <ArrowDownCircle className="h-6 w-6 text-red-400" />
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-text dark:text-text-dark mb-1 truncate">
-                {recurringTransaction.description}
-              </h3>
-              <span
-                className={cn(
-                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-                  isIncome
-                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                    : 'bg-red-500/20 text-red-400 border-red-500/30',
-                )}
-              >
-                {isIncome ? 'Receita' : 'Despesa'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Informações */}
-        <div className="space-y-2 mb-4">
-          <div className="text-sm">
-            <span className="text-gray-500 dark:text-gray-400">Valor: </span>
-            <span className="text-text dark:text-text-dark font-semibold">
-              {formatCurrency(recurringTransaction.value)}
+              {isIncome ? 'Receita' : 'Despesa'}
             </span>
           </div>
-          <div className="text-sm">
-            <span className="text-gray-500 dark:text-gray-400">Frequência: </span>
-            <span className="text-text dark:text-text-dark">
-              {frequencyLabels[recurringTransaction.frequency]}
-            </span>
-          </div>
-          <div className="text-sm">
-            <span className="text-gray-500 dark:text-gray-400">Data inicial: </span>
-            <span className="text-text dark:text-text-dark">
-              {formatDate(recurringTransaction.startDate)}
-            </span>
-          </div>
-          {recurringTransaction.repeatUntil && (
-            <div className="text-sm">
-              <span className="text-gray-500 dark:text-gray-400">Data final: </span>
-              <span className="text-text dark:text-text-dark">
-                {formatDate(recurringTransaction.repeatUntil)}
-              </span>
-            </div>
-          )}
-          <div className="text-sm">
-            <span className="text-gray-500 dark:text-gray-400">Categoria: </span>
-            <span className="text-text dark:text-text-dark">{categoryName}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-gray-500 dark:text-gray-400">Conta: </span>
-            <span className="text-text dark:text-text-dark">{accountName}</span>
-          </div>
-        </div>
-
-        {/* Ações */}
-        <div className="flex gap-2 pt-4 border-t border-border dark:border-border-dark">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onEdit(recurringTransaction)}
-            disabled={isUpdating || isDeleting}
-            className="flex-1 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
-          >
-            <Edit className="h-4 w-4 mr-2" />
-            Editar
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onDelete(recurringTransaction.id)}
-            disabled={isUpdating || isDeleting}
-            className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
         </div>
       </div>
-    </Card>
+
+      {/* Informações */}
+      <div className="space-y-1">
+        <div className="text-[11px] leading-tight">
+          <span className="text-gray-500 dark:text-gray-400">Valor: </span>
+          <span className="text-text dark:text-text-dark font-semibold">
+            {formatCurrency(recurringTransaction.value)}
+          </span>
+        </div>
+        <div className="text-[11px] leading-tight">
+          <span className="text-gray-500 dark:text-gray-400">Frequência: </span>
+          <span className="text-text dark:text-text-dark">
+            {frequencyLabels[recurringTransaction.frequency]}
+          </span>
+        </div>
+        <div className="text-[11px] leading-tight">
+          <span className="text-gray-500 dark:text-gray-400">Data inicial: </span>
+          <span className="text-text dark:text-text-dark">
+            {formatDate(recurringTransaction.startDate)}
+          </span>
+        </div>
+        {recurringTransaction.repeatUntil && (
+          <div className="text-[11px] leading-tight">
+            <span className="text-gray-500 dark:text-gray-400">Data final: </span>
+            <span className="text-text dark:text-text-dark">
+              {formatDate(recurringTransaction.repeatUntil)}
+            </span>
+          </div>
+        )}
+        <div className="text-[11px] leading-tight">
+          <span className="text-gray-500 dark:text-gray-400">Categoria: </span>
+          <span className="text-text dark:text-text-dark truncate block">{categoryName}</span>
+        </div>
+        <div className="text-[11px] leading-tight">
+          <span className="text-gray-500 dark:text-gray-400">Conta: </span>
+          <span className="text-text dark:text-text-dark truncate block">{accountName}</span>
+        </div>
+      </div>
+    </RecordCard>
   );
 }
