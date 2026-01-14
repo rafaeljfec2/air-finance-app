@@ -1,8 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { RecordCard } from '@/components/ui/RecordCard';
 import { cn } from '@/lib/utils';
 import { User, UserRole, UserStatus } from '@/services/userService';
-import { CheckCircle2, Edit, Mail, Trash2, XCircle } from 'lucide-react';
+import { CheckCircle2, Mail, XCircle } from 'lucide-react';
 
 interface UserCardProps {
   user: User;
@@ -13,7 +12,6 @@ interface UserCardProps {
   getRoleBadgeColor: (role: UserRole) => string;
   getStatusBadgeColor: (status: UserStatus) => string;
   getEmailVerifiedBadgeColor: (emailVerified: boolean | undefined) => string;
-  getOnboardingCompletedBadgeColor: (onboardingCompleted: boolean | undefined) => string;
   canDelete?: boolean;
 }
 
@@ -21,113 +19,79 @@ export function UserCard({
   user,
   onEdit,
   onDelete,
-  isUpdating,
-  isDeleting,
+  isUpdating = false,
+  isDeleting = false,
   getRoleBadgeColor,
   getStatusBadgeColor,
   getEmailVerifiedBadgeColor,
-  getOnboardingCompletedBadgeColor,
   canDelete = true,
 }: Readonly<UserCardProps>) {
   return (
-    <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm hover:shadow-lg transition-shadow">
-      <div className="p-6">
-        {/* Header do Card */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-text dark:text-text-dark mb-2 truncate">
-              {user.name}
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
-          </div>
-        </div>
-
-        {/* Badges */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          <span
-            className={cn(
-              'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-              getRoleBadgeColor(user.role),
-            )}
-          >
-            {(() => {
-              if (user.role === 'god') return 'God';
-              if (user.role === 'sys_admin') return 'Admin Sistema';
-              if (user.role === 'admin') return 'Admin Empresa';
-              if (user.role === 'owner') return 'Dono';
-              if (user.role === 'editor') return 'Editor';
-              if (user.role === 'operator') return 'Operador';
-              if (user.role === 'viewer') return 'Visualizador';
-              return 'Usuário';
-            })()}
-          </span>
-          <span
-            className={cn(
-              'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-              getStatusBadgeColor(user.status),
-            )}
-          >
-            {user.status === 'active' ? 'Ativo' : 'Inativo'}
-          </span>
-          <span
-            className={cn(
-              'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border',
-              getEmailVerifiedBadgeColor(user.emailVerified),
-            )}
-          >
-            {user.emailVerified === true ? (
-              <CheckCircle2 className="h-3 w-3" />
-            ) : (
-              <XCircle className="h-3 w-3" />
-            )}
-            <Mail className="h-3 w-3" />
-            {user.emailVerified === true ? 'Email Verificado' : 'Email Não Verificado'}
-          </span>
-          <span
-            className={cn(
-              'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border',
-              getOnboardingCompletedBadgeColor(user.onboardingCompleted),
-            )}
-          >
-            {user.onboardingCompleted === true ? (
-              <CheckCircle2 className="h-3 w-3" />
-            ) : (
-              <XCircle className="h-3 w-3" />
-            )}
-            {user.onboardingCompleted === true ? 'Onboarding Completo' : 'Onboarding Pendente'}
-          </span>
-          {user.integrations?.openaiModel && (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-blue-500/20 text-blue-400 border-blue-500/30">
-              🤖 {user.integrations.openaiModel}
-            </span>
-          )}
-        </div>
-
-        {/* Ações */}
-        <div className="flex gap-2 pt-4 border-t border-border dark:border-border-dark">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onEdit(user)}
-            disabled={isUpdating}
-            className="flex-1 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
-          >
-            <Edit className="h-4 w-4 mr-2" />
-            Editar
-          </Button>
-          {canDelete && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onDelete(user.id)}
-              disabled={isDeleting}
-              className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-500/30 hover:border-red-500/50"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
+    <RecordCard
+      onEdit={() => onEdit(user)}
+      onDelete={canDelete ? () => onDelete(user.id) : undefined}
+      isUpdating={isUpdating}
+      isDeleting={isDeleting}
+      showActions={canDelete}
+    >
+      {/* Header do Card */}
+      <div className="flex items-start justify-between mb-2">
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-text dark:text-text-dark mb-1 truncate leading-tight">
+            {user.name}
+          </h3>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate leading-tight">
+            {user.email}
+          </p>
         </div>
       </div>
-    </Card>
+
+      {/* Badges */}
+      <div className="flex flex-wrap gap-1.5 mb-2">
+        <span
+          className={cn(
+            'inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-medium border leading-tight',
+            getRoleBadgeColor(user.role),
+          )}
+        >
+          {(() => {
+            if (user.role === 'god') return 'God';
+            if (user.role === 'sys_admin') return 'Admin Sistema';
+            if (user.role === 'admin') return 'Admin Empresa';
+            if (user.role === 'owner') return 'Dono';
+            if (user.role === 'editor') return 'Editor';
+            if (user.role === 'operator') return 'Operador';
+            if (user.role === 'viewer') return 'Visualizador';
+            return 'Usuário';
+          })()}
+        </span>
+        <span
+          className={cn(
+            'inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-medium border leading-tight',
+            getStatusBadgeColor(user.status),
+          )}
+        >
+          {user.status === 'active' ? 'Ativo' : 'Inativo'}
+        </span>
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-medium border leading-tight',
+            getEmailVerifiedBadgeColor(user.emailVerified),
+          )}
+        >
+          {user.emailVerified === true ? (
+            <CheckCircle2 className="h-2.5 w-2.5" />
+          ) : (
+            <XCircle className="h-2.5 w-2.5" />
+          )}
+          <Mail className="h-2.5 w-2.5" />
+        </span>
+        {user.integrations?.openaiModel && (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-medium border bg-blue-500/20 text-blue-400 border-blue-500/30 leading-tight">
+            🤖 {user.integrations.openaiModel}
+          </span>
+        )}
+      </div>
+    </RecordCard>
   );
 }

@@ -8,8 +8,9 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { User, assignCompanyRole } from '@/services/userService';
 import { useCompanyStore } from '@/stores/company';
 import { useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { UsersHeader } from './components/UsersHeader';
+import { UsersErrorState } from './components/UsersErrorState';
 import { UsersList } from './components/UsersList';
 import { UserEmptyState } from './components/UserEmptyState';
 import { UserFilters } from './components/UserFilters';
@@ -18,6 +19,7 @@ import { useCanDeleteUser } from './hooks/useCanDeleteUser';
 import { useUserDelete } from './hooks/useUserDelete';
 import { useUserFilters } from './hooks/useUserFilters';
 import { useUserForm } from './hooks/useUserForm';
+import { useUserSorting } from './hooks/useUserSorting';
 
 export function UsersPage() {
   const { user: currentUser } = useAuth();
@@ -41,6 +43,13 @@ export function UsersPage() {
     filteredUsers,
     hasActiveFilters,
   } = useUserFilters(users);
+
+  const { sortConfig, handleSort, sortUsers } = useUserSorting();
+
+  const filteredAndSortedUsers = useMemo(() => {
+    if (!filteredUsers) return [];
+    return sortUsers(filteredUsers);
+  }, [filteredUsers, sortUsers]);
 
   const [showDeleteAllDataModal, setShowDeleteAllDataModal] = useState(false);
   const [permissionsUser, setPermissionsUser] = useState<User | null>(null);
@@ -70,13 +79,7 @@ export function UsersPage() {
   }
 
   if (error) {
-    return (
-      <ViewDefault>
-        <div className="container mx-auto px-4 sm:px-6 py-10">
-          <div className="text-red-500">Erro ao carregar usuários: {error.message}</div>
-        </div>
-      </ViewDefault>
-    );
+    return <UsersErrorState error={error} />;
   }
 
   return (
@@ -100,15 +103,17 @@ export function UsersPage() {
             onViewModeChange={setViewMode}
           />
 
-          {filteredUsers.length === 0 ? (
+          {filteredAndSortedUsers.length === 0 ? (
             <UserEmptyState hasFilters={hasActiveFilters} onCreateClick={handleCreate} />
           ) : (
             <UsersList
-              users={filteredUsers}
+              users={filteredAndSortedUsers}
               viewMode={viewMode}
               activeCompanyId={activeCompany?.id}
               isUpdating={isUpdating}
               isDeleting={isDeleting}
+              sortConfig={sortConfig}
+              onSort={handleSort}
               onEdit={handleEdit}
               onDelete={handleDelete}
               onAssignRole={handleAssignRole}
