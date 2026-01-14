@@ -1,11 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getInvestments,
-  getInvestmentById,
   createInvestment,
   updateInvestment,
   deleteInvestment,
-  getInvestmentPerformance,
   Investment,
   CreateInvestment,
 } from '../services/investmentService';
@@ -21,22 +19,6 @@ export const useInvestments = () => {
     queryKey: ['investments'],
     queryFn: getInvestments,
   });
-
-  const getInvestment = (id: string) => {
-    return useQuery<Investment>({
-      queryKey: ['investment', id],
-      queryFn: () => getInvestmentById(id),
-      enabled: !!id,
-    });
-  };
-
-  const getPerformance = (id: string, startDate: string, endDate: string) => {
-    return useQuery({
-      queryKey: ['investment-performance', id, startDate, endDate],
-      queryFn: () => getInvestmentPerformance(id, startDate, endDate),
-      enabled: !!id,
-    });
-  };
 
   const createMutation = useMutation({
     mutationFn: createInvestment,
@@ -66,8 +48,6 @@ export const useInvestments = () => {
     investments,
     isLoading,
     error,
-    getInvestment,
-    getPerformance,
     createInvestment: createMutation.mutate,
     updateInvestment: updateMutation.mutate,
     deleteInvestment: deleteMutation.mutate,

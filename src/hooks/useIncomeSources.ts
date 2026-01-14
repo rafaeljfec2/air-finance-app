@@ -2,11 +2,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ReactNode } from 'react';
 import {
   getIncomeSources,
-  getIncomeSourceById,
   createIncomeSource,
   updateIncomeSource,
   deleteIncomeSource,
-  getIncomeSourceProjection,
   type IncomeSource,
   type CreateIncomeSource,
 } from '../services/incomeSourceService';
@@ -22,22 +20,6 @@ export const useIncomeSources = (companyId: string) => {
     queryKey: ['income-sources', companyId],
     queryFn: () => getIncomeSources(companyId),
   });
-
-  const getIncomeSource = (id: string) => {
-    return useQuery<IncomeSource, ReactNode>({
-      queryKey: ['income-source', companyId, id],
-      queryFn: () => getIncomeSourceById(companyId, id),
-      enabled: !!id,
-    });
-  };
-
-  const getProjection = (id: string) => {
-    return useQuery<any, ReactNode>({
-      queryKey: ['income-source-projection', companyId, id],
-      queryFn: () => getIncomeSourceProjection(companyId, id),
-      enabled: !!id,
-    });
-  };
 
   const createMutation = useMutation<IncomeSource, ReactNode, CreateIncomeSource>({
     mutationFn: (data) => createIncomeSource(companyId, data),
@@ -72,8 +54,6 @@ export const useIncomeSources = (companyId: string) => {
     incomeSources,
     loading,
     error,
-    getIncomeSource,
-    getProjection,
     addIncomeSource: createMutation.mutate,
     updateIncomeSource: updateMutation.mutate,
     deleteIncomeSource: deleteMutation.mutate,

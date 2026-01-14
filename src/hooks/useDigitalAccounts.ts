@@ -1,11 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getDigitalAccounts,
-  getDigitalAccountById,
   createDigitalAccount,
   updateDigitalAccount,
   deleteDigitalAccount,
-  getDigitalAccountBalance,
   DigitalAccount,
   CreateDigitalAccount,
 } from '../services/digitalAccountService';
@@ -21,22 +19,6 @@ export const useDigitalAccounts = () => {
     queryKey: ['digital-accounts'],
     queryFn: getDigitalAccounts,
   });
-
-  const getDigitalAccount = (id: string) => {
-    return useQuery<DigitalAccount>({
-      queryKey: ['digital-account', id],
-      queryFn: () => getDigitalAccountById(id),
-      enabled: !!id,
-    });
-  };
-
-  const getBalance = (id: string) => {
-    return useQuery<number>({
-      queryKey: ['digital-account-balance', id],
-      queryFn: () => getDigitalAccountBalance(id),
-      enabled: !!id,
-    });
-  };
 
   const createMutation = useMutation({
     mutationFn: createDigitalAccount,
@@ -66,8 +48,6 @@ export const useDigitalAccounts = () => {
     digitalAccounts,
     isLoading,
     error,
-    getDigitalAccount,
-    getBalance,
     createDigitalAccount: createMutation.mutate,
     updateDigitalAccount: updateMutation.mutate,
     deleteDigitalAccount: deleteMutation.mutate,

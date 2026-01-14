@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getDependents,
-  getDependentById,
   createDependent,
   updateDependent,
   deleteDependent,
@@ -20,14 +19,6 @@ export const useDependents = () => {
     queryKey: ['dependents'],
     queryFn: getDependents,
   });
-
-  const getDependent = (id: string) => {
-    return useQuery<Dependent>({
-      queryKey: ['dependent', id],
-      queryFn: () => getDependentById(id),
-      enabled: !!id,
-    });
-  };
 
   const createMutation = useMutation({
     mutationFn: createDependent,
@@ -57,7 +48,6 @@ export const useDependents = () => {
     dependents,
     isLoading,
     error,
-    getDependent,
     createDependent: createMutation.mutate,
     updateDependent: updateMutation.mutate,
     deleteDependent: deleteMutation.mutate,

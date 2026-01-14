@@ -1,11 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getLoans,
-  getLoanById,
   createLoan,
   updateLoan,
   deleteLoan,
-  getLoanAmortization,
   type Loan,
   type CreateLoan,
 } from '../services/loanService';
@@ -22,20 +20,6 @@ export const useLoans = () => {
     queryKey: ['loans'],
     queryFn: getLoans,
   });
-
-  const getLoan = (id: string) =>
-    useQuery<Loan>({
-      queryKey: ['loans', id],
-      queryFn: () => getLoanById(id),
-      enabled: !!id,
-    });
-
-  const getAmortization = (id: string) =>
-    useQuery({
-      queryKey: ['loans', id, 'amortization'],
-      queryFn: () => getLoanAmortization(id),
-      enabled: !!id,
-    });
 
   // Mutations
   const createLoanMutation = useMutation({
@@ -67,8 +51,6 @@ export const useLoans = () => {
     loans,
     isLoading,
     error,
-    getLoan,
-    getAmortization,
     createLoan: createLoanMutation.mutate,
     updateLoan: updateLoanMutation.mutate,
     deleteLoan: deleteLoanMutation.mutate,

@@ -4,7 +4,6 @@ import {
     deleteAllUserData,
     deleteAllUserDataByEmail,
     deleteUser,
-    getUserById,
     getUsers,
     updateUser,
     type CreateUser,
@@ -22,14 +21,6 @@ export const useUsers = () => {
     queryKey: ['users'],
     queryFn: getUsers,
   });
-
-  const getUser = (id: string) => {
-    return useQuery<User>({
-      queryKey: ['user', id],
-      queryFn: () => getUserById(id),
-      enabled: !!id,
-    });
-  };
 
   const createMutation = useMutation({
     mutationFn: createUser,
@@ -74,7 +65,6 @@ export const useUsers = () => {
     users,
     isLoading,
     error,
-    getUser,
     createUser: createMutation.mutateAsync,
     updateUser: updateMutation.mutateAsync,
     deleteUser: deleteMutation.mutate,
