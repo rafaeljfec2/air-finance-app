@@ -8,7 +8,11 @@ import { formatDocument } from '@/utils/formatDocument';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
-export const CompanySelector = () => {
+interface CompanySelectorProps {
+  size?: 'default' | 'compact' | 'large';
+}
+
+export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {}) => {
   const { user, isLoadingUser } = useAuth();
   const { activeCompany, changeActiveCompany } = useActiveCompany();
 
@@ -106,8 +110,22 @@ export const CompanySelector = () => {
     );
   };
 
+  let heightClass = 'h-[52px]';
+  if (size === 'compact') {
+    heightClass = 'h-[44px]';
+  } else if (size === 'large') {
+    heightClass = 'h-[56px]';
+  }
+
+  let paddingClass = 'px-4';
+  if (size === 'compact') {
+    paddingClass = 'px-3';
+  } else if (size === 'large') {
+    paddingClass = 'px-2';
+  }
+
   return (
-    <div className="min-w-[242px]">
+    <div className="w-full min-w-0">
       <ComboBox
         options={companyOptions}
         value={activeCompany?.id || null}
@@ -118,8 +136,8 @@ export const CompanySelector = () => {
         renderItem={renderCompanyItem}
         renderTrigger={renderCompanyTrigger}
         maxHeight="max-h-56"
-        className="h-[52px] px-4 bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-md shadow-sm"
-        contentClassName="rounded-md shadow-lg"
+        className={`${heightClass} w-full ${paddingClass} bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-md shadow-sm`}
+        contentClassName="rounded-md shadow-lg w-full"
       />
     </div>
   );

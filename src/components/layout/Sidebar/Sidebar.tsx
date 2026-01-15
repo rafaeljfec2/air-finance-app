@@ -10,9 +10,14 @@ import { SidebarFooter } from './components/SidebarFooter';
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  isHeaderVisible?: boolean;
 }
 
-export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
+export function Sidebar({
+  isOpen = false,
+  onClose,
+  isHeaderVisible = true,
+}: Readonly<SidebarProps>) {
   const { isCollapsed } = useSidebarStore();
   const filteredNavigation = useFilteredNavigation();
   const { openMenu, toggleMenu } = useOpenMenu(filteredNavigation);
@@ -30,22 +35,22 @@ export function Sidebar({ isOpen = false, onClose }: Readonly<SidebarProps>) {
         )}
         aria-label="Menu lateral"
       >
-        {onClose && <SidebarHeader onClose={onClose} />}
-        <div className="flex flex-col h-full pt-2">
-          <nav className="flex-1 space-y-1 px-2 py-4 overflow-y-auto">
-            {filteredNavigation.map((group, idx) => (
-              <NavigationSection
-                key={group.section}
-                section={group}
-                index={idx}
-                isCollapsed={isCollapsed}
-                openMenu={openMenu}
-                onMenuToggle={toggleMenu}
-              />
-            ))}
-          </nav>
-          <SidebarFooter />
-        </div>
+        <div className="flex flex-col h-full overflow-hidden">
+        <SidebarHeader onClose={onClose} isHeaderVisible={isHeaderVisible} />
+        <nav className="flex-1 min-h-0 space-y-1 px-2 py-4 overflow-y-auto">
+          {filteredNavigation.map((group, idx) => (
+            <NavigationSection
+              key={group.section}
+              section={group}
+              index={idx}
+              isCollapsed={isCollapsed}
+              openMenu={openMenu}
+              onMenuToggle={toggleMenu}
+            />
+          ))}
+        </nav>
+        <SidebarFooter />
+      </div>
       </div>
     </>
   );

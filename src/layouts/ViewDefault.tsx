@@ -109,7 +109,7 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
             : 'h-screen md:h-[100dvh]',
         )}
       >
-        <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} />
+        <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} isHeaderVisible={isHeaderVisible} />
         <main
           className={cn(
             'flex-1 overflow-auto p-4 sm:p-6 pb-24 lg:pb-6 transition-all duration-300 w-full',

@@ -1,17 +1,44 @@
+import { CompanySelector } from '@/components/layout/CompanySelector';
+import { cn } from '@/lib/utils';
+import { useSidebarStore } from '@/stores/sidebar';
 import { X } from 'lucide-react';
 
 interface SidebarHeaderProps {
-  onClose: () => void;
+  onClose?: () => void;
+  isHeaderVisible: boolean;
 }
 
-export function SidebarHeader({ onClose }: Readonly<SidebarHeaderProps>) {
+export function SidebarHeader({ onClose, isHeaderVisible }: Readonly<SidebarHeaderProps>) {
+  const { isCollapsed } = useSidebarStore();
+  const showCompanySelector = !isHeaderVisible && !isCollapsed;
+  const showCloseButton = !!onClose;
+
+  if (!showCompanySelector && !showCloseButton) {
+    return null;
+  }
+
   return (
-    <button
-      className="absolute top-4 right-4 lg:hidden min-h-[44px] min-w-[44px] p-2 rounded-md text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary-500 flex items-center justify-center"
-      onClick={onClose}
-      aria-label="Fechar menu"
+    <div
+      className={cn(
+        'relative flex-shrink-0',
+        showCompanySelector && 'px-2 py-3 border-b border-border dark:border-border-dark',
+        !showCompanySelector && showCloseButton && 'p-4',
+      )}
     >
-      <X className="h-6 w-6" />
-    </button>
+      {showCompanySelector && (
+        <div className="w-full">
+          <CompanySelector size="large" />
+        </div>
+      )}
+      {showCloseButton && (
+        <button
+          className="absolute top-4 right-4 lg:hidden min-h-[44px] min-w-[44px] p-2 rounded-md text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary-500 flex items-center justify-center z-10"
+          onClick={onClose}
+          aria-label="Fechar menu"
+        >
+          <X className="h-6 w-6" />
+        </button>
+      )}
+    </div>
   );
 }
