@@ -37,19 +37,29 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ notification
     }
   };
 
+  const Component = onClick ? 'button' : 'div';
+  const componentProps = onClick
+    ? {
+        onClick,
+        onKeyDown: handleKeyDown,
+        type: 'button' as const,
+        'aria-label': `Notificação: ${notification.title}`,
+        className: cn(
+          'w-full text-left px-4 py-3 flex gap-3 cursor-pointer transition-colors border-b border-border/50 dark:border-border-dark/50 last:border-0',
+          notification.read
+            ? 'hover:bg-muted/50 dark:hover:bg-gray-800/50'
+            : 'bg-primary-50/50 dark:bg-primary-900/10 hover:bg-primary-100/50 dark:hover:bg-primary-900/20',
+        ),
+      }
+    : {
+        className: cn(
+          'px-4 py-3 flex gap-3 border-b border-border/50 dark:border-border-dark/50 last:border-0',
+          notification.read ? '' : 'bg-primary-50/50 dark:bg-primary-900/10',
+        ),
+      };
+
   return (
-    <div
-      onClick={onClick}
-      onKeyDown={handleKeyDown}
-      role={onClick ? 'button' : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      className={cn(
-        'px-4 py-3 flex gap-3 cursor-pointer transition-colors border-b border-border/50 dark:border-border-dark/50 last:border-0',
-        !notification.read
-          ? 'bg-primary-50/50 dark:bg-primary-900/10 hover:bg-primary-100/50 dark:hover:bg-primary-900/20'
-          : 'hover:bg-muted/50 dark:hover:bg-gray-800/50',
-      )}
-    >
+    <Component {...componentProps}>
       <div className="mt-1 flex-shrink-0">{getIcon(notification.type)}</div>
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-start mb-0.5">
@@ -77,6 +87,6 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ notification
           <div className="h-2 w-2 rounded-full bg-primary-500"></div>
         </div>
       )}
-    </div>
+    </Component>
   );
 };
