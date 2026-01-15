@@ -10,7 +10,10 @@ interface SidebarHeaderProps {
 
 export function SidebarHeader({ onClose, isHeaderVisible }: Readonly<SidebarHeaderProps>) {
   const { isCollapsed } = useSidebarStore();
-  const showCompanySelector = !isHeaderVisible && !isCollapsed;
+  // Show CompanySelector when sidebar is not collapsed
+  // On mobile: always visible when sidebar is open
+  // On desktop: only visible when header is hidden (controlled by CSS)
+  const showCompanySelector = !isCollapsed;
   const showCloseButton = !!onClose;
 
   if (!showCompanySelector && !showCloseButton) {
@@ -21,12 +24,18 @@ export function SidebarHeader({ onClose, isHeaderVisible }: Readonly<SidebarHead
     <div
       className={cn(
         'relative flex-shrink-0',
-        showCompanySelector && 'px-2 py-3 border-b border-border dark:border-border-dark',
+        showCompanySelector && 'px-2 py-3',
         !showCompanySelector && showCloseButton && 'p-4',
       )}
     >
       {showCompanySelector && (
-        <div className="w-full">
+        <div
+          className={cn(
+            'w-full',
+            // Hide on desktop when header is visible, show on mobile always
+            isHeaderVisible && 'lg:hidden',
+          )}
+        >
           <CompanySelector size="large" />
         </div>
       )}
