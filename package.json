@@ -9,7 +9,7 @@
     "build": "tsc && vite build --mode production",
     "build:prod": "tsc && vite build --mode production",
     "build:dev": "tsc && vite build --mode development",
-    "lint": "eslint . --ignore-pattern 'dist/**' --ignore-pattern '*.config.js' --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --ignore-pattern 'dist/**' --ignore-pattern '*.config.js' --ignore-pattern '.eslintrc.js' --ignore-pattern '.prettierrc.js' --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview --mode production",
     "preview:prod": "vite preview --mode production",
     "preview:dev": "vite preview --mode development",

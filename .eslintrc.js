@@ -13,10 +13,17 @@ module.exports = {
     'vitest.config.ts',
     'tailwind.config.*',
     'postcss.config.*',
+    '.eslintrc.js',
+    '.prettierrc.js',
   ],
   overrides: [
     {
-      files: ['.eslintrc.js', '.prettierrc.js', 'commitlint.config.js'],
+      files: ['*.js'],
+      parser: 'espree',
+      parserOptions: {
+        ecmaVersion: 2021,
+        sourceType: 'script',
+      },
       env: {
         node: true,
         browser: false,
@@ -27,9 +34,11 @@ module.exports = {
         process: 'readonly',
         __dirname: 'readonly',
         __filename: 'readonly',
+        exports: 'readonly',
       },
       rules: {
         'no-undef': 'off',
+        '@typescript-eslint/no-var-requires': 'off',
       },
     },
   ],
