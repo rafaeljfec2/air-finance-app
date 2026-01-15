@@ -64,8 +64,8 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
 
     return (
       <div className="flex flex-col">
-        <span className="font-medium leading-tight text-sm">{company.name}</span>
-        <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+        <span className="font-medium leading-tight text-xs">{company.name}</span>
+        <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
           {formatDocument(company.cnpj)}
         </span>
       </div>
@@ -80,7 +80,7 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
     if (!option) {
       return (
         <div className="flex flex-col items-start flex-1">
-          <span className="font-bold text-text dark:text-text-dark leading-tight text-sm">
+          <span className="font-bold text-text dark:text-text-dark leading-tight text-xs">
             {displayValue}
           </span>
         </div>
@@ -91,7 +91,7 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
     if (!company) {
       return (
         <div className="flex flex-col items-start flex-1">
-          <span className="font-bold text-text dark:text-text-dark leading-tight text-sm">
+          <span className="font-bold text-text dark:text-text-dark leading-tight text-xs">
             {displayValue}
           </span>
         </div>
@@ -100,10 +100,10 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
 
     return (
       <div className="flex flex-col items-start flex-1">
-        <span className="font-bold text-text dark:text-text-dark leading-tight text-sm">
+        <span className="font-bold text-text dark:text-text-dark leading-tight text-xs">
           {company.name}
         </span>
-        <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+        <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
           {formatDocument(company.cnpj)}
         </span>
       </div>
