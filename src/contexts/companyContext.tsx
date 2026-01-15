@@ -15,6 +15,7 @@ interface CompanyContextValue extends CompanyState {
   selectedCompany: Company | null;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCompanyStore = create<CompanyState>()(
   persist(
     (set) => ({

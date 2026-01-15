@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface PullToRefreshProps {
@@ -7,36 +7,39 @@ interface PullToRefreshProps {
   isRefreshing: boolean;
 }
 
-export function PullToRefresh({ children, onRefresh, isRefreshing }: PullToRefreshProps) {
+export function PullToRefresh({ children, onRefresh, isRefreshing }: Readonly<PullToRefreshProps>) {
   const [startY, setStartY] = useState(0);
   const [pullDistance, setPullDistance] = useState(0);
   const [isPulling, setIsPulling] = useState(false);
 
-  const handleTouchStart = (e: TouchEvent) => {
+  const handleTouchStart = useCallback((e: TouchEvent) => {
     if (window.scrollY === 0) {
       setStartY(e.touches[0].clientY);
       setIsPulling(true);
     }
-  };
+  }, []);
 
-  const handleTouchMove = (e: TouchEvent) => {
-    if (!isPulling) return;
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (!isPulling) return;
 
-    const currentY = e.touches[0].clientY;
-    const distance = currentY - startY;
+      const currentY = e.touches[0].clientY;
+      const distance = currentY - startY;
 
-    if (distance > 0) {
-      setPullDistance(Math.min(distance, 100));
-    }
-  };
+      if (distance > 0) {
+        setPullDistance(Math.min(distance, 100));
+      }
+    },
+    [isPulling, startY],
+  );
 
-  const handleTouchEnd = async () => {
+  const handleTouchEnd = useCallback(async () => {
     if (pullDistance >= 50) {
       await onRefresh();
     }
     setPullDistance(0);
     setIsPulling(false);
-  };
+  }, [pullDistance, onRefresh]);
 
   useEffect(() => {
     document.addEventListener('touchstart', handleTouchStart);
@@ -48,7 +51,7 @@ export function PullToRefresh({ children, onRefresh, isRefreshing }: PullToRefre
       document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [pullDistance, isPulling]);
+  }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
 
   return (
     <div className="relative">

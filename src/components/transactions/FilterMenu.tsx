@@ -54,7 +54,7 @@ export const FilterMenu = memo(
         return values.filter((value) => value.toLowerCase().includes(searchTerm.toLowerCase()));
       }
       return values;
-    }, [items, searchTerm]);
+    }, [items, searchTerm, field]);
 
     const handleSelectAll = () => {
       const newSelected = new Set(uniqueValues);

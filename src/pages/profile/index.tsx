@@ -46,6 +46,7 @@ export function Profile() {
     };
 
     fetchFullUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   const displayUser = fullUserData || user;

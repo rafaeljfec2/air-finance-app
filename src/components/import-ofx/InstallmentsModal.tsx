@@ -20,7 +20,7 @@ export function InstallmentsModal({
   open,
   onClose,
   installments,
-  accountId: _accountId, // eslint-disable-line @typescript-eslint/no-unused-vars // Unused but kept for API compatibility
+  accountId: _accountId, // eslint-disable-line @typescript-eslint/no-unused-vars
   periodEnd,
   onConfirm,
   isCreating = false,

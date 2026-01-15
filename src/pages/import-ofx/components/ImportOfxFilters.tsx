@@ -14,7 +14,7 @@ interface ImportOfxFiltersProps {
   setSearchTerm: (term: string) => void;
   selectedAccountId: string | undefined;
   setSelectedAccountId: (id: string | undefined) => void;
-  accounts: Array<{ id: string; name: string; accountNumber?: string; agency?: string | null }>;
+  accounts: Array<{ id: string; name: string; type?: string; accountNumber?: string | null; agency?: string | null }>;
 }
 
 export function ImportOfxFilters({

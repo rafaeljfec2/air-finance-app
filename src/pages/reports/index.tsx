@@ -61,37 +61,44 @@ export function Reports() {
     }
   }, [error]);
 
-  const summary = summaryQuery.data ?? {
-    income: 0,
-    expenses: 0,
-    balance: 0,
-    previousIncome: null,
-    previousExpenses: null,
-    previousBalance: null,
-    incomeChangePct: null,
-    expensesChangePct: null,
-    balanceChangePct: null,
-    periodStart: currentDate.toISOString(),
-    periodEnd: currentDate.toISOString(),
-  };
+  const summary = useMemo(
+    () =>
+      summaryQuery.data ?? {
+        income: 0,
+        expenses: 0,
+        balance: 0,
+        previousIncome: null,
+        previousExpenses: null,
+        previousBalance: null,
+        incomeChangePct: null,
+        expensesChangePct: null,
+        balanceChangePct: null,
+        periodStart: currentDate.toISOString(),
+        periodEnd: currentDate.toISOString(),
+      },
+    [summaryQuery.data, currentDate],
+  );
 
-  const historyRaw = historyQuery.data ?? [];
-  const expenses = expensesQuery.data ?? [];
+  const expenses = useMemo(() => expensesQuery.data ?? [], [expensesQuery.data]);
   const goals = goalsQuery.data ?? [];
 
-  const history = historyRaw.map((point) => ({
-    date: point.date,
-    balance: point.balance,
-    revenue: point.income,
-    expenses: point.expenses,
-  }));
+  const history = useMemo(() => {
+    const raw = historyQuery.data ?? [];
+    return raw.map((point) => ({
+      date: point.date,
+      balance: point.balance,
+      revenue: point.income,
+      expenses: point.expenses,
+    }));
+  }, [historyQuery.data]);
 
+  const expensesTotalMemo = useMemo(() => summary.expenses, [summary.expenses]);
+  
   const reportStructure = useMemo(() => {
-    const expensesTotal = summary.expenses;
     const expensesWithPct = expenses.map((e) => ({
       name: e.name,
       value: e.value,
-      percentage: expensesTotal > 0 ? (e.value / expensesTotal) * 100 : 0,
+      percentage: expensesTotalMemo > 0 ? (e.value / expensesTotalMemo) * 100 : 0,
       color: e.color,
     }));
 
@@ -107,7 +114,7 @@ export function Reports() {
         categories: [],
       },
       expenses: {
-        total: expensesTotal,
+        total: expensesTotalMemo,
         categories: expensesWithPct.map((e) => ({
           name: e.name,
           value: e.value,
@@ -122,7 +129,7 @@ export function Reports() {
       },
       summary: {
         income: { total: summary.income, categories: [] },
-        expenses: { total: expensesTotal, categories: [] },
+        expenses: { total: expensesTotalMemo, categories: [] },
         balance: {
           current: summary.balance,
           previous: summary.previousBalance ?? 0,
@@ -131,9 +138,9 @@ export function Reports() {
         },
       },
     };
-  }, [summary, expenses, currentDate]);
+  }, [summary, expenses, expensesTotalMemo, currentDate]);
 
-  const expensesTotal = summary.expenses;
+  const expensesTotal = expensesTotalMemo;
 
   const insights = useMemo<Insight[]>(() => {
     const list: Insight[] = [];
@@ -170,7 +177,7 @@ export function Reports() {
     }
 
     return list;
-  }, [summary, expenses, history, expensesTotal]);
+  }, [summary, expenses, expensesTotal]);
 
   if (!companyId) {
     return (

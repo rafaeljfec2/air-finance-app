@@ -6,7 +6,7 @@ import {
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCategories } from '@/hooks/useCategories';
 import { usePreviousBalance, useTransactions } from '@/hooks/useTransactions';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 interface UseTransactionLogicProps {
   companyId: string;
@@ -123,7 +123,7 @@ export function useTransactionLogic({
     return true;
   };
 
-  const shouldIncludeTransaction = (transaction: TransactionGridTransaction): boolean => {
+  const shouldIncludeTransaction = useCallback((transaction: TransactionGridTransaction): boolean => {
     if (transaction.id === 'previous-balance') {
       return true;
     }
@@ -133,7 +133,7 @@ export function useTransactionLogic({
     const matchesPeriod = matchesDatePeriod(transaction.paymentDate, startDate, endDate);
 
     return matchesSearch && matchesType && matchesPeriod;
-  };
+  }, [searchTerm, selectedType, startDate, endDate]);
 
   const transactionsWithPreviousBalance = useMemo(() => {
     let transactionsList = [...transactionsWithLabels];
@@ -167,7 +167,7 @@ export function useTransactionLogic({
         return dateB - dateA; // Newest date first (DESC)
       })
       .filter(shouldIncludeTransaction);
-  }, [transactionsWithPreviousBalance, searchTerm, selectedType, startDate, endDate]);
+  }, [transactionsWithPreviousBalance, shouldIncludeTransaction]);
 
   const totals = useMemo(() => {
     let totalCredits = 0;

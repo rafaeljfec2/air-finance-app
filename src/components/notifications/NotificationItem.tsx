@@ -2,14 +2,7 @@ import { cn } from '@/lib/utils';
 import { Notification, NotificationType } from '@/stores/useNotificationsStore';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import {
-  AlertTriangle,
-  CheckCircle,
-  Info,
-  Shield,
-  Wallet,
-  XCircle
-} from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, Shield, Wallet, XCircle } from 'lucide-react';
 import React from 'react';
 
 interface NotificationItemProps {
@@ -37,22 +30,35 @@ const getIcon = (type: NotificationType) => {
 };
 
 export const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClick }) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick?.();
+    }
+  };
+
   return (
     <div
       onClick={onClick}
+      onKeyDown={handleKeyDown}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
       className={cn(
-        "px-4 py-3 flex gap-3 cursor-pointer transition-colors border-b border-border/50 dark:border-border-dark/50 last:border-0",
-        !notification.read 
-          ? "bg-primary-50/50 dark:bg-primary-900/10 hover:bg-primary-100/50 dark:hover:bg-primary-900/20" 
-          : "hover:bg-muted/50 dark:hover:bg-gray-800/50"
+        'px-4 py-3 flex gap-3 cursor-pointer transition-colors border-b border-border/50 dark:border-border-dark/50 last:border-0',
+        !notification.read
+          ? 'bg-primary-50/50 dark:bg-primary-900/10 hover:bg-primary-100/50 dark:hover:bg-primary-900/20'
+          : 'hover:bg-muted/50 dark:hover:bg-gray-800/50',
       )}
     >
-      <div className="mt-1 flex-shrink-0">
-        {getIcon(notification.type)}
-      </div>
+      <div className="mt-1 flex-shrink-0">{getIcon(notification.type)}</div>
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-start mb-0.5">
-          <h4 className={cn("text-sm font-medium leading-none truncate pr-2 text-text dark:text-text-dark", !notification.read && "font-semibold")}>
+          <h4
+            className={cn(
+              'text-sm font-medium leading-none truncate pr-2 text-text dark:text-text-dark',
+              !notification.read && 'font-semibold',
+            )}
+          >
             {notification.title}
           </h4>
           <span className="text-[10px] text-gray-400 whitespace-nowrap flex-shrink-0">
@@ -68,7 +74,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ notification
       </div>
       {!notification.read && (
         <div className="flex items-center self-center">
-            <div className="h-2 w-2 rounded-full bg-primary-500"></div>
+          <div className="h-2 w-2 rounded-full bg-primary-500"></div>
         </div>
       )}
     </div>

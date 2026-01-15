@@ -88,7 +88,7 @@ export function useTransactionForm() {
     if (hasChanges) {
       setErrors(newErrors);
     }
-  }, [formData, touchedFields]);
+  }, [formData, touchedFields, errors]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

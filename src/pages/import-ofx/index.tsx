@@ -382,7 +382,13 @@ export function ImportOfxPage() {
             setSearchTerm={setSearchTerm}
             selectedAccountId={selectedAccountId}
             setSelectedAccountId={setSelectedAccountId}
-            accounts={accounts || []}
+            accounts={(accounts || []).map((acc) => ({
+              id: acc.id,
+              name: acc.name,
+              type: acc.type,
+              accountNumber: acc.accountNumber ?? undefined,
+              agency: acc.agency ?? undefined,
+            }))}
           />
 
           {/* Grid */}
