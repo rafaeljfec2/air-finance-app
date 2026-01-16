@@ -1,0 +1,12 @@
+# Assets Directory
+
+Adicione os seguintes arquivos:
+
+- `icon.png` (1024x1024) - Ícone do app
+- `splash.png` (1284x2778) - Splash screen
+- `adaptive-icon.png` (1024x1024) - Ícone adaptativo para Android
+- `favicon.png` (48x48) - Favicon para web
+
+Você pode usar ferramentas como:
+- https://icon.kitchen/ para gerar ícones
+- Figma ou Canva para criar as imagens
