@@ -17,8 +17,9 @@
 
 ## 🎯 Visão Geral
 
-O **Air Finance** é uma aplicação web de gestão financeira pessoal desenvolvida com:
+O **Air Finance** é um monorepo contendo aplicações web e mobile de gestão financeira pessoal desenvolvidas com:
 
+### Stack Web
 - **React 18** + **TypeScript**
 - **Vite** como build tool
 - **React Router** para roteamento
@@ -27,6 +28,12 @@ O **Air Finance** é uma aplicação web de gestão financeira pessoal desenvolv
 - **React Query** (@tanstack/react-query) para gerenciamento de dados do servidor
 - **Lucide React** para ícones
 
+### Stack Monorepo
+- **Yarn 4** (Berry) - Package manager
+- **Turborepo** - Build system otimizado
+- **Yarn Workspaces** - Gerenciamento de dependências
+- **@air-finance/shared** - Package compartilhado
+
 ### Princípios Arquiteturais
 
 - ✅ **Separação de Responsabilidades**: UI, lógica de negócio e serviços separados
@@ -34,10 +41,45 @@ O **Air Finance** é uma aplicação web de gestão financeira pessoal desenvolv
 - ✅ **Type Safety**: TypeScript em todo o código
 - ✅ **Mobile-First**: Design responsivo começando por mobile
 - ✅ **Clean Architecture**: Separação clara entre camadas
+- ✅ **Código Compartilhado**: Reutilização via monorepo
+- ✅ **Build Otimizado**: Turborepo com cache inteligente
 
 ---
 
 ## 📁 Estrutura de Diretórios
+
+### Estrutura do Monorepo
+
+```
+air-finance-app/
+├── apps/
+│   ├── web/                    # Frontend web (@air-finance/web)
+│   │   ├── src/               # Código fonte do web app
+│   │   ├── public/            # Arquivos estáticos
+│   │   ├── docs/              # Documentação específica do web
+│   │   └── package.json       # Dependências do web
+│   │
+│   └── mobile-webview/         # App mobile (@air-finance/mobile-webview)
+│       ├── src/               # Código fonte do mobile
+│       ├── assets/            # Assets do mobile
+│       └── package.json       # Dependências do mobile
+│
+├── packages/
+│   └── shared/                 # Package compartilhado (@air-finance/shared)
+│       ├── src/
+│       │   ├── types/         # Tipos TypeScript comuns
+│       │   ├── constants/     # Constantes compartilhadas
+│       │   └── utils/         # Utilitários compartilhados
+│       └── package.json       # Dependências do shared
+│
+├── scripts/                    # Scripts de build/deploy
+├── docs/                       # Documentação do monorepo
+├── package.json                # Root workspace
+├── turbo.json                  # Configuração Turborepo
+└── yarn.lock                   # Lockfile único
+```
+
+### Estrutura do Web App (apps/web/src/)
 
 ```
 src/
