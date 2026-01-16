@@ -25,7 +25,7 @@ export const CompanySchema = z
 export const AccountSchema = z.object({
   name: z.string().min(3, 'Nome da conta deve ter pelo menos 3 caracteres'),
   type: z
-    .enum(['checking', 'savings', 'investment', 'credit_card', 'digital_wallet'])
+    .enum(['checking', 'savings', 'investment', 'digital_wallet'])
     .default('checking'),
   initialBalance: z.coerce.number().default(0),
   institution: z.string().min(2, 'Informe a instituição'),
@@ -34,7 +34,15 @@ export const AccountSchema = z.object({
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida').default('#8A05BE'),
   icon: z.string().min(1, 'Ícone é obrigatório').default('Banknote'),
   initialBalanceDate: z.string().optional(),
-  creditLimit: z.number().optional(),
+});
+
+export const CreditCardSchema = z.object({
+  name: z.string().min(3, 'Nome do cartão deve ter pelo menos 3 caracteres'),
+  limit: z.coerce.number().min(0.01, 'Limite deve ser maior que zero'),
+  closingDay: z.coerce.number().min(1, 'Dia de fechamento inválido').max(31, 'Dia de fechamento inválido'),
+  dueDay: z.coerce.number().min(1, 'Dia de vencimento inválido').max(31, 'Dia de vencimento inválido'),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida').default('#8A05BE'),
+  icon: z.string().min(1, 'Ícone é obrigatório').default('CreditCard'),
 });
 
 export const CategorySchema = z.object({
@@ -95,6 +103,7 @@ export const RecurringTransactionSchema = z
 
 export type CompanyFormData = z.infer<typeof CompanySchema>;
 export type AccountFormData = z.infer<typeof AccountSchema>;
+export type CreditCardFormData = z.infer<typeof CreditCardSchema>;
 export type CategoryFormData = z.infer<typeof CategorySchema>;
 export type GoalFormData = z.infer<typeof GoalSchema>;
 export type RecurringTransactionFormData = z.infer<typeof RecurringTransactionSchema>;

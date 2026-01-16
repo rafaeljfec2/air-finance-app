@@ -17,27 +17,23 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import {
     Banknote,
     ChevronLeft,
     ChevronRight,
-    CreditCard,
-    DollarSign,
     Landmark,
     Loader2,
     Wallet,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { type AccountFormData, AccountSchema } from '../schemas';
 
 const accountTypes = [
   { value: 'checking', label: 'Conta Corrente', icon: Banknote, iconName: 'Banknote' },
   { value: 'savings', label: 'Poupança', icon: Wallet, iconName: 'Wallet' },
-  { value: 'credit_card', label: 'Cartão de Crédito', icon: CreditCard, iconName: 'CreditCard' },
   { value: 'digital_wallet', label: 'Carteira Digital', icon: Wallet, iconName: 'Wallet' },
   { value: 'investment', label: 'Investimento', icon: Landmark, iconName: 'Landmark' },
 ] as const;
@@ -56,43 +52,20 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
       type: 'checking',
       initialBalance: 0,
       initialBalanceDate: new Date().toISOString().split('T')[0],
-      creditLimit: 0,
       color: '#8A05BE',
       icon: 'Banknote',
     },
   });
 
-  const accountType = accountForm.watch('type');
-  const isCreditCard = accountType === 'credit_card';
-  const [limitInput, setLimitInput] = useState('');
-
   // Initialize form when initialData changes
   useEffect(() => {
     if (initialData) {
       accountForm.reset(initialData);
-      if (initialData.type === 'credit_card' && initialData.initialBalance) {
-        setLimitInput(formatCurrencyInput(initialData.initialBalance.toFixed(2).replace('.', '')));
-      } else {
-        setLimitInput('');
-      }
     }
   }, [initialData, accountForm]);
 
-  // Reset limit input when type changes
-  useEffect(() => {
-    if (!isCreditCard) {
-      setLimitInput('');
-    }
-  }, [isCreditCard]);
-
   const handleSubmit = (data: AccountFormData) => {
-    // For credit_card, ensure agency and accountNumber are empty strings
-    const submitData: AccountFormData = {
-      ...data,
-      agency: isCreditCard ? '' : (data.agency ?? ''),
-      accountNumber: isCreditCard ? '' : (data.accountNumber ?? ''),
-    };
-    onNext(submitData);
+    onNext(data);
   };
 
   const iconOptions = accountTypes.map((type) => ({
@@ -111,25 +84,21 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
       <form onSubmit={accountForm.handleSubmit(handleSubmit)}>
         <CardHeader className="px-4 sm:px-6">
           <CardTitle className="text-text dark:text-text-dark text-xl sm:text-2xl">
-            {isCreditCard ? 'Adicione um Cartão de Crédito' : 'Adicione uma Conta'}
+            Adicione uma Conta
           </CardTitle>
           <CardDescription className="text-text dark:text-text-dark/70 text-sm sm:text-base">
-            {isCreditCard
-              ? 'Cadastre seu cartão de crédito para controle financeiro.'
-              : 'Cadastre onde seu dinheiro está guardado (Banco ou Carteira).'}
+            Cadastre onde seu dinheiro está guardado (Banco ou Carteira). Este passo é opcional.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 px-4 sm:px-6">
           {/* Nome */}
           <div className="space-y-2">
             <Label htmlFor="accountName" className="text-text dark:text-text-dark">
-              {isCreditCard ? 'Nome do cartão *' : 'Nome da Conta *'}
+              Nome da Conta *
             </Label>
             <Input
               id="accountName"
-              placeholder={
-                isCreditCard ? 'Ex: Cartão Nubank' : 'Ex: Conta Principal ou Caixa Físico'
-              }
+              placeholder="Ex: Conta Principal ou Caixa Físico"
               className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
               {...accountForm.register('name')}
             />
@@ -149,7 +118,7 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
                 onValueChange={(v) =>
                   accountForm.setValue(
                     'type',
-                    v as 'checking' | 'savings' | 'investment' | 'credit_card' | 'digital_wallet',
+                    v as 'checking' | 'savings' | 'investment' | 'digital_wallet',
                   )
                 }
               >
@@ -190,162 +159,86 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
             </div>
           </div>
 
-          {/* Campos específicos para cartão de crédito */}
-          {isCreditCard ? (
-            <>
-              {/* Limite para cartão de crédito */}
-              {/* Saldo Inicial e Data para Cartão de Crédito */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="initialBalance" className="text-text dark:text-text-dark">
-                    Saldo Inicial *
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="initialBalance"
-                      type="text"
-                      inputMode="decimal"
-                      value={limitInput}
-                      onChange={(e) => {
-                        const formatted = formatCurrencyInput(e.target.value);
-                        setLimitInput(formatted);
-                        accountForm.setValue('initialBalance', parseCurrency(formatted));
-                      }}
-                      placeholder="R$ 0,00"
-                      className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark pl-10"
-                    />
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
-                  </div>
-                  {accountForm.formState.errors.initialBalance && (
-                    <p className="text-sm text-red-400">
-                      {String(accountForm.formState.errors.initialBalance.message)}
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="initialBalanceDate" className="text-text dark:text-text-dark">
-                    Data do Saldo *
-                  </Label>
-                  <Input
-                    id="initialBalanceDate"
-                    type="date"
-                    className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
-                    {...accountForm.register('initialBalanceDate')}
-                  />
-                  {accountForm.formState.errors.initialBalanceDate && (
-                    <p className="text-sm text-red-400">
-                      {String(accountForm.formState.errors.initialBalanceDate.message)}
-                    </p>
-                  )}
-                </div>
+          {/* Campos para contas bancárias */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="accountAgency" className="text-text dark:text-text-dark">
+                Agência{' '}
+                <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
+                  (Opcional)
+                </span>
+              </Label>
+              <Input
+                id="accountAgency"
+                placeholder="Ex: 1234"
+                className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
+                {...accountForm.register('agency')}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="accountNumber" className="text-text dark:text-text-dark">
+                Número da Conta{' '}
+                <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
+                  (Opcional)
+                </span>
+              </Label>
+              <Input
+                id="accountNumber"
+                placeholder="Ex: 12345-6"
+                className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
+                {...accountForm.register('accountNumber')}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="accountInitialBalance" className="text-text dark:text-text-dark">
+                Saldo Inicial{' '}
+                <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
+                  (Saldo atual)
+                </span>
+              </Label>
+              <div className="relative">
+                <Input
+                  id="accountInitialBalance"
+                  type="text"
+                  inputMode="decimal"
+                  className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
+                  {...accountForm.register('initialBalance', { valueAsNumber: true })}
+                />
               </div>
-              {/* Campo de Limite */}
-              <div className="space-y-2 mt-4">
-                <Label htmlFor="creditLimit" className="text-text dark:text-text-dark">
-                  Limite do Cartão
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="creditLimit"
-                    type="text"
-                    inputMode="decimal"
-                    defaultValue={accountForm.getValues('creditLimit') ? formatCurrencyInput(accountForm.getValues('creditLimit')!.toFixed(2).replace('.', '')) : ''}
-                    onChange={(e) => {
-                       const formatted = formatCurrencyInput(e.target.value);
-                       e.target.value = formatted; 
-                       accountForm.setValue('creditLimit', parseCurrency(formatted));
-                    }}
-                    placeholder="R$ 0,00"
-                     className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark pl-10"
-                  />
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
-                </div>
-              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="accountInitialBalanceDate" className="text-text dark:text-text-dark">
+                Data do Saldo *
+              </Label>
+              <Input
+                id="accountInitialBalanceDate"
+                type="date"
+                className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
+                {...accountForm.register('initialBalanceDate')}
+              />
+            </div>
+          </div>
 
-              {/* Cor e Ícone */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-text dark:text-text-dark">Cor</Label>
-                  <ColorPicker
-                    value={accountForm.watch('color')}
-                    onChange={(color) => accountForm.setValue('color', color)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-text dark:text-text-dark">Ícone</Label>
-                  <IconPicker
-                    value={accountForm.watch('icon')}
-                    onChange={(icon) => accountForm.setValue('icon', icon)}
-                    options={iconOptions}
-                  />
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Campos para outros tipos de conta */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="accountAgency" className="text-text dark:text-text-dark">
-                    Agência{' '}
-                    <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
-                      (Opcional)
-                    </span>
-                  </Label>
-                  <Input
-                    id="accountAgency"
-                    placeholder="Ex: 1234"
-                    className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
-                    {...accountForm.register('agency')}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="accountNumber" className="text-text dark:text-text-dark">
-                    Número da Conta{' '}
-                    <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
-                      (Opcional)
-                    </span>
-                  </Label>
-                  <Input
-                    id="accountNumber"
-                    placeholder="Ex: 12345-6"
-                    className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
-                    {...accountForm.register('accountNumber')}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="accountInitialBalance" className="text-text dark:text-text-dark">
-                    Saldo Inicial{' '}
-                    <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
-                      (Saldo atual)
-                    </span>
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="accountInitialBalance"
-                      type="text"
-                      inputMode="decimal"
-                      className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
-                      {...accountForm.register('initialBalance', { valueAsNumber: true })}
-                    />
-                  </div>
-                </div>
-                 <div className="space-y-2">
-                  <Label htmlFor="accountInitialBalanceDate" className="text-text dark:text-text-dark">
-                    Data do Saldo *
-                  </Label>
-                  <Input
-                    id="accountInitialBalanceDate"
-                    type="date"
-                     className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
-                    {...accountForm.register('initialBalanceDate')}
-                  />
-                </div>
-              </div>
-            </>
-          )}
+          {/* Cor e Ícone */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-text dark:text-text-dark">Cor</Label>
+              <ColorPicker
+                value={accountForm.watch('color')}
+                onChange={(color) => accountForm.setValue('color', color)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-text dark:text-text-dark">Ícone</Label>
+              <IconPicker
+                value={accountForm.watch('icon')}
+                onChange={(icon) => accountForm.setValue('icon', icon)}
+                options={iconOptions}
+              />
+            </div>
+          </div>
         </CardContent>
         <CardFooter className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 px-4 sm:px-6 pb-4 sm:pb-6">
           <Button

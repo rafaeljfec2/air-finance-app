@@ -15,6 +15,7 @@ interface FinishStepProps {
   summary: {
     companyName: string;
     accountName: string;
+    creditCardName: string;
     categoriesCount: number;
   };
   loading: boolean;
@@ -23,7 +24,7 @@ interface FinishStepProps {
 export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<FinishStepProps>) {
   return (
     <motion.div
-      key="step-4"
+      key="step-5"
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
@@ -57,14 +58,26 @@ export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<Fi
                 Empresa <strong>{summary.companyName}</strong> criada
               </span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                <Check className="h-4 w-4 text-green-600" />
+            {summary.accountName && (
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Check className="h-4 w-4 text-green-600" />
+                </div>
+                <span className="text-text dark:text-text-dark">
+                  Conta <strong>{summary.accountName}</strong> configurada
+                </span>
               </div>
-              <span className="text-text dark:text-text-dark">
-                Conta <strong>{summary.accountName}</strong> configurada
-              </span>
-            </div>
+            )}
+            {summary.creditCardName && (
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Check className="h-4 w-4 text-green-600" />
+                </div>
+                <span className="text-text dark:text-text-dark">
+                  Cartão <strong>{summary.creditCardName}</strong> configurado
+                </span>
+              </div>
+            )}
             <div className="flex items-center gap-3">
               <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                 <Check className="h-4 w-4 text-green-600" />

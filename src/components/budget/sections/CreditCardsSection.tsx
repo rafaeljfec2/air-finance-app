@@ -3,7 +3,7 @@ import { CreditCardBrandIcon } from '@/components/budget/CreditCardBrandIcon';
 import { Spinner } from '@/components/ui/spinner';
 import type { CreditCard, CreditCardBill } from '@/types/budget';
 import { formatDate } from '@/utils/date';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 interface CreditCardsSectionProps {
   cards: CreditCard[];
@@ -41,9 +41,57 @@ export function CreditCardsSection({
     return { current, total };
   };
 
-  // Calculate totals from transactions
-  const totals = useMemo(() => {
+  // Filter out credit transactions (payments received, credits, etc.)
+  const isDebitTransaction = useCallback(
+    (transaction: { description: string; category: string }): boolean => {
+      const description = transaction.description.toLowerCase();
+      const category = transaction.category.toLowerCase();
+
+      // Keywords that indicate credit transactions (payments received)
+      const creditKeywords = [
+        'pagamento recebido',
+        'recebido',
+        'crédito',
+        'credit',
+        'estorno',
+        'reembolso',
+        'devolução',
+      ];
+
+      // Categories that indicate income/revenue
+      const creditCategories = [
+        'salario',
+        'salário',
+        'aluguel recebido',
+        'rendimento',
+        'receita',
+        'income',
+        'revenue',
+      ];
+
+      // Check if description contains credit keywords
+      const hasCreditKeyword = creditKeywords.some(keyword => description.includes(keyword));
+
+      // Check if category indicates credit
+      const hasCreditCategory = creditCategories.some(cat => category.includes(cat));
+
+      // Exclude if it's a credit transaction
+      return !hasCreditKeyword && !hasCreditCategory;
+    },
+    [],
+  );
+
+  // Filter only debit transactions (exclude credits/payments received)
+  const debitTransactions = useMemo(() => {
     if (!activeBill?.transactions || activeBill.transactions.length === 0) {
+      return [];
+    }
+    return activeBill.transactions.filter(isDebitTransaction);
+  }, [activeBill?.transactions, isDebitTransaction]);
+
+  // Calculate totals from transactions (only debits)
+  const totals = useMemo(() => {
+    if (debitTransactions.length === 0) {
       return {
         totalParcelado: 0,
         totalVista: 0,
@@ -55,7 +103,7 @@ export function CreditCardsSection({
     let totalVista = 0;
     let totalFinalizando = 0;
 
-    activeBill.transactions.forEach((transaction) => {
+    debitTransactions.forEach((transaction) => {
       const installment = extractInstallment(transaction.description);
       const isParcelado = transaction.category === 'Parcelado' || installment !== null;
 
@@ -75,7 +123,7 @@ export function CreditCardsSection({
       totalVista,
       totalFinalizando,
     };
-  }, [activeBill?.transactions]);
+  }, [debitTransactions]);
 
   if (isLoading) {
     return (
@@ -148,7 +196,7 @@ export function CreditCardsSection({
           </thead>
           <tbody className="divide-y divide-border/60 dark:divide-border-dark/60">
             {(() => {
-              if (!activeBill?.transactions || activeBill.transactions.length === 0) {
+              if (debitTransactions.length === 0) {
                 return (
                   <tr>
                     <td
@@ -162,7 +210,7 @@ export function CreditCardsSection({
               }
 
               // Sort transactions: first those that are finishing (fewer remaining installments), then the rest
-              const sortedTransactions = [...activeBill.transactions].sort((a, b) => {
+              const sortedTransactions = [...debitTransactions].sort((a, b) => {
                 const installmentA = extractInstallment(a.description);
                 const installmentB = extractInstallment(b.description);
 

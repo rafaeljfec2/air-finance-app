@@ -4,22 +4,29 @@ import { useAuth } from '@/hooks/useAuth';
 import { apiClient as api } from '@/services/apiClient';
 import { useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence } from 'framer-motion';
-import { Banknote, Building2, CheckCircle2, Sparkles, Tags } from 'lucide-react';
+import { Banknote, Building2, CheckCircle2, CreditCard, Sparkles, Tags } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AccountStep } from './components/AccountStep';
 import { CategoriesStep } from './components/CategoriesStep';
 import { CompanyStep } from './components/CompanyStep';
+import { CreditCardStep } from './components/CreditCardStep';
 import { FinishStep } from './components/FinishStep';
 import { StepIndicator } from './components/StepIndicator';
 import { WelcomeStep } from './components/WelcomeStep';
-import type { AccountFormData, CategoryFormData, CompanyFormData } from './schemas';
+import type {
+  AccountFormData,
+  CategoryFormData,
+  CompanyFormData,
+  CreditCardFormData,
+} from './schemas';
 
 // Define steps configuration
 const steps = [
   { icon: Sparkles, label: 'Bem-vindo' },
   { icon: Building2, label: 'Empresa' },
   { icon: Banknote, label: 'Conta' },
+  { icon: CreditCard, label: 'Cartão' },
   { icon: Tags, label: 'Categorias' },
   { icon: CheckCircle2, label: 'Conclusão' },
 ];
@@ -36,6 +43,7 @@ export default function OnboardingPage() {
   const [formData, setFormData] = useState({
     company: null as CompanyFormData | null,
     account: null as AccountFormData | null,
+    creditCard: null as CreditCardFormData | null,
     categories: [] as CategoryFormData[],
   });
 
@@ -68,6 +76,11 @@ export default function OnboardingPage() {
 
   const handleAccountSubmit = (data: AccountFormData) => {
     setFormData((prev) => ({ ...prev, account: data }));
+    handleNextStep();
+  };
+
+  const handleCreditCardSubmit = (data: CreditCardFormData | null) => {
+    setFormData((prev) => ({ ...prev, creditCard: data }));
     handleNextStep();
   };
 
@@ -149,6 +162,26 @@ export default function OnboardingPage() {
   };
 
   /**
+   * Creates a credit card and returns its ID
+   */
+  const createCreditCard = async (
+    creditCard: CreditCardFormData,
+    companyId: string,
+  ): Promise<string> => {
+    const payload = {
+      name: creditCard.name,
+      limit: creditCard.limit,
+      closingDay: creditCard.closingDay,
+      dueDay: creditCard.dueDay,
+      color: creditCard.color,
+      icon: creditCard.icon,
+      companyId,
+    };
+    const response = await api.post(`/companies/${companyId}/credit-cards`, payload);
+    return response.data.id || response.data._id;
+  };
+
+  /**
    * Creates all categories for the company
    */
   const createCategories = async (
@@ -182,7 +215,7 @@ export default function OnboardingPage() {
 
   /**
    * Handles the final completion of the onboarding process
-   * Creates all entities in sequence: company, account, categories
+   * Creates all entities in sequence: company, account, credit card, categories
    */
   const handleFinalCompletion = async (): Promise<void> => {
     setIsLoading(true);
@@ -200,12 +233,17 @@ export default function OnboardingPage() {
         await createAccount(formData.account, companyId);
       }
 
-      // 3. Create categories
+      // 3. Create credit card (optional)
+      if (formData.creditCard) {
+        await createCreditCard(formData.creditCard, companyId);
+      }
+
+      // 4. Create categories
       if (formData.categories.length > 0) {
         await createCategories(formData.categories, companyId);
       }
 
-      // 4. Complete onboarding
+      // 5. Complete onboarding
       await completeOnboarding();
     } catch (error) {
       console.error('Erro ao finalizar onboarding:', error);
@@ -246,6 +284,15 @@ export default function OnboardingPage() {
             )}
 
             {currentStep === 3 && (
+              <CreditCardStep
+                onNext={handleCreditCardSubmit}
+                onBack={handlePrevStep}
+                loading={isLoading}
+                initialData={formData.creditCard}
+              />
+            )}
+
+            {currentStep === 4 && (
               <CategoriesStep
                 onNext={handleCategoriesSubmit}
                 onBack={handlePrevStep}
@@ -253,7 +300,7 @@ export default function OnboardingPage() {
               />
             )}
 
-            {currentStep === 4 && (
+            {currentStep === 5 && (
               <FinishStep
                 onComplete={handleFinalCompletion}
                 onBack={handlePrevStep}
@@ -261,6 +308,7 @@ export default function OnboardingPage() {
                 summary={{
                   companyName: formData.company?.name ?? '',
                   accountName: formData.account?.name ?? '',
+                  creditCardName: formData.creditCard?.name ?? '',
                   categoriesCount: formData.categories.length,
                 }}
               />
