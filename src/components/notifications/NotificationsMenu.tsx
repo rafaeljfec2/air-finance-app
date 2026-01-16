@@ -52,7 +52,7 @@ export function NotificationsMenu() {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items className="absolute right-0 mt-2 w-80 sm:w-96 origin-top-right rounded-lg bg-card dark:bg-card-dark shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden z-50">
+            <Menu.Items className="absolute right-0 right-safe lg:right-0 mt-2 w-80 sm:w-96 origin-top-right rounded-lg bg-card dark:bg-card-dark shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden z-50 max-w-[calc(100vw-var(--safe-area-inset-left)-var(--safe-area-inset-right)-1rem)]">
               <div className="flex items-center justify-between px-4 py-3 border-b border-border dark:border-border-dark bg-gray-50/50 dark:bg-gray-800/50">
                 <h3 className="font-semibold text-sm text-text dark:text-text-dark">Notificações</h3>
                 {unreadCount > 0 && (

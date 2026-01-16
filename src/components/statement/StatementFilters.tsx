@@ -59,7 +59,7 @@ export function StatementFilters({
           </button>
 
           {isFilterOpen && (
-            <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-card dark:bg-card-dark ring-1 ring-border dark:ring-border-dark z-10">
+            <div className="absolute right-0 right-safe lg:right-0 mt-2 w-56 rounded-lg shadow-lg bg-card dark:bg-card-dark ring-1 ring-border dark:ring-border-dark z-10 max-w-[calc(100vw-var(--safe-area-inset-left)-var(--safe-area-inset-right)-1rem)]">
               <div className="py-1">
                 <button
                   onClick={() => handleCategorySelect(null)}

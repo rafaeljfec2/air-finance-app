@@ -40,10 +40,10 @@ export function Modal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+    <div className="fixed inset-safe z-50 flex items-center justify-center p-safe sm:p-4">
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-safe bg-black/60 backdrop-blur-sm transition-opacity"
         aria-hidden="true"
         onClick={dismissible ? onClose : undefined}
       />
@@ -52,7 +52,9 @@ export function Modal({
         ref={modalRef}
         open={open}
         className={cn(
-          'relative z-10 w-full max-w-lg mx-auto rounded-xl bg-white dark:bg-gray-900 shadow-xl p-4 sm:p-6 pb-safe sm:pb-6 focus:outline-none border-0 max-h-[calc(100dvh-2rem)]',
+          'relative z-10 w-full max-w-lg mx-auto rounded-xl bg-white dark:bg-gray-900 shadow-xl p-4 sm:p-6 focus:outline-none border-0',
+          // Mobile: max height considers safe areas, desktop: standard
+          'max-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-2rem)] lg:max-h-[calc(100dvh-2rem)]',
           className?.includes('overflow-hidden') ? '' : 'overflow-y-auto',
           className,
         )}
@@ -62,7 +64,7 @@ export function Modal({
         {dismissible && (
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-md"
+            className="absolute top-safe-3 right-safe-3 lg:top-3 lg:right-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-md"
             aria-label="Fechar"
           >
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24">

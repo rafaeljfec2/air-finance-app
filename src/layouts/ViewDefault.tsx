@@ -37,7 +37,7 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
 
       {/* Botão flutuante para mostrar header quando estiver escondido */}
       {!isHeaderVisible && (
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-safe-4 right-safe-4 z-50">
           <button
             onClick={toggleHeaderVisibility}
             className="p-3 bg-primary-600 text-white rounded-full shadow-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-transform active:scale-95 flex items-center justify-center"
@@ -65,7 +65,7 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
       }
       {!location.pathname.includes('/new') &&
         !location.pathname.match(/\/transactions\/[a-zA-Z0-9-]+$/) && (
-          <div className="lg:hidden fixed bottom-6 right-6 z-40">
+          <div className="lg:hidden fixed bottom-safe-6 right-safe-6 z-40">
             <button
               onClick={() => setIsFabModalOpen(true)}
               className="p-4 bg-primary-600 text-white rounded-full shadow-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-transform active:scale-95 flex items-center justify-center"
@@ -112,7 +112,9 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
         <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} isHeaderVisible={isHeaderVisible} />
         <main
           className={cn(
-            'flex-1 overflow-auto p-4 sm:p-6 pb-24 lg:pb-6 transition-all duration-300 w-full',
+            'flex-1 overflow-auto p-4 sm:p-6 transition-all duration-300 w-full',
+            // Mobile: padding bottom considers safe area + FAB space (6rem = 24)
+            'pb-[calc(6rem+var(--safe-area-inset-bottom))] lg:pb-6',
             isCollapsed ? 'lg:pl-6' : 'lg:pl-8',
           )}
         >

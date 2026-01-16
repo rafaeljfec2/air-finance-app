@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Safe Area Insets - iOS and Android */
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-right: env(safe-area-inset-right, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  }
+
   html {
     @apply antialiased overflow-hidden;
   }
@@ -35,6 +43,143 @@
 
   .card {
     @apply rounded-lg bg-card dark:bg-card-dark border border-border dark:border-border-dark shadow-sm;
+  }
+}
+
+@layer utilities {
+  /* Safe Area Padding Utilities */
+  .pt-safe {
+    padding-top: calc(1rem + var(--safe-area-inset-top));
+  }
+
+  .pb-safe {
+    padding-bottom: calc(1rem + var(--safe-area-inset-bottom));
+  }
+
+  .pl-safe {
+    padding-left: calc(1rem + var(--safe-area-inset-left));
+  }
+
+  .pr-safe {
+    padding-right: calc(1rem + var(--safe-area-inset-right));
+  }
+
+  .px-safe {
+    padding-left: calc(1rem + var(--safe-area-inset-left));
+    padding-right: calc(1rem + var(--safe-area-inset-right));
+  }
+
+  .py-safe {
+    padding-top: calc(1rem + var(--safe-area-inset-top));
+    padding-bottom: calc(1rem + var(--safe-area-inset-bottom));
+  }
+
+  .p-safe {
+    padding-top: calc(1rem + var(--safe-area-inset-top));
+    padding-right: calc(1rem + var(--safe-area-inset-right));
+    padding-bottom: calc(1rem + var(--safe-area-inset-bottom));
+    padding-left: calc(1rem + var(--safe-area-inset-left));
+  }
+
+  /* Safe Area Margin Utilities */
+  .mt-safe {
+    margin-top: calc(1rem + var(--safe-area-inset-top));
+  }
+
+  .mb-safe {
+    margin-bottom: calc(1rem + var(--safe-area-inset-bottom));
+  }
+
+  .ml-safe {
+    margin-left: calc(1rem + var(--safe-area-inset-left));
+  }
+
+  .mr-safe {
+    margin-right: calc(1rem + var(--safe-area-inset-right));
+  }
+
+  /* Safe Area Position Utilities */
+  .top-safe {
+    top: var(--safe-area-inset-top);
+  }
+
+  .bottom-safe {
+    bottom: var(--safe-area-inset-bottom);
+  }
+
+  .left-safe {
+    left: var(--safe-area-inset-left);
+  }
+
+  .right-safe {
+    right: var(--safe-area-inset-right);
+  }
+
+  /* Safe Area with custom spacing */
+  .top-safe-4 {
+    top: calc(1rem + var(--safe-area-inset-top));
+  }
+
+  .top-safe-6 {
+    top: calc(1.5rem + var(--safe-area-inset-top));
+  }
+
+  .bottom-safe-4 {
+    bottom: calc(1rem + var(--safe-area-inset-bottom));
+  }
+
+  .bottom-safe-6 {
+    bottom: calc(1.5rem + var(--safe-area-inset-bottom));
+  }
+
+  .right-safe-4 {
+    right: calc(1rem + var(--safe-area-inset-right));
+  }
+
+  .right-safe-6 {
+    right: calc(1.5rem + var(--safe-area-inset-right));
+  }
+
+  .left-safe-4 {
+    left: calc(1rem + var(--safe-area-inset-left));
+  }
+
+  .left-safe-6 {
+    left: calc(1.5rem + var(--safe-area-inset-left));
+  }
+
+  /* Safe Area Insets (no padding/margin, just the inset value) */
+  .inset-safe-top {
+    top: var(--safe-area-inset-top);
+  }
+
+  .inset-safe-bottom {
+    bottom: var(--safe-area-inset-bottom);
+  }
+
+  .inset-safe-left {
+    left: var(--safe-area-inset-left);
+  }
+
+  .inset-safe-right {
+    right: var(--safe-area-inset-right);
+  }
+
+  .inset-safe-y {
+    top: var(--safe-area-inset-top);
+    bottom: var(--safe-area-inset-bottom);
+  }
+
+  .inset-safe-x {
+    left: var(--safe-area-inset-left);
+    right: var(--safe-area-inset-right);
+  }
+
+  .inset-safe {
+    top: var(--safe-area-inset-top);
+    right: var(--safe-area-inset-right);
+    bottom: var(--safe-area-inset-bottom);
+    left: var(--safe-area-inset-left);
   }
 }
 

@@ -598,6 +598,210 @@ O `ViewDefault` é o componente base para todas as páginas autenticadas e se ad
 
 #### 5. **FAB (Floating Action Button)**
 
+---
+
+## 📐 Safe Areas (iOS e Android)
+
+O projeto implementa suporte completo para **Safe Areas** do iOS e Android, garantindo que conteúdo não fique escondido atrás de barras de status, notches ou barras de navegação em dispositivos móveis.
+
+### O que são Safe Areas?
+
+Safe Areas são áreas seguras definidas pelo sistema operacional onde o conteúdo pode ser exibido sem ser obstruído por elementos do sistema como:
+- **Notch** (iPhone X e superiores)
+- **Barra de status** (iOS e Android)
+- **Barra de navegação** (Android)
+- **Indicadores de gestos** (iOS)
+
+### Configuração
+
+#### 1. Viewport Meta Tag
+
+O arquivo `index.html` já está configurado com `viewport-fit=cover`:
+
+```html
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover"
+/>
+```
+
+#### 2. Variáveis CSS
+
+As variáveis CSS para safe areas estão definidas em `src/index.css`:
+
+```css
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+}
+```
+
+### Classes Utilitárias
+
+O projeto fornece classes utilitárias para trabalhar com safe areas:
+
+#### Padding com Safe Area
+
+```tsx
+<div className="pt-safe">     {/* padding-top + safe area top */}
+<div className="pb-safe">     {/* padding-bottom + safe area bottom */}
+<div className="pl-safe">     {/* padding-left + safe area left */}
+<div className="pr-safe">     {/* padding-right + safe area right */}
+<div className="px-safe">    {/* padding horizontal + safe areas */}
+<div className="py-safe">    {/* padding vertical + safe areas */}
+<div className="p-safe">     {/* padding em todos os lados + safe areas */}
+```
+
+#### Margin com Safe Area
+
+```tsx
+<div className="mt-safe">    {/* margin-top + safe area top */}
+<div className="mb-safe">    {/* margin-bottom + safe area bottom */}
+```
+
+#### Posicionamento com Safe Area
+
+```tsx
+<div className="top-safe">        {/* top: safe area inset */}
+<div className="bottom-safe">     {/* bottom: safe area inset */}
+<div className="left-safe">       {/* left: safe area inset */}
+<div className="right-safe">      {/* right: safe area inset */}
+<div className="inset-safe">     {/* inset completo com safe areas */}
+<div className="inset-safe-y">   {/* top e bottom com safe areas */}
+<div className="inset-safe-x">   {/* left e right com safe areas */}
+```
+
+#### Posicionamento com Espaçamento Customizado
+
+```tsx
+<div className="top-safe-4">     {/* top: 1rem + safe area top */}
+<div className="top-safe-6">     {/* top: 1.5rem + safe area top */}
+<div className="bottom-safe-4">  {/* bottom: 1rem + safe area bottom */}
+<div className="bottom-safe-6">  {/* bottom: 1.5rem + safe area bottom */}
+<div className="right-safe-4">   {/* right: 1rem + safe area right */}
+<div className="right-safe-6">   {/* right: 1.5rem + safe area right */}
+```
+
+### Uso em Componentes
+
+#### Elementos Fixos (FAB, Botões Flutuantes)
+
+```tsx
+// ✅ CORRETO: Usar safe areas em elementos fixos
+<button className="fixed bottom-safe-6 right-safe-6">
+  FAB
+</button>
+
+// ❌ ERRADO: Não considerar safe areas
+<button className="fixed bottom-6 right-6">
+  FAB (pode ficar escondido)
+</button>
+```
+
+#### Modais e Overlays
+
+```tsx
+// ✅ CORRETO: Modal respeitando safe areas
+<div className="fixed inset-safe z-50 flex items-center justify-center p-safe">
+  <div className="modal-content">...</div>
+</div>
+
+// ❌ ERRADO: Modal sem safe areas
+<div className="fixed inset-0 z-50">
+  <div className="modal-content">...</div>
+</div>
+```
+
+#### Sidebar Mobile
+
+```tsx
+// ✅ CORRETO: Sidebar com safe areas
+<div className="fixed inset-safe-y left-0 h-full">
+  {/* Conteúdo da sidebar */}
+</div>
+```
+
+#### Dropdowns e Menus
+
+```tsx
+// ✅ CORRETO: Dropdown considerando safe area right
+<Menu.Items className="absolute right-0 right-safe lg:right-0">
+  {/* Itens do menu */}
+</Menu.Items>
+```
+
+### Hook Customizado: `useSafeArea`
+
+Para casos onde você precisa dos valores de safe area em JavaScript:
+
+```tsx
+import { useSafeArea } from '@/hooks/useSafeArea';
+
+function MyComponent() {
+  const { top, right, bottom, left } = useSafeArea();
+
+  return (
+    <div style={{ paddingTop: `${top}px` }}>
+      Conteúdo respeitando safe area
+    </div>
+  );
+}
+```
+
+### Utilitários: `safeArea.ts`
+
+Funções utilitárias para trabalhar com safe areas programaticamente:
+
+```tsx
+import { getSafeAreaInsets, hasSafeAreas } from '@/utils/safeArea';
+
+// Obter todos os insets
+const insets = getSafeAreaInsets();
+console.log(insets.top, insets.bottom);
+
+// Verificar se dispositivo tem safe areas
+if (hasSafeAreas()) {
+  // Aplicar estilos específicos
+}
+```
+
+### Componentes que Já Usam Safe Areas
+
+Os seguintes componentes já estão configurados para respeitar safe areas:
+
+- ✅ **ViewDefault**: FAB e botão de header
+- ✅ **Sidebar**: Container e header em mobile
+- ✅ **Modal**: Overlay e conteúdo
+- ✅ **ConfirmModal**: Overlay e conteúdo
+- ✅ **TransactionTypeModal**: Overlay e conteúdo
+- ✅ **NotificationsMenu**: Dropdown
+- ✅ **UserMenu**: Dropdown
+- ✅ **StatementFilters**: Dropdown de filtros
+
+### Boas Práticas
+
+1. **Sempre use safe areas em elementos fixos** (`fixed` ou `absolute` em contexto de viewport)
+2. **Em desktop, safe areas são 0px**, então use classes responsivas:
+   ```tsx
+   <div className="top-safe-4 lg:top-4">
+   ```
+3. **Teste em dispositivos reais** com notch (iPhone X+) e diferentes configurações de Android
+4. **Mantenha tamanhos mínimos de toque** (44x44px) mesmo com safe areas
+5. **Use as classes utilitárias** ao invés de calcular manualmente
+
+### Compatibilidade
+
+- ✅ **iOS 11+**: Suporte completo via `env()`
+- ✅ **Android Chrome 69+**: Suporte completo via `env()`
+- ✅ **Desktop**: Safe areas são 0px, não afeta layout
+- ✅ **Fallback**: Valores padrão (0px) para navegadores antigos
+
+---
+
+#### 5. **FAB (Floating Action Button)**
+
 **Mobile Only:**
 
 ```tsx

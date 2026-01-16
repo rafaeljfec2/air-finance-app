@@ -33,7 +33,7 @@ export function ConfirmModal({
   }, [open]);
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-safe z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-safe">
       <div
         className={`bg-card dark:bg-card-dark rounded-2xl p-8 shadow-2xl max-w-md mx-auto flex flex-col items-center border-2 animate-bounce-in ${danger ? 'border-red-500/30' : 'border-primary-500/20'}`}
       >

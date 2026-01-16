@@ -27,8 +27,10 @@ export function Sidebar({
       <SidebarOverlay isOpen={isOpen} onClose={onClose ?? (() => {})} />
       <div
         className={cn(
-          'fixed z-50 inset-y-0 left-0 h-full bg-card dark:bg-card-dark border-r border-border dark:border-border-dark',
+          'fixed z-50 left-0 h-full bg-card dark:bg-card-dark border-r border-border dark:border-border-dark',
           'transition-all duration-300 ease-in-out transform',
+          // Mobile: respect safe areas top and bottom
+          'inset-safe-y lg:inset-y-0',
           isCollapsed ? 'w-16' : 'w-64',
           isOpen ? 'translate-x-0' : '-translate-x-full',
           'lg:static lg:translate-x-0 lg:z-0',

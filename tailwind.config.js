@@ -37,6 +37,12 @@ module.exports = {
         'text-dark': '#f9fafb',
         'border-dark': '#374151',
       },
+      spacing: {
+        'safe-top': 'var(--safe-area-inset-top)',
+        'safe-right': 'var(--safe-area-inset-right)',
+        'safe-bottom': 'var(--safe-area-inset-bottom)',
+        'safe-left': 'var(--safe-area-inset-left)',
+      },
     },
   },
   plugins: [require('@tailwindcss/typography')],
