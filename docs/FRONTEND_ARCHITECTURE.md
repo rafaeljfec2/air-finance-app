@@ -16,7 +16,7 @@
 
 ## 🎯 Visão Geral
 
-O **Air Finance** é uma aplicação web de gestão financeira pessoal desenvolvida com tecnologias modernas e seguindo princípios de Clean Architecture.
+O **Air Finance** é uma aplicação web de gestão financeira pessoal desenvolvida com tecnologias modernas e seguindo princípios de Clean Architecture. Este documento descreve a arquitetura do workspace `@air-finance/web` dentro do monorepo Air Finance.
 
 ### Stack Tecnológico
 
@@ -28,6 +28,9 @@ O **Air Finance** é uma aplicação web de gestão financeira pessoal desenvolv
 - **React Query** (@tanstack/react-query) - Gerenciamento de dados do servidor
 - **Lucide React** - Biblioteca de ícones
 - **Class Variance Authority (CVA)** - Variantes de componentes
+- **@air-finance/shared** - Package compartilhado do monorepo
+- **Turborepo** - Monorepo build system
+- **Yarn 4** (Berry) - Package manager
 
 ### Princípios Arquiteturais
 
