@@ -1,0 +1,70 @@
+import { Plan } from '@/types/subscription';
+
+export const PLANS: Plan[] = [
+  {
+    id: 'free',
+    name: 'Free',
+    price: 0,
+    displayPrice: 'R$ 0,00',
+    features: [
+      'Controle manual de receitas e despesas',
+      'Dashboard mensal',
+      'Até 2 contas bancárias',
+      'Até 2 cartões de crédito',
+      'Suporte via comunidade',
+    ],
+    limits: {
+      maxAccounts: 2,
+      maxCards: 2,
+      aiEnabled: false,
+      bankIntegrationEnabled: false,
+      multiUser: false,
+      multiCompany: false,
+    },
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: 29.90,
+    displayPrice: 'R$ 29,90',
+    features: [
+      'Tudo do plano Free',
+      'Inteligência Artificial Ilimitada',
+      'Contas e cartões ilimitados',
+      'Importação de OFX/CSV',
+      'Gestão de metas avançada',
+      'Relatórios de tendências',
+    ],
+    limits: {
+      maxAccounts: -1,
+      maxCards: -1,
+      aiEnabled: true,
+      bankIntegrationEnabled: false,
+      multiUser: false,
+      multiCompany: false,
+    },
+    highlight: true,
+  },
+  {
+    id: 'business',
+    name: 'Business',
+    price: 79.90,
+    displayPrice: 'R$ 79,90',
+    features: [
+      'Tudo do plano Pro',
+      'Integração Bancária Automática (Inter e Nubank)',
+      'Gestão Multi-empresas (CNPJ)',
+      'Múltiplos usuários e permissões',
+      'Conciliação bancária automática',
+      'Suporte prioritário',
+    ],
+    limits: {
+      maxAccounts: -1,
+      maxCards: -1,
+      aiEnabled: true,
+      bankIntegrationEnabled: true,
+      multiUser: true,
+      multiCompany: true,
+    },
+  },
+];

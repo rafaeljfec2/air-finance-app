@@ -1,0 +1,12 @@
+# Ignorar outros apps e packages que não são necessários para o deploy
+apps/mobile-webview
+packages/shared/node_modules
+
+# Cache e builds
+.turbo
+node_modules
+**/node_modules
+
+# Arquivos temporários
+*.log
+.DS_Store

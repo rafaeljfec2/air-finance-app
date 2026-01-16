@@ -1,0 +1,11 @@
+dist
+dist/**
+node_modules
+build
+coverage
+*.config.js
+*.config.cjs
+.eslintrc.js
+.eslintrc.cjs
+.prettierrc.js
+commitlint.config.js
