@@ -12,7 +12,7 @@ if command -v corepack &> /dev/null; then
     corepack prepare yarn@4.0.0 --activate || echo "⚠️  Aviso: prepare falhou, continuando..."
     
     echo "📥 Instalando com Corepack Yarn..."
-    corepack yarn install
+    corepack yarn install --no-immutable
 else
     echo "⚠️  Corepack não disponível, usando Yarn padrão..."
     
@@ -23,7 +23,7 @@ else
     fi
     
     echo "📥 Instalando dependências..."
-    yarn install
+    yarn install --no-immutable
 fi
 
 echo "✅ Instalação concluída!"
