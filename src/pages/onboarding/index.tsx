@@ -175,7 +175,6 @@ export default function OnboardingPage() {
       dueDay: creditCard.dueDay,
       color: creditCard.color,
       icon: creditCard.icon,
-      companyId,
     };
     const response = await api.post(`/companies/${companyId}/credit-cards`, payload);
     return response.data.id || response.data._id;

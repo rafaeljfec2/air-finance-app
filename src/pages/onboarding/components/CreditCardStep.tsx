@@ -6,17 +6,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { ComboBox, type ComboBoxOption } from '@/components/ui/ComboBox';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
@@ -45,7 +39,7 @@ const bankTypes = [
   { value: 'outro', label: 'Outro', icon: Landmark, iconName: 'Landmark' },
 ] as const;
 
-const dueDates = Array.from({ length: 31 }, (_, i) => ({
+const dueDates: ComboBoxOption<number>[] = Array.from({ length: 31 }, (_, i) => ({
   value: i + 1,
   label: `${i + 1}${i + 1 === 1 ? 'º' : 'º'} dia`,
 }));
@@ -176,63 +170,39 @@ export function CreditCardStep({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-text dark:text-text-dark">Dia de fechamento *</Label>
-                <Select
-                  value={String(creditCardForm.watch('closingDay'))}
+                <ComboBox<number>
+                  label="Dia de fechamento *"
+                  options={dueDates}
+                  value={creditCardForm.watch('closingDay')}
                   onValueChange={(value) =>
-                    creditCardForm.setValue('closingDay', Number.parseInt(value, 10))
+                    creditCardForm.setValue('closingDay', value ?? 10)
                   }
-                >
-                  <SelectTrigger className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-                    {dueDates.map((d) => (
-                      <SelectItem
-                        key={d.value}
-                        value={String(d.value)}
-                        className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
-                      >
-                        {d.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {creditCardForm.formState.errors.closingDay && (
-                  <p className="text-sm text-red-400">
-                    {String(creditCardForm.formState.errors.closingDay.message)}
-                  </p>
-                )}
+                  placeholder="Selecione o dia"
+                  className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
+                  error={
+                    creditCardForm.formState.errors.closingDay
+                      ? String(creditCardForm.formState.errors.closingDay.message)
+                      : undefined
+                  }
+                  icon={Calendar}
+                />
               </div>
 
               <div className="space-y-2">
-                <Label className="text-text dark:text-text-dark">Dia de vencimento *</Label>
-                <Select
-                  value={String(creditCardForm.watch('dueDay'))}
-                  onValueChange={(value) =>
-                    creditCardForm.setValue('dueDay', Number.parseInt(value, 10))
+                <ComboBox<number>
+                  label="Dia de vencimento *"
+                  options={dueDates}
+                  value={creditCardForm.watch('dueDay')}
+                  onValueChange={(value) => creditCardForm.setValue('dueDay', value ?? 10)}
+                  placeholder="Selecione o dia"
+                  className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
+                  error={
+                    creditCardForm.formState.errors.dueDay
+                      ? String(creditCardForm.formState.errors.dueDay.message)
+                      : undefined
                   }
-                >
-                  <SelectTrigger className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-                    {dueDates.map((d) => (
-                      <SelectItem
-                        key={d.value}
-                        value={String(d.value)}
-                        className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
-                      >
-                        {d.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {creditCardForm.formState.errors.dueDay && (
-                  <p className="text-sm text-red-400">
-                    {String(creditCardForm.formState.errors.dueDay.message)}
-                  </p>
-                )}
+                  icon={Calendar}
+                />
               </div>
             </div>
           </div>
