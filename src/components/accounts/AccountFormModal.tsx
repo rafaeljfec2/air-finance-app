@@ -50,6 +50,7 @@ export function AccountFormModal({
     handleDateChange,
     handleTypeChange,
     handleSwitchChange,
+    handleBankChange,
     handleSubmit,
     handleClose,
   } = useAccountFormModal({ account, onSubmit, onClose });
@@ -110,6 +111,7 @@ export function AccountFormModal({
               accountTypeOptions={accountTypeOptions}
               onNameChange={handleChange}
               onTypeChange={handleTypeChange}
+              onBankChange={handleBankChange}
             />
 
             <BankingFieldsSection form={form} errors={errors} onFieldChange={handleChange} />

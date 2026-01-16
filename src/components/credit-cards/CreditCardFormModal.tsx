@@ -5,6 +5,8 @@ import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { ComboBox } from '@/components/ui/ComboBox';
+import { useBanks } from '@/hooks/useBanks';
 import { cn } from '@/lib/utils';
 import {
   CreateCreditCardPayload,
@@ -12,7 +14,7 @@ import {
 } from '@/services/creditCardService';
 import { useCompanyStore } from '@/stores/company';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
-import { Banknote, Calendar, CreditCard, DollarSign, Landmark, Palette, X } from 'lucide-react';
+import { Banknote, Building2, Calendar, CreditCard, DollarSign, Landmark, Palette, X } from 'lucide-react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -47,6 +49,8 @@ export function CreditCardFormModal({
   isLoading = false,
 }: Readonly<CreditCardFormModalProps>) {
   const { activeCompany } = useCompanyStore();
+  const { bankOptions, isLoading: isLoadingBanks } = useBanks();
+  
   const initialFormState: CreateCreditCardPayload = useMemo(
     () => ({
       name: '',
@@ -55,6 +59,7 @@ export function CreditCardFormModal({
       dueDay: 10,
       color: '#8A05BE',
       icon: 'CreditCard',
+      bankCode: undefined,
       companyId: activeCompany?.id || '',
     }),
     [activeCompany],
@@ -73,6 +78,7 @@ export function CreditCardFormModal({
         dueDay: creditCard.dueDay,
         color: creditCard.color,
         icon: creditCard.icon,
+        bankCode: creditCard.bankCode,
         companyId: creditCard.companyId,
       });
       setLimitInput(
@@ -99,6 +105,10 @@ export function CreditCardFormModal({
 
   const handleIconChange = (icon: string) => {
     setForm((prev) => ({ ...prev, icon }));
+  };
+
+  const handleBankChange = (bankCode: string | null) => {
+    setForm((prev) => ({ ...prev, bankCode: bankCode || undefined }));
   };
 
   const validate = () => {
@@ -183,7 +193,24 @@ export function CreditCardFormModal({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField label="Nome do cartão *" error={errors.name} className="md:col-span-2">
+                <FormField label="Banco / Instituição" error={errors.bankCode}>
+                  <ComboBox
+                    options={bankOptions}
+                    value={form.bankCode ?? null}
+                    onValueChange={handleBankChange}
+                    placeholder={isLoadingBanks ? "Carregando bancos..." : "Selecione o banco (opcional)"}
+                    disabled={isLoadingBanks}
+                    searchable
+                    searchPlaceholder="Buscar banco..."
+                    icon={Building2}
+                    className={cn(
+                      'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark',
+                      errors.bankCode && 'border-red-500',
+                    )}
+                  />
+                </FormField>
+
+                <FormField label="Nome do cartão *" error={errors.name}>
                   <div className="relative">
                     <Input
                       name="name"

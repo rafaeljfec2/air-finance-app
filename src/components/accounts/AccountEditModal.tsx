@@ -4,6 +4,8 @@ import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAccounts } from '@/hooks/useAccounts';
+import { useBanks } from '@/hooks/useBanks';
+import { Building2 } from 'lucide-react';
 
 interface AccountEditModalProps {
   open: boolean;
@@ -12,10 +14,12 @@ interface AccountEditModalProps {
 
 export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalProps>) {
   const { accounts, updateAccountAsync, isUpdating } = useAccounts();
+  const { bankOptions, isLoading: isLoadingBanks } = useBanks();
   const [selectedId, setSelectedId] = useState<string>('');
   const [form, setForm] = useState({
     name: '',
     institution: '',
+    bankCode: '',
     agency: '',
     accountNumber: '',
   });
@@ -47,6 +51,7 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
       setForm({
         name: selectedAccount.name ?? '',
         institution: selectedAccount.institution ?? '',
+        bankCode: selectedAccount.bankCode ?? '',
         agency: selectedAccount.agency ?? '',
         accountNumber: selectedAccount.accountNumber ?? '',
       });
@@ -58,6 +63,27 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
 
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleBankChange = (bankCode: string | null) => {
+    if (bankCode) {
+      const selectedBank = bankOptions.find(b => b.value === bankCode);
+      if (selectedBank) {
+        // Extract bank name from label (format: "001 - Banco do Brasil")
+        const bankName = selectedBank.label.split(' - ')[1] || selectedBank.label;
+        setForm((prev) => ({
+          ...prev,
+          bankCode: bankCode,
+          institution: bankName,
+        }));
+      }
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        bankCode: '',
+        institution: '',
+      }));
+    }
   };
 
   const validate = () => {
@@ -81,6 +107,7 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
         data: {
           name: form.name,
           institution: form.institution,
+          bankCode: form.bankCode || undefined,
           agency: form.agency,
           accountNumber: form.accountNumber,
         },
@@ -126,12 +153,18 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
               htmlFor="institution"
               className="text-xs text-muted-foreground dark:text-gray-400"
             >
-              Instituição
+              Banco / Instituição
             </label>
-            <Input
-              value={form.institution}
-              onChange={(e) => handleChange('institution', e.target.value)}
-              placeholder="Banco / instituição"
+            <ComboBox
+              options={bankOptions}
+              value={form.bankCode || null}
+              onValueChange={handleBankChange}
+              placeholder={isLoadingBanks ? "Carregando bancos..." : "Selecione o banco"}
+              disabled={isLoadingBanks}
+              searchable
+              searchPlaceholder="Buscar banco..."
+              icon={Building2}
+              className="w-full"
             />
             {errors.institution && <p className="text-xs text-red-500">{errors.institution}</p>}
           </div>

@@ -11,11 +11,13 @@ import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useBanks } from '@/hooks/useBanks';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import {
   Banknote,
+  Building2,
   Calendar,
   ChevronLeft,
   ChevronRight,
@@ -57,6 +59,8 @@ export function CreditCardStep({
   loading,
   initialData,
 }: Readonly<CreditCardStepProps>) {
+  const { bankOptions, isLoading: isLoadingBanks } = useBanks();
+  
   const creditCardForm = useForm<CreditCardFormData>({
     resolver: zodResolver(CreditCardSchema),
     defaultValues: initialData || {
@@ -87,6 +91,10 @@ export function CreditCardStep({
     onNext(data);
   };
 
+  const handleBankChange = (bankCode: string | null) => {
+    creditCardForm.setValue('bankCode', bankCode || undefined);
+  };
+
   const iconOptions = bankTypes.map((type) => ({
     value: type.iconName,
     icon: type.icon,
@@ -110,6 +118,22 @@ export function CreditCardStep({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 px-4 sm:px-6">
+          {/* Banco */}
+          <div className="space-y-2">
+            <Label className="text-text dark:text-text-dark">Banco</Label>
+            <ComboBox
+              options={bankOptions}
+              value={creditCardForm.watch('bankCode') ?? null}
+              onValueChange={handleBankChange}
+              placeholder={isLoadingBanks ? "Carregando bancos..." : "Selecione o banco (opcional)"}
+              disabled={isLoadingBanks}
+              searchable
+              searchPlaceholder="Buscar banco..."
+              icon={Building2}
+              className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
+            />
+          </div>
+
           {/* Nome */}
           <div className="space-y-2">
             <Label htmlFor="creditCardName" className="text-text dark:text-text-dark">

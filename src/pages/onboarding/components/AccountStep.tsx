@@ -17,10 +17,13 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { ComboBox } from '@/components/ui/ComboBox';
+import { useBanks } from '@/hooks/useBanks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import {
     Banknote,
+    Building2,
     ChevronLeft,
     ChevronRight,
     Landmark,
@@ -46,6 +49,8 @@ interface AccountStepProps {
 }
 
 export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<AccountStepProps>) {
+  const { bankOptions, isLoading: isLoadingBanks } = useBanks();
+  
   const accountForm = useForm<AccountFormData>({
     resolver: zodResolver(AccountSchema),
     defaultValues: initialData || {
@@ -66,6 +71,21 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
 
   const handleSubmit = (data: AccountFormData) => {
     onNext(data);
+  };
+
+  const handleBankChange = (bankCode: string | null) => {
+    if (bankCode) {
+      const selectedBank = bankOptions.find(b => b.value === bankCode);
+      if (selectedBank) {
+        // Extract bank name from label (format: "001 - Banco do Brasil")
+        const bankName = selectedBank.label.split(' - ')[1] || selectedBank.label;
+        accountForm.setValue('bankCode', bankCode);
+        accountForm.setValue('institution', bankName);
+      }
+    } else {
+      accountForm.setValue('bankCode', undefined);
+      accountForm.setValue('institution', '');
+    }
   };
 
   const iconOptions = accountTypes.map((type) => ({
@@ -145,11 +165,17 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-text dark:text-text-dark">Instituição *</Label>
-              <Input
-                placeholder="Ex: Nubank, Itau..."
+              <Label className="text-text dark:text-text-dark">Banco / Instituição *</Label>
+              <ComboBox
+                options={bankOptions}
+                value={accountForm.watch('bankCode') ?? null}
+                onValueChange={handleBankChange}
+                placeholder={isLoadingBanks ? "Carregando bancos..." : "Selecione o banco"}
+                disabled={isLoadingBanks}
+                searchable
+                searchPlaceholder="Buscar banco..."
+                icon={Building2}
                 className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
-                {...accountForm.register('institution')}
               />
               {accountForm.formState.errors.institution && (
                 <p className="text-sm text-red-400">

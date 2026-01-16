@@ -21,6 +21,7 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
       name: '',
       type: 'checking',
       institution: '',
+      bankCode: undefined,
       agency: '',
       accountNumber: '',
       color: '#8A05BE',
@@ -58,6 +59,7 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
       name: accountData.name,
       type: accountData.type,
       institution: accountData.institution,
+      bankCode: accountData.bankCode,
       agency: accountData.agency,
       accountNumber: accountData.accountNumber,
       color: accountData.color,
@@ -207,6 +209,14 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
     onClose();
   }, [resetFormState, onClose]);
 
+  const handleBankChange = useCallback((bankCode: string | null, bankName: string) => {
+    setForm((prev) => ({
+      ...prev,
+      bankCode: bankCode || undefined,
+      institution: bankName,
+    }));
+  }, []);
+
   return {
     form,
     errors,
@@ -221,6 +231,7 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
     handleDateChange,
     handleTypeChange,
     handleSwitchChange,
+    handleBankChange,
     handleSubmit,
     handleClose,
   };

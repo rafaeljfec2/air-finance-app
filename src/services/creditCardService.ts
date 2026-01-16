@@ -11,6 +11,7 @@ export const CreditCardSchema = z.object({
   dueDay: z.number().min(1, 'Dia de vencimento inválido').max(31, 'Dia de vencimento inválido'),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida'),
   icon: z.string().min(1, 'Ícone é obrigatório'),
+  bankCode: z.string().optional().nullable(),
   companyId: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -24,6 +25,7 @@ export type CreateCreditCardPayload = {
   dueDay: number;
   color: string;
   icon: string;
+  bankCode?: string;
   companyId: string;
 };
 

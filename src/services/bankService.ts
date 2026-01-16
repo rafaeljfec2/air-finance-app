@@ -4,7 +4,7 @@ import { apiClient } from './apiClient';
 export const BankSchema = z.object({
   code: z.string().min(1, 'Código obrigatório'),
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  ispb: z.string().min(1, 'ISPB obrigatório'),
+  ispb: z.string().optional(),
 });
 
 export const CreateBankSchema = BankSchema;
@@ -15,10 +15,16 @@ export type CreateBank = z.infer<typeof CreateBankSchema>;
 export const getBanks = async (): Promise<Bank[]> => {
   try {
     const response = await apiClient.get<Bank[]>('/bank');
-    return BankSchema.array().parse(response.data);
+    console.log('Resposta da API de bancos:', response.data);
+    const parsed = BankSchema.array().parse(response.data);
+    console.log('Bancos parseados:', parsed);
+    return parsed;
   } catch (error) {
     console.error('Erro ao buscar bancos:', error);
-    throw new Error('Falha ao buscar bancos' + error);
+    if (error instanceof Error) {
+      console.error('Mensagem do erro:', error.message);
+    }
+    throw error;
   }
 };
 

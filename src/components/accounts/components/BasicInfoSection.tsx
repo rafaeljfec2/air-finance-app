@@ -1,6 +1,7 @@
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
+import { useBanks } from '@/hooks/useBanks';
 import { cn } from '@/lib/utils';
 import type { CreateAccount } from '@/services/accountService';
 import { Building2, CreditCard } from 'lucide-react';
@@ -15,6 +16,7 @@ interface BasicInfoSectionProps {
   accountTypeOptions: ComboBoxOption<AccountType>[];
   onNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onTypeChange: (value: string | null) => void;
+  onBankChange: (bankCode: string | null, bankName: string) => void;
 }
 
 export function BasicInfoSection({
@@ -24,7 +26,23 @@ export function BasicInfoSection({
   accountTypeOptions,
   onNameChange,
   onTypeChange,
+  onBankChange,
 }: Readonly<BasicInfoSectionProps>) {
+  const { bankOptions, isLoading: isLoadingBanks } = useBanks();
+
+  const handleBankChange = (bankCode: string | null) => {
+    if (bankCode) {
+      const selectedBank = bankOptions.find(b => b.value === bankCode);
+      if (selectedBank) {
+        // Extract bank name from label (format: "001 - Banco do Brasil")
+        const bankName = selectedBank.label.split(' - ')[1] || selectedBank.label;
+        onBankChange(bankCode, bankName);
+      }
+    } else {
+      onBankChange(null, '');
+    }
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 mb-2">
@@ -79,21 +97,22 @@ export function BasicInfoSection({
           />
         </FormField>
 
-        <FormField label="Instituição *" error={errors.institution}>
-          <div className="relative">
-            <Input
-              name="institution"
-              value={form.institution}
-              onChange={onNameChange}
-              placeholder="Ex: Banco do Brasil"
-              required
-              className={cn(
-                'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
-                errors.institution && 'border-red-500 focus-visible:ring-red-500',
-              )}
-            />
-            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
-          </div>
+        <FormField label="Banco / Instituição *" error={errors.institution}>
+          <ComboBox
+            options={bankOptions}
+            value={form.bankCode ?? null}
+            onValueChange={handleBankChange}
+            placeholder={isLoadingBanks ? "Carregando bancos..." : "Selecione o banco"}
+            disabled={isLoadingBanks}
+            searchable
+            searchPlaceholder="Buscar banco..."
+            error={errors.institution}
+            icon={Building2}
+            className={cn(
+              'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark',
+              errors.institution && 'border-red-500',
+            )}
+          />
         </FormField>
       </div>
     </div>

@@ -10,6 +10,7 @@ export const AccountSchema = z.object({
     errorMap: () => ({ message: 'Tipo de conta inválido' }),
   }),
   institution: z.string().min(2, 'Instituição deve ter pelo menos 2 caracteres'),
+  bankCode: z.string().optional().nullable(),
   agency: z.string().optional().nullable(),
   accountNumber: z.string().optional().nullable(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida'),
