@@ -78,7 +78,7 @@ export function CreditCardFormModal({
         dueDay: creditCard.dueDay,
         color: creditCard.color,
         icon: creditCard.icon,
-        bankCode: creditCard.bankCode,
+        bankCode: creditCard.bankCode ?? undefined,
         companyId: creditCard.companyId,
       });
       setLimitInput(

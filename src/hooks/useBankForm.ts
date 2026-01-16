@@ -1,5 +1,4 @@
-import { createBank, deleteBank, getBankByCode, updateBank } from '@/services/bankService';
-import { Bank } from '@/types/bank';
+import { createBank, deleteBank, getBankByCode, updateBank, type Bank } from '@/services/bankService';
 import React, { useState } from 'react';
 
 interface UseBankForm {
@@ -17,7 +16,7 @@ interface UseBankForm {
 const initialValues: Bank = {
   code: '',
   name: '',
-  ispb: '',
+  ispb: undefined,
 };
 
 export function useBankForm(): UseBankForm {
@@ -29,7 +28,6 @@ export function useBankForm(): UseBankForm {
     const newErrors: Partial<Record<keyof Bank, string>> = {};
     if (!values.code) newErrors.code = 'Código obrigatório';
     if (!values.name) newErrors.name = 'Nome obrigatório';
-    if (!values.ispb) newErrors.ispb = 'ISPB obrigatório';
     return newErrors;
   }
 
@@ -75,7 +73,7 @@ export function useBankForm(): UseBankForm {
     setLoading(true);
     try {
       const updated = await updateBank(code, data);
-      setValues((prev) => ({ ...prev, ...updated }));
+      setValues(updated);
       setErrors({});
       return updated;
     } catch (error) {
