@@ -14,15 +14,15 @@ Na tela de configuração do projeto, defina:
 
 #### Framework Preset
 
-- **Framework Preset**: `Vite`
-- **Root Directory**: `apps/web` (IMPORTANTE!)
+- **Framework Preset**: `Other`
+- **Root Directory**: `.` (raiz do monorepo - DEIXE VAZIO ou use `.`)
 
 #### Build & Development Settings
 
 **Build Command**:
 
 ```bash
-cd ../.. && yarn build --filter=@air-finance/web
+turbo run build --filter=@air-finance/web
 ```
 
 **Output Directory**:
