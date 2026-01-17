@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Upload, X, FileCheck, AlertCircle } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useRef, useState, DragEvent, ChangeEvent, MouseEvent, KeyboardEvent } from 'react';
 
 interface CertificateUploadProps {
   label: string;
@@ -26,7 +26,7 @@ export function CertificateUpload({
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
 
-  const handleDrag = (e: React.DragEvent) => {
+  const handleDrag = (e: DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.type === 'dragenter' || e.type === 'dragover') {
@@ -36,7 +36,7 @@ export function CertificateUpload({
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -65,7 +65,7 @@ export function CertificateUpload({
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       handleFileSelection(selectedFile);
@@ -78,7 +78,14 @@ export function CertificateUpload({
     }
   };
 
-  const handleRemove = (e: React.MouseEvent) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
+  const handleRemove = (e: MouseEvent) => {
     e.stopPropagation();
     onRemove();
     if (inputRef.current) {
@@ -93,11 +100,14 @@ export function CertificateUpload({
       </label>
 
       <div
+        role="button"
+        tabIndex={disabled ? -1 : 0}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
         onClick={handleClick}
+        onKeyDown={handleKeyDown}
         className={cn(
           'relative border-2 border-dashed rounded-lg p-3 transition-all cursor-pointer',
           'hover:border-primary-500 dark:hover:border-primary-400',
