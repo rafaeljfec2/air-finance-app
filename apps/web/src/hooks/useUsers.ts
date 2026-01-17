@@ -17,9 +17,14 @@ export const useUsers = () => {
     data: users,
     isLoading,
     error,
+    refetch,
   } = useQuery<User[]>({
     queryKey: ['users'],
     queryFn: getUsers,
+    staleTime: 0, // Data is always considered stale
+    gcTime: 0, // Don't cache data
+    refetchOnMount: 'always', // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window regains focus
   });
 
   const createMutation = useMutation({
@@ -65,6 +70,7 @@ export const useUsers = () => {
     users,
     isLoading,
     error,
+    refetch,
     createUser: createMutation.mutateAsync,
     updateUser: updateMutation.mutateAsync,
     deleteUser: deleteMutation.mutate,
