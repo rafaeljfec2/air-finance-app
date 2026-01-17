@@ -39,23 +39,24 @@ export function UserFilters({
   onViewModeChange,
 }: Readonly<UserFiltersProps>) {
   return (
-    <div className="space-y-3 mb-4">
-      {/* Campo de busca */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-        <Input
-          type="text"
-          placeholder="Buscar por nome ou email..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10 h-11 rounded-xl bg-card dark:bg-card-dark border-border/50 dark:border-border-dark/50 text-text dark:text-text-dark focus:border-primary-500"
-        />
-      </div>
-
-      {/* Filtros */}
+    <div className="mb-4">
+      {/* Busca, Filtros e Toggle em uma única linha */}
       <div className="flex gap-2">
+        {/* Campo de busca */}
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+          <Input
+            type="text"
+            placeholder="Buscar por nome ou email..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-10 h-11 rounded-xl bg-card dark:bg-card-dark border-border/50 dark:border-border-dark/50 text-text dark:text-text-dark focus:border-primary-500"
+          />
+        </div>
+
+        {/* Filtro de função */}
         <Select value={filterRole} onValueChange={onRoleChange}>
-          <SelectTrigger className="flex-1 h-11 rounded-xl bg-card dark:bg-card-dark border-border/50 dark:border-border-dark/50 text-text dark:text-text-dark focus:border-primary-500">
+          <SelectTrigger className="w-[180px] h-11 rounded-xl bg-card dark:bg-card-dark border-border/50 dark:border-border-dark/50 text-text dark:text-text-dark focus:border-primary-500">
             <span className="text-sm">
               {(() => {
                 if (filterRole === 'all') return 'Todas as funções';
@@ -74,8 +75,9 @@ export function UserFilters({
           </SelectContent>
         </Select>
 
+        {/* Filtro de status */}
         <Select value={filterStatus} onValueChange={onStatusChange}>
-          <SelectTrigger className="flex-1 h-11 rounded-xl bg-card dark:bg-card-dark border-border/50 dark:border-border-dark/50 text-text dark:text-text-dark focus:border-primary-500">
+          <SelectTrigger className="w-[140px] h-11 rounded-xl bg-card dark:bg-card-dark border-border/50 dark:border-border-dark/50 text-text dark:text-text-dark focus:border-primary-500">
             <span className="text-sm">
               {(() => {
                 if (filterStatus === 'all') return 'Todos';
