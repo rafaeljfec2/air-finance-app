@@ -13,6 +13,7 @@ interface AccountsListProps {
   onSort: (field: 'name' | 'type' | 'institution' | 'agency' | 'accountNumber' | 'balance') => void;
   onEdit: (account: Account) => void;
   onDelete: (id: string) => void;
+  onConfigureIntegration?: (account: Account) => void;
   isUpdating: boolean;
   isDeleting: boolean;
 }
@@ -24,6 +25,7 @@ export function AccountsList({
   onSort,
   onEdit,
   onDelete,
+  onConfigureIntegration,
   isUpdating,
   isDeleting,
 }: Readonly<AccountsListProps>) {
@@ -36,6 +38,7 @@ export function AccountsList({
             account={account}
             onEdit={onEdit}
             onDelete={onDelete}
+            onConfigureIntegration={onConfigureIntegration}
             isUpdating={isUpdating}
             isDeleting={isDeleting}
           />
@@ -93,6 +96,7 @@ export function AccountsList({
             account={account}
             onEdit={onEdit}
             onDelete={onDelete}
+            onConfigureIntegration={onConfigureIntegration}
             isUpdating={isUpdating}
             isDeleting={isDeleting}
           />

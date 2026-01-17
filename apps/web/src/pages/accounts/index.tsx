@@ -1,4 +1,5 @@
 import { AccountFormModal } from '@/components/accounts/AccountFormModal';
+import { BankingIntegrationModal } from '@/components/accounts/BankingIntegrationModal';
 import { Loading } from '@/components/Loading';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -35,6 +36,8 @@ export function AccountsPage() {
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showBankingIntegrationModal, setShowBankingIntegrationModal] = useState(false);
+  const [configuringAccount, setConfiguringAccount] = useState<Account | null>(null);
   const [viewMode, setViewMode] = useViewMode('accounts-view-mode');
 
   const {
@@ -94,6 +97,16 @@ export function AccountsPage() {
     setDeleteId(null);
   };
 
+  const handleConfigureIntegration = (account: Account) => {
+    setConfiguringAccount(account);
+    setShowBankingIntegrationModal(true);
+  };
+
+  const handleBankingIntegrationSuccess = () => {
+    // Refresh accounts list to get updated integration status
+    globalThis.location.reload();
+  };
+
   if (isLoading) {
     return (
       <ViewDefault>
@@ -148,6 +161,7 @@ export function AccountsPage() {
               onSort={handleSort}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              onConfigureIntegration={handleConfigureIntegration}
               isUpdating={isUpdating}
               isDeleting={isDeleting}
             />
@@ -163,9 +177,23 @@ export function AccountsPage() {
           setEditingAccount(null);
         }}
         onSubmit={handleSubmit}
+        onConfigureIntegration={handleConfigureIntegration}
         account={editingAccount}
         isLoading={isCreating || isUpdating}
       />
+
+      {configuringAccount && (
+        <BankingIntegrationModal
+          open={showBankingIntegrationModal}
+          onClose={() => {
+            setShowBankingIntegrationModal(false);
+            setConfiguringAccount(null);
+          }}
+          account={configuringAccount}
+          onSuccess={handleBankingIntegrationSuccess}
+        />
+      )}
+
       <ConfirmModal
         open={showConfirmDelete}
         title="Confirmar exclusão de conta"

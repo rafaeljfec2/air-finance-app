@@ -2,7 +2,7 @@ import { ComboBoxOption } from '@/components/ui/ComboBox';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import type { Account, CreateAccount } from '@/services/accountService';
-import { CreditCard, X } from 'lucide-react';
+import { CreditCard, X, Link2 } from 'lucide-react';
 import { useMemo } from 'react';
 import { BankingFieldsSection } from './components/BankingFieldsSection';
 import { BasicInfoSection } from './components/BasicInfoSection';
@@ -25,6 +25,7 @@ interface AccountFormModalProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: CreateAccount) => void;
+  onConfigureIntegration?: (account: Account) => void;
   account?: Account | null;
   isLoading?: boolean;
 }
@@ -33,6 +34,7 @@ export function AccountFormModal({
   open,
   onClose,
   onSubmit,
+  onConfigureIntegration,
   account,
   isLoading = false,
 }: Readonly<AccountFormModalProps>) {
@@ -135,6 +137,63 @@ export function AccountFormModal({
               onColorChange={handleColorChange}
               onIconChange={handleIconChange}
             />
+
+            {/* Banking Integration Section */}
+            {account && onConfigureIntegration && (
+              <div className="space-y-3 pt-2 border-t border-border/50 dark:border-border-dark/50">
+                <div className="flex items-center gap-2">
+                  <Link2 className="h-4 w-4 text-primary-500 dark:text-primary-400" />
+                  <h3 className="text-sm font-semibold text-text dark:text-text-dark uppercase tracking-wide">
+                    Integração Bancária
+                  </h3>
+                </div>
+
+                <div className="p-4 rounded-lg bg-primary-50 dark:bg-primary-900/10 border border-primary-200 dark:border-primary-800">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      {account.hasBankingIntegration ? (
+                        <>
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                            <p className="text-sm font-semibold text-green-700 dark:text-green-300">
+                              Integração Ativa
+                            </p>
+                          </div>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            Esta conta está integrada com o Banco Inter. Você pode receber pagamentos via Pix,
+                            gerar boletos e realizar pagamentos.
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Configure a integração com seu banco
+                          </p>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            Conecte esta conta ao Banco Inter para receber pagamentos Pix, gerar boletos e
+                            realizar pagamentos diretamente pelo sistema.
+                          </p>
+                        </>
+                      )}
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={() => onConfigureIntegration(account)}
+                      variant="outline"
+                      className={
+                        account.hasBankingIntegration
+                          ? 'border-green-500 text-green-600 hover:bg-green-50 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-900/20'
+                          : 'border-primary-500 text-primary-600 hover:bg-primary-50 dark:border-primary-400 dark:text-primary-400 dark:hover:bg-primary-900/20'
+                      }
+                      disabled={isLoading}
+                    >
+                      <Link2 className="h-4 w-4 mr-2" />
+                      {account.hasBankingIntegration ? 'Ver Configuração' : 'Configurar'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </form>
         </div>
 

@@ -1,0 +1,236 @@
+import { useState, useCallback } from 'react';
+import { Account } from '@/services/accountService';
+import {
+  setupBankingIntegration,
+  fileToBase64,
+  validateCertificate,
+  validatePrivateKey,
+  validatePixKey,
+  type BankCredentials,
+} from '@/services/bankingIntegrationService';
+import { toast } from '@/components/ui/toast';
+
+interface UseBankingIntegrationProps {
+  account: Account;
+  onClose: () => void;
+  onSuccess?: () => void;
+}
+
+interface FormData {
+  pixKey: string;
+  bankCode: string;
+  accountNumber: string;
+  clientId: string;
+  clientSecret: string;
+}
+
+export function useBankingIntegration({
+  account,
+  onClose,
+  onSuccess,
+}: UseBankingIntegrationProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [certificateFile, setCertificateFile] = useState<File | null>(null);
+  const [privateKeyFile, setPrivateKeyFile] = useState<File | null>(null);
+  const [certificateBase64, setCertificateBase64] = useState<string>('');
+  const [privateKeyBase64, setPrivateKeyBase64] = useState<string>('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const [formData, setFormData] = useState<FormData>({
+    pixKey: account.pixKey || '',
+    bankCode: account.bankCode || '077',
+    accountNumber: account.accountNumber || '',
+    clientId: '',
+    clientSecret: '',
+  });
+
+  const handleChange = useCallback((name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
+  }, []);
+
+  const handleCertificateUpload = useCallback(async (file: File) => {
+    try {
+      const base64 = await fileToBase64(file);
+      
+      if (!validateCertificate(base64)) {
+        setErrors((prev) => ({
+          ...prev,
+          certificate: 'Certificado inválido. Verifique se é um arquivo .crt válido.',
+        }));
+        return;
+      }
+
+      setCertificateFile(file);
+      setCertificateBase64(base64);
+      setErrors((prev) => ({ ...prev, certificate: '' }));
+    } catch (error) {
+      setErrors((prev) => ({
+        ...prev,
+        certificate: 'Erro ao processar certificado.',
+      }));
+    }
+  }, []);
+
+  const handleCertificateRemove = useCallback(() => {
+    setCertificateFile(null);
+    setCertificateBase64('');
+    setErrors((prev) => ({ ...prev, certificate: '' }));
+  }, []);
+
+  const handlePrivateKeyUpload = useCallback(async (file: File) => {
+    try {
+      const base64 = await fileToBase64(file);
+      
+      if (!validatePrivateKey(base64)) {
+        setErrors((prev) => ({
+          ...prev,
+          privateKey: 'Chave privada inválida. Verifique se é um arquivo .key válido.',
+        }));
+        return;
+      }
+
+      setPrivateKeyFile(file);
+      setPrivateKeyBase64(base64);
+      setErrors((prev) => ({ ...prev, privateKey: '' }));
+    } catch (error) {
+      setErrors((prev) => ({
+        ...prev,
+        privateKey: 'Erro ao processar chave privada.',
+      }));
+    }
+  }, []);
+
+  const handlePrivateKeyRemove = useCallback(() => {
+    setPrivateKeyFile(null);
+    setPrivateKeyBase64('');
+    setErrors((prev) => ({ ...prev, privateKey: '' }));
+  }, []);
+
+  const validateForm = useCallback((): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Validate Pix Key
+    if (!formData.pixKey.trim()) {
+      newErrors.pixKey = 'Chave Pix é obrigatória';
+    } else {
+      const pixValidation = validatePixKey(formData.pixKey);
+      if (!pixValidation.valid) {
+        newErrors.pixKey = 'Chave Pix inválida';
+      }
+    }
+
+    // Validate Account Number
+    if (!formData.accountNumber.trim()) {
+      newErrors.accountNumber = 'Número da conta é obrigatório';
+    }
+
+    // Validate Client ID
+    if (!formData.clientId.trim()) {
+      newErrors.clientId = 'Client ID é obrigatório';
+    }
+
+    // Validate Client Secret
+    if (!formData.clientSecret.trim()) {
+      newErrors.clientSecret = 'Client Secret é obrigatório';
+    }
+
+    // Validate Certificate
+    if (!certificateFile || !certificateBase64) {
+      newErrors.certificate = 'Certificado digital é obrigatório';
+    }
+
+    // Validate Private Key
+    if (!privateKeyFile || !privateKeyBase64) {
+      newErrors.privateKey = 'Chave privada é obrigatória';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [formData, certificateFile, certificateBase64, privateKeyFile, privateKeyBase64]);
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+
+      if (!validateForm()) {
+        toast({
+          title: 'Erro de validação',
+          description: 'Verifique os campos obrigatórios.',
+          type: 'error',
+        });
+        return;
+      }
+
+      setIsLoading(true);
+
+      try {
+        // Get company info from account
+        const companyId = account.companyId;
+        
+        // Prepare bank credentials
+        const bankCredentials: BankCredentials = {
+          bankCode: formData.bankCode,
+          clientId: formData.clientId,
+          clientSecret: formData.clientSecret,
+          certificate: certificateBase64,
+          privateKey: privateKeyBase64,
+          accountNumber: formData.accountNumber,
+        };
+
+        // Call API to setup integration
+        const response = await setupBankingIntegration(account.id, {
+          name: account.name,
+          document: companyId, // TODO: Get actual company CNPJ
+          email: '', // TODO: Get company email
+          pixKey: formData.pixKey,
+          bankCredentials,
+        });
+
+        if (response.success) {
+          toast({
+            title: 'Integração configurada!',
+            description: 'A integração bancária foi configurada com sucesso.',
+            type: 'success',
+          });
+
+          onSuccess?.();
+          onClose();
+        }
+      } catch (error: any) {
+        console.error('Error setting up banking integration:', error);
+        toast({
+          title: 'Erro ao configurar integração',
+          description: error.message || 'Ocorreu um erro ao configurar a integração bancária.',
+          type: 'error',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [
+      validateForm,
+      account,
+      formData,
+      certificateBase64,
+      privateKeyBase64,
+      toast,
+      onSuccess,
+      onClose,
+    ],
+  );
+
+  return {
+    formData,
+    isLoading,
+    certificateFile,
+    privateKeyFile,
+    errors,
+    handleChange,
+    handleCertificateUpload,
+    handleCertificateRemove,
+    handlePrivateKeyUpload,
+    handlePrivateKeyRemove,
+    handleSubmit,
+  };
+}

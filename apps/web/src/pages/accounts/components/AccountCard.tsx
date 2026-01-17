@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Account } from '@/services/accountService';
 import { formatCurrency } from '@/utils/formatters';
-import { Banknote, Landmark, Wallet, Building, Hash, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { Banknote, Landmark, Wallet, Building, Hash, MoreVertical, Edit, Trash2, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
@@ -32,6 +32,7 @@ interface AccountCardProps {
   account: Account;
   onEdit: (account: Account) => void;
   onDelete: (id: string) => void;
+  onConfigureIntegration?: (account: Account) => void;
   isUpdating?: boolean;
   isDeleting?: boolean;
 }
@@ -40,6 +41,7 @@ export function AccountCard({
   account,
   onEdit,
   onDelete,
+  onConfigureIntegration,
   isUpdating = false,
   isDeleting = false,
 }: Readonly<AccountCardProps>) {
@@ -110,6 +112,16 @@ export function AccountCard({
                 </div>
               )}
 
+              {/* Integração Ativa */}
+              {account.hasBankingIntegration && (
+                <div className="flex items-center gap-1.5 col-span-2">
+                  <Link2 className="h-3.5 w-3.5 text-green-500 dark:text-green-400 shrink-0" />
+                  <span className="text-green-600 dark:text-green-400 text-[10px] font-semibold">
+                    Integração Ativa
+                  </span>
+                </div>
+              )}
+
               {/* Saldo - Destaque */}
               <div className="col-span-2 flex items-center gap-1.5 pt-1.5 border-t border-border/50 dark:border-border-dark/50">
                 <Wallet className="h-3.5 w-3.5 text-gray-400 shrink-0" />
@@ -140,8 +152,18 @@ export function AccountCard({
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-40 p-1" align="end">
+            <PopoverContent className="w-48 p-1" align="end">
               <div className="flex flex-col gap-1">
+                {!account.hasBankingIntegration && onConfigureIntegration && (
+                  <button
+                    onClick={() => onConfigureIntegration(account)}
+                    className="flex items-center w-full px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-primary-50 dark:hover:bg-primary-900/10 text-primary-600 dark:text-primary-400 transition-colors text-left gap-2"
+                    disabled={isUpdating || isDeleting}
+                  >
+                    <Link2 className="h-4 w-4" />
+                    Configurar Integração
+                  </button>
+                )}
                 <button
                   onClick={() => onEdit(account)}
                   className="flex items-center w-full px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-gray-100 dark:hover:bg-gray-800 text-text dark:text-text-dark transition-colors text-left gap-2"

@@ -29,6 +29,10 @@ export const AccountSchema = z.object({
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   creditLimit: z.number().optional(),
+  // Banking Integration fields
+  bankingTenantId: z.string().optional().nullable(),
+  pixKey: z.string().optional().nullable(),
+  hasBankingIntegration: z.boolean().optional().default(false),
 });
 
 export const CreateAccountSchema = AccountSchema.omit({

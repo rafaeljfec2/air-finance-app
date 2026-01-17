@@ -31,6 +31,7 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
       initialBalanceDate: formatDateToLocalISO(new Date()),
       useInitialBalanceInExtract: true,
       useInitialBalanceInCashFlow: true,
+      hasBankingIntegration: false,
     }),
     [activeCompany],
   );
@@ -71,6 +72,9 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
         : formatDateToLocalISO(new Date()),
       useInitialBalanceInExtract: accountData.useInitialBalanceInExtract ?? true,
       useInitialBalanceInCashFlow: accountData.useInitialBalanceInCashFlow ?? true,
+      hasBankingIntegration: accountData.hasBankingIntegration,
+      bankingTenantId: accountData.bankingTenantId,
+      pixKey: accountData.pixKey,
     };
   }, []);
 
