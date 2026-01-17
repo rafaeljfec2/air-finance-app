@@ -33,10 +33,29 @@ export function useBanks() {
     }));
   }, [banks]);
 
+  const getBankByCode = (code: string): Bank | undefined => {
+    return banks?.find(bank => bank.code === code);
+  };
+
+  const hasBankingIntegration = (code: string | null | undefined): boolean => {
+    if (!code) return false;
+    const bank = getBankByCode(code);
+    if (!bank) return false;
+    
+    // Verifica o campo integration
+    if (bank.integration?.active && bank.integration?.type && bank.integration.type !== 'none') {
+      return true;
+    }
+    
+    return false;
+  };
+
   return {
     banks: banks || [],
     bankOptions,
     isLoading,
     error,
+    getBankByCode,
+    hasBankingIntegration,
   };
 }

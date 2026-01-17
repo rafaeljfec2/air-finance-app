@@ -10,6 +10,7 @@ import { BalanceSection } from './components/BalanceSection';
 import { CustomizationSection } from './components/CustomizationSection';
 import { accountTypes, type AccountType } from './constants';
 import { useAccountFormModal } from './hooks/useAccountFormModal';
+import { useBanks } from '@/hooks/useBanks';
 
 function getModalTitle(account: Account | null | undefined): string {
   if (account) return 'Editar Conta';
@@ -57,6 +58,8 @@ export function AccountFormModal({
     handleClose,
   } = useAccountFormModal({ account, onSubmit, onClose });
 
+  const { hasBankingIntegration } = useBanks();
+
   const accountTypeOptions: ComboBoxOption<AccountType>[] = useMemo(
     () =>
       accountTypes.map((type) => ({
@@ -69,6 +72,12 @@ export function AccountFormModal({
 
   const modalTitle = useMemo(() => getModalTitle(account), [account]);
   const modalDescription = useMemo(() => getModalDescription(account), [account]);
+
+  // Verifica se o banco selecionado tem integração disponível
+  const bankSupportsIntegration = useMemo(() => {
+    const bankCode = account?.bankCode || form.bankCode;
+    return hasBankingIntegration(bankCode);
+  }, [account?.bankCode, form.bankCode, hasBankingIntegration]);
 
   const getSubmitButtonText = (): string => {
     if (isLoading) return 'Salvando...';
@@ -139,7 +148,7 @@ export function AccountFormModal({
             />
 
             {/* Banking Integration Section */}
-            {account && onConfigureIntegration && (
+            {account && onConfigureIntegration && bankSupportsIntegration && (
               <div className="space-y-1.5 pt-1.5 border-t border-border/50 dark:border-border-dark/50">
                 <div className="flex items-center gap-2">
                   <Link2 className="h-3.5 w-3.5 text-primary-500 dark:text-primary-400" />

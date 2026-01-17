@@ -4,6 +4,7 @@ import { formatCurrency } from '@/utils/formatters';
 import { Banknote, Landmark, Wallet, Building, Hash, MoreVertical, Edit, Trash2, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useBanks } from '@/hooks/useBanks';
 
 const accountTypes = [
   { value: 'checking', label: 'Conta Corrente', icon: Banknote },
@@ -45,6 +46,8 @@ export function AccountCard({
   isUpdating = false,
   isDeleting = false,
 }: Readonly<AccountCardProps>) {
+  const { hasBankingIntegration } = useBanks();
+
   // Skip credit_card type as it has its own page
   if (account.type === 'credit_card') {
     return null;
@@ -52,6 +55,9 @@ export function AccountCard({
 
   const Icon = accountTypes.find((t) => t.value === account.type)?.icon || Banknote;
   const accountType = account.type as AccountType;
+  
+  // Verifica se o banco suporta integração
+  const bankSupportsIntegration = hasBankingIntegration(account.bankCode);
 
   return (
     <div className="w-full rounded-lg transition-all text-left bg-white dark:bg-card-dark hover:shadow-md p-3 border border-border/50 dark:border-border-dark/50">
@@ -154,7 +160,7 @@ export function AccountCard({
             </PopoverTrigger>
             <PopoverContent className="w-48 p-1" align="end">
               <div className="flex flex-col gap-1">
-                {!account.hasBankingIntegration && onConfigureIntegration && (
+                {!account.hasBankingIntegration && onConfigureIntegration && bankSupportsIntegration && (
                   <button
                     onClick={() => onConfigureIntegration(account)}
                     className="flex items-center w-full px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-primary-50 dark:hover:bg-primary-900/10 text-primary-600 dark:text-primary-400 transition-colors text-left gap-2"

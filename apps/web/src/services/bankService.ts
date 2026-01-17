@@ -12,6 +12,21 @@ export const BankSchema = z.object({
     .default('banco'),
   pixDirect: z.boolean().optional().default(false),
   active: z.boolean().optional().default(true),
+  integration: z
+    .object({
+      active: z.boolean().default(false),
+      type: z.enum(['none', 'api']).default('none'),
+    })
+    .nullable()
+    .optional()
+    .default(null)
+    .transform((val) => {
+      // Se for null ou undefined, retorna o objeto padrão
+      if (!val) {
+        return { active: false, type: 'none' as const };
+      }
+      return val;
+    }),
 });
 
 export const CreateBankSchema = BankSchema;
