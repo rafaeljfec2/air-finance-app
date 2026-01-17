@@ -5,6 +5,7 @@ import { CompanySelectionModal } from '@/features/company/components/CompanySele
 import { cn } from '@/lib/utils';
 import { usePreferencesStore } from '@/stores/preferences';
 import { useSidebarStore } from '@/stores/sidebar';
+import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { Eye, Plus } from 'lucide-react';
 import { ReactNode, useCallback, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -20,6 +21,7 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFabModalOpen, setIsFabModalOpen] = useState(false);
   const location = useLocation();
+  const isScrollingDown = useScrollDirection();
 
   const handleOpenSidebar = useCallback(() => {
     setIsSidebarOpen(true);
@@ -65,7 +67,13 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
       }
       {!location.pathname.includes('/new') &&
         !location.pathname.match(/\/transactions\/[a-zA-Z0-9-]+$/) && (
-          <div className="lg:hidden fixed bottom-safe-6 right-safe-6 z-40">
+          <div
+            className={cn(
+              'lg:hidden fixed bottom-safe-6 right-safe-6 z-40',
+              'transition-all duration-300 ease-in-out',
+              isScrollingDown ? 'translate-y-24 opacity-0' : 'translate-y-0 opacity-100',
+            )}
+          >
             <button
               onClick={() => setIsFabModalOpen(true)}
               className="p-4 bg-primary-600 text-white rounded-full shadow-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-transform active:scale-95 flex items-center justify-center"

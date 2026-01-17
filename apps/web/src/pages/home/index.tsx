@@ -28,7 +28,7 @@ export function HomePage() {
 
   return (
     <ViewDefault>
-      <div className="flex flex-col min-h-[calc(100vh-6rem)] pb-20 md:pb-0 max-w-lg mx-auto md:max-w-none md:grid md:grid-cols-2 md:gap-8 lg:grid-cols-3">
+      <div className="flex flex-col min-h-[calc(100vh-6rem)] max-w-lg mx-auto md:max-w-none md:grid md:grid-cols-2 md:gap-8 lg:grid-cols-3">
         {/* Header Section */}
         <header className="bg-white dark:bg-card-dark px-6 pt-8 md:pt-6 pb-6 rounded-b-[2rem] md:rounded-2xl shadow-sm relative z-10 md:col-span-full">
           <HomeHeader
