@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/stores/auth';
 import { useCompanyStore } from '@/stores/company';
+import { useCompanyStore as useCompanyContext } from '@/contexts/companyContext';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -77,13 +78,25 @@ export const useAuth = () => {
   const logoutMutation = useMutation({
     mutationFn: logout,
     onSuccess: async () => {
+      // Clear authentication
       authUtils.clearAuth();
       queryClient.removeQueries({ queryKey: ['user'] });
       queryClient.removeQueries({ queryKey: ['companies'] });
       setUser(null);
       setToken(null);
-      // Clear active company to force selection on next login
+      
+      // SECURITY FIX: Clear ALL company stores to prevent data leaks between users
+      // Clear old company store (if still in use)
       useCompanyStore.getState().clearActiveCompany();
+      
+      // Clear company context store
+      useCompanyContext.getState().setCompanyId('');
+      useCompanyContext.getState().setCompanies([]);
+      
+      // Fallback: Manually remove from localStorage to ensure complete cleanup
+      localStorage.removeItem('company-storage');
+      localStorage.removeItem('@air-finance:company');
+      
       navigate('/');
     },
   });

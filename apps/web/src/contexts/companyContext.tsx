@@ -31,19 +31,28 @@ export const useCompanyStore = create<CompanyState>()(
     {
       name: '@air-finance:company',
       // Security: Only store company IDs and essential fields
+      // NEVER store userIds to prevent data leaks between users
       partialize: (state) => ({
         companyId: state.companyId,
-        // Store only minimal company data (IDs and names)
+        // Store only minimal company data (IDs and names) - NO userIds
         companies: state.companies.map((c) => ({
           id: c.id,
           name: c.name,
           type: c.type,
+          // Explicitly exclude userIds to prevent leakage
         })) as Company[],
       }),
       onRehydrateStorage: () => (state) => {
         // Re-sanitize on rehydration
         if (state?.companies) {
-          state.companies = state.companies.map((c) => sanitizeCompany(c) as Company);
+          state.companies = state.companies.map((c) => {
+            const sanitized = sanitizeCompany(c) as Company;
+            // Extra security: remove userIds if somehow present
+            if (sanitized && 'userIds' in sanitized) {
+              delete (sanitized as any).userIds;
+            }
+            return sanitized;
+          });
         }
       },
     },

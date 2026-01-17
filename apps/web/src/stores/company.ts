@@ -28,6 +28,7 @@ export const useCompanyStore = create<CompanyStore>()(
     }),
     {
       name: 'company-storage',
+      // Security: NEVER store userIds to prevent data leaks between users
       partialize: (state) => ({
         activeCompany: state.activeCompany
           ? {
@@ -35,7 +36,7 @@ export const useCompanyStore = create<CompanyStore>()(
               name: state.activeCompany.name,
               type: state.activeCompany.type,
               foundationDate: state.activeCompany.foundationDate,
-              userIds: state.activeCompany.userIds,
+              // Explicitly exclude userIds to prevent leakage
               createdAt: state.activeCompany.createdAt,
               updatedAt: state.activeCompany.updatedAt,
             }
@@ -43,7 +44,12 @@ export const useCompanyStore = create<CompanyStore>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (state?.activeCompany?.id) {
-          state.activeCompany = sanitizeCompany(state.activeCompany);
+          const sanitized = sanitizeCompany(state.activeCompany);
+          // Extra security: remove userIds if somehow present
+          if (sanitized && 'userIds' in sanitized) {
+            delete (sanitized as any).userIds;
+          }
+          state.activeCompany = sanitized;
         } else if (state?.activeCompany) {
           state.activeCompany = null;
         }
