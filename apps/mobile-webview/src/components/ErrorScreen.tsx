@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, TouchableOpacity, Platform } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -7,13 +7,8 @@ interface ErrorScreenProps {
   readonly onRetry: () => void
 }
 
-// iOS já gerencia Safe Area automaticamente
-// Android precisa de edges explícitos
-const SAFE_AREA_EDGES = Platform.select({
-  ios: [] as const,
-  android: ['top', 'bottom'] as const,
-  default: [] as const,
-})
+// Aplicar SafeArea em todas as edges
+const SAFE_AREA_EDGES = ['top', 'bottom', 'left', 'right'] as const
 
 export function ErrorScreen({ onRetry }: ErrorScreenProps) {
   return (

@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { StyleSheet, Platform } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import WebView from "react-native-webview";
+import { WebView } from "react-native-webview";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { WEBSITE_URL, USER_AGENT } from "./constants/webview";
 import { useAuthToken } from "./hooks/useAuthToken";
@@ -10,12 +10,11 @@ import { useWebViewLoading } from "./hooks/useWebViewLoading";
 import { LoadingScreen } from "./components/LoadingScreen";
 import { ErrorScreen } from "./components/ErrorScreen";
 
-// iOS já gerencia Safe Area automaticamente
-// Android precisa de edges explícitos
+// Ambas as plataformas gerenciam Safe Area com edges top/bottom
 const SAFE_AREA_EDGES = Platform.select({
-  ios: [] as const,
+  ios: ["top", "bottom"] as const,
   android: ["top", "bottom"] as const,
-  default: [] as const,
+  default: ["top", "bottom"] as const,
 });
 
 function AppContent() {
@@ -85,7 +84,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#18181b",
   },
   webview: {
     flex: 1,

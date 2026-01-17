@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "dev:web": "yarn workspace @air-finance/web dev",
-    "dev:mobile": "yarn workspace @air-finance/mobile-webview start",
+    "dev:mobile": "yarn workspace @air-finance/mobile-webview start:tunnel",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
