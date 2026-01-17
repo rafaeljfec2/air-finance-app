@@ -4,7 +4,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo, useEffect } from 'react';
 
 export function useBanks() {
-  const { data: banks, isLoading, error } = useQuery<Bank[]>({
+  const {
+    data: banks,
+    isLoading,
+    error,
+  } = useQuery<Bank[]>({
     queryKey: ['banks'],
     queryFn: getBanks,
     staleTime: 1000 * 60 * 60, // Cache por 1 hora
@@ -25,7 +29,7 @@ export function useBanks() {
     
     return activeBanks.map((bank) => ({
       value: bank.code,
-      label: `${bank.code} - ${bank.shortName}`,
+      label: `${bank.code} - ${bank.shortName || bank.name}`, // Fallback para name se shortName não existir
     }));
   }, [banks]);
 
