@@ -21,7 +21,10 @@ const initialValues: Bank = {
   type: 'banco',
   pixDirect: false,
   active: true,
-  integration: null,
+  integration: {
+    active: false,
+    type: 'none',
+  },
 };
 
 export function useBankForm(): UseBankForm {

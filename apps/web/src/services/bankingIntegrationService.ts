@@ -22,8 +22,25 @@ export interface SetupBankingIntegrationRequest {
 export interface SetupBankingIntegrationResponse {
   success: boolean;
   data: {
-    tenantId: string;
-    pixKey: string;
+    tenant: {
+      id: string;
+      name: string;
+      document: string;
+      email: string;
+      isActive: boolean;
+      createdAt: string;
+      updatedAt: string;
+    };
+    credentials: Array<{
+      id: string;
+      tenantId: string;
+      bankCode: string;
+      clientId: string;
+      accountNumber: string;
+      isActive: boolean;
+      createdAt: string;
+      updatedAt: string;
+    }>;
   };
 }
 

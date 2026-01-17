@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, type FormEvent } from 'react';
 import { Account } from '@/services/accountService';
 import {
   setupBankingIntegration,
@@ -9,6 +9,7 @@ import {
   type BankCredentials,
 } from '@/services/bankingIntegrationService';
 import { toast } from '@/components/ui/toast';
+import { useCompanies } from '@/hooks/useCompanies';
 
 interface UseBankingIntegrationProps {
   account: Account;
@@ -29,6 +30,7 @@ export function useBankingIntegration({
   onClose,
   onSuccess,
 }: UseBankingIntegrationProps) {
+  const { companies } = useCompanies();
   const [isLoading, setIsLoading] = useState(false);
   const [certificateFile, setCertificateFile] = useState<File | null>(null);
   const [privateKeyFile, setPrivateKeyFile] = useState<File | null>(null);
@@ -150,8 +152,13 @@ export function useBankingIntegration({
   }, [formData, certificateFile, certificateBase64, privateKeyFile, privateKeyBase64]);
 
   const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
+    async (e: FormEvent) => {
       e.preventDefault();
+
+      // Previne múltiplos submits
+      if (isLoading) {
+        return;
+      }
 
       if (!validateForm()) {
         toast({
@@ -166,7 +173,19 @@ export function useBankingIntegration({
 
       try {
         // Get company info from account
-        const companyId = account.companyId;
+        const company = companies?.find((c) => c.id === account.companyId);
+        
+        if (!company) {
+          throw new Error('Empresa não encontrada. Verifique se a conta está associada a uma empresa válida.');
+        }
+
+        if (!company.cnpj) {
+          throw new Error('CNPJ da empresa não cadastrado. Atualize os dados da empresa antes de configurar a integração.');
+        }
+
+        if (!company.email) {
+          throw new Error('Email da empresa não cadastrado. Atualize os dados da empresa antes de configurar a integração.');
+        }
         
         // Prepare bank credentials
         const bankCredentials: BankCredentials = {
@@ -180,9 +199,9 @@ export function useBankingIntegration({
 
         // Call API to setup integration
         const response = await setupBankingIntegration(account.id, {
-          name: account.name,
-          document: companyId, // TODO: Get actual company CNPJ
-          email: '', // TODO: Get company email
+          name: company.name,
+          document: company.cnpj,
+          email: company.email || '',
           pixKey: formData.pixKey,
           bankCredentials,
         });
@@ -197,11 +216,11 @@ export function useBankingIntegration({
           onSuccess?.();
           onClose();
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error setting up banking integration:', error);
         toast({
           title: 'Erro ao configurar integração',
-          description: error.message || 'Ocorreu um erro ao configurar a integração bancária.',
+          description: error instanceof Error ? error.message : 'Ocorreu um erro ao configurar a integração bancária.',
           type: 'error',
         });
       } finally {
@@ -209,12 +228,13 @@ export function useBankingIntegration({
       }
     },
     [
+      isLoading,
       validateForm,
       account,
+      companies,
       formData,
       certificateBase64,
       privateKeyBase64,
-      toast,
       onSuccess,
       onClose,
     ],

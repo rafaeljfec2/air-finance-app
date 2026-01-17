@@ -148,7 +148,7 @@ export function AccountFormModal({
             />
 
             {/* Banking Integration Section */}
-            {account && onConfigureIntegration && bankSupportsIntegration && (
+            {bankSupportsIntegration && (
               <div className="space-y-1.5 pt-1.5 border-t border-border/50 dark:border-border-dark/50">
                 <div className="flex items-center gap-2">
                   <Link2 className="h-3.5 w-3.5 text-primary-500 dark:text-primary-400" />
@@ -160,34 +160,40 @@ export function AccountFormModal({
                 <div className="p-3 rounded-lg bg-primary-50 dark:bg-primary-900/10 border border-primary-200 dark:border-primary-800">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1">
-                      {account.hasBankingIntegration ? (
+                      {account?.hasBankingIntegration ? (
                         <div className="flex items-center gap-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                           <p className="text-xs font-medium text-green-700 dark:text-green-300">
                             Integração Ativa - Banco Inter
                           </p>
                         </div>
-                      ) : (
+                      ) : account ? (
                         <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
                           Configure a integração com Banco Inter
                         </p>
+                      ) : (
+                        <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
+                          Após criar a conta, você poderá configurar a integração
+                        </p>
                       )}
                     </div>
-                    <Button
-                      type="button"
-                      onClick={() => onConfigureIntegration(account)}
-                      variant="outline"
-                      size="sm"
-                      className={
-                        account.hasBankingIntegration
-                          ? 'border-green-500 text-green-600 hover:bg-green-50 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-900/20 h-8 text-xs'
-                          : 'border-primary-500 text-primary-600 hover:bg-primary-50 dark:border-primary-400 dark:text-primary-400 dark:hover:bg-primary-900/20 h-8 text-xs'
-                      }
-                      disabled={isLoading}
-                    >
-                      <Link2 className="h-3 w-3 mr-1.5" />
-                      {account.hasBankingIntegration ? 'Ver' : 'Configurar'}
-                    </Button>
+                    {account && onConfigureIntegration && (
+                      <Button
+                        type="button"
+                        onClick={() => onConfigureIntegration(account)}
+                        variant="outline"
+                        size="sm"
+                        className={
+                          account.hasBankingIntegration
+                            ? 'border-green-500 text-green-600 hover:bg-green-50 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-900/20 h-8 text-xs'
+                            : 'border-primary-500 text-primary-600 hover:bg-primary-50 dark:border-primary-400 dark:text-primary-400 dark:hover:bg-primary-900/20 h-8 text-xs'
+                        }
+                        disabled={isLoading}
+                      >
+                        <Link2 className="h-3 w-3 mr-1.5" />
+                        {account.hasBankingIntegration ? 'Ver' : 'Configurar'}
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
