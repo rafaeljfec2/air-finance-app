@@ -2,6 +2,7 @@ import { MonthNavigator } from '@/components/budget/MonthNavigator';
 import { Loading } from '@/components/Loading';
 import { FinancialDashboard } from '@/components/reports/FinancialDashboard';
 import { Insight } from '@/components/reports/InsightsCard';
+import { TransactionSummary } from '@/pages/transactions/components/TransactionSummary';
 import {
   useDashboardSummary,
   useDashboardBalanceHistory,
@@ -13,7 +14,7 @@ import { useCompanyStore } from '@/stores/company';
 import type { DashboardFilters } from '@/types/dashboard';
 import { formatCurrency } from '@/utils/formatters';
 import { parseApiError, getUserFriendlyMessage } from '@/utils/apiErrorHandler';
-import { PieChart } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 export function Reports() {
@@ -213,35 +214,44 @@ export function Reports() {
 
   return (
     <ViewDefault>
-      <div className="space-y-6 px-4 sm:px-6 pb-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-primary-100 dark:bg-primary-900/20 rounded-lg">
-              <PieChart className="h-5 w-5 sm:h-6 sm:w-6 text-primary-600 dark:text-primary-400" />
+      <div className="space-y-4 px-4 sm:px-6 pb-8">
+        {/* Desktop Header */}
+        <div className="hidden md:flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+          <div>
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-8 w-8 text-primary-400" />
+              <h1 className="text-2xl font-bold text-text dark:text-text-dark">Painel Financeiro</h1>
             </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                Painel Financeiro
-              </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Visão estratégica para tomada de decisão
-              </p>
-            </div>
-          </div>
-
-          {/* Month Selector */}
-          <div className="flex justify-center sm:justify-end">
-            <MonthNavigator
-              month={(currentDate.getMonth() + 1).toString().padStart(2, '0')}
-              year={currentDate.getFullYear().toString()}
-              onChange={(m: string, y: string) => {
-                const newDate = new Date(Number(y), Number(m) - 1, 1);
-                setCurrentDate(newDate);
-              }}
-            />
+            <p className="text-sm text-gray-500 dark:text-gray-400">Visão estratégica para tomada de decisão</p>
           </div>
         </div>
+
+        {/* Mobile Header - Compacto */}
+        <div className="md:hidden flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-primary-500" />
+            <h1 className="text-lg font-bold text-text dark:text-text-dark">Relatórios</h1>
+          </div>
+        </div>
+
+        {/* Month Selector */}
+        <div className="flex justify-center mb-4">
+          <MonthNavigator
+            month={(currentDate.getMonth() + 1).toString().padStart(2, '0')}
+            year={currentDate.getFullYear().toString()}
+            onChange={(m: string, y: string) => {
+              const newDate = new Date(Number(y), Number(m) - 1, 1);
+              setCurrentDate(newDate);
+            }}
+          />
+        </div>
+
+        {/* Summary Cards - Same as Transactions */}
+        <TransactionSummary
+          totalCredits={summary.income}
+          totalDebits={summary.expenses}
+          finalBalance={summary.balance}
+        />
 
         {/* Dashboard with Real Data */}
         <FinancialDashboard
