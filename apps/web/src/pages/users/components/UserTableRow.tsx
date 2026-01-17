@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import { ComboBox } from '@/components/ui/ComboBox';
 import { cn } from '@/lib/utils';
 import { User, UserRole, UserStatus } from '@/services/userService';
 import { CheckCircle2, Edit, Mail, Shield, Trash2, XCircle } from 'lucide-react';
@@ -14,8 +13,6 @@ export interface UserTableRowProps {
   getStatusBadgeColor: (status: UserStatus) => string;
   getEmailVerifiedBadgeColor: (emailVerified: boolean | undefined) => string;
   getOnboardingCompletedBadgeColor: (onboardingCompleted: boolean | undefined) => string;
-  activeCompanyId?: string | null;
-  onAssignRole?: (userId: string, role: string) => void;
   onViewPermissions: (user: User) => void;
   canDelete?: boolean;
 }
@@ -43,15 +40,9 @@ export function UserTableRow({
   getStatusBadgeColor,
   getEmailVerifiedBadgeColor,
   getOnboardingCompletedBadgeColor,
-  activeCompanyId,
-  onAssignRole,
   onViewPermissions,
   canDelete = true,
 }: Readonly<UserTableRowProps>) {
-  const currentRole = activeCompanyId
-    ? (user.companyRoles?.[activeCompanyId] ?? 'viewer')
-    : user.role;
-
   return (
     <tr className="border-b border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark transition-colors">
       <td className="p-4">
@@ -62,41 +53,23 @@ export function UserTableRow({
       </td>
       <td className="p-4">
         <div className="flex items-center gap-2">
-          {activeCompanyId ? (
-            <ComboBox
-              options={[
-                { value: 'owner', label: 'Dono' },
-                { value: 'admin', label: 'Administrador' },
-                { value: 'editor', label: 'Editor' },
-                { value: 'viewer', label: 'Visualizador' },
-              ]}
-              value={currentRole}
-              onValueChange={(val: string | null) => {
-                if (val && onAssignRole) onAssignRole(user.id, val);
-              }}
-              disabled={!onAssignRole || user.role === 'god'}
-              className="h-7 w-[140px] text-xs bg-transparent border-gray-200 dark:border-gray-700"
-              searchable={false}
-            />
-          ) : (
-            <span
-              className={cn(
-                'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-                getRoleBadgeColor(user.role),
-              )}
-            >
-              {(() => {
-                if (user.role === 'god') return 'God';
-                if (user.role === 'sys_admin') return 'Admin Sistema';
-                if (user.role === 'admin') return 'Admin Empresa';
-                if (user.role === 'owner') return 'Dono';
-                if (user.role === 'editor') return 'Editor';
-                if (user.role === 'operator') return 'Operador';
-                if (user.role === 'viewer') return 'Visualizador';
-                return 'Usuário';
-              })()}
-            </span>
-          )}
+          <span
+            className={cn(
+              'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+              getRoleBadgeColor(user.role),
+            )}
+          >
+            {(() => {
+              if (user.role === 'god') return 'God';
+              if (user.role === 'sys_admin') return 'Admin Sistema';
+              if (user.role === 'admin') return 'Admin Empresa';
+              if (user.role === 'owner') return 'Dono';
+              if (user.role === 'editor') return 'Editor';
+              if (user.role === 'operator') return 'Operador';
+              if (user.role === 'viewer') return 'Visualizador';
+              return 'Usuário';
+            })()}
+          </span>
 
           <button
             onClick={() => onViewPermissions(user)}

@@ -14,14 +14,12 @@ import {
 interface UsersListProps {
   users: User[];
   viewMode: 'grid' | 'list';
-  activeCompanyId?: string | null;
   isUpdating: boolean;
   isDeleting: boolean;
   sortConfig: SortConfig<'name' | 'email' | 'role' | 'status' | 'plan' | 'createdAt'> | null;
   onSort: (field: 'name' | 'email' | 'role' | 'status' | 'plan' | 'createdAt') => void;
   onEdit: (user: User) => void;
   onDelete: (id: string) => void;
-  onAssignRole: (userId: string, role: string) => void;
   onViewPermissions: (user: User) => void;
   canDeleteUser: (user: User) => boolean;
 }
@@ -29,14 +27,12 @@ interface UsersListProps {
 export function UsersList({
   users,
   viewMode,
-  activeCompanyId,
   isUpdating,
   isDeleting,
   sortConfig,
   onSort,
   onEdit,
   onDelete,
-  onAssignRole,
   onViewPermissions,
   canDeleteUser,
 }: Readonly<UsersListProps>) {
@@ -106,8 +102,6 @@ export function UsersList({
                 getStatusBadgeColor={getStatusBadgeColor}
                 getEmailVerifiedBadgeColor={getEmailVerifiedBadgeColor}
                 getOnboardingCompletedBadgeColor={getOnboardingCompletedBadgeColor}
-                activeCompanyId={activeCompanyId}
-                onAssignRole={onAssignRole}
                 onViewPermissions={onViewPermissions}
                 canDelete={canDeleteUser(user)}
               />

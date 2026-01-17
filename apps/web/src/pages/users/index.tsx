@@ -5,9 +5,7 @@ import { UserFormModal } from '@/components/users/UserFormModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { User, assignCompanyRole } from '@/services/userService';
-import { useCompanyStore } from '@/stores/company';
-import { useQueryClient } from '@tanstack/react-query';
+import { User } from '@/services/userService';
 import { useMemo, useState } from 'react';
 import { UsersHeader } from './components/UsersHeader';
 import { UsersErrorState } from './components/UsersErrorState';
@@ -23,8 +21,6 @@ import { useUserSorting } from './hooks/useUserSorting';
 
 export function UsersPage() {
   const { user: currentUser } = useAuth();
-  const { activeCompany } = useCompanyStore();
-  const queryClient = useQueryClient();
   const { users, isLoading, error, isCreating, isUpdating, isDeleting } = useUsers();
 
   const { canDeleteUser } = useCanDeleteUser();
@@ -53,16 +49,6 @@ export function UsersPage() {
 
   const [showDeleteAllDataModal, setShowDeleteAllDataModal] = useState(false);
   const [permissionsUser, setPermissionsUser] = useState<User | null>(null);
-
-  const handleAssignRole = async (userId: string, role: string) => {
-    if (!activeCompany) return;
-    try {
-      await assignCompanyRole(userId, activeCompany.id, role);
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-    } catch (error) {
-      console.error('Failed to update role', error);
-    }
-  };
 
   const handleViewPermissions = (user: User) => {
     setPermissionsUser(user);
@@ -109,14 +95,12 @@ export function UsersPage() {
             <UsersList
               users={filteredAndSortedUsers}
               viewMode={viewMode}
-              activeCompanyId={activeCompany?.id}
               isUpdating={isUpdating}
               isDeleting={isDeleting}
               sortConfig={sortConfig}
               onSort={handleSort}
               onEdit={handleEdit}
               onDelete={handleDelete}
-              onAssignRole={handleAssignRole}
               onViewPermissions={handleViewPermissions}
               canDeleteUser={canDeleteUser}
             />
@@ -152,11 +136,7 @@ export function UsersPage() {
         <UserPermissionsModal
           open={!!permissionsUser}
           onClose={() => setPermissionsUser(null)}
-          role={
-            activeCompany
-              ? (permissionsUser.companyRoles?.[activeCompany.id] ?? 'viewer')
-              : permissionsUser.role
-          }
+          role={permissionsUser.role}
           userName={permissionsUser.name}
         />
       )}
