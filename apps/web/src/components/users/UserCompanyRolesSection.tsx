@@ -24,13 +24,6 @@ const ROLE_OPTIONS: ComboBoxOption<'owner' | 'admin' | 'editor' | 'operator' | '
   { value: 'viewer', label: 'Visualizador' },
 ];
 
-const ROLE_LABELS: Record<CompanyRole['role'], string> = {
-  owner: 'Dono',
-  admin: 'Admin',
-  editor: 'Editor',
-  operator: 'Operador',
-  viewer: 'Visualizador',
-};
 
 export function UserCompanyRolesSection({
   companyRoles,
