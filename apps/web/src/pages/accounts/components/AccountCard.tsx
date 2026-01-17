@@ -73,10 +73,20 @@ export function AccountCard({
 
           {/* Conteúdo */}
           <div className="flex-1 min-w-0">
-            {/* Nome */}
-            <h3 className="font-bold text-sm text-text dark:text-text-dark mb-1 line-clamp-1">
-              {account.name}
-            </h3>
+            {/* Nome e Badge Integração */}
+            <div className="flex items-center gap-1.5 mb-1">
+              <h3 className="font-bold text-sm text-text dark:text-text-dark line-clamp-1 flex-1 min-w-0">
+                {account.name}
+              </h3>
+              {account.hasBankingIntegration && (
+                <div className="shrink-0">
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-700">
+                    <Link2 className="h-2.5 w-2.5" />
+                    API
+                  </span>
+                </div>
+              )}
+            </div>
 
             {/* Badge Tipo */}
             <span
@@ -114,16 +124,6 @@ export function AccountCard({
                   <Hash className="h-3.5 w-3.5 text-gray-400 shrink-0" />
                   <span className="text-gray-600 dark:text-gray-300 truncate font-mono text-[11px]">
                     Cc: {account.accountNumber}
-                  </span>
-                </div>
-              )}
-
-              {/* Integração Ativa */}
-              {account.hasBankingIntegration && (
-                <div className="flex items-center gap-1.5 col-span-2">
-                  <Link2 className="h-3.5 w-3.5 text-green-500 dark:text-green-400 shrink-0" />
-                  <span className="text-green-600 dark:text-green-400 text-[10px] font-semibold">
-                    Integração Ativa
                   </span>
                 </div>
               )}

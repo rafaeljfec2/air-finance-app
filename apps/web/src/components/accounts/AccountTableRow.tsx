@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Account } from '@/services/accountService';
 import { formatCurrency } from '@/utils/formatters';
-import { Banknote, Edit, Landmark, Trash2, Wallet } from 'lucide-react';
+import { Banknote, Edit, Landmark, Trash2, Wallet, Link2 } from 'lucide-react';
 
 interface AccountTableRowProps {
   account: Account;
@@ -61,15 +61,23 @@ export function AccountTableRow({
             <Icon className="h-4 w-4 text-white" />
           </div>
           <div>
-            <div className="font-medium text-text dark:text-text-dark">{account.name}</div>
-            <span
-              className={cn(
-                'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border mt-1',
-                getTypeBadgeColor(accountType),
+            <div className="font-medium text-text dark:text-text-dark mb-1">{account.name}</div>
+            <div className="flex items-center gap-2">
+              <span
+                className={cn(
+                  'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border',
+                  getTypeBadgeColor(accountType),
+                )}
+              >
+                {getTypeLabel(accountType)}
+              </span>
+              {account.hasBankingIntegration && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-700">
+                  <Link2 className="h-3 w-3" />
+                  Integração Ativa
+                </span>
               )}
-            >
-              {getTypeLabel(accountType)}
-            </span>
+            </div>
           </div>
         </div>
       </td>

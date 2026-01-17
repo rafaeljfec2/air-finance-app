@@ -53,11 +53,14 @@ export function AccountListItem({
       {/* Conteúdo */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
-          <h3 className="font-semibold text-[13px] text-text dark:text-text-dark truncate leading-tight">
+          <h3 className="font-semibold text-[13px] text-text dark:text-text-dark truncate leading-tight flex-1 min-w-0">
             {account.name}
           </h3>
           {account.hasBankingIntegration && (
-            <Link2 className="h-3 w-3 text-green-500 dark:text-green-400 shrink-0" />
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-700 shrink-0">
+              <Link2 className="h-2.5 w-2.5" />
+              API
+            </span>
           )}
         </div>
         <p className="text-[11px] text-gray-500 dark:text-gray-400">
