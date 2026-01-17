@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Filter, History, Plus, Receipt } from 'lucide-react';
+import { Filter, Receipt } from 'lucide-react';
 
 interface TransactionHeaderProps {
   showFilters: boolean;
@@ -11,43 +11,36 @@ interface TransactionHeaderProps {
 export function TransactionHeader({
   showFilters,
   setShowFilters,
-  onNavigateToHistory,
-  onNavigateToNew,
 }: TransactionHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
-      <div>
-        <div className="flex items-center gap-2">
-          <Receipt className="h-8 w-8 text-primary-400" />
-          <h1 className="text-2xl font-bold text-text dark:text-text-dark">Fluxo de Caixa</h1>
+    <>
+      {/* Desktop Header */}
+      <div className="hidden md:flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+        <div>
+          <div className="flex items-center gap-2">
+            <Receipt className="h-8 w-8 text-primary-400" />
+            <h1 className="text-2xl font-bold text-text dark:text-text-dark">Fluxo de Caixa</h1>
+          </div>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Gerencie seu fluxo de caixa</p>
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Gerencie seu fluxo de caixa</p>
       </div>
-      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+
+      {/* Mobile Header - Compacto */}
+      <div className="md:hidden flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Receipt className="h-5 w-5 text-primary-500" />
+          <h1 className="text-lg font-bold text-text dark:text-text-dark">Transações</h1>
+        </div>
         <Button
           onClick={() => setShowFilters(!showFilters)}
-          variant="outline"
-          className="w-full sm:w-auto lg:hidden flex items-center justify-center gap-2 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+          variant="ghost"
+          size="sm"
+          className="flex items-center gap-1.5 text-text dark:text-text-dark"
         >
           <Filter className="h-4 w-4" />
-          {showFilters ? 'Ocultar Filtros' : 'Mostrar Filtros'}
-        </Button>
-        <Button
-          onClick={onNavigateToHistory}
-          variant="outline"
-          className="w-full sm:w-auto bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center justify-center gap-2"
-        >
-          <History className="h-5 w-5" />
-          Histórico
-        </Button>
-        <Button
-          onClick={onNavigateToNew}
-          className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
-        >
-          <Plus className="h-5 w-5" />
-          Novo lançamento
+          Filtros
         </Button>
       </div>
-    </div>
+    </>
   );
 }
