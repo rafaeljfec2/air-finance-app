@@ -13,7 +13,6 @@ import {
   Briefcase,
   TrendingUp,
   TrendingDown,
-  Wallet,
   LucideIcon,
 } from 'lucide-react';
 

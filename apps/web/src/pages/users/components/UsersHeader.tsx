@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, User as UserIcon } from 'lucide-react';
+import { Plus, Trash2, Users as UsersIcon } from 'lucide-react';
 
 interface UsersHeaderProps {
   onCreateClick: () => void;
@@ -13,33 +13,39 @@ export function UsersHeader({
   canDeleteAllData,
 }: Readonly<UsersHeaderProps>) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-      <div>
-        <div className="flex items-center gap-3 mb-2">
-          <UserIcon className="h-8 w-8 text-primary-400" />
-          <h1 className="text-2xl font-bold text-text dark:text-text-dark">Usuários</h1>
+    <div className="mb-4">
+      {/* Título com ícone */}
+      <div className="flex items-center gap-3 mb-3">
+        <div className="p-2.5 rounded-xl bg-primary-500/20">
+          <UsersIcon className="h-6 w-6 text-primary-500" />
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Gerencie usuários do sistema</p>
+        <div className="flex-1">
+          <h1 className="text-xl font-bold text-text dark:text-text-dark">Usuários</h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Gerencie usuários do sistema
+          </p>
+        </div>
       </div>
-      <div className="flex gap-2">
-        {canDeleteAllData && (
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={onDeleteAllDataClick}
-            className="flex items-center gap-2"
-          >
-            <Trash2 className="h-4 w-4" />
-            Deletar Dados
-          </Button>
-        )}
+
+      {/* Botões de ação */}
+      <div className="flex flex-col gap-2">
         <Button
           onClick={onCreateClick}
-          className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
+          className="w-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2 h-11 rounded-xl font-medium"
         >
           <Plus className="h-5 w-5" />
           Novo Usuário
         </Button>
+        {canDeleteAllData && (
+          <Button
+            variant="destructive"
+            onClick={onDeleteAllDataClick}
+            className="w-full flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm"
+          >
+            <Trash2 className="h-4 w-4" />
+            Deletar Todos os Dados
+          </Button>
+        )}
       </div>
     </div>
   );

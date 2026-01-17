@@ -1,6 +1,5 @@
-import { cn } from '@/lib/utils';
 import { Company } from '@/types/company';
-import { Building2, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
