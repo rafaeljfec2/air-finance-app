@@ -1,45 +1,53 @@
-import { useState } from 'react';
-import * as SecureStore from 'expo-secure-store';
-import { STORAGE_KEYS } from '@air-finance/shared/constants';
+import { useState, useEffect } from 'react'
+import * as SecureStore from 'expo-secure-store'
+import type { WebViewMessageEvent } from 'react-native-webview'
+import { AUTH_TOKEN_KEY } from '../constants/webview'
+import type { AuthMessage } from '../types/webview'
 
 export function useAuthToken() {
-  const [token, setToken] = useState<string | null>(null);
+  const [initialScript, setInitialScript] = useState<string>('')
 
-  // Script para injetar token no WebView
-  const initialScript = `
-    (function() {
-      window.MOBILE_APP = true;
-      window.postMessage = window.ReactNativeWebView?.postMessage || window.postMessage;
-      
-      // Interceptar login para salvar token
-      const originalFetch = window.fetch;
-      window.fetch = function(...args) {
-        return originalFetch(...args).then(response => {
-          const token = response.headers.get('Authorization');
-          if (token) {
-            window.ReactNativeWebView?.postMessage(JSON.stringify({
-              type: 'AUTH_TOKEN',
-              token: token
-            }));
-          }
-          return response;
-        });
-      };
-    })();
-    true;
-  `;
+  useEffect(() => {
+    loadToken()
+  }, [])
 
-  const handleMessage = async (event: any) => {
+  const loadToken = async () => {
     try {
-      const data = JSON.parse(event.nativeEvent.data);
-      if (data.type === 'AUTH_TOKEN') {
-        await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_TOKEN, data.token);
-        setToken(data.token);
+      const token = await SecureStore.getItemAsync(AUTH_TOKEN_KEY)
+      if (token) {
+        const script = `
+          try {
+            window.localStorage.setItem('${AUTH_TOKEN_KEY}', '${token}');
+          } catch (e) {
+            console.error('Failed to inject token', e);
+          }
+          true;
+        `
+        setInitialScript(script)
       }
     } catch (error) {
-      console.error('Error handling message:', error);
+      console.error('Error loading token:', error)
     }
-  };
+  }
 
-  return { initialScript, handleMessage, token };
+  const handleMessage = async (event: WebViewMessageEvent) => {
+    try {
+      if (!event.nativeEvent.data) return
+
+      const data: AuthMessage = JSON.parse(event.nativeEvent.data)
+
+      if (data.type === 'AUTH_SUCCESS' && data.token) {
+        await SecureStore.setItemAsync(AUTH_TOKEN_KEY, data.token)
+      } else if (data.type === 'AUTH_LOGOUT') {
+        await SecureStore.deleteItemAsync(AUTH_TOKEN_KEY)
+      }
+    } catch {
+      // Ignore parse errors from other messages
+    }
+  }
+
+  return {
+    initialScript,
+    handleMessage,
+  }
 }

@@ -1,12 +1,14 @@
-import React from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import React from 'react'
+import { StyleSheet, View, ActivityIndicator, Text } from 'react-native'
 
 export function LoadingScreen() {
   return (
     <View style={styles.container}>
+      <Text style={styles.logoText}>Air Finance</Text>
       <ActivityIndicator size="large" color="#22c55e" />
+      <Text style={styles.loadingText}>Carregando...</Text>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -18,6 +20,18 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: '#18181b',
+    zIndex: 1,
   },
-});
+  logoText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#22c55e',
+    marginBottom: 40,
+  },
+  loadingText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: '#a1a1aa',
+  },
+})
