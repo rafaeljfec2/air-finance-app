@@ -49,7 +49,7 @@ export const useCompanyStore = create<CompanyState>()(
             const sanitized = sanitizeCompany(c) as Company;
             // Extra security: remove userIds if somehow present
             if (sanitized && 'userIds' in sanitized) {
-              delete (sanitized as any).userIds;
+              delete (sanitized as unknown as Record<string, unknown>).userIds;
             }
             return sanitized;
           });

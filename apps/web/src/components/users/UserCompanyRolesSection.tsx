@@ -65,15 +65,16 @@ export function UserCompanyRolesSection({
 
   const handleRoleChange = (companyId: string, role: CompanyRole['role'] | null) => {
     if (!role) return;
-    onChange(
-      companyRoles.map((cr) => (cr.companyId === companyId ? { ...cr, role } : cr)),
-    );
+    onChange(companyRoles.map((cr) => (cr.companyId === companyId ? { ...cr, role } : cr)));
   };
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-text dark:text-text-dark">
+        <label
+          htmlFor="companies-and-roles"
+          className="text-sm font-medium text-text dark:text-text-dark"
+        >
           Empresas e Funções
         </label>
         {availableCompanies.length > 0 && (
