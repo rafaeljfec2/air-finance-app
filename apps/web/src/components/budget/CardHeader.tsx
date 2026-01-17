@@ -1,5 +1,5 @@
 import { Tooltip } from '@/components/ui/tooltip';
-import { Info } from 'lucide-react';
+import { ChevronDown, ChevronUp, Info } from 'lucide-react';
 import React from 'react';
 
 interface CardHeaderProps {
@@ -7,9 +7,18 @@ interface CardHeaderProps {
   title: string;
   tooltip?: string;
   children?: React.ReactNode;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-export const CardHeader: React.FC<CardHeaderProps> = ({ icon, title, tooltip, children }) => (
+export const CardHeader: React.FC<CardHeaderProps> = ({ 
+  icon, 
+  title, 
+  tooltip, 
+  children, 
+  isCollapsed, 
+  onToggleCollapse 
+}) => (
   <div className="mb-1">
     <div className="flex items-center justify-between gap-2">
       <div className="flex items-center gap-2">
@@ -25,7 +34,23 @@ export const CardHeader: React.FC<CardHeaderProps> = ({ icon, title, tooltip, ch
           </Tooltip>
         )}
       </div>
-      {children && <div className="flex items-center">{children}</div>}
+      <div className="flex items-center gap-2">
+        {children}
+        {onToggleCollapse && (
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+            aria-label={isCollapsed ? "Expandir card" : "Colapsar card"}
+          >
+            {isCollapsed ? (
+              <ChevronDown className="h-4 w-4 text-gray-500 group-hover:text-primary-600 dark:text-gray-400 dark:group-hover:text-primary-400 transition-colors" />
+            ) : (
+              <ChevronUp className="h-4 w-4 text-gray-500 group-hover:text-primary-600 dark:text-gray-400 dark:group-hover:text-primary-400 transition-colors" />
+            )}
+          </button>
+        )}
+      </div>
     </div>
   </div>
 );

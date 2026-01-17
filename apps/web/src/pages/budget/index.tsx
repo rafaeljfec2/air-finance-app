@@ -69,7 +69,7 @@ export function BudgetPage() {
             </h1>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 ml-11 max-w-2xl">
-            Visão geral do seu orçamento, fluxo de caixa e contas a pagar/receber para um planejamento financeiro eficiente.
+            Visão geral do seu orçamento.
           </p>
         </motion.div>
         

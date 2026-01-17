@@ -1,10 +1,11 @@
-import { CardContainer, CardHeader } from '@/components/budget';
+import { CardContainer, CardHeader, CardTotal } from '@/components/budget';
 import { CreditCardBrandIcon } from '@/components/budget/CreditCardBrandIcon';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import type { CreditCardBill, CreditCard as CreditCardType } from '@/types/budget';
+import { AnimatePresence, motion } from 'framer-motion';
 import { CreditCard, Maximize2 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 interface CreditCardsCardProps {
   cards: CreditCardType[];
@@ -31,6 +32,7 @@ export function CreditCardsCard({
   onChangeActiveCard,
   onExpand,
 }: Readonly<CreditCardsCardProps>) {
+  const [isCollapsed, setIsCollapsed] = useState(true);
   // Sort transactions: first those that are finishing (fewer remaining installments), then the rest
   const sortedTransactions = useMemo(() => {
     const transactions = activeBill?.transactions ?? [];
@@ -87,12 +89,16 @@ export function CreditCardsCard({
     onPageChange(Math.min(totalPages, safePage + 1));
   };
 
+  const totalBillValue = activeBill?.total ?? 0;
+
   return (
-    <CardContainer color="violet" className="min-h-[250px]">
+    <CardContainer color="violet" className={isCollapsed ? "min-h-0" : "min-h-[250px]"}>
       <CardHeader
         icon={<CreditCard className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
         title="Cartões de Crédito"
         tooltip="Gerenciamento de faturas, limites e lançamentos dos seus cartões de crédito."
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       >
         <Button
           type="button"
@@ -105,7 +111,17 @@ export function CreditCardsCard({
           Expandir
         </Button>
       </CardHeader>
-      <div className="mt-2 flex flex-col justify-between min-h-[180px]">
+      <CardTotal value={totalBillValue} color="violet" label="Total da Fatura" />
+      <AnimatePresence initial={false}>
+        {!isCollapsed && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="mt-2 flex flex-col justify-between min-h-[180px]">
         {isLoading ? (
           <div className="mt-6 flex justify-center">
             <Spinner size="md" className="text-violet-500" />
@@ -209,7 +225,10 @@ export function CreditCardsCard({
             )}
           </>
         )}
-      </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </CardContainer>
   );
 }

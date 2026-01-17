@@ -2,7 +2,9 @@ import { CardContainer, CardEmpty, CardHeader, CardStat, CardTotal } from '@/com
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import type { CashFlow } from '@/types/budget';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Activity, Maximize2 } from 'lucide-react';
+import { useState } from 'react';
 
 interface CashFlowCardProps {
   cashFlow: CashFlow | null;
@@ -11,12 +13,16 @@ interface CashFlowCardProps {
 }
 
 export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlowCardProps>) {
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
   return (
-    <CardContainer color="emerald" className="min-h-[250px]">
+    <CardContainer color="emerald" className={isCollapsed ? "min-h-0" : "min-h-[250px]"}>
       <CardHeader
         icon={<Activity className="h-4 w-4 text-primary-600 dark:text-primary-400" />}
         title="Fluxo de Caixa"
         tooltip="Comparativo entre o saldo inicial, previsão de entradas/saídas e o saldo final projetado para o mês."
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       >
         <Button
           type="button"
@@ -34,25 +40,37 @@ export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlo
         color={(cashFlow?.finalBalance ?? 0) >= 0 ? 'blue' : 'rose'} 
         label="Saldo Final" 
       />
-      {isLoading && (
-        <div className="mt-4 flex justify-center">
-          <Spinner size="lg" className="text-emerald-500" />
-        </div>
-      )}
-      {!isLoading && cashFlow && (
-        <div className="flex flex-col gap-2 mt-2">
-          <CardStat label="Entradas" value={cashFlow.totalIncome} positive />
-          <CardStat label="Saídas" value={cashFlow.totalExpense} negative />
-          <div className="border-t border-border dark:border-border-dark my-2" />
-          <CardStat
-            label="Saldo Final"
-            value={cashFlow.finalBalance}
-            blue={cashFlow.finalBalance >= 0}
-            negative={cashFlow.finalBalance < 0}
-          />
-        </div>
-      )}
-      {!isLoading && !cashFlow && <CardEmpty />}
+      <AnimatePresence initial={false}>
+        {!isCollapsed && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            {isLoading && (
+              <div className="mt-4 flex justify-center">
+                <Spinner size="lg" className="text-emerald-500" />
+              </div>
+            )}
+            {!isLoading && cashFlow && (
+              <div className="flex flex-col gap-2 mt-2">
+                <CardStat label="Entradas" value={cashFlow.totalIncome} positive />
+                <CardStat label="Saídas" value={cashFlow.totalExpense} negative />
+                <div className="border-t border-border dark:border-border-dark my-2" />
+                <CardStat
+                  label="Saldo Final"
+                  value={cashFlow.finalBalance}
+                  blue={cashFlow.finalBalance >= 0}
+                  negative={cashFlow.finalBalance < 0}
+                />
+              </div>
+            )}
+            {!isLoading && !cashFlow && <CardEmpty />}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </CardContainer>
   );
 }

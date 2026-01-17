@@ -2,7 +2,9 @@ import { BadgeStatus, CardContainer, CardHeader, CardTotal } from '@/components/
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import type { Payable } from '@/types/budget';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Maximize2, TrendingDown } from 'lucide-react';
+import { useState } from 'react';
 
 interface PayablesCardProps {
   payables: Payable[];
@@ -21,6 +23,7 @@ export function PayablesCard({
   onPageChange,
   onExpand,
 }: Readonly<PayablesCardProps>) {
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const totalPages = Math.ceil(payables.length / itemsPerPage) || 1;
   const safePage = Math.min(Math.max(currentPage, 1), totalPages);
   const startIndex = (safePage - 1) * itemsPerPage;
@@ -37,11 +40,13 @@ export function PayablesCard({
   };
 
   return (
-    <CardContainer color="rose" className="min-h-[250px]">
+    <CardContainer color="rose" className={isCollapsed ? "min-h-0" : "min-h-[250px]"}>
       <CardHeader
         icon={<TrendingDown className="h-4 w-4 text-rose-600 dark:text-rose-400" />}
         title="Contas a Pagar"
         tooltip="Lista de todas as despesas e obrigações financeiras para este mês."
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       >
         <Button
           type="button"
@@ -55,7 +60,16 @@ export function PayablesCard({
         </Button>
       </CardHeader>
       <CardTotal value={totalValue} color="rose" label="Total Pagar" />
-      <div className="mt-2 flex flex-col justify-between min-h-[180px]">
+      <AnimatePresence initial={false}>
+        {!isCollapsed && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="mt-2 flex flex-col justify-between min-h-[180px]">
         {isLoading ? (
           <div className="flex flex-1 items-center justify-center">
             <Spinner size="md" className="text-rose-500" />
@@ -125,7 +139,10 @@ export function PayablesCard({
             )}
           </>
         )}
-      </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </CardContainer>
   );
 }
