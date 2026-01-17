@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Edit, History, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Edit, History, MoreVertical, Trash2 } from 'lucide-react';
 import type { TransactionActionsProps } from './TransactionGrid.types';
 
 interface TransactionActionsPropsReadonly extends Readonly<TransactionActionsProps> {}
@@ -23,11 +23,11 @@ export function TransactionActions({
       <PopoverTrigger asChild>
         <Button 
           variant="ghost" 
-          className="h-8 w-8 p-0 data-[state=open]:bg-muted"
+          className="h-7 w-7 p-0 data-[state=open]:bg-muted"
           onClick={(e) => e.stopPropagation()} // Prevent row click
         >
           <span className="sr-only">Abrir menu</span>
-          <MoreHorizontal className="h-4 w-4" />
+          <MoreVertical className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-40 p-1" align="end">
