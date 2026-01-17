@@ -4,6 +4,7 @@ import { RecordsGrid } from '@/components/ui/RecordsGrid';
 import { SortableColumn , SortConfig } from '@/components/ui/SortableColumn';
 import { Category } from '@/services/categoryService';
 import { CategoryCard } from './CategoryCard';
+import { CategoryListItem } from './CategoryListItem';
 
 interface CategoriesListProps {
   categories: Category[];
@@ -44,36 +45,53 @@ export function CategoriesList({
   }
 
   return (
-    <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border dark:border-border-dark">
-              <SortableColumn field="name" currentSort={sortConfig} onSort={onSort}>
-                Categoria
-              </SortableColumn>
-              <SortableColumn field="type" currentSort={sortConfig} onSort={onSort}>
-                Tipo
-              </SortableColumn>
-              <th className="text-right p-3 text-sm font-semibold text-text dark:text-text-dark">
-                Ações
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((category) => (
-              <CategoryTableRow
-                key={category.id}
-                category={category}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                isUpdating={isUpdating}
-                isDeleting={isDeleting}
-              />
-            ))}
-          </tbody>
-        </table>
+    <>
+      {/* Desktop: Table view */}
+      <Card className="hidden md:block bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border dark:border-border-dark">
+                <SortableColumn field="name" currentSort={sortConfig} onSort={onSort}>
+                  Categoria
+                </SortableColumn>
+                <SortableColumn field="type" currentSort={sortConfig} onSort={onSort}>
+                  Tipo
+                </SortableColumn>
+                <th className="text-right p-3 text-sm font-semibold text-text dark:text-text-dark">
+                  Ações
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {categories.map((category) => (
+                <CategoryTableRow
+                  key={category.id}
+                  category={category}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  isUpdating={isUpdating}
+                  isDeleting={isDeleting}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      {/* Mobile: List view */}
+      <div className="md:hidden space-y-1">
+        {categories.map((category) => (
+          <CategoryListItem
+            key={category.id}
+            category={category}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            isUpdating={isUpdating}
+            isDeleting={isDeleting}
+          />
+        ))}
       </div>
-    </Card>
+    </>
   );
 }

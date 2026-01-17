@@ -4,6 +4,7 @@ import { RecordsGrid } from '@/components/ui/RecordsGrid';
 import { SortableColumn , SortConfig } from '@/components/ui/SortableColumn';
 import { Goal } from '@/services/goalService';
 import { GoalCard } from './GoalCard';
+import { GoalListItem } from './GoalListItem';
 
 interface GoalsListProps {
   goals: Goal[];
@@ -44,42 +45,59 @@ export function GoalsList({
   }
 
   return (
-    <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border dark:border-border-dark">
-              <SortableColumn field="name" currentSort={sortConfig} onSort={onSort}>
-                Meta
-              </SortableColumn>
-              <SortableColumn field="currentAmount" currentSort={sortConfig} onSort={onSort}>
-                Progresso
-              </SortableColumn>
-              <SortableColumn field="targetAmount" currentSort={sortConfig} onSort={onSort}>
-                Valores
-              </SortableColumn>
-              <SortableColumn field="deadline" currentSort={sortConfig} onSort={onSort}>
-                Prazo
-              </SortableColumn>
-              <th className="text-right p-3 text-sm font-semibold text-text dark:text-text-dark">
-                Ações
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {goals.map((goal) => (
-              <GoalTableRow
-                key={goal.id}
-                goal={goal}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                isUpdating={isUpdating}
-                isDeleting={isDeleting}
-              />
-            ))}
-          </tbody>
-        </table>
+    <>
+      {/* Desktop: Table view */}
+      <Card className="hidden md:block bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border dark:border-border-dark">
+                <SortableColumn field="name" currentSort={sortConfig} onSort={onSort}>
+                  Meta
+                </SortableColumn>
+                <SortableColumn field="currentAmount" currentSort={sortConfig} onSort={onSort}>
+                  Progresso
+                </SortableColumn>
+                <SortableColumn field="targetAmount" currentSort={sortConfig} onSort={onSort}>
+                  Valores
+                </SortableColumn>
+                <SortableColumn field="deadline" currentSort={sortConfig} onSort={onSort}>
+                  Prazo
+                </SortableColumn>
+                <th className="text-right p-3 text-sm font-semibold text-text dark:text-text-dark">
+                  Ações
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {goals.map((goal) => (
+                <GoalTableRow
+                  key={goal.id}
+                  goal={goal}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  isUpdating={isUpdating}
+                  isDeleting={isDeleting}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      {/* Mobile: List view */}
+      <div className="md:hidden space-y-1">
+        {goals.map((goal) => (
+          <GoalListItem
+            key={goal.id}
+            goal={goal}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            isUpdating={isUpdating}
+            isDeleting={isDeleting}
+          />
+        ))}
       </div>
-    </Card>
+    </>
   );
 }
