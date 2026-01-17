@@ -1,4 +1,4 @@
-import { Home, ArrowRightLeft, Plus, ChartBar, Menu } from 'lucide-react';
+import { Home, ArrowRightLeft, Plus, ChartBar, User } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -46,9 +46,9 @@ export function MobileBottomNav({ onNewTransaction, onMenuOpen }: Readonly<Mobil
       href: '/reports',
     },
     {
-      id: 'menu',
-      label: 'Menu',
-      icon: Menu,
+      id: 'profile',
+      label: 'Perfil',
+      icon: User,
       onClick: onMenuOpen,
     },
   ];
