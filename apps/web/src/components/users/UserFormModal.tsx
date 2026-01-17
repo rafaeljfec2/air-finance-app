@@ -3,6 +3,7 @@ import { FormField } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/useAuth';
 import { CreateUser, User } from '@/services/userService';
 import { UserRole } from '@/types/user';
 import { useCompanyStore } from '@/stores/company';
@@ -24,6 +25,7 @@ export function UserFormModal({
   user,
   isLoading = false,
 }: Readonly<UserFormModalProps>) {
+  const { user: currentUser } = useAuth();
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id || '';
 
@@ -31,7 +33,7 @@ export function UserFormModal({
     () => ({
       name: '',
       email: '',
-      role: 'user',
+      role: 'viewer', // Default to lowest permission role
       status: 'active',
       plan: 'free',
       companyIds: companyId ? [companyId] : [],
@@ -46,7 +48,8 @@ export function UserFormModal({
   const [form, setForm] = useState<CreateUser>(initialFormState);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const roleOptions: ComboBoxOption<
+  // All available roles with labels
+  const allRoleOptions: ComboBoxOption<
     'god' | 'sys_admin' | 'user' | 'owner' | 'admin' | 'editor' | 'operator' | 'viewer'
   >[] = useMemo(
     () => [
@@ -61,6 +64,51 @@ export function UserFormModal({
     ],
     [],
   );
+
+  // Filter role options based on current user's role
+  // Security: Users can only assign roles equal or below their own level
+  const roleOptions = useMemo(() => {
+    const currentRole = currentUser?.role;
+
+    // Company-level roles only (for owner, admin, etc.)
+    const companyRoles: typeof allRoleOptions = [
+      { value: 'owner', label: 'Dono (Empresa)' },
+      { value: 'admin', label: 'Administrador (Empresa)' },
+      { value: 'editor', label: 'Editor (Empresa)' },
+      { value: 'operator', label: 'Operador (Empresa)' },
+      { value: 'viewer', label: 'Visualizador (Empresa)' },
+    ];
+
+    switch (currentRole) {
+      case 'god':
+        // God can assign any role
+        return allRoleOptions;
+
+      case 'sys_admin':
+        // Sys admin can assign all except god
+        return allRoleOptions.filter((r) => r.value !== 'god');
+
+      case 'owner':
+        // Owner can assign company roles (including owner for other companies)
+        return companyRoles;
+
+      case 'admin':
+        // Admin can assign company roles except owner
+        return companyRoles.filter((r) => r.value !== 'owner');
+
+      case 'editor':
+        // Editor can only assign editor, operator, viewer
+        return companyRoles.filter((r) => ['editor', 'operator', 'viewer'].includes(r.value));
+
+      case 'operator':
+        // Operator can only assign operator, viewer
+        return companyRoles.filter((r) => ['operator', 'viewer'].includes(r.value));
+
+      default:
+        // Viewer and others cannot assign any roles (show only viewer as read-only)
+        return [{ value: 'viewer' as const, label: 'Visualizador (Empresa)' }];
+    }
+  }, [currentUser?.role, allRoleOptions]);
 
   const statusOptions: ComboBoxOption<'active' | 'inactive'>[] = useMemo(
     () => [
