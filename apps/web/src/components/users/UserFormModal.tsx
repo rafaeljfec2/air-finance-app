@@ -230,9 +230,7 @@ export function UserFormModal({
             onChange={setCompanyRoles}
             disabled={isLoading}
           />
-          {errors.companyIds && (
-            <p className="text-sm text-red-500">{errors.companyIds}</p>
-          )}
+          {errors.companyIds && <p className="text-sm text-red-500">{errors.companyIds}</p>}
         </div>
 
         <FormField label="Modelo OpenAI (Padrão)">
