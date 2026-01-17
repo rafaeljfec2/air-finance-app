@@ -17,15 +17,15 @@ export function BankingFieldsSection({
   onFieldChange,
 }: Readonly<BankingFieldsSectionProps>) {
   return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2 mb-2">
-        <Hash className="h-4 w-4 text-primary-500 dark:text-primary-400" />
-        <h3 className="text-sm font-semibold text-text dark:text-text-dark uppercase tracking-wide">
+    <div className="space-y-1.5">
+      <div className="flex items-center gap-2 mb-1">
+        <Hash className="h-3.5 w-3.5 text-primary-500 dark:text-primary-400" />
+        <h3 className="text-xs font-semibold text-text dark:text-text-dark uppercase tracking-wide">
           Dados Bancários
         </h3>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
         <FormField label="Agência *" error={errors.agency}>
           <Input
             name="agency"
