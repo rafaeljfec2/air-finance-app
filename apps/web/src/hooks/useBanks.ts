@@ -20,9 +20,12 @@ export function useBanks() {
   const bankOptions: ComboBoxOption<string>[] = useMemo(() => {
     if (!banks || banks.length === 0) return [];
     
-    return banks.map((bank) => ({
+    // Filtrar apenas bancos ativos
+    const activeBanks = banks.filter((bank) => bank.active !== false);
+    
+    return activeBanks.map((bank) => ({
       value: bank.code,
-      label: `${bank.code} - ${bank.name}`,
+      label: `${bank.code} - ${bank.shortName}`,
     }));
   }, [banks]);
 

@@ -15,8 +15,12 @@ interface UseBankForm {
 
 const initialValues: Bank = {
   code: '',
+  ispb: '',
   name: '',
-  ispb: undefined,
+  shortName: '',
+  type: 'banco',
+  pixDirect: false,
+  active: true,
 };
 
 export function useBankForm(): UseBankForm {

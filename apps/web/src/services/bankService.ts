@@ -3,8 +3,19 @@ import { apiClient } from './apiClient';
 
 export const BankSchema = z.object({
   code: z.string().min(1, 'Código obrigatório'),
+  ispb: z.string().min(1, 'ISPB obrigatório'),
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  ispb: z.string().optional(),
+  shortName: z.string().min(2, 'Nome curto obrigatório'),
+  type: z.enum([
+    'banco',
+    'cooperativa',
+    'instituicao_pagamento',
+    'financeira',
+    'scd',
+    'sep',
+  ]),
+  pixDirect: z.boolean().default(false),
+  active: z.boolean().default(true),
 });
 
 export const CreateBankSchema = BankSchema;
