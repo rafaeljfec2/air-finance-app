@@ -52,7 +52,8 @@ export const CreateUserSchema = UserSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-  companyRoles: true,
+}).extend({
+  companyRoles: z.record(z.string()).optional(),
 });
 
 export type User = z.infer<typeof UserSchema>;

@@ -3,10 +3,12 @@ import { FormField } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useCompanies } from '@/hooks/useCompanies';
 import { CreateUser, User } from '@/services/userService';
 import { useCompanyStore } from '@/stores/company';
 import { Loader2 } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
+import { CompanyRole, UserCompanyRolesSection } from './UserCompanyRolesSection';
 
 interface UserFormModalProps {
   open: boolean;
@@ -24,7 +26,9 @@ export function UserFormModal({
   isLoading = false,
 }: Readonly<UserFormModalProps>) {
   const { activeCompany } = useCompanyStore();
+  const { companies } = useCompanies();
   const companyId = activeCompany?.id || '';
+  const companyName = activeCompany?.name || '';
 
   const initialFormState: CreateUser = useMemo(
     () => ({
@@ -45,18 +49,13 @@ export function UserFormModal({
   const [form, setForm] = useState<CreateUser>(initialFormState);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Company-level roles only - system roles (god, sys_admin, user) are managed separately
-  const roleOptions: ComboBoxOption<'owner' | 'admin' | 'editor' | 'operator' | 'viewer'>[] =
-    useMemo(
-      () => [
-        { value: 'owner', label: 'Dono' },
-        { value: 'admin', label: 'Administrador' },
-        { value: 'editor', label: 'Editor' },
-        { value: 'operator', label: 'Operador' },
-        { value: 'viewer', label: 'Visualizador' },
-      ],
-      [],
-    );
+  // State for company roles management
+  const [companyRoles, setCompanyRoles] = useState<CompanyRole[]>(() => {
+    if (companyId && companyName) {
+      return [{ companyId, companyName, role: 'viewer' }];
+    }
+    return [];
+  });
 
   const statusOptions: ComboBoxOption<'active' | 'inactive'>[] = useMemo(
     () => [
@@ -93,11 +92,41 @@ export function UserFormModal({
           openaiModel: user.integrations?.openaiModel || 'gpt-3.5-turbo',
         },
       });
+
+      // Load company roles from user data
+      if (user.companyIds && user.companyRoles && companies) {
+        const roles: CompanyRole[] = user.companyIds.map((cId) => {
+          const company = companies.find((c) => c.id === cId);
+          return {
+            companyId: cId,
+            companyName: company?.name ?? 'Empresa desconhecida',
+            role: (user.companyRoles?.[cId] as CompanyRole['role']) ?? 'viewer',
+          };
+        });
+        setCompanyRoles(roles);
+      } else if (user.companyIds && companies) {
+        // User has companyIds but no companyRoles defined
+        const roles: CompanyRole[] = user.companyIds.map((cId) => {
+          const company = companies.find((c) => c.id === cId);
+          return {
+            companyId: cId,
+            companyName: company?.name ?? 'Empresa desconhecida',
+            role: 'viewer',
+          };
+        });
+        setCompanyRoles(roles);
+      }
     } else {
       setForm(initialFormState);
+      // Reset to active company with default role for new users
+      if (companyId && companyName) {
+        setCompanyRoles([{ companyId, companyName, role: 'viewer' }]);
+      } else {
+        setCompanyRoles([]);
+      }
     }
     setErrors({});
-  }, [user, initialFormState]);
+  }, [user, initialFormState, companies, companyId, companyName]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -112,7 +141,7 @@ export function UserFormModal({
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (!form.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email))
       errs.email = 'E-mail inválido';
-    if (!form.companyIds || form.companyIds.length === 0) errs.companyIds = 'Empresa obrigatória';
+    if (companyRoles.length === 0) errs.companyIds = 'Pelo menos uma empresa é obrigatória';
     return errs;
   };
 
@@ -122,12 +151,29 @@ export function UserFormModal({
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    onSubmit(form);
+    // Build companyIds and companyRoles from the section data
+    const companyIds = companyRoles.map((cr) => cr.companyId);
+    const companyRolesMap: Record<string, string> = {};
+    companyRoles.forEach((cr) => {
+      companyRolesMap[cr.companyId] = cr.role;
+    });
+
+    onSubmit({
+      ...form,
+      companyIds,
+      companyRoles: companyRolesMap,
+    });
   };
 
   const handleClose = () => {
     setForm(initialFormState);
     setErrors({});
+    // Reset company roles to active company
+    if (companyId && companyName) {
+      setCompanyRoles([{ companyId, companyName, role: 'viewer' }]);
+    } else {
+      setCompanyRoles([]);
+    }
     onClose();
   };
 
@@ -164,32 +210,29 @@ export function UserFormModal({
           />
         </FormField>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FormField label="Função" error={errors.role}>
-            <ComboBox
-              options={roleOptions}
-              value={form.role}
-              onValueChange={(value: 'owner' | 'admin' | 'editor' | 'operator' | 'viewer' | null) =>
-                setForm((prev) => ({ ...prev, role: value ?? 'viewer' }))
-              }
-              placeholder="Selecione a função"
-              disabled={isLoading}
-              className="w-full"
-            />
-          </FormField>
+        <FormField label="Status" error={errors.status}>
+          <ComboBox
+            options={statusOptions}
+            value={form.status}
+            onValueChange={(value: 'active' | 'inactive' | null) =>
+              setForm((prev) => ({ ...prev, status: value ?? 'active' }))
+            }
+            placeholder="Selecione o status"
+            disabled={isLoading}
+            className="w-full"
+          />
+        </FormField>
 
-          <FormField label="Status" error={errors.status}>
-            <ComboBox
-              options={statusOptions}
-              value={form.status}
-              onValueChange={(value: 'active' | 'inactive' | null) =>
-                setForm((prev) => ({ ...prev, status: value ?? 'active' }))
-              }
-              placeholder="Selecione o status"
-              disabled={isLoading}
-              className="w-full"
-            />
-          </FormField>
+        {/* Company Roles Section */}
+        <div className="space-y-2">
+          <UserCompanyRolesSection
+            companyRoles={companyRoles}
+            onChange={setCompanyRoles}
+            disabled={isLoading}
+          />
+          {errors.companyIds && (
+            <p className="text-sm text-red-500">{errors.companyIds}</p>
+          )}
         </div>
 
         <FormField label="Modelo OpenAI (Padrão)">
