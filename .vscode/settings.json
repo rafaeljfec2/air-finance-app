@@ -3,6 +3,7 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "cSpell.enabled": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },

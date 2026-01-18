@@ -85,16 +85,15 @@ export async function getAccountTenant(accountId: string): Promise<AccountTenant
 // ==================== UTILITIES ====================
 
 /**
- * Convert file to base64
+ * Read file content as text
  */
-export function fileToBase64(file: File): Promise<string> {
+export function fileToText(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsText(file);
     reader.onload = () => {
       const content = reader.result as string;
-      const base64 = btoa(content);
-      resolve(base64);
+      resolve(content);
     };
     reader.onerror = (error) => reject(error);
   });
@@ -103,33 +102,23 @@ export function fileToBase64(file: File): Promise<string> {
 /**
  * Validate certificate format (basic)
  */
-export function validateCertificate(base64: string): boolean {
-  try {
-    const decoded = atob(base64);
-    return (
-      decoded.includes('-----BEGIN CERTIFICATE-----') &&
-      decoded.includes('-----END CERTIFICATE-----')
-    );
-  } catch {
-    return false;
-  }
+export function validateCertificate(content: string): boolean {
+  return (
+    content.includes('-----BEGIN CERTIFICATE-----') &&
+    content.includes('-----END CERTIFICATE-----')
+  );
 }
 
 /**
  * Validate private key format (basic)
  */
-export function validatePrivateKey(base64: string): boolean {
-  try {
-    const decoded = atob(base64);
-    return (
-      (decoded.includes('-----BEGIN PRIVATE KEY-----') &&
-        decoded.includes('-----END PRIVATE KEY-----')) ||
-      (decoded.includes('-----BEGIN RSA PRIVATE KEY-----') &&
-        decoded.includes('-----END RSA PRIVATE KEY-----'))
-    );
-  } catch {
-    return false;
-  }
+export function validatePrivateKey(content: string): boolean {
+  return (
+    (content.includes('-----BEGIN PRIVATE KEY-----') &&
+      content.includes('-----END PRIVATE KEY-----')) ||
+    (content.includes('-----BEGIN RSA PRIVATE KEY-----') &&
+      content.includes('-----END RSA PRIVATE KEY-----'))
+  );
 }
 
 /**

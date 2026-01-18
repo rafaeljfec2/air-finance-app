@@ -54,7 +54,6 @@ export function AccountCard({
   }
 
   const Icon = accountTypes.find((t) => t.value === account.type)?.icon || Banknote;
-  const accountType = account.type as AccountType;
   
   // Verifica se o banco suporta integração
   const bankSupportsIntegration = hasBankingIntegration(account.bankCode);
@@ -92,10 +91,10 @@ export function AccountCard({
             <span
               className={cn(
                 'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border mb-2',
-                getTypeBadgeColor(accountType),
+                getTypeBadgeColor(account.type as AccountType),
               )}
             >
-              {getTypeLabel(accountType)}
+              {getTypeLabel(account.type as AccountType)}
             </span>
 
             {/* Informações em Grid */}

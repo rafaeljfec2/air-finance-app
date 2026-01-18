@@ -48,7 +48,6 @@ export function AccountTableRow({
   }
 
   const Icon = accountTypes.find((t) => t.value === account.type)?.icon || Banknote;
-  const accountType = account.type as AccountType;
 
   return (
     <tr className="border-b border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark transition-colors">
@@ -66,10 +65,10 @@ export function AccountTableRow({
               <span
                 className={cn(
                   'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border',
-                  getTypeBadgeColor(accountType),
+                  getTypeBadgeColor(account.type as AccountType),
                 )}
               >
-                {getTypeLabel(accountType)}
+                {getTypeLabel(account.type as AccountType)}
               </span>
               {account.hasBankingIntegration && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-700">

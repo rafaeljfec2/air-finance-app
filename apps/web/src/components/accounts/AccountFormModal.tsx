@@ -22,6 +22,33 @@ function getModalDescription(account: Account | null | undefined): string {
   return 'Preencha os dados da nova conta';
 }
 
+function BankingIntegrationStatus({ account }: Readonly<{ account?: Account | null }>) {
+  if (account?.hasBankingIntegration) {
+    return (
+      <div className="flex items-center gap-2">
+        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+        <p className="text-xs font-medium text-green-700 dark:text-green-300">
+          Integração Ativa - Banco Inter
+        </p>
+      </div>
+    );
+  }
+  
+  if (account) {
+    return (
+      <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
+        Configure a integração com Banco Inter
+      </p>
+    );
+  }
+  
+  return (
+    <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
+      Após criar a conta, você poderá configurar a integração
+    </p>
+  );
+}
+
 interface AccountFormModalProps {
   open: boolean;
   onClose: () => void;
@@ -160,22 +187,7 @@ export function AccountFormModal({
                 <div className="p-3 rounded-lg bg-primary-50 dark:bg-primary-900/10 border border-primary-200 dark:border-primary-800">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1">
-                      {account?.hasBankingIntegration ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                          <p className="text-xs font-medium text-green-700 dark:text-green-300">
-                            Integração Ativa - Banco Inter
-                          </p>
-                        </div>
-                      ) : account ? (
-                        <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                          Configure a integração com Banco Inter
-                        </p>
-                      ) : (
-                        <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
-                          Após criar a conta, você poderá configurar a integração
-                        </p>
-                      )}
+                      <BankingIntegrationStatus account={account} />
                     </div>
                     {account && onConfigureIntegration && (
                       <Button

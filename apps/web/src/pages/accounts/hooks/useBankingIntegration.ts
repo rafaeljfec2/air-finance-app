@@ -2,7 +2,7 @@ import { useState, useCallback, type FormEvent } from 'react';
 import { Account } from '@/services/accountService';
 import {
   setupBankingIntegration,
-  fileToBase64,
+  fileToText,
   validateCertificate,
   validatePrivateKey,
   validatePixKey,
@@ -34,8 +34,8 @@ export function useBankingIntegration({
   const [isLoading, setIsLoading] = useState(false);
   const [certificateFile, setCertificateFile] = useState<File | null>(null);
   const [privateKeyFile, setPrivateKeyFile] = useState<File | null>(null);
-  const [certificateBase64, setCertificateBase64] = useState<string>('');
-  const [privateKeyBase64, setPrivateKeyBase64] = useState<string>('');
+  const [certificateContent, setCertificateContent] = useState<string>('');
+  const [privateKeyContent, setPrivateKeyContent] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState<FormData>({
@@ -53,9 +53,9 @@ export function useBankingIntegration({
 
   const handleCertificateUpload = useCallback(async (file: File) => {
     try {
-      const base64 = await fileToBase64(file);
+      const content = await fileToText(file);
       
-      if (!validateCertificate(base64)) {
+      if (!validateCertificate(content)) {
         setErrors((prev) => ({
           ...prev,
           certificate: 'Certificado inválido. Verifique se é um arquivo .crt válido.',
@@ -64,9 +64,10 @@ export function useBankingIntegration({
       }
 
       setCertificateFile(file);
-      setCertificateBase64(base64);
+      setCertificateContent(content);
       setErrors((prev) => ({ ...prev, certificate: '' }));
     } catch (error) {
+      console.error('Error processing certificate:', error);
       setErrors((prev) => ({
         ...prev,
         certificate: 'Erro ao processar certificado.',
@@ -76,15 +77,15 @@ export function useBankingIntegration({
 
   const handleCertificateRemove = useCallback(() => {
     setCertificateFile(null);
-    setCertificateBase64('');
+    setCertificateContent('');
     setErrors((prev) => ({ ...prev, certificate: '' }));
   }, []);
 
   const handlePrivateKeyUpload = useCallback(async (file: File) => {
     try {
-      const base64 = await fileToBase64(file);
+      const content = await fileToText(file);
       
-      if (!validatePrivateKey(base64)) {
+      if (!validatePrivateKey(content)) {
         setErrors((prev) => ({
           ...prev,
           privateKey: 'Chave privada inválida. Verifique se é um arquivo .key válido.',
@@ -93,9 +94,10 @@ export function useBankingIntegration({
       }
 
       setPrivateKeyFile(file);
-      setPrivateKeyBase64(base64);
+      setPrivateKeyContent(content);
       setErrors((prev) => ({ ...prev, privateKey: '' }));
     } catch (error) {
+      console.error('Error processing private key:', error);
       setErrors((prev) => ({
         ...prev,
         privateKey: 'Erro ao processar chave privada.',
@@ -105,7 +107,7 @@ export function useBankingIntegration({
 
   const handlePrivateKeyRemove = useCallback(() => {
     setPrivateKeyFile(null);
-    setPrivateKeyBase64('');
+    setPrivateKeyContent('');
     setErrors((prev) => ({ ...prev, privateKey: '' }));
   }, []);
 
@@ -113,11 +115,11 @@ export function useBankingIntegration({
     const newErrors: Record<string, string> = {};
 
     // Validate Pix Key
-    if (!formData.pixKey.trim()) {
+    if (formData.pixKey.trim() === '') {
       newErrors.pixKey = 'Chave Pix é obrigatória';
     } else {
       const pixValidation = validatePixKey(formData.pixKey);
-      if (!pixValidation.valid) {
+      if (pixValidation.valid === false) {
         newErrors.pixKey = 'Chave Pix inválida';
       }
     }
@@ -138,18 +140,18 @@ export function useBankingIntegration({
     }
 
     // Validate Certificate
-    if (!certificateFile || !certificateBase64) {
+    if (!certificateFile || !certificateContent) {
       newErrors.certificate = 'Certificado digital é obrigatório';
     }
 
     // Validate Private Key
-    if (!privateKeyFile || !privateKeyBase64) {
+    if (!privateKeyFile || !privateKeyContent) {
       newErrors.privateKey = 'Chave privada é obrigatória';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData, certificateFile, certificateBase64, privateKeyFile, privateKeyBase64]);
+  }, [formData, certificateFile, certificateContent, privateKeyFile, privateKeyContent]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -192,8 +194,8 @@ export function useBankingIntegration({
           bankCode: formData.bankCode,
           clientId: formData.clientId,
           clientSecret: formData.clientSecret,
-          certificate: certificateBase64,
-          privateKey: privateKeyBase64,
+          certificate: certificateContent,
+          privateKey: privateKeyContent,
           accountNumber: formData.accountNumber,
         };
 
@@ -217,10 +219,12 @@ export function useBankingIntegration({
           onClose();
         }
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro ao configurar a integração bancária.';
         console.error('Error setting up banking integration:', error);
+        
         toast({
           title: 'Erro ao configurar integração',
-          description: error instanceof Error ? error.message : 'Ocorreu um erro ao configurar a integração bancária.',
+          description: errorMessage,
           type: 'error',
         });
       } finally {
@@ -233,8 +237,8 @@ export function useBankingIntegration({
       account,
       companies,
       formData,
-      certificateBase64,
-      privateKeyBase64,
+      certificateContent,
+      privateKeyContent,
       onSuccess,
       onClose,
     ],

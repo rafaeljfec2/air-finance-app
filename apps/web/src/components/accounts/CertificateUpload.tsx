@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Upload, X, FileCheck, AlertCircle } from 'lucide-react';
-import { useRef, useState, DragEvent, ChangeEvent, MouseEvent, KeyboardEvent } from 'react';
+import { useRef, useState, DragEvent, ChangeEvent, MouseEvent } from 'react';
 
 interface CertificateUploadProps {
   label: string;
@@ -72,19 +72,6 @@ export function CertificateUpload({
     }
   };
 
-  const handleClick = () => {
-    if (!disabled) {
-      inputRef.current?.click();
-    }
-  };
-
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleClick();
-    }
-  };
-
   const handleRemove = (e: MouseEvent) => {
     e.stopPropagation();
     onRemove();
@@ -99,17 +86,13 @@ export function CertificateUpload({
         {label}
       </label>
 
-      <div
-        role="button"
-        tabIndex={disabled ? -1 : 0}
+      <label
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
         className={cn(
-          'relative border-2 border-dashed rounded-lg p-3 transition-all cursor-pointer',
+          'relative border-2 border-dashed rounded-lg p-3 transition-all cursor-pointer block',
           'hover:border-primary-500 dark:hover:border-primary-400',
           'focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2',
           dragActive && 'border-primary-500 bg-primary-50 dark:bg-primary-900/10',
@@ -124,21 +107,12 @@ export function CertificateUpload({
           type="file"
           accept={accept}
           onChange={handleInputChange}
-          className="hidden"
+          className="sr-only"
           disabled={disabled}
+          aria-label={label}
         />
 
-        {!file ? (
-          <div className="flex flex-col items-center text-center">
-            <Upload className="h-6 w-6 text-gray-400 dark:text-gray-500 mb-1.5" />
-            <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
-              Clique ou arraste o arquivo
-            </p>
-            <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-              {accept.split(',').join(', ')} (máx {maxSize}MB)
-            </p>
-          </div>
-        ) : (
+        {file ? (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 flex-1 min-w-0">
               <FileCheck className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0" />
@@ -160,8 +134,18 @@ export function CertificateUpload({
               <X className="h-4 w-4" />
             </button>
           </div>
+        ) : (
+          <div className="flex flex-col items-center text-center">
+            <Upload className="h-6 w-6 text-gray-400 dark:text-gray-500 mb-1.5" />
+            <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              Clique ou arraste o arquivo
+            </p>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+              {accept.split(',').join(', ')} (máx {maxSize}MB)
+            </p>
+          </div>
         )}
-      </div>
+      </label>
 
       {error && (
         <div className="flex items-center gap-1.5 mt-1 text-red-600 dark:text-red-400">
