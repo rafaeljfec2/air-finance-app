@@ -15,6 +15,11 @@ import { createBrowserRouter } from 'react-router-dom';
 const AccountsPage = lazy(() =>
   import('@/pages/accounts').then((m) => ({ default: m.AccountsPage })),
 );
+const StatementSchedulePage = lazy(() =>
+  import('@/pages/accounts/statement-schedule/index').then((m) => ({
+    default: m.StatementSchedulePage,
+  })),
+);
 const AiClassificationPage = lazy(() =>
   import('@/pages/ai-classification').then((m) => ({ default: m.AiClassificationPage })),
 );
@@ -310,6 +315,19 @@ export const router = createBrowserRouter([
         <ProtectedRoute>
           <Suspense fallback={<SuspenseLoader />}>
             <AccountsPage />
+          </Suspense>
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/accounts/:accountId/statement-schedule',
+    element: (
+      <ErrorBoundary>
+        <ProtectedRoute>
+          <Suspense fallback={<SuspenseLoader />}>
+            <StatementSchedulePage />
           </Suspense>
         </ProtectedRoute>
       </ErrorBoundary>

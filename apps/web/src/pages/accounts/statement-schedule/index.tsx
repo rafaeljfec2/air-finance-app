@@ -1,40 +1,18 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Button } from '../ui/button';
-import { ComboBox } from '../ui/ComboBox';
-import { Modal } from '../ui/Modal';
+import { Button } from '@/components/ui/button';
+import { ComboBox } from '@/components/ui/ComboBox';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { Loading } from '@/components/Loading';
 import {
   getStatementSchedule,
   updateStatementSchedule,
   syncStatementNow,
   type StatementSchedule,
 } from '@/services/bankingIntegrationService';
-import { Calendar, Clock, Play } from 'lucide-react';
-
-interface StatementScheduleConfigProps {
-  accountId: string;
-  accountName: string;
-  open: boolean;
-  onClose: () => void;
-}
-
-// Hook to detect mobile
-function useIsMobile(): boolean {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024); // lg breakpoint
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  return isMobile;
-}
+import { Calendar, Clock, Play, ArrowLeft } from 'lucide-react';
+import { useAccounts } from '@/hooks/useAccounts';
 
 type FrequencyType = 'hourly' | 'every-4-hours' | 'daily' | 'twice-daily';
 
@@ -88,14 +66,11 @@ const timeOptions = [
   { label: '18:00', value: '18' },
 ];
 
-export function StatementScheduleConfig({
-  accountId,
-  accountName,
-  open,
-  onClose,
-}: Readonly<StatementScheduleConfigProps>) {
+export function StatementSchedulePage() {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
+  const { accountId } = useParams<{ accountId: string }>();
+  const { accounts } = useAccounts();
+
   const [schedule, setSchedule] = useState<StatementSchedule | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -105,13 +80,7 @@ export function StatementScheduleConfig({
   const [frequencyType, setFrequencyType] = useState<FrequencyType>('daily');
   const [selectedTime, setSelectedTime] = useState('8');
 
-  // Redirect to full page on mobile when opening
-  useEffect(() => {
-    if (open && isMobile) {
-      navigate(`/accounts/${accountId}/statement-schedule`);
-      onClose(); // Close modal since we're navigating
-    }
-  }, [open, isMobile, accountId, navigate, onClose]);
+  const account = accounts?.find(acc => acc.id === accountId);
 
   // Convert cron expression to user-friendly selection
   const parseCronToSelection = (cron: string | null): { type: FrequencyType; time: string } => {
@@ -121,7 +90,7 @@ export function StatementScheduleConfig({
     if (cron === '0 * * * *') return { type: 'hourly', time: '8' };
     if (cron === '0 */4 * * *') return { type: 'every-4-hours', time: '8' };
     if (cron === '0 8,18 * * *') return { type: 'twice-daily', time: '8' };
-    
+
     // Daily pattern: 0 HH * * *
     const dailyMatch = cron.match(/^0 (\d{1,2}) \* \* \*$/);
     if (dailyMatch) {
@@ -144,12 +113,14 @@ export function StatementScheduleConfig({
   };
 
   const loadSchedule = useCallback(async () => {
+    if (!accountId) return;
+
     setIsLoading(true);
     try {
       const response = await getStatementSchedule(accountId);
       setSchedule(response.data);
       setEnabled(response.data.enabled);
-      
+
       const selection = parseCronToSelection(response.data.cronExpression);
       setFrequencyType(selection.type);
       setSelectedTime(selection.time);
@@ -162,16 +133,18 @@ export function StatementScheduleConfig({
   }, [accountId]);
 
   useEffect(() => {
-    if (open && accountId) {
+    if (accountId) {
       loadSchedule();
     }
-  }, [open, accountId, loadSchedule]);
+  }, [accountId, loadSchedule]);
 
   const handleSave = async () => {
+    if (!accountId) return;
+
     setIsSaving(true);
     try {
       const cronExpression = enabled ? getCronExpression() : undefined;
-      
+
       await updateStatementSchedule(accountId, {
         enabled,
         cronExpression,
@@ -184,6 +157,7 @@ export function StatementScheduleConfig({
       );
 
       await loadSchedule();
+      navigate(-1); // Go back after save
     } catch (error) {
       console.error('Failed to update schedule:', error);
       toast.error('Erro ao atualizar configuração de sincronização');
@@ -193,6 +167,8 @@ export function StatementScheduleConfig({
   };
 
   const handleSyncNow = async () => {
+    if (!accountId) return;
+
     setIsSyncing(true);
     try {
       await syncStatementNow(accountId);
@@ -205,28 +181,60 @@ export function StatementScheduleConfig({
     }
   };
 
-  // Don't render modal on mobile (will navigate instead)
-  if (isMobile) {
-    return null;
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  if (!accountId) {
+    return (
+      <ViewDefault>
+        <div className="container mx-auto px-4 py-10">
+          <p className="text-red-500">Conta não encontrada</p>
+        </div>
+      </ViewDefault>
+    );
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Configurar Sincronização de Extrato">
-      <div className="space-y-6">
-        {/* Account Info */}
-        <div className="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-lg border border-primary-200 dark:border-primary-800">
-          <h3 className="font-semibold text-text dark:text-text-dark mb-1">{accountName}</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Configure a sincronização automática de extrato bancário
-          </p>
+    <ViewDefault>
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-2xl">
+        {/* Mobile Header with Back Button */}
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <button
+              onClick={handleBack}
+              className="lg:hidden p-2 rounded-lg text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark transition-colors"
+              aria-label="Voltar"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold text-text dark:text-text-dark">
+                Configurar Sincronização
+              </h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Configure a sincronização automática de extrato bancário
+              </p>
+            </div>
+          </div>
+
+          {/* Account Info */}
+          <div className="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-lg border border-primary-200 dark:border-primary-800">
+            <h3 className="font-semibold text-text dark:text-text-dark mb-1">
+              {account?.name || 'Conta'}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {account?.institution || 'Instituição bancária'}
+            </p>
+          </div>
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+          <div className="flex items-center justify-center py-12">
+            <Loading size="large">Carregando configuração...</Loading>
           </div>
         ) : (
-          <>
+          <div className="space-y-6">
             {/* Current Status */}
             {schedule && (
               <div className="space-y-3">
@@ -350,14 +358,15 @@ export function StatementScheduleConfig({
                   <p className="text-sm text-blue-800 dark:text-blue-200">
                     <strong>Resumo:</strong>{' '}
                     {scheduleOptions.find(opt => opt.type === frequencyType)?.label}
-                    {frequencyType === 'daily' && ` às ${timeOptions.find(t => t.value === selectedTime)?.label || '08:00'}`}
+                    {frequencyType === 'daily' &&
+                      ` às ${timeOptions.find(t => t.value === selectedTime)?.label || '08:00'}`}
                   </p>
                 </div>
               </div>
             )}
 
             {/* Actions */}
-            <div className="flex gap-3 pt-4 border-t border-border dark:border-border-dark">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border dark:border-border-dark">
               <Button
                 type="button"
                 onClick={handleSyncNow}
@@ -377,9 +386,9 @@ export function StatementScheduleConfig({
                 {isSaving ? 'Salvando...' : 'Salvar Configuração'}
               </Button>
             </div>
-          </>
+          </div>
         )}
       </div>
-    </Modal>
+    </ViewDefault>
   );
 }
