@@ -56,6 +56,24 @@ export interface AccountTenantResponse {
   data: AccountTenant;
 }
 
+export interface StatementSchedule {
+  cronExpression: string | null;
+  enabled: boolean;
+  lastSyncAt: string | null;
+  description: string;
+  isRunning?: boolean;
+}
+
+export interface StatementScheduleResponse {
+  success: boolean;
+  data: StatementSchedule;
+}
+
+export interface UpdateStatementScheduleRequest {
+  cronExpression?: string;
+  enabled: boolean;
+}
+
 // ==================== SERVICE ====================
 
 /**
@@ -78,6 +96,52 @@ export async function setupBankingIntegration(
 export async function getAccountTenant(accountId: string): Promise<AccountTenantResponse> {
   const response = await apiClient.get<AccountTenantResponse>(
     `/banking/accounts/${accountId}/tenant`,
+  );
+  return response.data;
+}
+
+/**
+ * Update statement sync schedule for an account
+ */
+export async function updateStatementSchedule(
+  accountId: string,
+  data: UpdateStatementScheduleRequest,
+): Promise<StatementScheduleResponse> {
+  const response = await apiClient.put<StatementScheduleResponse>(
+    `/banking/accounts/${accountId}/statement/schedule`,
+    data,
+  );
+  return response.data;
+}
+
+/**
+ * Get statement sync schedule for an account
+ */
+export async function getStatementSchedule(
+  accountId: string,
+): Promise<StatementScheduleResponse> {
+  const response = await apiClient.get<StatementScheduleResponse>(
+    `/banking/accounts/${accountId}/statement/schedule`,
+  );
+  return response.data;
+}
+
+/**
+ * Remove statement sync schedule for an account
+ */
+export async function removeStatementSchedule(accountId: string): Promise<{ success: boolean }> {
+  const response = await apiClient.delete<{ success: boolean }>(
+    `/banking/accounts/${accountId}/statement/schedule`,
+  );
+  return response.data;
+}
+
+/**
+ * Trigger manual statement sync
+ */
+export async function syncStatementNow(accountId: string): Promise<{ success: boolean }> {
+  const response = await apiClient.post<{ success: boolean }>(
+    `/banking/accounts/${accountId}/statement/sync-now`,
   );
   return response.data;
 }

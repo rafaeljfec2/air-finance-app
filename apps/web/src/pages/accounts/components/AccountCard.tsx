@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Account } from '@/services/accountService';
 import { formatCurrency } from '@/utils/formatters';
-import { Banknote, Landmark, Wallet, Building, Hash, MoreVertical, Edit, Trash2, Link2 } from 'lucide-react';
+import { Banknote, Landmark, Wallet, Building, Hash, MoreVertical, Edit, Trash2, Link2, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useBanks } from '@/hooks/useBanks';
@@ -34,6 +34,7 @@ interface AccountCardProps {
   onEdit: (account: Account) => void;
   onDelete: (id: string) => void;
   onConfigureIntegration?: (account: Account) => void;
+  onConfigureSchedule?: (account: Account) => void;
   isUpdating?: boolean;
   isDeleting?: boolean;
 }
@@ -43,6 +44,7 @@ export function AccountCard({
   onEdit,
   onDelete,
   onConfigureIntegration,
+  onConfigureSchedule,
   isUpdating = false,
   isDeleting = false,
 }: Readonly<AccountCardProps>) {
@@ -157,7 +159,7 @@ export function AccountCard({
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-48 p-1" align="end">
+            <PopoverContent className="w-56 p-1" align="end">
               <div className="flex flex-col gap-1">
                 {!account.hasBankingIntegration && onConfigureIntegration && bankSupportsIntegration && (
                   <button
@@ -167,6 +169,16 @@ export function AccountCard({
                   >
                     <Link2 className="h-4 w-4" />
                     Configurar Integração
+                  </button>
+                )}
+                {account.hasBankingIntegration && onConfigureSchedule && (
+                  <button
+                    onClick={() => onConfigureSchedule(account)}
+                    className="flex items-center w-full px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-blue-50 dark:hover:bg-blue-900/10 text-blue-600 dark:text-blue-400 transition-colors text-left gap-2"
+                    disabled={isUpdating || isDeleting}
+                  >
+                    <Clock className="h-4 w-4" />
+                    Sincronização Automática
                   </button>
                 )}
                 <button

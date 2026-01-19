@@ -14,6 +14,7 @@ interface AccountsListProps {
   onEdit: (account: Account) => void;
   onDelete: (id: string) => void;
   onConfigureIntegration?: (account: Account) => void;
+  onConfigureSchedule?: (account: Account) => void;
   isUpdating: boolean;
   isDeleting: boolean;
 }
@@ -26,6 +27,7 @@ export function AccountsList({
   onEdit,
   onDelete,
   onConfigureIntegration,
+  onConfigureSchedule,
   isUpdating,
   isDeleting,
 }: Readonly<AccountsListProps>) {
@@ -39,6 +41,7 @@ export function AccountsList({
             onEdit={onEdit}
             onDelete={onDelete}
             onConfigureIntegration={onConfigureIntegration}
+            onConfigureSchedule={onConfigureSchedule}
             isUpdating={isUpdating}
             isDeleting={isDeleting}
           />
@@ -97,6 +100,7 @@ export function AccountsList({
             onEdit={onEdit}
             onDelete={onDelete}
             onConfigureIntegration={onConfigureIntegration}
+            onConfigureSchedule={onConfigureSchedule}
             isUpdating={isUpdating}
             isDeleting={isDeleting}
           />

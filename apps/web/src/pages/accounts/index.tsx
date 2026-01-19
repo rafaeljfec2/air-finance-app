@@ -1,5 +1,6 @@
 import { AccountFormModal } from '@/components/accounts/AccountFormModal';
 import { BankingIntegrationModal } from '@/components/accounts/BankingIntegrationModal';
+import { StatementScheduleConfig } from '@/components/accounts/StatementScheduleConfig';
 import { Loading } from '@/components/Loading';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -38,6 +39,8 @@ export function AccountsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showBankingIntegrationModal, setShowBankingIntegrationModal] = useState(false);
   const [configuringAccount, setConfiguringAccount] = useState<Account | null>(null);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [schedulingAccount, setSchedulingAccount] = useState<Account | null>(null);
   const [viewMode, setViewMode] = useViewMode('accounts-view-mode');
 
   const {
@@ -107,6 +110,11 @@ export function AccountsPage() {
     globalThis.location.reload();
   };
 
+  const handleConfigureSchedule = (account: Account) => {
+    setSchedulingAccount(account);
+    setShowScheduleModal(true);
+  };
+
   if (isLoading) {
     return (
       <ViewDefault>
@@ -162,6 +170,7 @@ export function AccountsPage() {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onConfigureIntegration={handleConfigureIntegration}
+              onConfigureSchedule={handleConfigureSchedule}
               isUpdating={isUpdating}
               isDeleting={isDeleting}
             />
@@ -191,6 +200,18 @@ export function AccountsPage() {
           }}
           account={configuringAccount}
           onSuccess={handleBankingIntegrationSuccess}
+        />
+      )}
+
+      {schedulingAccount && (
+        <StatementScheduleConfig
+          open={showScheduleModal}
+          onClose={() => {
+            setShowScheduleModal(false);
+            setSchedulingAccount(null);
+          }}
+          accountId={schedulingAccount.id}
+          accountName={schedulingAccount.name}
         />
       )}
 
