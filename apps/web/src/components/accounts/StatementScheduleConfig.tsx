@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '../ui/select';
+import { ComboBox } from '../ui/ComboBox';
 import { Modal } from '../ui/Modal';
 import {
   getStatementSchedule,
@@ -296,21 +296,16 @@ export function StatementScheduleConfig({
                 {/* Time Selection for Daily */}
                 {frequencyType === 'daily' && (
                   <div className="space-y-2">
-                    <div className="text-sm font-medium text-text dark:text-text-dark">
-                      Horário da sincronização
-                    </div>
-                    <Select value={selectedTime} onValueChange={setSelectedTime}>
-                      <SelectTrigger className="w-full bg-card dark:bg-card-dark border-border dark:border-border-dark">
-                        <span>{timeOptions.find(t => t.value === selectedTime)?.label || '08:00'}</span>
-                      </SelectTrigger>
-                      <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
-                        {timeOptions.map((time) => (
-                          <SelectItem key={time.value} value={time.value}>
-                            {time.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <ComboBox
+                      label="Horário da sincronização"
+                      options={timeOptions.map((time) => ({
+                        value: time.value,
+                        label: time.label,
+                      }))}
+                      value={selectedTime}
+                      onValueChange={(value) => setSelectedTime(value || '8')}
+                      placeholder="Selecione o horário"
+                    />
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       Escolha o melhor horário para sincronizar seus extratos bancários
                     </p>
@@ -335,7 +330,7 @@ export function StatementScheduleConfig({
                 onClick={handleSyncNow}
                 disabled={isSyncing}
                 variant="outline"
-                className="flex-1 flex items-center justify-center gap-2"
+                className="flex-1 flex items-center justify-center gap-2 border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark hover:border-primary-300 dark:hover:border-primary-700 transition-colors"
               >
                 <Play className="h-4 w-4" />
                 {isSyncing ? 'Sincronizando...' : 'Sincronizar Agora'}
