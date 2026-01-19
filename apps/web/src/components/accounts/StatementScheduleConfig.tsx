@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '../ui/select';
 import { Modal } from '../ui/Modal';
 import {
   getStatementSchedule,
@@ -9,7 +9,7 @@ import {
   syncStatementNow,
   type StatementSchedule,
 } from '@/services/bankingIntegrationService';
-import { Calendar, Clock, Play, Info } from 'lucide-react';
+import { Calendar, Clock, Play } from 'lucide-react';
 
 interface StatementScheduleConfigProps {
   accountId: string;
@@ -18,13 +18,56 @@ interface StatementScheduleConfigProps {
   onClose: () => void;
 }
 
-const cronExamples = [
-  { label: 'A cada hora', value: '0 * * * *' },
-  { label: 'A cada 4 horas', value: '0 */4 * * *' },
-  { label: 'Diariamente às 8h', value: '0 8 * * *' },
-  { label: 'Diariamente às 12h', value: '0 12 * * *' },
-  { label: 'Diariamente às 18h', value: '0 18 * * *' },
-  { label: 'Duas vezes ao dia (8h e 18h)', value: '0 8,18 * * *' },
+type FrequencyType = 'hourly' | 'every-4-hours' | 'daily' | 'twice-daily';
+
+interface ScheduleOption {
+  type: FrequencyType;
+  label: string;
+  description: string;
+  cronExpression: string;
+  requiresTime?: boolean;
+}
+
+const scheduleOptions: ScheduleOption[] = [
+  {
+    type: 'hourly',
+    label: 'A cada hora',
+    description: 'Sincroniza automaticamente a cada hora',
+    cronExpression: '0 * * * *',
+  },
+  {
+    type: 'every-4-hours',
+    label: 'A cada 4 horas',
+    description: 'Sincroniza 6 vezes ao dia (00h, 04h, 08h, 12h, 16h, 20h)',
+    cronExpression: '0 */4 * * *',
+  },
+  {
+    type: 'daily',
+    label: 'Uma vez por dia',
+    description: 'Escolha o melhor horário para sincronizar',
+    cronExpression: '0 8 * * *',
+    requiresTime: true,
+  },
+  {
+    type: 'twice-daily',
+    label: 'Duas vezes por dia',
+    description: 'Sincroniza de manhã e à tarde',
+    cronExpression: '0 8,18 * * *',
+  },
+];
+
+const timeOptions = [
+  { label: '08:00', value: '8' },
+  { label: '09:00', value: '9' },
+  { label: '10:00', value: '10' },
+  { label: '11:00', value: '11' },
+  { label: '12:00', value: '12' },
+  { label: '13:00', value: '13' },
+  { label: '14:00', value: '14' },
+  { label: '15:00', value: '15' },
+  { label: '16:00', value: '16' },
+  { label: '17:00', value: '17' },
+  { label: '18:00', value: '18' },
 ];
 
 export function StatementScheduleConfig({
@@ -39,7 +82,38 @@ export function StatementScheduleConfig({
   const [isSyncing, setIsSyncing] = useState(false);
 
   const [enabled, setEnabled] = useState(false);
-  const [cronExpression, setCronExpression] = useState('0 8 * * *');
+  const [frequencyType, setFrequencyType] = useState<FrequencyType>('daily');
+  const [selectedTime, setSelectedTime] = useState('8');
+
+  // Convert cron expression to user-friendly selection
+  const parseCronToSelection = (cron: string | null): { type: FrequencyType; time: string } => {
+    if (!cron) return { type: 'daily', time: '8' };
+
+    // Match common patterns
+    if (cron === '0 * * * *') return { type: 'hourly', time: '8' };
+    if (cron === '0 */4 * * *') return { type: 'every-4-hours', time: '8' };
+    if (cron === '0 8,18 * * *') return { type: 'twice-daily', time: '8' };
+    
+    // Daily pattern: 0 HH * * *
+    const dailyMatch = cron.match(/^0 (\d{1,2}) \* \* \*$/);
+    if (dailyMatch) {
+      return { type: 'daily', time: dailyMatch[1] };
+    }
+
+    return { type: 'daily', time: '8' };
+  };
+
+  // Convert selection to cron expression
+  const getCronExpression = (): string => {
+    const option = scheduleOptions.find(opt => opt.type === frequencyType);
+    if (!option) return '0 8 * * *';
+
+    if (option.type === 'daily') {
+      return `0 ${selectedTime} * * *`;
+    }
+
+    return option.cronExpression;
+  };
 
   const loadSchedule = useCallback(async () => {
     setIsLoading(true);
@@ -47,7 +121,10 @@ export function StatementScheduleConfig({
       const response = await getStatementSchedule(accountId);
       setSchedule(response.data);
       setEnabled(response.data.enabled);
-      setCronExpression(response.data.cronExpression || '0 8 * * *');
+      
+      const selection = parseCronToSelection(response.data.cronExpression);
+      setFrequencyType(selection.type);
+      setSelectedTime(selection.time);
     } catch (error) {
       console.error('Failed to load schedule:', error);
       toast.error('Erro ao carregar configuração de sincronização');
@@ -63,16 +140,13 @@ export function StatementScheduleConfig({
   }, [open, accountId, loadSchedule]);
 
   const handleSave = async () => {
-    if (enabled && !cronExpression.trim()) {
-      toast.error('Expressão Cron é obrigatória quando a sincronização está habilitada');
-      return;
-    }
-
     setIsSaving(true);
     try {
+      const cronExpression = enabled ? getCronExpression() : undefined;
+      
       await updateStatementSchedule(accountId, {
         enabled,
-        cronExpression: enabled ? cronExpression : undefined,
+        cronExpression,
       });
 
       toast.success(
@@ -174,54 +248,82 @@ export function StatementScheduleConfig({
               </label>
             </div>
 
-            {/* Cron Expression Input */}
+            {/* Schedule Configuration */}
             {enabled && (
-              <div className="space-y-3">
-                <div className="space-y-2">
-                  <label
-                    htmlFor="cron-expression-input"
-                    className="text-sm font-medium text-text dark:text-text-dark"
-                  >
-                    Expressão Cron
-                  </label>
-                  <Input
-                    id="cron-expression-input"
-                    type="text"
-                    value={cronExpression}
-                    onChange={(e) => setCronExpression(e.target.value)}
-                    placeholder="0 8 * * *"
-                    className="font-mono"
-                  />
-                  <div className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
-                    <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
-                    <span>Formato: minuto hora dia mês dia-da-semana</span>
-                  </div>
-                </div>
-
-                {/* Quick Examples */}
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="text-sm font-medium text-text dark:text-text-dark">
-                    Exemplos rápidos:
+                    Frequência de sincronização
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {cronExamples.map((example) => (
+                  <div className="space-y-2">
+                    {scheduleOptions.map((option) => (
                       <button
-                        key={example.value}
+                        key={option.type}
                         type="button"
-                        onClick={() => setCronExpression(example.value)}
-                        className={`px-3 py-2 text-xs rounded-lg border transition-colors text-left ${
-                          cronExpression === example.value
-                            ? 'bg-primary-100 dark:bg-primary-900/30 border-primary-500 text-primary-700 dark:text-primary-300'
-                            : 'bg-background dark:bg-background-dark border-border dark:border-border-dark text-gray-700 dark:text-gray-300 hover:border-primary-300 dark:hover:border-primary-700'
+                        onClick={() => setFrequencyType(option.type)}
+                        className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                          frequencyType === option.type
+                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                            : 'border-border dark:border-border-dark bg-background dark:bg-background-dark hover:border-primary-300 dark:hover:border-primary-700'
                         }`}
                       >
-                        <div className="font-medium">{example.label}</div>
-                        <div className="text-gray-500 dark:text-gray-400 font-mono mt-0.5">
-                          {example.value}
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1">
+                            <div className="font-semibold text-text dark:text-text-dark mb-1">
+                              {option.label}
+                            </div>
+                            <div className="text-sm text-gray-600 dark:text-gray-400">
+                              {option.description}
+                            </div>
+                          </div>
+                          <div
+                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                              frequencyType === option.type
+                                ? 'border-primary-500 bg-primary-500'
+                                : 'border-gray-300 dark:border-gray-600'
+                            }`}
+                          >
+                            {frequencyType === option.type && (
+                              <div className="w-2 h-2 rounded-full bg-white" />
+                            )}
+                          </div>
                         </div>
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* Time Selection for Daily */}
+                {frequencyType === 'daily' && (
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-text dark:text-text-dark">
+                      Horário da sincronização
+                    </div>
+                    <Select value={selectedTime} onValueChange={setSelectedTime}>
+                      <SelectTrigger className="w-full bg-card dark:bg-card-dark border-border dark:border-border-dark">
+                        <span>{timeOptions.find(t => t.value === selectedTime)?.label || '08:00'}</span>
+                      </SelectTrigger>
+                      <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+                        {timeOptions.map((time) => (
+                          <SelectItem key={time.value} value={time.value}>
+                            {time.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Escolha o melhor horário para sincronizar seus extratos bancários
+                    </p>
+                  </div>
+                )}
+
+                {/* Summary */}
+                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>Resumo:</strong>{' '}
+                    {scheduleOptions.find(opt => opt.type === frequencyType)?.label}
+                    {frequencyType === 'daily' && ` às ${timeOptions.find(t => t.value === selectedTime)?.label || '08:00'}`}
+                  </p>
                 </div>
               </div>
             )}

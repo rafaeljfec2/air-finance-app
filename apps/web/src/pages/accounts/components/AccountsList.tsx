@@ -82,6 +82,8 @@ export function AccountsList({
                   account={account}
                   onEdit={onEdit}
                   onDelete={onDelete}
+                  onConfigureIntegration={onConfigureIntegration}
+                  onConfigureSchedule={onConfigureSchedule}
                   isUpdating={isUpdating}
                   isDeleting={isDeleting}
                 />
