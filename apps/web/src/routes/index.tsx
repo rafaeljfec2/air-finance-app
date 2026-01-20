@@ -148,6 +148,12 @@ const LandingPageV2 = lazy(() =>
   })),
 );
 
+const PierreFinanceConfigPage = lazy(() =>
+  import('@/pages/pierre-finance-config').then((m) => ({
+    default: m.PierreFinanceConfigPage,
+  })),
+);
+
 /**
  * Helper function to create protected routes with common wrappers
  */
@@ -222,6 +228,7 @@ export const router = createBrowserRouter([
   // ==================== PUBLIC ROUTES ====================
   createPublicRoute('/', LandingPageV2),
   createPublicRoute('/landing-v2', LandingPageV2),
+  createPublicRoute('/pierre-finance-config', PierreFinanceConfigPage),
   {
     path: '/login',
     element: <Login />,

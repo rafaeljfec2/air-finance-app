@@ -27,6 +27,8 @@ const plans = [
       'Contas ilimitadas',
       'Cartões ilimitados',
       'Importação OFX',
+      'Exclusivo para CPF',
+      'Integração Open Finance via Pierre Finance',
     ],
     cta: 'Começar Agora',
     popular: true,
@@ -39,7 +41,7 @@ const plans = [
     period: '/mês',
     features: [
       'Tudo do plano Pro',
-      'Integração Bancária Automática (Inter)',
+      'Integração bancária via API do Inter',
       'Gestão Multi-empresas (CNPJ)',
       'Múltiplos usuários e permissões',
       'Conciliação bancária automática',

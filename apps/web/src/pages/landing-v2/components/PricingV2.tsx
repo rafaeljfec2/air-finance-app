@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react';
+import { Check, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const plans = [
@@ -28,6 +28,8 @@ const plans = [
       'Relatório avançado',
       'Metas de economia',
       'Exportação de dados',
+      'Exclusivo para CPF',
+      'Integração Open Finance via Pierre Finance',
     ],
     cta: 'Escolher este plano',
     popular: true,
@@ -39,6 +41,7 @@ const plans = [
     period: '/mês',
     features: [
       'Tudo do plano Pro',
+      'Integração bancária via API do Inter',
       'Múltiplos usuários',
       'Compartilhamento de conta',
       'Metas compartilhadas',
@@ -111,9 +114,9 @@ export function PricingV2() {
                 </div>
               </div>
 
-              <ul className="space-y-4 v2-mb-10 flex-grow">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-3">
+              <ul className="space-y-4 v2-mb-6 flex-grow">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#d1fae5] flex items-center justify-center mt-0.5">
                       <Check className="w-4 h-4 text-[#10b981]" />
                     </div>
@@ -121,6 +124,43 @@ export function PricingV2() {
                   </li>
                 ))}
               </ul>
+
+              {/* Pierre Finance Pro Highlight for Pro Plan */}
+              {plan.id === 'pro' && (
+                <div className="v2-mb-6 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center mt-0.5">
+                      <span className="text-white font-bold text-xs">P</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-gray-900 mb-1">
+                        Pierre Finance Pro
+                      </p>
+                      <p className="text-xs text-gray-600 mb-2">
+                        Custo adicional de <span className="font-bold text-blue-600">R$ 39/mês</span> pago diretamente ao Pierre Finance
+                      </p>
+                      <div className="flex flex-col gap-2">
+                        <a
+                          href="https://pierre.finance/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                        >
+                          Saiba mais sobre o Pierre Finance Pro
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                        <Link
+                          to="/pierre-finance-config"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                        >
+                          Saiba como configurar
+                          <ExternalLink className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <Link to="/register" className="w-full">
                 <button
