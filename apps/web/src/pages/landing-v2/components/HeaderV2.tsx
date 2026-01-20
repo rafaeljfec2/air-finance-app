@@ -1,9 +1,10 @@
 import { Logo } from '@/components/Logo';
-import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 
 export function HeaderV2() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -14,6 +15,21 @@ export function HeaderV2() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
+    e.preventDefault();
+    if (location.pathname === '/') {
+      const element = document.querySelector(hash);
+      element?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/');
+      // Small timeout to allow navigation to complete before scrolling
+      setTimeout(() => {
+        const element = document.querySelector(hash);
+        element?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
 
   return (
     <header
@@ -36,9 +52,39 @@ export function HeaderV2() {
         >
           <Logo />
         </button>
+        <nav
+          className="hidden md:flex items-center space-x-6 lg:space-x-8"
+          role="navigation"
+          aria-label="Navegação principal"
+        >
+          <a
+            href="#features"
+            onClick={(e) => handleNavClick(e, '#features')}
+            className="text-gray-700 hover:text-[#10b981] transition-colors font-medium text-sm lg:text-base"
+            aria-label="Ir para seção de Recursos"
+          >
+            Recursos
+          </a>
+          <a
+            href="#pricing"
+            onClick={(e) => handleNavClick(e, '#pricing')}
+            className="text-gray-700 hover:text-[#10b981] transition-colors font-medium text-sm lg:text-base"
+            aria-label="Ir para seção de Planos"
+          >
+            Planos
+          </a>
+          <button
+            onClick={() => navigate('/login')}
+            className="px-4 lg:px-6 py-2 lg:py-2.5 rounded-xl font-semibold text-[#10b981] border-2 border-[#10b981] hover:bg-[#10b981] hover:text-white transition-all duration-300 hover:scale-105 active:scale-95 text-sm lg:text-base"
+            aria-label="Entrar na aplicação"
+          >
+            Entrar
+          </button>
+        </nav>
+        {/* Mobile menu button - show only on mobile */}
         <button
           onClick={() => navigate('/login')}
-          className="px-6 py-2.5 rounded-xl font-semibold text-[#10b981] border-2 border-[#10b981] hover:bg-[#10b981] hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
+          className="md:hidden px-4 py-2 rounded-xl font-semibold text-[#10b981] border-2 border-[#10b981] hover:bg-[#10b981] hover:text-white transition-all duration-300 text-sm"
           aria-label="Entrar na aplicação"
         >
           Entrar

@@ -23,11 +23,12 @@ const plans = [
     period: '/mês',
     features: [
       'Tudo do plano Gratuito',
-      'Contas bancárias ilimitadas',
-      'Cartões ilimitados',
+      'Até 5 contas bancárias',
+      'Até 2 cartões de crédito',
       'Relatório avançado',
       'Metas de economia',
       'Exportação de dados',
+      'Insights gerados por IA',
       'Exclusivo para CPF',
       'Integração Open Finance via Pierre Finance',
     ],
@@ -42,6 +43,7 @@ const plans = [
     features: [
       'Tudo do plano Pro',
       'Integração bancária via API do Inter',
+      'Insights gerados por IA',
       'Múltiplos usuários',
       'Compartilhamento de conta',
       'Metas compartilhadas',
@@ -84,62 +86,62 @@ export function PricingV2() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.id}
               className={`v2-card flex flex-col relative transition-all duration-300 ${
                 plan.popular
-                  ? 'border-2 border-[#10b981] shadow-xl scale-105'
-                  : 'hover:border-[#10b981]/50 hover:shadow-lg'
+                  ? 'border-2 border-[#10b981] shadow-lg'
+                  : 'hover:border-[#10b981]/50 hover:shadow-md'
               }`}
             >
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#10b981] to-[#059669] text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#10b981] to-[#059669] text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
                   Mais popular
                 </div>
               )}
               
-              <div className="v2-mb-6">
-                <h3 className="v2-h3 v2-mb-2">{plan.name}</h3>
+              <div className="mb-4">
+                <h3 className="text-2xl font-bold text-gray-900">{plan.name}</h3>
               </div>
               
-              <div className="v2-mb-8">
+              <div className="mb-5">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-6xl font-bold text-gray-900">{plan.price}</span>
+                  <span className="text-5xl font-bold text-gray-900">{plan.price}</span>
                   <span className="text-2xl font-semibold text-gray-500">,90</span>
                   {plan.period && (
-                    <span className="text-lg text-gray-500 ml-2">{plan.period}</span>
+                    <span className="text-base text-gray-500 ml-1.5">{plan.period}</span>
                   )}
                 </div>
               </div>
 
-              <ul className="space-y-4 v2-mb-6 flex-grow">
+              <ul className="space-y-2.5 mb-5 flex-grow">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#d1fae5] flex items-center justify-center mt-0.5">
-                      <Check className="w-4 h-4 text-[#10b981]" />
+                  <li key={feature} className="flex items-start gap-2">
+                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[#d1fae5] flex items-center justify-center mt-0.5">
+                      <Check className="w-3.5 h-3.5 text-[#10b981]" />
                     </div>
-                    <span className="text-gray-700 leading-relaxed">{feature}</span>
+                    <span className="text-base text-gray-700 leading-snug">{feature}</span>
                   </li>
                 ))}
               </ul>
 
               {/* Pierre Finance Pro Highlight for Pro Plan */}
               {plan.id === 'pro' && (
-                <div className="v2-mb-6 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center mt-0.5">
-                      <span className="text-white font-bold text-xs">P</span>
+                <div className="mb-5 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
+                  <div className="flex items-start gap-2">
+                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center mt-0.5">
+                      <span className="text-white font-bold text-[11px]">P</span>
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-900 mb-1">
+                      <p className="text-sm font-semibold text-gray-900 mb-0.5">
                         Pierre Finance Pro
                       </p>
-                      <p className="text-xs text-gray-600 mb-2">
+                      <p className="text-xs text-gray-600 mb-1.5">
                         Custo adicional de <span className="font-bold text-blue-600">R$ 39/mês</span> pago diretamente ao Pierre Finance
                       </p>
-                      <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-1">
                         <a
                           href="https://pierre.finance/"
                           target="_blank"
@@ -164,10 +166,10 @@ export function PricingV2() {
 
               <Link to="/register" className="w-full">
                 <button
-                  className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
+                  className={`w-full py-3 rounded-lg font-semibold text-base transition-all duration-300 ${
                     plan.popular
-                      ? 'bg-gradient-to-r from-[#10b981] to-[#059669] text-white hover:shadow-xl hover:scale-105'
-                      : 'bg-gray-900 text-white hover:bg-gray-800 hover:shadow-lg'
+                      ? 'bg-gradient-to-r from-[#10b981] to-[#059669] text-white hover:shadow-lg hover:scale-[1.02]'
+                      : 'bg-gray-900 text-white hover:bg-gray-800 hover:shadow-md'
                   }`}
                   aria-label={`${plan.cta} - Plano ${plan.name}`}
                 >

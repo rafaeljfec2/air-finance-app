@@ -33,8 +33,10 @@ export function FinancialDashboard() {
                 <span className="text-xs font-semibold">+12%</span>
               </div>
             </div>
-            <div className="text-4xl font-bold text-green-700">R$ 15.000</div>
-            <div className="text-sm text-green-600 mt-1">,00</div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-bold text-green-700">R$ 15.000</span>
+              <span className="text-2xl font-semibold text-green-600">,00</span>
+            </div>
           </div>
           
           <div className="p-8 bg-gradient-to-br from-red-50 to-red-100/50">
@@ -46,8 +48,10 @@ export function FinancialDashboard() {
                 <span className="text-sm font-semibold text-red-700">Despesas</span>
               </div>
             </div>
-            <div className="text-4xl font-bold text-red-700">R$ 2.550</div>
-            <div className="text-sm text-red-600 mt-1">,00</div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-bold text-red-700">R$ 2.550</span>
+              <span className="text-2xl font-semibold text-red-600">,00</span>
+            </div>
           </div>
         </div>
       </div>

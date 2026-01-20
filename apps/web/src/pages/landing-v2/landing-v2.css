@@ -117,8 +117,8 @@
 .v2-card {
   background: var(--v2-bg);
   border: 1px solid var(--v2-border);
-  border-radius: 20px;
-  padding: 40px;
+  border-radius: 16px;
+  padding: 24px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

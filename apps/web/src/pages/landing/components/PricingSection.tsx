@@ -24,9 +24,10 @@ const plans = [
     features: [
       'Tudo do Free',
       'IA Ilimitada',
-      'Contas ilimitadas',
-      'Cartões ilimitados',
+      'Até 5 contas bancárias',
+      'Até 2 cartões de crédito',
       'Importação OFX',
+      'Insights gerados por IA',
       'Exclusivo para CPF',
       'Integração Open Finance via Pierre Finance',
     ],
@@ -42,6 +43,7 @@ const plans = [
     features: [
       'Tudo do plano Pro',
       'Integração bancária via API do Inter',
+      'Insights gerados por IA',
       'Gestão Multi-empresas (CNPJ)',
       'Múltiplos usuários e permissões',
       'Conciliação bancária automática',
