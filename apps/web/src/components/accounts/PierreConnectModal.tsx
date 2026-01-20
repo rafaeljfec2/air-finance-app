@@ -10,6 +10,7 @@ interface PierreConnectModalProps {
   open: boolean;
   onClose: () => void;
   companyId: string;
+  pierreFinanceTenantId?: string;
   onSuccess?: () => void;
 }
 
@@ -17,6 +18,7 @@ export function PierreConnectModal({
   open,
   onClose,
   companyId,
+  pierreFinanceTenantId,
   onSuccess,
 }: Readonly<PierreConnectModalProps>) {
   const {
@@ -32,7 +34,7 @@ export function PierreConnectModal({
     handleToggleAccount,
     handleSelectAll,
     handleImport,
-  } = usePierreIntegration({ companyId, onSuccess });
+  } = usePierreIntegration({ companyId, pierreFinanceTenantId, onSuccess });
 
   const handleClose = () => {
     if (!isConnecting && !isImporting) {
@@ -79,27 +81,29 @@ export function PierreConnectModal({
         {/* Content */}
         <div className="px-6 py-4 min-h-0">
           <div className="space-y-4">
-            {/* Info Alert */}
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800">
-              <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-              <div className="flex-1 text-xs text-blue-800 dark:text-blue-300">
-                <p className="font-semibold mb-1.5">Como obter sua API Key</p>
-                <ol className="list-decimal list-inside space-y-0.5 text-blue-700 dark:text-blue-400">
-                  <li>Acesse o Pierre Finance e faça login</li>
-                  <li>Vá em Configurações → API & Integrações</li>
-                  <li>Crie ou copie sua API Key (formato: sk-xxx)</li>
-                </ol>
-                <a
-                  href="https://www.pierre.finance/api-key"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-medium"
-                >
-                  Acessar Pierre Finance
-                  <ExternalLink className="h-3 w-3" />
-                </a>
+            {/* Info Alert - Only show when not connected */}
+            {!tenantId && (
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800">
+                <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                <div className="flex-1 text-xs text-blue-800 dark:text-blue-300">
+                  <p className="font-semibold mb-1.5">Como obter sua API Key</p>
+                  <ol className="list-decimal list-inside space-y-0.5 text-blue-700 dark:text-blue-400">
+                    <li>Acesse o Pierre Finance e faça login</li>
+                    <li>Vá em Configurações → API & Integrações</li>
+                    <li>Crie ou copie sua API Key (formato: sk-xxx)</li>
+                  </ol>
+                  <a
+                    href="https://www.pierre.finance/api-key"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-medium"
+                  >
+                    Acessar Pierre Finance
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
               </div>
-            </div>
+            )}
 
             {!tenantId ? (
               /* Step 1: API Key Input */

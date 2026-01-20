@@ -3,32 +3,70 @@ import { toast } from 'sonner';
 import {
   connectPierre,
   importPierreAccounts,
+  getPierreAccounts,
   type PierreAccount,
 } from '@/services/bankingIntegrationService';
 
 interface UsePierreIntegrationProps {
   companyId: string;
+  pierreFinanceTenantId?: string;
   onSuccess?: () => void;
 }
 
-export function usePierreIntegration({ companyId, onSuccess }: UsePierreIntegrationProps) {
+export function usePierreIntegration({
+  companyId,
+  pierreFinanceTenantId,
+  onSuccess,
+}: UsePierreIntegrationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [apiKey, setApiKey] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
-  const [tenantId, setTenantId] = useState<string | null>(null);
+  const [isLoadingAccounts, setIsLoadingAccounts] = useState(false);
+  const [tenantId, setTenantId] = useState<string | null>(pierreFinanceTenantId || null);
   const [accounts, setAccounts] = useState<PierreAccount[]>([]);
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const handleOpen = useCallback(() => {
+  const handleOpen = useCallback(async () => {
     setIsOpen(true);
     setApiKey('');
-    setTenantId(null);
-    setAccounts([]);
     setSelectedAccountIds([]);
     setError(null);
-  }, []);
+
+    // Se já tem tenant configurado, carregar contas automaticamente
+    if (pierreFinanceTenantId) {
+      setTenantId(pierreFinanceTenantId);
+      setIsLoadingAccounts(true);
+
+      try {
+        const response = await getPierreAccounts(companyId);
+
+        if (response.success) {
+          setAccounts(response.data);
+
+          if (response.data.length === 0) {
+            toast.warning('Nenhuma conta encontrada no Pierre Finance');
+          }
+        } else {
+          setError('Erro ao carregar contas do Pierre Finance');
+          toast.error('Erro ao carregar contas do Pierre Finance');
+        }
+      } catch (err: unknown) {
+        const error = err as { response?: { data?: { message?: string } } };
+        const errorMessage =
+          error.response?.data?.message || 'Erro ao carregar contas do Pierre Finance';
+        setError(errorMessage);
+        toast.error(errorMessage);
+        console.error('Error loading Pierre accounts:', err);
+      } finally {
+        setIsLoadingAccounts(false);
+      }
+    } else {
+      setTenantId(null);
+      setAccounts([]);
+    }
+  }, [companyId, pierreFinanceTenantId]);
 
   const handleClose = useCallback(() => {
     if (!isConnecting && !isImporting) {
@@ -42,7 +80,7 @@ export function usePierreIntegration({ companyId, onSuccess }: UsePierreIntegrat
   }, [isConnecting, isImporting]);
 
   const handleConnect = useCallback(async () => {
-    if (!apiKey || !apiKey.startsWith('sk-')) {
+    if (!apiKey?.startsWith('sk-')) {
       setError('API Key inválida. Deve começar com "sk-"');
       return;
     }
@@ -62,6 +100,10 @@ export function usePierreIntegration({ companyId, onSuccess }: UsePierreIntegrat
         } else {
           toast.success(`${response.data.accounts.length} conta(s) encontrada(s)`);
         }
+
+        // Reload company to get updated pierreFinanceTenantId
+        // This ensures the modal will show accounts directly next time
+        onSuccess?.();
       } else {
         setError('Erro ao conectar com Pierre Finance');
         toast.error('Erro ao conectar com Pierre Finance');
@@ -76,7 +118,7 @@ export function usePierreIntegration({ companyId, onSuccess }: UsePierreIntegrat
     } finally {
       setIsConnecting(false);
     }
-  }, [apiKey, companyId]);
+  }, [apiKey, companyId, onSuccess]);
 
   const handleToggleAccount = useCallback((accountId: string) => {
     setSelectedAccountIds((prev) => {
@@ -96,7 +138,7 @@ export function usePierreIntegration({ companyId, onSuccess }: UsePierreIntegrat
   }, [accounts, selectedAccountIds.length]);
 
   const handleImport = useCallback(async () => {
-    if (!tenantId || selectedAccountIds.length === 0) {
+    if (selectedAccountIds.length === 0) {
       toast.error('Selecione pelo menos uma conta para importar');
       return;
     }
@@ -105,7 +147,7 @@ export function usePierreIntegration({ companyId, onSuccess }: UsePierreIntegrat
     setError(null);
 
     try {
-      const response = await importPierreAccounts(tenantId, companyId, selectedAccountIds);
+      const response = await importPierreAccounts(companyId, selectedAccountIds);
 
       if (response.success) {
         toast.success(`${response.data.imported} conta(s) importada(s) com sucesso!`);
@@ -124,13 +166,14 @@ export function usePierreIntegration({ companyId, onSuccess }: UsePierreIntegrat
     } finally {
       setIsImporting(false);
     }
-  }, [tenantId, companyId, selectedAccountIds, onSuccess]);
+  }, [companyId, selectedAccountIds, onSuccess]);
 
   return {
     isOpen,
     apiKey,
     isConnecting,
     isImporting,
+    isLoadingAccounts,
     tenantId,
     accounts,
     selectedAccountIds,

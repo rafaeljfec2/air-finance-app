@@ -15,13 +15,21 @@ const initialState: Pick<CompanyStore, 'activeCompany'> = {
 
 /**
  * Removes sensitive fields from company data before persisting to localStorage
+ * 
+ * This function automatically includes ALL company fields except userIds.
+ * New fields added to the Company interface (like pierreFinanceTenantId) 
+ * are automatically included in localStorage without code changes.
+ * 
  * @param company - The company object to sanitize for storage
- * @returns Company object without sensitive fields (userIds)
+ * @returns Company object without sensitive fields (userIds removed)
  */
 function sanitizeCompanyForStorage(company: Company | null): Partial<Company> | null {
   if (!company) return null;
 
   // Create a copy and remove sensitive fields (userIds is intentionally unused)
+  // The spread operator automatically includes all fields like:
+  // - id, name, cnpj, documentType, type, foundationDate, etc.
+  // - pierreFinanceTenantId (automatically included)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { userIds, ...safeCompany } = company;
   return safeCompany;

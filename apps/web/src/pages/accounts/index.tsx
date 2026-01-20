@@ -133,8 +133,17 @@ export function AccountsPage() {
     setShowPierreModal(true);
   };
 
-  const handlePierreSuccess = () => {
-    // Refresh accounts list after Pierre import
+  const handlePierreSuccess = async () => {
+    // Refresh company to get updated pierreFinanceTenantId
+    if (activeCompany?.id) {
+      try {
+        const updatedCompany = await companyService.getById(activeCompany.id);
+        setActiveCompany(updatedCompany);
+      } catch (err) {
+        console.error('Failed to refresh company data:', err);
+      }
+    }
+    // Refresh accounts list after Pierre import/connect
     globalThis.location.reload();
   };
 
@@ -250,6 +259,7 @@ export function AccountsPage() {
           open={showPierreModal}
           onClose={() => setShowPierreModal(false)}
           companyId={activeCompany.id}
+          pierreFinanceTenantId={activeCompany.pierreFinanceTenantId}
           onSuccess={handlePierreSuccess}
         />
       )}

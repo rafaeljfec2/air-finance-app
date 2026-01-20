@@ -68,10 +68,9 @@ export const updateCreditCard = async (
   data: Partial<CreateCreditCardPayload>,
 ): Promise<CreditCard> => {
   try {
-    const validatedData = CreditCardSchema.partial().parse(data);
     const response = await apiClient.put<CreditCard>(
       `/companies/${companyId}/credit-cards/${id}`,
-      validatedData,
+      data,
     );
     return CreditCardSchema.parse(response.data);
   } catch (error) {

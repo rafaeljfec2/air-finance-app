@@ -26,7 +26,7 @@ const bankTypes = [
 
 const dueDates = Array.from({ length: 31 }, (_, i) => ({
   value: i + 1,
-  label: `${i + 1}${i + 1 === 1 ? 'º' : 'º'} dia`,
+  label: `${i + 1}º dia`,
 }));
 
 interface CreditCardFormModalProps {
@@ -56,7 +56,7 @@ export function CreditCardFormModal({
       dueDay: 10,
       color: '#8A05BE',
       icon: 'CreditCard',
-      bankCode: undefined,
+      bankCode: '',
       companyId: activeCompany?.id || '',
     }),
     [activeCompany],
@@ -76,7 +76,7 @@ export function CreditCardFormModal({
         dueDay: creditCard.dueDay,
         color: creditCard.color,
         icon: creditCard.icon,
-        bankCode: creditCard.bankCode ?? undefined,
+        bankCode: creditCard.bankCode ?? '',
         companyId: creditCard.companyId,
       });
       setLimitInput(
@@ -106,7 +106,12 @@ export function CreditCardFormModal({
   };
 
   const handleBankChange = (bankCode: string | null) => {
-    setForm((prev) => ({ ...prev, bankCode: bankCode || undefined }));
+    console.log('🏦 [CreditCardForm] Bank changed:', { bankCode });
+    setForm((prev) => {
+      const newForm = { ...prev, bankCode: bankCode ?? '' };
+      console.log('🏦 [CreditCardForm] New form after bank change:', newForm);
+      return newForm;
+    });
   };
 
   const validate = () => {
@@ -123,7 +128,41 @@ export function CreditCardFormModal({
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    onSubmit(form);
+    // Preparar dados para envio - garantir que bankCode e accountNumber sejam incluídos
+    const submitData: CreateCreditCardPayload = {
+      name: form.name,
+      limit: form.limit,
+      closingDay: form.closingDay,
+      dueDay: form.dueDay,
+      color: form.color,
+      icon: form.icon,
+      companyId: form.companyId,
+    };
+
+    // Incluir accountNumber e bankCode apenas se tiverem valores não vazios
+    console.log('🔍 [Form] Before adding optional fields:', {
+      accountNumber: form.accountNumber,
+      bankCode: form.bankCode,
+      trimmedAccountNumber: form.accountNumber?.trim(),
+      trimmedBankCode: form.bankCode?.trim(),
+    });
+
+    if (form.accountNumber && form.accountNumber.trim() !== '') {
+      submitData.accountNumber = form.accountNumber;
+      console.log('✅ [Form] Adding accountNumber:', form.accountNumber);
+    } else {
+      console.log('⚠️ [Form] Skipping accountNumber (empty or null)');
+    }
+    
+    if (form.bankCode && form.bankCode.trim() !== '') {
+      submitData.bankCode = form.bankCode;
+      console.log('✅ [Form] Adding bankCode:', form.bankCode);
+    } else {
+      console.log('⚠️ [Form] Skipping bankCode (empty or null)');
+    }
+
+    console.log('📤 [Form] Final submitData:', submitData);
+    onSubmit(submitData);
     onClose();
     setForm({
       ...initialFormState,

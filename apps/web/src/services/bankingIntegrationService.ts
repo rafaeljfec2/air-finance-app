@@ -285,7 +285,7 @@ export async function connectPierre(
 /**
  * Get Pierre Finance accounts
  */
-export async function getPierreAccounts(tenantId: string): Promise<{
+export async function getPierreAccounts(companyId: string): Promise<{
   success: boolean;
   data: PierreAccount[];
   count: number;
@@ -294,7 +294,7 @@ export async function getPierreAccounts(tenantId: string): Promise<{
     success: boolean;
     data: PierreAccount[];
     count: number;
-  }>(`/banking/pierre/accounts?tenantId=${tenantId}`);
+  }>(`/banking/pierre/accounts?companyId=${companyId}`);
   return response.data;
 }
 
@@ -302,12 +302,11 @@ export async function getPierreAccounts(tenantId: string): Promise<{
  * Import selected Pierre Finance accounts
  */
 export async function importPierreAccounts(
-  tenantId: string,
   companyId: string,
   accountIds: string[],
 ): Promise<ImportPierreAccountsResponse> {
   const response = await apiClient.post<ImportPierreAccountsResponse>(
-    `/banking/pierre/import-accounts?tenantId=${tenantId}&companyId=${companyId}`,
+    `/banking/pierre/import-accounts?companyId=${companyId}`,
     { accountIds },
   );
   return response.data;

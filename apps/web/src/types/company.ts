@@ -10,6 +10,7 @@ export interface Company {
   address?: string;
   notes?: string;
   userIds: string[];
+  pierreFinanceTenantId?: string;
   createdAt: string;
   updatedAt: string;
 }
