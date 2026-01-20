@@ -77,6 +77,7 @@ function transformCompanyData(company: Record<string, unknown>): Record<string, 
     createdAt: normalizeDate(company.createdAt),
     updatedAt: normalizeDate(company.updatedAt),
     foundationDate: normalizeFoundationDate(company.foundationDate),
+    documentType: company.documentType as 'CPF' | 'CNPJ' | undefined,
   };
 }
 
@@ -85,6 +86,7 @@ export const CompanySchema = z.object({
   id: z.string(),
   name: z.string().min(2),
   cnpj: z.string(),
+  documentType: z.enum(['CPF', 'CNPJ']).optional(),
   type: z.enum(['matriz', 'filial', 'holding', 'prestadora', 'outra']),
   foundationDate: z.string().datetime(),
   email: z.string().email().optional(),
@@ -129,7 +131,7 @@ export const companyService = {
       const response = await apiClient.get<unknown>('/companies');
       const data = response.data as Array<Record<string, unknown>>;
       const transformedData = data.map(transformCompanyData);
-      return CompanySchema.array().parse(transformedData);
+      return CompanySchema.array().parse(transformedData) as Company[];
     } catch (error) {
       throw parseApiError(error);
     }
@@ -148,7 +150,7 @@ export const companyService = {
       }
 
       const transformedData = data.map(transformCompanyData);
-      return CompanySchema.array().parse(transformedData);
+      return CompanySchema.array().parse(transformedData) as Company[];
     } catch (error) {
       throw parseApiError(error);
     }
@@ -162,7 +164,7 @@ export const companyService = {
       const response = await apiClient.get<unknown>(`/companies/${companyId}`);
       const company = response.data as Record<string, unknown>;
       const transformedCompany = transformCompanyData(company);
-      return CompanySchema.parse(transformedCompany);
+      return CompanySchema.parse(transformedCompany) as Company;
     } catch (error) {
       throw parseApiError(error);
     }

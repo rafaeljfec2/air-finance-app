@@ -217,3 +217,98 @@ export function validatePixKey(key: string): { valid: boolean; type?: string } {
 
   return { valid: false };
 }
+
+// ==================== PIERRE FINANCE ====================
+
+export interface PierreAccount {
+  id: string;
+  userId: string;
+  itemId: string;
+  name: string;
+  type: 'BANK' | 'CREDIT';
+  subtype: string;
+  number: string;
+  currencyCode: string;
+  balance: string;
+  taxNumber: string;
+  owner: string;
+  creditData?: Record<string, unknown>;
+  bankData?: Record<string, unknown>;
+  marketingName?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ConnectPierreRequest {
+  apiKey: string;
+}
+
+export interface ConnectPierreResponse {
+  success: boolean;
+  data: {
+    tenantId: string;
+    accounts: PierreAccount[];
+  };
+}
+
+export interface ImportPierreAccountsRequest {
+  accountIds: string[];
+}
+
+export interface ImportPierreAccountsResponse {
+  success: boolean;
+  data: {
+    imported: number;
+    accounts: Array<{
+      id: string;
+      name: string;
+      type: string;
+      bankCode: string;
+    }>;
+  };
+}
+
+/**
+ * Connect with Pierre Finance
+ */
+export async function connectPierre(
+  apiKey: string,
+  companyId: string,
+): Promise<ConnectPierreResponse> {
+  const response = await apiClient.post<ConnectPierreResponse>(
+    `/banking/pierre/connect?companyId=${companyId}`,
+    { apiKey },
+  );
+  return response.data;
+}
+
+/**
+ * Get Pierre Finance accounts
+ */
+export async function getPierreAccounts(tenantId: string): Promise<{
+  success: boolean;
+  data: PierreAccount[];
+  count: number;
+}> {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: PierreAccount[];
+    count: number;
+  }>(`/banking/pierre/accounts?tenantId=${tenantId}`);
+  return response.data;
+}
+
+/**
+ * Import selected Pierre Finance accounts
+ */
+export async function importPierreAccounts(
+  tenantId: string,
+  companyId: string,
+  accountIds: string[],
+): Promise<ImportPierreAccountsResponse> {
+  const response = await apiClient.post<ImportPierreAccountsResponse>(
+    `/banking/pierre/import-accounts?tenantId=${tenantId}&companyId=${companyId}`,
+    { accountIds },
+  );
+  return response.data;
+}

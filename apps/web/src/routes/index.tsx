@@ -10,7 +10,7 @@ import { Login } from '@/pages/login';
 import { SignUpPage } from '@/pages/signup';
 import { TermsOfService } from '@/pages/legal/TermsOfService';
 import { PrivacyPolicy } from '@/pages/legal/PrivacyPolicy';
-import { Suspense, lazy } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { createBrowserRouter, RouteObject } from 'react-router-dom';
 
 // Lazy Components
@@ -153,7 +153,7 @@ const LandingPageV2 = lazy(() =>
  */
 function createProtectedRoute(
   path: string,
-  Component: React.ComponentType<any>,
+  Component: React.ComponentType<Record<string, unknown>>,
   options: {
     requireOnboarding?: boolean;
     requireGod?: boolean;
@@ -194,7 +194,7 @@ function createProtectedRoute(
  */
 function createSimpleProtectedRoute(
   path: string,
-  Component: React.ComponentType<any>,
+  Component: React.ComponentType<Record<string, unknown>>,
 ): RouteObject {
   return createProtectedRoute(path, Component);
 }
@@ -204,7 +204,7 @@ function createSimpleProtectedRoute(
  */
 function createPublicRoute(
   path: string,
-  Component: React.ComponentType<any>,
+  Component: React.ComponentType<Record<string, unknown>>,
   suspense: boolean = true,
 ): RouteObject {
   const element = suspense ? (

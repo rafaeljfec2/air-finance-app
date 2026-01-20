@@ -9,7 +9,7 @@ import { RouteObject } from 'react-router-dom';
 
 interface RouteConfig {
   path: string;
-  component: LazyExoticComponent<ComponentType<any>> | ComponentType<any>;
+  component: LazyExoticComponent<ComponentType<Record<string, unknown>>> | ComponentType<Record<string, unknown>>;
   requireAuth?: boolean;
   requireOnboarding?: boolean;
   requireGod?: boolean;
@@ -67,7 +67,7 @@ function createProtectedRoute(config: RouteConfig): RouteObject {
  */
 function createPublicRoute(
   path: string,
-  component: LazyExoticComponent<ComponentType<any>> | ComponentType<any>,
+  component: LazyExoticComponent<ComponentType<Record<string, unknown>>> | ComponentType<Record<string, unknown>>,
   suspense: boolean = true,
 ): RouteObject {
   const Component = component;

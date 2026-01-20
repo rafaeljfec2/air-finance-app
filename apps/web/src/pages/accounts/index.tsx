@@ -1,6 +1,7 @@
 import { AccountFormModal } from '@/components/accounts/AccountFormModal';
 import { BankingIntegrationModal } from '@/components/accounts/BankingIntegrationModal';
 import { StatementScheduleConfig } from '@/components/accounts/StatementScheduleConfig';
+import { PierreConnectModal } from '@/components/accounts/PierreConnectModal';
 import { Loading } from '@/components/Loading';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -9,7 +10,8 @@ import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Account, CreateAccount } from '@/services/accountService';
 import { useCompanyStore } from '@/stores/company';
-import { useMemo, useState } from 'react';
+import { companyService } from '@/services/companyService';
+import { useMemo, useState, useEffect } from 'react';
 import { AccountsEmptyState } from './components/AccountsEmptyState';
 import { AccountsErrorState } from './components/AccountsErrorState';
 import { AccountsFilters } from './components/AccountsFilters';
@@ -30,8 +32,19 @@ export function AccountsPage() {
     isUpdating,
     isDeleting,
   } = useAccounts();
-  const { activeCompany } = useCompanyStore();
+  const { activeCompany, setActiveCompany } = useCompanyStore();
   const { canCreateAccount } = usePlanLimits();
+
+  // Ensure documentType is loaded (fix for localStorage cache issue)
+  useEffect(() => {
+    if (activeCompany?.id && !activeCompany.documentType) {
+      companyService.getById(activeCompany.id).then((company) => {
+        setActiveCompany(company);
+      }).catch((err) => {
+        console.error('Failed to refresh company data:', err);
+      });
+    }
+  }, [activeCompany?.id, activeCompany?.documentType, setActiveCompany]);
 
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
@@ -41,6 +54,7 @@ export function AccountsPage() {
   const [configuringAccount, setConfiguringAccount] = useState<Account | null>(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [schedulingAccount, setSchedulingAccount] = useState<Account | null>(null);
+  const [showPierreModal, setShowPierreModal] = useState(false);
   const [viewMode, setViewMode] = useViewMode('accounts-view-mode');
 
   const {
@@ -115,6 +129,26 @@ export function AccountsPage() {
     setShowScheduleModal(true);
   };
 
+  const handleConnectPierre = () => {
+    setShowPierreModal(true);
+  };
+
+  const handlePierreSuccess = () => {
+    // Refresh accounts list after Pierre import
+    globalThis.location.reload();
+  };
+
+  // Check if company is CPF (to show Pierre button)
+  const isPierreAvailable = activeCompany?.documentType === 'CPF';
+  
+  console.log('🔍 Pierre Button Debug:', {
+    activeCompanyId: activeCompany?.id,
+    activeCompanyName: activeCompany?.name,
+    documentType: activeCompany?.documentType,
+    isPierreAvailable,
+    rawActiveCompany: activeCompany,
+  });
+
   if (isLoading) {
     return (
       <ViewDefault>
@@ -148,7 +182,11 @@ export function AccountsPage() {
     <ViewDefault>
       <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-          <AccountsHeader onCreate={handleCreate} canCreate={canCreateAccount} />
+          <AccountsHeader 
+            onCreate={handleCreate} 
+            canCreate={canCreateAccount}
+            onConnectPierre={isPierreAvailable ? handleConnectPierre : undefined}
+          />
 
           <AccountsFilters
             searchTerm={searchTerm}
@@ -212,6 +250,15 @@ export function AccountsPage() {
           }}
           accountId={schedulingAccount.id}
           accountName={schedulingAccount.name}
+        />
+      )}
+
+      {isPierreAvailable && activeCompany && (
+        <PierreConnectModal
+          open={showPierreModal}
+          onClose={() => setShowPierreModal(false)}
+          companyId={activeCompany.id}
+          onSuccess={handlePierreSuccess}
         />
       )}
 

@@ -49,6 +49,7 @@ export const sanitizeCompany = (company: Company | null): Company | null => {
     userIds: company.userIds,
     createdAt: company.createdAt,
     updatedAt: company.updatedAt,
+    documentType: company.documentType,
     // Removed sensitive fields:
     // - cnpj (sensitive fiscal data - fetch from server when needed)
     // - email (contact information - fetch from server when needed)

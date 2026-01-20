@@ -1,12 +1,13 @@
 import { Button } from '@/components/ui/button';
-import { Banknote, Plus } from 'lucide-react';
+import { Banknote, Plus, Link2 } from 'lucide-react';
 
 interface AccountsHeaderProps {
   onCreate: () => void;
   canCreate: boolean;
+  onConnectPierre?: () => void;
 }
 
-export function AccountsHeader({ onCreate, canCreate }: Readonly<AccountsHeaderProps>) {
+export function AccountsHeader({ onCreate, canCreate, onConnectPierre }: Readonly<AccountsHeaderProps>) {
   return (
     <>
       {/* Mobile Header */}
@@ -23,15 +24,27 @@ export function AccountsHeader({ onCreate, canCreate }: Readonly<AccountsHeaderP
           </div>
         </div>
 
-        {canCreate && (
-          <Button
-            onClick={onCreate}
-            className="w-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2 h-11 rounded-xl font-medium shadow-lg shadow-primary-500/20"
-          >
-            <Plus className="h-5 w-5" />
-            Nova Conta
-          </Button>
-        )}
+        <div className="flex flex-col gap-2">
+          {onConnectPierre && (
+            <Button
+              onClick={onConnectPierre}
+              variant="outline"
+              className="w-full border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 flex items-center justify-center gap-2 h-11 rounded-xl font-medium"
+            >
+              <Link2 className="h-5 w-5" />
+              Conectar Pierre Finance
+            </Button>
+          )}
+          {canCreate && (
+            <Button
+              onClick={onCreate}
+              className="w-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2 h-11 rounded-xl font-medium shadow-lg shadow-primary-500/20"
+            >
+              <Plus className="h-5 w-5" />
+              Nova Conta
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Desktop Header */}
@@ -50,15 +63,27 @@ export function AccountsHeader({ onCreate, canCreate }: Readonly<AccountsHeaderP
           </div>
         </div>
 
-        {canCreate && (
-          <Button
-            onClick={onCreate}
-            className="bg-primary-500 hover:bg-primary-600 text-white flex items-center gap-2 h-12 px-6 rounded-xl font-semibold shadow-lg shadow-primary-500/30 transition-all hover:shadow-xl hover:shadow-primary-500/40"
-          >
-            <Plus className="h-5 w-5" />
-            Nova Conta
-          </Button>
-        )}
+        <div className="flex items-center gap-3">
+          {onConnectPierre && (
+            <Button
+              onClick={onConnectPierre}
+              variant="outline"
+              className="border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 flex items-center gap-2 h-12 px-6 rounded-xl font-semibold"
+            >
+              <Link2 className="h-5 w-5" />
+              Pierre Finance
+            </Button>
+          )}
+          {canCreate && (
+            <Button
+              onClick={onCreate}
+              className="bg-primary-500 hover:bg-primary-600 text-white flex items-center gap-2 h-12 px-6 rounded-xl font-semibold shadow-lg shadow-primary-500/30 transition-all hover:shadow-xl hover:shadow-primary-500/40"
+            >
+              <Plus className="h-5 w-5" />
+              Nova Conta
+            </Button>
+          )}
+        </div>
       </div>
     </>
   );

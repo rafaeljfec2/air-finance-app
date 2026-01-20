@@ -2,6 +2,7 @@ export interface Company {
   id: string;
   name: string;
   cnpj: string;
+  documentType?: 'CPF' | 'CNPJ';
   type: 'matriz' | 'filial' | 'holding' | 'prestadora' | 'outra';
   foundationDate: string;
   email?: string;

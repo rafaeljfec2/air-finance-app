@@ -35,6 +35,7 @@ export const useCompanyStore = create<CompanyStore>()(
               id: state.activeCompany.id,
               name: state.activeCompany.name,
               type: state.activeCompany.type,
+              documentType: state.activeCompany.documentType,
               foundationDate: state.activeCompany.foundationDate,
               // Explicitly exclude userIds to prevent leakage
               createdAt: state.activeCompany.createdAt,
