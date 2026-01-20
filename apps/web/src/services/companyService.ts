@@ -95,6 +95,7 @@ export const CompanySchema = z.object({
   address: z.string().optional(),
   notes: z.string().optional(),
   userIds: z.array(z.string()),
+  pierreFinanceTenantId: z.string().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });

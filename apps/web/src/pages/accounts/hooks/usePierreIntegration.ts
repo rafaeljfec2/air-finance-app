@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 import {
   connectPierre,
@@ -11,22 +11,62 @@ interface UsePierreIntegrationProps {
   companyId: string;
   pierreFinanceTenantId?: string;
   onSuccess?: () => void;
+  open?: boolean;
 }
 
 export function usePierreIntegration({
   companyId,
   pierreFinanceTenantId,
   onSuccess,
+  open = false,
 }: UsePierreIntegrationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [apiKey, setApiKey] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [isLoadingAccounts, setIsLoadingAccounts] = useState(false);
-  const [tenantId, setTenantId] = useState<string | null>(pierreFinanceTenantId || null);
+  const [tenantId, setTenantId] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<PierreAccount[]>([]);
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (
+      open &&
+      pierreFinanceTenantId &&
+      pierreFinanceTenantId.trim() !== '' &&
+      accounts.length === 0 &&
+      !isLoadingAccounts
+    ) {
+      setTenantId(pierreFinanceTenantId);
+      setIsLoadingAccounts(true);
+
+      getPierreAccounts(companyId)
+        .then((response) => {
+          if (response.success && response.data) {
+            setAccounts(response.data);
+
+            if (response.data.length === 0) {
+              toast.warning('Nenhuma conta encontrada no Pierre Finance');
+            }
+          } else {
+            setError('Erro ao carregar contas do Pierre Finance');
+            toast.error('Erro ao carregar contas do Pierre Finance');
+          }
+        })
+        .catch((err: unknown) => {
+          const error = err as { response?: { data?: { message?: string } } };
+          const errorMessage =
+            error.response?.data?.message || 'Erro ao carregar contas do Pierre Finance';
+          setError(errorMessage);
+          toast.error(errorMessage);
+          console.error('Error loading Pierre accounts:', err);
+        })
+        .finally(() => {
+          setIsLoadingAccounts(false);
+        });
+    }
+  }, [open, pierreFinanceTenantId, companyId, isLoadingAccounts, accounts.length]);
 
   const handleOpen = useCallback(async () => {
     setIsOpen(true);

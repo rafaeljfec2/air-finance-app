@@ -42,20 +42,13 @@ export const sanitizeCompany = (company: Company | null): Company | null => {
     id: company.id,
     name: company.name,
     type: company.type,
-    // CNPJ removed - fetch from server when needed
-    // This reduces exposure of sensitive fiscal data
-    cnpj: '', // Placeholder - will be fetched from server
+    cnpj: '',
     foundationDate: company.foundationDate,
     userIds: company.userIds,
     createdAt: company.createdAt,
     updatedAt: company.updatedAt,
     documentType: company.documentType,
-    // Removed sensitive fields:
-    // - cnpj (sensitive fiscal data - fetch from server when needed)
-    // - email (contact information - fetch from server when needed)
-    // - phone (contact information - fetch from server when needed)
-    // - address (location data - fetch from server when needed)
-    // - notes (may contain sensitive information - fetch from server when needed)
+    pierreFinanceTenantId: company.pierreFinanceTenantId,
   } as Company;
 };
 

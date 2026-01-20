@@ -38,7 +38,7 @@ export function PierreAccountList({
   };
 
   const formatBalance = (balance: string) => {
-    const value = parseFloat(balance || '0');
+    const value = Number.parseFloat(balance || '0');
     return formatCurrency(value);
   };
 
@@ -127,7 +127,7 @@ export function PierreAccountList({
                     </div>
                     <div className="text-right shrink-0">
                       <p className={`text-sm font-semibold ${
-                        parseFloat(account.balance) >= 0
+                        Number.parseFloat(account.balance) >= 0
                           ? 'text-green-600 dark:text-green-400'
                           : 'text-red-600 dark:text-red-400'
                       }`}>

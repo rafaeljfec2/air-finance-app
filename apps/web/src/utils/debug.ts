@@ -52,13 +52,12 @@ function getTimestamp(): string {
 }
 
 /**
- * Format log message with context and data
+ * Format log message with context
  */
 function formatMessage(
   level: LogLevel,
   message: string,
   context?: string,
-  data?: unknown,
 ): string {
   const parts: string[] = [];
 
@@ -94,7 +93,7 @@ export const debug = {
     if (!shouldLog('debug')) return;
 
     const { context, data, timestamp = true } = options ?? {};
-    const formattedMessage = formatMessage('debug', message, context, data);
+    const formattedMessage = formatMessage('debug', message, context);
     const logData: unknown[] = [formattedMessage];
 
     if (timestamp) {
@@ -115,7 +114,7 @@ export const debug = {
     if (!shouldLog('info')) return;
 
     const { context, data, timestamp = true } = options ?? {};
-    const formattedMessage = formatMessage('info', message, context, data);
+    const formattedMessage = formatMessage('info', message, context);
     const logData: unknown[] = [formattedMessage];
 
     if (timestamp) {
@@ -136,7 +135,7 @@ export const debug = {
     if (!shouldLog('warn')) return;
 
     const { context, data, timestamp = true } = options ?? {};
-    const formattedMessage = formatMessage('warn', message, context, data);
+    const formattedMessage = formatMessage('warn', message, context);
     const logData: unknown[] = [formattedMessage];
 
     if (timestamp) {
@@ -157,7 +156,7 @@ export const debug = {
     if (!shouldLog('error')) return;
 
     const { context, data, error: err, timestamp = true } = options ?? {};
-    const formattedMessage = formatMessage('error', message, context, data);
+    const formattedMessage = formatMessage('error', message, context);
     const logData: unknown[] = [formattedMessage];
 
     if (timestamp) {

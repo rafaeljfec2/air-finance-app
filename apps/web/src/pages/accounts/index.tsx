@@ -134,16 +134,15 @@ export function AccountsPage() {
   };
 
   const handlePierreSuccess = async () => {
-    // Refresh company to get updated pierreFinanceTenantId
     if (activeCompany?.id) {
       try {
         const updatedCompany = await companyService.getById(activeCompany.id);
         setActiveCompany(updatedCompany);
+        await new Promise(resolve => setTimeout(resolve, 200));
       } catch (err) {
         console.error('Failed to refresh company data:', err);
       }
     }
-    // Refresh accounts list after Pierre import/connect
     globalThis.location.reload();
   };
 

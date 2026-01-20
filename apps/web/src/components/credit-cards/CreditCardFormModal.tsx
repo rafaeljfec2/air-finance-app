@@ -14,20 +14,38 @@ import {
 } from '@/services/creditCardService';
 import { useCompanyStore } from '@/stores/company';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
-import { Banknote, Building2, Calendar, CreditCard, DollarSign, Hash, Landmark, Palette, X } from 'lucide-react';
+import {
+  Banknote,
+  Building2,
+  Calendar,
+  CreditCard,
+  DollarSign,
+  Hash,
+  Landmark,
+  Palette,
+  X,
+} from 'lucide-react';
 import type { ChangeEvent, FormEvent } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 
-const bankTypes = [
+const BANK_TYPES = [
   { value: 'CreditCard', label: 'Cartão', icon: CreditCard, iconName: 'CreditCard' },
   { value: 'Banknote', label: 'Nota', icon: Banknote, iconName: 'Banknote' },
   { value: 'Landmark', label: 'Banco', icon: Landmark, iconName: 'Landmark' },
 ] as const;
 
-const dueDates = Array.from({ length: 31 }, (_, i) => ({
+const DUE_DATES = Array.from({ length: 31 }, (_, i) => ({
   value: i + 1,
   label: `${i + 1}º dia`,
 }));
+
+const DEFAULT_COLOR = '#8A05BE';
+const DEFAULT_ICON = 'CreditCard';
+const DEFAULT_CLOSING_DAY = 10;
+const DEFAULT_DUE_DAY = 10;
+const MAX_ACCOUNT_NUMBER_LENGTH = 10;
+
+const MODAL_CLASSES = 'max-w-3xl bg-card dark:bg-card-dark p-0 flex flex-col h-[90vh] max-h-[90vh]';
 
 interface CreditCardFormModalProps {
   open: boolean;
@@ -35,6 +53,16 @@ interface CreditCardFormModalProps {
   onSubmit: (data: CreateCreditCardPayload) => void;
   creditCard?: CreditCardType | null;
   isLoading?: boolean;
+}
+
+interface FormErrors {
+  name?: string;
+  limit?: string;
+  companyId?: string;
+  accountNumber?: string;
+  bankCode?: string;
+  closingDay?: string;
+  dueDay?: string;
 }
 
 export function CreditCardFormModal({
@@ -46,16 +74,16 @@ export function CreditCardFormModal({
 }: Readonly<CreditCardFormModalProps>) {
   const { activeCompany } = useCompanyStore();
   const { bankOptions, isLoading: isLoadingBanks } = useBanks();
-  
+
   const initialFormState: CreateCreditCardPayload = useMemo(
     () => ({
       name: '',
       accountNumber: '',
       limit: 0,
-      closingDay: 10,
-      dueDay: 10,
-      color: '#8A05BE',
-      icon: 'CreditCard',
+      closingDay: DEFAULT_CLOSING_DAY,
+      dueDay: DEFAULT_DUE_DAY,
+      color: DEFAULT_COLOR,
+      icon: DEFAULT_ICON,
       bankCode: '',
       companyId: activeCompany?.id || '',
     }),
@@ -63,7 +91,7 @@ export function CreditCardFormModal({
   );
 
   const [form, setForm] = useState<CreateCreditCardPayload>(initialFormState);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [limitInput, setLimitInput] = useState('');
 
   useEffect(() => {
@@ -80,7 +108,9 @@ export function CreditCardFormModal({
         companyId: creditCard.companyId,
       });
       setLimitInput(
-        creditCard.limit ? formatCurrencyInput(creditCard.limit.toFixed(2).replace('.', '')) : '',
+        creditCard.limit
+          ? formatCurrencyInput(creditCard.limit.toFixed(2).replace('.', ''))
+          : '',
       );
     } else {
       setForm({
@@ -92,43 +122,50 @@ export function CreditCardFormModal({
     setErrors({});
   }, [creditCard, open, initialFormState, activeCompany]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const handleColorChange = (color: string) => {
+  const handleColorChange = useCallback((color: string) => {
     setForm((prev) => ({ ...prev, color }));
-  };
+  }, []);
 
-  const handleIconChange = (icon: string) => {
+  const handleIconChange = useCallback((icon: string) => {
     setForm((prev) => ({ ...prev, icon }));
-  };
+  }, []);
 
-  const handleBankChange = (bankCode: string | null) => {
-    console.log('🏦 [CreditCardForm] Bank changed:', { bankCode });
-    setForm((prev) => {
-      const newForm = { ...prev, bankCode: bankCode ?? '' };
-      console.log('🏦 [CreditCardForm] New form after bank change:', newForm);
-      return newForm;
+  const handleBankChange = useCallback((bankCode: string | null) => {
+    setForm((prev) => ({ ...prev, bankCode: bankCode ?? '' }));
+  }, []);
+
+  const handleLimitChange = useCallback((value: string) => {
+    const formatted = formatCurrencyInput(value);
+    setLimitInput(formatted);
+    setForm((prev) => ({
+      ...prev,
+      limit: parseCurrency(formatted),
+    }));
+  }, []);
+
+  const resetForm = useCallback(() => {
+    setForm({
+      ...initialFormState,
+      companyId: activeCompany?.id || '',
     });
-  };
+    setErrors({});
+    setLimitInput('');
+  }, [initialFormState, activeCompany]);
 
-  const validate = () => {
-    const errs: Record<string, string> = {};
+  const validate = useCallback((): FormErrors => {
+    const errs: FormErrors = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
     if (!form.limit || form.limit <= 0) errs.limit = 'Limite inválido';
     if (!form.companyId) errs.companyId = 'Selecione uma empresa';
     return errs;
-  };
+  }, [form]);
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    const errs = validate();
-    setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
-
-    // Preparar dados para envio - garantir que bankCode e accountNumber sejam incluídos
+  const buildSubmitData = useCallback((): CreateCreditCardPayload => {
     const submitData: CreateCreditCardPayload = {
       name: form.name,
       limit: form.limit,
@@ -139,48 +176,54 @@ export function CreditCardFormModal({
       companyId: form.companyId,
     };
 
-    // Incluir accountNumber e bankCode apenas se tiverem valores não vazios
-    console.log('🔍 [Form] Before adding optional fields:', {
-      accountNumber: form.accountNumber,
-      bankCode: form.bankCode,
-      trimmedAccountNumber: form.accountNumber?.trim(),
-      trimmedBankCode: form.bankCode?.trim(),
-    });
-
-    if (form.accountNumber && form.accountNumber.trim() !== '') {
-      submitData.accountNumber = form.accountNumber;
-      console.log('✅ [Form] Adding accountNumber:', form.accountNumber);
-    } else {
-      console.log('⚠️ [Form] Skipping accountNumber (empty or null)');
-    }
-    
-    if (form.bankCode && form.bankCode.trim() !== '') {
-      submitData.bankCode = form.bankCode;
-      console.log('✅ [Form] Adding bankCode:', form.bankCode);
-    } else {
-      console.log('⚠️ [Form] Skipping bankCode (empty or null)');
+    if (form.accountNumber?.trim()) {
+      submitData.accountNumber = form.accountNumber.trim();
     }
 
-    console.log('📤 [Form] Final submitData:', submitData);
-    onSubmit(submitData);
-    onClose();
-    setForm({
-      ...initialFormState,
-      companyId: activeCompany?.id || '',
-    });
-    setErrors({});
-    setLimitInput('');
-  };
+    if (form.bankCode?.trim()) {
+      submitData.bankCode = form.bankCode.trim();
+    }
 
-  const handleClose = () => {
-    setForm({
-      ...initialFormState,
-      companyId: activeCompany?.id || '',
-    });
-    setErrors({});
-    setLimitInput('');
+    return submitData;
+  }, [form]);
+
+  const handleSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault();
+      const errs = validate();
+      setErrors(errs);
+
+      if (Object.keys(errs).length > 0) return;
+
+      const submitData = buildSubmitData();
+      onSubmit(submitData);
+      resetForm();
+      onClose();
+    },
+    [validate, buildSubmitData, onSubmit, resetForm, onClose],
+  );
+
+  const handleClose = useCallback(() => {
+    resetForm();
     onClose();
+  }, [resetForm, onClose]);
+
+  const modalTitle = creditCard ? 'Editar Cartão' : 'Novo Cartão de Crédito';
+  const modalDescription = creditCard
+    ? 'Atualize as informações do cartão'
+    : 'Preencha os dados do novo cartão de crédito';
+
+  const getSubmitButtonText = () => {
+    if (isLoading) return 'Salvando...';
+    if (creditCard) return 'Salvar Alterações';
+    return 'Criar Cartão';
   };
+  const submitButtonText = getSubmitButtonText();
+  const bankComboBoxKey = `bank-${creditCard?.id || 'new'}-${form.bankCode || 'none'}`;
+  const iconPickerOptions = BANK_TYPES.map((t) => ({
+    value: t.iconName,
+    icon: t.icon,
+  }));
 
   return (
     <Modal
@@ -188,7 +231,7 @@ export function CreditCardFormModal({
       onClose={handleClose}
       title=""
       dismissible={false}
-      className="max-w-3xl bg-card dark:bg-card-dark p-0 flex flex-col h-[90vh] max-h-[90vh]"
+      className={MODAL_CLASSES}
     >
       <div className="flex flex-col flex-1 overflow-hidden min-h-0">
         {/* Header Customizado */}
@@ -199,12 +242,10 @@ export function CreditCardFormModal({
             </div>
             <div>
               <h2 className="text-xl font-semibold text-text dark:text-text-dark">
-                {creditCard ? 'Editar Cartão' : 'Novo Cartão de Crédito'}
+                {modalTitle}
               </h2>
               <p className="text-sm text-muted-foreground dark:text-gray-400">
-                {creditCard
-                  ? 'Atualize as informações do cartão'
-                  : 'Preencha os dados do novo cartão de crédito'}
+                {modalDescription}
               </p>
             </div>
           </div>
@@ -232,11 +273,13 @@ export function CreditCardFormModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField label="Banco / Instituição" error={errors.bankCode}>
                   <ComboBox
-                    key={`bank-${creditCard?.id || 'new'}-${form.bankCode || 'none'}`}
+                    key={bankComboBoxKey}
                     options={bankOptions}
                     value={form.bankCode ?? null}
                     onValueChange={handleBankChange}
-                    placeholder={isLoadingBanks ? "Carregando bancos..." : "Selecione o banco (opcional)"}
+                    placeholder={
+                      isLoadingBanks ? 'Carregando bancos...' : 'Selecione o banco (opcional)'
+                    }
                     disabled={isLoadingBanks}
                     searchable
                     searchPlaceholder="Buscar banco..."
@@ -272,14 +315,7 @@ export function CreditCardFormModal({
                       type="text"
                       inputMode="decimal"
                       value={limitInput}
-                      onChange={(e) => {
-                        const formatted = formatCurrencyInput(e.target.value);
-                        setLimitInput(formatted);
-                        setForm((prev) => ({
-                          ...prev,
-                          limit: parseCurrency(formatted),
-                        }));
-                      }}
+                      onChange={(e) => handleLimitChange(e.target.value)}
                       placeholder="R$ 0,00"
                       required
                       className={cn(
@@ -299,7 +335,7 @@ export function CreditCardFormModal({
                       value={form.accountNumber}
                       onChange={handleChange}
                       placeholder="Ex: 4508"
-                      maxLength={10}
+                      maxLength={MAX_ACCOUNT_NUMBER_LENGTH}
                       className={cn(
                         'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
                         errors.accountNumber && 'border-red-500 focus-visible:ring-red-500',
@@ -334,10 +370,10 @@ export function CreditCardFormModal({
                         errors.closingDay && 'border-red-500 focus:ring-red-500',
                       )}
                     >
-                      {dueDates.find((d) => d.value === form.closingDay)?.label || 'Selecione...'}
+                      {DUE_DATES.find((d) => d.value === form.closingDay)?.label || 'Selecione...'}
                     </SelectTrigger>
                     <SelectContent className="bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark max-h-60 overflow-y-auto">
-                      {dueDates.map((d) => (
+                      {DUE_DATES.map((d) => (
                         <SelectItem
                           key={d.value}
                           value={String(d.value)}
@@ -363,10 +399,10 @@ export function CreditCardFormModal({
                         errors.dueDay && 'border-red-500 focus:ring-red-500',
                       )}
                     >
-                      {dueDates.find((d) => d.value === form.dueDay)?.label || 'Selecione...'}
+                      {DUE_DATES.find((d) => d.value === form.dueDay)?.label || 'Selecione...'}
                     </SelectTrigger>
                     <SelectContent className="bg-card dark:bg-card-dark text-text dark:text-text-dark border-border dark:border-border-dark max-h-60 overflow-y-auto">
-                      {dueDates.map((d) => (
+                      {DUE_DATES.map((d) => (
                         <SelectItem
                           key={d.value}
                           value={String(d.value)}
@@ -399,10 +435,7 @@ export function CreditCardFormModal({
                   <IconPicker
                     value={form.icon}
                     onChange={handleIconChange}
-                    options={bankTypes.map((t) => ({
-                      value: t.iconName,
-                      icon: t.icon,
-                    }))}
+                    options={iconPickerOptions}
                   />
                 </FormField>
               </div>
@@ -427,10 +460,7 @@ export function CreditCardFormModal({
             className="bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/20"
             disabled={isLoading}
           >
-            {(() => {
-              if (isLoading) return 'Salvando...';
-              return creditCard ? 'Salvar Alterações' : 'Criar Cartão';
-            })()}
+            {submitButtonText}
           </Button>
         </div>
       </div>
