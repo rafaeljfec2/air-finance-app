@@ -2,9 +2,10 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { ComboBox } from '@/components/ui/ComboBox';
 import { formatDateToLocalISO, parseLocalDate } from '@/utils/date';
 import { Calendar, Download, Filter, Search } from 'lucide-react';
+import { useMemo } from 'react';
 
 interface Account {
   id: string;
@@ -40,7 +41,6 @@ export function TransactionFilters({
   setSelectedType,
   accounts,
 }: TransactionFiltersProps) {
-  // Convert date strings to Date objects for DatePicker
   const startDateObj = startDate ? parseLocalDate(startDate) : undefined;
   const endDateObj = endDate ? parseLocalDate(endDate) : undefined;
 
@@ -64,6 +64,20 @@ export function TransactionFilters({
     const account = accounts?.find((acc) => acc.id === accountId);
     return account?.name ?? 'Todas';
   };
+
+  const accountOptions = useMemo(() => {
+    const options = accounts?.map(account => ({
+      value: account.id,
+      label: account.name,
+    })) || [];
+    return [{ value: 'all', label: 'Todas as contas' }, ...options];
+  }, [accounts]);
+
+  const typeOptions = useMemo(() => [
+    { value: 'all', label: 'Todos os tipos' },
+    { value: 'RECEITA', label: 'Receitas' },
+    { value: 'DESPESA', label: 'Despesas' },
+  ], []);
 
   return (
     <>
@@ -202,37 +216,29 @@ export function TransactionFilters({
                 className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full"
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full lg:w-auto">
               <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-              <Select
+              <ComboBox
+                options={accountOptions}
                 value={selectedAccountId || 'all'}
-                onValueChange={(value) => setSelectedAccountId(value === 'all' ? undefined : value)}
-              >
-                <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500 w-full lg:w-auto min-w-[160px]">
-                  <span className="truncate">{getAccountDisplayName(selectedAccountId)}</span>
-                </SelectTrigger>
-                <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark max-h-56 overflow-y-auto">
-                  <SelectItem value="all">Todas as contas</SelectItem>
-                  {accounts?.map((account) => (
-                    <SelectItem key={account.id} value={account.id}>
-                      {account.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onValueChange={(value) => setSelectedAccountId(value === 'all' || !value ? undefined : value)}
+                placeholder="Todas as contas"
+                searchPlaceholder="Buscar conta..."
+                searchable
+                icon={Filter}
+                className="bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark w-full lg:w-auto lg:min-w-[160px]"
+              />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full lg:w-auto">
               <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-              <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger className="bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500 w-full lg:w-auto min-w-[140px]">
-                  <span className="truncate">{getTransactionTypeLabel(selectedType)}</span>
-                </SelectTrigger>
-                <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">
-                  <SelectItem value="all">Todos os tipos</SelectItem>
-                  <SelectItem value="RECEITA">Receitas</SelectItem>
-                  <SelectItem value="DESPESA">Despesas</SelectItem>
-                </SelectContent>
-              </Select>
+              <ComboBox
+                options={typeOptions}
+                value={selectedType}
+                onValueChange={(value) => setSelectedType(value || 'all')}
+                placeholder="Todos os tipos"
+                icon={Filter}
+                className="bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark w-full lg:w-auto lg:min-w-[140px]"
+              />
             </div>
             <Button
               variant="outline"
