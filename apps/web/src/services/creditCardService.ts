@@ -6,6 +6,7 @@ import { parseApiError } from '@/utils/apiErrorHandler';
 export const CreditCardSchema = z.object({
   id: z.string(),
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  accountNumber: z.string().optional().nullable(),
   limit: z.number().min(0, 'Limite deve ser maior que zero'),
   closingDay: z.number().min(1, 'Dia de fechamento inválido').max(31, 'Dia de fechamento inválido'),
   dueDay: z.number().min(1, 'Dia de vencimento inválido').max(31, 'Dia de vencimento inválido'),
@@ -20,6 +21,7 @@ export const CreditCardSchema = z.object({
 export type CreditCard = z.infer<typeof CreditCardSchema>;
 export type CreateCreditCardPayload = {
   name: string;
+  accountNumber?: string;
   limit: number;
   closingDay: number;
   dueDay: number;

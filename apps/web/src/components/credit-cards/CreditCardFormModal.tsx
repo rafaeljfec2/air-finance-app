@@ -14,18 +14,14 @@ import {
 } from '@/services/creditCardService';
 import { useCompanyStore } from '@/stores/company';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
-import { Banknote, Building2, Calendar, CreditCard, DollarSign, Landmark, Palette, X } from 'lucide-react';
+import { Banknote, Building2, Calendar, CreditCard, DollarSign, Hash, Landmark, Palette, X } from 'lucide-react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 const bankTypes = [
-  { value: 'nubank', label: 'Nubank', icon: CreditCard, iconName: 'CreditCard' },
-  { value: 'itau', label: 'Itaú', icon: Banknote, iconName: 'Banknote' },
-  { value: 'bradesco', label: 'Bradesco', icon: Banknote, iconName: 'Banknote' },
-  { value: 'santander', label: 'Santander', icon: Banknote, iconName: 'Banknote' },
-  { value: 'bb', label: 'Banco do Brasil', icon: Banknote, iconName: 'Banknote' },
-  { value: 'caixa', label: 'Caixa Econômica', icon: Banknote, iconName: 'Banknote' },
-  { value: 'outro', label: 'Outro', icon: Landmark, iconName: 'Landmark' },
+  { value: 'CreditCard', label: 'Cartão', icon: CreditCard, iconName: 'CreditCard' },
+  { value: 'Banknote', label: 'Nota', icon: Banknote, iconName: 'Banknote' },
+  { value: 'Landmark', label: 'Banco', icon: Landmark, iconName: 'Landmark' },
 ] as const;
 
 const dueDates = Array.from({ length: 31 }, (_, i) => ({
@@ -54,6 +50,7 @@ export function CreditCardFormModal({
   const initialFormState: CreateCreditCardPayload = useMemo(
     () => ({
       name: '',
+      accountNumber: '',
       limit: 0,
       closingDay: 10,
       dueDay: 10,
@@ -73,6 +70,7 @@ export function CreditCardFormModal({
     if (creditCard) {
       setForm({
         name: creditCard.name,
+        accountNumber: creditCard.accountNumber ?? '',
         limit: creditCard.limit,
         closingDay: creditCard.closingDay,
         dueDay: creditCard.dueDay,
@@ -195,6 +193,7 @@ export function CreditCardFormModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField label="Banco / Instituição" error={errors.bankCode}>
                   <ComboBox
+                    key={`bank-${creditCard?.id || 'new'}-${form.bankCode || 'none'}`}
                     options={bankOptions}
                     value={form.bankCode ?? null}
                     onValueChange={handleBankChange}
@@ -250,6 +249,24 @@ export function CreditCardFormModal({
                       )}
                     />
                     <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                  </div>
+                </FormField>
+
+                <FormField label="Número da conta" error={errors.accountNumber}>
+                  <div className="relative">
+                    <Input
+                      name="accountNumber"
+                      type="text"
+                      value={form.accountNumber}
+                      onChange={handleChange}
+                      placeholder="Ex: 4508"
+                      maxLength={10}
+                      className={cn(
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        errors.accountNumber && 'border-red-500 focus-visible:ring-red-500',
+                      )}
+                    />
+                    <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
                   </div>
                 </FormField>
               </div>

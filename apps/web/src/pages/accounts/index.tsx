@@ -140,14 +140,6 @@ export function AccountsPage() {
 
   // Check if company is CPF (to show Pierre button)
   const isPierreAvailable = activeCompany?.documentType === 'CPF';
-  
-  console.log('🔍 Pierre Button Debug:', {
-    activeCompanyId: activeCompany?.id,
-    activeCompanyName: activeCompany?.name,
-    documentType: activeCompany?.documentType,
-    isPierreAvailable,
-    rawActiveCompany: activeCompany,
-  });
 
   if (isLoading) {
     return (
