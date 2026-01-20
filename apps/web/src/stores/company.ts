@@ -14,11 +14,24 @@ const initialState: Pick<CompanyStore, 'activeCompany'> = {
 };
 
 /**
+ * Removes sensitive fields from company data before persisting to localStorage
+ * @param company - The company object to sanitize for storage
+ * @returns Company object without sensitive fields (userIds)
+ */
+function sanitizeCompanyForStorage(company: Company | null): Partial<Company> | null {
+  if (!company) return null;
+
+  // Create a copy and remove sensitive fields (userIds is intentionally unused)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { userIds, ...safeCompany } = company;
+  return safeCompany;
+}
+
+/**
  * Custom storage with encryption for sensitive company data
  * Note: Encryption is complex with Zustand persist, so we'll use sanitization instead
  * For full encryption, consider implementing at the API level or using HttpOnly cookies
  */
-
 export const useCompanyStore = create<CompanyStore>()(
   persist(
     (set) => ({
@@ -30,18 +43,7 @@ export const useCompanyStore = create<CompanyStore>()(
       name: 'company-storage',
       // Security: NEVER store userIds to prevent data leaks between users
       partialize: (state) => ({
-        activeCompany: state.activeCompany
-          ? {
-              id: state.activeCompany.id,
-              name: state.activeCompany.name,
-              type: state.activeCompany.type,
-              documentType: state.activeCompany.documentType,
-              foundationDate: state.activeCompany.foundationDate,
-              // Explicitly exclude userIds to prevent leakage
-              createdAt: state.activeCompany.createdAt,
-              updatedAt: state.activeCompany.updatedAt,
-            }
-          : null,
+        activeCompany: sanitizeCompanyForStorage(state.activeCompany),
       }),
       onRehydrateStorage: () => (state) => {
         if (state?.activeCompany?.id) {
