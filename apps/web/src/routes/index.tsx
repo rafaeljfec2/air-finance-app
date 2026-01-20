@@ -1,15 +1,17 @@
-import { OnboardingGuard } from '@/components/auth/OnboardingGuard';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { RequireGod } from '@/components/auth/RequireGod';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { SuspenseLoader } from '@/components/SuspenseLoader';
+import { OnboardingGuard } from '@/components/auth/OnboardingGuard';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { RequireGod } from '@/components/auth/RequireGod';
 import { ConfirmError, ConfirmProcessing, ConfirmSuccess } from '@/pages/confirm-email';
 import { EmailPendingPage } from '@/pages/email-pending';
 import { Login } from '@/pages/login';
 import { SignUpPage } from '@/pages/signup';
+import { TermsOfService } from '@/pages/legal/TermsOfService';
+import { PrivacyPolicy } from '@/pages/legal/PrivacyPolicy';
 import { Suspense, lazy } from 'react';
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, RouteObject } from 'react-router-dom';
 
 // Lazy Components
 const AccountsPage = lazy(() =>
@@ -79,7 +81,6 @@ const NotificationsPage = lazy(() =>
 const PreferencesPage = lazy(() =>
   import('@/pages/settings/preferences').then((m) => ({ default: m.PreferencesPage })),
 );
-// ... existing imports ...
 const OpenAILogsPage = lazy(() =>
   import('@/pages/admin/openai-logs').then((m) => ({ default: m.OpenAILogsPage })),
 );
@@ -106,10 +107,6 @@ const FinancialHealthPage = lazy(() =>
     default: m.FinancialHealthPage,
   })),
 );
-
-// Legal Pages
-import { TermsOfService } from '@/pages/legal/TermsOfService';
-import { PrivacyPolicy } from '@/pages/legal/PrivacyPolicy';
 
 // SEO Pages
 const GestaoFinanceiraCPFPage = lazy(() =>
@@ -151,23 +148,80 @@ const LandingPageV2 = lazy(() =>
   })),
 );
 
+/**
+ * Helper function to create protected routes with common wrappers
+ */
+function createProtectedRoute(
+  path: string,
+  Component: React.ComponentType<any>,
+  options: {
+    requireOnboarding?: boolean;
+    requireGod?: boolean;
+    errorCode?: number;
+  } = {},
+): RouteObject {
+  const { requireOnboarding = false, requireGod = false, errorCode } = options;
+
+  let element: React.ReactNode = (
+    <Suspense fallback={<SuspenseLoader />}>
+      <Component />
+    </Suspense>
+  );
+
+  if (requireGod) {
+    element = <RequireGod>{element}</RequireGod>;
+  }
+
+  if (requireOnboarding) {
+    element = <OnboardingGuard>{element}</OnboardingGuard>;
+  }
+
+  element = (
+    <ErrorBoundary>
+      <ProtectedRoute>{element}</ProtectedRoute>
+    </ErrorBoundary>
+  );
+
+  return {
+    path,
+    element,
+    errorElement: errorCode ? <ErrorPage code={errorCode} /> : <ErrorPage />,
+  };
+}
+
+/**
+ * Helper function to create simple protected routes without onboarding
+ */
+function createSimpleProtectedRoute(
+  path: string,
+  Component: React.ComponentType<any>,
+): RouteObject {
+  return createProtectedRoute(path, Component);
+}
+
+/**
+ * Helper function to create public routes
+ */
+function createPublicRoute(
+  path: string,
+  Component: React.ComponentType<any>,
+  suspense: boolean = true,
+): RouteObject {
+  const element = suspense ? (
+    <Suspense fallback={<SuspenseLoader />}>
+      <Component />
+    </Suspense>
+  ) : (
+    <Component />
+  );
+
+  return { path, element };
+}
+
 export const router = createBrowserRouter([
-  {
-    path: '/',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <LandingPageV2 />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/landing-v2',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <LandingPageV2 />
-      </Suspense>
-    ),
-  },
+  // ==================== PUBLIC ROUTES ====================
+  createPublicRoute('/', LandingPageV2),
+  createPublicRoute('/landing-v2', LandingPageV2),
   {
     path: '/login',
     element: <Login />,
@@ -175,6 +229,11 @@ export const router = createBrowserRouter([
   {
     path: '/register',
     element: <SignUpPage />,
+  },
+  {
+    path: '/signup',
+    element: <SignUpPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: '/confirm',
@@ -188,32 +247,8 @@ export const router = createBrowserRouter([
     path: '/confirm/error',
     element: <ConfirmError />,
   },
-  {
-    path: '/email-pending',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <EmailPendingPage />
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-  },
-  {
-    path: '/forgot-password',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <ForgotPasswordPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/new-password',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <NewPasswordPage />
-      </Suspense>
-    ),
-  },
+  createPublicRoute('/forgot-password', ForgotPasswordPage),
+  createPublicRoute('/new-password', NewPasswordPage),
   {
     path: '/reset-password/:token',
     element: (
@@ -222,292 +257,81 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
   },
-  {
-    path: '/onboarding',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <OnboardingGuard>
-            <Suspense fallback={<SuspenseLoader />}>
-              <OnboardingPage />
-            </Suspense>
-          </OnboardingGuard>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage code={500} />,
-  },
-  {
-    path: '/home',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <OnboardingGuard>
-            <Suspense fallback={<SuspenseLoader />}>
-              <HomePage />
-            </Suspense>
-          </OnboardingGuard>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage code={500} />,
-  },
-  {
-    path: '/dashboard',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <OnboardingGuard>
-            <Suspense fallback={<SuspenseLoader />}>
-              <Dashboard />
-            </Suspense>
-          </OnboardingGuard>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage code={500} />,
-  },
-  {
-    path: '/financial-health',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <OnboardingGuard>
-            <Suspense fallback={<SuspenseLoader />}>
-              <FinancialHealthPage />
-            </Suspense>
-          </OnboardingGuard>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage code={500} />,
-  },
-  {
-    path: '/dependents',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <DependentsPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage code={500} />,
-  },
-  {
-    path: '/categories',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <CategoriesPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage code={500} />,
-  },
-  {
-    path: '/accounts',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <AccountsPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/accounts/:accountId/statement-schedule',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <StatementSchedulePage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/business-logs',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <BusinessLogsPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/signup',
-    element: <SignUpPage />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/profile',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <Profile />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/import-ofx',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <ImportOfxPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/budget',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <BudgetPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/statement',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <Statement />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/transactions/new',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <NewTransaction />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/transactions',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <OnboardingGuard>
-            <Suspense fallback={<SuspenseLoader />}>
-              <Transactions />
-            </Suspense>
-          </OnboardingGuard>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/reports',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <OnboardingGuard>
-            <Suspense fallback={<SuspenseLoader />}>
-              <Reports />
-            </Suspense>
-          </OnboardingGuard>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
+  createPublicRoute('/pricing', PricingPage),
+  createPublicRoute('/terms', TermsOfService, false),
+  createPublicRoute('/privacy', PrivacyPolicy, false),
+
+  // ==================== SEO PAGES ====================
+  createPublicRoute('/gestao-financeira-cpf', GestaoFinanceiraCPFPage),
+  createPublicRoute(
+    '/gestao-financeira-cpf/controle-financeiro-pessoal',
+    ControleFinanceiroPessoalPage,
+  ),
+  createPublicRoute(
+    '/gestao-financeira-cpf/organizacao-financeira-pessoal',
+    OrganizacaoFinanceiraPessoalPage,
+  ),
+  createPublicRoute(
+    '/gestao-financeira-cpf/categorizacao-automatica-gastos',
+    CategorizacaoAutomaticaGastosPage,
+  ),
+  createPublicRoute(
+    '/gestao-financeira-cpf/gestao-financeira-com-inteligencia-artificial',
+    GestaoFinanceiraComIAPage,
+  ),
+  createPublicRoute(
+    '/gestao-financeira-cpf/score-credito-e-financas-pessoais',
+    ScoreCreditoFinancasPessoaisPage,
+  ),
+
+  // ==================== PROTECTED ROUTES WITH ONBOARDING ====================
+  createProtectedRoute('/onboarding', OnboardingPage, { errorCode: 500 }),
+  createProtectedRoute('/home', HomePage, { requireOnboarding: true, errorCode: 500 }),
+  createProtectedRoute('/dashboard', Dashboard, { requireOnboarding: true, errorCode: 500 }),
+  createProtectedRoute('/financial-health', FinancialHealthPage, {
+    requireOnboarding: true,
+    errorCode: 500,
+  }),
+  createProtectedRoute('/transactions', Transactions, { requireOnboarding: true }),
+  createProtectedRoute('/reports', Reports, { requireOnboarding: true }),
+
+  // ==================== PROTECTED ROUTES (SIMPLE) ====================
+  createSimpleProtectedRoute('/email-pending', EmailPendingPage),
+  createSimpleProtectedRoute('/dependents', DependentsPage),
+  createSimpleProtectedRoute('/categories', CategoriesPage),
+  createSimpleProtectedRoute('/accounts', AccountsPage),
+  createSimpleProtectedRoute('/accounts/:accountId/statement-schedule', StatementSchedulePage),
+  createSimpleProtectedRoute('/business-logs', BusinessLogsPage),
+  createSimpleProtectedRoute('/profile', Profile),
+  createSimpleProtectedRoute('/import-ofx', ImportOfxPage),
+  createSimpleProtectedRoute('/budget', BudgetPage),
+  createSimpleProtectedRoute('/statement', Statement),
+  createSimpleProtectedRoute('/transactions/new', NewTransaction),
+  createSimpleProtectedRoute('/credit-cards', CreditCardsPage),
+  createSimpleProtectedRoute('/goals', GoalsPage),
+  createSimpleProtectedRoute('/recurring-transactions', RecurringTransactionsPage),
+  createSimpleProtectedRoute('/income-sources', IncomeSourcesPage),
+  createSimpleProtectedRoute('/companies', CompaniesPage),
+  createSimpleProtectedRoute('/users', UsersPage),
+  createSimpleProtectedRoute('/payables', Payables),
+  createSimpleProtectedRoute('/receivables', Receivables),
+  createSimpleProtectedRoute('/monthly-closing', MonthlyClosing),
+  createSimpleProtectedRoute('/annual-result', AnnualResult),
+  createSimpleProtectedRoute('/planner', PlannerPage),
+  createSimpleProtectedRoute('/settings/preferences', PreferencesPage),
+  createSimpleProtectedRoute('/settings/notifications', NotificationsPage),
+  createSimpleProtectedRoute('/ai/classification', AiClassificationPage),
+
+  // ==================== ADMIN ROUTES (REQUIRE GOD) ====================
+  createProtectedRoute('/admin/openai-logs', OpenAILogsPage, { requireGod: true }),
+  createProtectedRoute('/admin/plans', PlansAdminPage, { requireGod: true }),
+
+  // ==================== SETTINGS ROUTES (SPECIAL HANDLING) ====================
   {
     path: '/settings',
     element: (
       <Suspense fallback={<SuspenseLoader />}>
         <Settings />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/pricing',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <PricingPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/gestao-financeira-cpf',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <GestaoFinanceiraCPFPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/gestao-financeira-cpf/controle-financeiro-pessoal',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <ControleFinanceiroPessoalPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/gestao-financeira-cpf/organizacao-financeira-pessoal',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <OrganizacaoFinanceiraPessoalPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/gestao-financeira-cpf/categorizacao-automatica-gastos',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <CategorizacaoAutomaticaGastosPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/gestao-financeira-cpf/gestao-financeira-com-inteligencia-artificial',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <GestaoFinanceiraComIAPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/gestao-financeira-cpf/score-credito-e-financas-pessoais',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <ScoreCreditoFinancasPessoaisPage />
       </Suspense>
     ),
   },
@@ -543,6 +367,8 @@ export const router = createBrowserRouter([
     path: '/settings/export',
     element: <div>Exportar dados</div>,
   },
+
+  // ==================== PLACEHOLDER ROUTES ====================
   {
     path: '/privacy-policy',
     element: <div>Política de privacidade</div>,
@@ -551,227 +377,8 @@ export const router = createBrowserRouter([
     path: '/support',
     element: <div>Ajuda e suporte</div>,
   },
-  {
-    path: '/ai/classification',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <AiClassificationPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
 
-  {
-    path: '/credit-cards',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <CreditCardsPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/goals',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <GoalsPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/recurring-transactions',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <RecurringTransactionsPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/income-sources',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <IncomeSourcesPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/companies',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <CompaniesPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/users',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <UsersPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/payables',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <Payables />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/receivables',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <Receivables />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/monthly-closing',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <MonthlyClosing />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/annual-result',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <AnnualResult />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/planner',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <PlannerPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/settings/preferences',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <PreferencesPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/settings/notifications',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <Suspense fallback={<SuspenseLoader />}>
-            <NotificationsPage />
-          </Suspense>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/admin/openai-logs',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <RequireGod>
-            <Suspense fallback={<SuspenseLoader />}>
-              <OpenAILogsPage />
-            </Suspense>
-          </RequireGod>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/admin/plans',
-    element: (
-      <ErrorBoundary>
-        <ProtectedRoute>
-          <RequireGod>
-            <Suspense fallback={<SuspenseLoader />}>
-              <PlansAdminPage />
-            </Suspense>
-          </RequireGod>
-        </ProtectedRoute>
-      </ErrorBoundary>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/terms',
-    element: <TermsOfService />,
-  },
-  {
-    path: '/privacy',
-    element: <PrivacyPolicy />,
-  },
+  // ==================== 404 ROUTE ====================
   {
     path: '*',
     element: <ErrorPage code={404} />,
