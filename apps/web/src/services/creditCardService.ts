@@ -13,6 +13,7 @@ export const CreditCardSchema = z.object({
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida'),
   icon: z.string().min(1, 'Ícone é obrigatório'),
   bankCode: z.string().optional().nullable(),
+  brand: z.enum(['nubank', 'itau']).optional(),
   initialBalance: z.number().optional(),
   initialBalanceDate: z.string().optional().nullable(),
   companyId: z.string(),
