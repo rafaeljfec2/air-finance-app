@@ -32,7 +32,7 @@ export function CreditCardsCard({
   onChangeActiveCard,
   onExpand,
 }: Readonly<CreditCardsCardProps>) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   // Sort transactions: first those that are finishing (fewer remaining installments), then the rest
   const sortedTransactions = useMemo(() => {
     const transactions = activeBill?.transactions ?? [];

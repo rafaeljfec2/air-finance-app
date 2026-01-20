@@ -6,6 +6,7 @@ import { IconPicker } from '@/components/ui/icon-picker';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { ComboBox } from '@/components/ui/ComboBox';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { useBanks } from '@/hooks/useBanks';
 import { cn } from '@/lib/utils';
 import {
@@ -14,6 +15,7 @@ import {
 } from '@/services/creditCardService';
 import { useCompanyStore } from '@/stores/company';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
+import { formatDateToLocalISO, formatDateForInput } from '@/utils/date';
 import {
   Banknote,
   Building2,
@@ -45,7 +47,7 @@ const DEFAULT_CLOSING_DAY = 10;
 const DEFAULT_DUE_DAY = 10;
 const MAX_ACCOUNT_NUMBER_LENGTH = 10;
 
-const MODAL_CLASSES = 'max-w-3xl bg-card dark:bg-card-dark p-0 flex flex-col h-[90vh] max-h-[90vh]';
+const MODAL_CLASSES = 'max-w-2xl bg-card dark:bg-card-dark p-0 flex flex-col overflow-hidden max-h-[85vh]';
 
 interface CreditCardFormModalProps {
   open: boolean;
@@ -63,6 +65,8 @@ interface FormErrors {
   bankCode?: string;
   closingDay?: string;
   dueDay?: string;
+  initialBalance?: string;
+  initialBalanceDate?: string;
 }
 
 export function CreditCardFormModal({
@@ -85,6 +89,8 @@ export function CreditCardFormModal({
       color: DEFAULT_COLOR,
       icon: DEFAULT_ICON,
       bankCode: '',
+      initialBalance: 0,
+      initialBalanceDate: formatDateToLocalISO(new Date()),
       companyId: activeCompany?.id || '',
     }),
     [activeCompany],
@@ -93,6 +99,7 @@ export function CreditCardFormModal({
   const [form, setForm] = useState<CreateCreditCardPayload>(initialFormState);
   const [errors, setErrors] = useState<FormErrors>({});
   const [limitInput, setLimitInput] = useState('');
+  const [initialBalanceInput, setInitialBalanceInput] = useState('');
 
   useEffect(() => {
     if (creditCard) {
@@ -105,11 +112,20 @@ export function CreditCardFormModal({
         color: creditCard.color,
         icon: creditCard.icon,
         bankCode: creditCard.bankCode ?? '',
+        initialBalance: creditCard.initialBalance ?? 0,
+        initialBalanceDate: creditCard.initialBalanceDate
+          ? formatDateForInput(creditCard.initialBalanceDate)
+          : formatDateToLocalISO(new Date()),
         companyId: creditCard.companyId,
       });
       setLimitInput(
         creditCard.limit
           ? formatCurrencyInput(creditCard.limit.toFixed(2).replace('.', ''))
+          : '',
+      );
+      setInitialBalanceInput(
+        creditCard.initialBalance
+          ? formatCurrencyInput(creditCard.initialBalance.toFixed(2).replace('.', ''))
           : '',
       );
     } else {
@@ -118,6 +134,7 @@ export function CreditCardFormModal({
         companyId: activeCompany?.id || '',
       });
       setLimitInput('');
+      setInitialBalanceInput('');
     }
     setErrors({});
   }, [creditCard, open, initialFormState, activeCompany]);
@@ -148,6 +165,15 @@ export function CreditCardFormModal({
     }));
   }, []);
 
+  const handleInitialBalanceChange = useCallback((value: string) => {
+    const formatted = formatCurrencyInput(value);
+    setInitialBalanceInput(formatted);
+    setForm((prev) => ({
+      ...prev,
+      initialBalance: parseCurrency(formatted),
+    }));
+  }, []);
+
   const resetForm = useCallback(() => {
     setForm({
       ...initialFormState,
@@ -155,6 +181,7 @@ export function CreditCardFormModal({
     });
     setErrors({});
     setLimitInput('');
+    setInitialBalanceInput('');
   }, [initialFormState, activeCompany]);
 
   const validate = useCallback((): FormErrors => {
@@ -174,6 +201,8 @@ export function CreditCardFormModal({
       color: form.color,
       icon: form.icon,
       companyId: form.companyId,
+      initialBalance: form.initialBalance ?? 0,
+      initialBalanceDate: form.initialBalanceDate || formatDateToLocalISO(new Date()),
     };
 
     if (form.accountNumber?.trim()) {
@@ -233,9 +262,9 @@ export function CreditCardFormModal({
       dismissible={false}
       className={MODAL_CLASSES}
     >
-      <div className="flex flex-col flex-1 overflow-hidden min-h-0">
+      <div className="flex flex-col h-full min-h-0">
         {/* Header Customizado */}
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-border dark:border-border-dark flex-shrink-0">
+        <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-border dark:border-border-dark flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary-500/10 dark:bg-primary-400/10">
               <CreditCard className="h-5 w-5 text-primary-500 dark:text-primary-400" />
@@ -259,18 +288,18 @@ export function CreditCardFormModal({
         </div>
 
         {/* Conteúdo com Scroll */}
-        <div className="flex-1 overflow-y-auto px-6 min-h-0">
-          <form onSubmit={handleSubmit} id="credit-card-form" className="space-y-6 py-4">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-5 min-h-0 overscroll-contain">
+          <form onSubmit={handleSubmit} id="credit-card-form" className="space-y-4 py-3">
             {/* Seção: Informações Básicas */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
-                <CreditCard className="h-4 w-4 text-primary-500 dark:text-primary-400" />
-                <h3 className="text-sm font-semibold text-text dark:text-text-dark uppercase tracking-wide">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 mb-2">
+                <CreditCard className="h-3.5 w-3.5 text-primary-500 dark:text-primary-400" />
+                <h3 className="text-xs font-semibold text-text dark:text-text-dark uppercase tracking-wide">
                   Informações Básicas
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <FormField label="Banco / Instituição" error={errors.bankCode}>
                   <ComboBox
                     key={bankComboBoxKey}
@@ -344,19 +373,52 @@ export function CreditCardFormModal({
                     <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
                   </div>
                 </FormField>
+
+                <FormField label="Saldo Inicial" error={errors.initialBalance}>
+                  <div className="relative">
+                    <Input
+                      name="initialBalance"
+                      type="text"
+                      inputMode="decimal"
+                      value={initialBalanceInput}
+                      onChange={(e) => handleInitialBalanceChange(e.target.value)}
+                      placeholder="R$ 0,00"
+                      className={cn(
+                        'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-all pl-10',
+                        errors.initialBalance && 'border-red-500 focus-visible:ring-red-500',
+                      )}
+                    />
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                  </div>
+                </FormField>
+
+                <FormField label="Data do Saldo Inicial" error={errors.initialBalanceDate}>
+                  <DatePicker
+                    value={form.initialBalanceDate ? new Date(form.initialBalanceDate) : undefined}
+                    onChange={(date) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        initialBalanceDate: date ? formatDateToLocalISO(date) : undefined,
+                      }))
+                    }
+                    placeholder="Selecionar data"
+                    error={errors.initialBalanceDate}
+                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+                  />
+                </FormField>
               </div>
             </div>
 
             {/* Seção: Datas */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
-                <Calendar className="h-4 w-4 text-primary-500 dark:text-primary-400" />
-                <h3 className="text-sm font-semibold text-text dark:text-text-dark uppercase tracking-wide">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Calendar className="h-3.5 w-3.5 text-primary-500 dark:text-primary-400" />
+                <h3 className="text-xs font-semibold text-text dark:text-text-dark uppercase tracking-wide">
                   Datas
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <FormField label="Dia de fechamento *" error={errors.closingDay}>
                   <Select
                     value={String(form.closingDay)}
@@ -418,15 +480,15 @@ export function CreditCardFormModal({
             </div>
 
             {/* Seção: Personalização */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
-                <Palette className="h-4 w-4 text-primary-500 dark:text-primary-400" />
-                <h3 className="text-sm font-semibold text-text dark:text-text-dark uppercase tracking-wide">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Palette className="h-3.5 w-3.5 text-primary-500 dark:text-primary-400" />
+                <h3 className="text-xs font-semibold text-text dark:text-text-dark uppercase tracking-wide">
                   Personalização
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <FormField label="Cor">
                   <ColorPicker value={form.color} onChange={handleColorChange} />
                 </FormField>
@@ -444,7 +506,7 @@ export function CreditCardFormModal({
         </div>
 
         {/* Footer Fixo */}
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-border dark:border-border-dark bg-card dark:bg-card-dark flex-shrink-0">
+        <div className="flex justify-end gap-3 px-5 py-3 border-t border-border dark:border-border-dark bg-card dark:bg-card-dark flex-shrink-0">
           <Button
             type="button"
             variant="outline"

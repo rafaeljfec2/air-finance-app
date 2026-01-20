@@ -13,7 +13,7 @@ interface CashFlowCardProps {
 }
 
 export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlowCardProps>) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <CardContainer color="emerald" className={isCollapsed ? "min-h-0" : "min-h-[250px]"}>

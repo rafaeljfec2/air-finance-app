@@ -23,7 +23,7 @@ export function PayablesCard({
   onPageChange,
   onExpand,
 }: Readonly<PayablesCardProps>) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const totalPages = Math.ceil(payables.length / itemsPerPage) || 1;
   const safePage = Math.min(Math.max(currentPage, 1), totalPages);
   const startIndex = (safePage - 1) * itemsPerPage;

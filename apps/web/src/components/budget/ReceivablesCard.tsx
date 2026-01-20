@@ -23,7 +23,7 @@ export function ReceivablesCard({
   onPageChange,
   onExpand,
 }: Readonly<ReceivablesCardProps>) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const totalPages = Math.ceil(receivables.length / itemsPerPage) || 1;
   const safePage = Math.min(Math.max(currentPage, 1), totalPages);
   const startIndex = (safePage - 1) * itemsPerPage;
