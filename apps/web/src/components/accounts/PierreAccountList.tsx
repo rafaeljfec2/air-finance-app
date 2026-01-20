@@ -37,8 +37,11 @@ export function PierreAccountList({
     return 'Conta Bancária';
   };
 
-  const formatBalance = (balance: string) => {
+  const formatBalance = (balance: string, account: PierreAccount) => {
     const value = Number.parseFloat(balance || '0');
+    if (account.type === 'CREDIT') {
+      return formatCurrency(-Math.abs(value));
+    }
     return formatCurrency(value);
   };
 
@@ -126,12 +129,17 @@ export function PierreAccountList({
                       </p>
                     </div>
                     <div className="text-right shrink-0">
+                      {account.type === 'CREDIT' && (
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">
+                          Valor utilizado
+                        </p>
+                      )}
                       <p className={`text-sm font-semibold ${
-                        Number.parseFloat(account.balance) >= 0
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
+                        account.type === 'CREDIT' || Number.parseFloat(account.balance) < 0
+                          ? 'text-red-600 dark:text-red-400'
+                          : 'text-green-600 dark:text-green-400'
                       }`}>
-                        {formatBalance(account.balance)}
+                        {formatBalance(account.balance, account)}
                       </p>
                     </div>
                   </div>
