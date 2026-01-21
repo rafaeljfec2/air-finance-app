@@ -178,10 +178,10 @@ export function TransactionGrid({
                     <col className="w-[6%] sm:w-[8%]" />
                     <col className="w-[12%] sm:w-[15%]" />
                     <col className="w-[20%] sm:w-[25%]" />
-                    <col className="w-[12%] sm:w-[15%]" />
-                    <col className="w-[12%] text-right" />
-                    <col className="w-[12%] text-right" />
-                    <col className="w-[12%] text-right" />
+                    <col className="w-[14%] sm:w-[18%]" />
+                    <col className="w-[11%] text-right" />
+                    <col className="w-[11%] text-right" />
+                    <col className="w-[11%] text-right" />
                   </colgroup>
                   <thead>
                     <tr className="bg-background/30 dark:bg-background-dark/30">

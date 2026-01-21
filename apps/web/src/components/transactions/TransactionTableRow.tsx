@@ -99,9 +99,9 @@ export const TableRow = memo(
             </span>
           </Tooltip>
         </td>
-        <td className={cn(cellPaddingClass, "text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis align-middle")} style={cellPadding}>
+        <td className={cn(cellPaddingClass, "text-xs text-text dark:text-text-dark align-middle overflow-hidden")} style={{...cellPadding, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
           <Tooltip content={transaction.accountId || 'Sem conta'}>
-            <span className="block overflow-hidden text-ellipsis">
+            <span className="block overflow-hidden text-ellipsis whitespace-nowrap">
               {transaction.accountId || 'Sem conta'}
             </span>
           </Tooltip>
