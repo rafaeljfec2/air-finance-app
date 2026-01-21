@@ -3,16 +3,17 @@
  * Maps bank codes and institution names to logo paths and fallback icons
  */
 
-// Imports estáticos dos logos SVG (processados pelo Vite)
-import bancoDoBrasilLogo from '@/assets/images/banks/001-banco-do-brasil.svg';
-import bradescoLogo from '@/assets/images/banks/237-bradesco.svg';
-import itauLogo from '@/assets/images/banks/341-itau.svg';
-import santanderLogo from '@/assets/images/banks/033-santander.svg';
-import caixaLogo from '@/assets/images/banks/104-caixa.svg';
-import nubankLogo from '@/assets/images/banks/260-nubank.svg';
-import interLogo from '@/assets/images/banks/077-inter.svg';
-import originalLogo from '@/assets/images/banks/212-original.svg';
-import btgLogo from '@/assets/images/banks/208-btg.svg';
+// Imports estáticos dos logos SVG como URLs (processados pelo Vite)
+// Usando ?url para garantir que o Vite retorne uma URL string ao invés de componente React
+import bancoDoBrasilLogo from '@/assets/images/banks/001-banco-do-brasil.svg?url';
+import bradescoLogo from '@/assets/images/banks/237-bradesco.svg?url';
+import itauLogo from '@/assets/images/banks/341-itau.svg?url';
+import santanderLogo from '@/assets/images/banks/033-santander.svg?url';
+import caixaLogo from '@/assets/images/banks/104-caixa.svg?url';
+import nubankLogo from '@/assets/images/banks/260-nubank.svg?url';
+import interLogo from '@/assets/images/banks/077-inter.svg?url';
+import originalLogo from '@/assets/images/banks/212-original.svg?url';
+import btgLogo from '@/assets/images/banks/208-btg.svg?url';
 
 // Mapeamento bankCode -> URL do logo (importado estaticamente pelo Vite)
 const BANK_LOGOS: Record<string, string> = {
@@ -22,6 +23,7 @@ const BANK_LOGOS: Record<string, string> = {
   '033': santanderLogo,
   '104': caixaLogo,
   '260': nubankLogo,
+  '140': nubankLogo,
   '077': interLogo,
   '212': originalLogo,
   '208': btgLogo,
@@ -31,29 +33,42 @@ const BANK_LOGOS: Record<string, string> = {
 // Mapeamento institution name -> bankCode (normalizado, case-insensitive)
 const INSTITUTION_TO_CODE: Record<string, string> = {
   'banco do brasil': '001',
-  'bb': '001',
-  'bradesco': '237',
-  'itau': '341',
-  'itaú': '341',
+  bb: '001',
+  'banco do brasil s.a': '001',
+  bradesco: '237',
+  'bradesco s.a': '237',
+  itau: '341',
+  itaú: '341',
   'itau unibanco': '341',
   'itaú unibanco': '341',
-  'santander': '033',
-  'caixa': '104',
+  'itau unibanco s.a': '341',
+  'itaú unibanco s.a': '341',
+  santander: '033',
+  'banco santander': '033',
+  'banco santander brasil': '033',
+  'banco santander brasil s.a': '033',
+  caixa: '104',
   'caixa economica': '104',
   'caixa econômica': '104',
   'caixa economica federal': '104',
   'caixa econômica federal': '104',
-  'nubank': '260',
+  nubank: '260',
   'nu pagamentos': '260',
+  'nu pagamentos s.a': '260',
   'nu pagamentos s.a.': '260',
-  'inter': '077',
+  inter: '077',
   'banco inter': '077',
-  'original': '212',
+  'banco inter s.a': '077',
+  original: '212',
   'banco original': '212',
-  'pan': '623',
+  'banco original s.a': '212',
+  pan: '623',
   'banco pan': '623',
-  'btg': '208',
+  btg: '208',
   'btg pactual': '208',
+  'banco btg pactual': '208',
+  'banco btg pacutal': '208', // Typo no repositório
+  'pierre finance': '260', // Pode ser usado para Nu Pagamentos
 };
 
 // Mapeamento bankCode -> ícone do lucide-react como fallback
@@ -77,8 +92,7 @@ function normalizeInstitution(institution: string): string {
   return institution
     .toLowerCase()
     .normalize('NFD')
-    // eslint-disable-next-line prefer-string-replace-all
-    .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+    .replaceAll(/[\u0300-\u036f]/g, '') // Remove acentos
     .trim();
 }
 

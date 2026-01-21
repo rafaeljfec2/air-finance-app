@@ -21,7 +21,10 @@ export function useBanks() {
     }
   }, [error]);
 
-  const bankOptions: ComboBoxOption<string>[] = useMemo(() => {
+  const bankOptions: (ComboBoxOption<string> & {
+    bankCode?: string;
+    bankName?: string;
+  })[] = useMemo(() => {
     if (!banks || banks.length === 0) return [];
     
     // Filtrar apenas bancos ativos
@@ -30,6 +33,9 @@ export function useBanks() {
     return activeBanks.map((bank) => ({
       value: bank.code,
       label: `${bank.code} - ${bank.shortName || bank.name}`, // Fallback para name se shortName não existir
+      // Store bank info for logo rendering
+      bankCode: bank.code,
+      bankName: bank.shortName || bank.name,
     }));
   }, [banks]);
 

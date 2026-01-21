@@ -10,7 +10,15 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
-    plugins: [react(), svgr()],
+    plugins: [
+      react(),
+      svgr({
+        // Permitir importar SVGs como URLs (default) e como componentes React (?react)
+        svgrOptions: {
+          exportType: 'default',
+        },
+      }),
+    ],
     define: {
       'process.env': env,
       __APP_VERSION__: JSON.stringify(pkg.version),

@@ -5,10 +5,11 @@ import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
-import { ComboBox } from '@/components/ui/ComboBox';
+import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { useBanks } from '@/hooks/useBanks';
 import { cn } from '@/lib/utils';
+import { BankIcon } from '@/components/bank/BankIcon';
 import {
   CreateCreditCardPayload,
   CreditCard as CreditCardType,
@@ -313,6 +314,50 @@ export function CreditCardFormModal({
                     searchable
                     searchPlaceholder="Buscar banco..."
                     icon={Building2}
+                    renderItem={(option) => {
+                      const bankOption = option as ComboBoxOption<string> & {
+                        bankCode?: string;
+                        bankName?: string;
+                      };
+                      return (
+                        <div className="flex items-center gap-2.5">
+                          <BankIcon
+                            bankCode={bankOption.bankCode}
+                            institution={bankOption.bankName}
+                            size="sm"
+                            className="flex-shrink-0"
+                          />
+                          <span className="text-sm">{option.label}</span>
+                        </div>
+                      );
+                    }}
+                    renderTrigger={(option) => {
+                      if (!option) {
+                        return (
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <Building2 className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                            <span className="truncate text-gray-900 dark:text-gray-100">
+                              {isLoadingBanks ? 'Carregando bancos...' : 'Selecione o banco (opcional)'}
+                            </span>
+                          </div>
+                        );
+                      }
+                      const bankOption = option as ComboBoxOption<string> & {
+                        bankCode?: string;
+                        bankName?: string;
+                      };
+                      return (
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <BankIcon
+                            bankCode={bankOption.bankCode}
+                            institution={bankOption.bankName}
+                            size="sm"
+                            className="flex-shrink-0"
+                          />
+                          <span className="truncate text-gray-900 dark:text-gray-100">{option.label}</span>
+                        </div>
+                      );
+                    }}
                     className={cn(
                       'bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark',
                       errors.bankCode && 'border-red-500',

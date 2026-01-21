@@ -60,13 +60,16 @@ export function CreditCardsSection({
                     >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <BankIcon
-                            bankCode={card.bankCode}
-                            institution={card.name}
-                            iconName={card.icon}
-                            size="lg"
-                            className="text-white"
-                          />
+                          <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0 overflow-hidden bg-white/10">
+                            <BankIcon
+                              bankCode={card.bankCode}
+                              institution={card.name}
+                              iconName={card.icon}
+                              size="lg"
+                              fillContainer={true}
+                              className="p-1"
+                            />
+                          </div>
                           <div>
                             <h4 className="font-semibold text-white">{card.name}</h4>
                             <p className="text-xs text-white/80">{card.accountNumber}</p>

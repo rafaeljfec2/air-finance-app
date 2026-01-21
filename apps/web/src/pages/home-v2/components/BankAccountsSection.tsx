@@ -69,16 +69,14 @@ export function BankAccountsSection({
                 key={account.id}
                 className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: account.color }}
-                >
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
                   <BankIcon
                     bankCode={account.bankCode}
                     institution={account.institution}
                     iconName={account.icon}
                     size="md"
-                    className="text-white"
+                    fillContainer={true}
+                    className="p-1"
                   />
                 </div>
 

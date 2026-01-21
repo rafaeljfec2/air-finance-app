@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBanks } from '@/hooks/useBanks';
 import { Building2 } from 'lucide-react';
+import { BankIcon } from '@/components/bank/BankIcon';
 
 interface AccountEditModalProps {
   open: boolean;
@@ -164,6 +165,50 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
               searchable
               searchPlaceholder="Buscar banco..."
               icon={Building2}
+              renderItem={(option) => {
+                const bankOption = option as ComboBoxOption<string> & {
+                  bankCode?: string;
+                  bankName?: string;
+                };
+                return (
+                  <div className="flex items-center gap-2.5">
+                    <BankIcon
+                      bankCode={bankOption.bankCode}
+                      institution={bankOption.bankName}
+                      size="sm"
+                      className="flex-shrink-0"
+                    />
+                    <span className="text-sm">{option.label}</span>
+                  </div>
+                );
+              }}
+              renderTrigger={(option) => {
+                if (!option) {
+                  return (
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <Building2 className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                      <span className="truncate text-gray-900 dark:text-gray-100">
+                        {isLoadingBanks ? 'Carregando bancos...' : 'Selecione o banco'}
+                      </span>
+                    </div>
+                  );
+                }
+                const bankOption = option as ComboBoxOption<string> & {
+                  bankCode?: string;
+                  bankName?: string;
+                };
+                return (
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <BankIcon
+                      bankCode={bankOption.bankCode}
+                      institution={bankOption.bankName}
+                      size="sm"
+                      className="flex-shrink-0"
+                    />
+                    <span className="truncate text-gray-900 dark:text-gray-100">{option.label}</span>
+                  </div>
+                );
+              }}
               className="w-full"
             />
             {errors.institution && <p className="text-xs text-red-500">{errors.institution}</p>}
