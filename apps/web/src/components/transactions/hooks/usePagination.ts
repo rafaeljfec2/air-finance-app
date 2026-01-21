@@ -37,6 +37,12 @@ export function usePagination(itemsPerPage: number = 5) {
     setCurrentPage(1);
   };
 
+  const goToLastPage = (totalPages: number) => {
+    if (totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  };
+
   return {
     currentPage,
     itemsPerPageSelected,
@@ -44,5 +50,6 @@ export function usePagination(itemsPerPage: number = 5) {
     handlePageChange,
     handleItemsPerPageChange,
     resetPage,
+    goToLastPage,
   };
 }
