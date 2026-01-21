@@ -23,25 +23,28 @@ export function PaginationControls({
   onItemsPerPageChange,
 }: PaginationControlsProps) {
   return (
-    <div className="mb-2 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0 border-b border-border dark:border-border-dark pb-2">
-      <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto justify-center sm:justify-start text-center sm:text-left">
+    <div className="mb-2 flex flex-row items-center justify-between gap-1 sm:gap-2 border-b border-border dark:border-border-dark pb-2 overflow-x-auto">
+      <div className="flex flex-row items-center gap-1 sm:gap-2 flex-shrink-0">
         <select
           value={itemsPerPage}
           onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-          className="text-xs bg-background dark:bg-background-dark border border-border dark:border-border-dark rounded-md py-0.5 px-2"
+          className="text-xs bg-background dark:bg-background-dark border border-border dark:border-border-dark rounded-md py-0.5 px-1.5 sm:px-2 flex-shrink-0"
         >
-          <option value={5}>5 por página</option>
-          <option value={10}>10 por página</option>
-          <option value={15}>15 por página</option>
-          <option value={20}>20 por página</option>
-          <option value={30}>30 por página</option>
-          <option value={40}>40 por página</option>
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={15}>15</option>
+          <option value={20}>20</option>
+          <option value={30}>30</option>
+          <option value={40}>40</option>
         </select>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
+        <p className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap hidden sm:inline">
+          por página
+        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap hidden sm:inline">
           Mostrando {startIndex + 1} a {Math.min(endIndex, totalItems)} de {totalItems}
         </p>
       </div>
-      <div className="flex items-center gap-1 w-full sm:w-auto justify-center sm:justify-end">
+      <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
         <button
           onClick={() => onPageChange(1)}
           disabled={currentPage === 1}
@@ -68,7 +71,7 @@ export function PaginationControls({
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <output className="text-xs font-medium text-text dark:text-text-dark px-2">
+        <output className="text-xs font-medium text-text dark:text-text-dark px-1 sm:px-2 whitespace-nowrap">
           Página {currentPage} de {totalPages}
         </output>
         <button
