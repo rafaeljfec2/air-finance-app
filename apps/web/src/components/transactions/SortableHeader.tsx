@@ -46,9 +46,10 @@ export function SortableHeader({
   return (
     <th
       className={cn(
-        'text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none relative',
+        'text-left py-1 px-2 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none relative align-middle',
         className,
       )}
+      style={{ lineHeight: '1.25' }}
       role="columnheader"
       aria-sort={getAriaSort()}
       onClick={() => onSort(field)}

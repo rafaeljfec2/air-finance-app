@@ -1,16 +1,12 @@
 import { Account } from '@/services/accountService';
 import { formatCurrency } from '@/utils/formatters';
-import { Banknote, Landmark, Wallet, MoreVertical, Edit, Trash2, Link2, Clock } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Link2, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useBanks } from '@/hooks/useBanks';
-
-const accountTypes = [
-  { value: 'checking', label: 'Conta Corrente', icon: Banknote },
-  { value: 'savings', label: 'Poupança', icon: Wallet },
-  { value: 'digital_wallet', label: 'Carteira Digital', icon: Wallet },
-  { value: 'investment', label: 'Investimento', icon: Landmark },
-] as const;
+import { BankIcon } from '@/components/bank/BankIcon';
+import { hasBankLogo } from '@/utils/bankIcons';
+import { cn } from '@/lib/utils';
 
 interface AccountListItemProps {
   account: Account;
@@ -37,19 +33,28 @@ export function AccountListItem({
     return null;
   }
 
-  const Icon = accountTypes.find((t) => t.value === account.type)?.icon || Banknote;
-  
   // Verifica se o banco suporta integração
   const bankSupportsIntegration = hasBankingIntegration(account.bankCode);
+  const hasLogo = hasBankLogo(account.bankCode ?? undefined, account.institution ?? undefined);
 
   return (
     <div className="flex items-center gap-2.5 p-2 bg-card dark:bg-card-dark hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors rounded-lg border border-border/50 dark:border-border-dark/50">
-      {/* Ícone com cor */}
+      {/* Ícone com logo do banco ou cor personalizada */}
       <div
-        className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-        style={{ backgroundColor: account.color }}
+        className={cn(
+          'w-9 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden',
+          !hasLogo && 'p-1.5'
+        )}
+        style={!hasLogo ? { backgroundColor: account.color } : undefined}
       >
-        <Icon className="h-5 w-5 text-white" />
+        <BankIcon
+          bankCode={account.bankCode ?? undefined}
+          institution={account.institution ?? undefined}
+          iconName={!hasLogo ? account.icon ?? undefined : undefined}
+          size="md"
+          fillContainer={hasLogo}
+          className={hasLogo ? 'p-1' : 'text-white'}
+        />
       </div>
 
       {/* Conteúdo */}

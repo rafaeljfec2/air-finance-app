@@ -29,17 +29,18 @@ export const TableRow = memo(
             ? 'bg-gray-50/80 dark:bg-gray-900/40 italic font-medium'
             : 'hover:bg-muted/50 dark:hover:bg-muted/50',
         )}
+        style={{ height: 'auto', lineHeight: '1.25' }}
       >
-        <td className="py-1 px-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+        <td className="py-1 px-2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap align-middle">
           {formatTransactionDate(transaction.paymentDate || transaction.createdAt, 'dd/MM/yyyy')}
         </td>
-        <td className="py-1 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
-          <div className="flex items-center gap-2">
+        <td className="py-1 px-2 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis align-middle">
+          <div className="flex items-center gap-1.5">
             {!isPreviousBalance && (
               transaction.launchType === 'revenue' ? (
-                <ArrowUpCircle className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+                <ArrowUpCircle className="h-3 w-3 text-green-500 flex-shrink-0" />
               ) : (
-                <ArrowDownCircle className="h-3.5 w-3.5 text-red-500 flex-shrink-0" />
+                <ArrowDownCircle className="h-3 w-3 text-red-500 flex-shrink-0" />
               )
             )}
             <Tooltip content={transaction.categoryId || 'Sem categoria'}>
@@ -49,28 +50,28 @@ export const TableRow = memo(
             </Tooltip>
           </div>
         </td>
-        <td className="py-1 px-4 text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis">
+        <td className="py-1 px-2 text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis align-middle">
           <Tooltip content={transaction.description || 'Sem descrição'}>
             <span className="block overflow-hidden text-ellipsis">
               {transaction.description || 'Sem descrição'}
             </span>
           </Tooltip>
         </td>
-        <td className="py-1 px-4 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis">
+        <td className="py-1 px-2 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis align-middle">
           <Tooltip content={transaction.accountId || 'Sem conta'}>
             <span className="block overflow-hidden text-ellipsis">
               {transaction.accountId || 'Sem conta'}
             </span>
           </Tooltip>
         </td>
-        <td className="py-1 pl-0 pr-8 text-xs font-medium text-right text-emerald-400 whitespace-nowrap">
+        <td className="py-1 pl-0 pr-4 text-xs font-medium text-right text-emerald-400 whitespace-nowrap align-middle">
           {isPreviousBalance
             ? '-'
             : transaction.launchType === 'revenue'
               ? formatCurrency(transaction.value)
               : '-'}
         </td>
-        <td className="py-1 pl-0 pr-8 text-xs font-medium text-right text-red-400 whitespace-nowrap">
+        <td className="py-1 pl-0 pr-4 text-xs font-medium text-right text-red-400 whitespace-nowrap align-middle">
           {isPreviousBalance
             ? '-'
             : transaction.launchType === 'expense'
@@ -79,7 +80,7 @@ export const TableRow = memo(
         </td>
         <td
           className={cn(
-            'py-1 pl-0 pr-8 text-xs font-medium text-right whitespace-nowrap',
+            'py-1 pl-0 pr-4 text-xs font-medium text-right whitespace-nowrap align-middle',
             (transaction.balance ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400',
           )}
         >
@@ -88,7 +89,7 @@ export const TableRow = memo(
             : formatCurrency(transaction.balance ?? 0)}
         </td>
         {showActions && !isPreviousBalance && (
-          <td className="py-1 px-4">
+          <td className="py-1 px-2 align-middle">
             <TransactionActions
               transaction={transaction}
               onEdit={onEdit}
@@ -99,7 +100,7 @@ export const TableRow = memo(
             />
           </td>
         )}
-        {showActions && isPreviousBalance && <td className="py-1 px-4" />}
+        {showActions && isPreviousBalance && <td className="py-1 px-2 align-middle" />}
       </tr>
     );
   },

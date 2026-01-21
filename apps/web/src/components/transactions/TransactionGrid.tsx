@@ -137,7 +137,7 @@ export function TransactionGrid({
         className,
       )}
     >
-      <div className="p-3 sm:p-4">
+      <div className="p-2 sm:p-3">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-8">
             <Loader2 className="h-8 w-8 text-primary-500 animate-spin mb-3" />
@@ -147,8 +147,8 @@ export function TransactionGrid({
           <>
             {/* Desktop Table View */}
             <div className="hidden md:block">
-              <div className="w-full min-h-[320px]">
-                <table className="w-full table-fixed">
+              <div className="w-full min-h-[240px]">
+                <table className="w-full table-fixed text-xs">
                   <colgroup>
                     <col className="w-[6%] sm:w-[8%]" />
                     <col className="w-[12%] sm:w-[15%]" />
@@ -174,27 +174,27 @@ export function TransactionGrid({
                       </SortableHeader>
                       <SortableHeader
                         field="credit"
-                        className="text-right pl-0 pr-8"
+                        className="text-right pl-0 pr-4"
                         {...headerProps}
                       >
                         Crédito
                       </SortableHeader>
                       <SortableHeader
                         field="debit"
-                        className="text-right pl-0 pr-8"
+                        className="text-right pl-0 pr-4"
                         {...headerProps}
                       >
                         Débito
                       </SortableHeader>
                       <SortableHeader
                         field="balance"
-                        className="text-right pl-0 pr-8"
+                        className="text-right pl-0 pr-4"
                         {...headerProps}
                       >
                         Saldo
                       </SortableHeader>
                       {showActions && (
-                        <th className="w-24 text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">
+                        <th className="w-20 text-left py-1.5 px-2 text-xs font-medium text-gray-500 dark:text-gray-400">
                           Ações
                         </th>
                       )}
@@ -217,15 +217,15 @@ export function TransactionGrid({
                       <tr>
                         <td
                           colSpan={showActions ? 8 : 7}
-                          className="py-16 text-center"
+                          className="py-8 text-center"
                         >
-                          <div className="flex flex-col items-center justify-center gap-3">
-                            <div className="p-4 bg-muted/50 rounded-full">
-                              <Receipt className="h-8 w-8 text-muted-foreground/50" />
+                          <div className="flex flex-col items-center justify-center gap-2">
+                            <div className="p-3 bg-muted/50 rounded-full">
+                              <Receipt className="h-6 w-6 text-muted-foreground/50" />
                             </div>
-                            <div className="flex flex-col gap-1">
-                              <p className="font-medium text-text dark:text-text-dark">Nenhuma transação encontrada</p>
-                              <p className="text-sm text-muted-foreground">Tente ajustar os filtros ou busque por outro termo.</p>
+                            <div className="flex flex-col gap-0.5">
+                              <p className="text-sm font-medium text-text dark:text-text-dark">Nenhuma transação encontrada</p>
+                              <p className="text-xs text-muted-foreground">Tente ajustar os filtros ou busque por outro termo.</p>
                             </div>
                           </div>
                         </td>

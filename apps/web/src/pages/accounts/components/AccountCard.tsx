@@ -5,6 +5,8 @@ import { Banknote, Landmark, Wallet, Building, Hash, MoreVertical, Edit, Trash2,
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useBanks } from '@/hooks/useBanks';
+import { BankIcon } from '@/components/bank/BankIcon';
+import { hasBankLogo } from '@/utils/bankIcons';
 
 const accountTypes = [
   { value: 'checking', label: 'Conta Corrente', icon: Banknote },
@@ -55,21 +57,30 @@ export function AccountCard({
     return null;
   }
 
-  const Icon = accountTypes.find((t) => t.value === account.type)?.icon || Banknote;
-  
   // Verifica se o banco suporta integração
   const bankSupportsIntegration = hasBankingIntegration(account.bankCode);
+  const hasLogo = hasBankLogo(account.bankCode ?? undefined, account.institution ?? undefined);
 
   return (
     <div className="w-full rounded-lg transition-all text-left bg-white dark:bg-card-dark hover:shadow-md p-3 border border-border/50 dark:border-border-dark/50">
       <div className="flex items-start justify-between gap-2.5">
         <div className="flex items-start gap-2.5 flex-1 min-w-0">
-          {/* Ícone com cor personalizada */}
+          {/* Ícone com logo do banco ou cor personalizada */}
           <div
-            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-            style={{ backgroundColor: account.color }}
+            className={cn(
+              'w-9 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden',
+              !hasLogo && 'p-1.5'
+            )}
+            style={!hasLogo ? { backgroundColor: account.color } : undefined}
           >
-            <Icon className="h-5 w-5 text-white" />
+            <BankIcon
+              bankCode={account.bankCode ?? undefined}
+              institution={account.institution ?? undefined}
+              iconName={!hasLogo ? account.icon ?? undefined : undefined}
+              size="md"
+              fillContainer={hasLogo}
+              className={hasLogo ? 'p-1' : 'text-white'}
+            />
           </div>
 
           {/* Conteúdo */}

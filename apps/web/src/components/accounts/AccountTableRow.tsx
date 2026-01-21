@@ -5,6 +5,8 @@ import { Account } from '@/services/accountService';
 import { formatCurrency } from '@/utils/formatters';
 import { Banknote, Edit, Landmark, Trash2, Wallet, Link2, Clock, MoreVertical } from 'lucide-react';
 import { useBanks } from '@/hooks/useBanks';
+import { BankIcon } from '@/components/bank/BankIcon';
+import { hasBankLogo } from '@/utils/bankIcons';
 
 interface AccountTableRowProps {
   account: Account;
@@ -55,18 +57,28 @@ export function AccountTableRow({
     return null;
   }
 
-  const Icon = accountTypes.find((t) => t.value === account.type)?.icon || Banknote;
   const bankSupportsIntegration = hasBankingIntegration(account.bankCode);
+  const hasLogo = hasBankLogo(account.bankCode ?? undefined, account.institution ?? undefined);
 
   return (
     <tr className="border-b border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark transition-colors">
       <td className="p-4">
         <div className="flex items-center gap-3">
           <div
-            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: account.color }}
+            className={cn(
+              'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden',
+              !hasLogo && 'rounded-full'
+            )}
+            style={!hasLogo ? { backgroundColor: account.color } : undefined}
           >
-            <Icon className="h-4 w-4 text-white" />
+            <BankIcon
+              bankCode={account.bankCode ?? undefined}
+              institution={account.institution ?? undefined}
+              iconName={!hasLogo ? account.icon ?? undefined : undefined}
+              size="sm"
+              fillContainer={hasLogo}
+              className={hasLogo ? 'p-0.5' : 'text-white'}
+            />
           </div>
           <div>
             <div className="font-medium text-text dark:text-text-dark mb-1">{account.name}</div>
