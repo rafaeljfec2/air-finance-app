@@ -45,6 +45,31 @@ export const CreateAccountSchema = AccountSchema.omit({
 export type Account = z.infer<typeof AccountSchema>;
 export type CreateAccount = z.infer<typeof CreateAccountSchema>;
 
+// Account Summary Schemas
+export const AccountSummaryItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  institution: z.string(),
+  type: z.string(),
+  balance: z.number(),
+  color: z.string(),
+  icon: z.string(),
+});
+
+export const AccountsSummarySchema = z.object({
+  accounts: z.array(AccountSummaryItemSchema),
+  totalBalance: z.number(),
+});
+
+export const TotalBalanceSchema = z.object({
+  totalBalance: z.number(),
+  totalAccounts: z.number(),
+});
+
+export type AccountSummaryItem = z.infer<typeof AccountSummaryItemSchema>;
+export type AccountsSummary = z.infer<typeof AccountsSummarySchema>;
+export type TotalBalance = z.infer<typeof TotalBalanceSchema>;
+
 export const getAccounts = async (companyId: string): Promise<Account[]> => {
   try {
     const response = await apiClient.get<Account[]>(`/companies/${companyId}/accounts`);
@@ -105,6 +130,24 @@ export const getAccountBalance = async (id: string): Promise<number> => {
   try {
     const response = await apiClient.get<{ balance: number }>(`/accounts/${id}/balance`);
     return response.data.balance;
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+export const getAccountsSummary = async (companyId: string): Promise<AccountsSummary> => {
+  try {
+    const response = await apiClient.get<AccountsSummary>(`/companies/${companyId}/accounts/summary`);
+    return AccountsSummarySchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+export const getTotalBalance = async (companyId: string): Promise<TotalBalance> => {
+  try {
+    const response = await apiClient.get<TotalBalance>(`/companies/${companyId}/accounts/total-balance`);
+    return TotalBalanceSchema.parse(response.data);
   } catch (error) {
     throw parseApiError(error);
   }

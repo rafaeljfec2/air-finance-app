@@ -45,6 +45,7 @@ const Dashboard = lazy(() =>
   import('@/pages/dashboard/Dashboard').then((m) => ({ default: m.Dashboard })),
 );
 const HomePage = lazy(() => import('@/pages/home').then((m) => ({ default: m.HomePage })));
+const HomePageV2 = lazy(() => import('@/pages/home-v2').then((m) => ({ default: m.HomePageV2 })));
 const DependentsPage = lazy(() =>
   import('@/pages/dependents').then((m) => ({ default: m.DependentsPage })),
 );
@@ -294,6 +295,7 @@ export const router = createBrowserRouter([
   // ==================== PROTECTED ROUTES WITH ONBOARDING ====================
   createProtectedRoute('/onboarding', OnboardingPage, { errorCode: 500 }),
   createProtectedRoute('/home', HomePage, { requireOnboarding: true, errorCode: 500 }),
+  createProtectedRoute('/home-v2', HomePageV2, { requireOnboarding: true, errorCode: 500 }),
   createProtectedRoute('/dashboard', Dashboard, { requireOnboarding: true, errorCode: 500 }),
   createProtectedRoute('/financial-health', FinancialHealthPage, {
     requireOnboarding: true,

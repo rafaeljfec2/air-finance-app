@@ -36,6 +36,44 @@ export type CreateCreditCardPayload = {
   companyId: string;
 };
 
+// Credit Card Summary Schemas
+export const CreditCardSummaryItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  accountNumber: z.string(),
+  limit: z.number(),
+  totalUsed: z.number(),
+  totalAvailable: z.number(),
+  totalInstallments: z.number(),
+  color: z.string(),
+  icon: z.string(),
+});
+
+export const CreditCardAggregatedSchema = z.object({
+  totalLimit: z.number(),
+  totalUsed: z.number(),
+  totalAvailable: z.number(),
+  totalInstallments: z.number(),
+});
+
+export const CreditCardsSummarySchema = z.object({
+  creditCards: z.array(CreditCardSummaryItemSchema),
+  aggregated: CreditCardAggregatedSchema,
+});
+
+export const CreditCardTotalSummarySchema = z.object({
+  totalLimit: z.number(),
+  totalUsed: z.number(),
+  totalAvailable: z.number(),
+  totalInstallments: z.number(),
+  totalCards: z.number(),
+});
+
+export type CreditCardSummaryItem = z.infer<typeof CreditCardSummaryItemSchema>;
+export type CreditCardAggregated = z.infer<typeof CreditCardAggregatedSchema>;
+export type CreditCardsSummary = z.infer<typeof CreditCardsSummarySchema>;
+export type CreditCardTotalSummary = z.infer<typeof CreditCardTotalSummarySchema>;
+
 // Service functions
 export const getCreditCards = async (companyId: string): Promise<CreditCard[]> => {
   try {
@@ -127,6 +165,30 @@ export const updateCreditCardStatus = async (
       { status },
     );
     return CreditCardSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+export const getCreditCardsSummary = async (companyId: string): Promise<CreditCardsSummary> => {
+  try {
+    const response = await apiClient.get<CreditCardsSummary>(
+      `/companies/${companyId}/credit-cards/summary`,
+    );
+    return CreditCardsSummarySchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+export const getCreditCardTotalSummary = async (
+  companyId: string,
+): Promise<CreditCardTotalSummary> => {
+  try {
+    const response = await apiClient.get<CreditCardTotalSummary>(
+      `/companies/${companyId}/credit-cards/total-summary`,
+    );
+    return CreditCardTotalSummarySchema.parse(response.data);
   } catch (error) {
     throw parseApiError(error);
   }
