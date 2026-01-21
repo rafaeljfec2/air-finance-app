@@ -15,6 +15,7 @@ export function HomePage() {
 
   const {
     balance,
+    accumulatedBalance,
     income,
     expenses,
     incomePercentage,
@@ -33,6 +34,7 @@ export function HomePage() {
         <header className="bg-white dark:bg-card-dark px-6 pt-8 md:pt-6 pb-6 rounded-b-[2rem] md:rounded-2xl shadow-sm relative z-10 md:col-span-full">
           <HomeHeader
             balance={balance}
+            accumulatedBalance={accumulatedBalance}
             isPrivacyModeEnabled={isPrivacyModeEnabled}
             onTogglePrivacyMode={togglePrivacyMode}
           />

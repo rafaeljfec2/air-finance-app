@@ -4,12 +4,14 @@ import { Bell, Eye, EyeOff } from 'lucide-react';
 
 interface HomeHeaderProps {
   balance: number;
+  accumulatedBalance: number | null;
   isPrivacyModeEnabled: boolean;
   onTogglePrivacyMode: () => void;
 }
 
 export function HomeHeader({
   balance,
+  accumulatedBalance,
   isPrivacyModeEnabled,
   onTogglePrivacyMode,
 }: Readonly<HomeHeaderProps>) {
@@ -22,9 +24,19 @@ export function HomeHeader({
           Olá, {user?.name?.split(' ')[0]}
         </p>
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(balance)}
-          </h1>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(balance)}
+            </h1>
+            {accumulatedBalance !== null && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Saldo Acumulado:{' '}
+                <span className="font-medium">
+                  {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(accumulatedBalance)}
+                </span>
+              </p>
+            )}
+          </div>
           <button
             onClick={onTogglePrivacyMode}
             className="text-gray-400 hover:text-primary-500"

@@ -44,6 +44,7 @@ export function useHomePageData() {
   const summaryQuery = useDashboardSummary(companyId, filters);
 
   const balance = summaryQuery.data?.balance ?? 0;
+  const accumulatedBalance = summaryQuery.data?.accumulatedBalance ?? null;
 
   const income = summaryQuery.data?.income ?? 0;
   const expenses = summaryQuery.data?.expenses ?? 0;
@@ -81,6 +82,7 @@ export function useHomePageData() {
 
   return {
     balance,
+    accumulatedBalance,
     income,
     expenses,
     incomePercentage,

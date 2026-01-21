@@ -19,6 +19,7 @@ const DashboardSummarySchema = z.object({
   previousIncome: z.number().nullable(),
   previousExpenses: z.number().nullable(),
   previousBalance: z.number().nullable(),
+  accumulatedBalance: z.number().nullable(),
   incomeChangePct: z.number().nullable(),
   expensesChangePct: z.number().nullable(),
   balanceChangePct: z.number().nullable(),

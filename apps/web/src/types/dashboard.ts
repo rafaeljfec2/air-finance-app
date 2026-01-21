@@ -7,6 +7,7 @@ export interface DashboardSummary {
   previousIncome: number | null;
   previousExpenses: number | null;
   previousBalance: number | null;
+  accumulatedBalance: number | null;
   incomeChangePct: number | null;
   expensesChangePct: number | null;
   balanceChangePct: number | null;
