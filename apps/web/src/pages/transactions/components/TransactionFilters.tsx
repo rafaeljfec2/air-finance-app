@@ -114,8 +114,8 @@ export function TransactionFilters({
           showFilters ? '' : 'hidden lg:block'
         }`}
       >
-        <div className="p-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-center gap-4">
+        <div className="p-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-center gap-2">
             {/* Date Range Filter */}
             <div className="flex flex-col gap-2 sm:col-span-2 lg:w-auto lg:flex-row lg:items-center">
               <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1 lg:mb-0">
@@ -128,7 +128,7 @@ export function TransactionFilters({
                     value={startDateObj}
                     onChange={handleStartDateChange}
                     placeholder="Início"
-                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full lg:w-[130px]"
+                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full lg:w-[130px] h-8 text-sm"
                     showIcon={false}
                   />
                   <span className="text-gray-500 dark:text-gray-400 text-sm">até</span>
@@ -136,7 +136,7 @@ export function TransactionFilters({
                     value={endDateObj}
                     onChange={handleEndDateChange}
                     placeholder="Fim"
-                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full lg:w-[130px]"
+                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full lg:w-[130px] h-8 text-sm"
                     showIcon={false}
                   />
                 </div>
@@ -152,7 +152,7 @@ export function TransactionFilters({
                       setStartDate(formatDateToLocalISO(firstDay));
                       setEndDate(formatDateToLocalISO(lastDay));
                     }}
-                    className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
                     title="Mês passado"
                   >
                     Mês Passado
@@ -166,7 +166,7 @@ export function TransactionFilters({
                       setStartDate(formatDateToLocalISO(now));
                       setEndDate(formatDateToLocalISO(now));
                     }}
-                    className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
                     title="Hoje"
                   >
                     Hoje
@@ -182,7 +182,7 @@ export function TransactionFilters({
                       setStartDate(formatDateToLocalISO(firstDay));
                       setEndDate(formatDateToLocalISO(lastDay));
                     }}
-                    className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
                     title="Este mês"
                   >
                     Este Mês
@@ -198,7 +198,7 @@ export function TransactionFilters({
                       setStartDate(formatDateToLocalISO(firstDay));
                       setEndDate(formatDateToLocalISO(lastDay));
                     }}
-                    className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
                     title="Mês seguinte"
                   >
                     Mês Seguinte
@@ -213,7 +213,7 @@ export function TransactionFilters({
                 placeholder="Buscar transação..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full"
+                className="pl-10 h-8 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full text-sm"
               />
             </div>
             <div className="flex items-center gap-2 w-full lg:w-auto">
@@ -226,7 +226,7 @@ export function TransactionFilters({
                 searchPlaceholder="Buscar conta..."
                 searchable
                 icon={Filter}
-                className="bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark w-full lg:w-auto lg:min-w-[160px]"
+                className="h-8 bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark w-full lg:w-auto lg:min-w-[160px] text-sm"
               />
             </div>
             <div className="flex items-center gap-2 w-full lg:w-auto">
@@ -237,14 +237,14 @@ export function TransactionFilters({
                 onValueChange={(value) => setSelectedType(value || 'all')}
                 placeholder="Todos os tipos"
                 icon={Filter}
-                className="bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark w-full lg:w-auto lg:min-w-[140px]"
+                className="h-8 bg-background dark:bg-background-dark text-text dark:text-text-dark border-border dark:border-border-dark w-full lg:w-auto lg:min-w-[140px] text-sm"
               />
             </div>
             <Button
               variant="outline"
-              className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center justify-center gap-2"
+              className="h-8 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center justify-center gap-2 text-sm"
             >
-              <Download className="h-4 w-4" />
+              <Download className="h-3.5 w-3.5" />
               Exportar
             </Button>
           </div>

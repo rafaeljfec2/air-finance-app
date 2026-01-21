@@ -58,8 +58,8 @@ export function ImportOfxFilters({
     }));
 
   return (
-    <div className="bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg p-4 mb-4 shadow-sm backdrop-blur-sm">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-center gap-4">
+    <div className="bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg p-2 mb-4 shadow-sm backdrop-blur-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-center gap-2">
         {/* Date Range Filter */}
         <div className="flex flex-col gap-2 sm:col-span-2 lg:w-auto lg:flex-row lg:items-center">
           <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1 lg:mb-0">
@@ -72,7 +72,7 @@ export function ImportOfxFilters({
                 value={startDate}
                 onChange={setStartDate}
                 placeholder="Início"
-                className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full lg:w-[130px]"
+                className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full lg:w-[130px] h-8 text-sm"
                 showIcon={false}
               />
               <span className="text-gray-500 dark:text-gray-400 text-sm">até</span>
@@ -80,7 +80,7 @@ export function ImportOfxFilters({
                 value={endDate}
                 onChange={setEndDate}
                 placeholder="Fim"
-                className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full lg:w-[130px]"
+                className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full lg:w-[130px] h-8 text-sm"
                 showIcon={false}
               />
             </div>
@@ -89,7 +89,7 @@ export function ImportOfxFilters({
                 variant="outline"
                 size="sm"
                 onClick={handleToday}
-                className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 Hoje
               </Button>
@@ -97,7 +97,7 @@ export function ImportOfxFilters({
                 variant="outline"
                 size="sm"
                 onClick={handleThisMonth}
-                className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 Este Mês
               </Button>
@@ -105,7 +105,7 @@ export function ImportOfxFilters({
                 variant="outline"
                 size="sm"
                 onClick={handleLastMonth}
-                className="flex-1 sm:flex-none text-xs h-9 sm:h-auto bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 Mês Passado
               </Button>
@@ -120,7 +120,7 @@ export function ImportOfxFilters({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar transação..."
-            className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full"
+            className="pl-10 h-8 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full text-sm"
           />
         </div>
 
@@ -137,7 +137,7 @@ export function ImportOfxFilters({
               placeholder="Todas as contas"
               searchable
               searchPlaceholder="Buscar conta..."
-              className="w-full bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark"
+              className="w-full h-8 bg-background dark:bg-background-dark border border-border dark:border-border-dark text-text dark:text-text-dark text-sm"
               maxHeight="max-h-56"
               renderItem={(option) => {
                 if (option.value === 'all') return <span>{option.label}</span>;
@@ -169,9 +169,9 @@ export function ImportOfxFilters({
         {/* Export */}
         <Button
           variant="outline"
-          className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center justify-center gap-2"
+          className="h-8 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center justify-center gap-2 text-sm"
         >
-          <Download className="h-4 w-4" />
+          <Download className="h-3.5 w-3.5" />
           Exportar
         </Button>
       </div>
