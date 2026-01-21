@@ -6,7 +6,7 @@ interface LogoProps {
   variant?: 'default' | 'white';
 }
 
-export function Logo({ className, showSlogan = false, variant = 'default' }: LogoProps) {
+export function Logo({ className, showSlogan = false, variant = 'default' }: Readonly<LogoProps>) {
   return (
     <div className={cn('flex flex-col items-center', className)}>
       <div className="flex items-center gap-2">

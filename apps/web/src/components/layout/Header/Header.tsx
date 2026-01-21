@@ -1,4 +1,3 @@
-import { Logo } from '@/components/Logo';
 import { NotificationsMenu } from '@/components/notifications/NotificationsMenu';
 import { SupportModal } from '@/components/support/SupportModal';
 import { CompanySelector } from '../CompanySelector';
@@ -35,17 +34,13 @@ export function Header({ onOpenSidebar }: Readonly<HeaderProps>) {
           onBack={goBack}
         />
 
-        {/* Logo */}
-        <div className="flex-shrink-0">
-          <Logo />
+        {/* Company Selector - Substitui o Logo */}
+        <div className="flex-shrink-0 min-w-[200px] max-w-[300px]">
+          <CompanySelector size="compact" />
         </div>
 
         {/* Ações do Header */}
         <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
-          {/* Company Selector */}
-          <div className="hidden lg:block">
-            <CompanySelector />
-          </div>
 
           {/* Atalhos Rápidos */}
           <HeaderQuickActions onNavigate={navigateTo} />
