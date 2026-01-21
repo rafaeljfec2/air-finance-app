@@ -25,13 +25,29 @@ export function HomeHeader({
         </p>
         <div className="flex items-center gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1
+              className={`text-2xl font-bold ${
+                isPrivacyModeEnabled
+                  ? 'text-gray-900 dark:text-white'
+                  : balance >= 0
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : 'text-red-600 dark:text-red-400'
+              }`}
+            >
               {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(balance)}
             </h1>
             {accumulatedBalance !== null && (
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Saldo Acumulado:{' '}
-                <span className="font-medium">
+                <span
+                  className={`font-medium ${
+                    isPrivacyModeEnabled
+                      ? 'text-gray-500 dark:text-gray-400'
+                      : accumulatedBalance >= 0
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : 'text-red-600 dark:text-red-400'
+                  }`}
+                >
                   {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(accumulatedBalance)}
                 </span>
               </p>
