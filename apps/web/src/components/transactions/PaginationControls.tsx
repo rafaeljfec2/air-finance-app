@@ -23,7 +23,7 @@ export function PaginationControls({
   onItemsPerPageChange,
 }: PaginationControlsProps) {
   return (
-    <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0 border-t border-border dark:border-border-dark pt-4">
+    <div className="mb-4 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0 border-b border-border dark:border-border-dark pb-4">
       <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto justify-center sm:justify-start text-center sm:text-left">
         <select
           value={itemsPerPage}
@@ -32,8 +32,10 @@ export function PaginationControls({
         >
           <option value={5}>5 por página</option>
           <option value={10}>10 por página</option>
+          <option value={15}>15 por página</option>
           <option value={20}>20 por página</option>
-          <option value={50}>50 por página</option>
+          <option value={30}>30 por página</option>
+          <option value={40}>40 por página</option>
         </select>
         <p className="text-xs text-gray-500 dark:text-gray-400">
           Mostrando {startIndex + 1} a {Math.min(endIndex, totalItems)} de {totalItems}

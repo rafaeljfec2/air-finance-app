@@ -145,6 +145,18 @@ export function TransactionGrid({
           </div>
         ) : (
           <>
+            {/* Pagination Header */}
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              itemsPerPage={itemsPerPageSelected}
+              startIndex={startIndex}
+              endIndex={endIndex}
+              totalItems={totalItems}
+              onPageChange={handlePageChange}
+              onItemsPerPageChange={handleItemsPerPageChange}
+            />
+
             {/* Desktop Table View */}
             <div className="hidden md:block">
               <div className="w-full min-h-[240px]">
@@ -262,18 +274,6 @@ export function TransactionGrid({
                 </div>
               )}
             </div>
-
-            {/* Pagination */}
-            <PaginationControls
-              currentPage={currentPage}
-              totalPages={totalPages}
-              itemsPerPage={itemsPerPageSelected}
-              startIndex={startIndex}
-              endIndex={endIndex}
-              totalItems={totalItems}
-              onPageChange={handlePageChange}
-              onItemsPerPageChange={handleItemsPerPageChange}
-            />
           </>
         )}
       </div>
