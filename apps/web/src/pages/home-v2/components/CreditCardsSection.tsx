@@ -8,6 +8,8 @@ import type {
 import { useState } from 'react';
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
 import { BankIcon } from '@/components/bank/BankIcon';
+import { hasBankLogo } from '@/utils/bankIcons';
+import { cn } from '@/lib/utils';
 
 interface CreditCardsSectionProps {
   creditCards: CreditCardSummaryItem[];
@@ -60,14 +62,19 @@ export function CreditCardsSection({
                     >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0 overflow-hidden bg-white/10">
+                          <div
+                            className={cn(
+                              'w-12 h-12 rounded-lg flex items-center justify-center shrink-0 overflow-hidden',
+                              !hasBankLogo(card.bankCode, card.name) && 'bg-white/10'
+                            )}
+                          >
                             <BankIcon
                               bankCode={card.bankCode}
                               institution={card.name}
                               iconName={card.icon}
                               size="lg"
-                              fillContainer={true}
-                              className="p-1"
+                              fillContainer={hasBankLogo(card.bankCode, card.name)}
+                              className={hasBankLogo(card.bankCode, card.name) ? 'p-1' : 'text-white'}
                             />
                           </div>
                           <div>

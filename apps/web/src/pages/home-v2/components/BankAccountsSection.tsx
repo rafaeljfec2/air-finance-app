@@ -3,6 +3,8 @@ import { Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { AccountSummaryItem } from '@/services/accountService';
 import { BankIcon } from '@/components/bank/BankIcon';
+import { hasBankLogo } from '@/utils/bankIcons';
+import { cn } from '@/lib/utils';
 
 interface BankAccountsSectionProps {
   accounts: AccountSummaryItem[];
@@ -69,14 +71,24 @@ export function BankAccountsSection({
                 key={account.id}
                 className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
+                <div
+                  className={cn(
+                    'w-10 h-10 rounded-lg flex items-center justify-center shrink-0 overflow-hidden',
+                    !hasBankLogo(account.bankCode, account.institution) && 'p-1.5'
+                  )}
+                  style={
+                    !hasBankLogo(account.bankCode, account.institution)
+                      ? { backgroundColor: account.color }
+                      : undefined
+                  }
+                >
                   <BankIcon
                     bankCode={account.bankCode}
                     institution={account.institution}
                     iconName={account.icon}
                     size="md"
-                    fillContainer={true}
-                    className="p-1"
+                    fillContainer={hasBankLogo(account.bankCode, account.institution)}
+                    className={hasBankLogo(account.bankCode, account.institution) ? 'p-1' : 'text-white'}
                   />
                 </div>
 
