@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type React from 'react';
 import * as Icons from 'lucide-react';
 import { getBankInfo } from '@/utils/bankIcons';
 import { cn } from '@/lib/utils';
@@ -84,11 +85,15 @@ export function BankIcon({
 
   // If custom iconName is provided and no logo available, use it
   if (iconName) {
-    const Icon = (Icons as any)[iconName] || Icons.Banknote;
+    const Icon =
+      (Icons as Record<string, React.ComponentType<{ className?: string }>>)[iconName] ||
+      Icons.Banknote;
     return <Icon className={cn(SIZE_CLASSES[size], className)} />;
   }
 
   // Fallback to bank-specific lucide-react icon
-  const FallbackIcon = (Icons as any)[bankInfo.iconName] || Icons.Banknote;
+  const FallbackIcon =
+    (Icons as Record<string, React.ComponentType<{ className?: string }>>)[bankInfo.iconName] ||
+    Icons.Banknote;
   return <FallbackIcon className={cn(SIZE_CLASSES[size], className)} />;
 }

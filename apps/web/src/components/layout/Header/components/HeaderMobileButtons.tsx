@@ -1,3 +1,4 @@
+import React from 'react';
 import { ArrowLeft, Menu as MenuIcon } from 'lucide-react';
 
 interface HeaderMobileButtonsProps {

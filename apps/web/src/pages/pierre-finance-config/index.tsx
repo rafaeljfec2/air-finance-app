@@ -41,8 +41,8 @@ export function PierreFinanceConfigPage() {
                 </div>
                 <h1 className="v2-h1 v2-mb-6">Como configurar o Pierre Finance</h1>
                 <p className="v2-body max-w-3xl mx-auto text-gray-600">
-                  Guia passo a passo para obter sua API Key e conectar suas contas bancárias via Open
-                  Finance
+                  Guia passo a passo para obter sua API Key e conectar suas contas bancárias via
+                  Open Finance
                 </p>
               </div>
 
@@ -51,7 +51,8 @@ export function PierreFinanceConfigPage() {
                 <h2 className="v2-h3 v2-mb-6">O que é o Pierre Finance?</h2>
                 <p className="v2-body text-gray-600 v2-mb-6">
                   O Pierre Finance é um agregador de contas bancárias via Open Finance que permite
-                  conectar e gerenciar múltiplas contas bancárias em um único lugar. Com ele, você pode:
+                  conectar e gerenciar múltiplas contas bancárias em um único lugar. Com ele, você
+                  pode:
                 </p>
                 <ul className="space-y-3 text-gray-600 v2-mb-6">
                   <li className="flex items-start gap-3">
@@ -74,7 +75,8 @@ export function PierreFinanceConfigPage() {
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <p className="text-sm text-blue-800">
                     <strong>Importante:</strong> O Pierre Finance Pro custa R$ 39/mês e é pago
-                    diretamente ao Pierre Finance. Este é um custo adicional ao plano Pro do Air Finance.
+                    diretamente ao Pierre Finance. Este é um custo adicional ao plano Pro do Air
+                    Finance.
                   </p>
                 </div>
               </div>
@@ -90,8 +92,8 @@ export function PierreFinanceConfigPage() {
                     <div className="flex-1">
                       <h2 className="v2-h3 v2-mb-2">Acesse o Pierre Finance e faça login</h2>
                       <p className="text-gray-600">
-                        Primeiro, você precisa ter uma conta no Pierre Finance. Se ainda não tem, crie
-                        uma conta gratuitamente.
+                        Primeiro, você precisa ter uma conta no Pierre Finance. Se ainda não tem,
+                        crie uma conta gratuitamente.
                       </p>
                     </div>
                   </div>
@@ -117,17 +119,19 @@ export function PierreFinanceConfigPage() {
                     <div className="flex-1">
                       <h2 className="v2-h3 v2-mb-2">Navegue até a seção de API Keys</h2>
                       <p className="text-gray-600 v2-mb-4">
-                        Após fazer login, você precisa acessar a área de configurações para gerenciar
-                        suas API Keys.
+                        Após fazer login, você precisa acessar a área de configurações para
+                        gerenciar suas API Keys.
                       </p>
                       <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 v2-mb-4">
                         <p className="text-sm text-gray-700 font-medium v2-mb-2">Como encontrar:</p>
                         <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600">
-                          <li>Clique no menu lateral esquerdo (ícone de três linhas ou seu nome)</li>
-                          <li>Procure por "Minha Conta" ou "Configurações"</li>
+                          <li>
+                            Clique no menu lateral esquerdo (ícone de três linhas ou seu nome)
+                          </li>
+                          <li>Procure por &quot;Minha Conta&quot; ou &quot;Configurações&quot;</li>
                           <li>Na página de configurações, você verá várias abas no topo</li>
                           <li>
-                            Clique na aba <strong>"API Keys"</strong>
+                            Clique na aba <strong>&quot;API Keys&quot;</strong>
                           </li>
                         </ol>
                       </div>
@@ -141,7 +145,8 @@ export function PierreFinanceConfigPage() {
                           Localização da API Keys
                         </p>
                         <p className="text-sm text-blue-700">
-                          A seção de API Keys está localizada em: <strong>Minha Conta → API Keys</strong>
+                          A seção de API Keys está localizada em:{' '}
+                          <strong>Minha Conta → API Keys</strong>
                         </p>
                       </div>
                     </div>
@@ -157,7 +162,8 @@ export function PierreFinanceConfigPage() {
                     <div className="flex-1">
                       <h2 className="v2-h3 v2-mb-2">Visualize ou crie sua API Key</h2>
                       <p className="text-gray-600 v2-mb-4">
-                        Na página de API Keys, você pode visualizar sua chave padrão ou criar uma nova.
+                        Na página de API Keys, você pode visualizar sua chave padrão ou criar uma
+                        nova.
                       </p>
                     </div>
                   </div>
@@ -173,7 +179,7 @@ export function PierreFinanceConfigPage() {
                         Se você já tem uma API Key padrão, você pode visualizá-la diretamente:
                       </p>
                       <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
-                        <li>Clique no link "Ver minha API key padrão →"</li>
+                        <li>Clique no link &quot;Ver minha API key padrão →&quot;</li>
                         <li>Clique no ícone de olho para revelar a chave</li>
                         <li>Clique no ícone de copiar para copiar a chave completa</li>
                       </ol>
@@ -190,17 +196,17 @@ export function PierreFinanceConfigPage() {
                       </p>
                       <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
                         <li>
-                          No campo "Nome da API key", digite um nome descritivo (ex: "Air Finance
-                          Production")
+                          No campo &quot;Nome da API key&quot;, digite um nome descritivo (ex: &quot;Air Finance
+                          Production&quot;)
                         </li>
-                        <li>Clique no botão "+ Criar"</li>
+                        <li>Clique no botão &quot;+ Criar&quot;</li>
                         <li>Após criar, clique no ícone de olho para revelar a chave</li>
                         <li>Clique no ícone de copiar para copiar a chave completa</li>
                       </ol>
                       <div className="mt-4 p-3 bg-yellow-50 rounded border border-yellow-200">
                         <p className="text-xs text-yellow-800">
-                          <strong>Dica:</strong> A API Key sempre começa com "sk-" seguido de caracteres
-                          alfanuméricos. Certifique-se de copiar a chave completa.
+                          <strong>Dica:</strong> A API Key sempre começa com &quot;sk-&quot; seguido de
+                          caracteres alfanuméricos. Certifique-se de copiar a chave completa.
                         </p>
                       </div>
                     </div>
@@ -229,17 +235,15 @@ export function PierreFinanceConfigPage() {
                           Bancárias
                         </li>
                         <li>
-                          Clique no botão <strong>"Conectar com Pierre Finance"</strong> (geralmente
+                          Clique no botão <strong>&quot;Conectar com Pierre Finance&quot;</strong> (geralmente
                           localizado no topo da página)
                         </li>
+                        <li>No modal que abrir, você verá instruções sobre como obter a API Key</li>
                         <li>
-                          No modal que abrir, você verá instruções sobre como obter a API Key
+                          Cole sua API Key no campo <strong>&quot;API Key do Pierre Finance&quot;</strong>
                         </li>
                         <li>
-                          Cole sua API Key no campo <strong>"API Key do Pierre Finance"</strong>
-                        </li>
-                        <li>
-                          Clique em <strong>"Conectar com Pierre Finance"</strong>
+                          Clique em <strong>&quot;Conectar com Pierre Finance&quot;</strong>
                         </li>
                         <li>
                           Aguarde a conexão ser estabelecida. Você verá uma mensagem de sucesso
@@ -248,7 +252,7 @@ export function PierreFinanceConfigPage() {
                           Selecione as contas bancárias que deseja importar para o Air Finance
                         </li>
                         <li>
-                          Clique em <strong>"Importar"</strong> para finalizar
+                          Clique em <strong>&quot;Importar&quot;</strong> para finalizar
                         </li>
                       </ol>
                     </div>
@@ -261,8 +265,8 @@ export function PierreFinanceConfigPage() {
                             Pronto! Suas contas estão conectadas
                           </p>
                           <p className="text-sm text-green-700">
-                            Após a importação, suas contas bancárias aparecerão automaticamente no Air
-                            Finance e você poderá gerenciá-las normalmente.
+                            Após a importação, suas contas bancárias aparecerão automaticamente no
+                            Air Finance e você poderá gerenciá-las normalmente.
                           </p>
                         </div>
                       </div>
@@ -280,8 +284,8 @@ export function PierreFinanceConfigPage() {
                     <li className="flex items-start gap-3">
                       <Check className="w-6 h-6 text-[#10b981] flex-shrink-0 mt-0.5" />
                       <span>
-                        <strong>Sua API Key nunca é armazenada no nosso sistema</strong> - ela é usada
-                        apenas para estabelecer a conexão
+                        <strong>Sua API Key nunca é armazenada no nosso sistema</strong> - ela é
+                        usada apenas para estabelecer a conexão
                       </span>
                     </li>
                     <li className="flex items-start gap-3">
@@ -316,7 +320,7 @@ export function PierreFinanceConfigPage() {
                         A API Key não está funcionando
                       </h3>
                       <p className="text-sm text-gray-600">
-                        Verifique se você copiou a chave completa, incluindo o prefixo "sk-".
+                        Verifique se você copiou a chave completa, incluindo o prefixo &quot;sk-&quot;.
                         Certifique-se de que não há espaços antes ou depois da chave.
                       </p>
                     </div>
@@ -325,9 +329,9 @@ export function PierreFinanceConfigPage() {
                         Não consigo encontrar a seção de API Keys
                       </h3>
                       <p className="text-sm text-gray-600">
-                        Certifique-se de que você está logado no Pierre Finance e que tem uma assinatura
-                        ativa (Pierre Pro ou Premium). A funcionalidade de API Keys está disponível para
-                        assinantes.
+                        Certifique-se de que você está logado no Pierre Finance e que tem uma
+                        assinatura ativa (Pierre Pro ou Premium). A funcionalidade de API Keys está
+                        disponível para assinantes.
                       </p>
                     </div>
                     <div className="border-l-4 border-[#10b981] pl-4">
@@ -335,8 +339,8 @@ export function PierreFinanceConfigPage() {
                         A conexão está demorando muito
                       </h3>
                       <p className="text-sm text-gray-600">
-                        A primeira conexão pode levar alguns minutos. Se demorar mais de 5 minutos, tente
-                        desconectar e reconectar. Verifique também sua conexão com a internet.
+                        A primeira conexão pode levar alguns minutos. Se demorar mais de 5 minutos,
+                        tente desconectar e reconectar. Verifique também sua conexão com a internet.
                       </p>
                     </div>
                   </div>
