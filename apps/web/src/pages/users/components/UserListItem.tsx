@@ -1,5 +1,5 @@
 import { User, UserRole, UserStatus } from '@/services/userService';
-import { MoreVertical, Edit, Trash2, CheckCircle2, XCircle } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, CheckCircle2, XCircle, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -8,6 +8,7 @@ interface UserListItemProps {
   user: User;
   onEdit: (user: User) => void;
   onDelete: (id: string) => void;
+  onViewPermissions?: (user: User) => void;
   isUpdating: boolean;
   isDeleting: boolean;
   getRoleBadgeColor: (role: UserRole) => string;
@@ -19,6 +20,7 @@ export function UserListItem({
   user,
   onEdit,
   onDelete,
+  onViewPermissions,
   isUpdating = false,
   isDeleting = false,
   getRoleBadgeColor,
@@ -74,29 +76,39 @@ export function UserListItem({
         </div>
       </div>
 
-      {/* Menu */}
-      {canDelete && (
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0"
-              disabled={isUpdating || isDeleting}
-            >
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-40 p-1" align="end">
-            <div className="flex flex-col gap-1">
+      {/* Menu de contexto - sempre visível */}
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 shrink-0"
+            disabled={isUpdating || isDeleting}
+          >
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-56 p-1" align="end">
+          <div className="flex flex-col gap-1">
+            {onViewPermissions && (
               <button
-                onClick={() => onEdit(user)}
-                className="flex items-center w-full px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-gray-100 dark:hover:bg-gray-800 text-text dark:text-text-dark transition-colors text-left gap-2"
+                onClick={() => onViewPermissions(user)}
+                className="flex items-center w-full px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-primary-50 dark:hover:bg-primary-900/10 text-primary-600 dark:text-primary-400 transition-colors text-left gap-2"
                 disabled={isUpdating || isDeleting}
               >
-                <Edit className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                Editar
+                <Shield className="h-4 w-4" />
+                Visualizar Permissões
               </button>
+            )}
+            <button
+              onClick={() => onEdit(user)}
+              className="flex items-center w-full px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-gray-100 dark:hover:bg-gray-800 text-text dark:text-text-dark transition-colors text-left gap-2"
+              disabled={isUpdating || isDeleting}
+            >
+              <Edit className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+              Editar
+            </button>
+            {canDelete && (
               <button
                 onClick={() => onDelete(user.id)}
                 className="flex items-center w-full px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-red-50 dark:hover:bg-red-900/10 text-red-600 dark:text-red-400 transition-colors text-left gap-2"
@@ -105,10 +117,10 @@ export function UserListItem({
                 <Trash2 className="h-4 w-4" />
                 Excluir
               </button>
-            </div>
-          </PopoverContent>
-        </Popover>
-      )}
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }

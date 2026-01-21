@@ -122,6 +122,7 @@ export function UsersList({
             user={user}
             onEdit={onEdit}
             onDelete={onDelete}
+            onViewPermissions={onViewPermissions}
             isUpdating={isUpdating}
             isDeleting={isDeleting}
             getRoleBadgeColor={getRoleBadgeColor}
