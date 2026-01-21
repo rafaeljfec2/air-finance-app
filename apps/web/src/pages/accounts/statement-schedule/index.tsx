@@ -92,9 +92,10 @@ export function StatementSchedulePage() {
     if (cron === '0 8,18 * * *') return { type: 'twice-daily', time: '8' };
 
     // Daily pattern: 0 HH * * *
-    const dailyMatch = cron.match(/^0 (\d{1,2}) \* \* \*$/);
+    const dailyPattern = /^0 (\d{1,2}) \* \* \*$/;
+    const dailyMatch = dailyPattern.exec(cron);
     if (dailyMatch) {
-      return { type: 'daily', time: dailyMatch[1] };
+      return { type: 'daily', time: dailyMatch[1] ?? '8' };
     }
 
     return { type: 'daily', time: '8' };
@@ -195,95 +196,117 @@ export function StatementSchedulePage() {
     );
   }
 
+  const getScheduleDescription = (): string => {
+    if (!schedule?.enabled || !schedule?.cronExpression) return '';
+    
+    const selection = parseCronToSelection(schedule.cronExpression);
+    const option = scheduleOptions.find(opt => opt.type === selection.type);
+    
+    if (!option) return '';
+    
+    if (selection.type === 'daily') {
+      const timeLabel = timeOptions.find(t => t.value === selection.time)?.label ?? '08:00';
+      return `Diariamente às ${timeLabel}`;
+    }
+    
+    return option.label;
+  };
+
   return (
     <ViewDefault>
-      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-2xl">
-        {/* Mobile Header with Back Button */}
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-4">
+      <div className="w-full max-w-3xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
+        {/* Header with Back Button */}
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center gap-3 mb-6 sm:mb-8">
             <button
               onClick={handleBack}
-              className="lg:hidden p-2 rounded-lg text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark transition-colors"
+              className="lg:hidden p-2 -ml-2 rounded-lg text-text dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-label="Voltar"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <div>
-              <h1 className="text-2xl font-bold text-text dark:text-text-dark">
-                Configurar Sincronização
-              </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Configure a sincronização automática de extrato bancário
-              </p>
-            </div>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text dark:text-text-dark text-center flex-1">
+              Configurar Sincronização de Extrato
+            </h1>
+            <div className="lg:hidden w-[44px]" />
           </div>
 
-          {/* Account Info */}
-          <div className="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-lg border border-primary-200 dark:border-primary-800">
-            <h3 className="font-semibold text-text dark:text-text-dark mb-1">
-              {account?.name || 'Conta'}
+          {/* Account Info Card */}
+          <div className="bg-primary-50 dark:bg-primary-900/20 p-5 sm:p-6 rounded-xl border-2 border-primary-300 dark:border-primary-700 shadow-sm">
+            <h3 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark mb-2">
+              {account?.name ?? 'Conta'}
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {account?.institution || 'Instituição bancária'}
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+              Configure a sincronização automática de extrato bancário
             </p>
           </div>
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
+          <div className="flex items-center justify-center py-16 sm:py-20">
             <Loading size="large">Carregando configuração...</Loading>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6 sm:space-y-8">
             {/* Current Status */}
             {schedule && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-background dark:bg-background-dark rounded-lg border border-border dark:border-border-dark">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Status:</span>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 sm:p-5 bg-background dark:bg-background-dark rounded-xl border border-border dark:border-border-dark shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                    <span className="text-base sm:text-lg text-gray-700 dark:text-gray-300 font-medium">Status:</span>
                   </div>
                   <span
-                    className={`text-sm font-medium ${schedule.enabled ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400'}`}
+                    className={`px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-sm sm:text-base font-semibold ${
+                      schedule.enabled
+                        ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white'
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                    }`}
                   >
                     {schedule.enabled ? 'Ativo' : 'Desativado'}
                   </span>
                 </div>
 
-                {schedule.lastSyncAt && (
-                  <div className="flex items-center justify-between p-3 bg-background dark:bg-background-dark rounded-lg border border-border dark:border-border-dark">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Última sincronização:
-                      </span>
-                    </div>
-                    <span className="text-sm font-medium text-text dark:text-text-dark">
-                      {new Date(schedule.lastSyncAt).toLocaleString('pt-BR')}
-                    </span>
+                {schedule.enabled && getScheduleDescription() && (
+                  <div className="p-4 sm:p-5 bg-background dark:bg-background-dark rounded-xl border border-border dark:border-border-dark shadow-sm">
+                    <p className="text-base sm:text-lg font-semibold text-text dark:text-text-dark">
+                      {getScheduleDescription()}
+                    </p>
                   </div>
                 )}
 
-                {schedule.description && (
-                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                    <p className="text-sm text-blue-800 dark:text-blue-200">
-                      {schedule.description}
-                    </p>
+                {schedule.lastSyncAt && (
+                  <div className="flex items-center justify-between p-4 sm:p-5 bg-background dark:bg-background-dark rounded-xl border border-border dark:border-border-dark shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                      <span className="text-base sm:text-lg text-gray-700 dark:text-gray-300 font-medium">
+                        Última sincronização:
+                      </span>
+                    </div>
+                    <span className="text-sm sm:text-base font-medium text-text dark:text-text-dark text-right">
+                      {new Date(schedule.lastSyncAt).toLocaleString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
                   </div>
                 )}
               </div>
             )}
 
             {/* Enable/Disable Toggle */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-3 cursor-pointer">
+            <div className="p-4 sm:p-5 bg-background dark:bg-background-dark rounded-xl border border-border dark:border-border-dark shadow-sm">
+              <label className="flex items-center gap-4 cursor-pointer min-h-[44px]">
                 <input
                   type="checkbox"
                   checked={enabled}
                   onChange={(e) => setEnabled(e.target.checked)}
-                  className="w-5 h-5 text-primary-500 rounded focus:ring-primary-500"
+                  className="w-6 h-6 sm:w-7 sm:h-7 text-primary-500 rounded focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 cursor-pointer flex-shrink-0"
                 />
-                <span className="text-sm font-medium text-text dark:text-text-dark">
+                <span className="text-base sm:text-lg font-semibold text-text dark:text-text-dark">
                   Habilitar sincronização automática
                 </span>
               </label>
@@ -291,41 +314,41 @@ export function StatementSchedulePage() {
 
             {/* Schedule Configuration */}
             {enabled && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-text dark:text-text-dark">
+              <div className="space-y-6 sm:space-y-8">
+                <div className="space-y-4">
+                  <h2 className="text-lg sm:text-xl font-bold text-text dark:text-text-dark">
                     Frequência de sincronização
-                  </div>
-                  <div className="space-y-2">
+                  </h2>
+                  <div className="space-y-3 sm:space-y-4">
                     {scheduleOptions.map((option) => (
                       <button
                         key={option.type}
                         type="button"
                         onClick={() => setFrequencyType(option.type)}
-                        className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                        className={`w-full p-5 sm:p-6 rounded-xl border-2 transition-all text-left min-h-[44px] ${
                           frequencyType === option.type
-                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                            : 'border-border dark:border-border-dark bg-background dark:bg-background-dark hover:border-primary-300 dark:hover:border-primary-700'
+                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30 shadow-md'
+                            : 'border-border dark:border-border-dark bg-background dark:bg-background-dark hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-sm active:scale-[0.98]'
                         }`}
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1">
-                            <div className="font-semibold text-text dark:text-text-dark mb-1">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-bold text-lg sm:text-xl text-text dark:text-text-dark mb-2">
                               {option.label}
                             </div>
-                            <div className="text-sm text-gray-600 dark:text-gray-400">
+                            <div className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                               {option.description}
                             </div>
                           </div>
                           <div
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                            className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-1 ${
                               frequencyType === option.type
                                 ? 'border-primary-500 bg-primary-500'
                                 : 'border-gray-300 dark:border-gray-600'
                             }`}
                           >
                             {frequencyType === option.type && (
-                              <div className="w-2 h-2 rounded-full bg-white" />
+                              <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-white" />
                             )}
                           </div>
                         </div>
@@ -336,7 +359,7 @@ export function StatementSchedulePage() {
 
                 {/* Time Selection for Daily */}
                 {frequencyType === 'daily' && (
-                  <div className="space-y-2">
+                  <div className="space-y-3 sm:space-y-4">
                     <ComboBox
                       label="Horário da sincronização"
                       options={timeOptions.map((time) => ({
@@ -344,44 +367,36 @@ export function StatementSchedulePage() {
                         label: time.label,
                       }))}
                       value={selectedTime}
-                      onValueChange={(value) => setSelectedTime(value || '8')}
+                      onValueChange={(value) => setSelectedTime(value ?? '8')}
                       placeholder="Selecione o horário"
                     />
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
                       Escolha o melhor horário para sincronizar seus extratos bancários
                     </p>
                   </div>
                 )}
-
-                {/* Summary */}
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
-                    <strong>Resumo:</strong>{' '}
-                    {scheduleOptions.find(opt => opt.type === frequencyType)?.label}
-                    {frequencyType === 'daily' &&
-                      ` às ${timeOptions.find(t => t.value === selectedTime)?.label || '08:00'}`}
-                  </p>
-                </div>
               </div>
             )}
 
             {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border dark:border-border-dark">
+            <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t-2 border-border dark:border-border-dark">
               <Button
                 type="button"
                 onClick={handleSyncNow}
-                disabled={isSyncing}
+                disabled={isSyncing || isLoading}
                 variant="outline"
-                className="flex-1 flex items-center justify-center gap-2 border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark hover:border-primary-300 dark:hover:border-primary-700 transition-colors"
+                className="flex-1 flex items-center justify-center gap-3 h-12 sm:h-14 border-2 border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-primary-400 dark:hover:border-primary-600 transition-all font-semibold min-h-[44px] text-base sm:text-lg shadow-sm hover:shadow-md"
               >
-                <Play className="h-4 w-4" />
-                {isSyncing ? 'Sincronizando...' : 'Sincronizar Agora'}
+                <Play className="h-5 w-5 sm:h-6 sm:w-6" />
+                <span>
+                  {isSyncing ? 'Sincronizando...' : 'Sincronizar Agora'}
+                </span>
               </Button>
               <Button
                 type="button"
                 onClick={handleSave}
-                disabled={isSaving}
-                className="flex-1 bg-primary-500 hover:bg-primary-600 text-white"
+                disabled={isSaving || isLoading}
+                className="flex-1 h-12 sm:h-14 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-semibold text-base sm:text-lg min-h-[44px] transition-all shadow-md hover:shadow-lg"
               >
                 {isSaving ? 'Salvando...' : 'Salvar Configuração'}
               </Button>
