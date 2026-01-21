@@ -80,7 +80,7 @@ export function StatementSchedulePage() {
   const [frequencyType, setFrequencyType] = useState<FrequencyType>('daily');
   const [selectedTime, setSelectedTime] = useState('8');
 
-  const account = accounts?.find(acc => acc.id === accountId);
+  const account = accounts?.find((acc) => acc.id === accountId);
 
   // Convert cron expression to user-friendly selection
   const parseCronToSelection = (cron: string | null): { type: FrequencyType; time: string } => {
@@ -103,7 +103,7 @@ export function StatementSchedulePage() {
 
   // Convert selection to cron expression
   const getCronExpression = (): string => {
-    const option = scheduleOptions.find(opt => opt.type === frequencyType);
+    const option = scheduleOptions.find((opt) => opt.type === frequencyType);
     if (!option) return '0 8 * * *';
 
     if (option.type === 'daily') {
@@ -200,17 +200,17 @@ export function StatementSchedulePage() {
 
   const getScheduleDescription = (): string => {
     if (!schedule?.enabled || !schedule?.cronExpression) return '';
-    
+
     const selection = parseCronToSelection(schedule.cronExpression);
-    const option = scheduleOptions.find(opt => opt.type === selection.type);
-    
+    const option = scheduleOptions.find((opt) => opt.type === selection.type);
+
     if (!option) return '';
-    
+
     if (selection.type === 'daily') {
-      const timeLabel = timeOptions.find(t => t.value === selection.time)?.label ?? '08:00';
+      const timeLabel = timeOptions.find((t) => t.value === selection.time)?.label ?? '08:00';
       return `Diariamente às ${timeLabel}`;
     }
-    
+
     return option.label;
   };
 
@@ -257,7 +257,9 @@ export function StatementSchedulePage() {
                 <div className="flex items-center justify-between p-4 sm:p-5 bg-background dark:bg-background-dark rounded-xl border border-border dark:border-border-dark shadow-sm">
                   <div className="flex items-center gap-3">
                     <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                    <span className="text-base sm:text-lg text-gray-700 dark:text-gray-300 font-medium">Status:</span>
+                    <span className="text-base sm:text-lg text-gray-700 dark:text-gray-300 font-medium">
+                      Status:
+                    </span>
                   </div>
                   <span
                     className={`px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-sm sm:text-base font-semibold ${
@@ -391,9 +393,7 @@ export function StatementSchedulePage() {
                 className="flex-1 flex items-center justify-center gap-3 h-12 sm:h-14 border-2 border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-primary-400 dark:hover:border-primary-600 transition-all font-semibold min-h-[44px] text-base sm:text-lg shadow-sm hover:shadow-md"
               >
                 <Play className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span>
-                  {isSyncing ? 'Sincronizando...' : 'Sincronizar Agora'}
-                </span>
+                <span>{isSyncing ? 'Sincronizando...' : 'Sincronizar Agora'}</span>
               </Button>
               <Button
                 type="button"
