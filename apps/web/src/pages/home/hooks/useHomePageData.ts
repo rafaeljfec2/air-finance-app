@@ -43,10 +43,7 @@ export function useHomePageData() {
   const transactionsQuery = useTransactions(companyId, monthFilters);
   const summaryQuery = useDashboardSummary(companyId, filters);
 
-  const balance =
-    balanceQuery.data && balanceQuery.data.length > 0
-      ? balanceQuery.data.at(-1)?.balance ?? 0
-      : 0;
+  const balance = summaryQuery.data?.balance ?? 0;
 
   const income = summaryQuery.data?.income ?? 0;
   const expenses = summaryQuery.data?.expenses ?? 0;
