@@ -18,6 +18,7 @@ import type {
 import { calculateBalance, getFieldValues } from './TransactionGrid.utils';
 import { MobileCard } from './TransactionMobileCard';
 import { TableRow } from './TransactionTableRow';
+import './TransactionGrid.css';
 
 export function TransactionGrid({
   transactions,
@@ -162,7 +163,7 @@ export function TransactionGrid({
             {/* Desktop Table View */}
             <div className="hidden md:block">
               <div className="w-full min-h-[240px]">
-                <table className="w-full table-fixed text-xs">
+                <table className={cn("w-full table-fixed text-xs", spacious && "transaction-grid-spacious")}>
                   <colgroup>
                     <col className="w-[6%] sm:w-[8%]" />
                     <col className="w-[12%] sm:w-[15%]" />

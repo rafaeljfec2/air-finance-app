@@ -63,10 +63,16 @@ export const TableRow = memo(
     };
 
     // Estilos espaçosos quando spacious=true (aumenta altura das linhas)
-    const cellPadding = spacious ? { paddingTop: '8px', paddingBottom: '8px', lineHeight: '1.5' } : undefined;
-    const rowStyle = spacious ? { height: 'auto', lineHeight: '1.5' } : { height: 'auto', lineHeight: '1.25' };
-    const cellPaddingClass = spacious ? 'py-2 px-2' : 'py-1 px-2';
-    const numericCellPaddingClass = spacious ? 'py-2 pl-0 pr-4' : 'py-1 pl-0 pr-4';
+    // Quando spacious=false, forçar linhas compactas com padding mínimo
+    const cellPadding = spacious 
+      ? { paddingTop: '8px', paddingBottom: '8px', lineHeight: '1.5' } 
+      : { paddingTop: '2px', paddingBottom: '2px', lineHeight: '1.0' };
+    const rowStyle = spacious 
+      ? { height: 'auto', lineHeight: '1.5' } 
+      : { height: 'auto', lineHeight: '1.0', minHeight: 'auto' };
+    // Quando spacious=false, usar classes compactas e garantir que não haja padding extra
+    const cellPaddingClass = spacious ? 'py-2 px-2' : 'py-0.5 px-2';
+    const numericCellPaddingClass = spacious ? 'py-2 pl-0 pr-4' : 'py-0.5 pl-0 pr-4';
 
     return (
       <tr

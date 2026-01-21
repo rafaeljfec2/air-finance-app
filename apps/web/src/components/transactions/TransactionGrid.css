@@ -1,0 +1,39 @@
+/* Estilos específicos para o TransactionGrid quando spacious=true */
+
+/* IMPORTANTE: Estes estilos SÓ se aplicam quando a tabela tem a classe transaction-grid-spacious */
+/* Sem essa classe, as linhas devem ser compactas (py-0.5) */
+
+/* Classe spacious-cell aplicada diretamente nas células - máxima especificidade */
+table.transaction-grid-spacious tbody tr td.spacious-cell {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  line-height: 1.5 !important;
+}
+
+/* Forçar padding em TODAS as células do tbody quando spacious=true */
+table.transaction-grid-spacious tbody tr td {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  line-height: 1.5 !important;
+}
+
+/* Headers quando spacious=true */
+table.transaction-grid-spacious thead tr th {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  line-height: 1.5 !important;
+}
+
+/* Garantir que tabelas SEM a classe transaction-grid-spacious tenham linhas compactas */
+table:not(.transaction-grid-spacious) tbody tr td {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  line-height: 2 !important;
+}
+
+/* Headers compactos quando não spacious */
+table:not(.transaction-grid-spacious) thead tr th {
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+  line-height: 1.25 !important;
+}

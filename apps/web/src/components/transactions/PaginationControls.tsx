@@ -23,12 +23,12 @@ export function PaginationControls({
   onItemsPerPageChange,
 }: PaginationControlsProps) {
   return (
-    <div className="mb-4 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0 border-b border-border dark:border-border-dark pb-4">
+    <div className="mb-2 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0 border-b border-border dark:border-border-dark pb-2">
       <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto justify-center sm:justify-start text-center sm:text-left">
         <select
           value={itemsPerPage}
           onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-          className="text-xs bg-background dark:bg-background-dark border border-border dark:border-border-dark rounded-md py-1 px-2"
+          className="text-xs bg-background dark:bg-background-dark border border-border dark:border-border-dark rounded-md py-0.5 px-2"
         >
           <option value={5}>5 por página</option>
           <option value={10}>10 por página</option>

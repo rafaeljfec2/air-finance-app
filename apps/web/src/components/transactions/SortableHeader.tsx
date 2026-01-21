@@ -47,7 +47,7 @@ export function SortableHeader({
 
   const headerStyle = spacious
     ? { paddingTop: '12px', paddingBottom: '12px', lineHeight: '1.5' }
-    : { lineHeight: '1.25' };
+    : { paddingTop: '4px', paddingBottom: '4px', lineHeight: '1.0' };
   const headerPaddingClass = spacious ? 'py-2 px-2' : 'py-1 px-2';
 
   return (
