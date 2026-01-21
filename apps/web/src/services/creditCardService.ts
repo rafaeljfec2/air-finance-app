@@ -41,6 +41,7 @@ export const CreditCardSummaryItemSchema = z.object({
   id: z.string(),
   name: z.string(),
   accountNumber: z.string(),
+  bankCode: z.string().optional(),
   limit: z.number(),
   totalUsed: z.number(),
   totalAvailable: z.number(),

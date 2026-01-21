@@ -1,13 +1,13 @@
 import { formatCurrency } from '@/utils/formatters';
 import { Plus, CreditCard as CreditCardIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import * as Icons from 'lucide-react';
 import type {
   CreditCardSummaryItem,
   CreditCardAggregated,
 } from '@/services/creditCardService';
 import { useState } from 'react';
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
+import { BankIcon } from '@/components/bank/BankIcon';
 
 interface CreditCardsSectionProps {
   creditCards: CreditCardSummaryItem[];
@@ -21,11 +21,6 @@ export function CreditCardsSection({
   isPrivacyModeEnabled,
 }: Readonly<CreditCardsSectionProps>) {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
-
-  const getIcon = (iconName: string) => {
-    const Icon = (Icons as any)[iconName] || Icons.CreditCard;
-    return Icon;
-  };
 
   const displayCards = creditCards;
 
@@ -53,7 +48,6 @@ export function CreditCardsSection({
           <>
             <div className="space-y-3 mb-4">
               {displayCards.map((card) => {
-                const Icon = getIcon(card.icon);
                 const usagePercentage = card.limit > 0 ? (card.totalUsed / card.limit) * 100 : 0;
 
                 return (
@@ -66,7 +60,13 @@ export function CreditCardsSection({
                     >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <Icon className="h-6 w-6 text-white" />
+                          <BankIcon
+                            bankCode={card.bankCode}
+                            institution={card.name}
+                            iconName={card.icon}
+                            size="lg"
+                            className="text-white"
+                          />
                           <div>
                             <h4 className="font-semibold text-white">{card.name}</h4>
                             <p className="text-xs text-white/80">{card.accountNumber}</p>

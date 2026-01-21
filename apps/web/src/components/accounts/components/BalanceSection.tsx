@@ -18,7 +18,10 @@ interface BalanceSectionProps {
   onLimitInputChange: (value: string) => void;
   onCreditLimitChange: (value: string, inputElement: HTMLInputElement) => void;
   onDateChange: (date: Date | undefined, fieldName: string) => void;
-  onSwitchChange: (field: 'useInitialBalanceInExtract' | 'useInitialBalanceInCashFlow', checked: boolean) => void;
+  onSwitchChange: (
+    field: 'useInitialBalanceInExtract' | 'useInitialBalanceInCashFlow',
+    checked: boolean,
+  ) => void;
 }
 
 export function BalanceSection({
@@ -137,7 +140,9 @@ export function BalanceSection({
               <div className="flex items-center gap-3">
                 <Switch
                   checked={form.useInitialBalanceInExtract ?? true}
-                  onCheckedChange={(checked) => onSwitchChange('useInitialBalanceInExtract', checked)}
+                  onCheckedChange={(checked) =>
+                    onSwitchChange('useInitialBalanceInExtract', checked)
+                  }
                 />
                 <span className="text-sm text-muted-foreground dark:text-gray-400">
                   {(form.useInitialBalanceInExtract ?? true) ? 'Sim' : 'Não'}

@@ -15,6 +15,22 @@ export function BalanceSection({
   isPrivacyModeEnabled,
   onTogglePrivacyMode,
 }: Readonly<BalanceSectionProps>) {
+  const getBalanceColorClass = (): string => {
+    if (isPrivacyModeEnabled) {
+      return 'text-gray-900 dark:text-white';
+    }
+    return balance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400';
+  };
+
+  const getAccumulatedBalanceColorClass = (): string => {
+    if (isPrivacyModeEnabled) {
+      return 'text-gray-700 dark:text-gray-300';
+    }
+    return accumulatedBalance !== null && accumulatedBalance >= 0
+      ? 'text-blue-600 dark:text-blue-400'
+      : 'text-red-600 dark:text-red-400';
+  };
+
   return (
     <div className="bg-white dark:bg-card-dark rounded-2xl p-6 shadow-sm">
       <div className="flex justify-between items-start mb-4">
@@ -37,30 +53,14 @@ export function BalanceSection({
       </div>
 
       <div className="space-y-2">
-        <h2
-          className={`text-3xl font-bold ${
-            isPrivacyModeEnabled
-              ? 'text-gray-900 dark:text-white'
-              : balance >= 0
-                ? 'text-blue-600 dark:text-blue-400'
-                : 'text-red-600 dark:text-red-400'
-          }`}
-        >
+        <h2 className={`text-3xl font-bold ${getBalanceColorClass()}`}>
           {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(balance)}
         </h2>
 
         {accumulatedBalance !== null && (
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Saldo Acumulado:{' '}
-            <span
-              className={`font-semibold ${
-                isPrivacyModeEnabled
-                  ? 'text-gray-700 dark:text-gray-300'
-                  : accumulatedBalance >= 0
-                    ? 'text-blue-600 dark:text-blue-400'
-                    : 'text-red-600 dark:text-red-400'
-              }`}
-            >
+            <span className={`font-semibold ${getAccumulatedBalanceColorClass()}`}>
               {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(accumulatedBalance)}
             </span>
           </p>

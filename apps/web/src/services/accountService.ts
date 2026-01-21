@@ -50,6 +50,7 @@ export const AccountSummaryItemSchema = z.object({
   id: z.string(),
   name: z.string(),
   institution: z.string(),
+  bankCode: z.string().optional(),
   type: z.string(),
   balance: z.number(),
   color: z.string(),
@@ -137,7 +138,9 @@ export const getAccountBalance = async (id: string): Promise<number> => {
 
 export const getAccountsSummary = async (companyId: string): Promise<AccountsSummary> => {
   try {
-    const response = await apiClient.get<AccountsSummary>(`/companies/${companyId}/accounts/summary`);
+    const response = await apiClient.get<AccountsSummary>(
+      `/companies/${companyId}/accounts/summary`,
+    );
     return AccountsSummarySchema.parse(response.data);
   } catch (error) {
     throw parseApiError(error);
@@ -146,8 +149,51 @@ export const getAccountsSummary = async (companyId: string): Promise<AccountsSum
 
 export const getTotalBalance = async (companyId: string): Promise<TotalBalance> => {
   try {
-    const response = await apiClient.get<TotalBalance>(`/companies/${companyId}/accounts/total-balance`);
+    const response = await apiClient.get<TotalBalance>(
+      `/companies/${companyId}/accounts/total-balance`,
+    );
     return TotalBalanceSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+export const diagnoseAccountBalance = async (
+  companyId: string,
+  accountId: string,
+): Promise<{
+  accountId: string;
+  accountName: string;
+  currentInitialBalance: number;
+  transactionsCount: number;
+  transactionsTotal: number;
+  calculatedBalance: number;
+}> => {
+  try {
+    const response = await apiClient.get(
+      `/companies/${companyId}/accounts/${accountId}/diagnose-balance`,
+    );
+    return response.data;
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+export const correctAccountBalance = async (
+  companyId: string,
+  accountId: string,
+  expectedBalance: number,
+): Promise<{
+  success: boolean;
+  newInitialBalance: number;
+  newCalculatedBalance: number;
+}> => {
+  try {
+    const response = await apiClient.post(
+      `/companies/${companyId}/accounts/${accountId}/correct-balance`,
+      { expectedBalance },
+    );
+    return response.data;
   } catch (error) {
     throw parseApiError(error);
   }

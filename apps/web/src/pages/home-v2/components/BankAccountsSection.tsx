@@ -1,8 +1,8 @@
 import { formatCurrency } from '@/utils/formatters';
 import { Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import * as Icons from 'lucide-react';
 import type { AccountSummaryItem } from '@/services/accountService';
+import { BankIcon } from '@/components/bank/BankIcon';
 
 interface BankAccountsSectionProps {
   accounts: AccountSummaryItem[];
@@ -25,11 +25,6 @@ export function BankAccountsSection({
 }: Readonly<BankAccountsSectionProps>) {
   const displayAccounts = accounts;
   const hasMore = false;
-
-  const getIcon = (iconName: string) => {
-    const Icon = (Icons as any)[iconName] || Icons.Banknote;
-    return Icon;
-  };
 
   return (
     <div className="bg-white dark:bg-card-dark rounded-2xl p-6 shadow-sm">
@@ -69,7 +64,6 @@ export function BankAccountsSection({
       ) : (
         <div className="space-y-3">
           {displayAccounts.map((account) => {
-            const Icon = getIcon(account.icon);
             return (
               <div
                 key={account.id}
@@ -79,7 +73,13 @@ export function BankAccountsSection({
                   className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
                   style={{ backgroundColor: account.color }}
                 >
-                  <Icon className="h-5 w-5 text-white" />
+                  <BankIcon
+                    bankCode={account.bankCode}
+                    institution={account.institution}
+                    iconName={account.icon}
+                    size="md"
+                    className="text-white"
+                  />
                 </div>
 
                 <div className="flex-1 min-w-0">
