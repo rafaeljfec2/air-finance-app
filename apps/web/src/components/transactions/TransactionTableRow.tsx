@@ -21,14 +21,30 @@ export const TableRow = memo(
   ({ transaction, showActions, onActionClick, onEdit, onDelete, onViewHistory }: TableRowProps) => {
     const isPreviousBalance = transaction.id === 'previous-balance';
 
+    // Extrair lógica dos ternários aninhados para variáveis separadas
+    const getCreditValue = () => {
+      if (isPreviousBalance) return '-';
+      if (transaction.launchType === 'revenue') return formatCurrency(transaction.value);
+      return '-';
+    };
+
+    const getDebitValue = () => {
+      if (isPreviousBalance) return '-';
+      if (transaction.launchType === 'expense') return formatCurrency(transaction.value);
+      return '-';
+    };
+
+    const getRowClassName = () => {
+      const baseClasses = 'transition-colors border-b border-border/50 dark:border-border-dark/50 last:border-0';
+      if (isPreviousBalance) {
+        return cn(baseClasses, 'bg-gray-50/80 dark:bg-gray-900/40 italic font-medium');
+      }
+      return cn(baseClasses, 'hover:bg-muted/50 dark:hover:bg-muted/50');
+    };
+
     return (
       <tr
-        className={cn(
-          'transition-colors border-b border-border/50 dark:border-border-dark/50 last:border-0',
-          isPreviousBalance
-            ? 'bg-gray-50/80 dark:bg-gray-900/40 italic font-medium'
-            : 'hover:bg-muted/50 dark:hover:bg-muted/50',
-        )}
+        className={getRowClassName()}
         style={{ height: 'auto', lineHeight: '1.25' }}
       >
         <td className="py-1 px-2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap align-middle">
@@ -65,18 +81,10 @@ export const TableRow = memo(
           </Tooltip>
         </td>
         <td className="py-1 pl-0 pr-4 text-xs font-medium text-right text-emerald-400 whitespace-nowrap align-middle">
-          {isPreviousBalance
-            ? '-'
-            : transaction.launchType === 'revenue'
-              ? formatCurrency(transaction.value)
-              : '-'}
+          {getCreditValue()}
         </td>
         <td className="py-1 pl-0 pr-4 text-xs font-medium text-right text-red-400 whitespace-nowrap align-middle">
-          {isPreviousBalance
-            ? '-'
-            : transaction.launchType === 'expense'
-              ? formatCurrency(transaction.value)
-              : '-'}
+          {getDebitValue()}
         </td>
         <td
           className={cn(
