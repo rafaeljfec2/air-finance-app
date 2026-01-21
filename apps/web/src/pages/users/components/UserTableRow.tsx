@@ -45,14 +45,18 @@ export function UserTableRow({
 }: Readonly<UserTableRowProps>) {
   return (
     <tr className="border-b border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark transition-colors">
-      <td className="p-4">
-        <div className="font-medium text-text dark:text-text-dark">{user.name}</div>
+      <td className="py-5 px-4">
+        <div className="pb-2">
+          <div className="font-medium text-text dark:text-text-dark">{user.name}</div>
+        </div>
       </td>
-      <td className="p-4">
-        <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
+      <td className="py-5 px-4">
+        <div className="pb-2">
+          <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
+        </div>
       </td>
-      <td className="p-4">
-        <div className="flex items-center gap-2">
+      <td className="py-5 px-4">
+        <div className="pb-2 flex items-center gap-2">
           <span
             className={cn(
               'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
@@ -80,58 +84,66 @@ export function UserTableRow({
           </button>
         </div>
       </td>
-      <td className="p-4">
-        <span
-          className={cn(
-            'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-            PLAN_STYLES[user.plan] || PLAN_STYLES.free,
-          )}
-        >
-          {PLAN_LABELS[user.plan] || 'Gratuito'}
-        </span>
+      <td className="py-5 px-4">
+        <div className="pb-2">
+          <span
+            className={cn(
+              'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+              PLAN_STYLES[user.plan] || PLAN_STYLES.free,
+            )}
+          >
+            {PLAN_LABELS[user.plan] || 'Gratuito'}
+          </span>
+        </div>
       </td>
-      <td className="p-4">
-        <span
-          className={cn(
-            'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
-            getStatusBadgeColor(user.status),
-          )}
-        >
-          {user.status === 'active' ? 'Ativo' : 'Inativo'}
-        </span>
+      <td className="py-5 px-4">
+        <div className="pb-2">
+          <span
+            className={cn(
+              'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+              getStatusBadgeColor(user.status),
+            )}
+          >
+            {user.status === 'active' ? 'Ativo' : 'Inativo'}
+          </span>
+        </div>
       </td>
-      <td className="p-4">
-        <span
-          className={cn(
-            'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border',
-            getEmailVerifiedBadgeColor(user.emailVerified),
-          )}
-        >
-          {user.emailVerified === true ? (
-            <CheckCircle2 className="h-3 w-3" />
-          ) : (
-            <XCircle className="h-3 w-3" />
-          )}
-          <Mail className="h-3 w-3" />
-          {user.emailVerified === true ? 'Verificado' : 'Não Verificado'}
-        </span>
+      <td className="py-5 px-4">
+        <div className="pb-2">
+          <span
+            className={cn(
+              'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border',
+              getEmailVerifiedBadgeColor(user.emailVerified),
+            )}
+          >
+            {user.emailVerified === true ? (
+              <CheckCircle2 className="h-3 w-3" />
+            ) : (
+              <XCircle className="h-3 w-3" />
+            )}
+            <Mail className="h-3 w-3" />
+            {user.emailVerified === true ? 'Verificado' : 'Não Verificado'}
+          </span>
+        </div>
       </td>
-      <td className="p-4">
-        <span
-          className={cn(
-            'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border',
-            getOnboardingCompletedBadgeColor(user.onboardingCompleted),
-          )}
-        >
-          {user.onboardingCompleted === true ? (
-            <CheckCircle2 className="h-3 w-3" />
-          ) : (
-            <XCircle className="h-3 w-3" />
-          )}
-          {user.onboardingCompleted === true ? 'Completo' : 'Pendente'}
-        </span>
+      <td className="py-5 px-4">
+        <div className="pb-2">
+          <span
+            className={cn(
+              'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border',
+              getOnboardingCompletedBadgeColor(user.onboardingCompleted),
+            )}
+          >
+            {user.onboardingCompleted === true ? (
+              <CheckCircle2 className="h-3 w-3" />
+            ) : (
+              <XCircle className="h-3 w-3" />
+            )}
+            {user.onboardingCompleted === true ? 'Completo' : 'Pendente'}
+          </span>
+        </div>
       </td>
-      <td className="p-4">
+      <td className="py-5 px-4">
         <div className="flex justify-end gap-2">
           <Button
             size="sm"

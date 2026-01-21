@@ -47,11 +47,14 @@ export const useUserForm = () => {
 
       if (editingUser) {
         // Update existing user - preserve global role
+        // CRITICAL: Use ONLY the companies from userData (which comes from the form)
+        // NEVER add the active company automatically when editing
         const globalRole = editingUser.role;
         await updateUser({
           id: editingUser.id,
           data: { ...userData, role: globalRole },
         });
+        // DO NOT assign company role when editing - userData already contains the correct companies
       } else {
         // Create new user with default global role
         const userToCreate = {
@@ -62,11 +65,11 @@ export const useUserForm = () => {
 
         const newUser = await createUser(userToCreate);
         targetUserId = newUser.id;
-      }
 
-      // Assign company role if active company and role provided
-      if (activeCompany && targetUserId && role) {
-        await handleAssignRole(targetUserId, role);
+        // Assign company role if active company and role provided (only for new users)
+        if (activeCompany && targetUserId && role) {
+          await handleAssignRole(targetUserId, role);
+        }
       }
 
       // Handle global role update if no active company
