@@ -55,7 +55,7 @@ export function SortableColumn<T extends string = string>({
   return (
     <th
       className={cn(
-        'py-3.5 px-4 text-sm font-semibold text-text dark:text-text-dark cursor-pointer select-none hover:bg-card dark:hover:bg-card-dark transition-colors',
+        'py-4 px-4 text-sm font-semibold text-text dark:text-text-dark cursor-pointer select-none hover:bg-card dark:hover:bg-card-dark transition-colors',
         alignClasses[align],
         isActive && 'bg-primary-50 dark:bg-primary-900/20',
         className,
