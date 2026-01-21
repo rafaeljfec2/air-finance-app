@@ -35,7 +35,7 @@ export function Header({ onOpenSidebar }: Readonly<HeaderProps>) {
         />
 
         {/* Company Selector - Substitui o Logo */}
-        <div className="flex-shrink-0 min-w-[200px] max-w-[300px]">
+        <div className="flex-shrink-0 min-w-[200px] max-w-[300px] flex items-center justify-start">
           <CompanySelector size="compact" />
         </div>
 

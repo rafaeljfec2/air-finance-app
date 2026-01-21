@@ -125,7 +125,7 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
   }
 
   return (
-    <div className="w-full min-w-0">
+    <div className="w-full min-w-0 flex items-center justify-start">
       <ComboBox
         options={companyOptions}
         value={activeCompany?.id || null}
@@ -136,7 +136,7 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
         renderItem={renderCompanyItem}
         renderTrigger={renderCompanyTrigger}
         maxHeight="max-h-56"
-        className={`${heightClass} w-full ${paddingClass} bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-md shadow-sm`}
+        className={`${heightClass} w-full ${paddingClass} bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-md shadow-sm flex items-center justify-start`}
         contentClassName="rounded-md shadow-lg w-full"
       />
     </div>
