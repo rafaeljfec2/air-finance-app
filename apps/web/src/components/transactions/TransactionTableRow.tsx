@@ -2,6 +2,7 @@ import { Tooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatters';
 import { memo } from 'react';
+import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { TransactionActions } from './TransactionActions';
 import type { TransactionGridTransaction } from './TransactionGrid.types';
 import { formatTransactionDate } from './TransactionGrid.utils';
@@ -14,8 +15,6 @@ interface TableRowProps {
   onDelete?: (transaction: TransactionGridTransaction) => void;
   onViewHistory?: (transaction: TransactionGridTransaction) => void;
 }
-
-import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 
 export const TableRow = memo(
   ({ transaction, showActions, onActionClick, onEdit, onDelete, onViewHistory }: TableRowProps) => {
@@ -42,6 +41,26 @@ export const TableRow = memo(
       return cn(baseClasses, 'hover:bg-muted/50 dark:hover:bg-muted/50');
     };
 
+    const getCategoryIcon = () => {
+      if (isPreviousBalance) return null;
+      if (transaction.launchType === 'revenue') {
+        return <ArrowUpCircle className="h-3 w-3 text-green-500 flex-shrink-0" />;
+      }
+      return <ArrowDownCircle className="h-3 w-3 text-red-500 flex-shrink-0" />;
+    };
+
+    const getBalanceDisplay = () => {
+      const balance = transaction.balance ?? 0;
+      if (balance >= 0) {
+        return `+${formatCurrency(Math.abs(balance))}`;
+      }
+      return formatCurrency(balance);
+    };
+
+    const getBalanceColor = () => {
+      return (transaction.balance ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400';
+    };
+
     return (
       <tr
         className={getRowClassName()}
@@ -52,13 +71,7 @@ export const TableRow = memo(
         </td>
         <td className="py-1 px-2 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis align-middle">
           <div className="flex items-center gap-1.5">
-            {!isPreviousBalance && (
-              transaction.launchType === 'revenue' ? (
-                <ArrowUpCircle className="h-3 w-3 text-green-500 flex-shrink-0" />
-              ) : (
-                <ArrowDownCircle className="h-3 w-3 text-red-500 flex-shrink-0" />
-              )
-            )}
+            {getCategoryIcon()}
             <Tooltip content={transaction.categoryId || 'Sem categoria'}>
               <span className="block overflow-hidden text-ellipsis">
                 {transaction.categoryId || 'Sem categoria'}
@@ -89,12 +102,10 @@ export const TableRow = memo(
         <td
           className={cn(
             'py-1 pl-0 pr-4 text-xs font-medium text-right whitespace-nowrap align-middle',
-            (transaction.balance ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400',
+            getBalanceColor(),
           )}
         >
-          {(transaction.balance ?? 0) >= 0
-            ? `+${formatCurrency(Math.abs(transaction.balance ?? 0))}`
-            : formatCurrency(transaction.balance ?? 0)}
+          {getBalanceDisplay()}
         </td>
         {showActions && !isPreviousBalance && (
           <td className="py-1 px-2 align-middle">
