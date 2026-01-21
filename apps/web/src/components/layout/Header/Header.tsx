@@ -34,8 +34,8 @@ export function Header({ onOpenSidebar }: Readonly<HeaderProps>) {
           onBack={goBack}
         />
 
-        {/* Company Selector - Substitui o Logo */}
-        <div className="flex-shrink-0 min-w-[200px] max-w-[300px] flex items-center justify-start">
+        {/* Company Selector - Substitui o Logo - Hidden on mobile (already in sidebar) */}
+        <div className="hidden lg:flex flex-shrink-0 min-w-[200px] max-w-[300px] items-center justify-start">
           <CompanySelector size="compact" />
         </div>
 

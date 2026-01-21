@@ -14,7 +14,11 @@ export function useHeaderNavigation() {
   }, [location.pathname]);
 
   const goBack = useCallback(() => {
-    navigate(-1);
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/home', { replace: true });
+    }
   }, [navigate]);
 
   const navigateTo = useCallback(

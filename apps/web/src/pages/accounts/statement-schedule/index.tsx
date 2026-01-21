@@ -182,7 +182,9 @@ export function StatementSchedulePage() {
     }
   };
 
-  const handleBack = () => {
+  const handleBack = (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
+    e?.stopPropagation();
     navigate(-1);
   };
 
@@ -215,20 +217,21 @@ export function StatementSchedulePage() {
   return (
     <ViewDefault>
       <div className="w-full max-w-3xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
-        {/* Header with Back Button */}
+        {/* Header with Back Button - Only for Web */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-3 mb-6 sm:mb-8">
             <button
+              type="button"
               onClick={handleBack}
-              className="lg:hidden p-2 -ml-2 rounded-lg text-text dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="hidden lg:flex p-3 rounded-lg text-text dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-[44px] min-w-[44px] items-center justify-center border border-border dark:border-border-dark hover:border-primary-300 dark:hover:border-primary-700 cursor-pointer z-10"
               aria-label="Voltar"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-6 w-6 pointer-events-none" />
             </button>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text dark:text-text-dark text-center flex-1">
               Configurar Sincronização de Extrato
             </h1>
-            <div className="lg:hidden w-[44px]" />
+            <div className="hidden lg:block w-[52px]" />
           </div>
 
           {/* Account Info Card */}
