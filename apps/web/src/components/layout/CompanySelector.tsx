@@ -121,7 +121,7 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
   if (size === 'compact') {
     paddingClass = 'px-3';
   } else if (size === 'large') {
-    paddingClass = 'px-2';
+    paddingClass = 'px-0';
   }
 
   return (
