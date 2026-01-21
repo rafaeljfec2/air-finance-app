@@ -258,6 +258,7 @@ export function Statement() {
               isLoading={isLoading}
               showActions={true}
               onActionClick={handleEdit}
+              spacious={true}
             />
           </div>
         </div>

@@ -44,6 +44,7 @@ export interface TransactionGridProps {
   onViewHistory?: (transaction: TransactionGridTransaction) => void;
   className?: string;
   resetPageKey?: string | number; // Key that changes when page should be reset (e.g., account filter change)
+  spacious?: boolean; // Se true, aumenta o padding vertical das linhas
 }
 
 export interface TransactionActionsProps {

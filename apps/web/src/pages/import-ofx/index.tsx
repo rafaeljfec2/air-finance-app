@@ -397,6 +397,7 @@ export function ImportOfxPage() {
             isLoading={isLoading || isFetching}
             showActions={false}
             resetPageKey={`${selectedAccountId}-${startDate}-${endDate}-${searchTerm}`} // Force reset on filter change
+            spacious={true}
           />
         </div>
       </div>

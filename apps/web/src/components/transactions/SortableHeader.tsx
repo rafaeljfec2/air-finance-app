@@ -22,6 +22,7 @@ interface SortableHeaderProps {
   onCloseFilter: () => void;
   getFieldValues: (transactions: TransactionGridTransaction[], field: SortField) => string[];
   transactions: TransactionGridTransaction[];
+  spacious?: boolean;
 }
 
 export function SortableHeader({
@@ -37,19 +38,25 @@ export function SortableHeader({
   onCloseFilter,
   getFieldValues,
   transactions,
+  spacious = false,
 }: Readonly<SortableHeaderProps>) {
   const getAriaSort = () => {
     if (sortConfig.field !== field) return 'none';
     return sortConfig.direction === 'asc' ? 'ascending' : 'descending';
   };
 
+  const headerStyle = spacious
+    ? { paddingTop: '12px', paddingBottom: '12px', lineHeight: '1.5' }
+    : { lineHeight: '1.25' };
+  const headerPaddingClass = spacious ? 'py-2 px-2' : 'py-1 px-2';
+
   return (
     <th
       className={cn(
-        'text-left py-1 px-2 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none relative align-middle',
+        'text-left', headerPaddingClass, 'text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none relative align-middle',
         className,
       )}
-      style={{ lineHeight: '1.25' }}
+      style={headerStyle}
       role="columnheader"
       aria-sort={getAriaSort()}
       onClick={() => onSort(field)}

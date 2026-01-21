@@ -29,6 +29,7 @@ export function TransactionGrid({
   onViewHistory,
   className,
   resetPageKey,
+  spacious = false,
 }: Readonly<TransactionGridProps>) {
   const navigate = useNavigate();
   const [sortConfig, setSortConfig] = useState<{ field: SortField; direction: SortDirection }>({
@@ -126,6 +127,7 @@ export function TransactionGrid({
     onCloseFilter: () => setActiveFilter(null),
     getFieldValues,
     transactions,
+    spacious,
   };
 
   const hasItems = paginatedItems.length > 0;
@@ -206,7 +208,10 @@ export function TransactionGrid({
                         Saldo
                       </SortableHeader>
                       {showActions && (
-                        <th className="w-20 text-left py-1.5 px-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+                        <th className={cn(
+                          "w-20 text-left px-2 text-xs font-medium text-gray-500 dark:text-gray-400 align-middle",
+                          spacious ? "py-2" : "py-1.5"
+                        )} style={spacious ? { paddingTop: '12px', paddingBottom: '12px', lineHeight: '1.5' } : undefined}>
                           Ações
                         </th>
                       )}
@@ -223,6 +228,7 @@ export function TransactionGrid({
                           onEdit={onEdit}
                           onDelete={onDelete}
                           onViewHistory={onViewHistory}
+                          spacious={spacious}
                         />
                       ))
                     ) : (

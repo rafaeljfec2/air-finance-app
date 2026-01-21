@@ -14,10 +14,11 @@ interface TableRowProps {
   onEdit?: (transaction: TransactionGridTransaction) => void;
   onDelete?: (transaction: TransactionGridTransaction) => void;
   onViewHistory?: (transaction: TransactionGridTransaction) => void;
+  spacious?: boolean;
 }
 
 export const TableRow = memo(
-  ({ transaction, showActions, onActionClick, onEdit, onDelete, onViewHistory }: TableRowProps) => {
+  ({ transaction, showActions, onActionClick, onEdit, onDelete, onViewHistory, spacious = false }: TableRowProps) => {
     const isPreviousBalance = transaction.id === 'previous-balance';
 
     // Extrair lógica dos ternários aninhados para variáveis separadas
@@ -61,15 +62,21 @@ export const TableRow = memo(
       return (transaction.balance ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400';
     };
 
+    // Estilos espaçosos quando spacious=true (aumenta altura das linhas)
+    const cellPadding = spacious ? { paddingTop: '8px', paddingBottom: '8px', lineHeight: '1.5' } : undefined;
+    const rowStyle = spacious ? { height: 'auto', lineHeight: '1.5' } : { height: 'auto', lineHeight: '1.25' };
+    const cellPaddingClass = spacious ? 'py-2 px-2' : 'py-1 px-2';
+    const numericCellPaddingClass = spacious ? 'py-2 pl-0 pr-4' : 'py-1 pl-0 pr-4';
+
     return (
       <tr
         className={getRowClassName()}
-        style={{ height: 'auto', lineHeight: '1.25' }}
+        style={rowStyle}
       >
-        <td className="py-1 px-2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap align-middle">
+        <td className={cn(cellPaddingClass, "text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap align-middle")} style={cellPadding}>
           {formatTransactionDate(transaction.paymentDate || transaction.createdAt, 'dd/MM/yyyy')}
         </td>
-        <td className="py-1 px-2 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis align-middle">
+        <td className={cn(cellPaddingClass, "text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis align-middle")} style={cellPadding}>
           <div className="flex items-center gap-1.5">
             {getCategoryIcon()}
             <Tooltip content={transaction.categoryId || 'Sem categoria'}>
@@ -79,36 +86,38 @@ export const TableRow = memo(
             </Tooltip>
           </div>
         </td>
-        <td className="py-1 px-2 text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis align-middle">
+        <td className={cn(cellPaddingClass, "text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis align-middle")} style={cellPadding}>
           <Tooltip content={transaction.description || 'Sem descrição'}>
             <span className="block overflow-hidden text-ellipsis">
               {transaction.description || 'Sem descrição'}
             </span>
           </Tooltip>
         </td>
-        <td className="py-1 px-2 text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis align-middle">
+        <td className={cn(cellPaddingClass, "text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis align-middle")} style={cellPadding}>
           <Tooltip content={transaction.accountId || 'Sem conta'}>
             <span className="block overflow-hidden text-ellipsis">
               {transaction.accountId || 'Sem conta'}
             </span>
           </Tooltip>
         </td>
-        <td className="py-1 pl-0 pr-4 text-xs font-medium text-right text-emerald-400 whitespace-nowrap align-middle">
+        <td className={cn(numericCellPaddingClass, "text-xs font-medium text-right text-emerald-400 whitespace-nowrap align-middle")} style={cellPadding}>
           {getCreditValue()}
         </td>
-        <td className="py-1 pl-0 pr-4 text-xs font-medium text-right text-red-400 whitespace-nowrap align-middle">
+        <td className={cn(numericCellPaddingClass, "text-xs font-medium text-right text-red-400 whitespace-nowrap align-middle")} style={cellPadding}>
           {getDebitValue()}
         </td>
         <td
           className={cn(
-            'py-1 pl-0 pr-4 text-xs font-medium text-right whitespace-nowrap align-middle',
+            numericCellPaddingClass,
+            'text-xs font-medium text-right whitespace-nowrap align-middle',
             getBalanceColor(),
           )}
+          style={cellPadding}
         >
           {getBalanceDisplay()}
         </td>
         {showActions && !isPreviousBalance && (
-          <td className="py-1 px-2 align-middle">
+          <td className={cn(cellPaddingClass, "align-middle")} style={cellPadding}>
             <TransactionActions
               transaction={transaction}
               onEdit={onEdit}
@@ -119,7 +128,7 @@ export const TableRow = memo(
             />
           </td>
         )}
-        {showActions && isPreviousBalance && <td className="py-1 px-2 align-middle" />}
+        {showActions && isPreviousBalance && <td className={cn(cellPaddingClass, "align-middle")} style={cellPadding} />}
       </tr>
     );
   },
