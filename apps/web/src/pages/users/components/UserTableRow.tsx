@@ -45,18 +45,18 @@ export function UserTableRow({
 }: Readonly<UserTableRowProps>) {
   return (
     <tr className="border-b border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark transition-colors">
-      <td className="py-5 px-4">
-        <div className="pb-2">
+      <td className="py-4.5 px-4">
+        <div>
           <div className="font-medium text-text dark:text-text-dark">{user.name}</div>
         </div>
       </td>
-      <td className="py-5 px-4">
-        <div className="pb-2">
+      <td className="py-4.5 px-4">
+        <div>
           <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
         </div>
       </td>
-      <td className="py-5 px-4">
-        <div className="pb-2 flex items-center gap-2">
+      <td className="py-4.5 px-4">
+        <div className="flex items-center gap-2">
           <span
             className={cn(
               'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
@@ -84,8 +84,8 @@ export function UserTableRow({
           </button>
         </div>
       </td>
-      <td className="py-5 px-4">
-        <div className="pb-2">
+      <td className="py-4.5 px-4">
+        <div>
           <span
             className={cn(
               'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
@@ -96,8 +96,8 @@ export function UserTableRow({
           </span>
         </div>
       </td>
-      <td className="py-5 px-4">
-        <div className="pb-2">
+      <td className="py-4.5 px-4">
+        <div>
           <span
             className={cn(
               'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
@@ -108,8 +108,8 @@ export function UserTableRow({
           </span>
         </div>
       </td>
-      <td className="py-5 px-4">
-        <div className="pb-2">
+      <td className="py-4.5 px-4">
+        <div>
           <span
             className={cn(
               'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border',
@@ -126,8 +126,8 @@ export function UserTableRow({
           </span>
         </div>
       </td>
-      <td className="py-5 px-4">
-        <div className="pb-2">
+      <td className="py-4.5 px-4">
+        <div>
           <span
             className={cn(
               'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border',
@@ -143,7 +143,7 @@ export function UserTableRow({
           </span>
         </div>
       </td>
-      <td className="py-5 px-4">
+      <td className="py-4.5 px-4">
         <div className="flex justify-end gap-2">
           <Button
             size="sm"

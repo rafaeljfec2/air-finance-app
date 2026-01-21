@@ -81,13 +81,13 @@ export function UsersList({
                 <SortableColumn field="status" currentSort={sortConfig} onSort={onSort}>
                   Status
                 </SortableColumn>
-                <th className="text-left p-3 text-sm font-semibold text-text dark:text-text-dark">
+                <th className="text-left py-3.5 px-4 text-sm font-semibold text-text dark:text-text-dark">
                   Email Verificado
                 </th>
-                <th className="text-left p-3 text-sm font-semibold text-text dark:text-text-dark">
+                <th className="text-left py-3.5 px-4 text-sm font-semibold text-text dark:text-text-dark">
                   Onboarding
                 </th>
-                <th className="text-right p-3 text-sm font-semibold text-text dark:text-text-dark">
+                <th className="text-right py-3.5 px-4 text-sm font-semibold text-text dark:text-text-dark">
                   Ações
                 </th>
               </tr>
