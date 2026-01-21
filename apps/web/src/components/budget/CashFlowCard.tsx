@@ -36,8 +36,8 @@ export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlo
         </Button>
       </CardHeader>
       <CardTotal
-        value={cashFlow?.finalBalance ?? 0} 
-        color={(cashFlow?.finalBalance ?? 0) >= 0 ? 'blue' : 'rose'} 
+        value={cashFlow?.currentBalance ?? 0} 
+        color={(cashFlow?.currentBalance ?? 0) >= 0 ? 'blue' : 'rose'} 
         label="Saldo Final" 
       />
       <AnimatePresence initial={false}>
@@ -61,9 +61,9 @@ export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlo
                 <div className="border-t border-border dark:border-border-dark my-2" />
                 <CardStat
                   label="Saldo Final"
-                  value={cashFlow.finalBalance}
-                  blue={cashFlow.finalBalance >= 0}
-                  negative={cashFlow.finalBalance < 0}
+                  value={cashFlow.currentBalance}
+                  blue={cashFlow.currentBalance >= 0}
+                  negative={cashFlow.currentBalance < 0}
                 />
               </div>
             )}

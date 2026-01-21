@@ -6,6 +6,7 @@ export const mockCashFlows: CashFlow[] = [
     initialBalance: 2000,
     totalIncome: 8000,
     totalExpense: 6500,
+    currentBalance: 1500,
     finalBalance: 3500,
   },
   {
@@ -13,6 +14,7 @@ export const mockCashFlows: CashFlow[] = [
     initialBalance: 1500,
     totalIncome: 7500,
     totalExpense: 7000,
+    currentBalance: 500,
     finalBalance: 2000,
   },
 ];

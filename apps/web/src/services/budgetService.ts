@@ -8,6 +8,7 @@ const CashFlowSchema = z.object({
   initialBalance: z.number(),
   totalIncome: z.number(),
   totalExpense: z.number(),
+  currentBalance: z.number(),
   finalBalance: z.number(),
 });
 

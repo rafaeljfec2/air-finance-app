@@ -22,8 +22,8 @@ export function CashFlowSection({ cashFlow, isLoading }: Readonly<CashFlowSectio
           <div className="border-t border-border dark:border-border-dark my-3" />
           <CardStat
             label="Saldo Final"
-            value={cashFlow.finalBalance}
-            highlight={cashFlow.finalBalance >= 0}
+            value={cashFlow.currentBalance}
+            highlight={cashFlow.currentBalance >= 0}
           />
         </>
       )}

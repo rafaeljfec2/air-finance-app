@@ -3,7 +3,8 @@ export interface CashFlow {
   initialBalance: number;
   totalIncome: number;
   totalExpense: number;
-  finalBalance: number;
+  currentBalance: number; // Saldo do mês (totalIncome - totalExpense)
+  finalBalance: number; // Saldo final acumulado (initialBalance + currentBalance)
 }
 
 export interface Receivable {
