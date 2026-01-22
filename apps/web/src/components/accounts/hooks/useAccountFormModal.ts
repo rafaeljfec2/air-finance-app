@@ -106,14 +106,6 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
     setForm((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleColorChange = useCallback((color: string) => {
-    setForm((prev) => ({ ...prev, color }));
-  }, []);
-
-  const handleIconChange = useCallback((icon: string) => {
-    setForm((prev) => ({ ...prev, icon }));
-  }, []);
-
   const handleLimitInputChange = useCallback((rawValue: string) => {
     const formatted = formatCurrencyInput(rawValue);
     const numericValue = parseCurrency(formatted);
@@ -227,8 +219,6 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
     initialBalanceInput,
     limitInput,
     handleChange,
-    handleColorChange,
-    handleIconChange,
     handleLimitInputChange,
     handleInitialBalanceChange,
     handleCreditLimitChange,

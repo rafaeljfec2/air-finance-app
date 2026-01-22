@@ -7,7 +7,6 @@ import { useMemo } from 'react';
 import { BankingFieldsSection } from './components/BankingFieldsSection';
 import { BasicInfoSection } from './components/BasicInfoSection';
 import { BalanceSection } from './components/BalanceSection';
-import { CustomizationSection } from './components/CustomizationSection';
 import { accountTypes, type AccountType } from './constants';
 import { useAccountFormModal } from './hooks/useAccountFormModal';
 import { useBanks } from '@/hooks/useBanks';
@@ -72,8 +71,6 @@ export function AccountFormModal({
     initialBalanceInput,
     limitInput,
     handleChange,
-    handleColorChange,
-    handleIconChange,
     handleLimitInputChange,
     handleInitialBalanceChange,
     handleCreditLimitChange,
@@ -166,12 +163,6 @@ export function AccountFormModal({
               onCreditLimitChange={handleCreditLimitChange}
               onDateChange={handleDateChange}
               onSwitchChange={handleSwitchChange}
-            />
-
-            <CustomizationSection
-              form={form}
-              onColorChange={handleColorChange}
-              onIconChange={handleIconChange}
             />
 
             {/* Banking Integration Section */}
