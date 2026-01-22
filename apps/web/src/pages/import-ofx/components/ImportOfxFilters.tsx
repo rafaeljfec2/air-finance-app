@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { ComboBox, type ComboBoxOption } from '@/components/ui/ComboBox';
-import { DatePicker } from '@/components/ui/DatePicker';
+import { DateRangePicker } from '@/components/ui/DateRangePicker';
 import { Input } from '@/components/ui/input';
-import { endOfMonth, startOfMonth, subMonths } from 'date-fns';
-import { Download, Filter, Search } from 'lucide-react';
+import { formatDateToLocalISO } from '@/utils/date';
+import { Download, Search, Calendar } from 'lucide-react';
+import { useState } from 'react';
 
 interface ImportOfxFiltersProps {
   startDate: Date | undefined;
@@ -14,7 +15,13 @@ interface ImportOfxFiltersProps {
   setSearchTerm: (term: string) => void;
   selectedAccountId: string | undefined;
   setSelectedAccountId: (id: string | undefined) => void;
-  accounts: Array<{ id: string; name: string; type?: string; accountNumber?: string | null; agency?: string | null }>;
+  accounts: Array<{
+    id: string;
+    name: string;
+    type?: string;
+    accountNumber?: string | null;
+    agency?: string | null;
+  }>;
 }
 
 export function ImportOfxFilters({
@@ -28,25 +35,29 @@ export function ImportOfxFilters({
   setSelectedAccountId,
   accounts,
 }: Readonly<ImportOfxFiltersProps>) {
-  const setDateRange = (start: Date, end: Date) => {
+  const [isDateRangePickerOpen, setIsDateRangePickerOpen] = useState(false);
+
+  // Converter Date para string para o DateRangePicker
+  const startDateString = startDate ? formatDateToLocalISO(startDate) : '';
+  const endDateString = endDate ? formatDateToLocalISO(endDate) : '';
+
+  const handleDateRangeApply = (start: Date | undefined, end: Date | undefined) => {
     setStartDate(start);
     setEndDate(end);
+    setIsDateRangePickerOpen(false);
   };
 
-  const handleToday = () => {
-    const today = new Date();
-    setDateRange(today, today);
-  };
-
-  const handleThisMonth = () => {
-    const today = new Date();
-    setDateRange(startOfMonth(today), endOfMonth(today));
-  };
-
-  const handleLastMonth = () => {
-    const today = new Date();
-    const lastMonth = subMonths(today, 1);
-    setDateRange(startOfMonth(lastMonth), endOfMonth(lastMonth));
+  const getDateRangeLabel = (): string => {
+    if (!startDate && !endDate) {
+      return 'Selecionar período';
+    }
+    if (startDate && endDate) {
+      return `${startDate.toLocaleDateString('pt-BR')} até ${endDate.toLocaleDateString('pt-BR')}`;
+    }
+    if (startDate) {
+      return startDate.toLocaleDateString('pt-BR');
+    }
+    return 'Selecionar período';
   };
 
   // Convert accounts to options
@@ -63,53 +74,32 @@ export function ImportOfxFilters({
         {/* Date Range Filter */}
         <div className="flex flex-col gap-2 sm:col-span-2 lg:w-auto lg:flex-row lg:items-center">
           <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1 lg:mb-0">
-            {/* Icon could be added here if desired, e.g. Calendar */}
             <span className="text-sm font-medium lg:hidden">Período</span>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
-            <div className="grid grid-cols-[1fr_auto_1fr] sm:flex sm:items-center gap-2 w-full lg:w-auto">
-              <DatePicker
-                value={startDate}
-                onChange={setStartDate}
-                placeholder="Início"
-                className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full lg:w-[130px] h-8 text-sm"
-                showIcon={false}
-              />
-              <span className="text-gray-500 dark:text-gray-400 text-sm">até</span>
-              <DatePicker
-                value={endDate}
-                onChange={setEndDate}
-                placeholder="Fim"
-                className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full lg:w-[130px] h-8 text-sm"
-                showIcon={false}
-              />
-            </div>
-            <div className="flex gap-2 justify-end sm:justify-start">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleToday}
-                className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                Hoje
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleThisMonth}
-                className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                Este Mês
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleLastMonth}
-                className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                Mês Passado
-              </Button>
-            </div>
+          <div className="flex items-center gap-2 w-full lg:w-auto">
+            <DateRangePicker
+              open={isDateRangePickerOpen}
+              onClose={() => setIsDateRangePickerOpen(false)}
+              startDate={startDateString}
+              endDate={endDateString}
+              onApply={handleDateRangeApply}
+              trigger={
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsDateRangePickerOpen(!isDateRangePickerOpen);
+                  }}
+                  className="h-8 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center gap-2 text-sm min-w-[200px] justify-start"
+                >
+                  <Calendar className="h-3.5 w-3.5" />
+                  <span className="truncate">{getDateRangeLabel()}</span>
+                </Button>
+              }
+              position="bottom"
+            />
           </div>
         </div>
 
@@ -126,7 +116,6 @@ export function ImportOfxFilters({
 
         {/* Accounts */}
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
           <div className="w-full lg:w-auto min-w-[200px]">
             <ComboBox
               options={[{ value: 'all', label: 'Todas as contas' }, ...accountOptions]}

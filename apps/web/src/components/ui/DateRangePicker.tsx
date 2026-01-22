@@ -1,3 +1,4 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { DatePicker } from '@/components/ui/DatePicker';
@@ -17,7 +18,6 @@ import {
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DayPicker, type DateRange } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 
@@ -205,11 +205,11 @@ export function DateRangePicker({
         const normalizedStart = start ? startOfDay(start) : undefined;
         const normalizedEnd = end ? startOfDay(end) : undefined;
         setDateRange({ from: normalizedStart, to: normalizedEnd });
-        
+
         // Atualizar campos personalizados
         setCustomStartDate(start ? formatDateToLocalISO(start) : '');
         setCustomEndDate(end ? formatDateToLocalISO(end) : '');
-        
+
         if (normalizedStart) {
           const startMonth = startOfMonth(normalizedStart);
           if (normalizedEnd) {
@@ -239,39 +239,36 @@ export function DateRangePicker({
     }
   }, [open, initialStartDate, initialEndDate, parseDate]);
 
-  const handlePresetClick = useCallback(
-    (preset: PresetOption) => {
-      setSelectedPreset(preset.id);
-      const range = preset.getRange();
-      // Normalizar para início do dia para o react-day-picker
-      const normalizedRange = {
-        from: startOfDay(range.start),
-        to: startOfDay(range.end),
-      };
-      setDateRange(normalizedRange);
-      
-      // Atualizar campos personalizados
-      setCustomStartDate(formatDateToLocalISO(range.start));
-      setCustomEndDate(formatDateToLocalISO(range.end));
-      
-      // Posicionar calendários para mostrar os meses do intervalo
-      const startMonth = startOfMonth(normalizedRange.from);
-      const endMonth = startOfMonth(normalizedRange.to);
-      
-      // Se o intervalo está no mesmo mês, mostrar esse mês e o próximo
-      if (startMonth.getTime() === endMonth.getTime()) {
-        setCurrentMonth(startMonth);
-        const nextMonth = new Date(startMonth);
-        nextMonth.setMonth(nextMonth.getMonth() + 1);
-        setSecondMonth(nextMonth);
-      } else {
-        // Se o intervalo está em meses diferentes, mostrar o mês inicial e o mês final
-        setCurrentMonth(startMonth);
-        setSecondMonth(endMonth);
-      }
-    },
-    [],
-  );
+  const handlePresetClick = useCallback((preset: PresetOption) => {
+    setSelectedPreset(preset.id);
+    const range = preset.getRange();
+    // Normalizar para início do dia para o react-day-picker
+    const normalizedRange = {
+      from: startOfDay(range.start),
+      to: startOfDay(range.end),
+    };
+    setDateRange(normalizedRange);
+
+    // Atualizar campos personalizados
+    setCustomStartDate(formatDateToLocalISO(range.start));
+    setCustomEndDate(formatDateToLocalISO(range.end));
+
+    // Posicionar calendários para mostrar os meses do intervalo
+    const startMonth = startOfMonth(normalizedRange.from);
+    const endMonth = startOfMonth(normalizedRange.to);
+
+    // Se o intervalo está no mesmo mês, mostrar esse mês e o próximo
+    if (startMonth.getTime() === endMonth.getTime()) {
+      setCurrentMonth(startMonth);
+      const nextMonth = new Date(startMonth);
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      setSecondMonth(nextMonth);
+    } else {
+      // Se o intervalo está em meses diferentes, mostrar o mês inicial e o mês final
+      setCurrentMonth(startMonth);
+      setSecondMonth(endMonth);
+    }
+  }, []);
 
   const handleRangeSelect = useCallback((range: DateRange | undefined) => {
     if (range) {
@@ -280,11 +277,11 @@ export function DateRangePicker({
         to: range.to ? startOfDay(range.to) : undefined,
       };
       setDateRange(normalizedRange);
-      
+
       // Atualizar campos personalizados
       setCustomStartDate(normalizedRange.from ? formatDateToLocalISO(normalizedRange.from) : '');
       setCustomEndDate(normalizedRange.to ? formatDateToLocalISO(normalizedRange.to) : '');
-      
+
       // Atualizar posição dos calendários quando uma data é selecionada
       if (normalizedRange.from) {
         const fromMonth = startOfMonth(normalizedRange.from);
@@ -311,7 +308,7 @@ export function DateRangePicker({
       setCustomStartDate('');
       setCustomEndDate('');
     }
-    
+
     if (range?.from && range?.to) {
       setSelectedPreset(null);
     }
@@ -372,11 +369,8 @@ export function DateRangePicker({
       const range = preset.getRange();
       const presetStart = startOfDay(range.start);
       const presetEnd = startOfDay(range.end);
-      
-      if (
-        isSameDay(normalizedFrom, presetStart) &&
-        isSameDay(normalizedTo, presetEnd)
-      ) {
+
+      if (isSameDay(normalizedFrom, presetStart) && isSameDay(normalizedTo, presetEnd)) {
         return preset.id;
       }
     }
@@ -391,6 +385,30 @@ export function DateRangePicker({
       setSelectedPreset(null);
     }
   }, [dateRange, checkPresetMatch]);
+
+  const handleBackdropClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    },
+    [onClose],
+  );
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [open, onClose]);
 
   // Mobile layout content
   const mobileContent = (
@@ -432,11 +450,13 @@ export function DateRangePicker({
 
       {/* Período Personalizado Section */}
       <div className="px-4 pb-4">
-        <h3 className="text-sm font-medium text-text dark:text-text-dark mb-3">Período personalizado</h3>
+        <h3 className="text-sm font-medium text-text dark:text-text-dark mb-3">
+          Período personalizado
+        </h3>
         <div className="flex gap-2 items-end">
           <div className="flex-1">
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">De</label>
             <DatePicker
+              label="De"
               value={customStartDate}
               onChange={(date) => {
                 const dateStr = date ? formatDateToLocalISO(date) : '';
@@ -458,8 +478,8 @@ export function DateRangePicker({
             />
           </div>
           <div className="flex-1">
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Até</label>
             <DatePicker
+              label="Até"
               value={customEndDate}
               onChange={(date) => {
                 const dateStr = date ? formatDateToLocalISO(date) : '';
@@ -572,16 +592,19 @@ export function DateRangePicker({
                   month: 'space-y-2',
                   caption: 'hidden',
                   weekdays: 'flex',
-                  weekday: 'text-xs text-muted-foreground dark:text-gray-400 w-8 h-8 lg:w-8 lg:h-8 flex items-center justify-center',
+                  weekday:
+                    'text-xs text-muted-foreground dark:text-gray-400 w-8 h-8 lg:w-8 lg:h-8 flex items-center justify-center',
                   week: 'flex',
                   day: 'w-9 h-9 lg:w-8 lg:h-8 text-sm rounded-md flex items-center justify-center transition-colors touch-manipulation',
                   day_selected: 'bg-primary-500 text-white dark:bg-primary-400',
                   day_range_start: 'bg-primary-500 text-white rounded-l-md',
                   day_range_end: 'bg-primary-500 text-white rounded-r-md',
-                  day_range_middle: 'bg-primary-100 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100',
+                  day_range_middle:
+                    'bg-primary-100 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100',
                   day_today: 'font-semibold',
                   day_outside: 'text-muted-foreground dark:text-gray-500 opacity-50',
-                  day_disabled: 'text-muted-foreground dark:text-gray-500 opacity-30 cursor-not-allowed',
+                  day_disabled:
+                    'text-muted-foreground dark:text-gray-500 opacity-30 cursor-not-allowed',
                   day_hidden: 'invisible',
                 }}
                 modifiersClassNames={{
@@ -625,16 +648,19 @@ export function DateRangePicker({
                     month: 'space-y-2',
                     caption: 'hidden',
                     weekdays: 'flex',
-                    weekday: 'text-xs text-muted-foreground dark:text-gray-400 w-8 h-8 flex items-center justify-center',
+                    weekday:
+                      'text-xs text-muted-foreground dark:text-gray-400 w-8 h-8 flex items-center justify-center',
                     week: 'flex',
                     day: 'w-8 h-8 text-sm rounded-md flex items-center justify-center transition-colors',
                     day_selected: 'bg-primary-500 text-white dark:bg-primary-400',
                     day_range_start: 'bg-primary-500 text-white rounded-l-md',
                     day_range_end: 'bg-primary-500 text-white rounded-r-md',
-                    day_range_middle: 'bg-primary-100 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100',
+                    day_range_middle:
+                      'bg-primary-100 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100',
                     day_today: 'font-semibold',
                     day_outside: 'text-muted-foreground dark:text-gray-500 opacity-50',
-                    day_disabled: 'text-muted-foreground dark:text-gray-500 opacity-30 cursor-not-allowed',
+                    day_disabled:
+                      'text-muted-foreground dark:text-gray-500 opacity-30 cursor-not-allowed',
                     day_hidden: 'invisible',
                   }}
                   modifiersClassNames={{
@@ -675,22 +701,20 @@ export function DateRangePicker({
 
   if (trigger) {
     return (
-      <Popover 
-        open={open} 
+      <Popover
+        open={open}
         onOpenChange={(isOpen) => {
           if (!isOpen) {
             onClose();
           }
         }}
       >
-        <PopoverTrigger asChild>
-          {trigger}
-        </PopoverTrigger>
+        <PopoverTrigger asChild>{trigger}</PopoverTrigger>
         <PopoverContent
           align="start"
           side={position}
-          sideOffset={8}
-          className="w-[calc(100vw-2rem)] sm:w-auto max-w-[calc(100vw-2rem)] sm:max-w-4xl p-0 border-0 bg-transparent shadow-none z-[9999] lg:bg-card lg:dark:bg-card-dark lg:border lg:border-border lg:dark:border-border-dark lg:rounded-lg date-range-picker-modal"
+          sideOffset={0}
+          className="w-screen sm:w-auto max-w-screen sm:max-w-4xl p-0 border-0 bg-transparent shadow-none z-[9999] lg:bg-card lg:dark:bg-card-dark lg:border lg:border-border lg:dark:border-border-dark lg:rounded-lg lg:sideOffset-8 date-range-picker-modal"
         >
           {content}
         </PopoverContent>
@@ -703,15 +727,20 @@ export function DateRangePicker({
   return (
     <div
       className="fixed inset-0 z-50 flex items-end lg:items-center justify-center bg-black/60 backdrop-blur-sm p-0 lg:p-4 animate-in fade-in duration-200"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
+      onClick={handleBackdropClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') {
           onClose();
         }
       }}
+      role="button"
+      tabIndex={0}
+      aria-label="Fechar seletor de período"
     >
-      <div 
-        className="w-full lg:w-full lg:max-w-4xl lg:max-h-[90vh] overflow-auto lg:rounded-lg date-range-picker-modal" 
+      <div
+        className="w-full max-w-full lg:w-full lg:max-w-4xl lg:max-h-[90vh] overflow-auto lg:rounded-lg date-range-picker-modal"
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
       >
         {content}
       </div>
