@@ -1,8 +1,9 @@
 import { Logo } from '@/components/Logo';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
 
 interface LoginLayoutProps {
@@ -11,6 +12,8 @@ interface LoginLayoutProps {
 }
 
 export function LoginLayout({ cardContent, footer }: Readonly<LoginLayoutProps>) {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-brand-arrow/5 dark:from-background-dark dark:via-background-dark dark:to-brand-leaf/5 relative overflow-hidden">
       {/* Elementos decorativos */}
@@ -26,13 +29,14 @@ export function LoginLayout({ cardContent, footer }: Readonly<LoginLayoutProps>)
         transition={{ duration: 0.5 }}
         className="absolute top-8 left-8 z-10"
       >
-        <Link
-          to="/home"
-          className="inline-flex items-center gap-2 text-text/60 hover:text-brand-arrow dark:text-text-dark/60 dark:hover:text-brand-leaf transition-colors cursor-pointer"
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/home')}
+          className="inline-flex items-center gap-2 text-text/60 hover:text-brand-arrow dark:text-text-dark/60 dark:hover:text-brand-leaf transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
           <span>Voltar para o início</span>
-        </Link>
+        </Button>
       </motion.div>
 
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4">
