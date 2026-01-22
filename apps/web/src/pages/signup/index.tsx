@@ -16,7 +16,7 @@ function calculatePasswordStrength(password: string): number {
 
   if (password.length >= 8) score += 1;
   if (/[A-Z]/.test(password)) score += 1;
-  if (/[0-9]/.test(password)) score += 1;
+  if (/\d/.test(password)) score += 1;
   if (/[^A-Za-z0-9]/.test(password)) score += 1; // Special char
 
   return score;
