@@ -122,6 +122,11 @@ export interface ComboBoxProps<T = string> {
    * Callback when "Clear" is clicked
    */
   onClearAll?: () => void;
+
+  /**
+   * Whether to show the clear button (X icon)
+   */
+  showClearButton?: boolean;
 }
 
 /**
@@ -164,6 +169,7 @@ export function ComboBox<T extends string | number = string>({
   showSelectAll = false,
   onSelectAll,
   onClearAll,
+  showClearButton = true,
 }: Readonly<ComboBoxProps<T>>) {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [isOpen, setIsOpen] = React.useState(false);
@@ -285,7 +291,7 @@ export function ComboBox<T extends string | number = string>({
               <span className="truncate text-gray-900 dark:text-gray-100">{displayValue}</span>
             </div>
           )}
-          {hasValue && !disabled && !renderTrigger && (
+          {hasValue && !disabled && !renderTrigger && showClearButton && (
             // Note: Using span instead of button to avoid nested button issue (SelectTrigger is already a button)
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
             <span
