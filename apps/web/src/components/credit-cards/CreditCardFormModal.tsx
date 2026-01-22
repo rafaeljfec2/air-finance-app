@@ -1,8 +1,6 @@
 import { FormField } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
-import { ColorPicker } from '@/components/ui/color-picker';
-import { IconPicker } from '@/components/ui/icon-picker';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
@@ -18,24 +16,15 @@ import { useCompanyStore } from '@/stores/company';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { formatDateToLocalISO, formatDateForInput } from '@/utils/date';
 import {
-  Banknote,
   Building2,
   Calendar,
   CreditCard,
   DollarSign,
   Hash,
-  Landmark,
-  Palette,
   X,
 } from 'lucide-react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useEffect, useMemo, useState, useCallback } from 'react';
-
-const BANK_TYPES = [
-  { value: 'CreditCard', label: 'Cartão', icon: CreditCard, iconName: 'CreditCard' },
-  { value: 'Banknote', label: 'Nota', icon: Banknote, iconName: 'Banknote' },
-  { value: 'Landmark', label: 'Banco', icon: Landmark, iconName: 'Landmark' },
-] as const;
 
 const DUE_DATES = Array.from({ length: 31 }, (_, i) => ({
   value: i + 1,
@@ -145,14 +134,6 @@ export function CreditCardFormModal({
     setForm((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleColorChange = useCallback((color: string) => {
-    setForm((prev) => ({ ...prev, color }));
-  }, []);
-
-  const handleIconChange = useCallback((icon: string) => {
-    setForm((prev) => ({ ...prev, icon }));
-  }, []);
-
   const handleBankChange = useCallback((bankCode: string | null) => {
     setForm((prev) => ({ ...prev, bankCode: bankCode ?? '' }));
   }, []);
@@ -250,10 +231,6 @@ export function CreditCardFormModal({
   };
   const submitButtonText = getSubmitButtonText();
   const bankComboBoxKey = `bank-${creditCard?.id || 'new'}-${form.bankCode || 'none'}`;
-  const iconPickerOptions = BANK_TYPES.map((t) => ({
-    value: t.iconName,
-    icon: t.icon,
-  }));
 
   return (
     <Modal
@@ -520,30 +497,6 @@ export function CreditCardFormModal({
                       ))}
                     </SelectContent>
                   </Select>
-                </FormField>
-              </div>
-            </div>
-
-            {/* Seção: Personalização */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 mb-2">
-                <Palette className="h-3.5 w-3.5 text-primary-500 dark:text-primary-400" />
-                <h3 className="text-xs font-semibold text-text dark:text-text-dark uppercase tracking-wide">
-                  Personalização
-                </h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <FormField label="Cor">
-                  <ColorPicker value={form.color} onChange={handleColorChange} />
-                </FormField>
-
-                <FormField label="Ícone">
-                  <IconPicker
-                    value={form.icon}
-                    onChange={handleIconChange}
-                    options={iconPickerOptions}
-                  />
                 </FormField>
               </div>
             </div>
