@@ -30,16 +30,15 @@ export function Header({ onOpenSidebar }: Readonly<HeaderProps>) {
       <div className="h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Left side: Mobile buttons (with back button) + Company Selector (web only) */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
+          {/* Company Selector - Alinhado à esquerda na view web (sem botão de voltar) */}
+          <div className="hidden lg:flex flex-shrink-0 min-w-[200px] max-w-[300px] items-center justify-start -ml-4 sm:-ml-6 lg:-ml-4">
+            <CompanySelector size="compact" />
+          </div>
           <HeaderMobileButtons
             onOpenSidebar={onOpenSidebar}
             showBackButton={shouldShowBackButton}
             onBack={goBack}
           />
-
-          {/* Company Selector - Alinhado à esquerda na view web (sem botão de voltar) */}
-          <div className="hidden lg:flex flex-shrink-0 min-w-[200px] max-w-[300px] items-center justify-start">
-            <CompanySelector size="compact" />
-          </div>
         </div>
 
         {/* Right side: Ações do Header */}
