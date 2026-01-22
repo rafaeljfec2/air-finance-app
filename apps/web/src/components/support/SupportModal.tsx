@@ -5,12 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Modal } from '@/components/ui/Modal';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/components/ui/toast';
 import { supportService } from '@/services/supportService';
 import { Loader2, Send } from 'lucide-react';
 
 interface SupportModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
 }
 
 const CATEGORY_OPTIONS = [
@@ -47,9 +48,35 @@ export function SupportModal({ isOpen, onClose }: SupportModalProps) {
         setFormData({ subject: '', category: 'question', message: '', priority: 'normal' });
         onClose();
       }, 2000);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to create ticket:', error);
-      alert('Erro ao enviar solicitação. Tente novamente.');
+      
+      let errorMessage = 'Erro ao enviar solicitação. Tente novamente.';
+      
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number; data?: { message?: string } } };
+        const status = axiosError.response?.status;
+        const message = axiosError.response?.data?.message;
+        
+        if (status === 400) {
+          errorMessage = message ?? 'Dados inválidos. Verifique os campos preenchidos.';
+        } else if (status === 401) {
+          errorMessage = 'Sessão expirada. Por favor, faça login novamente.';
+        } else if (status === 403) {
+          errorMessage = 'Você não tem permissão para realizar esta ação.';
+        } else if (status === 422) {
+          errorMessage = message ?? 'Dados inválidos. Verifique os campos preenchidos.';
+        } else if (status === 500) {
+          errorMessage = 'Erro interno do servidor. Tente novamente mais tarde.';
+        } else if (message) {
+          errorMessage = message;
+        }
+      }
+      
+      toast({
+        type: 'error',
+        description: errorMessage,
+      });
     } finally {
       setLoading(false);
     }
