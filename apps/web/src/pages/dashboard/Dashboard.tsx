@@ -1,4 +1,4 @@
-import { BalanceEvolutionCard } from '@/components/dashboard/BalanceEvolutionCard';
+import { AccountBalancesCard } from '@/components/dashboard/AccountBalancesCard';
 import { CreditCardExpensesCard } from '@/components/dashboard/CreditCardExpensesCard';
 import { ExpensesDistributionCard } from '@/components/dashboard/ExpensesDistributionCard';
 import { FinancialGoalsCard } from '@/components/dashboard/FinancialGoalsCard';
@@ -91,9 +91,6 @@ export function Dashboard() {
 
   const formattedDate = format(selectedDate, "MMMM 'de' yyyy", { locale: ptBR });
 
-  const balanceHistory = balanceHistoryQuery.data ?? [];
-  const isLoadingBalanceHistory = balanceHistoryQuery.isLoading;
-
   const expensesByCategory = expensesByCategoryQuery.data ?? [];
   const totalExpenses = expensesByCategory.reduce((sum, cat) => sum + cat.value, 0);
 
@@ -112,39 +109,17 @@ export function Dashboard() {
       };
     }) ?? [];
 
-  const renderBalanceHistoryContent = () => {
-    if (isLoadingBalanceHistory) {
-      return (
-        <div className="flex h-full items-center justify-center text-gray-500 dark:text-gray-400">
-          Carregando evolução do saldo...
-        </div>
-      );
-    }
-
-    if (balanceHistory.length > 0) {
-      // Reutiliza o mesmo gráfico da seção principal
-      return <BalanceEvolutionCard companyId={companyId} filters={filters} />;
-    }
-
-    return (
-      <div className="flex h-full items-center justify-center text-gray-500 dark:text-gray-400">
-        Nenhum movimento financeiro no período selecionado.
-      </div>
-    );
-  };
-
   return (
     <ViewDefault>
       {/* Modais */}
       <Modal
         open={showDetailsModal}
         onClose={() => setShowDetailsModal(false)}
-        title="Evolução do Saldo"
+        title="Saldo das Contas"
         className="max-w-4xl"
       >
-        {/* ... modal content ... */}
-        <div className="mb-6 h-64">{renderBalanceHistoryContent()}</div>
-        <div className="border-t border-border dark:border-border-dark pt-4">
+        <AccountBalancesCard companyId={companyId} />
+        <div className="border-t border-border dark:border-border-dark pt-4 mt-6">
           <h3 className="text-sm font-medium text-text dark:text-text-dark mb-3">
             Movimentações Recentes
           </h3>
@@ -323,11 +298,7 @@ export function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {/* Row 1 */}
               <motion.div variants={item} className="md:col-span-2">
-                <BalanceEvolutionCard
-                  companyId={companyId}
-                  filters={filters}
-                  onOpenDetails={() => setShowDetailsModal(true)}
-                />
+                <AccountBalancesCard companyId={companyId} />
               </motion.div>
               <motion.div variants={item} className="md:col-span-1">
                 <ExpensesDistributionCard
