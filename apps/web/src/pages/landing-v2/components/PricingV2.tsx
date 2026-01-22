@@ -23,13 +23,13 @@ const plans = [
     period: '/mês',
     features: [
       'Tudo do plano Gratuito',
-      'Até 5 contas bancárias',
-      'Até 2 cartões de crédito',
+      'Recomendado para freelancers e autônomos',
+      'Até 2 contas bancárias',
+      'R$ 6,00 por conta adicional',
       'Relatório avançado',
       'Metas de economia',
       'Exportação de dados',
       'Insights gerados por IA',
-      'Exclusivo para CPF',
       'Integração Open Finance via Pierre Finance',
     ],
     cta: 'Escolher este plano',
@@ -38,10 +38,15 @@ const plans = [
   {
     id: 'business',
     name: 'Business',
-    price: 'R$ 79',
+    price: 'R$ 149',
     period: '/mês',
     features: [
       'Tudo do plano Pro',
+      'Recomendado para empresas',
+      'Até 2 empresas',
+      'R$ 29,00 por empresa adicional',
+      'Até 2 contas bancárias por empresa',
+      'R$ 12,00 por conta adicional por empresa',
       'Integração bancária via API do Inter',
       'Insights gerados por IA',
       'Múltiplos usuários',
@@ -62,9 +67,10 @@ export function PricingV2() {
         <div className="v2-text-center v2-mb-12">
           <h2 className="v2-h2 v2-mb-6">Planos para todos os perfis</h2>
           <p className="v2-body max-w-2xl mx-auto text-gray-600 mb-8">
-            Escolha o plano ideal para suas necessidades e comece a transformar sua vida financeira hoje
+            Escolha o plano ideal para suas necessidades e comece a transformar sua vida financeira
+            hoje
           </p>
-          
+
           {/* Beta Banner */}
           <div className="max-w-3xl mx-auto mb-8">
             <div className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-[#10b981]/10 via-[#10b981]/5 to-[#10b981]/10 border-2 border-[#10b981]/20">
@@ -78,8 +84,8 @@ export function PricingV2() {
                   Estamos em fase Beta por tempo limitado
                 </p>
                 <p className="text-sm text-gray-600 leading-relaxed">
-                  Durante este período, você é livre para usar qualquer plano gratuitamente. 
-                  Se fizer sentido para você, pode contribuir e nos ajudar a melhorar o Airfinance.
+                  Durante este período, você é livre para usar qualquer plano gratuitamente. Se
+                  fizer sentido para você, pode contribuir e nos ajudar a melhorar o Airfinance.
                 </p>
               </div>
             </div>
@@ -101,11 +107,11 @@ export function PricingV2() {
                   Mais popular
                 </div>
               )}
-              
+
               <div className="mb-4">
                 <h3 className="text-2xl font-bold text-gray-900">{plan.name}</h3>
               </div>
-              
+
               <div className="mb-5">
                 <div className="flex items-baseline gap-1">
                   <span className="text-5xl font-bold text-gray-900">{plan.price}</span>
@@ -139,7 +145,9 @@ export function PricingV2() {
                         Pierre Finance Pro
                       </p>
                       <p className="text-xs text-gray-600 mb-1.5">
-                        Custo adicional de <span className="font-bold text-blue-600">R$ 39/mês</span> pago diretamente ao Pierre Finance
+                        Custo adicional de{' '}
+                        <span className="font-bold text-blue-600">R$ 39/mês</span> pago diretamente
+                        ao Pierre Finance
                       </p>
                       <div className="flex flex-col gap-1">
                         <a

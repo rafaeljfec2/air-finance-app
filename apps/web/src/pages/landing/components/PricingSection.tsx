@@ -25,7 +25,6 @@ const plans = [
       'Tudo do Free',
       'IA Ilimitada',
       'Até 5 contas bancárias',
-      'Até 2 cartões de crédito',
       'Importação OFX',
       'Insights gerados por IA',
       'Exclusivo para CPF',
