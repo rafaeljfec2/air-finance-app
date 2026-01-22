@@ -61,11 +61,14 @@ export function UsersList({
   return (
     <>
       {/* Desktop: Table view */}
-      <Card className="hidden md:block bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
+      <Card className="hidden md:block bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm p-0">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border dark:border-border-dark">
+                <SortableColumn field="createdAt" currentSort={sortConfig} onSort={onSort}>
+                  Data de Cadastro
+                </SortableColumn>
                 <SortableColumn field="name" currentSort={sortConfig} onSort={onSort}>
                   Nome
                 </SortableColumn>
@@ -81,13 +84,13 @@ export function UsersList({
                 <SortableColumn field="status" currentSort={sortConfig} onSort={onSort}>
                   Status
                 </SortableColumn>
-                <th className="text-left py-4 px-4 text-sm font-semibold text-text dark:text-text-dark">
+                <th className="text-left py-2 px-3 text-xs font-semibold text-text dark:text-text-dark">
                   Email Verificado
                 </th>
-                <th className="text-left py-4 px-4 text-sm font-semibold text-text dark:text-text-dark">
+                <th className="text-left py-2 px-3 text-xs font-semibold text-text dark:text-text-dark">
                   Onboarding
                 </th>
-                <th className="text-right py-4 px-4 text-sm font-semibold text-text dark:text-text-dark">
+                <th className="text-right py-2 px-3 text-xs font-semibold text-text dark:text-text-dark">
                   Ações
                 </th>
               </tr>
