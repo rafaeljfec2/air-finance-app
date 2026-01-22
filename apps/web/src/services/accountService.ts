@@ -147,6 +147,19 @@ export const getAccountsSummary = async (companyId: string): Promise<AccountsSum
   }
 };
 
+export const getAccountsSummaryFromExtracts = async (
+  companyId: string,
+): Promise<AccountsSummary> => {
+  try {
+    const response = await apiClient.get<AccountsSummary>(
+      `/companies/${companyId}/accounts/summary-from-extracts`,
+    );
+    return AccountsSummarySchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
 export const getTotalBalance = async (companyId: string): Promise<TotalBalance> => {
   try {
     const response = await apiClient.get<TotalBalance>(

@@ -92,3 +92,18 @@ export const useDashboardRecentTransactions = (
     staleTime: 30 * 1000, // Consider stale after 30 seconds
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
+
+export const useDashboardExtractsSummary = (companyId: string, filters: DashboardFilters) =>
+  useQuery<DashboardSummary>({
+    queryKey: [
+      'dashboard',
+      'extracts-summary',
+      companyId,
+      filters.timeRange,
+      filters.referenceDate ?? null,
+    ],
+    queryFn: () => dashboardService.fetchExtractsSummary(companyId, filters),
+    enabled: !!companyId,
+    staleTime: 30 * 1000, // Consider stale after 30 seconds
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
+  });

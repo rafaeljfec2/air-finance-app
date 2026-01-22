@@ -1,15 +1,15 @@
 import { useCompanyStore } from '@/stores/company';
-import { useHomePageData } from '@/pages/home/hooks/useHomePageData';
+import { useHomePageDataFromExtracts } from '@/pages/home/hooks/useHomePageDataFromExtracts';
 import { useQuery } from '@tanstack/react-query';
 import { getAccountsSummaryFromExtracts } from '@/services/accountService';
 import { getCreditCardsSummary } from '@/services/creditCardService';
 
-export function useHomeV2Data() {
+export function useHomeV2DataFromExtracts() {
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
 
-  // Get balance data from transactions (cash flow)
-  const { balance, accumulatedBalance, summaryQuery } = useHomePageData();
+  // Get balance data from extracts hook
+  const { balance, accumulatedBalance, summaryQuery } = useHomePageDataFromExtracts();
 
   // Get accounts summary with calculated balances from extracts
   const accountsSummaryQuery = useQuery({

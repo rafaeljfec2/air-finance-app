@@ -173,6 +173,21 @@ async function fetchRecentTransactions(
   }
 }
 
+async function fetchExtractsSummary(
+  companyId: string,
+  filters: DashboardFilters,
+): Promise<DashboardSummary> {
+  try {
+    const response = await apiClient.get(`/companies/${companyId}/dashboard/extracts-summary`, {
+      params: buildParams(filters),
+    });
+
+    return DashboardSummarySchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+}
+
 export const dashboardService = {
   fetchDashboardSummary,
   fetchBalanceHistory,
@@ -180,4 +195,5 @@ export const dashboardService = {
   fetchComparison,
   fetchGoalsSummary,
   fetchRecentTransactions,
+  fetchExtractsSummary,
 };
