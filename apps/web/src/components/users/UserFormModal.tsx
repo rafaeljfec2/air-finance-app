@@ -89,37 +89,56 @@ export function UserFormModal({
     [],
   );
 
+  // Helper function to find missing company IDs
+  const findMissingCompanyIds = (
+    companyIds: string[],
+    existingCompanies: Company[],
+  ): string[] => {
+    const existingIds = new Set(existingCompanies.map((c) => c.id));
+    return companyIds.filter((cId) => !existingIds.has(cId));
+  };
+
+  // Helper function to fetch a single company
+  const fetchCompanyById = async (cId: string): Promise<Company | null> => {
+    try {
+      return await companyService.getById(cId);
+    } catch (error) {
+      console.error(`Erro ao buscar empresa ${cId}:`, error);
+      return null;
+    }
+  };
+
+  // Helper function to update fetched companies state
+  const updateFetchedCompanies = (newCompanies: Map<string, Company>) => {
+    if (newCompanies.size === 0) return;
+
+    setFetchedCompanies((prev) => {
+      const updated = new Map(prev);
+      newCompanies.forEach((company, id) => updated.set(id, company));
+      return updated;
+    });
+  };
+
   // Fetch companies that are not in the companies list
   useEffect(() => {
     if (!user?.companyIds || !companies) return;
 
     const fetchMissingCompanies = async () => {
-      const missingCompanyIds = user.companyIds.filter(
-        (cId) => !companies.find((c) => c.id === cId),
-      );
+      const missingCompanyIds = findMissingCompanyIds(user.companyIds, companies);
 
       if (missingCompanyIds.length === 0) return;
 
+      const fetchPromises = missingCompanyIds.map((cId) => fetchCompanyById(cId));
+      const results = await Promise.allSettled(fetchPromises);
+
       const newFetchedCompanies = new Map<string, Company>();
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled' && result.value) {
+          newFetchedCompanies.set(missingCompanyIds[index] ?? '', result.value);
+        }
+      });
 
-      await Promise.allSettled(
-        missingCompanyIds.map(async (cId) => {
-          try {
-            const company = await companyService.getById(cId);
-            newFetchedCompanies.set(cId, company);
-          } catch (error) {
-            console.error(`Erro ao buscar empresa ${cId}:`, error);
-          }
-        }),
-      );
-
-      if (newFetchedCompanies.size > 0) {
-        setFetchedCompanies((prev) => {
-          const updated = new Map(prev);
-          newFetchedCompanies.forEach((company, id) => updated.set(id, company));
-          return updated;
-        });
-      }
+      updateFetchedCompanies(newFetchedCompanies);
     };
 
     fetchMissingCompanies();
