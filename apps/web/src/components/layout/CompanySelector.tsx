@@ -63,7 +63,7 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
     if (!company) return <span>{option.label}</span>;
 
     return (
-      <div className="flex flex-col">
+      <div className="flex flex-col items-start">
         <span className="font-medium leading-tight text-xs">{company.name}</span>
         <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
           {formatDocument(company.cnpj)}
@@ -79,8 +79,8 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
   ) => {
     if (!option) {
       return (
-        <div className="flex flex-col items-start flex-1">
-          <span className="font-bold text-text dark:text-text-dark leading-tight text-xs">
+        <div className="flex flex-col items-start justify-center flex-1 min-w-0 pl-1">
+          <span className="font-bold text-text dark:text-text-dark leading-tight text-xs uppercase">
             {displayValue}
           </span>
         </div>
@@ -90,8 +90,8 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
     const company = companies.find((c) => c.id === option.value);
     if (!company) {
       return (
-        <div className="flex flex-col items-start flex-1">
-          <span className="font-bold text-text dark:text-text-dark leading-tight text-xs">
+        <div className="flex flex-col items-start justify-center flex-1 min-w-0 pl-1">
+          <span className="font-bold text-text dark:text-text-dark leading-tight text-xs uppercase">
             {displayValue}
           </span>
         </div>
@@ -99,11 +99,11 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
     }
 
     return (
-      <div className="flex flex-col items-start flex-1">
-        <span className="font-bold text-text dark:text-text-dark leading-tight text-xs">
+      <div className="flex flex-col items-start justify-center flex-1 min-w-0 pl-1">
+        <span className="font-bold text-text dark:text-text-dark leading-tight text-xs uppercase">
           {company.name}
         </span>
-        <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+        <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 leading-tight">
           {formatDocument(company.cnpj)}
         </span>
       </div>
@@ -117,11 +117,11 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
     heightClass = 'h-[56px]';
   }
 
-  let paddingClass = 'px-4';
+  let paddingClass = 'px-4 py-2';
   if (size === 'compact') {
-    paddingClass = 'px-3';
+    paddingClass = 'px-3 py-1.5';
   } else if (size === 'large') {
-    paddingClass = 'px-0';
+    paddingClass = 'px-4 py-3';
   }
 
   return (
