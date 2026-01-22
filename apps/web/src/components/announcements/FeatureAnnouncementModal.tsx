@@ -71,9 +71,9 @@ const PRIORITY_LABELS: Record<AnnouncementPriority, string> = {
   normal: 'Normal',
 };
 
-const MODAL_STYLES = {
-  height: 'calc(100dvh - 4rem - env(safe-area-inset-bottom, 0px))',
-  maxHeight: 'calc(100dvh - 4rem - env(safe-area-inset-bottom, 0px))',
+const MODAL_STYLES_MOBILE = {
+  height: 'calc(85vh - 4rem - env(safe-area-inset-bottom, 0px))',
+  maxHeight: 'calc(85vh - 4rem - env(safe-area-inset-bottom, 0px))',
   marginBottom: 'max(calc(4rem + env(safe-area-inset-bottom, 0px)), 0px)',
 } as const;
 
@@ -135,7 +135,7 @@ function ModalHeader({ announcement, styles, onClose }: Readonly<ModalHeaderProp
   const TypeIcon = getTypeIcon(announcement.type);
 
   return (
-    <div className={cn('relative h-24 sm:h-32 bg-gradient-to-r flex-shrink-0', styles.gradient)}>
+    <div className={cn('relative h-16 sm:h-32 bg-gradient-to-r flex-shrink-0', styles.gradient)}>
       {announcement.imageUrl && (
         <div className="absolute inset-0">
           <img
@@ -146,18 +146,18 @@ function ModalHeader({ announcement, styles, onClose }: Readonly<ModalHeaderProp
         </div>
       )}
       <div className="relative h-full flex items-center justify-center">
-        <div className="bg-white/20 backdrop-blur-sm rounded-full p-2 sm:p-4">
-          <TypeIcon className="h-8 w-8 sm:h-12 sm:w-12 text-white" />
+        <div className="bg-white/20 backdrop-blur-sm rounded-full p-1.5 sm:p-4">
+          <TypeIcon className="h-6 w-6 sm:h-12 sm:w-12 text-white" />
         </div>
       </div>
 
       <div
-        className="absolute top-2 sm:top-4 left-2 sm:left-4 flex gap-1.5 sm:gap-2 flex-wrap"
+        className="absolute top-1.5 sm:top-4 left-1.5 sm:left-4 flex gap-1 sm:gap-2 flex-wrap"
         style={{ paddingTop: SAFE_AREA_STYLES.topPadding }}
       >
         <span
           className={cn(
-            'px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold border',
+            'px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-xs font-semibold border',
             styles.badge,
           )}
         >
@@ -165,7 +165,7 @@ function ModalHeader({ announcement, styles, onClose }: Readonly<ModalHeaderProp
         </span>
         <span
           className={cn(
-            'px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold border',
+            'px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-xs font-semibold border',
             styles.badge,
           )}
         >
@@ -176,11 +176,11 @@ function ModalHeader({ announcement, styles, onClose }: Readonly<ModalHeaderProp
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute top-2 sm:top-4 right-2 sm:right-4 text-white/80 hover:text-white transition-colors p-1.5 sm:p-2 rounded-full hover:bg-white/20 min-h-[44px] min-w-[44px] flex items-center justify-center"
+          className="absolute top-1.5 sm:top-4 right-1.5 sm:right-4 text-white/80 hover:text-white transition-colors p-1 sm:p-2 rounded-full hover:bg-white/20 min-h-[36px] min-w-[36px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center"
           style={{ paddingTop: SAFE_AREA_STYLES.topPadding }}
           aria-label="Fechar"
         >
-          <X className="h-5 w-5 sm:h-5 sm:w-5" />
+          <X className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>
       )}
     </div>
@@ -194,12 +194,12 @@ interface ModalContentProps {
 function ModalContent({ announcement }: Readonly<ModalContentProps>) {
   return (
     <div className="flex-1 overflow-y-auto overscroll-contain min-h-0">
-      <div className="p-4 sm:p-6 lg:p-8">
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
+      <div className="p-3 sm:p-6 lg:p-8">
+        <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4">
           {announcement.title}
         </h2>
-        <div className="mb-4 sm:mb-6">
-          <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+        <div className="mb-2 sm:mb-6">
+          <p className="text-xs sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
             {announcement.description}
           </p>
         </div>
@@ -218,34 +218,34 @@ interface ModalActionsProps {
 function ModalActions({ announcement, styles, onConfirm, isLoading }: Readonly<ModalActionsProps>) {
   return (
     <div
-      className="flex-shrink-0 p-4 sm:p-6 lg:p-8 pt-3 sm:pt-3 lg:pt-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-lg"
+      className="flex-shrink-0 p-3 sm:p-6 lg:p-8 pt-2 sm:pt-3 lg:pt-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-lg"
       style={{ paddingBottom: SAFE_AREA_STYLES.bottomPadding }}
     >
-      <div className="flex flex-col gap-2 sm:gap-3">
+      <div className="flex flex-col gap-1.5 sm:gap-3">
         {announcement.actionButtonText && announcement.actionButtonLink && (
           <Button
             variant="outline"
             onClick={() => handleActionButtonClick(announcement.actionButtonLink!)}
-            className="flex-1 border-2 min-h-[48px] text-sm sm:text-base font-semibold"
+            className="flex-1 border-2 min-h-[44px] sm:min-h-[48px] text-xs sm:text-base font-semibold"
           >
             {announcement.actionButtonText}
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ml-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
         )}
 
         <Button
           onClick={onConfirm}
           disabled={isLoading}
-          className={cn('flex-1 text-white shadow-lg min-h-[48px] text-sm sm:text-base font-semibold', styles.button)}
+          className={cn('flex-1 text-white shadow-lg min-h-[44px] sm:min-h-[48px] text-xs sm:text-base font-semibold', styles.button)}
         >
           {isLoading ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+              <div className="animate-spin rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 border-2 border-white border-t-transparent mr-2" />
               Processando...
             </>
           ) : (
             <>
-              <CheckCircle2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              <CheckCircle2 className="mr-2 h-3.5 w-3.5 sm:h-5 sm:w-5" />
               Entendi, obrigado!
             </>
           )}
@@ -268,7 +268,7 @@ export function FeatureAnnouncementModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-4 pb-0 sm:pb-4">
         <ModalOverlay onClose={onClose} />
 
         <motion.div
@@ -283,8 +283,9 @@ export function FeatureAnnouncementModal({
             'overflow-hidden',
             'flex flex-col',
             'mb-0 sm:mb-0',
+            'sm:max-h-[85vh]',
           )}
-          style={MODAL_STYLES}
+          style={MODAL_STYLES_MOBILE}
         >
           <ModalHeader announcement={announcement} styles={styles} onClose={onClose} />
           <ModalContent announcement={announcement} />
