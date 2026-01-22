@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -222,7 +222,7 @@ export function StatementSchedulePage() {
               type="button"
               variant="ghost"
               onClick={handleBack}
-              className="p-2 h-auto"
+              className="hidden md:flex p-2 h-auto"
               aria-label="Voltar"
             >
               <ArrowLeft className="h-5 w-5" />
