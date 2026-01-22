@@ -41,6 +41,9 @@ export function HomeHeader({
         </p>
         <div className="flex items-center gap-3">
           <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+              Saldo do fluxo de caixa
+            </p>
             <h1 className={`text-2xl font-bold ${getBalanceColorClass()}`}>
               {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(balance)}
             </h1>
