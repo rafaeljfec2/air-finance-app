@@ -134,7 +134,7 @@ function ModalHeader({ announcement, styles, onClose }: Readonly<ModalHeaderProp
   const TypeIcon = getTypeIcon(announcement.type);
 
   return (
-    <div className={cn('relative h-16 sm:h-32 bg-gradient-to-r flex-shrink-0', styles.gradient)}>
+    <div className={cn('relative h-16 sm:h-24 lg:h-24 bg-gradient-to-r flex-shrink-0', styles.gradient)}>
       {announcement.imageUrl && (
         <div className="absolute inset-0">
           <img
@@ -145,8 +145,8 @@ function ModalHeader({ announcement, styles, onClose }: Readonly<ModalHeaderProp
         </div>
       )}
       <div className="relative h-full flex items-center justify-center">
-        <div className="bg-white/20 backdrop-blur-sm rounded-full p-1.5 sm:p-4">
-          <TypeIcon className="h-6 w-6 sm:h-12 sm:w-12 text-white" />
+        <div className="bg-white/20 backdrop-blur-sm rounded-full p-1.5 sm:p-3 lg:p-3">
+          <TypeIcon className="h-6 w-6 sm:h-10 sm:w-10 lg:h-10 lg:w-10 text-white" />
         </div>
       </div>
 
@@ -193,12 +193,12 @@ interface ModalContentProps {
 function ModalContent({ announcement }: Readonly<ModalContentProps>) {
   return (
     <div className="flex-1 overflow-y-auto overscroll-contain min-h-0">
-      <div className="p-3 sm:p-6 lg:p-8">
-        <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4">
+      <div className="p-3 sm:p-4 lg:p-6">
+        <h2 className="text-lg sm:text-xl lg:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
           {announcement.title}
         </h2>
-        <div className="mb-2 sm:mb-6">
-          <p className="text-xs sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+        <div className="mb-2 sm:mb-4">
+          <p className="text-xs sm:text-sm lg:text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
             {announcement.description}
           </p>
         </div>
@@ -217,7 +217,7 @@ interface ModalActionsProps {
 function ModalActions({ announcement, styles, onConfirm, isLoading }: Readonly<ModalActionsProps>) {
   return (
     <div
-      className="flex-shrink-0 p-3 sm:p-6 lg:p-8 pt-2 sm:pt-3 lg:pt-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-lg"
+      className="flex-shrink-0 p-3 sm:p-4 lg:p-4 pt-2 sm:pt-2 lg:pt-2 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-lg"
       style={{ paddingBottom: SAFE_AREA_STYLES.bottomPadding }}
     >
       <div className="flex flex-col gap-1.5 sm:gap-3">
@@ -225,7 +225,7 @@ function ModalActions({ announcement, styles, onConfirm, isLoading }: Readonly<M
           <Button
             variant="outline"
             onClick={() => handleActionButtonClick(announcement.actionButtonLink!)}
-            className="flex-1 border-2 min-h-[44px] sm:min-h-[48px] text-xs sm:text-base font-semibold"
+            className="flex-1 border-2 min-h-[44px] sm:min-h-[44px] text-xs sm:text-sm font-semibold"
           >
             {announcement.actionButtonText}
             <ArrowRight className="ml-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -235,7 +235,7 @@ function ModalActions({ announcement, styles, onConfirm, isLoading }: Readonly<M
         <Button
           onClick={onConfirm}
           disabled={isLoading}
-          className={cn('flex-1 text-white shadow-lg min-h-[44px] sm:min-h-[48px] text-xs sm:text-base font-semibold', styles.button)}
+          className={cn('flex-1 text-white shadow-lg min-h-[44px] sm:min-h-[44px] text-xs sm:text-sm font-semibold', styles.button)}
         >
           {isLoading ? (
             <>
