@@ -5,6 +5,7 @@ import { router } from './routes';
 import { ThemeProvider } from './components/ThemeProvider';
 import { Toaster } from 'sonner';
 import { CompanyProvider } from '@/contexts/companyContext';
+import { AnnouncementsProvider } from '@/components/announcements/AnnouncementsProvider';
 import { useEffect, lazy, Suspense } from 'react';
 import { initStorageCleanup } from '@/utils/storageCleanup';
 

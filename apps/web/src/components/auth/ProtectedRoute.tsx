@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Loading } from '@/components/Loading';
+import { AnnouncementsProvider } from '@/components/announcements/AnnouncementsProvider';
 import React from 'react';
 
 interface ProtectedRouteProps {
@@ -24,5 +25,10 @@ export function ProtectedRoute({ children, requireAuth = true }: Readonly<Protec
     return <Navigate to="/home" replace />;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <AnnouncementsProvider />
+      {children}
+    </>
+  );
 }
