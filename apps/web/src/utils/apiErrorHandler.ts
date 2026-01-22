@@ -513,17 +513,17 @@ export function getUserFriendlyMessage(error: ApiError): string {
     }
   }
 
-  // Mensagens por status HTTP
+  // Mensagens por status HTTP (prioriza mensagem do backend quando disponível)
   const statusMessages: Record<number, string> = {
     400: message || 'Dados inválidos. Por favor, verifique as informações e tente novamente.',
-    401: 'Credenciais inválidas. Por favor, tente novamente.',
-    403: 'Você não tem permissão para realizar esta ação.',
-    404: 'Recurso não encontrado.',
+    401: message || 'Credenciais inválidas. Por favor, tente novamente.',
+    403: message || 'Você não tem permissão para realizar esta ação.',
+    404: message || 'Recurso não encontrado.',
     409: message || 'Conflito detectado. Por favor, verifique os dados e tente novamente.',
     422: message || 'Dados inválidos. Por favor, verifique as informações e tente novamente.',
-    429: 'Muitas requisições. Por favor, aguarde um momento e tente novamente.',
+    429: message || 'Muitas requisições. Por favor, aguarde um momento e tente novamente.',
     500: message || 'Erro interno do servidor. Por favor, tente novamente mais tarde.',
-    503: 'Serviço indisponível. Por favor, tente novamente mais tarde.',
+    503: message || 'Serviço indisponível. Por favor, tente novamente mais tarde.',
   };
 
   return (

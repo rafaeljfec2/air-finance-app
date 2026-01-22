@@ -66,9 +66,22 @@ export function Login() {
           // Parseia o erro usando o handler centralizado
           const apiError = parseApiError(err);
           const friendlyMessage = getUserFriendlyMessage(apiError);
+          const backendMessage = (apiError.message ?? '').toLowerCase();
+          const lowerFriendlyMessage = friendlyMessage.toLowerCase();
 
           // Trata caso especial de email não verificado
-          if (apiError.status === 403 && friendlyMessage.includes('verificado')) {
+          // Verifica tanto na mensagem original do backend quanto na mensagem amigável
+          // A mensagem do backend é: "E-mail não verificado. Por favor, verifique seu e-mail para continuar."
+          const isEmailNotVerified =
+            apiError.status === 403 &&
+            (backendMessage.includes('não verificado') ||
+              backendMessage.includes('verifique seu e-mail') ||
+              backendMessage.includes('verifique seu email') ||
+              lowerFriendlyMessage.includes('não verificado') ||
+              lowerFriendlyMessage.includes('verifique seu e-mail') ||
+              lowerFriendlyMessage.includes('verifique seu email'));
+
+          if (isEmailNotVerified) {
             setNeedsConfirmation(true);
             setError(null); // Clear generic error
             return;
@@ -165,7 +178,8 @@ export function Login() {
                   </h2>
                   <p className="text-sm text-text/80 dark:text-text-dark/80">
                     Sua conta ainda não foi ativada. Enviamos um link de confirmação para{' '}
-                    <strong>{formData.email}</strong>.
+                    <strong>{formData.email}</strong>. Caso você não receba o e-mail, clique no
+                    botão abaixo para reenviar.
                   </p>
 
                   {resendSuccess && (
@@ -406,4 +420,3 @@ export function Login() {
     </div>
   );
 }
-
