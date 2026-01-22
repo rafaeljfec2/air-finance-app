@@ -285,9 +285,7 @@ export function ComboBox<T extends string | number = string>({
             renderTrigger(selectedOption, displayValue)
           ) : (
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              {Icon && (
-                <Icon className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-              )}
+              {Icon && <Icon className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />}
               <span className="truncate text-gray-900 dark:text-gray-100">{displayValue}</span>
             </div>
           )}
