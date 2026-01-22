@@ -76,6 +76,15 @@
     @apply hidden;
   }
 
+  .date-range-picker .rdp-nav {
+    @apply hidden;
+  }
+
+  .date-range-picker .rdp-button_previous,
+  .date-range-picker .rdp-button_next {
+    @apply hidden;
+  }
+
   .date-range-picker .rdp-weekdays {
     @apply flex;
   }
