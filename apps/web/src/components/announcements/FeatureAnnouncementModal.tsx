@@ -72,9 +72,8 @@ const PRIORITY_LABELS: Record<AnnouncementPriority, string> = {
 };
 
 const MODAL_STYLES_MOBILE = {
-  height: 'calc(85vh - 4rem - env(safe-area-inset-bottom, 0px))',
-  maxHeight: 'calc(85vh - 4rem - env(safe-area-inset-bottom, 0px))',
-  marginBottom: 'max(calc(4rem + env(safe-area-inset-bottom, 0px)), 0px)',
+  maxHeight: 'calc(70vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))',
+  height: 'auto',
 } as const;
 
 const SAFE_AREA_STYLES = {
@@ -268,22 +267,21 @@ export function FeatureAnnouncementModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-4 pb-0 sm:pb-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-4">
         <ModalOverlay onClose={onClose} />
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 100 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 100 }}
-          transition={{ type: 'spring', duration: 0.4 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ type: 'spring', duration: 0.3 }}
           className={cn(
-            'relative z-10 w-full max-w-2xl rounded-t-3xl sm:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl',
+            'relative z-10 w-full max-w-lg sm:max-w-2xl rounded-2xl sm:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl',
             'border-2 sm:border-2',
             styles.border,
             'overflow-hidden',
             'flex flex-col',
-            'mb-0 sm:mb-0',
-            'sm:max-h-[85vh]',
+            'max-h-[70vh] sm:max-h-[85vh]',
           )}
           style={MODAL_STYLES_MOBILE}
         >
