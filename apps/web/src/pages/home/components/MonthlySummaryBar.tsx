@@ -65,15 +65,15 @@ export function MonthlySummaryBar({
   };
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-800 rounded-xl p-4">
-      <div className="flex justify-between text-sm mb-2">
+    <div className="bg-gray-100 dark:bg-gray-800 rounded-xl p-3">
+      <div className="flex justify-between text-xs mb-1.5">
         <span className="text-gray-600 dark:text-gray-300">Receitas vs Despesas</span>
         <span className="font-medium text-gray-900 dark:text-white">{currentMonthYear}</span>
       </div>
-      <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden flex">
+      <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden flex">
         {renderProgressBar()}
       </div>
-      <div className="flex justify-between text-xs mt-2 text-gray-500">
+      <div className="flex justify-between text-[10px] mt-1.5 text-gray-500">
         <span>Entradas: {formatValue(income, '+')}</span>
         <span>Saídas: {formatValue(expenses, '-')}</span>
       </div>
