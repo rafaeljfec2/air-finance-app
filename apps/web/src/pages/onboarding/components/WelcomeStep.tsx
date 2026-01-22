@@ -48,8 +48,7 @@ export function WelcomeStep({ onNext }: Readonly<WelcomeStepProps>) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            whileHover={{ scale: 1.02, y: -4 }}
-            className="p-4 sm:p-6 rounded-lg border border-brand-leaf/20 bg-brand-arrow/10 flex flex-col items-center text-center transition-shadow hover:shadow-lg hover:shadow-brand-leaf/20 cursor-default"
+            className="p-4 sm:p-6 rounded-lg border border-brand-leaf/20 bg-brand-arrow/10 flex flex-col items-center text-center"
           >
             <Target className="h-8 w-8 sm:h-10 sm:w-10 text-brand-leaf mb-2 sm:mb-3" />
             <h3 className="font-semibold text-brand-leaf text-base sm:text-lg mb-1 sm:mb-2">
@@ -63,8 +62,7 @@ export function WelcomeStep({ onNext }: Readonly<WelcomeStepProps>) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            whileHover={{ scale: 1.02, y: -4 }}
-            className="p-4 sm:p-6 rounded-lg border border-brand-leaf/20 bg-brand-leaf/10 flex flex-col items-center text-center transition-shadow hover:shadow-lg hover:shadow-brand-leaf/20 cursor-default"
+            className="p-4 sm:p-6 rounded-lg border border-brand-leaf/20 bg-brand-leaf/10 flex flex-col items-center text-center"
           >
             <TrendingUp className="h-8 w-8 sm:h-10 sm:w-10 text-brand-leaf mb-2 sm:mb-3" />
             <h3 className="font-semibold text-brand-leaf text-base sm:text-lg mb-1 sm:mb-2">
