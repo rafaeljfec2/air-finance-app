@@ -102,7 +102,7 @@ export function FeatureAnnouncementModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
         {/* Overlay com blur */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -114,19 +114,26 @@ export function FeatureAnnouncementModal({
 
         {/* Modal */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          initial={{ opacity: 0, scale: 0.95, y: 100 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          exit={{ opacity: 0, scale: 0.95, y: 100 }}
           transition={{ type: 'spring', duration: 0.4 }}
           className={cn(
-            'relative z-10 w-full max-w-2xl rounded-2xl bg-white dark:bg-gray-900 shadow-2xl',
-            'border-2',
+            'relative z-10 w-full max-w-2xl rounded-t-3xl sm:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl',
+            'border-2 sm:border-2',
             styles.border,
             'overflow-hidden',
+            'flex flex-col',
+            'mb-0 sm:mb-0',
           )}
+          style={{
+            height: 'calc(100dvh - 4rem - env(safe-area-inset-bottom, 0px))',
+            maxHeight: 'calc(100dvh - 4rem - env(safe-area-inset-bottom, 0px))',
+            marginBottom: 'max(calc(4rem + env(safe-area-inset-bottom, 0px)), 0px)',
+          }}
         >
           {/* Header com gradiente */}
-          <div className={cn('relative h-32 bg-gradient-to-r', styles.gradient)}>
+          <div className={cn('relative h-24 sm:h-32 bg-gradient-to-r flex-shrink-0', styles.gradient)}>
             {announcement.imageUrl && (
               <div className="absolute inset-0">
                 <img
@@ -137,16 +144,16 @@ export function FeatureAnnouncementModal({
               </div>
             )}
             <div className="relative h-full flex items-center justify-center">
-              <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
-                <TypeIcon className="h-12 w-12 text-white" />
+              <div className="bg-white/20 backdrop-blur-sm rounded-full p-2 sm:p-4">
+                <TypeIcon className="h-8 w-8 sm:h-12 sm:w-12 text-white" />
               </div>
             </div>
 
             {/* Badges */}
-            <div className="absolute top-4 left-4 flex gap-2">
+            <div className="absolute top-2 sm:top-4 left-2 sm:left-4 flex gap-1.5 sm:gap-2 flex-wrap" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
               <span
                 className={cn(
-                  'px-3 py-1 rounded-full text-xs font-semibold border',
+                  'px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold border',
                   styles.badge,
                 )}
               >
@@ -154,7 +161,7 @@ export function FeatureAnnouncementModal({
               </span>
               <span
                 className={cn(
-                  'px-3 py-1 rounded-full text-xs font-semibold border',
+                  'px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold border',
                   styles.badge,
                 )}
               >
@@ -166,28 +173,38 @@ export function FeatureAnnouncementModal({
             {onClose && (
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors p-2 rounded-full hover:bg-white/20"
+                className="absolute top-2 sm:top-4 right-2 sm:right-4 text-white/80 hover:text-white transition-colors p-1.5 sm:p-2 rounded-full hover:bg-white/20 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
                 aria-label="Fechar"
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5 sm:h-5 sm:w-5" />
               </button>
             )}
           </div>
 
-          {/* Conteúdo */}
-          <div className="p-6 sm:p-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              {announcement.title}
-            </h2>
+          {/* Conteúdo com scroll */}
+          <div className="flex-1 overflow-y-auto overscroll-contain min-h-0">
+            <div className="p-4 sm:p-6 lg:p-8">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
+                {announcement.title}
+              </h2>
 
-            <div className="prose prose-sm dark:prose-invert max-w-none mb-6">
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
-                {announcement.description}
-              </p>
+              <div className="mb-4 sm:mb-6">
+                <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+                  {announcement.description}
+                </p>
+              </div>
             </div>
+          </div>
 
-            {/* Botões de ação */}
-            <div className="flex flex-col sm:flex-row gap-3 mt-8">
+          {/* Botões de ação - fixo no bottom */}
+          <div 
+            className="flex-shrink-0 p-4 sm:p-6 lg:p-8 pt-3 sm:pt-3 lg:pt-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-lg"
+            style={{
+              paddingBottom: 'max(calc(1rem + env(safe-area-inset-bottom, 0px)), 1rem)',
+            }}
+          >
+            <div className="flex flex-col gap-2 sm:gap-3">
               {announcement.actionButtonText && announcement.actionButtonLink && (
                 <Button
                   variant="outline"
@@ -198,7 +215,7 @@ export function FeatureAnnouncementModal({
                       window.open(announcement.actionButtonLink, '_blank');
                     }
                   }}
-                  className="flex-1 border-2"
+                  className="flex-1 border-2 min-h-[48px] text-sm sm:text-base font-semibold"
                 >
                   {announcement.actionButtonText}
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -208,7 +225,7 @@ export function FeatureAnnouncementModal({
               <Button
                 onClick={onConfirm}
                 disabled={isLoading}
-                className={cn('flex-1 text-white shadow-lg', styles.button)}
+                className={cn('flex-1 text-white shadow-lg min-h-[48px] text-sm sm:text-base font-semibold', styles.button)}
               >
                 {isLoading ? (
                   <>
@@ -217,7 +234,7 @@ export function FeatureAnnouncementModal({
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="mr-2 h-5 w-5" />
+                    <CheckCircle2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                     Entendi, obrigado!
                   </>
                 )}
