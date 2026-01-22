@@ -82,18 +82,22 @@ export function TransactionFilters({
   };
 
   const accountOptions = useMemo(() => {
-    const options = accounts?.map(account => ({
-      value: account.id,
-      label: account.name,
-    })) || [];
+    const options =
+      accounts?.map((account) => ({
+        value: account.id,
+        label: account.name,
+      })) || [];
     return [{ value: 'all', label: 'Todas as contas' }, ...options];
   }, [accounts]);
 
-  const typeOptions = useMemo(() => [
-    { value: 'all', label: 'Todos os tipos' },
-    { value: 'RECEITA', label: 'Receitas' },
-    { value: 'DESPESA', label: 'Despesas' },
-  ], []);
+  const typeOptions = useMemo(
+    () => [
+      { value: 'all', label: 'Todos os tipos' },
+      { value: 'RECEITA', label: 'Receitas' },
+      { value: 'DESPESA', label: 'Despesas' },
+    ],
+    [],
+  );
 
   return (
     <>
@@ -134,7 +138,6 @@ export function TransactionFilters({
             {/* Date Range Filter */}
             <div className="flex flex-col gap-2 sm:col-span-2 lg:w-auto lg:flex-row lg:items-center">
               <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1 lg:mb-0">
-                <Calendar className="h-4 w-4" />
                 <span className="text-sm font-medium lg:hidden">Período</span>
               </div>
               <div className="flex items-center gap-2 w-full lg:w-auto">
@@ -181,7 +184,9 @@ export function TransactionFilters({
               <ComboBox
                 options={accountOptions}
                 value={selectedAccountId || 'all'}
-                onValueChange={(value) => setSelectedAccountId(value === 'all' || !value ? undefined : value)}
+                onValueChange={(value) =>
+                  setSelectedAccountId(value === 'all' || !value ? undefined : value)
+                }
                 placeholder="Todas as contas"
                 searchPlaceholder="Buscar conta..."
                 searchable
