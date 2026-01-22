@@ -11,6 +11,8 @@ import {
   endOfYear,
   format,
   isSameDay,
+  startOfDay,
+  endOfDay,
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -43,8 +45,6 @@ export function DateRangePicker({
   trigger,
   position = 'bottom',
 }: Readonly<DateRangePickerProps>) {
-  const now = new Date();
-
   const parseDate = useCallback((date: string | Date | null | undefined): Date | undefined => {
     if (!date) return undefined;
     if (date instanceof Date) {
@@ -68,7 +68,7 @@ export function DateRangePicker({
 
   const [currentMonth, setCurrentMonth] = useState<Date>(() => {
     const start = parseDate(initialStartDate);
-    return start ?? now;
+    return start ?? new Date();
   });
 
   const [secondMonth, setSecondMonth] = useState<Date>(() => {
@@ -78,6 +78,7 @@ export function DateRangePicker({
       nextMonth.setMonth(nextMonth.getMonth() + 1);
       return nextMonth;
     }
+    const now = new Date();
     const nextMonth = new Date(now);
     nextMonth.setMonth(nextMonth.getMonth() + 1);
     return nextMonth;
@@ -88,75 +89,93 @@ export function DateRangePicker({
       {
         id: 'all',
         label: 'Todo período',
-        getRange: () => ({
-          start: new Date(2000, 0, 1),
-          end: new Date(now.getFullYear() + 10, 11, 31),
-        }),
+        getRange: () => {
+          const now = new Date();
+          return {
+            start: startOfDay(new Date(2000, 0, 1)),
+            end: endOfDay(new Date(now.getFullYear() + 10, 11, 31)),
+          };
+        },
       },
       {
         id: 'last30',
         label: 'Últimos 30 dias',
-        getRange: () => ({
-          start: subDays(now, 30),
-          end: now,
-        }),
+        getRange: () => {
+          const now = new Date();
+          // Últimos 30 dias: de 30 dias atrás até hoje (incluindo hoje)
+          const start = startOfDay(subDays(now, 29));
+          const end = endOfDay(now);
+          return { start, end };
+        },
       },
       {
         id: 'last90',
         label: 'Últimos 90 dias',
-        getRange: () => ({
-          start: subDays(now, 90),
-          end: now,
-        }),
+        getRange: () => {
+          const now = new Date();
+          const start = startOfDay(subDays(now, 89));
+          const end = endOfDay(now);
+          return { start, end };
+        },
       },
       {
         id: 'thisMonth',
         label: 'Este mês',
-        getRange: () => ({
-          start: startOfMonth(now),
-          end: endOfMonth(now),
-        }),
+        getRange: () => {
+          const now = new Date();
+          return {
+            start: startOfDay(startOfMonth(now)),
+            end: endOfDay(endOfMonth(now)),
+          };
+        },
       },
       {
         id: 'lastMonth',
         label: 'Mês passado',
         getRange: () => {
+          const now = new Date();
           const lastMonth = subMonths(now, 1);
           return {
-            start: startOfMonth(lastMonth),
-            end: endOfMonth(lastMonth),
+            start: startOfDay(startOfMonth(lastMonth)),
+            end: endOfDay(endOfMonth(lastMonth)),
           };
         },
       },
       {
         id: 'last6Months',
         label: 'Últimos 6 meses',
-        getRange: () => ({
-          start: subMonths(now, 6),
-          end: now,
-        }),
+        getRange: () => {
+          const now = new Date();
+          const start = startOfDay(startOfMonth(subMonths(now, 5)));
+          const end = endOfDay(now);
+          return { start, end };
+        },
       },
       {
         id: 'thisYear',
         label: 'Este ano',
-        getRange: () => ({
-          start: startOfYear(now),
-          end: endOfYear(now),
-        }),
+        getRange: () => {
+          const now = new Date();
+          return {
+            start: startOfDay(startOfYear(now)),
+            end: endOfDay(endOfYear(now)),
+          };
+        },
       },
       {
         id: 'lastYear',
         label: 'Ano passado',
         getRange: () => {
+          const now = new Date();
           const lastYear = subYears(now, 1);
           return {
-            start: startOfYear(lastYear),
-            end: endOfYear(lastYear),
+            start: startOfDay(startOfYear(lastYear)),
+            end: endOfDay(endOfYear(lastYear)),
           };
         },
       },
     ],
-    [now],
+    [],
   );
 
   useEffect(() => {
@@ -164,12 +183,29 @@ export function DateRangePicker({
       const start = parseDate(initialStartDate);
       const end = parseDate(initialEndDate);
       if (start || end) {
-        setDateRange({ from: start, to: end });
-        if (start) {
-          setCurrentMonth(start);
-          const nextMonth = new Date(start);
-          nextMonth.setMonth(nextMonth.getMonth() + 1);
-          setSecondMonth(nextMonth);
+        const normalizedStart = start ? startOfDay(start) : undefined;
+        const normalizedEnd = end ? startOfDay(end) : undefined;
+        setDateRange({ from: normalizedStart, to: normalizedEnd });
+        
+        if (normalizedStart) {
+          const startMonth = startOfMonth(normalizedStart);
+          if (normalizedEnd) {
+            const endMonth = startOfMonth(normalizedEnd);
+            if (startMonth.getTime() === endMonth.getTime()) {
+              setCurrentMonth(startMonth);
+              const nextMonth = new Date(startMonth);
+              nextMonth.setMonth(nextMonth.getMonth() + 1);
+              setSecondMonth(nextMonth);
+            } else {
+              setCurrentMonth(startMonth);
+              setSecondMonth(endMonth);
+            }
+          } else {
+            setCurrentMonth(startMonth);
+            const nextMonth = new Date(startMonth);
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            setSecondMonth(nextMonth);
+          }
         }
       } else {
         setDateRange(undefined);
@@ -182,17 +218,65 @@ export function DateRangePicker({
     (preset: PresetOption) => {
       setSelectedPreset(preset.id);
       const range = preset.getRange();
-      setDateRange({ from: range.start, to: range.end });
-      setCurrentMonth(range.start);
-      const nextMonth = new Date(range.start);
-      nextMonth.setMonth(nextMonth.getMonth() + 1);
-      setSecondMonth(nextMonth);
+      // Normalizar para início do dia para o react-day-picker
+      const normalizedRange = {
+        from: startOfDay(range.start),
+        to: startOfDay(range.end),
+      };
+      setDateRange(normalizedRange);
+      
+      // Posicionar calendários para mostrar os meses do intervalo
+      const startMonth = startOfMonth(normalizedRange.from);
+      const endMonth = startOfMonth(normalizedRange.to);
+      
+      // Se o intervalo está no mesmo mês, mostrar esse mês e o próximo
+      if (startMonth.getTime() === endMonth.getTime()) {
+        setCurrentMonth(startMonth);
+        const nextMonth = new Date(startMonth);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        setSecondMonth(nextMonth);
+      } else {
+        // Se o intervalo está em meses diferentes, mostrar o mês inicial e o mês final
+        setCurrentMonth(startMonth);
+        setSecondMonth(endMonth);
+      }
     },
     [],
   );
 
   const handleRangeSelect = useCallback((range: DateRange | undefined) => {
-    setDateRange(range);
+    if (range) {
+      const normalizedRange: DateRange = {
+        from: range.from ? startOfDay(range.from) : undefined,
+        to: range.to ? startOfDay(range.to) : undefined,
+      };
+      setDateRange(normalizedRange);
+      
+      // Atualizar posição dos calendários quando uma data é selecionada
+      if (normalizedRange.from) {
+        const fromMonth = startOfMonth(normalizedRange.from);
+        if (normalizedRange.to) {
+          const toMonth = startOfMonth(normalizedRange.to);
+          if (fromMonth.getTime() !== toMonth.getTime()) {
+            setCurrentMonth(fromMonth);
+            setSecondMonth(toMonth);
+          } else {
+            setCurrentMonth(fromMonth);
+            const nextMonth = new Date(fromMonth);
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            setSecondMonth(nextMonth);
+          }
+        } else {
+          setCurrentMonth(fromMonth);
+          const nextMonth = new Date(fromMonth);
+          nextMonth.setMonth(nextMonth.getMonth() + 1);
+          setSecondMonth(nextMonth);
+        }
+      }
+    } else {
+      setDateRange(undefined);
+    }
+    
     if (range?.from && range?.to) {
       setSelectedPreset(null);
     }
@@ -246,11 +330,17 @@ export function DateRangePicker({
       return null;
     }
 
+    const normalizedFrom = startOfDay(dateRange.from);
+    const normalizedTo = startOfDay(dateRange.to);
+
     for (const preset of presetOptions) {
       const range = preset.getRange();
+      const presetStart = startOfDay(range.start);
+      const presetEnd = startOfDay(range.end);
+      
       if (
-        isSameDay(dateRange.from, range.start) &&
-        isSameDay(dateRange.to, range.end)
+        isSameDay(normalizedFrom, presetStart) &&
+        isSameDay(normalizedTo, presetEnd)
       ) {
         return preset.id;
       }
