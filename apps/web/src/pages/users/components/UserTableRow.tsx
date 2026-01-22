@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { formatDate } from '@/utils/formatters';
+import { formatDateTime } from '@/utils/formatters';
 import { User, UserRole, UserStatus } from '@/services/userService';
 import { CheckCircle2, Edit, Mail, Shield, Trash2, XCircle } from 'lucide-react';
 
@@ -49,7 +49,7 @@ export function UserTableRow({
       <td className="py-2 px-3">
         <div>
           <div className="text-xs text-gray-600 dark:text-gray-400">
-            {user.createdAt ? formatDate(user.createdAt) : '-'}
+            {user.createdAt ? formatDateTime(user.createdAt) : '-'}
           </div>
         </div>
       </td>

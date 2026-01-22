@@ -57,7 +57,7 @@ export function formatMonthYear(date: Date | string): string {
   return format(dateObj, "MMMM 'de' yyyy", { locale: ptBR });
 }
 
-export function formatDateTime(dateStr: string, pattern: string): string {
+export function formatDateTime(dateStr: string, pattern?: string): string {
   const date = parseISO(dateStr);
-  return format(date, pattern, { locale: ptBR });
+  return format(date, pattern ?? 'dd/MM/yyyy HH:mm', { locale: ptBR });
 }
