@@ -21,11 +21,11 @@ export function SidebarFooter() {
         {!isCollapsed && <span className="ml-3">Comunidade</span>}
       </a>
 
-      {/* Collapse Toggle Button */}
+      {/* Collapse Toggle Button - Hidden on mobile */}
       <button
         onClick={toggleCollapse}
         className={cn(
-          'flex items-center justify-center w-full p-2 text-sm font-medium rounded-md',
+          'hidden lg:flex items-center justify-center w-full p-2 text-sm font-medium rounded-md',
           'text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark',
           'transition-colors duration-200',
         )}

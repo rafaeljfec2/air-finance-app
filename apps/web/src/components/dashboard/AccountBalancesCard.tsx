@@ -13,17 +13,7 @@ interface AccountBalancesCardProps {
   companyId: string;
 }
 
-const accountTypeLabels: Record<string, string> = {
-  checking: 'Conta Corrente',
-  savings: 'Poupança',
-  digital_wallet: 'Carteira Digital',
-  investment: 'Investimento',
-  credit_card: 'Cartão de Crédito',
-};
-
-export function AccountBalancesCard({
-  companyId,
-}: Readonly<AccountBalancesCardProps>) {
+export function AccountBalancesCard({ companyId }: Readonly<AccountBalancesCardProps>) {
   const { data, isLoading, error } = useQuery({
     queryKey: ['accounts-summary', companyId],
     queryFn: () => getAccountsSummary(companyId),
@@ -37,9 +27,7 @@ export function AccountBalancesCard({
     <Card className="border-border dark:border-border-dark">
       <div className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-medium text-text dark:text-text-dark">
-            Saldo das Contas
-          </h3>
+          <h3 className="text-base font-medium text-text dark:text-text-dark">Saldo das Contas</h3>
           <Link
             to="/accounts"
             className="text-xs text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1"
@@ -66,9 +54,7 @@ export function AccountBalancesCard({
             {/* Total Balance - Compact */}
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-3 py-2">
               <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-600 dark:text-gray-400">
-                  Total
-                </span>
+                <span className="text-xs text-gray-600 dark:text-gray-400">Total</span>
                 <span
                   className={`text-base font-bold ${
                     totalBalance >= 0
@@ -96,7 +82,7 @@ export function AccountBalancesCard({
                     <div
                       className={cn(
                         'w-8 h-8 rounded-md flex items-center justify-center shrink-0 overflow-hidden',
-                        hasBankLogo(account.bankCode, account.institution) ? '' : 'p-1'
+                        hasBankLogo(account.bankCode, account.institution) ? '' : 'p-1',
                       )}
                       style={
                         hasBankLogo(account.bankCode, account.institution)
