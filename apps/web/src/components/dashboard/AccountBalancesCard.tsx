@@ -2,7 +2,7 @@ import { formatCurrency } from '@/utils/formatters';
 import { Card } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { useQuery } from '@tanstack/react-query';
-import { getAccountsSummary } from '@/services/accountService';
+import { getAccountsSummaryFromExtracts } from '@/services/accountService';
 import { BankIcon } from '@/components/bank/BankIcon';
 import { hasBankLogo } from '@/utils/bankIcons';
 import { cn } from '@/lib/utils';
@@ -15,8 +15,8 @@ interface AccountBalancesCardProps {
 
 export function AccountBalancesCard({ companyId }: Readonly<AccountBalancesCardProps>) {
   const { data, isLoading, error } = useQuery({
-    queryKey: ['accounts-summary', companyId],
-    queryFn: () => getAccountsSummary(companyId),
+    queryKey: ['accounts-summary-from-extracts', companyId],
+    queryFn: () => getAccountsSummaryFromExtracts(companyId),
     enabled: !!companyId,
   });
 
