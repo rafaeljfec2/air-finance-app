@@ -32,15 +32,17 @@ export function HeaderMobileButtons({
         </button>
       )}
 
-      {/* Botão hambúrguer mobile */}
-      <button
-        type="button"
-        className="lg:hidden mr-2 min-h-[44px] min-w-[44px] p-2 rounded-md text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary-500 flex items-center justify-center"
-        onClick={onOpenSidebar}
-        aria-label="Abrir menu"
-      >
-        <MenuIcon className="h-6 w-6" />
-      </button>
+      {/* Botão hambúrguer mobile - Mostra apenas quando não há botão de voltar (na home) */}
+      {!showBackButton && (
+        <button
+          type="button"
+          className="lg:hidden mr-2 min-h-[44px] min-w-[44px] p-2 rounded-md text-text dark:text-text-dark hover:bg-background dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary-500 flex items-center justify-center"
+          onClick={onOpenSidebar}
+          aria-label="Abrir menu"
+        >
+          <MenuIcon className="h-6 w-6" />
+        </button>
+      )}
     </div>
   );
 }
