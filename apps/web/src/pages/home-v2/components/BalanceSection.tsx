@@ -35,7 +35,7 @@ export function BalanceSection({
     <div className="bg-white dark:bg-card-dark rounded-2xl p-6 shadow-sm">
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500 dark:text-gray-400">Saldo</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">Saldo do fluxo de caixa</span>
           <button
             onClick={onTogglePrivacyMode}
             className="text-gray-400 hover:text-primary-500 transition-colors"
