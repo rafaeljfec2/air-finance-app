@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { DatePicker } from '@/components/ui/DatePicker';
+import { DateRangePicker } from '@/components/ui/DateRangePicker';
 import { Input } from '@/components/ui/input';
 import { ComboBox } from '@/components/ui/ComboBox';
 import { formatDateToLocalISO, parseLocalDate } from '@/utils/date';
 import { Calendar, Download, Filter, Search } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 interface Account {
   id: string;
@@ -40,16 +40,32 @@ export function TransactionFilters({
   selectedType,
   setSelectedType,
   accounts,
-}: TransactionFiltersProps) {
-  const startDateObj = startDate ? parseLocalDate(startDate) : undefined;
-  const endDateObj = endDate ? parseLocalDate(endDate) : undefined;
+}: Readonly<TransactionFiltersProps>) {
+  const [isDateRangePickerOpen, setIsDateRangePickerOpen] = useState(false);
 
-  const handleStartDateChange = (date: Date | undefined) => {
-    setStartDate(date ? formatDateToLocalISO(date) : '');
+  const handleDateRangeApply = (start: Date | undefined, end: Date | undefined) => {
+    setStartDate(start ? formatDateToLocalISO(start) : '');
+    setEndDate(end ? formatDateToLocalISO(end) : '');
   };
 
-  const handleEndDateChange = (date: Date | undefined) => {
-    setEndDate(date ? formatDateToLocalISO(date) : '');
+  const getDateRangeLabel = (): string => {
+    if (!startDate && !endDate) {
+      return 'Selecionar período';
+    }
+    if (startDate && endDate) {
+      const start = parseLocalDate(startDate);
+      const end = parseLocalDate(endDate);
+      if (start && end) {
+        return `${start.toLocaleDateString('pt-BR')} até ${end.toLocaleDateString('pt-BR')}`;
+      }
+    }
+    if (startDate) {
+      const start = parseLocalDate(startDate);
+      if (start) {
+        return start.toLocaleDateString('pt-BR');
+      }
+    }
+    return 'Selecionar período';
   };
 
   const getTransactionTypeLabel = (type: string): string => {
@@ -87,8 +103,7 @@ export function TransactionFilters({
           <span className="font-medium text-text dark:text-text-dark">Filtros ativos:</span>
           <span className="flex items-center gap-1 bg-background dark:bg-background-dark px-2 py-0.5 rounded border border-border dark:border-border-dark">
             <Calendar className="h-3 w-3" />
-            {startDateObj ? startDateObj.toLocaleDateString() : 'Início'} -{' '}
-            {endDateObj ? endDateObj.toLocaleDateString() : 'Fim'}
+            {getDateRangeLabel()}
           </span>
           {selectedAccountId && (
             <span className="bg-background dark:bg-background-dark px-2 py-0.5 rounded border border-border dark:border-border-dark">
@@ -122,88 +137,33 @@ export function TransactionFilters({
                 <Calendar className="h-4 w-4" />
                 <span className="text-sm font-medium lg:hidden">Período</span>
               </div>
-              <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
-                <div className="grid grid-cols-[1fr_auto_1fr] sm:flex sm:items-center gap-2 w-full lg:w-auto">
-                  <DatePicker
-                    value={startDateObj}
-                    onChange={handleStartDateChange}
-                    placeholder="Início"
-                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full lg:w-[130px] h-8 text-sm"
-                    showIcon={false}
-                  />
-                  <span className="text-gray-500 dark:text-gray-400 text-sm">até</span>
-                  <DatePicker
-                    value={endDateObj}
-                    onChange={handleEndDateChange}
-                    placeholder="Fim"
-                    className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500 w-full lg:w-[130px] h-8 text-sm"
-                    showIcon={false}
-                  />
-                </div>
-                <div className="flex gap-2 justify-end sm:justify-start">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      const now = new Date();
-                      const firstDay = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-                      const lastDay = new Date(now.getFullYear(), now.getMonth(), 0);
-                      setStartDate(formatDateToLocalISO(firstDay));
-                      setEndDate(formatDateToLocalISO(lastDay));
-                    }}
-                    className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
-                    title="Mês passado"
-                  >
-                    Mês Passado
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      const now = new Date();
-                      setStartDate(formatDateToLocalISO(now));
-                      setEndDate(formatDateToLocalISO(now));
-                    }}
-                    className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
-                    title="Hoje"
-                  >
-                    Hoje
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      const now = new Date();
-                      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-                      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-                      setStartDate(formatDateToLocalISO(firstDay));
-                      setEndDate(formatDateToLocalISO(lastDay));
-                    }}
-                    className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
-                    title="Este mês"
-                  >
-                    Este Mês
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      const now = new Date();
-                      const firstDay = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-                      const lastDay = new Date(now.getFullYear(), now.getMonth() + 2, 0);
-                      setStartDate(formatDateToLocalISO(firstDay));
-                      setEndDate(formatDateToLocalISO(lastDay));
-                    }}
-                    className="flex-1 sm:flex-none text-xs h-8 bg-background dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-gray-800"
-                    title="Mês seguinte"
-                  >
-                    Mês Seguinte
-                  </Button>
-                </div>
+              <div className="flex items-center gap-2 w-full lg:w-auto">
+                <DateRangePicker
+                  open={isDateRangePickerOpen}
+                  onClose={() => setIsDateRangePickerOpen(false)}
+                  startDate={startDate}
+                  endDate={endDate}
+                  onApply={(start, end) => {
+                    handleDateRangeApply(start, end);
+                    setIsDateRangePickerOpen(false);
+                  }}
+                  trigger={
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsDateRangePickerOpen(!isDateRangePickerOpen);
+                      }}
+                      className="h-8 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark flex items-center gap-2 text-sm min-w-[200px] justify-start"
+                    >
+                      <Calendar className="h-3.5 w-3.5" />
+                      <span className="truncate">{getDateRangeLabel()}</span>
+                    </Button>
+                  }
+                  position="bottom"
+                />
               </div>
             </div>
             <div className="relative lg:flex-1">

@@ -54,6 +54,74 @@
   }
 }
 
+@layer components {
+  /* Date Range Picker Styles */
+  .date-range-picker {
+    @apply text-text dark:text-text-dark;
+  }
+
+  .date-range-picker .rdp {
+    @apply m-0;
+  }
+
+  .date-range-picker .rdp-month {
+    @apply space-y-2;
+  }
+
+  .date-range-picker .rdp-weekdays {
+    @apply flex;
+  }
+
+  .date-range-picker .rdp-weekday {
+    @apply text-xs text-gray-500 dark:text-gray-400 w-8 h-8 flex items-center justify-center font-normal;
+  }
+
+  .date-range-picker .rdp-week {
+    @apply flex;
+  }
+
+  .date-range-picker .rdp-day {
+    @apply w-8 h-8 text-sm rounded-md flex items-center justify-center transition-colors cursor-pointer;
+    @apply text-text dark:text-text-dark;
+  }
+
+  .date-range-picker .rdp-day:hover:not(.rdp-day_disabled):not(.rdp-day_selected) {
+    @apply bg-primary-100 dark:bg-primary-900/30;
+  }
+
+  .date-range-picker .rdp-day_selected {
+    @apply bg-primary-500 text-white dark:bg-primary-400;
+  }
+
+  .date-range-picker .rdp-day_range_start {
+    @apply bg-primary-500 text-white rounded-l-md;
+  }
+
+  .date-range-picker .rdp-day_range_end {
+    @apply bg-primary-500 text-white rounded-r-md;
+  }
+
+  .date-range-picker .rdp-day_range_middle {
+    @apply bg-primary-100 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100;
+  }
+
+  .date-range-picker .rdp-day_today {
+    @apply font-semibold;
+  }
+
+  .date-range-picker .rdp-day_outside {
+    @apply text-gray-500 dark:text-gray-500 opacity-50;
+  }
+
+  .date-range-picker .rdp-day_disabled {
+    @apply text-gray-500 dark:text-gray-500 opacity-30 cursor-not-allowed;
+  }
+
+  .date-range-picker .rdp-day_hidden {
+    @apply invisible;
+  }
+}
+
 @layer utilities {
   /* Safe Area Padding Utilities */
   .pt-safe {
