@@ -6,8 +6,6 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { ColorPicker } from '@/components/ui/color-picker';
-import { IconPicker } from '@/components/ui/icon-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -57,8 +55,6 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
       type: 'checking',
       initialBalance: 0,
       initialBalanceDate: new Date().toISOString().split('T')[0],
-      color: '#8A05BE',
-      icon: 'Banknote',
     },
   });
 
@@ -87,11 +83,6 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
       accountForm.setValue('institution', '');
     }
   };
-
-  const iconOptions = accountTypes.map((type) => ({
-    value: type.iconName,
-    icon: type.icon,
-  }));
 
   return (
     <motion.div
@@ -243,25 +234,6 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
                 type="date"
                 className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
                 {...accountForm.register('initialBalanceDate')}
-              />
-            </div>
-          </div>
-
-          {/* Cor e Ícone */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-text dark:text-text-dark">Cor</Label>
-              <ColorPicker
-                value={accountForm.watch('color')}
-                onChange={(color) => accountForm.setValue('color', color)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-text dark:text-text-dark">Ícone</Label>
-              <IconPicker
-                value={accountForm.watch('icon')}
-                onChange={(icon) => accountForm.setValue('icon', icon)}
-                options={iconOptions}
               />
             </div>
           </div>

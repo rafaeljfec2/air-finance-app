@@ -97,13 +97,7 @@ export default function OnboardingPage() {
       name: company.name,
       type: company.type ?? 'matriz',
       foundationDate: new Date().toISOString().split('T')[0],
-      cnpj: '00000000000000', // Default placeholder
     };
-
-    // Remove formatting from document (dots, slashes, hyphens) before sending
-    if (company.document?.trim()) {
-      payload.cnpj = company.document.replace(/\D/g, '');
-    }
 
     return payload;
   };

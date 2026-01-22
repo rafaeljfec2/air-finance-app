@@ -1,26 +1,9 @@
-import { validateCNPJ, validateCPF } from '@/utils/formatDocument';
 import { z } from 'zod';
 
-export const CompanySchema = z
-  .object({
-    name: z.string().min(3, 'Nome da empresa deve ter pelo menos 3 caracteres'),
-    documentType: z.enum(['cnpj', 'cpf']).default('cnpj'),
-    document: z.string().min(1, 'CNPJ ou CPF é obrigatório'),
-    type: z.enum(['matriz', 'filial']).default('matriz'),
-  })
-  .refine(
-    (data) => {
-      if (!data.document) return true;
-      if (data.documentType === 'cpf') {
-        return validateCPF(data.document);
-      }
-      return validateCNPJ(data.document);
-    },
-    {
-      message: 'CNPJ ou CPF inválido',
-      path: ['document'],
-    },
-  );
+export const CompanySchema = z.object({
+  name: z.string().min(3, 'Nome da empresa deve ter pelo menos 3 caracteres'),
+  type: z.enum(['matriz', 'filial']).default('matriz'),
+});
 
 export const AccountSchema = z.object({
   name: z.string().min(3, 'Nome da conta deve ter pelo menos 3 caracteres'),
@@ -32,8 +15,8 @@ export const AccountSchema = z.object({
   bankCode: z.string().optional(),
   agency: z.string().optional(),
   accountNumber: z.string().optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida').default('#8A05BE'),
-  icon: z.string().min(1, 'Ícone é obrigatório').default('Banknote'),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida').optional().default('#8A05BE'),
+  icon: z.string().min(1, 'Ícone é obrigatório').optional().default('Banknote'),
   initialBalanceDate: z.string().optional(),
 });
 

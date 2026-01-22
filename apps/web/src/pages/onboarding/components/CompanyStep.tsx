@@ -8,25 +8,10 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { formatCNPJ, formatCPF, validateCNPJ, validateCPF } from '@/utils/formatDocument';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
-import {
-  AlertCircle,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Loader2,
-  XCircle,
-} from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { AlertCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { type CompanyFormData, CompanySchema } from '../schemas';
 
@@ -41,13 +26,9 @@ export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<C
   const companyForm = useForm<CompanyFormData>({
     resolver: zodResolver(CompanySchema),
     defaultValues: initialData || {
-      documentType: 'cnpj',
       type: 'matriz',
     },
   });
-
-  const [documentValid, setDocumentValid] = useState<boolean | null>(null);
-  const documentType = companyForm.watch('documentType');
 
   // Initialize form when initialData changes
   useEffect(() => {
@@ -90,102 +71,6 @@ export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<C
               <p className="text-sm text-red-400 flex items-center gap-1" role="alert">
                 <AlertCircle className="h-4 w-4" />
                 {String(companyForm.formState.errors.name.message)}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="documentType" className="text-text dark:text-text-dark">
-              Tipo de Documento
-            </Label>
-            <Select
-              value={documentType}
-              onValueChange={(value) => {
-                companyForm.setValue('documentType', value as 'cnpj' | 'cpf');
-                companyForm.setValue('document', ''); // Clear document when type changes
-                setDocumentValid(null); // Reset validation
-              }}
-            >
-              <SelectTrigger className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-                <SelectValue placeholder="Selecione o tipo" />
-              </SelectTrigger>
-              <SelectContent className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-                <SelectItem
-                  value="cnpj"
-                  className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
-                >
-                  CNPJ
-                </SelectItem>
-                <SelectItem
-                  value="cpf"
-                  className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
-                >
-                  CPF
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="document" className="text-text dark:text-text-dark">
-              {documentType === 'cnpj' ? 'CNPJ' : 'CPF'}
-              <span className="text-xs text-text dark:text-text-dark/50 ml-1 font-normal">
-                (Opcional, mas recomendado)
-              </span>
-            </Label>
-            <div className="relative">
-              <Input
-                id="document"
-                placeholder={
-                  documentType === 'cnpj' ? 'Ex: 12.345.678/0001-90' : 'Ex: 123.456.789-00'
-                }
-                className={`bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark pr-10 ${
-                  documentValid === true
-                    ? 'border-green-400 ring-2 ring-green-400/20'
-                    : documentValid === false
-                      ? 'border-red-400 ring-2 ring-red-400/20'
-                      : ''
-                }`}
-                {...companyForm.register('document')}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  const formatted = documentType === 'cnpj' ? formatCNPJ(value) : formatCPF(value);
-                  companyForm.setValue('document', formatted, { shouldValidate: true });
-
-                  // Real-time validation
-                  const digits = formatted.replace(/\D/g, '');
-                  if (documentType === 'cnpj' && digits.length === 14) {
-                    setDocumentValid(validateCNPJ(formatted));
-                  } else if (documentType === 'cpf' && digits.length === 11) {
-                    setDocumentValid(validateCPF(formatted));
-                  } else if (digits.length > 0) {
-                    setDocumentValid(false);
-                  } else {
-                    setDocumentValid(null);
-                  }
-                }}
-                onBlur={() => {
-                  const doc = companyForm.watch('document');
-                  if (doc) {
-                    const digits = doc.replace(/\D/g, '');
-                    if (documentType === 'cnpj' && digits.length === 14) {
-                      setDocumentValid(validateCNPJ(doc));
-                    } else if (documentType === 'cpf' && digits.length === 11) {
-                      setDocumentValid(validateCPF(doc));
-                    }
-                  }
-                }}
-                value={companyForm.watch('document') ?? ''}
-              />
-              {documentValid === true && (
-                <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-green-400 pointer-events-none" />
-              )}
-              {documentValid === false && (
-                <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-red-400 pointer-events-none" />
-              )}
-            </div>
-            {companyForm.formState.errors.document && (
-              <p className="text-sm text-red-400 flex items-center gap-1">
-                <AlertCircle className="h-4 w-4" />
-                {String(companyForm.formState.errors.document.message)}
               </p>
             )}
           </div>
