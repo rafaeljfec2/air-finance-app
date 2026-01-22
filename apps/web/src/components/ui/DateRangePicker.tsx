@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { parseLocalDate } from '@/utils/date';
+import { DatePicker } from '@/components/ui/DatePicker';
+import { parseLocalDate, formatDateToLocalISO } from '@/utils/date';
 import {
   startOfMonth,
   endOfMonth,
@@ -15,7 +16,7 @@ import {
   endOfDay,
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DayPicker, type DateRange } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
@@ -84,17 +85,24 @@ export function DateRangePicker({
     return nextMonth;
   });
 
+  // Estados para campos de data personalizados (mobile)
+  const [customStartDate, setCustomStartDate] = useState<string>(() => {
+    return initialStartDate ? formatDateToLocalISO(parseDate(initialStartDate) ?? new Date()) : '';
+  });
+  const [customEndDate, setCustomEndDate] = useState<string>(() => {
+    return initialEndDate ? formatDateToLocalISO(parseDate(initialEndDate) ?? new Date()) : '';
+  });
+
   const presetOptions: PresetOption[] = useMemo(
     () => [
       {
-        id: 'all',
-        label: 'Todo período',
+        id: 'last7',
+        label: 'Últimos 7 dias',
         getRange: () => {
           const now = new Date();
-          return {
-            start: startOfDay(new Date(2000, 0, 1)),
-            end: endOfDay(new Date(now.getFullYear() + 10, 11, 31)),
-          };
+          const start = startOfDay(subDays(now, 6));
+          const end = endOfDay(now);
+          return { start, end };
         },
       },
       {
@@ -174,6 +182,17 @@ export function DateRangePicker({
           };
         },
       },
+      {
+        id: 'all',
+        label: 'Todo período',
+        getRange: () => {
+          const now = new Date();
+          return {
+            start: startOfDay(new Date(2000, 0, 1)),
+            end: endOfDay(new Date(now.getFullYear() + 10, 11, 31)),
+          };
+        },
+      },
     ],
     [],
   );
@@ -186,6 +205,10 @@ export function DateRangePicker({
         const normalizedStart = start ? startOfDay(start) : undefined;
         const normalizedEnd = end ? startOfDay(end) : undefined;
         setDateRange({ from: normalizedStart, to: normalizedEnd });
+        
+        // Atualizar campos personalizados
+        setCustomStartDate(start ? formatDateToLocalISO(start) : '');
+        setCustomEndDate(end ? formatDateToLocalISO(end) : '');
         
         if (normalizedStart) {
           const startMonth = startOfMonth(normalizedStart);
@@ -210,6 +233,8 @@ export function DateRangePicker({
       } else {
         setDateRange(undefined);
         setSelectedPreset(null);
+        setCustomStartDate('');
+        setCustomEndDate('');
       }
     }
   }, [open, initialStartDate, initialEndDate, parseDate]);
@@ -224,6 +249,10 @@ export function DateRangePicker({
         to: startOfDay(range.end),
       };
       setDateRange(normalizedRange);
+      
+      // Atualizar campos personalizados
+      setCustomStartDate(formatDateToLocalISO(range.start));
+      setCustomEndDate(formatDateToLocalISO(range.end));
       
       // Posicionar calendários para mostrar os meses do intervalo
       const startMonth = startOfMonth(normalizedRange.from);
@@ -252,6 +281,10 @@ export function DateRangePicker({
       };
       setDateRange(normalizedRange);
       
+      // Atualizar campos personalizados
+      setCustomStartDate(normalizedRange.from ? formatDateToLocalISO(normalizedRange.from) : '');
+      setCustomEndDate(normalizedRange.to ? formatDateToLocalISO(normalizedRange.to) : '');
+      
       // Atualizar posição dos calendários quando uma data é selecionada
       if (normalizedRange.from) {
         const fromMonth = startOfMonth(normalizedRange.from);
@@ -275,6 +308,8 @@ export function DateRangePicker({
       }
     } else {
       setDateRange(undefined);
+      setCustomStartDate('');
+      setCustomEndDate('');
     }
     
     if (range?.from && range?.to) {
@@ -357,18 +392,125 @@ export function DateRangePicker({
     }
   }, [dateRange, checkPresetMatch]);
 
-  const content = (
-    <div className="w-full max-w-4xl bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg shadow-lg">
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] divide-x divide-border dark:divide-border-dark">
-        {/* Left Panel - Preset Options */}
-        <div className="p-4 space-y-1">
+  // Mobile layout content
+  const mobileContent = (
+    <div className="w-full bg-card dark:bg-card-dark rounded-t-2xl shadow-lg">
+      {/* Drag Handle */}
+      <div className="flex justify-center pt-3 pb-2">
+        <div className="w-12 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
+      </div>
+
+      {/* Header */}
+      <div className="px-4 pb-4">
+        <h2 className="text-lg font-semibold text-text dark:text-text-dark">Filtros</h2>
+      </div>
+
+      {/* Período Section */}
+      <div className="px-4 pb-4">
+        <h3 className="text-sm font-medium text-text dark:text-text-dark mb-3">Período</h3>
+        <div className="grid grid-cols-2 gap-2">
           {presetOptions.map((preset) => (
             <button
               key={preset.id}
               type="button"
               onClick={() => handlePresetClick(preset)}
               className={`
-                w-full text-left px-3 py-2 rounded-md text-sm transition-colors
+                px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border
+                ${preset.id === 'all' ? 'col-span-2' : ''}
+                ${
+                  selectedPreset === preset.id
+                    ? 'bg-primary-500 border-primary-500 text-white dark:bg-primary-400 dark:border-primary-400'
+                    : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-text dark:text-text-dark hover:bg-gray-200 dark:hover:bg-gray-700'
+                }
+              `}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Período Personalizado Section */}
+      <div className="px-4 pb-4">
+        <h3 className="text-sm font-medium text-text dark:text-text-dark mb-3">Período personalizado</h3>
+        <div className="flex gap-2 items-end">
+          <div className="flex-1">
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">De</label>
+            <DatePicker
+              value={customStartDate}
+              onChange={(date) => {
+                const dateStr = date ? formatDateToLocalISO(date) : '';
+                setCustomStartDate(dateStr);
+                if (dateStr) {
+                  const start = parseLocalDate(dateStr);
+                  if (start) {
+                    setDateRange((prev) => ({
+                      from: startOfDay(start),
+                      to: prev?.to,
+                    }));
+                    setSelectedPreset(null);
+                  }
+                }
+              }}
+              placeholder="dd/mm/aaaa"
+              showIcon={true}
+              className="bg-gray-900 dark:bg-gray-900 text-white border-gray-700 dark:border-gray-700 h-10"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Até</label>
+            <DatePicker
+              value={customEndDate}
+              onChange={(date) => {
+                const dateStr = date ? formatDateToLocalISO(date) : '';
+                setCustomEndDate(dateStr);
+                if (dateStr) {
+                  const end = parseLocalDate(dateStr);
+                  if (end) {
+                    setDateRange((prev) => ({
+                      from: prev?.from,
+                      to: startOfDay(end),
+                    }));
+                    setSelectedPreset(null);
+                  }
+                }
+              }}
+              placeholder="dd/mm/aaaa"
+              showIcon={true}
+              className="bg-gray-900 dark:bg-gray-900 text-white border-gray-700 dark:border-gray-700 h-10"
+            />
+          </div>
+          <Button
+            onClick={() => {
+              const start = customStartDate ? parseLocalDate(customStartDate) : undefined;
+              const end = customEndDate ? parseLocalDate(customEndDate) : undefined;
+              if (start && end) {
+                onApply(startOfDay(start), startOfDay(end));
+                onClose();
+              }
+            }}
+            className="bg-primary-500 hover:bg-primary-600 text-white h-10 w-10 p-0 flex items-center justify-center"
+          >
+            <Check className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Desktop layout content
+  const desktopContent = (
+    <div className="w-full max-w-4xl bg-card dark:bg-card-dark border border-border dark:border-border-dark rounded-lg shadow-lg">
+      <div className="flex flex-col lg:grid lg:grid-cols-[280px_1fr] lg:divide-x lg:divide-border lg:dark:divide-border-dark">
+        {/* Preset Options - Mobile: Top, Desktop: Left */}
+        <div className="p-3 lg:p-4 space-y-1 border-b lg:border-b-0 border-border dark:border-border-dark">
+          {presetOptions.map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              onClick={() => handlePresetClick(preset)}
+              className={`
+                w-full text-left px-3 py-2.5 rounded-md text-sm transition-colors
                 ${
                   selectedPreset === preset.id
                     ? 'bg-primary-500 text-white dark:bg-primary-400 dark:text-white'
@@ -381,22 +523,22 @@ export function DateRangePicker({
           ))}
         </div>
 
-        {/* Right Panel - Custom Calendar */}
-        <div className="p-4">
-          <div className="mb-4">
-            <p className="text-sm text-muted-foreground dark:text-gray-400">
+        {/* Custom Calendar Panel - Mobile: Below presets, Desktop: Right */}
+        <div className="p-3 lg:p-4">
+          <div className="mb-3 lg:mb-4">
+            <p className="text-xs lg:text-sm text-muted-foreground dark:text-gray-400">
               Ou selecione um período personalizado
             </p>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-2 lg:gap-4">
             {/* First Calendar */}
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
                 <button
                   type="button"
                   onClick={handlePrevMonth}
-                  className="p-1 rounded hover:bg-card dark:hover:bg-card-dark transition-colors"
+                  className="p-1.5 rounded hover:bg-card dark:hover:bg-card-dark transition-colors touch-manipulation"
                   aria-label="Mês anterior"
                 >
                   <ChevronLeft className="h-4 w-4 text-text dark:text-text-dark" />
@@ -404,7 +546,16 @@ export function DateRangePicker({
                 <span className="text-sm font-medium text-text dark:text-text-dark">
                   {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
                 </span>
-                <div className="w-4" />
+                <div className="w-4 lg:hidden" />
+                <button
+                  type="button"
+                  onClick={handleNextMonth}
+                  className="p-1.5 rounded hover:bg-card dark:hover:bg-card-dark transition-colors touch-manipulation lg:hidden"
+                  aria-label="Próximo mês"
+                >
+                  <ChevronRight className="h-4 w-4 text-text dark:text-text-dark" />
+                </button>
+                <div className="hidden lg:block w-4" />
               </div>
               <DayPicker
                 mode="range"
@@ -421,9 +572,9 @@ export function DateRangePicker({
                   month: 'space-y-2',
                   caption: 'hidden',
                   weekdays: 'flex',
-                  weekday: 'text-xs text-muted-foreground dark:text-gray-400 w-8 h-8 flex items-center justify-center',
+                  weekday: 'text-xs text-muted-foreground dark:text-gray-400 w-8 h-8 lg:w-8 lg:h-8 flex items-center justify-center',
                   week: 'flex',
-                  day: 'w-8 h-8 text-sm rounded-md flex items-center justify-center transition-colors',
+                  day: 'w-9 h-9 lg:w-8 lg:h-8 text-sm rounded-md flex items-center justify-center transition-colors touch-manipulation',
                   day_selected: 'bg-primary-500 text-white dark:bg-primary-400',
                   day_range_start: 'bg-primary-500 text-white rounded-l-md',
                   day_range_end: 'bg-primary-500 text-white rounded-r-md',
@@ -442,73 +593,84 @@ export function DateRangePicker({
               />
             </div>
 
-            {/* Second Calendar */}
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-4" />
-                <span className="text-sm font-medium text-text dark:text-text-dark">
-                  {format(secondMonth, 'MMMM yyyy', { locale: ptBR })}
-                </span>
-                <button
-                  type="button"
-                  onClick={handleNextMonth}
-                  className="p-1 rounded hover:bg-card dark:hover:bg-card-dark transition-colors"
-                  aria-label="Próximo mês"
-                >
-                  <ChevronRight className="h-4 w-4 text-text dark:text-text-dark" />
-                </button>
+            {/* Second Calendar - Hidden on mobile, visible on desktop */}
+            <div className="hidden lg:flex flex-1">
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-4" />
+                  <span className="text-sm font-medium text-text dark:text-text-dark">
+                    {format(secondMonth, 'MMMM yyyy', { locale: ptBR })}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleNextMonth}
+                    className="p-1.5 rounded hover:bg-card dark:hover:bg-card-dark transition-colors"
+                    aria-label="Próximo mês"
+                  >
+                    <ChevronRight className="h-4 w-4 text-text dark:text-text-dark" />
+                  </button>
+                </div>
+                <DayPicker
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={handleRangeSelect}
+                  month={secondMonth}
+                  locale={ptBR}
+                  className="date-range-picker"
+                  components={{
+                    MonthCaption: () => null,
+                  }}
+                  classNames={{
+                    months: 'flex flex-col',
+                    month: 'space-y-2',
+                    caption: 'hidden',
+                    weekdays: 'flex',
+                    weekday: 'text-xs text-muted-foreground dark:text-gray-400 w-8 h-8 flex items-center justify-center',
+                    week: 'flex',
+                    day: 'w-8 h-8 text-sm rounded-md flex items-center justify-center transition-colors',
+                    day_selected: 'bg-primary-500 text-white dark:bg-primary-400',
+                    day_range_start: 'bg-primary-500 text-white rounded-l-md',
+                    day_range_end: 'bg-primary-500 text-white rounded-r-md',
+                    day_range_middle: 'bg-primary-100 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100',
+                    day_today: 'font-semibold',
+                    day_outside: 'text-muted-foreground dark:text-gray-500 opacity-50',
+                    day_disabled: 'text-muted-foreground dark:text-gray-500 opacity-30 cursor-not-allowed',
+                    day_hidden: 'invisible',
+                  }}
+                  modifiersClassNames={{
+                    selected: 'bg-primary-500 text-white',
+                    range_start: 'bg-primary-500 text-white rounded-l-md',
+                    range_end: 'bg-primary-500 text-white rounded-r-md',
+                    range_middle: 'bg-primary-100 dark:bg-primary-900/30',
+                  }}
+                />
               </div>
-              <DayPicker
-                mode="range"
-                selected={dateRange}
-                onSelect={handleRangeSelect}
-                month={secondMonth}
-                locale={ptBR}
-                className="date-range-picker"
-                components={{
-                  MonthCaption: () => null,
-                }}
-                classNames={{
-                  months: 'flex flex-col',
-                  month: 'space-y-2',
-                  caption: 'hidden',
-                  weekdays: 'flex',
-                  weekday: 'text-xs text-muted-foreground dark:text-gray-400 w-8 h-8 flex items-center justify-center',
-                  week: 'flex',
-                  day: 'w-8 h-8 text-sm rounded-md flex items-center justify-center transition-colors',
-                  day_selected: 'bg-primary-500 text-white dark:bg-primary-400',
-                  day_range_start: 'bg-primary-500 text-white rounded-l-md',
-                  day_range_end: 'bg-primary-500 text-white rounded-r-md',
-                  day_range_middle: 'bg-primary-100 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100',
-                  day_today: 'font-semibold',
-                  day_outside: 'text-muted-foreground dark:text-gray-500 opacity-50',
-                  day_disabled: 'text-muted-foreground dark:text-gray-500 opacity-30 cursor-not-allowed',
-                  day_hidden: 'invisible',
-                }}
-                modifiersClassNames={{
-                  selected: 'bg-primary-500 text-white',
-                  range_start: 'bg-primary-500 text-white rounded-l-md',
-                  range_end: 'bg-primary-500 text-white rounded-r-md',
-                  range_middle: 'bg-primary-100 dark:bg-primary-900/30',
-                }}
-              />
             </div>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between p-4 border-t border-border dark:border-border-dark bg-card dark:bg-card-dark">
-        <span className="text-sm text-text dark:text-text-dark">{getRangeLabel()}</span>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 lg:p-4 border-t border-border dark:border-border-dark bg-card dark:bg-card-dark">
+        <span className="text-xs lg:text-sm text-text dark:text-text-dark">{getRangeLabel()}</span>
         <Button
           onClick={handleApply}
-          className="bg-primary-500 hover:bg-primary-600 text-white flex items-center gap-2"
+          className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2"
         >
           <Check className="h-4 w-4" />
           Aplicar
         </Button>
       </div>
     </div>
+  );
+
+  const content = (
+    <>
+      {/* Mobile Layout */}
+      <div className="lg:hidden">{mobileContent}</div>
+      {/* Desktop Layout */}
+      <div className="hidden lg:block">{desktopContent}</div>
+    </>
   );
 
   if (trigger) {
@@ -528,7 +690,7 @@ export function DateRangePicker({
           align="start"
           side={position}
           sideOffset={8}
-          className="w-auto p-0 border-0 bg-transparent shadow-none z-[9999]"
+          className="w-[calc(100vw-2rem)] sm:w-auto max-w-[calc(100vw-2rem)] sm:max-w-4xl p-0 border-0 bg-transparent shadow-none z-[9999] lg:bg-card lg:dark:bg-card-dark lg:border lg:border-border lg:dark:border-border-dark lg:rounded-lg"
         >
           {content}
         </PopoverContent>
@@ -540,14 +702,14 @@ export function DateRangePicker({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-end lg:items-center justify-center bg-black/60 backdrop-blur-sm p-0 lg:p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
         }
       }}
     >
-      <div className="max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="w-full lg:w-full lg:max-w-4xl lg:max-h-[90vh] overflow-auto lg:rounded-lg" onClick={(e) => e.stopPropagation()}>
         {content}
       </div>
     </div>

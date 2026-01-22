@@ -100,6 +100,13 @@
   .date-range-picker .rdp-day {
     @apply w-8 h-8 text-sm rounded-md flex items-center justify-center transition-colors cursor-pointer;
     @apply text-text dark:text-text-dark;
+    @apply touch-manipulation;
+  }
+
+  @media (max-width: 640px) {
+    .date-range-picker .rdp-day {
+      @apply w-9 h-9;
+    }
   }
 
   .date-range-picker .rdp-day:hover:not(.rdp-day_disabled):not(.rdp-day_selected) {
