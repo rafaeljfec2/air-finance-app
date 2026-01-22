@@ -180,7 +180,6 @@ export function TransactionFilters({
               />
             </div>
             <div className="flex items-center gap-2 w-full lg:w-auto">
-              <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
               <ComboBox
                 options={accountOptions}
                 value={selectedAccountId || 'all'}
@@ -195,7 +194,6 @@ export function TransactionFilters({
               />
             </div>
             <div className="flex items-center gap-2 w-full lg:w-auto">
-              <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
               <ComboBox
                 options={typeOptions}
                 value={selectedType}

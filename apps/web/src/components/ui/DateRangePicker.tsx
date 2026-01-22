@@ -16,7 +16,7 @@ import {
   endOfDay,
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Check, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DayPicker, type DateRange } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
@@ -690,7 +690,7 @@ export function DateRangePicker({
           align="start"
           side={position}
           sideOffset={8}
-          className="w-[calc(100vw-2rem)] sm:w-auto max-w-[calc(100vw-2rem)] sm:max-w-4xl p-0 border-0 bg-transparent shadow-none z-[9999] lg:bg-card lg:dark:bg-card-dark lg:border lg:border-border lg:dark:border-border-dark lg:rounded-lg"
+          className="w-[calc(100vw-2rem)] sm:w-auto max-w-[calc(100vw-2rem)] sm:max-w-4xl p-0 border-0 bg-transparent shadow-none z-[9999] lg:bg-card lg:dark:bg-card-dark lg:border lg:border-border lg:dark:border-border-dark lg:rounded-lg date-range-picker-modal"
         >
           {content}
         </PopoverContent>
@@ -702,14 +702,17 @@ export function DateRangePicker({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end lg:items-center justify-center bg-black/60 backdrop-blur-sm p-0 lg:p-4"
+      className="fixed inset-0 z-50 flex items-end lg:items-center justify-center bg-black/60 backdrop-blur-sm p-0 lg:p-4 animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
         }
       }}
     >
-      <div className="w-full lg:w-full lg:max-w-4xl lg:max-h-[90vh] overflow-auto lg:rounded-lg" onClick={(e) => e.stopPropagation()}>
+      <div 
+        className="w-full lg:w-full lg:max-w-4xl lg:max-h-[90vh] overflow-auto lg:rounded-lg date-range-picker-modal" 
+        onClick={(e) => e.stopPropagation()}
+      >
         {content}
       </div>
     </div>
