@@ -39,7 +39,7 @@ export function Sidebar({
       >
         <div className="flex flex-col h-full overflow-hidden">
         <SidebarHeader onClose={onClose} isHeaderVisible={isHeaderVisible} />
-        <nav className="flex-1 min-h-0 space-y-1 px-2 py-4 overflow-y-auto">
+        <nav className="flex-1 min-h-0 space-y-1 px-2 py-4 overflow-y-auto pb-24 lg:pb-4">
           {filteredNavigation.map((group, idx) => (
             <NavigationSection
               key={group.section}
@@ -51,7 +51,9 @@ export function Sidebar({
             />
           ))}
         </nav>
-        <SidebarFooter />
+        <div className="flex-shrink-0 lg:pb-0 pb-20">
+          <SidebarFooter />
+        </div>
       </div>
       </div>
     </>
