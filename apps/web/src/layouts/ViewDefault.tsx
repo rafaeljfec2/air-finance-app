@@ -53,8 +53,8 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
         className={cn(
           'flex transition-all duration-300',
           isHeaderVisible
-            ? 'h-[calc(100vh-4rem)] md:h-[calc(100dvh-4rem)]'
-            : 'h-screen md:h-[100dvh]',
+            ? 'h-[calc(100dvh-4rem)]'
+            : 'h-[100dvh]',
         )}
       >
         <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} isHeaderVisible={isHeaderVisible} />

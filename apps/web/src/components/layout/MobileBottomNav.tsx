@@ -62,7 +62,7 @@ export function MobileBottomNav({ onNewTransaction, onMenuOpen }: Readonly<Mobil
     <nav
       className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-card-dark border-t border-border dark:border-border-dark shadow-lg"
       style={{
-        paddingBottom: 'max(env(safe-area-inset-bottom), 0.5rem)',
+        paddingBottom: 'max(env(safe-area-inset-bottom, constant(safe-area-inset-bottom, 0px)), 0.5rem)',
       }}
       aria-label="Navegação principal móvel"
     >

@@ -5,18 +5,26 @@
 @layer base {
   :root {
     /* Safe Area Insets - iOS and Android */
-    --safe-area-inset-top: env(safe-area-inset-top, 0px);
-    --safe-area-inset-right: env(safe-area-inset-right, 0px);
-    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
-    --safe-area-inset-left: env(safe-area-inset-left, 0px);
+    /* Support for both env() (modern) and constant() (iOS 11.0-11.2) */
+    --safe-area-inset-top: env(safe-area-inset-top, constant(safe-area-inset-top, 0px));
+    --safe-area-inset-right: env(safe-area-inset-right, constant(safe-area-inset-right, 0px));
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, constant(safe-area-inset-bottom, 0px));
+    --safe-area-inset-left: env(safe-area-inset-left, constant(safe-area-inset-left, 0px));
   }
 
   html {
     @apply antialiased overflow-hidden;
+    /* Ensure safe area is respected on mobile browsers */
+    height: 100%;
+    height: -webkit-fill-available;
   }
 
   body {
     @apply bg-background dark:bg-background-dark text-text dark:text-text-dark overflow-hidden;
+    /* Ensure safe area is respected on mobile browsers */
+    min-height: 100%;
+    min-height: -webkit-fill-available;
+    min-height: 100dvh;
   }
 }
 
