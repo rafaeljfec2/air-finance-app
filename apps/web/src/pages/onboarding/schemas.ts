@@ -25,8 +25,8 @@ export const CreditCardSchema = z.object({
   limit: z.coerce.number().min(0.01, 'Limite deve ser maior que zero'),
   closingDay: z.coerce.number().min(1, 'Dia de fechamento inválido').max(31, 'Dia de fechamento inválido'),
   dueDay: z.coerce.number().min(1, 'Dia de vencimento inválido').max(31, 'Dia de vencimento inválido'),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida').default('#8A05BE'),
-  icon: z.string().min(1, 'Ícone é obrigatório').default('CreditCard'),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida').optional().default('#8A05BE'),
+  icon: z.string().min(1, 'Ícone é obrigatório').optional().default('CreditCard'),
   bankCode: z.string().optional(),
 });
 

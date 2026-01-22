@@ -167,8 +167,8 @@ export default function OnboardingPage() {
       limit: creditCard.limit,
       closingDay: creditCard.closingDay,
       dueDay: creditCard.dueDay,
-      color: creditCard.color,
-      icon: creditCard.icon,
+      color: creditCard.color ?? '#8A05BE',
+      icon: creditCard.icon ?? 'CreditCard',
     };
     const response = await api.post(`/companies/${companyId}/credit-cards`, payload);
     return response.data.id || response.data._id;
