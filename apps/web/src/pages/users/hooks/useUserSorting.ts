@@ -4,7 +4,7 @@ import { User } from '@/services/userService';
 
 export function useUserSorting() {
   const { sortConfig, handleSort, sortData } = useSortable<
-    'name' | 'email' | 'role' | 'status' | 'plan' | 'createdAt'
+    'name' | 'email' | 'role' | 'status' | 'plan' | 'createdAt' | 'emailVerified' | 'onboardingCompleted'
   >({
     initialField: 'createdAt',
     initialDirection: 'desc',
@@ -36,6 +36,10 @@ export function useUserSorting() {
             return user.plan;
           case 'createdAt':
             return new Date(user.createdAt);
+          case 'emailVerified':
+            return user.emailVerified === true ? 1 : user.emailVerified === false ? 0 : -1;
+          case 'onboardingCompleted':
+            return user.onboardingCompleted === true ? 1 : user.onboardingCompleted === false ? 0 : -1;
           default:
             return (user as unknown as Record<string, unknown>)[field];
         }

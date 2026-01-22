@@ -17,8 +17,8 @@ interface UsersListProps {
   viewMode: 'grid' | 'list';
   isUpdating: boolean;
   isDeleting: boolean;
-  sortConfig: SortConfig<'name' | 'email' | 'role' | 'status' | 'plan' | 'createdAt'> | null;
-  onSort: (field: 'name' | 'email' | 'role' | 'status' | 'plan' | 'createdAt') => void;
+  sortConfig: SortConfig<'name' | 'email' | 'role' | 'status' | 'plan' | 'createdAt' | 'emailVerified' | 'onboardingCompleted'> | null;
+  onSort: (field: 'name' | 'email' | 'role' | 'status' | 'plan' | 'createdAt' | 'emailVerified' | 'onboardingCompleted') => void;
   onEdit: (user: User) => void;
   onDelete: (id: string) => void;
   onViewPermissions: (user: User) => void;
@@ -84,12 +84,12 @@ export function UsersList({
                 <SortableColumn field="status" currentSort={sortConfig} onSort={onSort}>
                   Status
                 </SortableColumn>
-                <th className="text-left py-2 px-3 text-xs font-semibold text-text dark:text-text-dark">
+                <SortableColumn field="emailVerified" currentSort={sortConfig} onSort={onSort}>
                   Email Verificado
-                </th>
-                <th className="text-left py-2 px-3 text-xs font-semibold text-text dark:text-text-dark">
+                </SortableColumn>
+                <SortableColumn field="onboardingCompleted" currentSort={sortConfig} onSort={onSort}>
                   Onboarding
-                </th>
+                </SortableColumn>
                 <th className="text-right py-2 px-3 text-xs font-semibold text-text dark:text-text-dark">
                   Ações
                 </th>
