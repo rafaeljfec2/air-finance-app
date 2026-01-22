@@ -86,14 +86,14 @@ export function BankIcon({
   // If custom iconName is provided and no logo available, use it
   if (iconName) {
     const Icon =
-      (Icons as Record<string, React.ComponentType<{ className?: string }>>)[iconName] ||
+      (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[iconName] ||
       Icons.Banknote;
     return <Icon className={cn(SIZE_CLASSES[size], className)} />;
   }
 
   // Fallback to bank-specific lucide-react icon
   const FallbackIcon =
-    (Icons as Record<string, React.ComponentType<{ className?: string }>>)[bankInfo.iconName] ||
+    (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[bankInfo.iconName] ||
     Icons.Banknote;
   return <FallbackIcon className={cn(SIZE_CLASSES[size], className)} />;
 }

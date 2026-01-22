@@ -8,6 +8,7 @@ import { ConfirmError, ConfirmProcessing, ConfirmSuccess } from '@/pages/confirm
 import { EmailPendingPage } from '@/pages/email-pending';
 import { Login } from '@/pages/login';
 import { SignUpPage } from '@/pages/signup';
+import { AuthCallbackPage } from '@/pages/auth-callback';
 import { TermsOfService } from '@/pages/legal/TermsOfService';
 import { PrivacyPolicy } from '@/pages/legal/PrivacyPolicy';
 import React, { Suspense, lazy } from 'react';
@@ -264,6 +265,10 @@ export const router = createBrowserRouter([
         <ForgotPasswordPage />
       </Suspense>
     ),
+  },
+  {
+    path: '/auth/callback',
+    element: <AuthCallbackPage />,
   },
   createPublicRoute('/pricing', PricingPage),
   createPublicRoute('/terms', TermsOfService, false),

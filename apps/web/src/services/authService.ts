@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { apiClient } from './apiClient';
+import { env } from '@/utils/env';
 
 // Validation schemas
 export const UserSchema = z.object({
@@ -160,4 +161,11 @@ export const refreshToken = async (refreshTokenValue: string): Promise<AuthRespo
     console.error('Erro ao renovar token:', error);
     throw new Error('Falha ao renovar token');
   }
+};
+
+// Google OAuth Login
+export const loginWithGoogle = (): void => {
+  const apiUrl = env.VITE_API_URL;
+  const googleAuthUrl = `${apiUrl}/v1/auth/google`;
+  window.location.href = googleAuthUrl;
 };
