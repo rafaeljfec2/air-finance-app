@@ -14,29 +14,17 @@ import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import {
-  Banknote,
   Building2,
   Calendar,
   ChevronLeft,
   ChevronRight,
   CreditCard,
   DollarSign,
-  Landmark,
   Loader2,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { type CreditCardFormData, CreditCardSchema } from '../schemas';
-
-const bankTypes = [
-  { value: 'nubank', label: 'Nubank', icon: CreditCard, iconName: 'CreditCard' },
-  { value: 'itau', label: 'Itaú', icon: Banknote, iconName: 'Banknote' },
-  { value: 'bradesco', label: 'Bradesco', icon: Banknote, iconName: 'Banknote' },
-  { value: 'santander', label: 'Santander', icon: Banknote, iconName: 'Banknote' },
-  { value: 'bb', label: 'Banco do Brasil', icon: Banknote, iconName: 'Banknote' },
-  { value: 'caixa', label: 'Caixa Econômica', icon: Banknote, iconName: 'Banknote' },
-  { value: 'outro', label: 'Outro', icon: Landmark, iconName: 'Landmark' },
-] as const;
 
 const dueDates: ComboBoxOption<number>[] = Array.from({ length: 31 }, (_, i) => ({
   value: i + 1,
@@ -57,7 +45,7 @@ export function CreditCardStep({
   initialData,
 }: Readonly<CreditCardStepProps>) {
   const { bankOptions, isLoading: isLoadingBanks } = useBanks();
-  
+
   const creditCardForm = useForm<CreditCardFormData>({
     resolver: zodResolver(CreditCardSchema),
     defaultValues: initialData || {
@@ -115,7 +103,7 @@ export function CreditCardStep({
               options={bankOptions}
               value={creditCardForm.watch('bankCode') ?? null}
               onValueChange={handleBankChange}
-              placeholder={isLoadingBanks ? "Carregando bancos..." : "Selecione o banco (opcional)"}
+              placeholder={isLoadingBanks ? 'Carregando bancos...' : 'Selecione o banco (opcional)'}
               disabled={isLoadingBanks}
               searchable
               searchPlaceholder="Buscar banco..."
@@ -188,9 +176,7 @@ export function CreditCardStep({
                   label="Dia de fechamento *"
                   options={dueDates}
                   value={creditCardForm.watch('closingDay')}
-                  onValueChange={(value) =>
-                    creditCardForm.setValue('closingDay', value ?? 10)
-                  }
+                  onValueChange={(value) => creditCardForm.setValue('closingDay', value ?? 10)}
                   placeholder="Selecione o dia"
                   className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
                   error={
