@@ -68,6 +68,14 @@
     @apply space-y-2;
   }
 
+  .date-range-picker .rdp-caption {
+    @apply hidden;
+  }
+
+  .date-range-picker .rdp-caption_label {
+    @apply hidden;
+  }
+
   .date-range-picker .rdp-weekdays {
     @apply flex;
   }

@@ -323,6 +323,9 @@ export function DateRangePicker({
                 month={currentMonth}
                 locale={ptBR}
                 className="date-range-picker"
+                components={{
+                  MonthCaption: () => null,
+                }}
                 classNames={{
                   months: 'flex flex-col',
                   month: 'space-y-2',
@@ -372,6 +375,9 @@ export function DateRangePicker({
                 month={secondMonth}
                 locale={ptBR}
                 className="date-range-picker"
+                components={{
+                  MonthCaption: () => null,
+                }}
                 classNames={{
                   months: 'flex flex-col',
                   month: 'space-y-2',
