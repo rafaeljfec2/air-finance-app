@@ -11,7 +11,7 @@ import {
   syncStatementNow,
   type StatementSchedule,
 } from '@/services/bankingIntegrationService';
-import { Calendar, Clock, Play, ArrowLeft } from 'lucide-react';
+import { Play, ArrowLeft } from 'lucide-react';
 import { useAccounts } from '@/hooks/useAccounts';
 
 type FrequencyType = 'hourly' | 'every-4-hours' | 'daily' | 'twice-daily';
@@ -182,11 +182,9 @@ export function StatementSchedulePage() {
     }
   };
 
-  const handleBack = (e?: React.MouseEvent<HTMLButtonElement>) => {
-    e?.preventDefault();
-    e?.stopPropagation();
-    navigate(-1);
-  };
+  const handleBack = useCallback(() => {
+    navigate('/accounts');
+  }, [navigate]);
 
   if (!accountId) {
     return (
@@ -216,144 +214,108 @@ export function StatementSchedulePage() {
 
   return (
     <ViewDefault>
-      <div className="w-full max-w-3xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
-        {/* Header with Back Button - Only for Web */}
-        <div className="mb-6 sm:mb-8">
-          <div className="flex items-center gap-3 mb-6 sm:mb-8">
-            <button
+      <div className="w-full max-w-2xl mx-auto px-4 py-4">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <Button
               type="button"
+              variant="ghost"
               onClick={handleBack}
-              className="hidden lg:flex p-3 rounded-lg text-text dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-[44px] min-w-[44px] items-center justify-center border border-border dark:border-border-dark hover:border-primary-300 dark:hover:border-primary-700 cursor-pointer z-10"
+              className="p-2 h-auto"
               aria-label="Voltar"
             >
-              <ArrowLeft className="h-6 w-6 pointer-events-none" />
-            </button>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text dark:text-text-dark text-center flex-1">
-              Configurar Sincronização de Extrato
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-xl font-semibold text-text dark:text-text-dark">
+              Sincronização Automática
             </h1>
-            <div className="hidden lg:block w-[52px]" />
           </div>
-
-          {/* Account Info Card */}
-          <div className="bg-primary-50 dark:bg-primary-900/20 p-5 sm:p-6 rounded-xl border-2 border-primary-300 dark:border-primary-700 shadow-sm">
-            <h3 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark mb-2">
-              {account?.name ?? 'Conta'}
-            </h3>
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-              Configure a sincronização automática de extrato bancário
-            </p>
-          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-400 ml-11">
+            {account?.name ?? 'Conta'}
+          </p>
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-16 sm:py-20">
-            <Loading size="large">Carregando configuração...</Loading>
+          <div className="flex items-center justify-center py-12">
+            <Loading size="large">Carregando...</Loading>
           </div>
         ) : (
-          <div className="space-y-6 sm:space-y-8">
+          <div className="space-y-4">
             {/* Current Status */}
             {schedule && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 sm:p-5 bg-background dark:bg-background-dark rounded-xl border border-border dark:border-border-dark shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                    <span className="text-base sm:text-lg text-gray-700 dark:text-gray-300 font-medium">
-                      Status:
-                    </span>
-                  </div>
-                  <span
-                    className={`px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-sm sm:text-base font-semibold ${
-                      schedule.enabled
-                        ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white'
-                        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                    }`}
-                  >
-                    {schedule.enabled ? 'Ativo' : 'Desativado'}
-                  </span>
-                </div>
-
+              <div className="space-y-3">
                 {schedule.enabled && getScheduleDescription() && (
-                  <div className="p-4 sm:p-5 bg-background dark:bg-background-dark rounded-xl border border-border dark:border-border-dark shadow-sm">
-                    <p className="text-base sm:text-lg font-semibold text-text dark:text-text-dark">
-                      {getScheduleDescription()}
-                    </p>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {getScheduleDescription()}
                   </div>
                 )}
 
                 {schedule.lastSyncAt && (
-                  <div className="flex items-center justify-between p-4 sm:p-5 bg-background dark:bg-background-dark rounded-xl border border-border dark:border-border-dark shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                      <span className="text-base sm:text-lg text-gray-700 dark:text-gray-300 font-medium">
-                        Última sincronização:
-                      </span>
-                    </div>
-                    <span className="text-sm sm:text-base font-medium text-text dark:text-text-dark text-right">
-                      {new Date(schedule.lastSyncAt).toLocaleString('pt-BR', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
+                  <div className="text-xs text-gray-500 dark:text-gray-500">
+                    Última sincronização:{' '}
+                    {new Date(schedule.lastSyncAt).toLocaleString('pt-BR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </div>
                 )}
               </div>
             )}
 
             {/* Enable/Disable Toggle */}
-            <div className="p-4 sm:p-5 bg-background dark:bg-background-dark rounded-xl border border-border dark:border-border-dark shadow-sm">
-              <label className="flex items-center gap-4 cursor-pointer min-h-[44px]">
+            <div className="py-3 border-b border-border dark:border-border-dark">
+              <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={enabled}
                   onChange={(e) => setEnabled(e.target.checked)}
-                  className="w-6 h-6 sm:w-7 sm:h-7 text-primary-500 rounded focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 cursor-pointer flex-shrink-0"
+                  className="w-5 h-5 text-primary-500 rounded focus:ring-2 focus:ring-primary-500 cursor-pointer"
                 />
-                <span className="text-base sm:text-lg font-semibold text-text dark:text-text-dark">
-                  Habilitar sincronização automática
+                <span className="text-sm font-medium text-text dark:text-text-dark">
+                  Sincronização automática
                 </span>
               </label>
             </div>
 
             {/* Schedule Configuration */}
             {enabled && (
-              <div className="space-y-6 sm:space-y-8">
-                <div className="space-y-4">
-                  <h2 className="text-lg sm:text-xl font-bold text-text dark:text-text-dark">
-                    Frequência de sincronização
-                  </h2>
-                  <div className="space-y-3 sm:space-y-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h2 className="text-sm font-medium text-text dark:text-text-dark">Frequência</h2>
+                  <div className="space-y-2">
                     {scheduleOptions.map((option) => (
                       <button
                         key={option.type}
                         type="button"
                         onClick={() => setFrequencyType(option.type)}
-                        className={`w-full p-5 sm:p-6 rounded-xl border-2 transition-all text-left min-h-[44px] ${
+                        className={`w-full p-3 rounded-lg border transition-all text-left ${
                           frequencyType === option.type
-                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30 shadow-md'
-                            : 'border-border dark:border-border-dark bg-background dark:bg-background-dark hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-sm active:scale-[0.98]'
+                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                            : 'border-border dark:border-border-dark hover:border-primary-300 dark:hover:border-primary-700'
                         }`}
                       >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <div className="font-bold text-lg sm:text-xl text-text dark:text-text-dark mb-2">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-text dark:text-text-dark">
                               {option.label}
                             </div>
-                            <div className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                            <div className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
                               {option.description}
                             </div>
                           </div>
                           <div
-                            className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-1 ${
+                            className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                               frequencyType === option.type
                                 ? 'border-primary-500 bg-primary-500'
                                 : 'border-gray-300 dark:border-gray-600'
                             }`}
                           >
                             {frequencyType === option.type && (
-                              <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-white" />
+                              <div className="w-2 h-2 rounded-full bg-white" />
                             )}
                           </div>
                         </div>
@@ -364,9 +326,9 @@ export function StatementSchedulePage() {
 
                 {/* Time Selection for Daily */}
                 {frequencyType === 'daily' && (
-                  <div className="space-y-3 sm:space-y-4">
+                  <div className="space-y-2">
                     <ComboBox
-                      label="Horário da sincronização"
+                      label="Horário"
                       options={timeOptions.map((time) => ({
                         value: time.value,
                         label: time.label,
@@ -375,33 +337,30 @@ export function StatementSchedulePage() {
                       onValueChange={(value) => setSelectedTime(value ?? '8')}
                       placeholder="Selecione o horário"
                     />
-                    <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
-                      Escolha o melhor horário para sincronizar seus extratos bancários
-                    </p>
                   </div>
                 )}
               </div>
             )}
 
             {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t-2 border-border dark:border-border-dark">
+            <div className="flex gap-3 pt-4 border-t border-border dark:border-border-dark">
               <Button
                 type="button"
                 onClick={handleSyncNow}
                 disabled={isSyncing || isLoading}
                 variant="outline"
-                className="flex-1 flex items-center justify-center gap-3 h-12 sm:h-14 border-2 border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-primary-400 dark:hover:border-primary-600 transition-all font-semibold min-h-[44px] text-base sm:text-lg shadow-sm hover:shadow-md"
+                className="flex-1 flex items-center justify-center gap-2 h-10 text-sm"
               >
-                <Play className="h-5 w-5 sm:h-6 sm:w-6" />
+                <Play className="h-4 w-4" />
                 <span>{isSyncing ? 'Sincronizando...' : 'Sincronizar Agora'}</span>
               </Button>
               <Button
                 type="button"
                 onClick={handleSave}
                 disabled={isSaving || isLoading}
-                className="flex-1 h-12 sm:h-14 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-semibold text-base sm:text-lg min-h-[44px] transition-all shadow-md hover:shadow-lg"
+                className="flex-1 h-10 bg-primary-500 hover:bg-primary-600 text-white text-sm"
               >
-                {isSaving ? 'Salvando...' : 'Salvar Configuração'}
+                {isSaving ? 'Salvando...' : 'Salvar'}
               </Button>
             </div>
           </div>
