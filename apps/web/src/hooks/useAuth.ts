@@ -25,28 +25,33 @@ export const useAuth = () => {
   const queryClient = useQueryClient();
   const { setUser, setToken } = useAuthStore();
 
-  // Só busca o usuário se houver um token armazenado
-  const hasToken = !!authUtils.getToken();
-
+  // Sempre tenta buscar o usuário, pois cookies HttpOnly são enviados automaticamente
+  // Com cookies HttpOnly, não há token no localStorage, mas os cookies são enviados automaticamente
+  // Se não houver autenticação, a API retornará erro e o React Query tratará
   const {
     data: user,
     isLoading: isLoadingUser,
     refetch,
+    error: userError,
   } = useQuery<User>({
     queryKey: ['user'],
     queryFn: getCurrentUser,
     retry: false,
     staleTime: 0, // Always fetch fresh data to avoid stale permissions/flags
     gcTime: 10 * 60 * 1000,
-    enabled: hasToken, // Só executa se houver token
+    enabled: true, // Sempre tenta buscar, pois cookies HttpOnly são enviados automaticamente
   });
 
   // Sincronizar user do React Query com o Zustand store quando disponível
   useEffect(() => {
     if (user) {
       setUser(user);
+    } else if (userError) {
+      // Se houver erro (ex: 401), limpa o estado de autenticação
+      setUser(null);
+      setToken(null);
     }
-  }, [user, setUser]);
+  }, [user, userError, setUser, setToken]);
 
   const loginMutation = useMutation({
     mutationFn: async (variables: LoginOptions & LoginData) => {

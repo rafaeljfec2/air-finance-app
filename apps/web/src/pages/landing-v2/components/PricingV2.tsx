@@ -12,12 +12,12 @@ const plans = [
       '1 conta bancária',
       '1 cartão de crédito',
       'Fluxo de caixa mensal',
-      'Importação de extratos via OFX ',
+      'Importação de extratos via OFX',
       'Classificação automática de gastos',
       'Dashboard de receitas e despesas',
       'Histórico financeiro mensal',
       'Relatórios básicos por categoria e período',
-      'Não inclui Open Finance',
+      'Gestão financeira manual (sem Open Finance)',
     ],
     cta: 'Começar agora',
     popular: false,
@@ -29,14 +29,14 @@ const plans = [
     period: '/mês',
     features: [
       'Tudo do plano Gratuito',
-      'Recomendado para freelancers e autônomos',
-      'Até 2 contas bancárias',
-      'R$ 6,00 por conta adicional',
-      'Relatório avançado',
-      'Metas de economia',
-      'Exportação de dados',
-      'Insights gerados por IA',
-      'Integração Open Finance via Pierre Finance',
+      'Ideal para freelancers, autônomos e profissionais liberais',
+      'Até 2 contas bancárias com sincronização automática',
+      'R$ 9,90 por conta bancária adicional',
+      'Relatórios financeiros avançados',
+      'Metas inteligentes de economia',
+      'Exportação de dados (Excel e CSV)',
+      'Insights financeiros gerados por IA',
+      'Integração automática via Open Finance (Pierre Finance)',
     ],
     cta: 'Escolher este plano',
     popular: true,
@@ -48,17 +48,19 @@ const plans = [
     period: '/mês',
     features: [
       'Tudo do plano Pro',
-      'Recomendado para empresas',
-      'Até 2 empresas',
-      'R$ 29,00 por empresa adicional',
+      'Ideal para empresas e famílias',
+      'Até 2 empresas inclusas',
+      'R$ 29,90 por empresa adicional',
       'Até 2 contas bancárias por empresa',
-      'R$ 12,00 por conta adicional por empresa',
-      'Integração bancária via API do Inter',
-      'Insights gerados por IA',
-      'Múltiplos usuários',
-      'Compartilhamento de conta',
-      'Metas compartilhadas',
+      'R$ 19,90 por conta bancária adicional',
+      'Integração bancária automática via Open Finance',
+      'Integração via API do Banco Inter',
+      'Insights financeiros gerados por IA',
+      'Múltiplos usuários por empresa',
+      'Compartilhamento de contas',
+      'Metas financeiras compartilhadas',
       'Controle de gastos familiar',
+      'Relatórios empresariais avançados',
       'Suporte prioritário',
     ],
     cta: 'Escolher este plano',
@@ -78,8 +80,8 @@ export function PricingV2() {
             <>
               <h2 className="v2-h2 v2-mb-6">Planos para todos os perfis</h2>
               <p className="v2-body max-w-2xl mx-auto text-gray-600 mb-8">
-                Escolha o plano ideal para suas necessidades e comece a transformar sua vida financeira
-                hoje
+                Escolha o plano ideal para suas necessidades e comece a transformar sua vida
+                financeira hoje
               </p>
             </>
           )}
@@ -88,20 +90,21 @@ export function PricingV2() {
           <div className={`mx-auto mb-8 ${isProduction ? 'max-w-4xl' : 'max-w-3xl'}`}>
             <div
               className={`relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#10b981] via-[#059669] to-[#047857] shadow-2xl border-2 border-[#10b981]/30 ${
-                isProduction
-                  ? 'px-8 py-8 md:px-12 md:py-10'
-                  : 'px-6 py-4'
+                isProduction ? 'px-8 py-8 md:px-12 md:py-10' : 'px-6 py-4'
               }`}
             >
               {/* Animated background gradient */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
-              
+
               {/* Sparkle decoration */}
               <div className="absolute top-4 right-4 opacity-20">
                 <Sparkles className="w-6 h-6 text-white animate-pulse" />
               </div>
               <div className="absolute bottom-4 left-4 opacity-20">
-                <Gift className="w-5 h-5 text-white animate-pulse" style={{ animationDelay: '1s' }} />
+                <Gift
+                  className="w-5 h-5 text-white animate-pulse"
+                  style={{ animationDelay: '1s' }}
+                />
               </div>
 
               <div className="relative flex flex-col md:flex-row items-center gap-6">
@@ -112,7 +115,9 @@ export function PricingV2() {
                       isProduction ? 'w-16 h-16' : 'w-12 h-12'
                     }`}
                   >
-                    <span className={`text-white font-bold ${isProduction ? 'text-2xl' : 'text-lg'}`}>
+                    <span
+                      className={`text-white font-bold ${isProduction ? 'text-2xl' : 'text-lg'}`}
+                    >
                       β
                     </span>
                   </div>
@@ -139,8 +144,8 @@ export function PricingV2() {
                       isProduction ? 'text-base md:text-lg' : 'text-sm'
                     }`}
                   >
-                    Use qualquer plano gratuitamente durante a fase beta. Se fizer sentido para você,
-                    pode contribuir e nos ajudar a melhorar o Airfinance.
+                    Use qualquer plano gratuitamente durante a fase beta. Se fizer sentido para
+                    você, pode contribuir e nos ajudar a melhorar o Airfinance.
                   </p>
                 </div>
 
@@ -214,8 +219,8 @@ export function PricingV2() {
                         </p>
                         <p className="text-xs text-gray-600 mb-1.5">
                           Custo adicional de{' '}
-                          <span className="font-bold text-blue-600">R$ 39/mês</span> pago diretamente
-                          ao Pierre Finance
+                          <span className="font-bold text-blue-600">R$ 39/mês</span> pago
+                          diretamente ao Pierre Finance
                         </p>
                         <div className="flex flex-col gap-1">
                           <a

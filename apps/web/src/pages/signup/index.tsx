@@ -10,7 +10,6 @@ import { CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-
 function calculatePasswordStrength(password: string): number {
   let score = 0;
   if (!password) return 0;
@@ -141,140 +140,144 @@ export function SignUpPage() {
 
                 <form className="space-y-5" onSubmit={handleSubmit} autoComplete="off">
                   <div>
-                  <label htmlFor="name" className="block text-sm font-medium mb-1">
-                    Nome
-                  </label>
-                  <Input
-                    id="name"
-                    type="text"
-                    autoComplete="name"
-                    value={form.name}
-                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                    disabled={isRegistering}
-                    className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.name ? 'border-red-500' : ''}`}
-                    placeholder="Seu nome completo"
-                  />
-                  {errors.name && (
-                    <span className="text-xs text-red-500 mt-1 block">{errors.name}</span>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium mb-1">
-                    E-mail
-                  </label>
-                  <Input
-                    id="email"
-                    type="email"
-                    autoComplete="email"
-                    value={form.email}
-                    onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                    disabled={isRegistering}
-                    className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.email ? 'border-red-500' : ''}`}
-                    placeholder="seu@email.com"
-                  />
-                  {errors.email && (
-                    <span className="text-xs text-red-500 mt-1 block">{errors.email}</span>
-                  )}
-                </div>
-                <div className="relative">
-                  <label htmlFor="password" className="block text-sm font-medium mb-1">
-                    Senha
-                  </label>
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="new-password"
-                    value={form.password}
-                    onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                    disabled={isRegistering}
-                    className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.password ? 'border-red-500' : ''}`}
-                    placeholder="Crie uma senha"
-                  />
-                  <button
-                    type="button"
-                    tabIndex={-1}
-                    className="absolute right-3 top-8 text-gray-400 hover:text-brand-arrow"
-                    onClick={() => setShowPassword((v) => !v)}
-                    aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                  {/* Password Strength Indicator */}
-                  {form.password && (
-                    <div className="mt-2">
-                      <div className="flex gap-1 h-1 mb-1">
-                        {[1, 2, 3, 4].map((level) => {
-                           const strength = calculatePasswordStrength(form.password);
-                           let color = 'bg-gray-200 dark:bg-gray-700';
-                           if (strength >= level) {
-                             if (strength <= 1) color = 'bg-red-500';
-                             else if (strength === 2) color = 'bg-yellow-500';
-                             else if (strength === 3) color = 'bg-blue-500';
-                             else color = 'bg-green-500';
-                           }
-                           return (
-                             <div key={level} className={`flex-1 rounded-full h-full transition-colors duration-300 ${color}`} />
-                           );
-                        })}
-                      </div>
-                      <p className="text-xs text-right text-gray-500 dark:text-gray-400">
-                        Força: <span className="font-medium">
-                          {(() => {
-                            const s = calculatePasswordStrength(form.password);
-                            if (s <= 1) return 'Fraca';
-                            if (s === 2) return 'Média';
-                            if (s === 3) return 'Forte';
-                            return 'Muito Forte';
-                          })()}
-                        </span>
-                      </p>
-                    </div>
-                  )}
-                  {errors.password && (
-                    <span className="text-xs text-red-500 mt-1 block">{errors.password}</span>
-                  )}
-                </div>
-                <div className="relative">
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
-                    Confirmar Senha
-                  </label>
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    autoComplete="new-password"
-                    value={form.confirmPassword}
-                    onChange={(e) => setForm((f) => ({ ...f, confirmPassword: e.target.value }))}
-                    disabled={isRegistering}
-                    className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.confirmPassword ? 'border-red-500' : ''}`}
-                    placeholder="Repita a senha"
-                  />
-                  <button
-                    type="button"
-                    tabIndex={-1}
-                    className="absolute right-3 top-8 text-gray-400 hover:text-brand-arrow"
-                    onClick={() => setShowConfirmPassword((v) => !v)}
-                    aria-label={showConfirmPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
+                    <label htmlFor="name" className="block text-sm font-medium mb-1">
+                      Nome
+                    </label>
+                    <Input
+                      id="name"
+                      type="text"
+                      autoComplete="name"
+                      value={form.name}
+                      onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                      disabled={isRegistering}
+                      className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.name ? 'border-red-500' : ''}`}
+                      placeholder="Seu nome completo"
+                    />
+                    {errors.name && (
+                      <span className="text-xs text-red-500 mt-1 block">{errors.name}</span>
                     )}
-                  </button>
-                  {errors.confirmPassword && (
-                    <span className="text-xs text-red-500 mt-1 block">
-                      {errors.confirmPassword}
-                    </span>
-                  )}
-                </div>
-                {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-                <Button
-                  type="submit"
-                  className="w-full bg-brand-arrow hover:bg-brand-arrow/90 text-white py-3 text-lg mt-2"
-                  disabled={isRegistering}
-                >
-                  {isRegistering ? 'Criando conta...' : 'Criar conta'}
-                </Button>
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium mb-1">
+                      E-mail
+                    </label>
+                    <Input
+                      id="email"
+                      type="email"
+                      autoComplete="email"
+                      value={form.email}
+                      onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                      disabled={isRegistering}
+                      className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.email ? 'border-red-500' : ''}`}
+                      placeholder="seu@email.com"
+                    />
+                    {errors.email && (
+                      <span className="text-xs text-red-500 mt-1 block">{errors.email}</span>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <label htmlFor="password" className="block text-sm font-medium mb-1">
+                      Senha
+                    </label>
+                    <Input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      value={form.password}
+                      onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                      disabled={isRegistering}
+                      className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.password ? 'border-red-500' : ''}`}
+                      placeholder="Crie uma senha"
+                    />
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      className="absolute right-3 top-8 text-gray-400 hover:text-brand-arrow"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                    {/* Password Strength Indicator */}
+                    {form.password && (
+                      <div className="mt-2">
+                        <div className="flex gap-1 h-1 mb-1">
+                          {[1, 2, 3, 4].map((level) => {
+                            const strength = calculatePasswordStrength(form.password);
+                            let color = 'bg-gray-200 dark:bg-gray-700';
+                            if (strength >= level) {
+                              if (strength <= 1) color = 'bg-red-500';
+                              else if (strength === 2) color = 'bg-yellow-500';
+                              else if (strength === 3) color = 'bg-blue-500';
+                              else color = 'bg-green-500';
+                            }
+                            return (
+                              <div
+                                key={level}
+                                className={`flex-1 rounded-full h-full transition-colors duration-300 ${color}`}
+                              />
+                            );
+                          })}
+                        </div>
+                        <p className="text-xs text-right text-gray-500 dark:text-gray-400">
+                          Força:{' '}
+                          <span className="font-medium">
+                            {(() => {
+                              const s = calculatePasswordStrength(form.password);
+                              if (s <= 1) return 'Fraca';
+                              if (s === 2) return 'Média';
+                              if (s === 3) return 'Forte';
+                              return 'Muito Forte';
+                            })()}
+                          </span>
+                        </p>
+                      </div>
+                    )}
+                    {errors.password && (
+                      <span className="text-xs text-red-500 mt-1 block">{errors.password}</span>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
+                      Confirmar Senha
+                    </label>
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      value={form.confirmPassword}
+                      onChange={(e) => setForm((f) => ({ ...f, confirmPassword: e.target.value }))}
+                      disabled={isRegistering}
+                      className={`bg-card dark:bg-card-dark text-text dark:text-text-dark border border-border dark:border-border-dark placeholder:text-muted-foreground dark:placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 transition-colors ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                      placeholder="Repita a senha"
+                    />
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      className="absolute right-3 top-8 text-gray-400 hover:text-brand-arrow"
+                      onClick={() => setShowConfirmPassword((v) => !v)}
+                      aria-label={showConfirmPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                    {errors.confirmPassword && (
+                      <span className="text-xs text-red-500 mt-1 block">
+                        {errors.confirmPassword}
+                      </span>
+                    )}
+                  </div>
+                  {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+                  <Button
+                    type="submit"
+                    className="w-full bg-brand-arrow hover:bg-brand-arrow/90 text-white py-3 text-lg mt-2"
+                    disabled={isRegistering}
+                  >
+                    {isRegistering ? 'Criando conta...' : 'Criar conta'}
+                  </Button>
                 </form>
               </div>
             )}

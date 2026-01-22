@@ -128,7 +128,7 @@ export function Login() {
         className="absolute top-8 left-8 z-10"
       >
         <Link
-          to="/"
+          to="/home"
           className="inline-flex items-center gap-2 text-text/60 hover:text-brand-arrow dark:text-text-dark/60 dark:hover:text-brand-leaf transition-colors cursor-pointer"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -155,7 +155,7 @@ export function Login() {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <Card className="bg-card/50 dark:bg-card-dark/50 border-border dark:border-border-dark backdrop-blur-sm">
-              {!needsConfirmation ? (
+              {needsConfirmation ? (
                 <div className="p-6 space-y-6">
                   {/* Botão Google OAuth */}
                   <Button

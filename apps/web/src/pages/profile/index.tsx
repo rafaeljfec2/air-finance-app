@@ -23,7 +23,6 @@ export function Profile() {
   const { user, setUser } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [, setIsLoadingUser] = useState(false);
   const [fullUserData, setFullUserData] = useState<typeof user | null>(null);
   const [avatar, setAvatar] = useState(user?.avatar || '/avatars/default.png');
 
@@ -32,7 +31,6 @@ export function Profile() {
     const fetchFullUserData = async () => {
       if (!user?.id) return;
 
-      setIsLoadingUser(true);
       try {
         const fullUser = await getCurrentUser();
         setFullUserData(fullUser);
@@ -40,8 +38,6 @@ export function Profile() {
         console.error('Error fetching full user data:', error);
         // Fallback to stored user data
         setFullUserData(user);
-      } finally {
-        setIsLoadingUser(false);
       }
     };
 
@@ -69,9 +65,17 @@ export function Profile() {
         location: fullUserData.location || '',
         bio: fullUserData.bio || '',
       });
-      setAvatar(fullUserData.avatar || '/avatars/default.png');
+      // Atualiza avatar se disponível, caso contrário usa o do store ou padrão
+      setAvatar(fullUserData.avatar || user?.avatar || '/avatars/default.png');
     }
-  }, [fullUserData]);
+  }, [fullUserData, user?.avatar]);
+
+  // Atualiza avatar quando o user do store mudar (ex: após login)
+  useEffect(() => {
+    if (user?.avatar && user.avatar.trim().length > 0) {
+      setAvatar(user.avatar);
+    }
+  }, [user?.avatar]);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -226,11 +230,26 @@ export function Profile() {
                     {/* Avatar */}
                     <div className="flex flex-col items-center justify-center gap-3 min-w-[8rem]">
                       <div className="relative flex items-center justify-center">
-                        <img
-                          src={avatar}
-                          alt={formData.name}
-                          className="w-32 h-32 rounded-full object-cover border-4 border-border dark:border-border-dark"
-                        />
+                        {avatar && avatar !== '/avatars/default.png' ? (
+                          <img
+                            src={avatar}
+                            alt={formData.name}
+                            className="w-32 h-32 rounded-full object-cover border-4 border-border dark:border-border-dark"
+                            crossOrigin="anonymous"
+                            referrerPolicy="no-referrer"
+                            onError={(e) => {
+                              // Fallback para avatar padrão se a imagem falhar
+                              const target = e.target as HTMLImageElement;
+                              if (target.src !== '/avatars/default.png') {
+                                target.src = '/avatars/default.png';
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="w-32 h-32 rounded-full bg-primary-100 dark:bg-primary-900/30 border-4 border-border dark:border-border-dark flex items-center justify-center">
+                            <User className="w-16 h-16 text-primary-600 dark:text-primary-400" />
+                          </div>
+                        )}
                         {isEditing && (
                           <label
                             htmlFor="avatar-upload"

@@ -1,6 +1,7 @@
 import { Menu, Transition } from '@headlessui/react';
 import { CircleUser, Eye, EyeOff, LifeBuoy, LogOut, Settings } from 'lucide-react';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
+import { useAuthStore } from '@/stores/auth';
 import { UserMenuItem } from './UserMenuItem';
 
 interface UserMenuProps {
@@ -18,13 +19,29 @@ export function UserMenu({
   onToggleHeaderVisibility,
   onOpenSupport,
 }: Readonly<UserMenuProps>) {
+  const { user } = useAuthStore();
+  const avatar = user?.avatar;
+  const hasAvatar = avatar && avatar.trim().length > 0;
+  const [avatarError, setAvatarError] = useState(false);
+
   return (
     <Menu as="div" className="relative">
       {() => (
         <>
-          <Menu.Button className="flex items-center justify-center min-h-[44px] min-w-[44px] text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 p-2">
+          <Menu.Button className="flex items-center justify-center min-h-[44px] min-w-[44px] text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 p-2 hover:opacity-80 transition-opacity">
             <span className="sr-only">Abrir menu do usuário</span>
-            <CircleUser className="h-8 w-8 text-text dark:text-text-dark" />
+            {hasAvatar && !avatarError ? (
+              <img
+                src={avatar}
+                alt={user?.name || 'Usuário'}
+                className="h-8 w-8 rounded-full object-cover border-2 border-border dark:border-border-dark"
+                crossOrigin="anonymous"
+                referrerPolicy="no-referrer"
+                onError={() => setAvatarError(true)}
+              />
+            ) : (
+              <CircleUser className="h-8 w-8 text-text dark:text-text-dark" />
+            )}
           </Menu.Button>
 
           <Transition

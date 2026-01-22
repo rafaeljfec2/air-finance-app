@@ -22,6 +22,8 @@ export const sanitizeUser = (user: User | null): User | null => {
     role: user.role,
     status: user.status,
     companyIds: user.companyIds,
+    avatar: user.avatar, // Keep avatar for UI display
+    plan: user.plan, // Keep plan for UI display
     // Removed sensitive fields:
     // - email (fetch from server via getCurrentUser() when needed)
     // - emailVerified (can be fetched from server)

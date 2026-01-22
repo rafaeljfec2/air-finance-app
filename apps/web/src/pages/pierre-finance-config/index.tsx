@@ -196,8 +196,8 @@ export function PierreFinanceConfigPage() {
                       </p>
                       <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
                         <li>
-                          No campo &quot;Nome da API key&quot;, digite um nome descritivo (ex: &quot;Air Finance
-                          Production&quot;)
+                          No campo &quot;Nome da API key&quot;, digite um nome descritivo (ex:
+                          &quot;Air Finance Production&quot;)
                         </li>
                         <li>Clique no botão &quot;+ Criar&quot;</li>
                         <li>Após criar, clique no ícone de olho para revelar a chave</li>
@@ -205,8 +205,8 @@ export function PierreFinanceConfigPage() {
                       </ol>
                       <div className="mt-4 p-3 bg-yellow-50 rounded border border-yellow-200">
                         <p className="text-xs text-yellow-800">
-                          <strong>Dica:</strong> A API Key sempre começa com &quot;sk-&quot; seguido de
-                          caracteres alfanuméricos. Certifique-se de copiar a chave completa.
+                          <strong>Dica:</strong> A API Key sempre começa com &quot;sk-&quot; seguido
+                          de caracteres alfanuméricos. Certifique-se de copiar a chave completa.
                         </p>
                       </div>
                     </div>
@@ -235,12 +235,13 @@ export function PierreFinanceConfigPage() {
                           Bancárias
                         </li>
                         <li>
-                          Clique no botão <strong>&quot;Conectar com Pierre Finance&quot;</strong> (geralmente
-                          localizado no topo da página)
+                          Clique no botão <strong>&quot;Conectar com Pierre Finance&quot;</strong>{' '}
+                          (geralmente localizado no topo da página)
                         </li>
                         <li>No modal que abrir, você verá instruções sobre como obter a API Key</li>
                         <li>
-                          Cole sua API Key no campo <strong>&quot;API Key do Pierre Finance&quot;</strong>
+                          Cole sua API Key no campo{' '}
+                          <strong>&quot;API Key do Pierre Finance&quot;</strong>
                         </li>
                         <li>
                           Clique em <strong>&quot;Conectar com Pierre Finance&quot;</strong>
@@ -320,8 +321,9 @@ export function PierreFinanceConfigPage() {
                         A API Key não está funcionando
                       </h3>
                       <p className="text-sm text-gray-600">
-                        Verifique se você copiou a chave completa, incluindo o prefixo &quot;sk-&quot;.
-                        Certifique-se de que não há espaços antes ou depois da chave.
+                        Verifique se você copiou a chave completa, incluindo o prefixo
+                        &quot;sk-&quot;. Certifique-se de que não há espaços antes ou depois da
+                        chave.
                       </p>
                     </div>
                     <div className="border-l-4 border-[#10b981] pl-4">
