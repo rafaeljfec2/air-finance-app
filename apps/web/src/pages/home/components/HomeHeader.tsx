@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/useAuth';
 import { formatCurrency } from '@/utils/formatters';
-import { Bell, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface HomeHeaderProps {
   balance: number;
@@ -34,44 +34,35 @@ export function HomeHeader({
   };
 
   return (
-    <div className="flex justify-between items-start mb-4">
-      <div>
-        <p className="text-gray-500 dark:text-gray-400 text-xs mb-0.5">
+    <div className="mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-gray-500 dark:text-gray-400 text-sm">
           Olá, {user?.name?.split(' ')[0]}
         </p>
-        <div className="flex items-center gap-3">
-          <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
-              Saldo do fluxo de caixa
-            </p>
-            <h1 className={`text-xl font-bold ${getBalanceColorClass()}`}>
-              {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(balance)}
-            </h1>
-            {accumulatedBalance !== null && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Saldo Acumulado:{' '}
-                <span className={`font-medium ${getAccumulatedBalanceColorClass()}`}>
-                  {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(accumulatedBalance)}
-                </span>
-              </p>
-            )}
-          </div>
-          <button
-            onClick={onTogglePrivacyMode}
-            className="text-gray-400 hover:text-primary-500"
-            aria-label={isPrivacyModeEnabled ? 'Mostrar saldo' : 'Ocultar saldo'}
-          >
-            {isPrivacyModeEnabled ? <Eye size={18} /> : <EyeOff size={18} />}
-          </button>
-        </div>
+        <button
+          onClick={onTogglePrivacyMode}
+          className="text-gray-400 hover:text-primary-500 flex-shrink-0 transition-colors"
+          aria-label={isPrivacyModeEnabled ? 'Mostrar saldo' : 'Ocultar saldo'}
+        >
+          {isPrivacyModeEnabled ? <Eye size={20} /> : <EyeOff size={20} />}
+        </button>
       </div>
-      <button
-        className="p-1.5 bg-gray-100 dark:bg-gray-800 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors relative"
-        aria-label="Notificações"
-      >
-        <Bell size={18} />
-        <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-gray-800"></span>
-      </button>
+      <div>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+          Saldo do fluxo de caixa
+        </p>
+        <h1 className={`text-2xl font-bold ${getBalanceColorClass()} mb-3`}>
+          {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(balance)}
+        </h1>
+        {accumulatedBalance !== null && (
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Saldo Acumulado:{' '}
+            <span className={`font-medium ${getAccumulatedBalanceColorClass()}`}>
+              {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(accumulatedBalance)}
+            </span>
+          </p>
+        )}
+      </div>
     </div>
   );
 }
