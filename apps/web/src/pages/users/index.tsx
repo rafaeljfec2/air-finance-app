@@ -45,7 +45,7 @@ export function UsersPage() {
   const filteredAndSortedUsers = useMemo(() => {
     if (!filteredUsers) return [];
     return sortUsers(filteredUsers);
-  }, [filteredUsers, sortUsers]);
+  }, [filteredUsers, sortUsers, sortConfig]);
 
   const [showDeleteAllDataModal, setShowDeleteAllDataModal] = useState(false);
   const [permissionsUser, setPermissionsUser] = useState<User | null>(null);

@@ -1,32 +1,48 @@
+import { useCallback } from 'react';
 import { useSortable } from '@/hooks/useSortable';
 import { User } from '@/services/userService';
 
 export function useUserSorting() {
   const { sortConfig, handleSort, sortData } = useSortable<
     'name' | 'email' | 'role' | 'status' | 'plan' | 'createdAt'
-  >();
+  >({
+    initialField: 'createdAt',
+    initialDirection: 'desc',
+  });
 
-  const sortUsers = (users: User[]): User[] => {
-    return sortData(users as unknown as Record<string, unknown>[], (item, field) => {
-      const user = item as unknown as User;
-      switch (field) {
-        case 'name':
-          return user.name;
-        case 'email':
-          return user.email;
-        case 'role':
-          return user.role;
-        case 'status':
-          return user.status;
-        case 'plan':
-          return user.plan;
-        case 'createdAt':
-          return new Date(user.createdAt);
-        default:
-          return (user as unknown as Record<string, unknown>)[field];
+  const sortUsers = useCallback(
+    (users: User[]): User[] => {
+      // If no sort config, apply default sort by createdAt desc
+      if (!sortConfig) {
+        return [...users].sort((a, b) => {
+          const aDate = new Date(a.createdAt).getTime();
+          const bDate = new Date(b.createdAt).getTime();
+          return bDate - aDate; // Descending order (newest first)
+        });
       }
-    }) as unknown as User[];
-  };
+
+      return sortData(users as unknown as Record<string, unknown>[], (item, field) => {
+        const user = item as unknown as User;
+        switch (field) {
+          case 'name':
+            return user.name;
+          case 'email':
+            return user.email;
+          case 'role':
+            return user.role;
+          case 'status':
+            return user.status;
+          case 'plan':
+            return user.plan;
+          case 'createdAt':
+            return new Date(user.createdAt);
+          default:
+            return (user as unknown as Record<string, unknown>)[field];
+        }
+      }) as unknown as User[];
+    },
+    [sortConfig, sortData],
+  );
 
   return {
     sortConfig,
