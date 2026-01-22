@@ -95,7 +95,7 @@ export default function OnboardingPage() {
   const mapCompanyPayload = (company: CompanyFormData): Record<string, unknown> => {
     const payload: Record<string, unknown> = {
       name: company.name,
-      type: company.type,
+      type: company.type ?? 'matriz',
       foundationDate: new Date().toISOString().split('T')[0],
       cnpj: '00000000000000', // Default placeholder
     };

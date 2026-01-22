@@ -42,6 +42,7 @@ export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<C
     resolver: zodResolver(CompanySchema),
     defaultValues: initialData || {
       documentType: 'cnpj',
+      type: 'matriz',
     },
   });
 
@@ -65,15 +66,18 @@ export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<C
     >
       <form onSubmit={companyForm.handleSubmit(onNext)}>
         <CardHeader className="px-4 sm:px-6">
-          <CardTitle className="text-text dark:text-text dark:text-text-dark text-xl sm:text-2xl">Crie sua Empresa</CardTitle>
+          <CardTitle className="text-text dark:text-text dark:text-text-dark text-xl sm:text-2xl">
+            Crie sua Cadastro
+          </CardTitle>
           <CardDescription className="text-text/70 dark:text-text dark:text-text-dark/70 text-sm sm:text-base">
-            A empresa é a base para organizar suas finanças. Você poderá adicionar outras depois.
+            Seu cadastro é a base para organizar suas finanças. Você poderá adicionar outros
+            cadastros depois.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 px-4 sm:px-6">
           <div className="space-y-2">
             <Label htmlFor="companyName" className="text-text dark:text-text-dark">
-              Nome da Empresa
+              Nome
             </Label>
             <Input
               id="companyName"
@@ -184,33 +188,6 @@ export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<C
                 {String(companyForm.formState.errors.document.message)}
               </p>
             )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="type" className="text-text dark:text-text-dark">
-              Tipo
-            </Label>
-            <Select
-              onValueChange={(v) => companyForm.setValue('type', v as 'matriz' | 'filial')}
-              defaultValue="matriz"
-            >
-              <SelectTrigger className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-                <SelectValue placeholder="Selecione o tipo" />
-              </SelectTrigger>
-              <SelectContent className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-                <SelectItem
-                  value="matriz"
-                  className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
-                >
-                  Matriz
-                </SelectItem>
-                <SelectItem
-                  value="filial"
-                  className="text-text dark:text-text-dark hover:bg-border dark:hover:bg-border-dark focus:bg-border dark:focus:bg-border-dark"
-                >
-                  Filial
-                </SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 px-4 sm:px-6 pb-4 sm:pb-6">
