@@ -68,12 +68,12 @@ export function AccountTableRow({
               'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden',
               !hasLogo && 'rounded-full'
             )}
-            style={!hasLogo ? { backgroundColor: account.color } : undefined}
+            style={hasLogo ? undefined : { backgroundColor: account.color }}
           >
             <BankIcon
               bankCode={account.bankCode ?? undefined}
               institution={account.institution ?? undefined}
-              iconName={!hasLogo ? account.icon ?? undefined : undefined}
+              iconName={hasLogo ? undefined : account.icon ?? undefined}
               size="sm"
               fillContainer={hasLogo}
               className={hasLogo ? 'p-0.5' : 'text-white'}

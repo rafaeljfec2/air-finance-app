@@ -11,7 +11,7 @@ export function formatCurrency(value: number): string {
 export function parseCurrency(value: string): number {
   if (!value) return 0;
 
-  const cleanValue = value.replace(/[^\d,.-]/g, '');
+  const cleanValue = value.replaceAll(/[^\d,.-]/g, '');
 
   if (!cleanValue.match(/\d/)) return 0;
 
