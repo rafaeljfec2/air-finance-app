@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCompanies } from '@/hooks/useCompanies';
 import { CreateUser, User } from '@/services/userService';
+import { companyService } from '@/services/companyService';
 import { useCompanyStore } from '@/stores/company';
 import { Loader2 } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { CompanyRole, UserCompanyRolesSection } from './UserCompanyRolesSection';
+import type { Company } from '@/types/company';
 
 interface UserFormModalProps {
   open: boolean;
@@ -29,6 +31,15 @@ export function UserFormModal({
   const { companies } = useCompanies();
   const companyId = activeCompany?.id || '';
   const companyName = activeCompany?.name || '';
+  const [fetchedCompanies, setFetchedCompanies] = useState<Map<string, Company>>(new Map());
+
+  // Combine companies from hook and fetched companies
+  const allCompanies = useMemo(() => {
+    const companiesMap = new Map<string, Company>();
+    companies?.forEach((c) => companiesMap.set(c.id, c));
+    fetchedCompanies.forEach((c, id) => companiesMap.set(id, c));
+    return Array.from(companiesMap.values());
+  }, [companies, fetchedCompanies]);
 
   const initialFormState: CreateUser = useMemo(
     () => ({
@@ -78,6 +89,42 @@ export function UserFormModal({
     [],
   );
 
+  // Fetch companies that are not in the companies list
+  useEffect(() => {
+    if (!user?.companyIds || !companies) return;
+
+    const fetchMissingCompanies = async () => {
+      const missingCompanyIds = user.companyIds.filter(
+        (cId) => !companies.find((c) => c.id === cId),
+      );
+
+      if (missingCompanyIds.length === 0) return;
+
+      const newFetchedCompanies = new Map<string, Company>();
+
+      await Promise.allSettled(
+        missingCompanyIds.map(async (cId) => {
+          try {
+            const company = await companyService.getById(cId);
+            newFetchedCompanies.set(cId, company);
+          } catch (error) {
+            console.error(`Erro ao buscar empresa ${cId}:`, error);
+          }
+        }),
+      );
+
+      if (newFetchedCompanies.size > 0) {
+        setFetchedCompanies((prev) => {
+          const updated = new Map(prev);
+          newFetchedCompanies.forEach((company, id) => updated.set(id, company));
+          return updated;
+        });
+      }
+    };
+
+    fetchMissingCompanies();
+  }, [user?.companyIds, companies]);
+
   useEffect(() => {
     if (user) {
       setForm({
@@ -94,9 +141,9 @@ export function UserFormModal({
       });
 
       // Load company roles from user data
-      if (user.companyIds && user.companyRoles && companies) {
+      if (user.companyIds && user.companyRoles && allCompanies) {
         const roles: CompanyRole[] = user.companyIds.map((cId) => {
-          const company = companies.find((c) => c.id === cId);
+          const company = allCompanies.find((c) => c.id === cId);
           return {
             companyId: cId,
             companyName: company?.name ?? 'Empresa desconhecida',
@@ -104,10 +151,10 @@ export function UserFormModal({
           };
         });
         setCompanyRoles(roles);
-      } else if (user.companyIds && companies) {
+      } else if (user.companyIds && allCompanies) {
         // User has companyIds but no companyRoles defined
         const roles: CompanyRole[] = user.companyIds.map((cId) => {
-          const company = companies.find((c) => c.id === cId);
+          const company = allCompanies.find((c) => c.id === cId);
           return {
             companyId: cId,
             companyName: company?.name ?? 'Empresa desconhecida',
@@ -124,9 +171,10 @@ export function UserFormModal({
       } else {
         setCompanyRoles([]);
       }
+      setFetchedCompanies(new Map());
     }
     setErrors({});
-  }, [user, initialFormState, companies, companyId, companyName]);
+  }, [user, initialFormState, allCompanies, companyId, companyName]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
