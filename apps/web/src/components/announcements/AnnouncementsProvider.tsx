@@ -9,12 +9,15 @@ export function AnnouncementsProvider() {
   const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Only show announcements after onboarding is completed
+  const hasCompletedOnboarding = user?.onboardingCompleted === true;
+
   useEffect(() => {
-    if (unreadAnnouncements.length > 0 && user) {
+    if (unreadAnnouncements.length > 0 && user && hasCompletedOnboarding) {
       setCurrentAnnouncementIndex(0);
       setIsModalOpen(true);
     }
-  }, [unreadAnnouncements.length, user]);
+  }, [unreadAnnouncements.length, user, hasCompletedOnboarding]);
 
   const handleConfirm = async () => {
     const currentAnnouncement = unreadAnnouncements[currentAnnouncementIndex];
@@ -41,7 +44,8 @@ export function AnnouncementsProvider() {
 
   const currentAnnouncement = unreadAnnouncements[currentAnnouncementIndex];
 
-  if (!currentAnnouncement || !isModalOpen) {
+  // Don't show announcements if onboarding is not completed
+  if (!hasCompletedOnboarding || !currentAnnouncement || !isModalOpen) {
     return null;
   }
 

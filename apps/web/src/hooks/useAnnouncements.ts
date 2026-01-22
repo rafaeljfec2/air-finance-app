@@ -25,8 +25,8 @@ export function useAnnouncements() {
     },
   });
 
-  const markAsRead = (announcementId: string) => {
-    markAsReadMutation.mutate(announcementId);
+  const markAsRead = async (announcementId: string) => {
+    return markAsReadMutation.mutateAsync(announcementId);
   };
 
   return {
