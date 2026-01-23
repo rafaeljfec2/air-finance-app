@@ -91,8 +91,8 @@ export function BillTransactionList({
 
   if (transactions.length === 0) {
     return (
-      <div className="bg-card dark:bg-card-dark px-4 py-12 text-center">
-        <p className="text-sm text-text/60 dark:text-text-dark/60">
+      <div className="bg-white dark:bg-gray-900 px-4 py-12 text-center">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           Nenhuma transação encontrada
         </p>
       </div>
@@ -100,7 +100,7 @@ export function BillTransactionList({
   }
 
   return (
-    <div className="bg-card dark:bg-card-dark">
+    <div className="bg-transparent">
       {sortedDates.map((dateKey) => {
         const dateTransactions = groupedTransactions[dateKey];
         return dateTransactions.map((transaction, index) => (
@@ -113,10 +113,10 @@ export function BillTransactionList({
       })}
 
       {isLoadingMore && (
-        <div className="sticky bottom-0 z-10 bg-card dark:bg-card-dark border-t border-border dark:border-border-dark shadow-sm">
+        <div className="sticky bottom-0 z-10 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex items-center justify-center gap-2 py-4 px-4">
-            <div className="animate-spin rounded-full border-2 border-border dark:border-border-dark border-t-primary-500 h-4 w-4" />
-            <span className="text-sm text-text/70 dark:text-text-dark/70 font-medium">
+            <div className="animate-spin rounded-full border-2 border-gray-300 dark:border-gray-700 border-t-primary-500 h-4 w-4" />
+            <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
               Carregando mais transações...
             </span>
           </div>
@@ -126,7 +126,7 @@ export function BillTransactionList({
       {hasMore && !isLoadingMore && (
         <div
           ref={loadMoreRef}
-          className="h-32 flex items-center justify-center bg-card dark:bg-card-dark"
+          className="h-32 flex items-center justify-center bg-transparent"
           aria-label="Carregar mais"
         >
           <div className="h-1 w-full" />

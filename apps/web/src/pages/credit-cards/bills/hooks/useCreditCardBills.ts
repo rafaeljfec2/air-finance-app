@@ -253,21 +253,19 @@ export function useCreditCardBills(
     }
 
     const pageTransactions = extractsData.data.flatMap((extract, extractIndex) =>
-      extract.transactions
-        .filter((tx: ExtractTransaction) => tx.amount < 0)
-        .map((tx: ExtractTransaction, txIndex) => {
-          const extractId = extract.id ?? `extract-${extractIndex}`;
-          const uniqueId = tx.fitId
-            ? `${extractId}-${tx.fitId}-${txIndex}`
-            : `${extractId}-${txIndex}-${tx.date}-${tx.description}-${tx.amount}`;
-          return {
-            id: uniqueId,
-            date: tx.date,
-            description: tx.description,
-            amount: Math.abs(tx.amount),
-            category: undefined,
-          };
-        }),
+      extract.transactions.map((tx: ExtractTransaction, txIndex) => {
+        const extractId = extract.id ?? `extract-${extractIndex}`;
+        const uniqueId = tx.fitId
+          ? `${extractId}-${tx.fitId}-${txIndex}`
+          : `${extractId}-${txIndex}-${tx.date}-${tx.description}-${tx.amount}`;
+        return {
+          id: uniqueId,
+          date: tx.date,
+          description: tx.description,
+          amount: tx.amount,
+          category: undefined,
+        };
+      }),
     );
 
     if (currentPage === 1) {

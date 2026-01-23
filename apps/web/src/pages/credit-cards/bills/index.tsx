@@ -7,7 +7,6 @@ import { TransactionTypeModal } from '@/components/transactions/TransactionTypeM
 import { useCreditCardBills } from './hooks/useCreditCardBills';
 import { useBillNavigation } from './hooks/useBillNavigation';
 import { CreditCardBillHeader } from './components/CreditCardBillHeader';
-import { BillNavigation } from './components/BillNavigation';
 import { BillSummary } from './components/BillSummary';
 import { BillTransactionList } from './components/BillTransactionList';
 import { BillEmptyState } from './components/BillEmptyState';
@@ -67,8 +66,13 @@ export function CreditCardBillsPage() {
             creditCard={creditCard}
             creditCards={creditCards ?? []}
             onCardSelect={handleCardSelect}
+            month={currentMonth}
+            onPreviousMonth={goToPreviousMonth}
+            onNextMonth={goToNextMonth}
+            canGoPrevious={canGoPrevious}
+            canGoNext={canGoNext}
           />
-          <div className="flex-1 overflow-y-auto bg-card dark:bg-card-dark">
+          <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950">
             <BillErrorState error={error} />
           </div>
         </div>
@@ -89,15 +93,13 @@ export function CreditCardBillsPage() {
             creditCard={creditCard}
             creditCards={creditCards ?? []}
             onCardSelect={handleCardSelect}
-          />
-          <BillNavigation
             month={currentMonth}
             onPreviousMonth={goToPreviousMonth}
             onNextMonth={goToNextMonth}
             canGoPrevious={canGoPrevious}
             canGoNext={canGoNext}
           />
-          <div className="flex-1 overflow-y-auto bg-card dark:bg-card-dark">
+          <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950">
             <BillEmptyState />
           </div>
         </div>
@@ -117,9 +119,6 @@ export function CreditCardBillsPage() {
           creditCard={creditCard}
           creditCards={creditCards ?? []}
           onCardSelect={handleCardSelect}
-        />
-
-        <BillNavigation
           month={currentMonth}
           onPreviousMonth={goToPreviousMonth}
           onNextMonth={goToNextMonth}
@@ -127,7 +126,7 @@ export function CreditCardBillsPage() {
           canGoNext={canGoNext}
         />
 
-        <div className="flex-1 overflow-y-auto bg-card dark:bg-card-dark">
+        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950">
           <BillSummary
             dueDate={currentBill.dueDate}
             status={currentBill.status}

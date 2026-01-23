@@ -341,11 +341,21 @@ export const getExtractsPaginated = async (
     const endIndex = startIndex + limit;
     const paginatedData = normalized.slice(startIndex, endIndex);
 
-    // Calculate total amount from all transactions (only negative amounts - expenses)
+    // Calculate total amount from all transactions (débitos - créditos)
+    // Débitos são negativos, créditos são positivos
+    // O total da fatura é a soma dos débitos (valores negativos convertidos para positivo)
+    // menos os créditos (valores positivos)
     const totalAmount = normalized
       .flatMap((extract) => extract.transactions)
-      .filter((tx) => tx.amount < 0)
-      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+      .reduce((sum, tx) => {
+        if (tx.amount < 0) {
+          // Débito: soma o valor absoluto
+          return sum + Math.abs(tx.amount);
+        } else {
+          // Crédito: subtrai o valor
+          return sum - tx.amount;
+        }
+      }, 0);
 
     return {
       data: paginatedData,
@@ -365,8 +375,15 @@ export const getExtractsPaginated = async (
   const normalized = isSingleExtractObject(data) ? [normalizeExtract(data)] : [normalizeExtract(data)];
   const totalAmount = normalized
     .flatMap((extract) => extract.transactions)
-    .filter((tx) => tx.amount < 0)
-    .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+    .reduce((sum, tx) => {
+      if (tx.amount < 0) {
+        // Débito: soma o valor absoluto
+        return sum + Math.abs(tx.amount);
+      } else {
+        // Crédito: subtrai o valor
+        return sum - tx.amount;
+      }
+    }, 0);
 
   return {
     data: normalized,
