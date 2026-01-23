@@ -1,4 +1,4 @@
-import type { ExtractTransaction, ExtractResponse } from '@/services/types/extract.types';
+import type { Extract, ExtractTransaction } from '@/services/creditCardService';
 
 export interface BillTransaction {
   id: string;
@@ -30,12 +30,12 @@ export const mapTransactionToBillTransaction = (
     id: generateTransactionId(extractId, extractIndex, tx, txIndex),
     date: tx.date,
     description: tx.description,
-    amount: tx.amount,
+    amount: typeof tx.amount === 'string' ? Number.parseFloat(tx.amount) : tx.amount,
     category: undefined,
   };
 };
 
-export const processExtractTransactions = (extracts: ExtractResponse[]): BillTransaction[] => {
+export const processExtractTransactions = (extracts: Extract[]): BillTransaction[] => {
   return extracts.flatMap((extract, extractIndex) => {
     if (!extract?.transactions || !Array.isArray(extract.transactions) || extract.transactions.length === 0) {
       return [];

@@ -1,26 +1,18 @@
 import { Card } from '@/components/ui/card';
 import { formatCurrency } from '@/utils/formatters';
-import { ArrowDownCircle, ArrowUpCircle, Wallet, CheckCircle2 } from 'lucide-react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ArrowDownCircle, ArrowUpCircle, Wallet } from 'lucide-react';
 
 interface TransactionSummaryProps {
   totalCredits: number;
   totalDebits: number;
   finalBalance: number;
-  ledgerBalanceDate?: string | null;
 }
 
 export function TransactionSummary({
   totalCredits,
   totalDebits,
   finalBalance,
-  ledgerBalanceDate,
-}: TransactionSummaryProps) {
-  const isOfficialBalance = !!ledgerBalanceDate;
-  const formattedDate = ledgerBalanceDate
-    ? format(new Date(ledgerBalanceDate), "dd/MM/yyyy", { locale: ptBR })
-    : null;
+}: Readonly<TransactionSummaryProps>) {
   return (
     <>
       {/* Desktop Summary - Cards grandes */}
@@ -60,12 +52,20 @@ export function TransactionSummary({
         <Card className="p-2 bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
           <div className="flex items-center justify-between space-x-3">
             <div className="flex items-center space-x-2">
-              <div className={`p-1.5 rounded-full ${finalBalance >= 0 ? 'bg-blue-100 dark:bg-blue-900/20' : 'bg-red-100 dark:bg-red-900/20'}`}>
-                <Wallet className={`h-3.5 w-3.5 ${finalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`} />
+              <div
+                className={`p-1.5 rounded-full ${finalBalance >= 0 ? 'bg-blue-100 dark:bg-blue-900/20' : 'bg-red-100 dark:bg-red-900/20'}`}
+              >
+                <Wallet
+                  className={`h-3.5 w-3.5 ${finalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}
+                />
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Saldo do Período</p>
-                <h3 className={`text-lg font-bold ${finalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  Saldo do Período
+                </p>
+                <h3
+                  className={`text-lg font-bold ${finalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}
+                >
                   {formatCurrency(finalBalance)}
                 </h3>
               </div>
@@ -107,10 +107,14 @@ export function TransactionSummary({
             {/* Saldo */}
             <div className="flex flex-col items-center flex-1">
               <div className="flex items-center gap-1 mb-1">
-                <Wallet className={`h-3.5 w-3.5 ${finalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`} />
+                <Wallet
+                  className={`h-3.5 w-3.5 ${finalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}
+                />
                 <span className="text-[10px] text-gray-500 dark:text-gray-400">Saldo</span>
               </div>
-              <span className={`text-sm font-bold ${finalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
+              <span
+                className={`text-sm font-bold ${finalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}
+              >
                 {formatCurrency(finalBalance)}
               </span>
             </div>

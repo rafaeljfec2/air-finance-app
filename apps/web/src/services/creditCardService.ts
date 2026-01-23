@@ -194,3 +194,95 @@ export const getCreditCardTotalSummary = async (
     throw parseApiError(error);
   }
 };
+
+// Credit Card Bill Schemas
+export const BillPeriodSchema = z.object({
+  startDate: z.string(),
+  endDate: z.string(),
+});
+
+export const ExtractTransactionSchema = z.object({
+  date: z.string(),
+  description: z.string(),
+  amount: z.number(),
+  fitId: z.string().optional(),
+});
+
+export const ExtractHeaderSchema = z.object({
+  bank: z.string().optional(),
+  agency: z.string().optional(),
+  account: z.string().optional(),
+  accountType: z.string().optional(),
+  periodStart: z.string().optional(),
+  periodEnd: z.string().optional(),
+  generatedAt: z.string().optional(),
+  ledgerBalance: z.number().optional().nullable(),
+  ledgerBalanceDate: z.string().optional().nullable(),
+});
+
+export const ExtractSchema = z.object({
+  id: z.string(),
+  companyId: z.string(),
+  userId: z.string(),
+  accountId: z.string(),
+  header: ExtractHeaderSchema,
+  transactions: z.array(ExtractTransactionSchema),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export const CreditCardBillSchema = z.object({
+  id: z.string(),
+  cardId: z.string(),
+  month: z.string(),
+  total: z.number(),
+  dueDate: z.string(),
+  status: z.enum(['OPEN', 'CLOSED', 'PAID']),
+  period: BillPeriodSchema,
+  transactions: z.array(ExtractSchema),
+});
+
+export const PaginationSchema = z.object({
+  page: z.number(),
+  limit: z.number(),
+  total: z.number(),
+  totalPages: z.number(),
+  totalAmount: z.number(),
+  hasNextPage: z.boolean(),
+  hasPreviousPage: z.boolean(),
+});
+
+export const CreditCardBillResponseSchema = z.object({
+  data: CreditCardBillSchema,
+  pagination: PaginationSchema,
+});
+
+export type BillPeriod = z.infer<typeof BillPeriodSchema>;
+export type ExtractTransaction = z.infer<typeof ExtractTransactionSchema>;
+export type ExtractHeader = z.infer<typeof ExtractHeaderSchema>;
+export type Extract = z.infer<typeof ExtractSchema>;
+export type CreditCardBill = z.infer<typeof CreditCardBillSchema>;
+export type Pagination = z.infer<typeof PaginationSchema>;
+export type CreditCardBillResponse = z.infer<typeof CreditCardBillResponseSchema>;
+
+export const getCreditCardBill = async (
+  companyId: string,
+  cardId: string,
+  month: string,
+  pagination?: { page: number; limit: number },
+): Promise<CreditCardBillResponse> => {
+  try {
+    const params: Record<string, string | number> = {};
+    if (pagination) {
+      params.page = pagination.page;
+      params.limit = pagination.limit;
+    }
+    const response = await apiClient.get<CreditCardBillResponse>(
+      `/companies/${companyId}/credit-cards/${cardId}/bills/${month}`,
+      { params },
+    );
+    return CreditCardBillResponseSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};

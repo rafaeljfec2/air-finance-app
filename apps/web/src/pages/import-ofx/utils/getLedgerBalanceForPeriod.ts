@@ -37,16 +37,6 @@ const filterExtractsWithLedgerBalance = (extracts: ExtractResponse[]): ExtractRe
   );
 };
 
-const getExtractDate = (extract: ExtractResponse): number => {
-  if (extract.header?.ledgerBalanceDate) {
-    return new Date(extract.header.ledgerBalanceDate).getTime();
-  }
-  if (extract.createdAt) {
-    return new Date(extract.createdAt).getTime();
-  }
-  return 0;
-};
-
 const findClosestExtractToEndDate = (
   extracts: ExtractResponse[],
   endDate: string,

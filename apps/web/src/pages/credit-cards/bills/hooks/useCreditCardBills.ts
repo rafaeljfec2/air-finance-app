@@ -1,15 +1,15 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getCreditCardById } from '@/services/creditCardService';
+import {
+  getCreditCardById,
+  getCreditCardBill,
+  type CreditCardBillResponse,
+  CreditCard,
+} from '@/services/creditCardService';
 import { getAccounts } from '@/services/accountService';
-import { getExtractsPaginated } from '@/services/transactionService';
 import { useCompanyStore } from '@/stores/company';
-import type { CreditCard } from '@/services/creditCardService';
 import type { Account } from '@/services/accountService';
-import { calculateBillPeriod, calculateDueDate, determineBillStatus } from './utils/billCalculations';
 import { processExtractTransactions, type BillTransaction } from './utils/transactionProcessing';
-import { getLedgerBalanceFromExtracts } from './utils/ledgerBalance';
-import { canProcessExtracts, isValidExtractData } from './utils/validation';
 import {
   createInitialPaginationState,
   updateTransactionsState,
@@ -38,10 +38,7 @@ interface UseCreditCardBillsReturn {
   hasMore: boolean;
 }
 
-export function useCreditCardBills(
-  cardId: string,
-  month: string,
-): UseCreditCardBillsReturn {
+export function useCreditCardBills(cardId: string, month: string): UseCreditCardBillsReturn {
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
 
@@ -70,53 +67,18 @@ export function useCreditCardBills(
     enabled: !!companyId,
   });
 
-  const account = useMemo(() => {
-    if (!creditCard || !accounts) {
-      return null;
-    }
-    return (
-      accounts.find(
-        (acc) => acc.type === 'credit_card' && acc.name === creditCard.name,
-      ) ?? null
-    );
-  }, [accounts, creditCard]);
-
-  const billPeriod = useMemo(() => {
-    return creditCard && month
-      ? calculateBillPeriod(month, creditCard.dueDay)
-      : null;
-  }, [creditCard, month]);
+  const account =
+    accounts?.find((acc) => acc.type === 'credit_card' && acc.name === creditCard?.name) ?? null;
 
   const {
-    data: extractsData,
-    isLoading: isLoadingExtracts,
-    error: extractsError,
+    data: billData,
+    isLoading: isLoadingBill,
+    error: billError,
     isFetching,
-  } = useQuery({
-    queryKey: [
-      'extracts-paginated',
-      companyId,
-      cardId,
-      creditCard?.id,
-      account?.id,
-      month,
-      billPeriod?.startDate,
-      billPeriod?.endDate,
-      currentPage,
-    ],
-    queryFn: async () => {
-      if (!billPeriod || !account?.id) {
-        return null;
-      }
-      return getExtractsPaginated(
-        companyId,
-        billPeriod.startDate,
-        billPeriod.endDate,
-        account.id,
-        { page: currentPage, limit: 10 },
-      );
-    },
-    enabled: !!billPeriod && !!account?.id && !!companyId && !!cardId && !!creditCard?.id && !!month,
+  } = useQuery<CreditCardBillResponse>({
+    queryKey: ['credit-card-bill', companyId, cardId, month, currentPage],
+    queryFn: () => getCreditCardBill(companyId, cardId, month, { page: currentPage, limit: 10 }),
+    enabled: !!companyId && !!cardId && !!month && !!creditCard?.id,
     staleTime: 0,
     gcTime: 0,
     refetchOnWindowFocus: false,
@@ -127,66 +89,47 @@ export function useCreditCardBills(
   });
 
   useEffect(() => {
-    if (extractsData?.pagination) {
-      setPagination(extractsData.pagination);
+    if (billData?.pagination) {
+      setPagination({
+        page: billData.pagination.page,
+        limit: billData.pagination.limit,
+        total: billData.pagination.total,
+        totalPages: billData.pagination.totalPages,
+        totalAmount: billData.pagination.totalAmount,
+        hasNextPage: billData.pagination.hasNextPage,
+        hasPreviousPage: billData.pagination.hasPreviousPage,
+      });
     }
-  }, [extractsData?.pagination]);
-
-  const resetStateForEmptyData = useCallback(
-    (shouldResetTransactions: boolean) => {
-      if (shouldResetTransactions) {
-        setAllTransactions([]);
-      }
-      if (isLoadingMore) {
-        setIsLoadingMore(false);
-      }
-    },
-    [isLoadingMore],
-  );
+  }, [billData?.pagination]);
 
   const previousMonthRef = useRef<string>(month);
-  const previousBillPeriodRef = useRef<{ startDate: string; endDate: string } | null>(null);
+  const previousCardIdRef = useRef<string>(cardId);
 
   useEffect(() => {
     const monthChanged = previousMonthRef.current !== month;
-    const billPeriodChanged =
-      previousBillPeriodRef.current?.startDate !== billPeriod?.startDate ||
-      previousBillPeriodRef.current?.endDate !== billPeriod?.endDate;
+    const cardChanged = previousCardIdRef.current !== cardId;
 
-    if (monthChanged || billPeriodChanged) {
+    if (monthChanged || cardChanged) {
       previousMonthRef.current = month;
-      previousBillPeriodRef.current = billPeriod
-        ? { startDate: billPeriod.startDate, endDate: billPeriod.endDate }
-        : null;
-      if (currentPage !== 1) {
-        setCurrentPage(1);
-      }
+      previousCardIdRef.current = cardId;
+      setCurrentPage(1);
       setAllTransactions([]);
       setIsLoadingMore(false);
       setPagination(createInitialPaginationState());
       return;
     }
 
-    if (!cardId || !account?.id) {
+    if (!billData?.data) {
       setAllTransactions([]);
       setIsLoadingMore(false);
       return;
     }
 
-    if (!canProcessExtracts(cardId, account.id, extractsData)) {
-      resetStateForEmptyData(currentPage === 1);
-      return;
-    }
-
-    if (!extractsData?.data) {
-      resetStateForEmptyData(currentPage === 1);
-      return;
-    }
-
-    const pageTransactions = processExtractTransactions(extractsData.data);
+    const pageTransactions = processExtractTransactions(billData.data.transactions);
 
     if (pageTransactions.length === 0) {
-      resetStateForEmptyData(currentPage === 1);
+      setAllTransactions([]);
+      setIsLoadingMore(false);
       return;
     }
 
@@ -195,21 +138,10 @@ export function useCreditCardBills(
     if (isLoadingMore) {
       setIsLoadingMore(false);
     }
-  }, [
-    extractsData,
-    currentPage,
-    isLoadingMore,
-    cardId,
-    account?.id,
-    resetStateForEmptyData,
-    allTransactions,
-    month,
-    billPeriod?.startDate,
-    billPeriod?.endDate,
-  ]);
+  }, [billData, currentPage, isLoadingMore, cardId, month, allTransactions]);
 
   const loadMore = useCallback(async () => {
-    if (isLoadingMore || isFetching || !pagination.hasNextPage || !billPeriod || !account?.id) {
+    if (isLoadingMore || isFetching || !pagination.hasNextPage) {
       return;
     }
 
@@ -225,39 +157,23 @@ export function useCreditCardBills(
       console.error('Error loading more extracts:', error);
       setIsLoadingMore(false);
     }
-  }, [
-    isLoadingMore,
-    isFetching,
-    pagination.hasNextPage,
-    pagination.totalPages,
-    billPeriod,
-    account?.id,
-    currentPage,
-  ]);
-
-  const calculatedTotal = useMemo(() => {
-    if (!isValidExtractData(extractsData) || !billPeriod || !extractsData?.data) {
-      return 0;
-    }
-    return getLedgerBalanceFromExtracts(extractsData.data, billPeriod);
-  }, [extractsData, billPeriod]);
+  }, [isLoadingMore, isFetching, pagination.hasNextPage, pagination.totalPages, currentPage]);
 
   const currentBill: CurrentBill | null =
-    creditCard && month && account
+    billData?.data && creditCard && month && account
       ? {
-          id: `${account.id}-${month}`,
-          cardId: creditCard.id,
-          month,
-          total: calculatedTotal,
-          dueDate: calculateDueDate(month, creditCard.dueDay),
-          status: determineBillStatus(month, creditCard.dueDay),
+          id: billData.data.id,
+          cardId: billData.data.cardId,
+          month: billData.data.month,
+          total: billData.data.total,
+          dueDate: billData.data.dueDate,
+          status: billData.data.status,
           transactions: allTransactions,
         }
       : null;
 
-  const isLoading =
-    isLoadingCard || isLoadingAccounts || (isLoadingExtracts && currentPage === 1);
-  const error = cardError ?? accountsError ?? extractsError;
+  const isLoading = isLoadingCard || isLoadingAccounts || (isLoadingBill && currentPage === 1);
+  const error = cardError ?? accountsError ?? billError;
 
   return {
     creditCard: creditCard ?? null,
