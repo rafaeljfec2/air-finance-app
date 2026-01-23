@@ -1,15 +1,10 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { format, subMonths, addMonths } from 'date-fns';
 
 export function useBillNavigation() {
   const [currentMonth, setCurrentMonth] = useState<string>(() => {
     return format(new Date(), 'yyyy-MM');
   });
-
-  const currentDate = useMemo(() => {
-    const [year, month] = currentMonth.split('-').map(Number);
-    return new Date(year, month - 1, 1);
-  }, [currentMonth]);
 
   const goToPreviousMonth = useCallback(() => {
     setCurrentMonth((prevMonth) => {

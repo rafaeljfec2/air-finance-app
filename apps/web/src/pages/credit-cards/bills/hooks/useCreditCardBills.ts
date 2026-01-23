@@ -6,7 +6,7 @@ import { getExtractsPaginated } from '@/services/transactionService';
 import { useCompanyStore } from '@/stores/company';
 import type { CreditCard } from '@/services/creditCardService';
 import type { Account } from '@/services/accountService';
-import type { ExtractTransaction } from '@/services/types/extract.types';
+import type { ExtractTransaction, ExtractResponse } from '@/services/types/extract.types';
 
 interface BillTransaction {
   id: string;
@@ -241,39 +241,22 @@ export function useCreditCardBills(
     });
   }, [month, cardId, creditCard?.id, account?.id]);
 
-  useEffect(() => {
-    // Reset if cardId or account changes (new card selected)
-    if (!cardId || !account?.id) {
-      setAllTransactions([]);
-      setIsLoadingMore(false);
-      return;
-    }
-
-    // Wait for extractsData to be available
-    if (!extractsData) {
-      if (currentPage === 1) {
+  // Helper function to reset state when no valid data
+  const resetStateForEmptyData = useCallback(
+    (shouldResetTransactions: boolean) => {
+      if (shouldResetTransactions) {
         setAllTransactions([]);
       }
       if (isLoadingMore) {
         setIsLoadingMore(false);
       }
-      return;
-    }
+    },
+    [isLoadingMore],
+  );
 
-    // Check if data exists and is an array
-    if (!extractsData.data || !Array.isArray(extractsData.data) || extractsData.data.length === 0) {
-      if (currentPage === 1) {
-        setAllTransactions([]);
-      }
-      if (isLoadingMore) {
-        setIsLoadingMore(false);
-      }
-      return;
-    }
-
-    // Process ALL transactions from extracts (both debits and credits)
-    // No filtering by amount - we want to show all transactions
-    const pageTransactions = extractsData.data.flatMap((extract, extractIndex) => {
+  // Helper function to process transactions from extracts
+  const processExtractTransactions = useCallback((extracts: ExtractResponse[]): BillTransaction[] => {
+    return extracts.flatMap((extract, extractIndex) => {
       if (!extract?.transactions || !Array.isArray(extract.transactions) || extract.transactions.length === 0) {
         return [];
       }
@@ -286,52 +269,88 @@ export function useCreditCardBills(
           id: uniqueId,
           date: tx.date,
           description: tx.description,
-          amount: tx.amount, // Keep original amount (negative for debits, positive for credits)
+          amount: tx.amount,
           category: undefined,
         };
       });
     });
+  }, []);
 
-    if (pageTransactions.length === 0) {
+  // Helper function to remove duplicate transactions
+  const removeDuplicates = useCallback((transactions: BillTransaction[]): BillTransaction[] => {
+    const seenIds = new Set<string>();
+    return transactions.filter((tx) => {
+      if (seenIds.has(tx.id)) {
+        return false;
+      }
+      seenIds.add(tx.id);
+      return true;
+    });
+  }, []);
+
+  // Helper function to update transactions state
+  const updateTransactionsState = useCallback(
+    (pageTransactions: BillTransaction[]) => {
       if (currentPage === 1) {
-        setAllTransactions([]);
+        const uniqueTransactions = removeDuplicates(pageTransactions);
+        setAllTransactions(uniqueTransactions);
+      } else {
+        setAllTransactions((prev) => {
+          const existingIds = new Set(prev.map((t) => t.id));
+          const newTransactions = pageTransactions.filter((t) => !existingIds.has(t.id));
+          const uniqueNewTransactions = removeDuplicates(newTransactions);
+          return [...prev, ...uniqueNewTransactions];
+        });
       }
-      if (isLoadingMore) {
-        setIsLoadingMore(false);
-      }
+    },
+    [currentPage, removeDuplicates],
+  );
+
+  // Helper function to validate if we can process extracts
+  const canProcessExtracts = useCallback(() => {
+    if (!cardId || !account?.id) {
+      return false;
+    }
+    if (!extractsData?.data || !Array.isArray(extractsData.data) || extractsData.data?.length === 0) {
+      return false;
+    }
+    return true;
+  }, [cardId, account?.id, extractsData]);
+
+  useEffect(() => {
+    // Reset if cardId or account changes (new card selected)
+    if (!cardId || !account?.id) {
+      setAllTransactions([]);
+      setIsLoadingMore(false);
       return;
     }
 
-    if (currentPage === 1) {
-      const seenIds = new Set<string>();
-      const uniqueTransactions = pageTransactions.filter((tx) => {
-        if (seenIds.has(tx.id)) {
-          return false;
-        }
-        seenIds.add(tx.id);
-        return true;
-      });
-      setAllTransactions(uniqueTransactions);
-    } else {
-      setAllTransactions((prev) => {
-        const existingIds = new Set(prev.map((t) => t.id));
-        const newTransactions = pageTransactions.filter((t) => !existingIds.has(t.id));
-        const seenIds = new Set<string>();
-        const uniqueNewTransactions = newTransactions.filter((tx) => {
-          if (seenIds.has(tx.id)) {
-            return false;
-          }
-          seenIds.add(tx.id);
-          return true;
-        });
-        return [...prev, ...uniqueNewTransactions];
-      });
+    // Validate and process extracts
+    if (!canProcessExtracts()) {
+      resetStateForEmptyData(currentPage === 1);
+      return;
     }
+
+    // TypeScript guard: extractsData.data is guaranteed to exist after canProcessExtracts
+    if (!extractsData?.data) {
+      resetStateForEmptyData(currentPage === 1);
+      return;
+    }
+
+    // Process ALL transactions from extracts (both debits and credits)
+    const pageTransactions = processExtractTransactions(extractsData.data);
+
+    if (pageTransactions.length === 0) {
+      resetStateForEmptyData(currentPage === 1);
+      return;
+    }
+
+    updateTransactionsState(pageTransactions);
 
     if (isLoadingMore) {
       setIsLoadingMore(false);
     }
-  }, [extractsData, currentPage, isLoadingMore, cardId, account?.id]);
+  }, [extractsData, currentPage, isLoadingMore, cardId, account?.id, resetStateForEmptyData, processExtractTransactions, updateTransactionsState, canProcessExtracts]);
 
   const loadMore = useCallback(async () => {
     if (isLoadingMore || isFetching || !pagination.hasNextPage || !billPeriod || !account?.id) {
