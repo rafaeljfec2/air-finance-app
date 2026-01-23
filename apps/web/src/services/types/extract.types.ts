@@ -12,6 +12,8 @@ export const ExtractHeaderSchema = z.object({
   periodStart: z.string().optional().nullable(),
   periodEnd: z.string().optional().nullable(),
   generatedAt: z.string().optional().nullable(),
+  ledgerBalance: z.number().optional().nullable(),
+  ledgerBalanceDate: z.string().optional().nullable(),
 });
 
 export const ExtractTransactionSchema = z.object({

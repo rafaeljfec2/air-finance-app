@@ -13,8 +13,10 @@ import { BillEmptyState } from './components/BillEmptyState';
 import { BillErrorState } from './components/BillErrorState';
 import { useCreditCards } from '@/hooks/useCreditCards';
 import { useCompanyStore } from '@/stores/company';
+import { CreditCardBillsPageDesktop } from './desktop';
 
 export function CreditCardBillsPage() {
+  // All hooks must be called before any conditional returns
   const { cardId } = useParams<{ cardId: string }>();
   const navigate = useNavigate();
   const { activeCompany } = useCompanyStore();
@@ -22,6 +24,7 @@ export function CreditCardBillsPage() {
   const [selectedCardId, setSelectedCardId] = useState<string>(cardId ?? '');
   const [isFabModalOpen, setIsFabModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const { creditCards } = useCreditCards(companyId);
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useBillNavigation();
@@ -34,6 +37,21 @@ export function CreditCardBillsPage() {
       setSelectedCardId(cardId);
     }
   }, [cardId]);
+
+  useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+    return () => window.removeEventListener('resize', checkDesktop);
+  }, []);
+
+  // Render desktop version if on desktop (after all hooks)
+  if (isDesktop) {
+    return <CreditCardBillsPageDesktop />;
+  }
 
   const handleCardSelect = (newCardId: string) => {
     if (newCardId !== selectedCardId) {

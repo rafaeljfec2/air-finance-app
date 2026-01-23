@@ -33,6 +33,17 @@ const safeParseTransaction = (tx: unknown): ExtractTransaction | null => {
   };
 };
 
+// Helper function to safely convert to number
+const safeNumber = (value: unknown): number | undefined => {
+  if (value === null || value === undefined) return undefined;
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number.parseFloat(value);
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }
+  return undefined;
+};
+
 // Normalize header data
 const normalizeHeader = (headerData: Record<string, unknown> | undefined): ExtractHeader => {
   if (!headerData) return {};
@@ -44,6 +55,8 @@ const normalizeHeader = (headerData: Record<string, unknown> | undefined): Extra
     periodStart: safeString(headerData.periodStart) ?? null,
     periodEnd: safeString(headerData.periodEnd) ?? null,
     generatedAt: safeString(headerData.generatedAt) ?? null,
+    ledgerBalance: safeNumber(headerData.ledgerBalance) ?? null,
+    ledgerBalanceDate: safeString(headerData.ledgerBalanceDate) ?? null,
   };
 };
 

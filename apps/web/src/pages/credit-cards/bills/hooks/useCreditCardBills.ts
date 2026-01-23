@@ -192,6 +192,7 @@ export function useCreditCardBills(
       cardId,
       creditCard?.id,
       account?.id,
+      month,
       billPeriod?.startDate,
       billPeriod?.endDate,
       currentPage,
@@ -208,7 +209,7 @@ export function useCreditCardBills(
         { page: currentPage, limit: 10 },
       );
     },
-    enabled: !!billPeriod && !!account?.id && !!companyId && !!cardId && !!creditCard?.id,
+    enabled: !!billPeriod && !!account?.id && !!companyId && !!cardId && !!creditCard?.id && !!month,
     staleTime: 0,
     gcTime: 0,
     refetchOnWindowFocus: false,
@@ -225,6 +226,22 @@ export function useCreditCardBills(
   }, [extractsData?.pagination]);
 
   useEffect(() => {
+    // Reset state when month, cardId, or account changes
+    setCurrentPage(1);
+    setAllTransactions([]);
+    setIsLoadingMore(false);
+    setPagination({
+      page: 1,
+      limit: 10,
+      total: 0,
+      totalPages: 0,
+      totalAmount: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    });
+  }, [month, cardId, creditCard?.id, account?.id]);
+
+  useEffect(() => {
     // Reset if cardId or account changes (new card selected)
     if (!cardId || !account?.id) {
       setAllTransactions([]);
@@ -232,6 +249,7 @@ export function useCreditCardBills(
       return;
     }
 
+    // Wait for extractsData to be available
     if (!extractsData) {
       if (currentPage === 1) {
         setAllTransactions([]);
@@ -242,7 +260,8 @@ export function useCreditCardBills(
       return;
     }
 
-    if (!extractsData.data) {
+    // Check if data exists and is an array
+    if (!extractsData.data || !Array.isArray(extractsData.data) || extractsData.data.length === 0) {
       if (currentPage === 1) {
         setAllTransactions([]);
       }
@@ -254,8 +273,11 @@ export function useCreditCardBills(
 
     // Process ALL transactions from extracts (both debits and credits)
     // No filtering by amount - we want to show all transactions
-    const pageTransactions = extractsData.data.flatMap((extract, extractIndex) =>
-      extract.transactions.map((tx: ExtractTransaction, txIndex) => {
+    const pageTransactions = extractsData.data.flatMap((extract, extractIndex) => {
+      if (!extract?.transactions || !Array.isArray(extract.transactions) || extract.transactions.length === 0) {
+        return [];
+      }
+      return extract.transactions.map((tx: ExtractTransaction, txIndex) => {
         const extractId = extract.id ?? `extract-${extractIndex}`;
         const uniqueId = tx.fitId
           ? `${extractId}-${tx.fitId}-${txIndex}`
@@ -267,8 +289,18 @@ export function useCreditCardBills(
           amount: tx.amount, // Keep original amount (negative for debits, positive for credits)
           category: undefined,
         };
-      }),
-    );
+      });
+    });
+
+    if (pageTransactions.length === 0) {
+      if (currentPage === 1) {
+        setAllTransactions([]);
+      }
+      if (isLoadingMore) {
+        setIsLoadingMore(false);
+      }
+      return;
+    }
 
     if (currentPage === 1) {
       const seenIds = new Set<string>();
@@ -328,20 +360,71 @@ export function useCreditCardBills(
     currentPage,
   ]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-    setAllTransactions([]);
-    setIsLoadingMore(false);
-    setPagination({
-      page: 1,
-      limit: 10,
-      total: 0,
-      totalPages: 0,
-      totalAmount: 0,
-      hasNextPage: false,
-      hasPreviousPage: false,
+  // Use ledgerBalance from extract header as source of truth (official balance from OFX)
+  // Filter extracts by bill period to get the correct balance for the selected month
+  const calculatedTotal = useMemo(() => {
+    if (!extractsData?.data || !Array.isArray(extractsData.data) || extractsData.data.length === 0) {
+      return 0;
+    }
+
+    if (!billPeriod) {
+      return 0;
+    }
+
+    // Filter extracts by ledgerBalanceDate - this is the correct date for the balance
+    // The ledgerBalanceDate should match the bill period's endDate
+    const extractsInPeriod = extractsData.data.filter(extract => {
+      const ledgerBalanceDate = extract.header?.ledgerBalanceDate;
+      if (!ledgerBalanceDate) return false;
+      
+      // Check if extract's ledgerBalanceDate matches the bill period's endDate
+      // Allow some flexibility (same date or within a few days)
+      const balanceDate = new Date(ledgerBalanceDate);
+      const billEndDate = new Date(billPeriod.endDate);
+      
+      // Extract is in period if ledgerBalanceDate is within 3 days of bill endDate
+      const daysDiff = Math.abs((balanceDate.getTime() - billEndDate.getTime()) / (1000 * 60 * 60 * 24));
+      return daysDiff <= 3;
     });
-  }, [month, cardId, creditCard?.id, account?.id]);
+
+    if (extractsInPeriod.length === 0) {
+      return 0;
+    }
+
+    // Find extracts with ledgerBalance within the bill period
+    const extractsWithLedgerBalance = extractsInPeriod.filter(
+      extract => extract.header?.ledgerBalance !== undefined && extract.header.ledgerBalance !== null,
+    );
+
+    if (extractsWithLedgerBalance.length === 0) {
+      return 0;
+    }
+
+    // Sort by ledgerBalanceDate (most recent first) or createdAt as fallback
+    // Within the same period, use the most recent extract
+    extractsWithLedgerBalance.sort((a, b) => {
+      const getDate = (extract: typeof extractsWithLedgerBalance[0]) => {
+        if (extract.header?.ledgerBalanceDate) {
+          return new Date(extract.header.ledgerBalanceDate).getTime();
+        }
+        if (extract.createdAt) {
+          return new Date(extract.createdAt).getTime();
+        }
+        return 0;
+      };
+      
+      const dateA = getDate(a);
+      const dateB = getDate(b);
+      return dateB - dateA; // Most recent first
+    });
+
+    const mostRecentExtract = extractsWithLedgerBalance[0];
+    const ledgerBalance = mostRecentExtract.header?.ledgerBalance ?? 0;
+    
+    // Use absolute value to display as positive bill balance
+    // (ledgerBalance can be negative from OFX, but we display as positive in the bill)
+    return Math.abs(ledgerBalance);
+  }, [extractsData?.data, billPeriod]);
 
   const currentBill: CurrentBill | null =
     creditCard && month && account
@@ -349,7 +432,7 @@ export function useCreditCardBills(
           id: `${account.id}-${month}`,
           cardId: creditCard.id,
           month,
-          total: pagination.totalAmount,
+          total: calculatedTotal,
           dueDate: calculateDueDate(month, creditCard.dueDay),
           status: determineBillStatus(month, creditCard.dueDay),
           transactions: allTransactions,
