@@ -71,8 +71,12 @@ export function ImportOfxModal({
         clearCashFlow,
       );
 
-      // Check for installment transactions
-      if (result.installmentTransactions && result.installmentTransactions.length > 0) {
+      // Check for installment transactions - only show modal if importing to cash flow
+      if (
+        importToCashFlow &&
+        result.installmentTransactions &&
+        result.installmentTransactions.length > 0
+      ) {
         console.log('Found installment transactions, opening modal');
         setDetectedInstallments(result.installmentTransactions);
         // Always use the account selected by the user in the combo, not the one from backend
@@ -82,7 +86,7 @@ export function ImportOfxModal({
         setShowInstallmentsModal(true);
         // Don't close the import modal yet, wait for user to handle installments
       } else {
-        // No installments, close modal and reset form
+        // No installments or not importing to cash flow, close modal and reset form
         resetFileUpload();
         setSelectedAccountId(null);
         setImportToCashFlow(true);
