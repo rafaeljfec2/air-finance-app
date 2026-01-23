@@ -49,7 +49,6 @@ export function TransactionGrid({
     handlePageChange,
     handleItemsPerPageChange,
     resetPage,
-    goToLastPage,
   } = usePagination(10);
 
   const handleFilterClick = useCallback(
@@ -108,14 +107,16 @@ export function TransactionGrid({
     [paginate, sortedAndFilteredTransactions],
   );
 
-  // Ir para a última página quando os dados mudarem (para mostrar os dados mais recentes)
-  const previousTotalItemsRef = useRef(0);
+  // Reset to first page when transactions change
+  const previousTransactionsLengthRef = useRef(0);
   useEffect(() => {
-    if (totalItems > 0 && totalItems !== previousTotalItemsRef.current) {
-      goToLastPage(totalPages);
-      previousTotalItemsRef.current = totalItems;
+    if (sortedAndFilteredTransactions.length !== previousTransactionsLengthRef.current) {
+      if (currentPage !== 1) {
+        resetPage();
+      }
+      previousTransactionsLengthRef.current = sortedAndFilteredTransactions.length;
     }
-  }, [totalItems, totalPages, goToLastPage]);
+  }, [sortedAndFilteredTransactions.length, currentPage, resetPage]);
 
   const handleActionClick = useCallback(
     (transaction: TransactionGridTransaction) => {
