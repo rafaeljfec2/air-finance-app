@@ -26,6 +26,7 @@ import { endOfMonth, startOfMonth } from 'date-fns';
 import { useMemo, useState } from 'react';
 import { ImportOfxFilters } from './components/ImportOfxFilters';
 import { ImportOfxHeader } from './components/ImportOfxHeader';
+import { getLedgerBalanceForPeriod } from './utils/getLedgerBalanceForPeriod';
 
 export function ImportOfxPage() {
   const { activeCompany } = useActiveCompany();
@@ -252,6 +253,18 @@ export function ImportOfxPage() {
     });
   }, [companyId, extracts, accounts]); // Removed dependency on startDate/endDate/selectedAccountId here to process raw data first
 
+  // Get ledger balance for the period if available
+  const ledgerBalanceData = useMemo(() => {
+    if (!endDate || extracts.length === 0) {
+      return null;
+    }
+    return getLedgerBalanceForPeriod({
+      extracts,
+      endDate,
+      accountId: selectedAccountId,
+    });
+  }, [extracts, endDate, selectedAccountId]);
+
   // 2. Filter and Calculate Balance
   const filteredTransactions = useMemo(() => {
     let filtered = rawTransactions;
@@ -313,8 +326,29 @@ export function ImportOfxPage() {
       transactionsWithBalance = calculateBalance(transactionsWithBalance);
     }
 
+    // Adjust final balance to use ledgerBalance if available
+    if (ledgerBalanceData && transactionsWithBalance.length > 0) {
+      const lastTransaction = transactionsWithBalance[transactionsWithBalance.length - 1];
+      const calculatedBalance = lastTransaction.balance ?? 0;
+      const officialBalance = ledgerBalanceData.balance;
+      
+      // Calculate difference to adjust all balances proportionally
+      const difference = officialBalance - calculatedBalance;
+      
+      // Adjust all transaction balances by the difference
+      transactionsWithBalance = transactionsWithBalance.map((tx) => {
+        if (tx.id === 'previous-balance') {
+          return tx;
+        }
+        return {
+          ...tx,
+          balance: (tx.balance ?? 0) + difference,
+        };
+      });
+    }
+
     return transactionsWithBalance;
-  }, [rawTransactions, startDate, endDate, selectedAccountId, previousBalance, accounts]);
+  }, [rawTransactions, startDate, endDate, selectedAccountId, previousBalance, accounts, ledgerBalanceData]);
 
   // 3. Search Filter (Text)
   const searchingTransactions = useMemo(() => {
@@ -333,11 +367,17 @@ export function ImportOfxPage() {
     let totalCredits = 0;
     let totalDebits = 0;
 
-    // finalBalance should be the balance of the most recent transaction (last in list since it's sorted ASC)
+    // finalBalance should prioritize ledgerBalance if available
+    // otherwise use the balance of the most recent transaction
     // or the previous balance if no transactions match
-    const finalBalance = filteredTransactions.length > 0
-      ? (filteredTransactions[filteredTransactions.length - 1].balance ?? 0)
-      : previousBalance;
+    let finalBalance: number;
+    if (ledgerBalanceData) {
+      finalBalance = ledgerBalanceData.balance;
+    } else if (filteredTransactions.length > 0) {
+      finalBalance = filteredTransactions[filteredTransactions.length - 1].balance ?? 0;
+    } else {
+      finalBalance = previousBalance;
+    }
 
     filteredTransactions.forEach((transaction) => {
       // Skip previous balance row for totals calculation
@@ -352,8 +392,13 @@ export function ImportOfxPage() {
       }
     });
 
-    return { totalCredits, totalDebits, finalBalance };
-  }, [filteredTransactions, previousBalance]);
+    return { 
+      totalCredits, 
+      totalDebits, 
+      finalBalance,
+      ledgerBalanceDate: ledgerBalanceData?.date ?? null,
+    };
+  }, [filteredTransactions, previousBalance, ledgerBalanceData]);
 
   return (
     <ViewDefault>

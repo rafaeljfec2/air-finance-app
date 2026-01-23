@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getCreditCardById } from '@/services/creditCardService';
 import { getAccounts } from '@/services/accountService';
@@ -132,13 +132,6 @@ export function useCreditCardBills(
     }
   }, [extractsData?.pagination]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-    setAllTransactions([]);
-    setIsLoadingMore(false);
-    setPagination(createInitialPaginationState());
-  }, [month, cardId, creditCard?.id, account?.id]);
-
   const resetStateForEmptyData = useCallback(
     (shouldResetTransactions: boolean) => {
       if (shouldResetTransactions) {
@@ -151,7 +144,29 @@ export function useCreditCardBills(
     [isLoadingMore],
   );
 
+  const previousMonthRef = useRef<string>(month);
+  const previousBillPeriodRef = useRef<{ startDate: string; endDate: string } | null>(null);
+
   useEffect(() => {
+    const monthChanged = previousMonthRef.current !== month;
+    const billPeriodChanged =
+      previousBillPeriodRef.current?.startDate !== billPeriod?.startDate ||
+      previousBillPeriodRef.current?.endDate !== billPeriod?.endDate;
+
+    if (monthChanged || billPeriodChanged) {
+      previousMonthRef.current = month;
+      previousBillPeriodRef.current = billPeriod
+        ? { startDate: billPeriod.startDate, endDate: billPeriod.endDate }
+        : null;
+      if (currentPage !== 1) {
+        setCurrentPage(1);
+      }
+      setAllTransactions([]);
+      setIsLoadingMore(false);
+      setPagination(createInitialPaginationState());
+      return;
+    }
+
     if (!cardId || !account?.id) {
       setAllTransactions([]);
       setIsLoadingMore(false);
@@ -188,6 +203,9 @@ export function useCreditCardBills(
     account?.id,
     resetStateForEmptyData,
     allTransactions,
+    month,
+    billPeriod?.startDate,
+    billPeriod?.endDate,
   ]);
 
   const loadMore = useCallback(async () => {

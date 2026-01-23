@@ -1,18 +1,26 @@
 import { Card } from '@/components/ui/card';
 import { formatCurrency } from '@/utils/formatters';
-import { ArrowDownCircle, ArrowUpCircle, Wallet } from 'lucide-react';
+import { ArrowDownCircle, ArrowUpCircle, Wallet, CheckCircle2 } from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface TransactionSummaryProps {
   totalCredits: number;
   totalDebits: number;
   finalBalance: number;
+  ledgerBalanceDate?: string | null;
 }
 
 export function TransactionSummary({
   totalCredits,
   totalDebits,
   finalBalance,
+  ledgerBalanceDate,
 }: TransactionSummaryProps) {
+  const isOfficialBalance = !!ledgerBalanceDate;
+  const formattedDate = ledgerBalanceDate
+    ? format(new Date(ledgerBalanceDate), "dd/MM/yyyy", { locale: ptBR })
+    : null;
   return (
     <>
       {/* Desktop Summary - Cards grandes */}
