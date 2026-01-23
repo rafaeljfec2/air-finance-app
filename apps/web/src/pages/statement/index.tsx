@@ -259,6 +259,7 @@ export function Statement() {
               showActions={true}
               onActionClick={handleEdit}
               spacious={true}
+              resetPageKey={`${searchTerm}-${selectedCategory}`}
             />
           </div>
         </div>

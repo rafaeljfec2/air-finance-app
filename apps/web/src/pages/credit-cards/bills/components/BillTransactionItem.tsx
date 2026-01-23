@@ -25,11 +25,18 @@ export function BillTransactionItem({
   };
 
   const formatDate = (dateStr: string) => {
-    return format(new Date(dateStr), "dd/MM/yyyy", { locale: ptBR });
+    // Parse date string (YYYY-MM-DD) and treat as local time
+    // Split the date string to avoid timezone conversion issues
+    const [year, month, day] = dateStr.split('T')[0].split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return format(date, "dd/MM/yyyy", { locale: ptBR });
   };
 
   const formatDateHeader = (dateStr: string) => {
-    return format(new Date(dateStr), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+    // Parse date string (YYYY-MM-DD) and treat as local time
+    const [year, month, day] = dateStr.split('T')[0].split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return format(date, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR });
   };
 
   return (

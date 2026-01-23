@@ -252,6 +252,8 @@ export function useCreditCardBills(
       return;
     }
 
+    // Process ALL transactions from extracts (both debits and credits)
+    // No filtering by amount - we want to show all transactions
     const pageTransactions = extractsData.data.flatMap((extract, extractIndex) =>
       extract.transactions.map((tx: ExtractTransaction, txIndex) => {
         const extractId = extract.id ?? `extract-${extractIndex}`;
@@ -262,7 +264,7 @@ export function useCreditCardBills(
           id: uniqueId,
           date: tx.date,
           description: tx.description,
-          amount: tx.amount,
+          amount: tx.amount, // Keep original amount (negative for debits, positive for credits)
           category: undefined,
         };
       }),

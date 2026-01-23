@@ -165,7 +165,7 @@ export function Transactions() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onViewHistory={handleViewHistory}
-            resetPageKey={selectedAccountId}
+            resetPageKey={`${selectedAccountId}-${startDate}-${endDate}-${searchTerm}-${selectedType}`}
           />
         </div>
       </div>

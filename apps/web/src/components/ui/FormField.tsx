@@ -7,7 +7,7 @@ interface FormFieldProps {
   className?: string;
 }
 
-export function FormField({ label, error, children, className = '' }: FormFieldProps) {
+export function FormField({ label, error, children, className = '' }: Readonly<FormFieldProps>) {
   return (
     <div className={`mb-2 ${className}`}>
       <label className="block text-sm font-medium text-text dark:text-text-dark mb-1">
