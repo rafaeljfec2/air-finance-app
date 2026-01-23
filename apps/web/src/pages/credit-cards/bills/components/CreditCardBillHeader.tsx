@@ -55,7 +55,7 @@ export function CreditCardBillHeader({
 
   return (
     <div
-      className="sticky top-0 z-10 relative overflow-hidden"
+      className="sticky top-0 z-10 overflow-hidden"
       style={{
         background: `linear-gradient(135deg, ${cardColor} 0%, ${cardColor}dd 100%)`,
       }}

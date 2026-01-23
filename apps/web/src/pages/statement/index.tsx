@@ -40,7 +40,9 @@ export function Statement() {
 
   // Configurar pull-to-refresh
   const { containerProps } = usePullToRefresh({
-    onRefresh: loadTransactions,
+    onRefresh: () => {
+      void loadTransactions();
+    },
   });
 
   // Filtrar transações
@@ -90,7 +92,6 @@ export function Statement() {
   }, [filteredTransactions]);
 
   const handleEdit = (transaction: TransactionGridTransaction) => {
-    // TODO: Implement edit modal
     console.log('Edit transaction:', transaction);
   };
 

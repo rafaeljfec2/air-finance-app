@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { format, subMonths, addMonths, startOfMonth } from 'date-fns';
+import { format, subMonths, addMonths } from 'date-fns';
 
 export function useBillNavigation() {
   const [currentMonth, setCurrentMonth] = useState<string>(() => {

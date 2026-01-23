@@ -320,7 +320,7 @@ export const getExtractsPaginated = async (
   const data = response.data;
 
   // Check if response is in paginated format
-  if (data && data.pagination && Array.isArray(data.data)) {
+  if (data?.pagination && Array.isArray(data.data)) {
     return {
       data: data.data.map((item: unknown) => normalizeExtract(item)),
       pagination: {
@@ -372,7 +372,7 @@ export const getExtractsPaginated = async (
   }
 
   // Single extract fallback
-  const normalized = isSingleExtractObject(data) ? [normalizeExtract(data)] : [normalizeExtract(data)];
+  const normalized = [normalizeExtract(data)];
   const totalAmount = normalized
     .flatMap((extract) => extract.transactions)
     .reduce((sum, tx) => {

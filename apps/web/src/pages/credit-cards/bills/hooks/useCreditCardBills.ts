@@ -358,7 +358,7 @@ export function useCreditCardBills(
 
   const isLoading =
     isLoadingCard || isLoadingAccounts || (isLoadingExtracts && currentPage === 1);
-  const error = (cardError ?? accountsError ?? extractsError) as Error | null;
+  const error = cardError ?? accountsError ?? extractsError;
 
   return {
     creditCard: creditCard ?? null,
@@ -366,7 +366,7 @@ export function useCreditCardBills(
     currentBill,
     isLoading,
     isLoadingMore,
-    error: error as Error | null,
+    error: error ?? null,
     pagination,
     loadMore,
     hasMore: pagination.hasNextPage,

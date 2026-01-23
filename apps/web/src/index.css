@@ -350,6 +350,7 @@
   gap: 12px !important;
   width: 100% !important;
   flex-wrap: nowrap !important;
+  white-space: nowrap !important;
 }
 
 .flatpickr-current-month {
@@ -387,10 +388,12 @@
 
 .flatpickr-current-month .flatpickr-monthDropdown-months {
   min-width: 123px !important;
+  margin-right: 6px !important;
 }
 
 .flatpickr-current-month .flatpickr-monthDropdown-years {
   min-width: 130px !important;
+  margin-left: 6px !important;
 }
 
 .flatpickr-current-month .flatpickr-monthDropdown-months:hover,
@@ -421,10 +424,6 @@
   min-width: 32px !important;
 }
 
-/* Ensure all elements are in a single row */
-.flatpickr-month {
-  flex-wrap: nowrap !important;
-}
 
 .flatpickr-month > * {
   flex-shrink: 0 !important;
@@ -632,10 +631,6 @@
   min-width: 130px !important;
 }
 
-/* Force single line layout for month container */
-.flatpickr-month {
-  white-space: nowrap !important;
-}
 
 .flatpickr-month .flatpickr-prev-month,
 .flatpickr-month .flatpickr-current-month,
@@ -660,27 +655,7 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ccc' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
 }
 
-/* Ensure month container is flex */
-.flatpickr-current-month .flatpickr-monthDropdown-months {
-  margin-right: 6px !important;
-}
 
-.flatpickr-current-month .flatpickr-monthDropdown-years {
-  margin-left: 6px !important;
-  display: inline-block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* Ensure year dropdown is always visible */
-.flatpickr-current-month .flatpickr-monthDropdown-years,
-.flatpickr-monthDropdown-years {
-  display: inline-block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  width: auto !important;
-  min-width: 100px !important;
-}
 
 /* Show year text by default */
 .flatpickr-current-month .cur-year {
