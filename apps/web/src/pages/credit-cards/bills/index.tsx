@@ -1,0 +1,156 @@
+import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Loading } from '@/components/Loading';
+import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
+import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
+import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
+import { useCreditCardBills } from './hooks/useCreditCardBills';
+import { useBillNavigation } from './hooks/useBillNavigation';
+import { CreditCardBillHeader } from './components/CreditCardBillHeader';
+import { BillNavigation } from './components/BillNavigation';
+import { BillSummary } from './components/BillSummary';
+import { BillTransactionList } from './components/BillTransactionList';
+import { BillEmptyState } from './components/BillEmptyState';
+import { BillErrorState } from './components/BillErrorState';
+import { useCreditCards } from '@/hooks/useCreditCards';
+import { useCompanyStore } from '@/stores/company';
+
+export function CreditCardBillsPage() {
+  const { cardId } = useParams<{ cardId: string }>();
+  const navigate = useNavigate();
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id ?? '';
+  const [selectedCardId, setSelectedCardId] = useState<string>(cardId ?? '');
+  const [isFabModalOpen, setIsFabModalOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { creditCards } = useCreditCards(companyId);
+  const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
+    useBillNavigation();
+
+  const { creditCard, currentBill, isLoading, isLoadingMore, error, loadMore, hasMore } =
+    useCreditCardBills(selectedCardId, currentMonth);
+
+  useEffect(() => {
+    if (cardId) {
+      setSelectedCardId(cardId);
+    }
+  }, [cardId]);
+
+  const handleCardSelect = (newCardId: string) => {
+    if (newCardId !== selectedCardId) {
+      setSelectedCardId(newCardId);
+      // Update URL without full navigation to avoid re-rendering the entire page
+      navigate(`/credit-cards/${newCardId}/bills`, { replace: true });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <>
+        <div className="flex items-center justify-center h-screen bg-background dark:bg-background-dark pb-20 lg:pb-0">
+          <Loading size="large">Carregando fatura, por favor aguarde...</Loading>
+        </div>
+        <MobileBottomNav
+          onNewTransaction={() => setIsFabModalOpen(true)}
+          onMenuOpen={() => setIsSidebarOpen(true)}
+        />
+        <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <div className="flex flex-col h-screen bg-background dark:bg-background-dark overflow-hidden pb-20 lg:pb-0">
+          <CreditCardBillHeader
+            creditCard={creditCard}
+            creditCards={creditCards ?? []}
+            onCardSelect={handleCardSelect}
+          />
+          <div className="flex-1 overflow-y-auto bg-card dark:bg-card-dark">
+            <BillErrorState error={error} />
+          </div>
+        </div>
+        <MobileBottomNav
+          onNewTransaction={() => setIsFabModalOpen(true)}
+          onMenuOpen={() => setIsSidebarOpen(true)}
+        />
+        <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
+      </>
+    );
+  }
+
+  if (!currentBill) {
+    return (
+      <>
+        <div className="flex flex-col h-screen bg-background dark:bg-background-dark overflow-hidden pb-20 lg:pb-0">
+          <CreditCardBillHeader
+            creditCard={creditCard}
+            creditCards={creditCards ?? []}
+            onCardSelect={handleCardSelect}
+          />
+          <BillNavigation
+            month={currentMonth}
+            onPreviousMonth={goToPreviousMonth}
+            onNextMonth={goToNextMonth}
+            canGoPrevious={canGoPrevious}
+            canGoNext={canGoNext}
+          />
+          <div className="flex-1 overflow-y-auto bg-card dark:bg-card-dark">
+            <BillEmptyState />
+          </div>
+        </div>
+        <MobileBottomNav
+          onNewTransaction={() => setIsFabModalOpen(true)}
+          onMenuOpen={() => setIsSidebarOpen(true)}
+        />
+        <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="flex flex-col h-screen bg-background dark:bg-background-dark overflow-hidden pb-20 lg:pb-0">
+        <CreditCardBillHeader
+          creditCard={creditCard}
+          creditCards={creditCards ?? []}
+          onCardSelect={handleCardSelect}
+        />
+
+        <BillNavigation
+          month={currentMonth}
+          onPreviousMonth={goToPreviousMonth}
+          onNextMonth={goToNextMonth}
+          canGoPrevious={canGoPrevious}
+          canGoNext={canGoNext}
+        />
+
+        <div className="flex-1 overflow-y-auto bg-card dark:bg-card-dark">
+          <BillSummary
+            dueDate={currentBill.dueDate}
+            status={currentBill.status}
+            total={currentBill.total}
+          />
+
+          <BillTransactionList
+            transactions={currentBill.transactions}
+            isLoadingMore={isLoadingMore}
+            hasMore={hasMore}
+            onLoadMore={loadMore}
+          />
+        </div>
+      </div>
+
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+      <MobileBottomNav
+        onNewTransaction={() => setIsFabModalOpen(true)}
+        onMenuOpen={() => setIsSidebarOpen(true)}
+      />
+
+      <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
+    </>
+  );
+}

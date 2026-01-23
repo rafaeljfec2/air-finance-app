@@ -283,3 +283,101 @@ export const getExtracts = async (
   // Fallback: try to normalize as single extract
   return [normalizeExtract(data)];
 };
+
+export const getExtractsPaginated = async (
+  companyId: string,
+  startDate: string,
+  endDate: string,
+  accountId?: string,
+  pagination?: { page: number; limit: number },
+): Promise<{
+  data: ExtractResponse[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    totalAmount: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+}> => {
+  const params: Record<string, string | number> = {
+    startDate,
+    endDate,
+    page: pagination?.page ?? 1,
+    limit: pagination?.limit ?? 10,
+  };
+
+  if (accountId) {
+    params.accountId = accountId;
+  }
+
+  const response = await apiClient.get(`/companies/${companyId}/transactions/extracts`, {
+    params,
+  });
+
+  const data = response.data;
+
+  // Check if response is in paginated format
+  if (data && data.pagination && Array.isArray(data.data)) {
+    return {
+      data: data.data.map((item: unknown) => normalizeExtract(item)),
+      pagination: {
+        ...data.pagination,
+        totalAmount: data.pagination.totalAmount ?? 0,
+      },
+    };
+  }
+
+  // Fallback: if backend doesn't support pagination yet, paginate on client side
+  if (Array.isArray(data)) {
+    const normalized = data.map((item) => normalizeExtract(item));
+    const total = normalized.length;
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
+    const totalPages = Math.ceil(total / limit);
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedData = normalized.slice(startIndex, endIndex);
+
+    // Calculate total amount from all transactions (only negative amounts - expenses)
+    const totalAmount = normalized
+      .flatMap((extract) => extract.transactions)
+      .filter((tx) => tx.amount < 0)
+      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+
+    return {
+      data: paginatedData,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        totalAmount,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
+
+  // Single extract fallback
+  const normalized = isSingleExtractObject(data) ? [normalizeExtract(data)] : [normalizeExtract(data)];
+  const totalAmount = normalized
+    .flatMap((extract) => extract.transactions)
+    .filter((tx) => tx.amount < 0)
+    .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+
+  return {
+    data: normalized,
+    pagination: {
+      page: 1,
+      limit: normalized.length,
+      total: normalized.length,
+      totalPages: 1,
+      totalAmount,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  };
+};

@@ -1,6 +1,7 @@
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { usePreferencesStore } from '@/stores/preferences';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
 import { HomeHeader } from './components/HomeHeader';
 import { MonthlySummaryBar } from './components/MonthlySummaryBar';
@@ -8,10 +9,16 @@ import { QuickActionsGrid } from './components/QuickActionsGrid';
 import { RecentTransactionsList } from './components/RecentTransactionsList';
 import { createQuickActions } from './constants/quickActions';
 import { useHomePageData } from './hooks/useHomePageData';
+import { useCreditCards } from '@/hooks/useCreditCards';
+import { useCompanyStore } from '@/stores/company';
 
 export function HomePage() {
   const { isPrivacyModeEnabled, togglePrivacyMode } = usePreferencesStore();
   const [isTypeModalOpen, setIsTypeModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id ?? '';
+  const { creditCards } = useCreditCards(companyId);
 
   const {
     balance,
@@ -25,7 +32,15 @@ export function HomePage() {
     summaryQuery,
   } = useHomePageData();
 
-  const quickActions = createQuickActions(() => setIsTypeModalOpen(true));
+  const handleCreditCardClick = () => {
+    if (creditCards && creditCards.length > 0) {
+      navigate(`/credit-cards/${creditCards[0].id}/bills`);
+    } else {
+      navigate('/credit-cards');
+    }
+  };
+
+  const quickActions = createQuickActions(() => setIsTypeModalOpen(true), handleCreditCardClick);
 
   return (
     <ViewDefault>

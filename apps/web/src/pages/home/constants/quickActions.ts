@@ -10,7 +10,10 @@ export interface QuickAction {
   onClick?: () => void;
 }
 
-export const createQuickActions = (onNewTransactionClick: () => void): QuickAction[] => [
+export const createQuickActions = (
+  onNewTransactionClick: () => void,
+  onCreditCardClick?: () => void,
+): QuickAction[] => [
   {
     label: 'Novo Lançamento',
     icon: Plus,
@@ -21,7 +24,13 @@ export const createQuickActions = (onNewTransactionClick: () => void): QuickActi
       'col-span-2 bg-primary-50 dark:bg-primary-900/10 border-primary-100 dark:border-primary-900/20',
   },
   { label: 'Contas', icon: Wallet, href: '/accounts', color: 'bg-purple-500' },
-  { label: 'Cartão de Crédito', icon: CreditCard, href: '/credit-cards', color: 'bg-indigo-500' },
+  {
+    label: 'Cartão de Crédito',
+    icon: CreditCard,
+    href: '/credit-cards',
+    onClick: onCreditCardClick,
+    color: 'bg-indigo-500',
+  },
   { label: 'Extrato', icon: Import, href: '/import-ofx', color: 'bg-green-500' },
   { label: 'Metas', icon: Flag, href: '/goals', color: 'bg-amber-500' },
   {

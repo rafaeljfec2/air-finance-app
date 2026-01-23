@@ -54,12 +54,16 @@ export function CreditCardsSection({
 
                 return (
                   <div key={card.id} className="space-y-2">
-                    <div
-                      className="relative overflow-hidden rounded-xl p-4"
-                      style={{
-                        background: `linear-gradient(135deg, ${card.color} 0%, ${card.color}dd 100%)`,
-                      }}
+                    <Link
+                      to={`/credit-cards/${card.id}/bills`}
+                      className="block"
                     >
+                      <div
+                        className="relative overflow-hidden rounded-xl p-4 cursor-pointer hover:opacity-90 transition-opacity"
+                        style={{
+                          background: `linear-gradient(135deg, ${card.color} 0%, ${card.color}dd 100%)`,
+                        }}
+                      >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <div
@@ -130,6 +134,7 @@ export function CreditCardsSection({
                         </p>
                       </div>
                     </div>
+                    </Link>
                   </div>
                 );
               })}
