@@ -127,7 +127,12 @@ export interface AuthResponse {
 export const login = async (data: LoginData): Promise<AuthResponse> => {
   try {
     const validatedData = LoginSchema.parse(data);
-    const response = await apiClient.post<{ user: ApiUser; token: string; refreshToken?: string; expiresIn?: number }>('/auth/login', validatedData);
+    const response = await apiClient.post<{
+      user: ApiUser;
+      token: string;
+      refreshToken?: string;
+      expiresIn?: number;
+    }>('/auth/login', validatedData);
     return {
       ...response.data,
       user: mapApiUserToUser(response.data.user),
@@ -141,7 +146,12 @@ export const login = async (data: LoginData): Promise<AuthResponse> => {
 export const register = async (data: RegisterData): Promise<AuthResponse> => {
   try {
     const validatedData = RegisterSchema.parse(data);
-    const response = await apiClient.post<{ user: ApiUser; token: string; refreshToken?: string; expiresIn?: number }>('/auth/register', validatedData);
+    const response = await apiClient.post<{
+      user: ApiUser;
+      token: string;
+      refreshToken?: string;
+      expiresIn?: number;
+    }>('/auth/register', validatedData);
     return {
       ...response.data,
       user: mapApiUserToUser(response.data.user),
@@ -195,7 +205,12 @@ export const getCurrentUser = async (): Promise<UserType> => {
 // Refresh Token
 export const refreshToken = async (refreshTokenValue: string): Promise<AuthResponse> => {
   try {
-    const response = await apiClient.post<{ user: ApiUser; token: string; refreshToken?: string; expiresIn?: number }>('/auth/refresh-token', {
+    const response = await apiClient.post<{
+      user: ApiUser;
+      token: string;
+      refreshToken?: string;
+      expiresIn?: number;
+    }>('/auth/refresh-token', {
       refreshToken: refreshTokenValue,
     });
     return {

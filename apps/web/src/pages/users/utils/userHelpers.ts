@@ -26,10 +26,10 @@ export function getRoleBadgeColor(role: UserRole | string): string {
       return 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30';
     case UserRole.EDITOR:
     case 'editor':
-        return 'bg-teal-500/20 text-teal-400 border-teal-500/30';
+      return 'bg-teal-500/20 text-teal-400 border-teal-500/30';
     case UserRole.VIEWER:
     case 'viewer':
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+      return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     default:
       return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
   }

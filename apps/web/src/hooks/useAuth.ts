@@ -89,19 +89,19 @@ export const useAuth = () => {
       queryClient.removeQueries({ queryKey: ['companies'] });
       setUser(null);
       setToken(null);
-      
+
       // SECURITY FIX: Clear ALL company stores to prevent data leaks between users
       // Clear old company store (if still in use)
       useCompanyStore.getState().clearActiveCompany();
-      
+
       // Clear company context store
       useCompanyContext.getState().setCompanyId('');
       useCompanyContext.getState().setCompanies([]);
-      
+
       // Fallback: Manually remove from localStorage to ensure complete cleanup
       localStorage.removeItem('company-storage');
       localStorage.removeItem('@air-finance:company');
-      
+
       navigate('/');
     },
   });

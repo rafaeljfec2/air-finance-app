@@ -1,7 +1,16 @@
 import { cn } from '@/lib/utils';
 import { User } from '@/services/userService';
 import { UserRole, UserStatus } from '@/types/user';
-import { CheckCircle2, Mail, XCircle, User as UserIcon, MoreVertical, Edit, Trash2, Shield } from 'lucide-react';
+import {
+  CheckCircle2,
+  Mail,
+  XCircle,
+  User as UserIcon,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Shield,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
@@ -47,9 +56,7 @@ export function UserCard({
             {/* E-mail */}
             <div className="flex items-center gap-1.5 mb-2">
               <Mail className="h-3 w-3 text-gray-400 shrink-0" />
-              <p className="text-[11px] text-gray-600 dark:text-gray-400 truncate">
-                {user.email}
-              </p>
+              <p className="text-[11px] text-gray-600 dark:text-gray-400 truncate">{user.email}</p>
             </div>
 
             {/* Badges em Grid */}

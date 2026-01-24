@@ -44,7 +44,13 @@ interface LoadingStateProps {
 }
 
 interface ConnectionStatusIndicatorProps {
-  readonly status: 'connecting' | 'connected' | 'error' | 'reconnecting' | 'disconnected' | 'closed';
+  readonly status:
+    | 'connecting'
+    | 'connected'
+    | 'error'
+    | 'reconnecting'
+    | 'disconnected'
+    | 'closed';
   readonly message?: string;
 }
 
@@ -235,8 +241,8 @@ function WaitingUserInputCard({
             )}
             <div className="pt-2 border-t border-blue-200 dark:border-blue-800">
               <p className="text-xs text-blue-800 dark:text-blue-200">
-                Complete a autenticação no site do banco. Após autenticar, volte para esta página
-                e aguarde a conexão ser estabelecida.
+                Complete a autenticação no site do banco. Após autenticar, volte para esta página e
+                aguarde a conexão ser estabelecida.
               </p>
             </div>
           </>
@@ -251,10 +257,7 @@ function WaitingUserInputCard({
   );
 }
 
-function ConnectionStatusIndicator({
-  status,
-  message,
-}: Readonly<ConnectionStatusIndicatorProps>) {
+function ConnectionStatusIndicator({ status, message }: Readonly<ConnectionStatusIndicatorProps>) {
   const statusConfig = useMemo(() => {
     switch (status) {
       case 'connected':
@@ -414,16 +417,14 @@ function OAuthWaitingStep({
         />
       )}
 
-      {!isConnectedOrSyncing &&
-        status !== 'WAITING_USER_INPUT' &&
-        status !== 'PENDING' && (
-          <StatusCard
-            icon={Clock}
-            title="Processando conexão..."
-            description="Aguarde enquanto processamos sua conexão. Você será notificado quando estiver concluída."
-            variant="gray"
-          />
-        )}
+      {!isConnectedOrSyncing && status !== 'WAITING_USER_INPUT' && status !== 'PENDING' && (
+        <StatusCard
+          icon={Clock}
+          title="Processando conexão..."
+          description="Aguarde enquanto processamos sua conexão. Você será notificado quando estiver concluída."
+          variant="gray"
+        />
+      )}
 
       {shouldShowSseIndicator && (
         <ConnectionStatusIndicator

@@ -8,11 +8,7 @@ import { getCurrentUser } from '@/services/authService';
 import { updateUser } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
 import { mapUserServiceToUserType } from '@/utils/userMapper';
-import {
-    Bell,
-    ChevronLeft,
-    Save
-} from 'lucide-react';
+import { Bell, ChevronLeft, Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,7 +17,7 @@ export function NotificationsPage() {
   const { user, setUser } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  
+
   const [notifications, setNotifications] = useState({
     email: true,
     push: true,
@@ -63,7 +59,7 @@ export function NotificationsPage() {
     setIsSaving(true);
     try {
       const updateData = {
-        notifications: { ...notifications }
+        notifications: { ...notifications },
       };
 
       const updatedUser = await updateUser(user.id, updateData);
@@ -74,8 +70,8 @@ export function NotificationsPage() {
         type: 'success',
       });
     } catch (error) {
-       console.error(error);
-       toast({
+      console.error(error);
+      toast({
         title: 'Erro',
         description: 'Erro ao salvar notificações',
         type: 'error',
@@ -86,11 +82,11 @@ export function NotificationsPage() {
   };
 
   const labels: Record<string, string> = {
-      email: 'Notificações por Email',
-      push: 'Notificações Push',
-      updates: 'Atualizações do Sistema',
-      marketing: 'Novidades e Promoções',
-      security: 'Alertas de Segurança'
+    email: 'Notificações por Email',
+    push: 'Notificações Push',
+    updates: 'Atualizações do Sistema',
+    marketing: 'Novidades e Promoções',
+    security: 'Alertas de Segurança',
   };
 
   return (
@@ -108,38 +104,45 @@ export function NotificationsPage() {
 
         <div className="max-w-3xl mx-auto">
           <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark p-6">
-           {isLoading ? (
-             <div className="flex justify-center py-8"><Spinner className="text-primary-500" /></div>
-           ) : (
-             <div className="space-y-6">
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <Spinner className="text-primary-500" />
+              </div>
+            ) : (
+              <div className="space-y-6">
                 {Object.entries(notifications).map(([key, value]) => (
-                    <div key={key} className="flex items-center justify-between border-b border-border dark:border-border-dark pb-4 last:border-0 last:pb-0">
-                        <div>
-                            <p className="font-medium text-text dark:text-text-dark">{labels[key] || key}</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                {value ? 'Ativado' : 'Desativado'}
-                            </p>
-                        </div>
-                        <Switch 
-                            checked={Boolean(value)}
-                            onCheckedChange={() => toggleNotification(key as keyof typeof notifications)}
-                        />
+                  <div
+                    key={key}
+                    className="flex items-center justify-between border-b border-border dark:border-border-dark pb-4 last:border-0 last:pb-0"
+                  >
+                    <div>
+                      <p className="font-medium text-text dark:text-text-dark">
+                        {labels[key] || key}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {value ? 'Ativado' : 'Desativado'}
+                      </p>
                     </div>
+                    <Switch
+                      checked={Boolean(value)}
+                      onCheckedChange={() => toggleNotification(key as keyof typeof notifications)}
+                    />
+                  </div>
                 ))}
 
                 <div className="pt-4 flex justify-end">
-                  <Button 
-                    onClick={handleSave} 
+                  <Button
+                    onClick={handleSave}
                     disabled={isSaving}
                     variant="success"
                     className="gap-2"
                   >
-                    {isSaving ? <Spinner size="sm"/> : <Save className="w-4 h-4" />}
+                    {isSaving ? <Spinner size="sm" /> : <Save className="w-4 h-4" />}
                     Salvar Alterações
                   </Button>
                 </div>
-             </div>
-           )}
+              </div>
+            )}
           </Card>
         </div>
       </div>
