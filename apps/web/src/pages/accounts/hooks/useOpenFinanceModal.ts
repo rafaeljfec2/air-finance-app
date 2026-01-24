@@ -5,8 +5,10 @@ import {
   getConnectors,
   createItem,
   resyncItem,
+  getItems,
   type OpeniConnector,
   type OpeniItemResponse,
+  type OpeniItem,
 } from '@/services/openiService';
 import { createAccount, type CreateAccount } from '@/services/accountService';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -20,7 +22,7 @@ interface UseOpenFinanceModalProps {
   open?: boolean;
 }
 
-type ModalStep = 'cpf-input' | 'connector-selection' | 'creating-item' | 'oauth-waiting';
+type ModalStep = 'existing-connections' | 'cpf-input' | 'connector-selection' | 'creating-item' | 'oauth-waiting';
 
 interface ErrorResponse {
   status?: number;
@@ -272,11 +274,33 @@ export function useOpenFinanceModal({
   const [createdAccountId, setCreatedAccountId] = useState<string | null>(null);
   const [createdItemId, setCreatedItemId] = useState<string | null>(null);
 
+  const {
+    data: existingItems,
+    isLoading: isLoadingExistingItems,
+  } = useQuery<OpeniItem[]>({
+    queryKey: ['openi-items', companyId],
+    queryFn: () => getItems(companyId),
+    enabled: !!companyId && !!open && !!openiTenantId,
+    staleTime: 30 * 1000,
+    retry: false,
+  });
+
   useEffect(() => {
     if (open) {
       const hasOpeniTenant = openiTenantId && openiTenantId.trim() !== '';
-      const newStep: ModalStep = hasOpeniTenant ? 'connector-selection' : 'cpf-input';
-      setStep(newStep);
+      
+      if (hasOpeniTenant && !isLoadingExistingItems) {
+        if (existingItems && existingItems.length > 0) {
+          setStep('existing-connections');
+        } else {
+          setStep('cpf-input');
+        }
+      } else if (hasOpeniTenant && isLoadingExistingItems) {
+        setStep('cpf-input');
+      } else {
+        setStep('cpf-input');
+      }
+      
       if (companyDocument) {
         setCpfCnpj(companyDocument);
       }
@@ -290,7 +314,7 @@ export function useOpenFinanceModal({
       setCreatedAccountId(null);
       setCreatedItemId(null);
     }
-  }, [open, openiTenantId, companyDocument]);
+  }, [open, openiTenantId, companyDocument, existingItems, isLoadingExistingItems]);
 
   const getDocumentType = useCallback((): 'CPF' | 'CNPJ' | undefined => {
     if (!cpfCnpj) return undefined;
@@ -550,6 +574,18 @@ export function useOpenFinanceModal({
     window.open(authUrl, '_blank');
   }, []);
 
+  const handleAddAnotherConnection = useCallback(() => {
+    setStep('cpf-input');
+  }, []);
+
+  const handleCancel = useCallback(() => {
+    setStep('cpf-input');
+    setCpfCnpj('');
+    setSelectedConnector(null);
+    setCreatedAccountId(null);
+    setCreatedItemId(null);
+  }, []);
+
   const handleClose = useCallback(() => {
     setStep('cpf-input');
     setCpfCnpj('');
@@ -567,6 +603,8 @@ export function useOpenFinanceModal({
     selectedConnector,
     createdAccountId,
     createdItemId,
+    existingItems: existingItems ?? [],
+    isLoadingExistingItems,
     itemStatus: lastEvent
       ? ({
           id: lastEvent.itemId,
@@ -585,6 +623,8 @@ export function useOpenFinanceModal({
     handleConnectorSearch,
     handleSelectConnector,
     handleOpenAuthUrl,
+    handleAddAnotherConnection,
+    handleCancel,
     handleClose,
     validateCpfCnpj,
   };

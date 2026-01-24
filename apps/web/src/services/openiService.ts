@@ -145,3 +145,37 @@ export const resyncItem = async (
     throw parseApiError(error);
   }
 };
+
+const OpeniItemSchema = z.object({
+  itemId: z.string(),
+  connectorId: z.string(),
+  connectorName: z.string().nullable(),
+  connectorType: z.string(),
+  connectorImageUrl: z.string().nullable(),
+  status: z.string(),
+  isActive: z.boolean(),
+  authUrl: z.string().nullable(),
+  authExpiresAt: z.string().nullable(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+const OpeniItemsResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.object({
+    items: z.array(OpeniItemSchema),
+  }),
+});
+
+export type OpeniItem = z.infer<typeof OpeniItemSchema>;
+
+export const getItems = async (companyId: string): Promise<OpeniItem[]> => {
+  try {
+    const response = await apiClient.get<{ success: boolean; data: { items: OpeniItem[] } }>(
+      `/companies/${companyId}/banking/openi/items`,
+    );
+    return OpeniItemsResponseSchema.parse(response.data).data.items;
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
