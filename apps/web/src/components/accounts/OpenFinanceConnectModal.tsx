@@ -1,3 +1,4 @@
+import { type ChangeEvent } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,10 +22,6 @@ interface OpenFinanceConnectModalProps {
   onSuccess?: () => void;
 }
 
-interface ModalHeaderProps {
-  isLoading: boolean;
-}
-
 interface CpfInputStepProps {
   cpfCnpj: string;
   onCpfCnpjChange: (value: string) => void;
@@ -32,7 +29,7 @@ interface CpfInputStepProps {
   validateCpfCnpj: (value: string) => boolean;
 }
 
-function ModalHeader({ isLoading }: Readonly<Omit<ModalHeaderProps, 'onClose'>>) {
+function ModalHeader() {
   return (
     <div className="flex items-center gap-3 px-6 pt-4 pb-3 border-b border-border dark:border-border-dark flex-shrink-0">
       <div className="p-2 rounded-lg bg-purple-500/10 dark:bg-purple-400/10">
@@ -64,7 +61,7 @@ function CpfInputStep({
     return cleaned.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, '');
     onCpfCnpjChange(value);
   };
@@ -170,7 +167,7 @@ export function OpenFinanceConnectModal({
       className={modalClassName}
     >
       <div className="flex flex-col min-h-0">
-        <ModalHeader isLoading={isLoading} />
+        <ModalHeader />
 
         <div className="px-6 py-4 min-h-0 flex-1 overflow-y-auto">
           {step === 'cpf-input' && (

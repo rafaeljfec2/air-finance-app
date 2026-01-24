@@ -166,7 +166,7 @@ export function useOpenFinanceModal({
     setStep('connector-selection');
   }, [cpfCnpj, validateCpfCnpj]);
 
-  const handleConnectorSearch = useCallback((_query: string) => {
+  const handleConnectorSearch = useCallback(() => {
     // Search is handled locally by OpeniConnectorSelector component
   }, []);
 

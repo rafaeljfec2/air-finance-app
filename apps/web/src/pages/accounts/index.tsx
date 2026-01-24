@@ -13,7 +13,6 @@ import { Account, CreateAccount } from '@/services/accountService';
 import { useCompanyStore } from '@/stores/company';
 import { companyService } from '@/services/companyService';
 import { useMemo, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AccountsEmptyState } from './components/AccountsEmptyState';
 import { AccountsErrorState } from './components/AccountsErrorState';
 import { AccountsFilters } from './components/AccountsFilters';
@@ -23,7 +22,6 @@ import { useAccountFilters } from './hooks/useAccountFilters';
 import { useAccountSorting } from './hooks/useAccountSorting';
 
 export function AccountsPage() {
-  const navigate = useNavigate();
   const {
     accounts,
     isLoading,
