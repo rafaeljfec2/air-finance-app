@@ -58,7 +58,7 @@ export function useOpenFinanceModal({
 
   const getDocumentType = useCallback((): 'CPF' | 'CNPJ' | undefined => {
     if (!cpfCnpj) return undefined;
-    const cleaned = cpfCnpj.replace(/\D/g, '');
+    const cleaned = cpfCnpj.replaceAll(/\D/g, '');
     if (cleaned.length === 11) return 'CPF';
     if (cleaned.length === 14) return 'CNPJ';
     return undefined;
@@ -72,9 +72,7 @@ export function useOpenFinanceModal({
     queryKey: ['openi-connectors', companyId, getDocumentType()],
     queryFn: () => getConnectors(companyId, undefined, getDocumentType()),
     enabled:
-      !!companyId &&
-      step === 'connector-selection' &&
-      (!!getDocumentType() || !!openiTenantId),
+      !!companyId && step === 'connector-selection' && (!!getDocumentType() || !!openiTenantId),
     staleTime: 5 * 60 * 1000,
   });
 
@@ -149,12 +147,12 @@ export function useOpenFinanceModal({
   });
 
   const validateCpfCnpj = useCallback((value: string): boolean => {
-    const cleaned = value.replace(/\D/g, '');
+    const cleaned = value.replaceAll(/\D/g, '');
     return cleaned.length === 11 || cleaned.length === 14;
   }, []);
 
   const handleCpfCnpjChange = useCallback((value: string) => {
-    const cleaned = value.replace(/\D/g, '');
+    const cleaned = value.replaceAll(/\D/g, '');
     setCpfCnpj(cleaned);
   }, []);
 
@@ -179,9 +177,7 @@ export function useOpenFinanceModal({
         let accountId = createdAccountId;
 
         if (!accountId) {
-          const existingAccount = accounts?.find(
-            (acc) => !acc.openiItemId && acc.bankingTenantId,
-          );
+          const existingAccount = accounts?.find((acc) => !acc.openiItemId && acc.bankingTenantId);
 
           if (existingAccount) {
             accountId = existingAccount.id;

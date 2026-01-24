@@ -54,7 +54,7 @@ function CpfInputStep({
   validateCpfCnpj,
 }: Readonly<CpfInputStepProps>) {
   const formatCpfCnpj = (value: string): string => {
-    const cleaned = value.replace(/\D/g, '');
+    const cleaned = value.replaceAll(/\D/g, '');
     if (cleaned.length <= 11) {
       return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
     }
@@ -62,7 +62,7 @@ function CpfInputStep({
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, '');
+    const value = e.target.value.replaceAll(/\D/g, '');
     onCpfCnpjChange(value);
   };
 
@@ -199,9 +199,7 @@ export function OpenFinanceConnectModal({
             </div>
           )}
 
-          {step === 'creating-item' && (
-            <LoadingState message="Criando conexão com o banco..." />
-          )}
+          {step === 'creating-item' && <LoadingState message="Criando conexão com o banco..." />}
 
           {step === 'oauth-waiting' && itemStatus && (
             <div className="space-y-4">
