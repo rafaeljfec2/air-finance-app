@@ -188,6 +188,7 @@ export function useOpenFinanceModal({
             setCreatedAccountId(accountId);
           } else {
             const newAccount = await createAccountMutation.mutateAsync({
+              companyId,
               name: `${connector.name} - Open Finance`,
               type: 'checking',
               institution: connector.name,
@@ -198,6 +199,7 @@ export function useOpenFinanceModal({
               initialBalanceDate: new Date().toISOString(),
               useInitialBalanceInExtract: true,
               useInitialBalanceInCashFlow: true,
+              hasBankingIntegration: false,
             });
             accountId = newAccount.id;
             setCreatedAccountId(accountId);
@@ -220,6 +222,7 @@ export function useOpenFinanceModal({
       }
     },
     [
+      companyId,
       cpfCnpj,
       companyDocument,
       createdAccountId,
