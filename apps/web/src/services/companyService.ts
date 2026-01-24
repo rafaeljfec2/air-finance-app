@@ -96,6 +96,7 @@ export const CompanySchema = z.object({
   notes: z.string().optional(),
   userIds: z.array(z.string()),
   pierreFinanceTenantId: z.string().optional(),
+  openiTenantId: z.string().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });

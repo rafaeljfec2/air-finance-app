@@ -11,6 +11,7 @@ export interface Company {
   notes?: string;
   userIds: string[];
   pierreFinanceTenantId?: string;
+  openiTenantId?: string;
   createdAt: string;
   updatedAt: string;
 }

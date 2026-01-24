@@ -59,6 +59,10 @@ export function AccountsPage() {
   const [schedulingAccount, setSchedulingAccount] = useState<Account | null>(null);
   const [showPierreModal, setShowPierreModal] = useState(false);
   const [showOpenFinanceModal, setShowOpenFinanceModal] = useState(false);
+  const [openFinanceCompanyData, setOpenFinanceCompanyData] = useState<{
+    openiTenantId?: string;
+    companyDocument?: string;
+  } | null>(null);
   const [viewMode, setViewMode] = useViewMode('accounts-view-mode');
 
   const {
@@ -137,8 +141,28 @@ export function AccountsPage() {
     setShowPierreModal(true);
   };
 
-  const handleConnectOpenFinance = () => {
-    setShowOpenFinanceModal(true);
+  const handleConnectOpenFinance = async () => {
+    if (activeCompany?.id) {
+      try {
+        const company = await companyService.getById(activeCompany.id);
+        setActiveCompany(company);
+        setOpenFinanceCompanyData({
+          openiTenantId: company.openiTenantId,
+          companyDocument: company.cnpj,
+        });
+        setShowOpenFinanceModal(true);
+      } catch (err) {
+        console.error('Failed to refresh company data:', err);
+        setOpenFinanceCompanyData({
+          openiTenantId: activeCompany.openiTenantId,
+          companyDocument: activeCompany.cnpj,
+        });
+        setShowOpenFinanceModal(true);
+      }
+    } else {
+      setOpenFinanceCompanyData(null);
+      setShowOpenFinanceModal(true);
+    }
   };
 
   const handleOpenFinanceSuccess = async () => {
@@ -287,9 +311,15 @@ export function AccountsPage() {
 
       {activeCompany && (
         <OpenFinanceConnectModal
+          key={`openi-modal-${activeCompany.id}-${openFinanceCompanyData?.openiTenantId ?? 'no-tenant'}`}
           open={showOpenFinanceModal}
-          onClose={() => setShowOpenFinanceModal(false)}
+          onClose={() => {
+            setShowOpenFinanceModal(false);
+            setOpenFinanceCompanyData(null);
+          }}
           companyId={activeCompany.id}
+          openiTenantId={openFinanceCompanyData?.openiTenantId ?? activeCompany.openiTenantId}
+          companyDocument={openFinanceCompanyData?.companyDocument ?? activeCompany.cnpj}
           onSuccess={handleOpenFinanceSuccess}
         />
       )}

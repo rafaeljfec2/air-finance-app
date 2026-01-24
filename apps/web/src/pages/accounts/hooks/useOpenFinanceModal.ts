@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
@@ -13,6 +13,8 @@ import { useAccounts } from '@/hooks/useAccounts';
 
 interface UseOpenFinanceModalProps {
   companyId: string;
+  openiTenantId?: string;
+  companyDocument?: string;
   onSuccess?: () => void;
   open?: boolean;
 }
@@ -21,16 +23,38 @@ type ModalStep = 'cpf-input' | 'connector-selection' | 'creating-item' | 'oauth-
 
 export function useOpenFinanceModal({
   companyId,
+  openiTenantId,
+  companyDocument,
   onSuccess,
   open = false,
 }: UseOpenFinanceModalProps) {
   const queryClient = useQueryClient();
   const { accounts } = useAccounts();
   const [step, setStep] = useState<ModalStep>('cpf-input');
-  const [cpfCnpj, setCpfCnpj] = useState('');
+  const [cpfCnpj, setCpfCnpj] = useState(companyDocument ?? '');
   const [selectedConnector, setSelectedConnector] = useState<OpeniConnector | null>(null);
   const [createdAccountId, setCreatedAccountId] = useState<string | null>(null);
   const [createdItemId, setCreatedItemId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      const hasOpeniTenant = openiTenantId && openiTenantId.trim() !== '';
+      const newStep: ModalStep = hasOpeniTenant ? 'connector-selection' : 'cpf-input';
+      setStep(newStep);
+      if (companyDocument) {
+        setCpfCnpj(companyDocument);
+      }
+      setSelectedConnector(null);
+      setCreatedAccountId(null);
+      setCreatedItemId(null);
+    } else {
+      setStep('cpf-input');
+      setCpfCnpj(companyDocument ?? '');
+      setSelectedConnector(null);
+      setCreatedAccountId(null);
+      setCreatedItemId(null);
+    }
+  }, [open, openiTenantId, companyDocument]);
 
   const getDocumentType = useCallback((): 'CPF' | 'CNPJ' | undefined => {
     if (!cpfCnpj) return undefined;
@@ -47,7 +71,10 @@ export function useOpenFinanceModal({
   } = useQuery<OpeniConnector[]>({
     queryKey: ['openi-connectors', companyId, getDocumentType()],
     queryFn: () => getConnectors(companyId, undefined, getDocumentType()),
-    enabled: !!companyId && step === 'connector-selection' && !!getDocumentType(),
+    enabled:
+      !!companyId &&
+      step === 'connector-selection' &&
+      (!!getDocumentType() || !!openiTenantId),
     staleTime: 5 * 60 * 1000,
   });
 
@@ -179,12 +206,13 @@ export function useOpenFinanceModal({
 
         const cpfField = connector.rules.find((r) => r.field === 'cpf' || r.field === 'document');
         const fieldName = cpfField?.field ?? 'cpf';
+        const documentToUse = cpfCnpj || companyDocument || '';
 
         await createItemMutation.mutateAsync({
           accountId,
           connectorId: connector.id,
           parameters: {
-            [fieldName]: cpfCnpj,
+            [fieldName]: documentToUse,
           },
         });
       } catch (error) {
@@ -193,6 +221,7 @@ export function useOpenFinanceModal({
     },
     [
       cpfCnpj,
+      companyDocument,
       createdAccountId,
       accounts,
       createAccountMutation,

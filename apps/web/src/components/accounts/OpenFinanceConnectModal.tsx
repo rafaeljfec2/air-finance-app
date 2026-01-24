@@ -16,6 +16,8 @@ interface OpenFinanceConnectModalProps {
   open: boolean;
   onClose: () => void;
   companyId: string;
+  openiTenantId?: string;
+  companyDocument?: string;
   onSuccess?: () => void;
 }
 
@@ -114,6 +116,8 @@ export function OpenFinanceConnectModal({
   open,
   onClose,
   companyId,
+  openiTenantId,
+  companyDocument,
   onSuccess,
 }: Readonly<OpenFinanceConnectModalProps>) {
   const {
@@ -136,6 +140,8 @@ export function OpenFinanceConnectModal({
     validateCpfCnpj,
   } = useOpenFinanceModal({
     companyId,
+    openiTenantId,
+    companyDocument,
     onSuccess: () => {
       handleClose();
       onSuccess?.();
