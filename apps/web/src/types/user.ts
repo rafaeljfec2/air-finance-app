@@ -1,14 +1,18 @@
-export type UserRole =
-  | 'god'
-  | 'admin'
-  | 'user'
-  | 'sys_admin'
-  | 'operator'
-  | 'owner'
-  | 'editor'
-  | 'viewer';
+export enum UserRole {
+  GOD = 'god',
+  ADMIN = 'admin',
+  USER = 'user',
+  SYS_ADMIN = 'sys_admin',
+  OPERATOR = 'operator',
+  OWNER = 'owner',
+  EDITOR = 'editor',
+  VIEWER = 'viewer',
+}
 
-export type UserStatus = 'active' | 'inactive';
+export enum UserStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+}
 
 export interface UserNotifications {
   email: boolean;
@@ -18,10 +22,29 @@ export interface UserNotifications {
   security: boolean;
 }
 
-export type UserCurrency = 'BRL' | 'USD' | 'EUR';
-export type UserLanguage = 'pt-BR' | 'en-US' | 'es-ES';
-export type UserTheme = 'light' | 'dark' | 'system';
-export type UserDateFormat = 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
+export enum UserCurrency {
+  BRL = 'BRL',
+  USD = 'USD',
+  EUR = 'EUR',
+}
+
+export enum UserLanguage {
+  PT_BR = 'pt-BR',
+  EN_US = 'en-US',
+  ES_ES = 'es-ES',
+}
+
+export enum UserTheme {
+  LIGHT = 'light',
+  DARK = 'dark',
+  SYSTEM = 'system',
+}
+
+export enum UserDateFormat {
+  DD_MM_YYYY = 'DD/MM/YYYY',
+  MM_DD_YYYY = 'MM/DD/YYYY',
+  YYYY_MM_DD = 'YYYY-MM-DD',
+}
 
 export interface UserPreferences {
   currency: UserCurrency;
@@ -30,12 +53,23 @@ export interface UserPreferences {
   dateFormat: UserDateFormat;
 }
 
+export enum OpenaiModel {
+  GPT_3_5_TURBO = 'gpt-3.5-turbo',
+  GPT_4 = 'gpt-4',
+  GPT_4_TURBO = 'gpt-4-turbo',
+  GPT_5_2 = 'gpt-5.2',
+  GPT_5_MINI = 'gpt-5-mini',
+}
 export interface UserIntegrations {
   openaiApiKey?: string;
-  openaiModel?: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo' | 'gpt-5.2' | 'gpt-5-mini';
+  openaiModel?: OpenaiModel;
 }
 
-export type UserPlan = 'free' | 'pro' | 'business';
+export enum UserPlan {
+  FREE = 'free',
+  PRO = 'pro',
+  BUSINESS = 'business',
+}
 
 export type User = {
   id: string;

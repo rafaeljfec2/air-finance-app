@@ -149,8 +149,11 @@ const handleItemStatus = (
   if (status === 'waiting_user_input' && itemData.auth?.authUrl) {
     window.open(itemData.auth.authUrl, '_blank');
     toast.info('Redirecionando para autenticação...');
-  } else if (status === 'connected') {
-    toast.success('Conexão já existe e está ativa!');
+  } else if (status === 'connected' || status === 'syncing') {
+    const message = status === 'syncing' 
+      ? 'Conexão estabelecida! Sincronizando contas...' 
+      : 'Conexão já existe e está ativa!';
+    toast.success(message);
     queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
     onSuccess?.();
   } else if (status === 'out_of_sync') {
@@ -352,8 +355,11 @@ export function useOpenFinanceModal({
         } else {
           console.warn('[OpenFinanceModal] No authUrl found in item');
         }
-      } else if (item.status === 'CONNECTED' || item.status === 'connected') {
-        toast.success('Conexão estabelecida com sucesso!');
+      } else if (item.status === 'CONNECTED' || item.status === 'connected' || item.status === 'SYNCING' || item.status === 'syncing') {
+        const message = item.status === 'SYNCING' || item.status === 'syncing'
+          ? 'Conexão estabelecida! Sincronizando contas...'
+          : 'Conexão estabelecida com sucesso!';
+        toast.success(message);
         queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
         onSuccess?.();
       }
@@ -414,9 +420,14 @@ export function useOpenFinanceModal({
         }
       }
 
-      if (status === 'connected' || event.event === 'ITEM_CONNECTED') {
-        console.log('[OpenFinanceModal] SSE: status is connected, connection established!');
-        toast.success('Conexão estabelecida com sucesso!');
+      if (status === 'connected' || status === 'syncing' || event.event === 'ITEM_CONNECTED' || (event.event === 'ITEM_UPDATED' && (status === 'connected' || status === 'syncing'))) {
+        if (status === 'syncing') {
+          console.log('[OpenFinanceModal] SSE: status is syncing, connection established and syncing accounts!');
+          toast.success('Conexão estabelecida! Sincronizando contas...');
+        } else {
+          console.log('[OpenFinanceModal] SSE: status is connected, connection established!');
+          toast.success('Conexão estabelecida com sucesso!');
+        }
         queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
         onSuccessRef.current?.();
       }

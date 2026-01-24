@@ -12,6 +12,7 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { Account, CreateAccount } from '@/services/accountService';
 import { useCompanyStore } from '@/stores/company';
 import { companyService } from '@/services/companyService';
+import { useAuthStore } from '@/stores/auth';
 import { useMemo, useState, useEffect } from 'react';
 import { AccountsEmptyState } from './components/AccountsEmptyState';
 import { AccountsErrorState } from './components/AccountsErrorState';
@@ -20,6 +21,7 @@ import { AccountsHeader } from './components/AccountsHeader';
 import { AccountsList } from './components/AccountsList';
 import { useAccountFilters } from './hooks/useAccountFilters';
 import { useAccountSorting } from './hooks/useAccountSorting';
+import { UserRole } from '@/types/user';
 
 export function AccountsPage() {
   const {
@@ -35,15 +37,20 @@ export function AccountsPage() {
   } = useAccounts();
   const { activeCompany, setActiveCompany } = useCompanyStore();
   const { canCreateAccount } = usePlanLimits();
+  const user = useAuthStore((state) => state.user);
+  const isGod = user?.role === UserRole.GOD;
 
   // Ensure documentType is loaded (fix for localStorage cache issue)
   useEffect(() => {
     if (activeCompany?.id && !activeCompany.documentType) {
-      companyService.getById(activeCompany.id).then((company) => {
-        setActiveCompany(company);
-      }).catch((err) => {
-        console.error('Failed to refresh company data:', err);
-      });
+      companyService
+        .getById(activeCompany.id)
+        .then((company) => {
+          setActiveCompany(company);
+        })
+        .catch((err) => {
+          console.error('Failed to refresh company data:', err);
+        });
     }
   }, [activeCompany?.id, activeCompany?.documentType, setActiveCompany]);
 
@@ -63,14 +70,8 @@ export function AccountsPage() {
   } | null>(null);
   const [viewMode, setViewMode] = useViewMode('accounts-view-mode');
 
-  const {
-    searchTerm,
-    setSearchTerm,
-    filterType,
-    setFilterType,
-    filterAccounts,
-    hasActiveFilters,
-  } = useAccountFilters();
+  const { searchTerm, setSearchTerm, filterType, setFilterType, filterAccounts, hasActiveFilters } =
+    useAccountFilters();
 
   const { sortConfig, handleSort, sortAccounts } = useAccountSorting();
 
@@ -181,7 +182,7 @@ export function AccountsPage() {
       try {
         const updatedCompany = await companyService.getById(activeCompany.id);
         setActiveCompany(updatedCompany);
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 200));
       } catch (err) {
         console.error('Failed to refresh company data:', err);
       }
@@ -225,11 +226,11 @@ export function AccountsPage() {
     <ViewDefault>
       <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-          <AccountsHeader 
-            onCreate={handleCreate} 
+          <AccountsHeader
+            onCreate={handleCreate}
             canCreate={canCreateAccount}
-            onConnectPierre={isPierreAvailable ? handleConnectPierre : undefined}
-            onConnectOpenFinance={handleConnectOpenFinance}
+            onConnectPierre={isGod && isPierreAvailable ? handleConnectPierre : undefined}
+            onConnectOpenFinance={isGod ? handleConnectOpenFinance : undefined}
           />
 
           <AccountsFilters
@@ -297,7 +298,7 @@ export function AccountsPage() {
         />
       )}
 
-      {isPierreAvailable && activeCompany && (
+      {isGod && isPierreAvailable && activeCompany && (
         <PierreConnectModal
           open={showPierreModal}
           onClose={() => setShowPierreModal(false)}
@@ -307,7 +308,7 @@ export function AccountsPage() {
         />
       )}
 
-      {activeCompany && (
+      {isGod && activeCompany && (
         <OpenFinanceConnectModal
           key={`openi-modal-${activeCompany.id}-${openFinanceCompanyData?.openiTenantId ?? 'no-tenant'}`}
           open={showOpenFinanceModal}
