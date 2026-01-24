@@ -7,6 +7,7 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { getCurrentUser } from '@/services/authService';
 import { updateUser } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
+import { mapUserServiceToUserType } from '@/utils/userMapper';
 import { useTheme } from '@/stores/useTheme';
 import { Calendar, ChevronLeft, DollarSign, Globe, Palette, Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -76,7 +77,7 @@ export function PreferencesPage() {
         user.id,
         updateData as unknown as Parameters<typeof updateUser>[1],
       );
-      setUser(updatedUser);
+      setUser(mapUserServiceToUserType(updatedUser));
       toast({
         title: 'Sucesso',
         description: 'Preferências atualizadas com sucesso!',

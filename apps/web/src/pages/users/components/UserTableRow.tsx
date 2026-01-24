@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { formatDateTime } from '@/utils/formatters';
-import { User, UserRole, UserStatus } from '@/services/userService';
+import { User } from '@/services/userService';
+import { UserRole, UserStatus } from '@/types/user';
 import { CheckCircle2, Edit, Mail, Shield, Trash2, XCircle } from 'lucide-react';
 
 export interface UserTableRowProps {
@@ -10,8 +11,8 @@ export interface UserTableRowProps {
   onDelete: (id: string) => void;
   isUpdating: boolean;
   isDeleting: boolean;
-  getRoleBadgeColor: (role: UserRole) => string;
-  getStatusBadgeColor: (status: UserStatus) => string;
+  getRoleBadgeColor: (role: UserRole | string) => string;
+  getStatusBadgeColor: (status: UserStatus | string) => string;
   getEmailVerifiedBadgeColor: (emailVerified: boolean | undefined) => string;
   getOnboardingCompletedBadgeColor: (onboardingCompleted: boolean | undefined) => string;
   onViewPermissions: (user: User) => void;

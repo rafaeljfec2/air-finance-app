@@ -7,6 +7,7 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { getCurrentUser } from '@/services/authService';
 import { updateUser } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
+import { mapUserServiceToUserType } from '@/utils/userMapper';
 import {
     Bell,
     ChevronLeft,
@@ -66,7 +67,7 @@ export function NotificationsPage() {
       };
 
       const updatedUser = await updateUser(user.id, updateData);
-      setUser(updatedUser);
+      setUser(mapUserServiceToUserType(updatedUser));
       toast({
         title: 'Sucesso',
         description: 'Notificações atualizadas com sucesso!',

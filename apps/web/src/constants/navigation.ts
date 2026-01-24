@@ -1,4 +1,5 @@
 import { NavigationSection } from '@/types/navigation';
+import { UserRole } from '@/types/user';
 import {
   ArrowRightLeft,
   Banknote,
@@ -81,8 +82,8 @@ export const navigation: NavigationSection[] = [
           { name: 'Perfil do Usuário', href: '/profile', icon: User },
           { name: 'Preferências', href: '/settings/preferences', icon: Pencil },
           { name: 'Notificações', href: '/settings/notifications', icon: Bell },
-          { name: 'Logs OpenAI', href: '/admin/openai-logs', icon: ChartBar, roles: ['god'] },
-          { name: 'Gerenciar Planos', href: '/admin/plans', icon: CreditCard, roles: ['god'] },
+          { name: 'Logs OpenAI', href: '/admin/openai-logs', icon: ChartBar, roles: [UserRole.GOD] },
+          { name: 'Gerenciar Planos', href: '/admin/plans', icon: CreditCard, roles: [UserRole.GOD] },
           { name: 'Assinatura', href: '/settings/subscription', icon: CreditCard },
         ],
       },

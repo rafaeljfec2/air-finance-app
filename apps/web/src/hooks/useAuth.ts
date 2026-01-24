@@ -6,7 +6,6 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   LoginData,
-  User,
   getCurrentUser,
   login,
   logout,
@@ -14,6 +13,7 @@ import {
   requestPasswordRecovery,
   resetPassword,
 } from '../services/authService';
+import { User } from '@/types/user';
 import { authUtils } from '../utils/auth';
 
 export interface LoginOptions {

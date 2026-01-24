@@ -8,6 +8,7 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { getCurrentUser } from '@/services/authService';
 import { updateUser } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
+import { mapUserServiceToUserType } from '@/utils/userMapper';
 import { Bot, ChevronLeft, Eye, EyeOff, Puzzle, Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -69,7 +70,7 @@ export function IntegrationsPage() {
       };
 
       const updatedUser = await updateUser(user.id, updateData);
-      setUser(updatedUser);
+      setUser(mapUserServiceToUserType(updatedUser));
       toast({
         title: 'Sucesso',
         description: 'Integrações atualizadas com sucesso!',

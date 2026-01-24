@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
-import { User, UserRole, UserStatus } from '@/services/userService';
+import { User } from '@/services/userService';
+import { UserRole, UserStatus } from '@/types/user';
 import { CheckCircle2, Mail, XCircle, User as UserIcon, MoreVertical, Edit, Trash2, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -10,8 +11,8 @@ interface UserCardProps {
   onDelete: (id: string) => void;
   isUpdating: boolean;
   isDeleting: boolean;
-  getRoleBadgeColor: (role: UserRole) => string;
-  getStatusBadgeColor: (status: UserStatus) => string;
+  getRoleBadgeColor: (role: UserRole | string) => string;
+  getStatusBadgeColor: (status: UserStatus | string) => string;
   getEmailVerifiedBadgeColor: (emailVerified: boolean | undefined) => string;
   canDelete?: boolean;
 }

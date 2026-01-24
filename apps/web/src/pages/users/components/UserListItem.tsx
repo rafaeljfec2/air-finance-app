@@ -1,4 +1,5 @@
-import { User, UserRole, UserStatus } from '@/services/userService';
+import { User } from '@/services/userService';
+import { UserRole, UserStatus } from '@/types/user';
 import { MoreVertical, Edit, Trash2, CheckCircle2, XCircle, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -11,8 +12,8 @@ interface UserListItemProps {
   onViewPermissions?: (user: User) => void;
   isUpdating: boolean;
   isDeleting: boolean;
-  getRoleBadgeColor: (role: UserRole) => string;
-  getStatusBadgeColor: (status: UserStatus) => string;
+  getRoleBadgeColor: (role: UserRole | string) => string;
+  getStatusBadgeColor: (status: UserStatus | string) => string;
   canDelete?: boolean;
 }
 
@@ -34,14 +35,15 @@ export function UserListItem({
     .join('')
     .toUpperCase();
 
-  const getRoleLabel = (role: UserRole) => {
-    if (role === 'god') return 'God';
-    if (role === 'sys_admin') return 'Admin';
-    if (role === 'admin') return 'Admin';
-    if (role === 'owner') return 'Dono';
-    if (role === 'editor') return 'Editor';
-    if (role === 'operator') return 'Operador';
-    if (role === 'viewer') return 'Viewer';
+  const getRoleLabel = (role: UserRole | string) => {
+    const roleValue = typeof role === 'string' ? role : role;
+    if (roleValue === UserRole.GOD || roleValue === 'god') return 'God';
+    if (roleValue === UserRole.SYS_ADMIN || roleValue === 'sys_admin') return 'Admin';
+    if (roleValue === UserRole.ADMIN || roleValue === 'admin') return 'Admin';
+    if (roleValue === UserRole.OWNER || roleValue === 'owner') return 'Dono';
+    if (roleValue === UserRole.EDITOR || roleValue === 'editor') return 'Editor';
+    if (roleValue === UserRole.OPERATOR || roleValue === 'operator') return 'Operador';
+    if (roleValue === UserRole.VIEWER || roleValue === 'viewer') return 'Viewer';
     return 'Usuário';
   };
 

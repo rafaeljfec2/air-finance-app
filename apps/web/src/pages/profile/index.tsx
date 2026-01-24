@@ -9,6 +9,7 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { getCurrentUser } from '@/services/authService';
 import { updateUser, type CreateUser } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
+import { mapUserServiceToUserType } from '@/utils/userMapper';
 import { Camera, Edit2, Mail, MapPin, Phone, Save, Shield, User, X } from 'lucide-react';
 
 type ProfileFormData = {
@@ -129,7 +130,7 @@ export function Profile() {
         const updatedUser = await updateUser(user.id, updateData);
 
         // Update local store
-        setUser(updatedUser);
+        setUser(mapUserServiceToUserType(updatedUser));
 
         setIsEditing(false);
         toast({

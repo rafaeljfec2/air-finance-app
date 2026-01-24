@@ -1,6 +1,17 @@
 import { z } from 'zod';
 import { apiClient } from './apiClient';
 import { env } from '@/utils/env';
+import {
+  User as UserType,
+  UserRole,
+  UserStatus,
+  UserPlan,
+  UserCurrency,
+  UserLanguage,
+  UserTheme,
+  UserDateFormat,
+  OpenaiModel,
+} from '@/types/user';
 
 // Validation schemas
 export const UserSchema = z.object({
@@ -75,15 +86,38 @@ export const ResetPasswordSchema = z
     path: ['confirmPassword'],
   });
 
-export type User = z.infer<typeof UserSchema>;
+export type ApiUser = z.infer<typeof UserSchema>;
 export type LoginData = z.infer<typeof LoginSchema>;
 export type RegisterData = z.infer<typeof RegisterSchema>;
 export type PasswordRecoveryData = z.infer<typeof PasswordRecoverySchema>;
 export type ResetPasswordData = z.infer<typeof ResetPasswordSchema>;
 
+function mapApiUserToUser(apiUser: ApiUser): UserType {
+  return {
+    ...apiUser,
+    role: apiUser.role as UserRole,
+    status: apiUser.status as UserStatus,
+    plan: (apiUser.plan ?? 'free') as UserPlan,
+    preferences: apiUser.preferences
+      ? {
+          currency: apiUser.preferences.currency as UserCurrency,
+          language: apiUser.preferences.language as UserLanguage,
+          theme: apiUser.preferences.theme as UserTheme,
+          dateFormat: apiUser.preferences.dateFormat as UserDateFormat,
+        }
+      : undefined,
+    integrations: apiUser.integrations
+      ? {
+          ...apiUser.integrations,
+          openaiModel: apiUser.integrations.openaiModel as OpenaiModel | undefined,
+        }
+      : undefined,
+  };
+}
+
 // Novo tipo de resposta
 export interface AuthResponse {
-  user: User;
+  user: UserType;
   token: string;
   refreshToken?: string;
   expiresIn?: number;
@@ -93,8 +127,11 @@ export interface AuthResponse {
 export const login = async (data: LoginData): Promise<AuthResponse> => {
   try {
     const validatedData = LoginSchema.parse(data);
-    const response = await apiClient.post<AuthResponse>('/auth/login', validatedData);
-    return response.data;
+    const response = await apiClient.post<{ user: ApiUser; token: string; refreshToken?: string; expiresIn?: number }>('/auth/login', validatedData);
+    return {
+      ...response.data,
+      user: mapApiUserToUser(response.data.user),
+    };
   } catch (error) {
     console.error('Erro ao fazer login:', error);
     throw error;
@@ -104,8 +141,11 @@ export const login = async (data: LoginData): Promise<AuthResponse> => {
 export const register = async (data: RegisterData): Promise<AuthResponse> => {
   try {
     const validatedData = RegisterSchema.parse(data);
-    const response = await apiClient.post<AuthResponse>('/auth/register', validatedData);
-    return response.data;
+    const response = await apiClient.post<{ user: ApiUser; token: string; refreshToken?: string; expiresIn?: number }>('/auth/register', validatedData);
+    return {
+      ...response.data,
+      user: mapApiUserToUser(response.data.user),
+    };
   } catch (error) {
     console.error('Erro ao registrar:', error);
     throw error;
@@ -141,10 +181,11 @@ export const logout = async (): Promise<void> => {
   }
 };
 
-export const getCurrentUser = async (): Promise<User> => {
+export const getCurrentUser = async (): Promise<UserType> => {
   try {
-    const response = await apiClient.get<User>('/auth/me');
-    return UserSchema.parse(response.data);
+    const response = await apiClient.get<ApiUser>('/auth/me');
+    const apiUser = UserSchema.parse(response.data);
+    return mapApiUserToUser(apiUser);
   } catch (error) {
     console.error('Erro ao obter usuário atual:', error);
     throw new Error('Falha ao obter usuário atual');
@@ -154,10 +195,13 @@ export const getCurrentUser = async (): Promise<User> => {
 // Refresh Token
 export const refreshToken = async (refreshTokenValue: string): Promise<AuthResponse> => {
   try {
-    const response = await apiClient.post<AuthResponse>('/auth/refresh-token', {
+    const response = await apiClient.post<{ user: ApiUser; token: string; refreshToken?: string; expiresIn?: number }>('/auth/refresh-token', {
       refreshToken: refreshTokenValue,
     });
-    return response.data;
+    return {
+      ...response.data,
+      user: mapApiUserToUser(response.data.user),
+    };
   } catch (error) {
     console.error('Erro ao renovar token:', error);
     throw new Error('Falha ao renovar token');

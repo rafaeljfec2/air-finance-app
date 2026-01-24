@@ -376,6 +376,10 @@ function OAuthWaitingStep({
     );
   }
 
+  if (!itemStatus) {
+    return null;
+  }
+
   const status = itemStatus.status.toUpperCase();
 
   return (
