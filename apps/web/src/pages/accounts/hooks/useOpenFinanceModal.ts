@@ -22,23 +22,39 @@ interface UseOpenFinanceModalProps {
 
 type ModalStep = 'cpf-input' | 'connector-selection' | 'creating-item' | 'oauth-waiting';
 
-const getErrorStatus = (error: unknown): number | undefined => {
-  const err = error as {
+interface ErrorResponse {
+  status?: number;
+  error?: string;
+  message?: string | { message?: string; itemId?: string };
+  itemId?: string;
+  details?: Array<{
+    id: string;
+    connectorId?: string;
+    status: string;
+    auth?: {
+      authUrl: string;
+      expiresAt: string;
+    };
+    warnings: string[];
+    updatedAt: string;
+    createdAt: string;
+  }>;
+  timestamp?: string;
+  path?: string;
+  response?: {
+    status?: number;
+    data?: ErrorResponse;
+  };
+  raw?: {
+    status?: number;
     response?: {
       status?: number;
-      data?: {
-        statusCode?: number;
-      };
-    };
-    status?: number;
-    raw?: {
-      status?: number;
-      response?: {
-        status?: number;
-      };
     };
   };
+}
 
+const getErrorStatus = (error: unknown): number | undefined => {
+  const err = error as ErrorResponse;
   return (
     err.response?.status ??
     err.status ??
@@ -48,55 +64,194 @@ const getErrorStatus = (error: unknown): number | undefined => {
   );
 };
 
-const getErrorData = (error: unknown) => {
-  const err = error as {
-    status?: number;
-    error?: string;
-    message?: string | { message?: string; itemId?: string };
-    itemId?: string;
-    details?: Array<{
-      id: string;
-      connectorId?: string;
-      status: string;
-      auth?: {
-        authUrl: string;
-        expiresAt: string;
-      };
-      warnings: string[];
-      updatedAt: string;
-      createdAt: string;
-    }>;
-    timestamp?: string;
-    path?: string;
-    response?: {
-      data?: {
-        status?: number;
-        error?: string;
-        message?: string | { message?: string; itemId?: string };
-        itemId?: string;
-        details?: Array<{
+const getErrorData = (error: unknown): ErrorResponse => {
+  const err = error as ErrorResponse;
+  return err.response?.data ?? err;
+};
+
+const extractItemIdFromError = (errorData: ErrorResponse, errorMessage: string): string | undefined => {
+  if (errorData.details && Array.isArray(errorData.details) && errorData.details.length > 0) {
+    const firstDetail = errorData.details[0];
+    if (firstDetail && typeof firstDetail === 'object' && 'id' in firstDetail) {
+      return firstDetail.id;
+    }
+  }
+
+  if (typeof errorData.message === 'object' && errorData.message !== null && 'itemId' in errorData.message) {
+    return errorData.message.itemId;
+  }
+
+  if (errorData.itemId) {
+    return errorData.itemId;
+  }
+
+  const itemIdRegex = /Item ID:\s*([a-f0-9-]+)/i;
+  const itemIdMatch = itemIdRegex.exec(errorMessage);
+  if (itemIdMatch?.[1]) {
+    return itemIdMatch[1];
+  }
+
+  if (typeof errorData === 'object' && errorData !== null) {
+    const errorDataString = JSON.stringify(errorData);
+    const itemIdMatchFromString = itemIdRegex.exec(errorDataString);
+    if (itemIdMatchFromString?.[1]) {
+      return itemIdMatchFromString[1];
+    }
+  }
+
+  return undefined;
+};
+
+const extractErrorMessage = (errorData: ErrorResponse): string => {
+  if (typeof errorData?.message === 'string') {
+    return errorData.message;
+  }
+  if (typeof errorData?.message === 'object' && errorData.message !== null) {
+    if (errorData.message.message) {
+      return errorData.message.message;
+    }
+    return JSON.stringify(errorData.message);
+  }
+  return 'Erro ao criar conexão Openi';
+};
+
+const hasConflictMessage = (errorMessage: string): boolean => {
+  return (
+    errorMessage.includes('Já existe um item ativo') ||
+    errorMessage.includes('Item ID:') ||
+    errorMessage.includes('already exists')
+  );
+};
+
+const handleItemStatus = (
+  itemData: {
+    id: string;
+    connectorId?: string;
+    status: string;
+    auth?: {
+      authUrl: string;
+      expiresAt: string;
+    };
+    warnings: string[];
+    updatedAt: string;
+    createdAt: string;
+  },
+  companyId: string,
+  accountId: string,
+  itemId: string,
+  queryClient: ReturnType<typeof useQueryClient>,
+  onSuccess: (() => void) | undefined,
+  setCreatedItemId: (id: string) => void,
+  setStep: (step: ModalStep) => void,
+): void => {
+  const status = itemData.status?.toLowerCase();
+
+  if (status === 'waiting_user_input' && itemData.auth?.authUrl) {
+    window.open(itemData.auth.authUrl, '_blank');
+    toast.info('Redirecionando para autenticação...');
+  } else if (status === 'connected') {
+    toast.success('Conexão já existe e está ativa!');
+    queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+    onSuccess?.();
+  } else if (status === 'out_of_sync') {
+    console.log('[OpenFinanceModal] Item is out_of_sync, requesting new connection...');
+    toast.info('Item desincronizado. Solicitando nova conexão...');
+
+    resyncItem(companyId, accountId, itemId)
+      .then(() => {
+        toast.success('Nova conexão solicitada. Aguardando autenticação...');
+        setCreatedItemId(itemId);
+        setStep('oauth-waiting');
+      })
+      .catch((resyncError) => {
+        console.error('[OpenFinanceModal] Error requesting resync:', resyncError);
+        toast.error('Erro ao solicitar nova conexão. Tente novamente.');
+        setStep('connector-selection');
+      });
+  } else if (status === 'pending') {
+    toast.info('Item já existe. Aguardando preparação da autenticação...');
+  } else {
+    toast.info(`Item já existe com status: ${itemData.status}`);
+  }
+};
+
+const processConflictError = (
+  error: unknown,
+  variables: { accountId: string; connectorId: string; parameters: Record<string, string> },
+  accounts: ReturnType<typeof useAccounts>['accounts'],
+  companyId: string,
+  queryClient: ReturnType<typeof useQueryClient>,
+  onSuccess: (() => void) | undefined,
+  setCreatedItemId: (id: string) => void,
+  setStep: (step: ModalStep) => void,
+): void => {
+  const errorStatus = getErrorStatus(error);
+  const errorData = getErrorData(error);
+  const errorMessage = extractErrorMessage(errorData);
+  const isConflict = errorStatus === 409;
+  const hasConflict = hasConflictMessage(errorMessage);
+
+  if (!isConflict && !hasConflict) {
+    toast.error(errorMessage);
+    setStep('connector-selection');
+    return;
+  }
+
+  console.log('[OpenFinanceModal] Item already exists, processing...', {
+    errorMessage,
+    errorData,
+    isConflict,
+    hasConflict,
+  });
+
+  try {
+    let itemId = extractItemIdFromError(errorData, errorMessage);
+    const existingAccount = accounts?.find((acc) => acc.id === variables.accountId);
+    itemId = itemId ?? existingAccount?.openiItemId;
+
+    if (!itemId) {
+      console.error('[OpenFinanceModal] Could not extract itemId from error:', {
+        errorData,
+        errorMessage,
+        existingAccount,
+      });
+      toast.error('Item já existe, mas não foi possível localizar o ID do item');
+      setStep('connector-selection');
+      return;
+    }
+
+    setCreatedItemId(itemId);
+    setStep('oauth-waiting');
+
+    if (errorData.details && Array.isArray(errorData.details) && errorData.details.length > 0) {
+      const firstDetail = errorData.details[0];
+      if (
+        firstDetail &&
+        typeof firstDetail === 'object' &&
+        'id' in firstDetail &&
+        'status' in firstDetail
+      ) {
+        const detail = firstDetail as {
           id: string;
           connectorId?: string;
           status: string;
-          auth?: {
-            authUrl: string;
-            expiresAt: string;
-          };
+          auth?: { authUrl: string; expiresAt: string };
           warnings: string[];
           updatedAt: string;
           createdAt: string;
-        }>;
-        timestamp?: string;
-        path?: string;
-      };
-    };
-  };
-  
-  if (err.response?.data) {
-    return err.response.data;
+        };
+        handleItemStatus(detail, companyId, variables.accountId, itemId, queryClient, onSuccess, setCreatedItemId, setStep);
+        return;
+      }
+    }
+
+    console.log('[OpenFinanceModal] Item data not in details, will wait for SSE events', itemId);
+    toast.info('Item já existe. Aguardando atualização via SSE...');
+  } catch (fetchError) {
+    console.error('[OpenFinanceModal] Error processing conflict error:', fetchError);
+    toast.error('Erro ao obter dados do item existente');
+    setStep('connector-selection');
   }
-  
-  return err;
 };
 
 export function useOpenFinanceModal({
@@ -164,7 +319,7 @@ export function useOpenFinanceModal({
     },
     onError: (error: unknown) => {
       const err = error as { response?: { data?: { message?: string } } };
-      const errorMessage = err.response?.data?.message || 'Erro ao criar conta';
+      const errorMessage = err.response?.data?.message ?? 'Erro ao criar conta';
       toast.error(errorMessage);
     },
   });
@@ -181,19 +336,10 @@ export function useOpenFinanceModal({
     }) => {
       return createItem(companyId, accountId, { connectorId, parameters });
     },
-    onSuccess: async (item, variables) => {
-      console.log('[OpenFinanceModal] Item created:', { item, accountId: variables.accountId });
-      console.log('[OpenFinanceModal] Setting createdItemId and step', {
-        itemId: item.id,
-        status: item.status,
-        willSetStep: 'oauth-waiting',
-      });
+    onSuccess: async (item) => {
+      console.log('[OpenFinanceModal] Item created:', { item });
       setCreatedItemId(item.id);
       setStep('oauth-waiting');
-      console.log('[OpenFinanceModal] State updated - createdItemId and step set', {
-        itemId: item.id,
-        step: 'oauth-waiting',
-      });
 
       if (item.status === 'PENDING' || item.status === 'pending') {
         console.log('[OpenFinanceModal] Status is PENDING, will poll until waiting_user_input...');
@@ -206,191 +352,23 @@ export function useOpenFinanceModal({
         } else {
           console.warn('[OpenFinanceModal] No authUrl found in item');
         }
-      } else if (item.status === 'CONNECTED' || item.status === 'CONNECTED') {
+      } else if (item.status === 'CONNECTED' || item.status === 'connected') {
         toast.success('Conexão estabelecida com sucesso!');
         queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
         onSuccess?.();
       }
     },
     onError: async (error: unknown, variables) => {
-      const errorStatus = getErrorStatus(error);
-      const errorData = getErrorData(error);
-
-      console.log('[OpenFinanceModal] Error received:', {
-        errorStatus,
-        errorData,
+      processConflictError(
         error,
-        stringified: JSON.stringify(errorData),
-      });
-
-      const isConflict = errorStatus === 409;
-
-      let errorMessage = 'Erro ao criar conexão Openi';
-      if (typeof errorData?.message === 'string') {
-        errorMessage = errorData.message;
-      } else if (typeof errorData?.message === 'object' && errorData.message !== null) {
-        if (errorData.message.message) {
-          errorMessage = errorData.message.message;
-        } else if (typeof errorData.message === 'object') {
-          errorMessage = JSON.stringify(errorData.message);
-        }
-      }
-
-      let itemIdFromError: string | undefined;
-      let itemDataFromDetails:
-        | {
-            id: string;
-            connectorId?: string;
-            status: string;
-            auth?: {
-              authUrl: string;
-              expiresAt: string;
-            };
-            warnings: string[];
-            updatedAt: string;
-            createdAt: string;
-          }
-        | undefined;
-
-      if (errorData?.details && Array.isArray(errorData.details) && errorData.details.length > 0) {
-        const firstDetail = errorData.details[0];
-        if (firstDetail && typeof firstDetail === 'object' && 'id' in firstDetail) {
-          const detail = firstDetail as {
-            id: string;
-            connectorId?: string;
-            status: string;
-            auth?: { authUrl: string; expiresAt: string };
-            warnings: string[];
-            updatedAt: string;
-            createdAt: string;
-          };
-          itemDataFromDetails = detail;
-          itemIdFromError = detail.id;
-          console.log('[OpenFinanceModal] Extracted item data from details:', {
-            id: detail.id,
-            status: detail.status,
-            hasAuthUrl: !!detail.auth?.authUrl,
-            connectorId: detail.connectorId,
-          });
-        }
-      }
-
-      if (
-        !itemIdFromError &&
-        typeof errorData?.message === 'object' &&
-        errorData.message !== null
-      ) {
-        if (errorData.message.itemId) {
-          itemIdFromError = errorData.message.itemId;
-        }
-      }
-      if (!itemIdFromError && errorData?.itemId) {
-        itemIdFromError = errorData.itemId;
-      }
-
-      const hasConflictMessage =
-        errorMessage.includes('Já existe um item ativo') ||
-        errorMessage.includes('Item ID:') ||
-        errorMessage.includes('already exists');
-
-      if (isConflict || hasConflictMessage) {
-        console.log('[OpenFinanceModal] Item already exists, processing...', {
-          itemIdFromError,
-          itemDataFromDetails,
-          errorMessage,
-          errorData,
-          fullError: error,
-          isConflict,
-          hasConflictMessage,
-        });
-        try {
-          const existingAccount = accounts?.find((acc) => acc.id === variables.accountId);
-          let itemId = itemIdFromError ?? existingAccount?.openiItemId;
-
-          if (!itemId) {
-            const itemIdRegex = /Item ID:\s*([a-f0-9-]+)/i;
-            const itemIdMatch = itemIdRegex.exec(errorMessage);
-            itemId = itemIdMatch?.[1];
-
-            if (!itemId && typeof errorData === 'object' && errorData !== null) {
-              const errorDataString = JSON.stringify(errorData);
-              const itemIdMatchFromString = itemIdRegex.exec(errorDataString);
-              itemId = itemIdMatchFromString?.[1];
-
-              if (!itemId && typeof errorData.message === 'object' && errorData.message !== null) {
-                const messageString = JSON.stringify(errorData.message);
-                const itemIdMatchFromMessage = itemIdRegex.exec(messageString);
-                itemId = itemIdMatchFromMessage?.[1];
-              }
-            }
-          }
-
-          if (itemId) {
-            setCreatedItemId(itemId);
-            setStep('oauth-waiting');
-
-            if (itemDataFromDetails) {
-              console.log(
-                '[OpenFinanceModal] Using item data from error details:',
-                itemDataFromDetails,
-              );
-              const status = itemDataFromDetails.status?.toLowerCase();
-
-              if (status === 'waiting_user_input' && itemDataFromDetails.auth?.authUrl) {
-                window.open(itemDataFromDetails.auth.authUrl, '_blank');
-                toast.info('Redirecionando para autenticação...');
-              } else if (status === 'connected') {
-                toast.success('Conexão já existe e está ativa!');
-                queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
-                onSuccess?.();
-              } else if (status === 'out_of_sync') {
-                console.log('[OpenFinanceModal] Item is out_of_sync, requesting new connection...');
-                toast.info('Item desincronizado. Solicitando nova conexão...');
-                
-                resyncItem(companyId, variables.accountId, itemId)
-                  .then(() => {
-                    toast.success('Nova conexão solicitada. Aguardando autenticação...');
-                    setCreatedItemId(itemId);
-                    setStep('oauth-waiting');
-                  })
-                  .catch((resyncError) => {
-                    console.error('[OpenFinanceModal] Error requesting resync:', resyncError);
-                    toast.error('Erro ao solicitar nova conexão. Tente novamente.');
-                    setStep('connector-selection');
-                  });
-                return;
-              } else if (status === 'pending') {
-                toast.info('Item já existe. Aguardando preparação da autenticação...');
-              } else {
-                toast.info(`Item já existe com status: ${itemDataFromDetails.status}`);
-              }
-            } else {
-              console.log(
-                '[OpenFinanceModal] Item data not in details, will wait for SSE events',
-                itemId,
-              );
-              toast.info('Item já existe. Aguardando atualização via SSE...');
-              setCreatedItemId(itemId);
-              setStep('oauth-waiting');
-            }
-          } else {
-            console.error('[OpenFinanceModal] Could not extract itemId from error:', {
-              errorData,
-              errorMessage,
-              existingAccount,
-            });
-            toast.error('Item já existe, mas não foi possível localizar o ID do item');
-            setStep('connector-selection');
-          }
-        } catch (fetchError) {
-          console.error('[OpenFinanceModal] Error fetching existing item:', fetchError);
-          toast.error('Erro ao obter dados do item existente');
-          setStep('connector-selection');
-        }
-      } else {
-        toast.error(errorMessage);
-        setStep('connector-selection');
-      }
+        variables,
+        accounts,
+        companyId,
+        queryClient,
+        onSuccess,
+        setCreatedItemId,
+        setStep,
+      );
     },
   });
 
@@ -532,194 +510,16 @@ export function useOpenFinanceModal({
         });
       } catch (error) {
         console.error('[OpenFinanceModal] Error creating Openi item:', error);
-
-        const errorStatus = getErrorStatus(error);
-        const errorData = getErrorData(error);
-
-        console.log('[OpenFinanceModal] Error structure in catch:', {
-          errorStatus,
-          errorData,
-          fullError: error,
-        });
-
-        const isConflict = errorStatus === 409;
-
-        let errorMessage = 'Erro ao criar conexão Openi';
-        if (typeof errorData?.message === 'string') {
-          errorMessage = errorData.message;
-        } else if (typeof errorData?.message === 'object' && errorData.message !== null) {
-          if (errorData.message.message) {
-            errorMessage = errorData.message.message;
-          } else if (typeof errorData.message === 'object') {
-            errorMessage = JSON.stringify(errorData.message);
-          }
-        }
-
-        const hasConflictMessage =
-          errorMessage.includes('Já existe um item ativo') ||
-          errorMessage.includes('Item ID:') ||
-          errorMessage.includes('already exists');
-
-        if (isConflict || hasConflictMessage) {
-          console.log('[OpenFinanceModal] Item already exists in catch block, processing...', {
-            errorMessage,
-            errorData,
-          });
-
-          try {
-            let itemId: string | undefined;
-            let itemDataFromDetails:
-              | {
-                  id: string;
-                  connectorId?: string;
-                  status: string;
-                  auth?: {
-                    authUrl: string;
-                    expiresAt: string;
-                  };
-                  warnings: string[];
-                  updatedAt: string;
-                  createdAt: string;
-                }
-              | undefined;
-
-            if (
-              isConflict &&
-              errorData?.details &&
-              Array.isArray(errorData.details) &&
-              errorData.details.length > 0
-            ) {
-              const firstDetail = errorData.details[0];
-              if (
-                firstDetail &&
-                typeof firstDetail === 'object' &&
-                'id' in firstDetail &&
-                'status' in firstDetail
-              ) {
-                const detail = firstDetail as {
-                  id: string;
-                  connectorId?: string;
-                  status: string;
-                  auth?: { authUrl: string; expiresAt: string };
-                  warnings: string[];
-                  updatedAt: string;
-                  createdAt: string;
-                };
-                itemDataFromDetails = detail;
-                itemId = detail.id;
-                console.log('[OpenFinanceModal] Extracted item data from details in catch:', {
-                  id: detail.id,
-                  status: detail.status,
-                  hasAuthUrl: !!detail.auth?.authUrl,
-                  connectorId: detail.connectorId,
-                });
-              }
-            }
-
-            if (!itemId) {
-              if (
-                typeof errorData?.message === 'object' &&
-                errorData.message !== null &&
-                errorData.message.itemId
-              ) {
-                itemId = errorData.message.itemId;
-              } else if (errorData?.itemId) {
-                itemId = errorData.itemId;
-              } else {
-                const existingAccount = accounts?.find((acc) => acc.id === accountId);
-                itemId = existingAccount?.openiItemId ?? undefined;
-              }
-            }
-
-            if (!itemId) {
-              const itemIdRegex = /Item ID:\s*([a-f0-9-]+)/i;
-              const itemIdMatch = itemIdRegex.exec(errorMessage);
-              itemId = itemIdMatch?.[1];
-
-              if (!itemId && typeof errorData === 'object' && errorData !== null) {
-                const errorDataString = JSON.stringify(errorData);
-                const itemIdMatchFromString = itemIdRegex.exec(errorDataString);
-                itemId = itemIdMatchFromString?.[1];
-              }
-            }
-
-            if (itemId) {
-              setCreatedItemId(itemId);
-              setStep('oauth-waiting');
-
-              if (!accountId) {
-                toast.error('Account ID não encontrado');
-                setStep('connector-selection');
-                return;
-              }
-
-              if (itemDataFromDetails) {
-                console.log(
-                  '[OpenFinanceModal] Using item data from error details in catch:',
-                  itemDataFromDetails,
-                );
-                const status = itemDataFromDetails.status?.toLowerCase();
-
-                if (status === 'waiting_user_input' && itemDataFromDetails.auth?.authUrl) {
-                  window.open(itemDataFromDetails.auth.authUrl, '_blank');
-                  toast.info('Redirecionando para autenticação...');
-                } else if (status === 'connected') {
-                  toast.success('Conexão já existe e está ativa!');
-                  queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
-                  onSuccess?.();
-                } else if (status === 'out_of_sync') {
-                  console.log('[OpenFinanceModal] Item is out_of_sync, requesting new connection...');
-                  toast.info('Item desincronizado. Solicitando nova conexão...');
-                  
-                  if (!accountId) {
-                    toast.error('Account ID não disponível para solicitar nova conexão');
-                    setStep('connector-selection');
-                    return;
-                  }
-
-                  resyncItem(companyId, accountId, itemId)
-                    .then(() => {
-                      toast.success('Nova conexão solicitada. Aguardando autenticação...');
-                      setCreatedItemId(itemId);
-                      setStep('oauth-waiting');
-                    })
-                    .catch((resyncError) => {
-                      console.error('[OpenFinanceModal] Error requesting resync:', resyncError);
-                      toast.error('Erro ao solicitar nova conexão. Tente novamente.');
-                      setStep('connector-selection');
-                    });
-                  return;
-                } else if (status === 'pending') {
-                  toast.info('Item já existe. Aguardando preparação da autenticação...');
-                } else {
-                  toast.info(`Item já existe com status: ${itemDataFromDetails.status}`);
-                }
-              } else {
-                console.log(
-                  '[OpenFinanceModal] Item data not in details, will wait for SSE events',
-                  itemId,
-                );
-                toast.info('Item já existe. Aguardando atualização via SSE...');
-                setCreatedItemId(itemId);
-                setStep('oauth-waiting');
-              }
-            } else {
-              console.error('[OpenFinanceModal] Could not extract itemId from error in catch:', {
-                errorData,
-                errorMessage,
-              });
-              toast.error('Item já existe, mas não foi possível localizar o ID do item');
-              setStep('connector-selection');
-            }
-          } catch (fetchError) {
-            console.error('[OpenFinanceModal] Error fetching existing item in catch:', fetchError);
-            toast.error('Erro ao obter dados do item existente');
-            setStep('connector-selection');
-          }
-        } else {
-          toast.error(errorMessage);
-          setStep('connector-selection');
-        }
+        processConflictError(
+          error,
+          { accountId: accountId ?? '', connectorId: connector.id, parameters: {} },
+          accounts,
+          companyId,
+          queryClient,
+          onSuccess,
+          setCreatedItemId,
+          setStep,
+        );
       }
     },
     [

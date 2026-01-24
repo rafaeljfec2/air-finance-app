@@ -9,13 +9,7 @@ const getTokenFromStorage = (): string | null => {
     }
 
     const parsed = JSON.parse(authStorage);
-    const token = parsed.state?.token ?? null;
-
-    if (token) {
-      return token;
-    }
-
-    return null;
+    return parsed.state?.token ?? null;
   } catch (error) {
     console.error('[useOpeniItemEvents] Error reading token from storage:', error);
     return null;
@@ -36,15 +30,49 @@ const getTokenFromApi = async (): Promise<string | null> => {
 
     if (response.ok) {
       const data = await response.json();
-      if (data.token) {
-        return data.token;
-      }
+      return data.token ?? null;
     }
     return null;
   } catch (error) {
     console.error('[useOpeniItemEvents] Error fetching SSE token from API:', error);
     return null;
   }
+};
+
+const getTokenFromAuthStorage = (): string | null => {
+  try {
+    const authStorageRaw = localStorage.getItem('auth-storage');
+    if (!authStorageRaw) {
+      return null;
+    }
+    const authStorageParsed = JSON.parse(authStorageRaw);
+    return authStorageParsed?.state?.token ?? null;
+  } catch {
+    return null;
+  }
+};
+
+const retrieveToken = async (currentState: ReturnType<typeof useAuthStore.getState>): Promise<string | null> => {
+  let tokenToUse = currentState.token ?? getTokenFromStorage();
+
+  if (!tokenToUse && currentState.user && currentState.isAuthenticated) {
+    tokenToUse = getTokenFromAuthStorage();
+  }
+
+  if (!tokenToUse && currentState.user && currentState.isAuthenticated) {
+    console.log('[useOpeniItemEvents] No token found, attempting to fetch SSE token from API (cookies may be in use)...');
+    try {
+      const apiToken = await getTokenFromApi();
+      if (apiToken) {
+        tokenToUse = apiToken;
+        console.log('[useOpeniItemEvents] SSE token obtained from API');
+      }
+    } catch (error) {
+      console.error('[useOpeniItemEvents] Error fetching SSE token:', error);
+    }
+  }
+
+  return tokenToUse;
 };
 
 export interface OpeniItemEvent {
@@ -79,6 +107,8 @@ interface UseOpeniItemEventsReturn {
 
 const MAX_RECONNECT_ATTEMPTS = 5;
 const INITIAL_RECONNECT_DELAY = 2000;
+const RETRY_INTERVAL_MS = 1000;
+const RETRY_TIMEOUT_MS = 10000;
 
 export const useOpeniItemEvents = ({
   companyId,
@@ -90,7 +120,7 @@ export const useOpeniItemEvents = ({
   const token = useAuthStore(state => state.token);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const user = useAuthStore(state => state.user);
-  
+
   console.log('[useOpeniItemEvents] Hook initialized', {
     itemId,
     enabled,
@@ -100,6 +130,7 @@ export const useOpeniItemEvents = ({
     tokenLength: token?.length ?? 0,
     usingCookies: !token && !!user,
   });
+
   const [lastEvent, setLastEvent] = useState<OpeniItemEvent | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
   const [error, setError] = useState<Error | null>(null);
@@ -111,6 +142,7 @@ export const useOpeniItemEvents = ({
   const isConnectingRef = useRef(false);
   const retryIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const connectRef = useRef<(() => Promise<void>) | null>(null);
 
   const disconnect = useCallback((resetItemId = true) => {
     console.log('[useOpeniItemEvents] disconnect() called', {
@@ -136,6 +168,93 @@ export const useOpeniItemEvents = ({
     }
     isConnectingRef.current = false;
   }, []);
+
+  const buildSseUrl = useCallback(
+    (tokenToUse: string): string => {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const baseUrl = apiUrl.endsWith('/v1') ? apiUrl : `${apiUrl.replace(/\/$/, '')}/v1`;
+      return `${baseUrl}/companies/${companyId}/banking/openi/items/${itemId}/events?token=${encodeURIComponent(tokenToUse)}`;
+    },
+    [companyId, itemId],
+  );
+
+  const handleEventMessage = useCallback(
+    (e: MessageEvent) => {
+      if (e.data.startsWith(':')) {
+        return;
+      }
+
+      try {
+        const event: OpeniItemEvent = JSON.parse(e.data);
+        setLastEvent(event);
+        onEvent?.(event);
+      } catch (parseError) {
+        console.error('Failed to parse SSE event:', parseError);
+      }
+    },
+    [onEvent],
+  );
+
+  const handleEventError = useCallback(
+    async (eventSource: EventSource) => {
+      console.error('SSE connection error:', {
+        readyState: eventSource.readyState,
+        url: eventSource.url,
+      });
+
+      if (eventSource.readyState === EventSource.CLOSED) {
+        if (!enabled || !itemId) {
+          console.log('[useOpeniItemEvents] Connection closed: SSE disabled or itemId cleared, not reconnecting');
+          disconnect();
+          return;
+        }
+
+        const currentState = useAuthStore.getState();
+        const currentToken = await retrieveToken(currentState);
+
+        if (!currentToken) {
+          const error = new Error('Authentication token lost during connection');
+          setError(error);
+          setConnectionStatus('error');
+          console.warn('[useOpeniItemEvents] Connection closed: token no longer available');
+          onError?.(error);
+          disconnect();
+          return;
+        }
+
+        if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
+          setConnectionStatus('reconnecting');
+          reconnectAttemptsRef.current += 1;
+
+          const delay = Math.min(
+            INITIAL_RECONNECT_DELAY * Math.pow(2, reconnectAttemptsRef.current - 1),
+            30000,
+          );
+
+          console.log(`[useOpeniItemEvents] Scheduling reconnect attempt ${reconnectAttemptsRef.current}/${MAX_RECONNECT_ATTEMPTS} in ${delay}ms`);
+
+          reconnectTimeoutRef.current = setTimeout(async () => {
+            if (enabled && itemId && connectRef.current) {
+              await connectRef.current();
+            } else {
+              console.log('[useOpeniItemEvents] Skipping reconnect: SSE disabled or itemId cleared');
+              disconnect();
+            }
+          }, delay);
+        } else {
+          const error = new Error('SSE connection failed after maximum reconnect attempts');
+          setError(error);
+          setConnectionStatus('error');
+          console.error('[useOpeniItemEvents] Max reconnect attempts reached, stopping');
+          onError?.(error);
+          disconnect();
+        }
+      } else if (eventSource.readyState === EventSource.CONNECTING) {
+        console.log('[useOpeniItemEvents] SSE is still connecting, waiting...');
+      }
+    },
+    [enabled, itemId, onError, disconnect],
+  );
 
   const connect = useCallback(async () => {
     console.log('[useOpeniItemEvents] connect() called', {
@@ -166,34 +285,7 @@ export const useOpeniItemEvents = ({
     }
 
     const currentState = useAuthStore.getState();
-    const currentUser = currentState.user;
-    const currentIsAuthenticated = currentState.isAuthenticated;
-    let tokenToUse = currentState.token ?? getTokenFromStorage();
-    
-    if (!tokenToUse && currentUser && currentIsAuthenticated) {
-      const authStorageRaw = localStorage.getItem('auth-storage');
-      if (authStorageRaw) {
-        try {
-          const authStorageParsed = JSON.parse(authStorageRaw);
-          tokenToUse = authStorageParsed?.state?.token ?? null;
-        } catch {
-          // Ignore parse errors
-        }
-      }
-    }
-
-    if (!tokenToUse && currentUser && currentIsAuthenticated) {
-      console.log('[useOpeniItemEvents] No token found, attempting to fetch SSE token from API (cookies may be in use)...');
-      try {
-        const apiToken = await getTokenFromApi();
-        if (apiToken) {
-          tokenToUse = apiToken;
-          console.log('[useOpeniItemEvents] SSE token obtained from API');
-        }
-      } catch (error) {
-        console.error('[useOpeniItemEvents] Error fetching SSE token:', error);
-      }
-    }
+    const tokenToUse = await retrieveToken(currentState);
 
     if (!tokenToUse) {
       if (!hasAttemptedConnectionRef.current) {
@@ -205,8 +297,8 @@ export const useOpeniItemEvents = ({
         console.warn('[useOpeniItemEvents] Token sources checked:', {
           zustandToken: currentState.token,
           storageToken: getTokenFromStorage(),
-          hasUser: !!currentUser,
-          isAuthenticated: currentIsAuthenticated,
+          hasUser: !!currentState.user,
+          isAuthenticated: currentState.isAuthenticated,
         });
         onError?.(err);
       }
@@ -225,20 +317,15 @@ export const useOpeniItemEvents = ({
     }
 
     currentItemIdRef.current = itemId;
-
     setConnectionStatus('connecting');
     setError(null);
 
-    const apiUrl = import.meta.env.VITE_API_URL;
-    const baseUrl = apiUrl.endsWith('/v1') ? apiUrl : `${apiUrl.replace(/\/$/, '')}/v1`;
-    const url = `${baseUrl}/companies/${companyId}/banking/openi/items/${itemId}/events?token=${encodeURIComponent(tokenToUse)}`;
+    const url = buildSseUrl(tokenToUse);
 
     console.log('[useOpeniItemEvents] Attempting SSE connection', {
       url: url.replace(tokenToUse, '***'),
       itemId,
       companyId,
-      baseUrl,
-      apiUrl,
       hasToken: !!tokenToUse,
       tokenLength: tokenToUse?.length ?? 0,
     });
@@ -248,7 +335,7 @@ export const useOpeniItemEvents = ({
         url: url.replace(tokenToUse, '***'),
         hasToken: !!tokenToUse,
       });
-      
+
       const eventSource = new EventSource(url);
       eventSourceRef.current = eventSource;
 
@@ -261,89 +348,9 @@ export const useOpeniItemEvents = ({
         });
       };
 
-      eventSource.onmessage = (e) => {
-        if (e.data.startsWith(':')) {
-          return;
-        }
+      eventSource.onmessage = handleEventMessage;
 
-        try {
-          const event: OpeniItemEvent = JSON.parse(e.data);
-          setLastEvent(event);
-          onEvent?.(event);
-        } catch (parseError) {
-          console.error('Failed to parse SSE event:', parseError);
-        }
-      };
-
-      eventSource.onerror = (err) => {
-        console.error('SSE connection error:', err, {
-          readyState: eventSource.readyState,
-          url: eventSource.url,
-        });
-        
-        if (eventSource.readyState === EventSource.CLOSED) {
-          if (!enabled || !itemId) {
-            console.log('[useOpeniItemEvents] Connection closed: SSE disabled or itemId cleared, not reconnecting');
-            disconnect();
-            return;
-          }
-
-          const currentState = useAuthStore.getState();
-          let currentToken = currentState.token ?? getTokenFromStorage();
-          
-          if (!currentToken && currentState.user && currentState.isAuthenticated) {
-            const authStorageRaw = localStorage.getItem('auth-storage');
-            if (authStorageRaw) {
-              try {
-                const authStorageParsed = JSON.parse(authStorageRaw);
-                currentToken = authStorageParsed?.state?.token ?? null;
-              } catch {
-                // Ignore parse errors
-              }
-            }
-          }
-
-          if (!currentToken) {
-            const error = new Error('Authentication token lost during connection');
-            setError(error);
-            setConnectionStatus('error');
-            console.warn('[useOpeniItemEvents] Connection closed: token no longer available');
-            onError?.(error);
-            disconnect();
-            return;
-          }
-
-          if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
-            setConnectionStatus('reconnecting');
-            reconnectAttemptsRef.current += 1;
-
-            const delay = Math.min(
-              INITIAL_RECONNECT_DELAY * Math.pow(2, reconnectAttemptsRef.current - 1),
-              30000,
-            );
-            
-            console.log(`[useOpeniItemEvents] Scheduling reconnect attempt ${reconnectAttemptsRef.current}/${MAX_RECONNECT_ATTEMPTS} in ${delay}ms`);
-
-            reconnectTimeoutRef.current = setTimeout(async () => {
-              if (enabled && itemId) {
-                await connect();
-              } else {
-                console.log('[useOpeniItemEvents] Skipping reconnect: SSE disabled or itemId cleared');
-                disconnect();
-              }
-            }, delay);
-          } else {
-            const error = new Error('SSE connection failed after maximum reconnect attempts');
-            setError(error);
-            setConnectionStatus('error');
-            console.error('[useOpeniItemEvents] Max reconnect attempts reached, stopping');
-            onError?.(error);
-            disconnect();
-          }
-        } else if (eventSource.readyState === EventSource.CONNECTING) {
-          console.log('[useOpeniItemEvents] SSE is still connecting, waiting...');
-        }
-      };
+      eventSource.onerror = () => handleEventError(eventSource);
     } catch (err) {
       isConnectingRef.current = false;
       const error = err instanceof Error ? err : new Error('Failed to create SSE connection');
@@ -351,12 +358,16 @@ export const useOpeniItemEvents = ({
       setConnectionStatus('error');
       onError?.(error);
     }
-  }, [companyId, itemId, enabled, onEvent, onError, disconnect]);
+  }, [companyId, itemId, enabled, onError, disconnect, handleEventMessage, handleEventError, buildSseUrl]);
+
+  connectRef.current = connect;
 
   const reconnect = useCallback(async () => {
     reconnectAttemptsRef.current = 0;
-    await connect();
-  }, [connect]);
+    if (connectRef.current) {
+      await connectRef.current();
+    }
+  }, []);
 
   useEffect(() => {
     console.log('[useOpeniItemEvents] useEffect triggered', {
@@ -386,34 +397,7 @@ export const useOpeniItemEvents = ({
 
     const attemptConnection = async (): Promise<boolean> => {
       const currentState = useAuthStore.getState();
-      const currentUser = currentState.user;
-      const currentIsAuthenticated = currentState.isAuthenticated;
-      let tokenToUse = currentState.token ?? getTokenFromStorage();
-      
-      if (!tokenToUse && currentUser && currentIsAuthenticated) {
-        const authStorageRaw = localStorage.getItem('auth-storage');
-        if (authStorageRaw) {
-          try {
-            const authStorageParsed = JSON.parse(authStorageRaw);
-            tokenToUse = authStorageParsed?.state?.token ?? null;
-          } catch {
-            // Ignore parse errors
-          }
-        }
-      }
-
-      if (!tokenToUse && currentUser && currentIsAuthenticated) {
-        console.log('[useOpeniItemEvents] No token found, attempting to fetch SSE token from API (cookies may be in use)...');
-        try {
-          const apiToken = await getTokenFromApi();
-          if (apiToken) {
-            tokenToUse = apiToken;
-            console.log('[useOpeniItemEvents] SSE token obtained from API');
-          }
-        } catch (error) {
-          console.error('[useOpeniItemEvents] Error fetching SSE token:', error);
-        }
-      }
+      const tokenToUse = await retrieveToken(currentState);
 
       if (!tokenToUse) {
         console.warn('[useOpeniItemEvents] Token not available, will retry...', {
@@ -421,8 +405,8 @@ export const useOpeniItemEvents = ({
           enabled,
           zustandToken: currentState.token,
           storageToken: getTokenFromStorage(),
-          hasUser: !!currentUser,
-          isAuthenticated: currentIsAuthenticated,
+          hasUser: !!currentState.user,
+          isAuthenticated: currentState.isAuthenticated,
         });
         return false;
       }
@@ -434,7 +418,9 @@ export const useOpeniItemEvents = ({
       });
 
       hasAttemptedConnectionRef.current = false;
-      await connect();
+      if (connectRef.current) {
+        await connectRef.current();
+      }
       return true;
     };
 
@@ -442,27 +428,8 @@ export const useOpeniItemEvents = ({
       if (!(await attemptConnection())) {
         retryIntervalRef.current = setInterval(async () => {
           const currentState = useAuthStore.getState();
-          let currentToken = currentState.token ?? getTokenFromStorage();
-          
-          if (!currentToken && currentState.user && currentState.isAuthenticated) {
-            const authStorageRaw = localStorage.getItem('auth-storage');
-            if (authStorageRaw) {
-              try {
-                const authStorageParsed = JSON.parse(authStorageRaw);
-                currentToken = authStorageParsed?.state?.token ?? null;
-              } catch {
-                // Ignore parse errors
-              }
-            }
-            
-            if (!currentToken) {
-              const apiToken = await getTokenFromApi();
-              if (apiToken) {
-                currentToken = apiToken;
-              }
-            }
-          }
-          
+          const currentToken = await retrieveToken(currentState);
+
           console.log('[useOpeniItemEvents] Retrying connection - checking token availability', {
             zustandToken: currentState.token,
             storageToken: getTokenFromStorage(),
@@ -470,8 +437,8 @@ export const useOpeniItemEvents = ({
             isAuthenticated: currentState.isAuthenticated,
             hasToken: !!currentToken,
           });
-          
-          if (currentToken) {
+
+          if (currentToken && connectRef.current) {
             if (await attemptConnection()) {
               if (retryIntervalRef.current) {
                 clearInterval(retryIntervalRef.current);
@@ -479,7 +446,7 @@ export const useOpeniItemEvents = ({
               }
             }
           }
-        }, 1000);
+        }, RETRY_INTERVAL_MS);
 
         retryTimeoutRef.current = setTimeout(() => {
           if (retryIntervalRef.current) {
@@ -498,7 +465,7 @@ export const useOpeniItemEvents = ({
             setConnectionStatus('error');
             setError(new Error('No authentication token available'));
           }
-        }, 10000);
+        }, RETRY_TIMEOUT_MS);
       }
     })();
 
@@ -521,7 +488,7 @@ export const useOpeniItemEvents = ({
       }
       hasAttemptedConnectionRef.current = false;
     };
-  }, [itemId, enabled, connect, disconnect]);
+  }, [itemId, enabled, disconnect]);
 
   return {
     lastEvent,
