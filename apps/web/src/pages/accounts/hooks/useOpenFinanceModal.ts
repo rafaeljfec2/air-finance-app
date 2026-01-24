@@ -32,14 +32,22 @@ export function useOpenFinanceModal({
   const [createdAccountId, setCreatedAccountId] = useState<string | null>(null);
   const [createdItemId, setCreatedItemId] = useState<string | null>(null);
 
+  const getDocumentType = useCallback((): 'CPF' | 'CNPJ' | undefined => {
+    if (!cpfCnpj) return undefined;
+    const cleaned = cpfCnpj.replace(/\D/g, '');
+    if (cleaned.length === 11) return 'CPF';
+    if (cleaned.length === 14) return 'CNPJ';
+    return undefined;
+  }, [cpfCnpj]);
+
   const {
     data: connectors,
     isLoading: isLoadingConnectors,
     error: connectorsError,
   } = useQuery<OpeniConnector[]>({
-    queryKey: ['openi-connectors', companyId],
-    queryFn: () => getConnectors(companyId),
-    enabled: !!companyId && step === 'connector-selection',
+    queryKey: ['openi-connectors', companyId, getDocumentType()],
+    queryFn: () => getConnectors(companyId, undefined, getDocumentType()),
+    enabled: !!companyId && step === 'connector-selection' && !!getDocumentType(),
     staleTime: 5 * 60 * 1000,
   });
 

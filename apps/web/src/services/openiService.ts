@@ -67,15 +67,17 @@ export interface CreateOpeniItemParams {
 }
 
 export const getConnectors = async (
-  _companyId: string,
+  companyId: string,
   query?: string,
+  documentType?: 'CPF' | 'CNPJ',
 ): Promise<OpeniConnector[]> => {
   try {
     const params: Record<string, string> = {};
     if (query) params.q = query;
+    if (documentType) params.documentType = documentType;
 
     const response = await apiClient.get<{ data: OpeniConnector[] }>(
-      `/banking/openi/connectors`,
+      `/companies/${companyId}/banking/openi/connectors`,
       { params },
     );
     return OpeniConnectorsResponseSchema.parse(response.data).data;
@@ -91,13 +93,13 @@ export const createItem = async (
 ): Promise<OpeniItemResponse> => {
   try {
     const response = await apiClient.post<{ data: OpeniItemResponse }>(
-      `/banking/openi/items`,
+      `/companies/${companyId}/banking/openi/items`,
       {
         connectorId: params.connectorId,
         parameters: params.parameters,
       },
       {
-        params: { companyId, accountId },
+        params: { accountId },
       },
     );
     return CreateOpeniItemResponseSchema.parse(response.data).data;
@@ -131,10 +133,10 @@ export const resyncItem = async (
 ): Promise<ResyncOpeniItemResponse> => {
   try {
     const response = await apiClient.post<ResyncOpeniItemResponse>(
-      `/banking/openi/items/${itemId}/resync`,
+      `/companies/${companyId}/banking/openi/items/${itemId}/resync`,
       {},
       {
-        params: { companyId, accountId },
+        params: { accountId },
       },
     );
     return ResyncOpeniItemResponseSchema.parse(response.data);

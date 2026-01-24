@@ -2,7 +2,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Link2, X, Loader2, CheckCircle2 } from 'lucide-react';
+import { Link2, Loader2, CheckCircle2 } from 'lucide-react';
 import { OpeniConnectorSelector } from './OpeniConnectorSelector';
 import { OpeniItemStatus } from './OpeniItemStatus';
 import { useOpenFinanceModal } from '@/pages/accounts/hooks/useOpenFinanceModal';
@@ -20,7 +20,6 @@ interface OpenFinanceConnectModalProps {
 }
 
 interface ModalHeaderProps {
-  onClose: () => void;
   isLoading: boolean;
 }
 
@@ -31,31 +30,20 @@ interface CpfInputStepProps {
   validateCpfCnpj: (value: string) => boolean;
 }
 
-function ModalHeader({ onClose, isLoading }: Readonly<ModalHeaderProps>) {
+function ModalHeader({ isLoading }: Readonly<Omit<ModalHeaderProps, 'onClose'>>) {
   return (
-    <div className="flex items-center justify-between px-6 pt-4 pb-3 border-b border-border dark:border-border-dark flex-shrink-0">
-      <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-purple-500/10 dark:bg-purple-400/10">
-          <Link2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold text-text dark:text-text-dark">
-            Conectar com Open Finance
-          </h2>
-          <p className="text-xs text-muted-foreground dark:text-gray-400">
-            Conecte suas contas bancárias via Open Finance
-          </p>
-        </div>
+    <div className="flex items-center gap-3 px-6 pt-4 pb-3 border-b border-border dark:border-border-dark flex-shrink-0">
+      <div className="p-2 rounded-lg bg-purple-500/10 dark:bg-purple-400/10">
+        <Link2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
       </div>
-      <button
-        type="button"
-        onClick={onClose}
-        disabled={isLoading}
-        className="min-h-[40px] min-w-[40px] p-2 rounded-lg hover:bg-background dark:hover:bg-background-dark text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50"
-        aria-label="Fechar"
-      >
-        <X className="h-5 w-5" />
-      </button>
+      <div>
+        <h2 className="text-lg font-semibold text-text dark:text-text-dark">
+          Conectar com Open Finance
+        </h2>
+        <p className="text-xs text-muted-foreground dark:text-gray-400">
+          Conecte suas contas bancárias via Open Finance
+        </p>
+      </div>
     </div>
   );
 }
@@ -176,7 +164,7 @@ export function OpenFinanceConnectModal({
       className={modalClassName}
     >
       <div className="flex flex-col min-h-0">
-        <ModalHeader onClose={handleModalClose} isLoading={isLoading} />
+        <ModalHeader isLoading={isLoading} />
 
         <div className="px-6 py-4 min-h-0 flex-1 overflow-y-auto">
           {step === 'cpf-input' && (
