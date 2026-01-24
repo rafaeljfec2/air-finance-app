@@ -6,6 +6,8 @@ import {
   createItem,
   resyncItem,
   getItems,
+  getAccounts,
+  importAccounts,
   type OpeniConnector,
   type OpeniItemResponse,
   type OpeniItem,
@@ -151,13 +153,13 @@ const handleItemStatus = (
   if (status === 'waiting_user_input' && itemData.auth?.authUrl) {
     window.open(itemData.auth.authUrl, '_blank');
     toast.info('Redirecionando para autenticação...');
-  } else if (status === 'connected' || status === 'syncing') {
-    const message = status === 'syncing' 
-      ? 'Conexão estabelecida! Sincronizando contas...' 
-      : 'Conexão já existe e está ativa!';
-    toast.success(message);
-    queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
-    onSuccess?.();
+      } else if (status === 'connected' || status === 'syncing' || status === 'synced') {
+        const message = status === 'syncing' 
+          ? 'Conexão estabelecida! Sincronizando contas...' 
+          : 'Conexão já existe e está ativa!';
+        toast.success(message);
+        queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+        onSuccess?.();
   } else if (status === 'out_of_sync') {
     console.log('[OpenFinanceModal] Item is out_of_sync, requesting new connection...');
     toast.info('Item desincronizado. Solicitando nova conexão...');
@@ -285,19 +287,25 @@ export function useOpenFinanceModal({
     retry: false,
   });
 
+  const [isInitializing, setIsInitializing] = useState(false);
+  const [importedItems, setImportedItems] = useState<Set<string>>(new Set());
+
   useEffect(() => {
     if (open) {
       const hasOpeniTenant = openiTenantId && openiTenantId.trim() !== '';
       
-      if (hasOpeniTenant && !isLoadingExistingItems) {
+      if (hasOpeniTenant && isLoadingExistingItems) {
+        setIsInitializing(true);
+        setStep('cpf-input');
+      } else if (hasOpeniTenant && !isLoadingExistingItems) {
+        setIsInitializing(false);
         if (existingItems && existingItems.length > 0) {
           setStep('existing-connections');
         } else {
           setStep('cpf-input');
         }
-      } else if (hasOpeniTenant && isLoadingExistingItems) {
-        setStep('cpf-input');
       } else {
+        setIsInitializing(false);
         setStep('cpf-input');
       }
       
@@ -308,13 +316,86 @@ export function useOpenFinanceModal({
       setCreatedAccountId(null);
       setCreatedItemId(null);
     } else {
+      setIsInitializing(false);
       setStep('cpf-input');
       setCpfCnpj(companyDocument ?? '');
       setSelectedConnector(null);
       setCreatedAccountId(null);
       setCreatedItemId(null);
+      setImportedItems(new Set());
     }
   }, [open, openiTenantId, companyDocument, existingItems, isLoadingExistingItems]);
+
+  useEffect(() => {
+    if (
+      open &&
+      existingItems &&
+      existingItems.length > 0 &&
+      !isLoadingExistingItems
+    ) {
+      const connectedItems = existingItems.filter(
+        item =>
+          (item.status === 'CONNECTED' ||
+            item.status === 'SYNCING' ||
+            item.status === 'SYNCED') &&
+          !importedItems.has(item.itemId),
+      );
+
+      if (connectedItems.length > 0) {
+        console.log(
+          '[OpenFinanceModal] Found connected items, importing accounts automatically:',
+          connectedItems.map(i => ({ itemId: i.itemId, status: i.status })),
+        );
+
+        connectedItems.forEach(async item => {
+          try {
+            const availableAccounts = await getAccounts(companyId, item.itemId);
+
+            if (availableAccounts && availableAccounts.length > 0) {
+              const accountIds = availableAccounts.map(acc => acc.id);
+              console.log(
+                `[OpenFinanceModal] Auto-importing ${accountIds.length} accounts for item ${item.itemId}`,
+              );
+
+              const importResult = await importAccounts(
+                companyId,
+                item.itemId,
+                accountIds,
+              );
+
+              console.log(
+                '[OpenFinanceModal] Auto-import completed:',
+                importResult,
+              );
+
+              setImportedItems(prev => new Set(prev).add(item.itemId));
+              queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+
+              toast.success(
+                `${importResult.data.imported} conta(s) importada(s) automaticamente!`,
+              );
+            } else {
+              console.log(
+                `[OpenFinanceModal] No accounts found for item ${item.itemId}`,
+              );
+            }
+          } catch (error) {
+            console.error(
+              `[OpenFinanceModal] Error auto-importing accounts for item ${item.itemId}:`,
+              error,
+            );
+          }
+        });
+      }
+    }
+  }, [
+    open,
+    existingItems,
+    isLoadingExistingItems,
+    companyId,
+    queryClient,
+    importedItems,
+  ]);
 
   const getDocumentType = useCallback((): 'CPF' | 'CNPJ' | undefined => {
     if (!cpfCnpj) return undefined;
@@ -379,7 +460,7 @@ export function useOpenFinanceModal({
         } else {
           console.warn('[OpenFinanceModal] No authUrl found in item');
         }
-      } else if (item.status === 'CONNECTED' || item.status === 'connected' || item.status === 'SYNCING' || item.status === 'syncing') {
+      } else if (item.status === 'CONNECTED' || item.status === 'connected' || item.status === 'SYNCING' || item.status === 'syncing' || item.status === 'SYNCED' || item.status === 'synced') {
         const message = item.status === 'SYNCING' || item.status === 'syncing'
           ? 'Conexão estabelecida! Sincronizando contas...'
           : 'Conexão estabelecida com sucesso!';
@@ -444,16 +525,69 @@ export function useOpenFinanceModal({
         }
       }
 
-      if (status === 'connected' || status === 'syncing' || event.event === 'ITEM_CONNECTED' || (event.event === 'ITEM_UPDATED' && (status === 'connected' || status === 'syncing'))) {
+      if (status === 'connected' || status === 'syncing' || status === 'synced' || event.event === 'ITEM_CONNECTED' || (event.event === 'ITEM_UPDATED' && (status === 'connected' || status === 'syncing' || status === 'synced'))) {
+        const itemId = event.itemId;
+        
         if (status === 'syncing') {
           console.log('[OpenFinanceModal] SSE: status is syncing, connection established and syncing accounts!');
-          toast.success('Conexão estabelecida! Sincronizando contas...');
+          toast.info('Conexão estabelecida! Importando contas...');
         } else {
           console.log('[OpenFinanceModal] SSE: status is connected, connection established!');
-          toast.success('Conexão estabelecida com sucesso!');
+          toast.info('Conexão estabelecida! Importando contas...');
         }
-        queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
-        onSuccessRef.current?.();
+
+        (async () => {
+          const maxRetries = 5;
+          const retryDelays = [2000, 3000, 5000, 8000, 10000];
+          
+          for (let attempt = 0; attempt < maxRetries; attempt++) {
+            try {
+              console.log(`[OpenFinanceModal] Fetching available accounts for itemId: ${itemId} (attempt ${attempt + 1}/${maxRetries})`);
+              const availableAccounts = await getAccounts(companyId, itemId);
+              
+              if (availableAccounts && availableAccounts.length > 0) {
+                const accountIds = availableAccounts.map(acc => acc.id);
+                console.log('[OpenFinanceModal] Importing accounts:', accountIds);
+
+                const importResult = await importAccounts(companyId, itemId, accountIds);
+                
+                console.log('[OpenFinanceModal] Accounts imported successfully:', importResult);
+                
+                const successMessage = status === 'syncing'
+                  ? `Conexão estabelecida! ${importResult.data.imported} conta(s) importada(s) com sucesso!`
+                  : `${importResult.data.imported} conta(s) importada(s) com sucesso!`;
+                
+                toast.success(successMessage);
+                queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+                onSuccessRef.current?.();
+                return;
+              }
+
+              if (attempt < maxRetries - 1) {
+                const delay = retryDelays[attempt] ?? 10000;
+                console.log(`[OpenFinanceModal] No accounts found yet. Retrying in ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+              } else {
+                console.warn('[OpenFinanceModal] No accounts found after all retries');
+                toast.warning('Nenhuma conta encontrada para importar. Tente novamente mais tarde.');
+                queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+                onSuccessRef.current?.();
+              }
+            } catch (error) {
+              console.error(`[OpenFinanceModal] Error importing accounts (attempt ${attempt + 1}):`, error);
+              
+              if (attempt === maxRetries - 1) {
+                const errorMessage = error instanceof Error ? error.message : 'Erro ao importar contas';
+                toast.error(`Erro ao importar contas: ${errorMessage}`);
+                queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+                onSuccessRef.current?.();
+              } else {
+                const delay = retryDelays[attempt] ?? 10000;
+                await new Promise(resolve => setTimeout(resolve, delay));
+              }
+            }
+          }
+        })();
       }
 
       if (event.event === 'ITEM_ERROR') {
@@ -605,6 +739,7 @@ export function useOpenFinanceModal({
     createdItemId,
     existingItems: existingItems ?? [],
     isLoadingExistingItems,
+    isInitializing,
     itemStatus: lastEvent
       ? ({
           id: lastEvent.itemId,

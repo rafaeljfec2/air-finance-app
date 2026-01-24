@@ -179,3 +179,83 @@ export const getItems = async (companyId: string): Promise<OpeniItem[]> => {
     throw parseApiError(error);
   }
 };
+
+const OpeniAccountSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.enum(['BANK', 'CREDIT']),
+  subtype: z.string(),
+  balance: z.number(),
+  currency: z.string(),
+  bankCode: z.string(),
+  accountNumber: z.string(),
+  branchNumber: z.string(),
+  marketingName: z.string(),
+  bankCompeCode: z.string(),
+  bankBranchNumber: z.string(),
+  accountDigit: z.string().nullable(),
+  accountSuffix: z.string().nullable(),
+  currentBalance: z.number(),
+  currentAutomaticallyInvestedBalance: z.number(),
+  overdraftLimit: z.number(),
+  overdraftUsedLimit: z.number(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+const OpeniAccountsResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.object({
+    accounts: z.array(OpeniAccountSchema),
+  }),
+});
+
+const ImportOpeniAccountsResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.object({
+    imported: z.number(),
+    accounts: z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        type: z.string(),
+        bankCode: z.string(),
+      }),
+    ),
+  }),
+});
+
+export type OpeniAccount = z.infer<typeof OpeniAccountSchema>;
+export type ImportOpeniAccountsResponse = z.infer<typeof ImportOpeniAccountsResponseSchema>;
+
+export const getAccounts = async (
+  companyId: string,
+  itemId: string,
+): Promise<OpeniAccount[]> => {
+  try {
+    const response = await apiClient.get<{ success: boolean; data: { accounts: OpeniAccount[] } }>(
+      `/companies/${companyId}/banking/openi/items/${itemId}/accounts`,
+    );
+    return OpeniAccountsResponseSchema.parse(response.data).data.accounts;
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+export const importAccounts = async (
+  companyId: string,
+  itemId: string,
+  accountIds: string[],
+): Promise<ImportOpeniAccountsResponse> => {
+  try {
+    const response = await apiClient.post<ImportOpeniAccountsResponse>(
+      `/companies/${companyId}/banking/openi/items/${itemId}/import-accounts`,
+      {
+        accountIds,
+      },
+    );
+    return ImportOpeniAccountsResponseSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
