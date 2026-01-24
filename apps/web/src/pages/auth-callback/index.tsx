@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth';
 import { getCurrentUser } from '@/services/authService';
+import { authUtils } from '@/utils/auth';
 import { SuspenseLoader } from '@/components/SuspenseLoader';
 import { CheckCircle2, AlertCircle, LogIn, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,10 @@ export function AuthCallbackPage() {
       // Caso 1: Precisa vincular (usuário está logado)
       if (needsLinkParam === 'true') {
         try {
+          // Limpa tokens antigos do localStorage para evitar conflito
+          // O Google OAuth usa cookies HttpOnly, então não precisamos de tokens no localStorage
+          authUtils.clearAuth();
+
           // Busca dados do usuário logado
           const currentUser = await getCurrentUser();
           updateAuthState(currentUser, null);
@@ -61,6 +66,10 @@ export function AuthCallbackPage() {
       // Caso 3: Sucesso normal
       if (success === 'true') {
         try {
+          // Limpa tokens antigos do localStorage para evitar conflito
+          // O Google OAuth usa cookies HttpOnly, então não precisamos de tokens no localStorage
+          authUtils.clearAuth();
+
           // Token já está em cookie HttpOnly, apenas busca dados do usuário
           const currentUser = await getCurrentUser();
 

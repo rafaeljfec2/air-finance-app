@@ -65,6 +65,7 @@ export const PasswordRecoverySchema = z.object({
 
 export const ResetPasswordSchema = z
   .object({
+    email: z.string().email(),
     token: z.string(),
     password: z.string().min(6),
     confirmPassword: z.string().min(6),
@@ -167,5 +168,5 @@ export const refreshToken = async (refreshTokenValue: string): Promise<AuthRespo
 export const loginWithGoogle = (): void => {
   const apiUrl = env.VITE_API_URL;
   const googleAuthUrl = `${apiUrl}/v1/auth/google`;
-  window.location.href = googleAuthUrl;
+  globalThis.location.href = googleAuthUrl;
 };

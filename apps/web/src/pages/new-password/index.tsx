@@ -23,8 +23,15 @@ export function NewPasswordPage() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const token = searchParams.get('token');
+  const email = searchParams.get('email');
+
   if (!token) {
     navigate('/login');
+    return null;
+  }
+
+  if (!email) {
+    navigate('/login?error=missing_email');
     return null;
   }
 
@@ -51,6 +58,7 @@ export function NewPasswordPage() {
 
     try {
       await resetPassword.mutateAsync({
+        email: decodeURIComponent(email || ''),
         token: token || '',
         password: form.password,
         confirmPassword: form.confirmPassword,

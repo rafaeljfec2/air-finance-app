@@ -38,11 +38,12 @@ const OpeniItemAuthSchema = z.object({
 
 const OpeniItemResponseSchema = z.object({
   id: z.string(),
-  status: z.enum(['PENDING', 'CONNECTED', 'ERROR', 'WAITING_USER_INPUT']),
+  connectorId: z.string().optional(),
+  status: z.string(),
   auth: OpeniItemAuthSchema.optional(),
   warnings: z.array(z.string()),
-  updatedAt: z.string(),
-  createdAt: z.string(),
+  updatedAt: z.string().optional(),
+  createdAt: z.string().optional(),
 });
 
 const CreateOpeniItemResponseSchema = z.object({
@@ -115,9 +116,9 @@ export const getItemStatus = async (
 ): Promise<OpeniItemResponse> => {
   try {
     const response = await apiClient.get<{ data: OpeniItemResponse }>(
-      `/banking/openi/items/${itemId}`,
+      `/companies/${companyId}/banking/openi/items/${itemId}`,
       {
-        params: { companyId, accountId },
+        params: { accountId },
       },
     );
     return OpeniItemResponseSchema.parse(response.data.data);
