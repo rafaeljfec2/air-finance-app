@@ -43,7 +43,7 @@ interface ErrorResponse {
   path?: string;
   response?: {
     status?: number;
-    data?: ErrorResponse;
+    data?: ErrorResponse & { statusCode?: number };
   };
   raw?: {
     status?: number;
@@ -207,7 +207,7 @@ const processConflictError = (
   try {
     let itemId = extractItemIdFromError(errorData, errorMessage);
     const existingAccount = accounts?.find((acc) => acc.id === variables.accountId);
-    itemId = itemId ?? existingAccount?.openiItemId;
+    itemId = itemId ?? (existingAccount?.openiItemId ?? undefined);
 
     if (!itemId) {
       console.error('[OpenFinanceModal] Could not extract itemId from error:', {
@@ -401,7 +401,7 @@ export function useOpenFinanceModal({
   }, [onSuccess]);
 
   const handleSseEvent = useCallback(
-    (event: Parameters<Parameters<typeof useOpeniItemEvents>[0]['onEvent']>[0]) => {
+    (event: { event: string; itemId: string; status?: string; auth?: { authUrl: string; expiresAt: string }; warnings?: string[]; timestamp: string }) => {
       console.log('[OpenFinanceModal] SSE event received:', event);
 
       const status = event.status?.toLowerCase();
