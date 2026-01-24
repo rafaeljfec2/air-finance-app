@@ -2,6 +2,7 @@ import { AccountFormModal } from '@/components/accounts/AccountFormModal';
 import { BankingIntegrationModal } from '@/components/accounts/BankingIntegrationModal';
 import { StatementScheduleConfig } from '@/components/accounts/StatementScheduleConfig';
 import { PierreConnectModal } from '@/components/accounts/PierreConnectModal';
+import { OpenFinanceConnectModal } from '@/components/accounts/OpenFinanceConnectModal';
 import { Loading } from '@/components/Loading';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -12,6 +13,7 @@ import { Account, CreateAccount } from '@/services/accountService';
 import { useCompanyStore } from '@/stores/company';
 import { companyService } from '@/services/companyService';
 import { useMemo, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AccountsEmptyState } from './components/AccountsEmptyState';
 import { AccountsErrorState } from './components/AccountsErrorState';
 import { AccountsFilters } from './components/AccountsFilters';
@@ -21,6 +23,7 @@ import { useAccountFilters } from './hooks/useAccountFilters';
 import { useAccountSorting } from './hooks/useAccountSorting';
 
 export function AccountsPage() {
+  const navigate = useNavigate();
   const {
     accounts,
     isLoading,
@@ -55,6 +58,7 @@ export function AccountsPage() {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [schedulingAccount, setSchedulingAccount] = useState<Account | null>(null);
   const [showPierreModal, setShowPierreModal] = useState(false);
+  const [showOpenFinanceModal, setShowOpenFinanceModal] = useState(false);
   const [viewMode, setViewMode] = useViewMode('accounts-view-mode');
 
   const {
@@ -133,6 +137,23 @@ export function AccountsPage() {
     setShowPierreModal(true);
   };
 
+  const handleConnectOpenFinance = () => {
+    setShowOpenFinanceModal(true);
+  };
+
+  const handleOpenFinanceSuccess = async () => {
+    if (activeCompany?.id) {
+      try {
+        const updatedCompany = await companyService.getById(activeCompany.id);
+        setActiveCompany(updatedCompany);
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      } catch (err) {
+        console.error('Failed to refresh company data:', err);
+      }
+    }
+    globalThis.location.reload();
+  };
+
   const handlePierreSuccess = async () => {
     if (activeCompany?.id) {
       try {
@@ -186,6 +207,7 @@ export function AccountsPage() {
             onCreate={handleCreate} 
             canCreate={canCreateAccount}
             onConnectPierre={isPierreAvailable ? handleConnectPierre : undefined}
+            onConnectOpenFinance={handleConnectOpenFinance}
           />
 
           <AccountsFilters
@@ -260,6 +282,15 @@ export function AccountsPage() {
           companyId={activeCompany.id}
           pierreFinanceTenantId={activeCompany.pierreFinanceTenantId}
           onSuccess={handlePierreSuccess}
+        />
+      )}
+
+      {activeCompany && (
+        <OpenFinanceConnectModal
+          open={showOpenFinanceModal}
+          onClose={() => setShowOpenFinanceModal(false)}
+          companyId={activeCompany.id}
+          onSuccess={handleOpenFinanceSuccess}
         />
       )}
 

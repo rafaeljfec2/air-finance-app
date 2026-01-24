@@ -33,6 +33,12 @@ export const AccountSchema = z.object({
   bankingTenantId: z.string().optional().nullable(),
   pixKey: z.string().optional().nullable(),
   hasBankingIntegration: z.boolean().optional().default(false),
+  // Openi fields
+  openiItemId: z.string().optional().nullable(),
+  openiConnectorId: z.string().optional().nullable(),
+  openiItemStatus: z.enum(['PENDING', 'CONNECTED', 'ERROR', 'WAITING_USER_INPUT']).optional().nullable(),
+  openiAuthUrl: z.string().optional().nullable(),
+  openiAuthExpiresAt: z.string().datetime().optional().nullable(),
 });
 
 export const CreateAccountSchema = AccountSchema.omit({

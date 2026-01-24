@@ -23,6 +23,9 @@ const StatementSchedulePage = lazy(() =>
     default: m.StatementSchedulePage,
   })),
 );
+const OpenFinancePage = lazy(() =>
+  import('@/pages/openfinance').then((m) => ({ default: m.OpenFinancePage })),
+);
 const AiClassificationPage = lazy(() =>
   import('@/pages/ai-classification').then((m) => ({ default: m.AiClassificationPage })),
 );
@@ -320,6 +323,7 @@ export const router = createBrowserRouter([
   createSimpleProtectedRoute('/categories', CategoriesPage),
   createSimpleProtectedRoute('/accounts', AccountsPage),
   createSimpleProtectedRoute('/accounts/:accountId/statement-schedule', StatementSchedulePage),
+  createSimpleProtectedRoute('/openfinance', OpenFinancePage),
   createSimpleProtectedRoute('/business-logs', BusinessLogsPage),
   createSimpleProtectedRoute('/profile', Profile),
   createSimpleProtectedRoute('/import-ofx', ImportOfxPage),

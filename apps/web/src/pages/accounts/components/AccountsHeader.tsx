@@ -5,9 +5,15 @@ interface AccountsHeaderProps {
   onCreate: () => void;
   canCreate: boolean;
   onConnectPierre?: () => void;
+  onConnectOpenFinance?: () => void;
 }
 
-export function AccountsHeader({ onCreate, canCreate, onConnectPierre }: Readonly<AccountsHeaderProps>) {
+export function AccountsHeader({
+  onCreate,
+  canCreate,
+  onConnectPierre,
+  onConnectOpenFinance,
+}: Readonly<AccountsHeaderProps>) {
   return (
     <>
       {/* Mobile Header */}
@@ -33,6 +39,16 @@ export function AccountsHeader({ onCreate, canCreate, onConnectPierre }: Readonl
             >
               <Link2 className="h-5 w-5" />
               Conectar Pierre Finance
+            </Button>
+          )}
+          {onConnectOpenFinance && (
+            <Button
+              onClick={onConnectOpenFinance}
+              variant="outline"
+              className="w-full border-purple-500 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/10 flex items-center justify-center gap-2 h-11 rounded-xl font-medium"
+            >
+              <Link2 className="h-5 w-5" />
+              Open Finance
             </Button>
           )}
           {canCreate && (
@@ -72,6 +88,16 @@ export function AccountsHeader({ onCreate, canCreate, onConnectPierre }: Readonl
             >
               <Link2 className="h-5 w-5" />
               Pierre Finance
+            </Button>
+          )}
+          {onConnectOpenFinance && (
+            <Button
+              onClick={onConnectOpenFinance}
+              variant="outline"
+              className="border-purple-500 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/10 flex items-center gap-2 h-12 px-6 rounded-xl font-semibold"
+            >
+              <Link2 className="h-5 w-5" />
+              Open Finance
             </Button>
           )}
           {canCreate && (
