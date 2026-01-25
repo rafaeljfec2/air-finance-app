@@ -6,13 +6,15 @@ import {
 import { NavigationGroup } from './NavigationGroup';
 import { NavigationItem } from './NavigationItem';
 import { cn } from '@/lib/utils';
+import { useSidebarStore } from '@/stores/sidebar';
+import { PanelLeftClose, PanelLeft } from 'lucide-react';
 
 interface NavigationSectionProps {
-  section: NavigationSectionType;
-  index: number;
-  isCollapsed: boolean;
-  openMenu: string | null;
-  onMenuToggle: (itemName: string) => void;
+  readonly section: NavigationSectionType;
+  readonly index: number;
+  readonly isCollapsed: boolean;
+  readonly openMenu: string | null;
+  readonly onMenuToggle: (itemName: string) => void;
 }
 
 function isGroupItem(item: NavigationItemType): item is NavigationGroupItem {
@@ -26,11 +28,37 @@ export function NavigationSection({
   openMenu,
   onMenuToggle,
 }: Readonly<NavigationSectionProps>) {
+  const { toggleCollapse } = useSidebarStore();
+  const isFirstSection = index === 0;
+
   return (
     <div key={section.section} className={cn('mb-2', index !== 0 && 'mt-6')}>
-      {!isCollapsed && (
-        <div className="text-[10px] font-semibold text-gray-500 tracking-widest uppercase mb-1 pl-2">
-          {section.section}
+      {isCollapsed ? (
+        isFirstSection && (
+          <button
+            onClick={toggleCollapse}
+            className="hidden lg:flex items-center justify-center w-full p-2 mb-1 rounded-md text-text-muted dark:text-text-muted-dark hover:bg-background dark:hover:bg-background-dark hover:text-text dark:hover:text-text-dark transition-colors"
+            aria-label="Expandir menu"
+            title="Expandir menu"
+          >
+            <PanelLeft className="h-4 w-4" />
+          </button>
+        )
+      ) : (
+        <div className="flex items-center justify-between mb-1 pl-2 pr-1">
+          <span className="text-[10px] font-semibold text-gray-500 tracking-widest uppercase">
+            {section.section}
+          </span>
+          {isFirstSection && (
+            <button
+              onClick={toggleCollapse}
+              className="hidden lg:flex items-center justify-center p-1 rounded-md text-text-muted dark:text-text-muted-dark hover:bg-background dark:hover:bg-background-dark hover:text-text dark:hover:text-text-dark transition-colors"
+              aria-label="Recolher menu"
+              title="Recolher menu"
+            >
+              <PanelLeftClose className="h-4 w-4" />
+            </button>
+          )}
         </div>
       )}
       {section.items.map((item) => {

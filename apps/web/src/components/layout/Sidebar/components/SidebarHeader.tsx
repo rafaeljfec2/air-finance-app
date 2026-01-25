@@ -4,15 +4,12 @@ import { useSidebarStore } from '@/stores/sidebar';
 import { X } from 'lucide-react';
 
 interface SidebarHeaderProps {
-  onClose?: () => void;
-  isHeaderVisible: boolean;
+  readonly onClose?: () => void;
+  readonly isHeaderVisible: boolean;
 }
 
 export function SidebarHeader({ onClose, isHeaderVisible }: Readonly<SidebarHeaderProps>) {
   const { isCollapsed } = useSidebarStore();
-  // Show CompanySelector when sidebar is not collapsed
-  // On mobile: always visible when sidebar is open
-  // On desktop: only visible when header is hidden (controlled by CSS)
   const showCompanySelector = !isCollapsed;
   const showCloseButton = !!onClose;
 
@@ -32,7 +29,6 @@ export function SidebarHeader({ onClose, isHeaderVisible }: Readonly<SidebarHead
         <div
           className={cn(
             'w-full',
-            // Hide on desktop when header is visible, show on mobile always
             isHeaderVisible && 'lg:hidden',
           )}
         >
