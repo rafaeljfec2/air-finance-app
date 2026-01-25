@@ -151,7 +151,7 @@ export function CreditCardBillsPage() {
         <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 relative flex flex-col">
           {isLoading && !isInitialLoad && (
             <div className="absolute inset-0 bg-background/50 dark:bg-background-dark/50 backdrop-blur-sm z-10 flex items-center justify-center">
-              <Loading size="medium">Carregando...</Loading>
+              <Loading size="large">Carregando...</Loading>
             </div>
           )}
           <BillSummary
