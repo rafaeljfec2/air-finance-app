@@ -15,16 +15,13 @@ import {
   Pencil,
   Plus,
   RefreshCcw,
-  Save,
-  Settings,
   Tag,
   User,
   Wallet,
 } from 'lucide-react';
-
 export const navigation: NavigationSection[] = [
   {
-    section: '📊 Análise e Planejamento',
+    section: '📊 Visão Geral',
     items: [
       { name: 'Home', href: '/home', icon: Home },
       { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -33,69 +30,67 @@ export const navigation: NavigationSection[] = [
         href: '/financial-health',
         icon: LineChart,
       },
-      { name: 'Meu Orçamento', href: '/budget', icon: Wallet },
-      /*{ name: 'Classificação Inteligente', href: '/ai/classification', icon: ChartBar },
-       { name: 'Meu Planner', href: '/planner', icon: Calendar }, */
       { name: 'Relatórios', href: '/reports', icon: ChartBar },
     ],
   },
+
   {
-    section: '💰 Gestão Financeira',
+    section: '💸 Movimentações',
     items: [
-      {
-        name: 'Financeiro',
-        icon: ArrowRightLeft,
-        children: [
-          { name: 'Nova Transação', href: '/transactions/new', icon: Plus },
-          { name: 'Fluxo de Caixa', href: '/transactions', icon: ArrowRightLeft },
-          { name: 'Extrato Bancário', href: '/import-ofx', icon: Import },
-          /* { name: 'Contas a Pagar', href: '/payables', icon: ArrowDown },
-          { name: 'Contas a Receber', href: '/receivables', icon: ArrowUp }, 
-          { name: 'Fechamento Mensal', href: '/monthly-closing', icon: Calendar },
-          { name: 'Resultado Anual', href: '/annual-result', icon: ChartBar }, */
-        ],
-      },
+      { name: 'Nova Transação', href: '/transactions/new', icon: Plus },
+      { name: 'Fluxo de Caixa', href: '/transactions', icon: ArrowRightLeft },
+      { name: 'Importar Extrato (OFX)', href: '/import-ofx', icon: Import },
     ],
   },
+
   {
-    section: '🧾 Administração',
+    section: '🏦 Contas & Estrutura',
+    items: [
+      { name: 'Empresas', href: '/companies', icon: Building2 },
+      { name: 'Contas Bancárias', href: '/accounts', icon: Banknote },
+      { name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCard },
+      { name: 'Categorias', href: '/categories', icon: Tag },
+      { name: 'Recorrências', href: '/recurring-transactions', icon: RefreshCcw },
+    ],
+  },
+
+  {
+    section: '🎯 Planejamento',
+    items: [
+      { name: 'Orçamento', href: '/budget', icon: Wallet },
+      { name: 'Metas Financeiras', href: '/goals', icon: Flag },
+    ],
+  },
+
+  {
+    section: '⚙️ Conta & Preferências',
+    items: [
+      { name: 'Perfil', href: '/profile', icon: User },
+      { name: 'Preferências', href: '/settings/preferences', icon: Pencil },
+      { name: 'Notificações', href: '/settings/notifications', icon: Bell },
+      { name: 'Assinatura', href: '/settings/subscription', icon: CreditCard },
+    ],
+  },
+
+  {
+    section: '🛡️ Administração',
     items: [
       {
-        name: 'Cadastros',
-        icon: Save,
-        children: [
-          { name: 'Empresas', href: '/companies', icon: Building2 },
-          { name: 'Contas', href: '/accounts', icon: Banknote },
-          { name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCard },
-          { name: 'Categorias', href: '/categories', icon: Tag },
-          /* { name: 'Dependentes', href: '/dependents', icon: Users }, */
-          { name: 'Metas', href: '/goals', icon: Flag },
-          { name: 'Recorrências', href: '/recurring-transactions', icon: RefreshCcw },
-          { name: 'Usuários', href: '/users', icon: User },
-          /* { name: 'Fontes de Receitas', href: '/income-sources', icon: DollarSign }, */
-        ],
+        name: 'Usuários',
+        href: '/users',
+        icon: User,
       },
       {
-        name: 'Configurações',
-        icon: Settings,
-        children: [
-          { name: 'Perfil do Usuário', href: '/profile', icon: User },
-          { name: 'Preferências', href: '/settings/preferences', icon: Pencil },
-          { name: 'Notificações', href: '/settings/notifications', icon: Bell },
-          {
-            name: 'Logs OpenAI',
-            href: '/admin/openai-logs',
-            icon: ChartBar,
-            roles: [UserRole.GOD],
-          },
-          {
-            name: 'Gerenciar Planos',
-            href: '/admin/plans',
-            icon: CreditCard,
-            roles: [UserRole.GOD],
-          },
-          { name: 'Assinatura', href: '/settings/subscription', icon: CreditCard },
-        ],
+        name: 'Logs OpenAI',
+        href: '/admin/openai-logs',
+        icon: ChartBar,
+        roles: [UserRole.GOD],
+      },
+      {
+        name: 'Gerenciar Planos',
+        href: '/admin/plans',
+        icon: CreditCard,
+        roles: [UserRole.GOD],
       },
     ],
   },
