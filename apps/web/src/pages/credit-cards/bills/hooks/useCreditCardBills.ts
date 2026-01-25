@@ -1,6 +1,5 @@
 import { useCompanyStore } from '@/stores/company';
 import { useCreditCardQueries } from './useCreditCardQueries';
-import { useBillData } from './useBillData';
 import { useBillTransactions } from './useBillTransactions';
 import { useBillPagination } from './useBillPagination';
 import { useCurrentBill } from './utils/billConstruction';
@@ -17,39 +16,27 @@ export function useCreditCardBills(cardId: string, month: string): UseCreditCard
       cardId,
     });
 
-  const { currentPage } = useBillPagination({
-    cardId,
-    month,
-    billData: undefined,
-    isFetching: false,
-  });
-
-  const { billData, isLoadingBill, isFetching, billError } = useBillData({
-    companyId,
-    cardId,
-    month,
-    currentPage,
-    creditCardId: creditCard?.id,
-  });
-
   const {
-    currentPage: finalCurrentPage,
+    currentPage,
     isLoadingMore: finalIsLoadingMore,
     pagination: finalPagination,
     loadMore: finalLoadMore,
     hasMore: finalHasMore,
+    billData,
+    isLoadingBill,
+    billError,
   } = useBillPagination({
     cardId,
     month,
-    billData,
-    isFetching,
+    companyId,
+    creditCardId: creditCard?.id,
   });
 
   const { isInitialLoad } = useInitialLoad({ billData, cardId, month });
 
   const { allTransactions } = useBillTransactions({
     billData,
-    currentPage: finalCurrentPage,
+    currentPage,
     cardId,
     month,
   });
@@ -62,7 +49,7 @@ export function useCreditCardBills(cardId: string, month: string): UseCreditCard
     allTransactions,
   });
 
-  const isLoading = isLoadingCard || isLoadingAccounts || (isLoadingBill && finalCurrentPage === 1);
+  const isLoading = isLoadingCard || isLoadingAccounts || (isLoadingBill && currentPage === 1);
   const error = cardError ?? accountsError ?? billError;
 
   return {

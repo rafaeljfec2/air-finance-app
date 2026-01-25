@@ -1,25 +1,49 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getCreditCardBill, type CreditCardBillResponse } from '@/services/creditCardService';
 import { createInitialPaginationState, type PaginationState } from './utils/stateManagement';
-import type { CreditCardBillResponse } from '@/services/creditCardService';
 
 interface UseBillPaginationParams {
   cardId: string;
   month: string;
-  billData?: CreditCardBillResponse;
-  isFetching: boolean;
+  companyId: string;
+  creditCardId?: string;
 }
 
 export const useBillPagination = ({
   cardId,
   month,
-  billData,
-  isFetching,
+  companyId,
+  creditCardId,
 }: UseBillPaginationParams) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [pagination, setPagination] = useState<PaginationState>(createInitialPaginationState());
   const previousMonthRef = useRef<string>(month);
   const previousCardIdRef = useRef<string>(cardId);
+
+  const {
+    data: billData,
+    isLoading: isLoadingBill,
+    isFetching,
+    error: billError,
+  } = useQuery<CreditCardBillResponse>({
+    queryKey: ['credit-card-bill', companyId, cardId, month, currentPage],
+    queryFn: () => getCreditCardBill(companyId, cardId, month, { page: currentPage, limit: 10 }),
+    enabled: !!companyId && !!cardId && !!month && !!creditCardId,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    retry: false,
+    placeholderData: (previousData) => {
+      if (previousData && previousData.pagination?.page === currentPage) {
+        return previousData;
+      }
+      return undefined;
+    },
+  });
 
   useEffect(() => {
     const monthChanged = previousMonthRef.current !== month;
@@ -36,7 +60,7 @@ export const useBillPagination = ({
 
   useEffect(() => {
     if (billData?.pagination) {
-      setPagination({
+      const newPagination = {
         page: billData.pagination.page,
         limit: billData.pagination.limit,
         total: billData.pagination.total,
@@ -44,9 +68,21 @@ export const useBillPagination = ({
         totalAmount: billData.pagination.totalAmount,
         hasNextPage: billData.pagination.hasNextPage,
         hasPreviousPage: billData.pagination.hasPreviousPage,
-      });
+      };
+      setPagination(newPagination);
     }
   }, [billData?.pagination]);
+
+  const previousIsFetchingRef = useRef<boolean>(isFetching);
+  
+  useEffect(() => {
+    const wasFetching = previousIsFetchingRef.current;
+    previousIsFetchingRef.current = isFetching;
+
+    if (wasFetching && !isFetching && isLoadingMore) {
+      setIsLoadingMore(false);
+    }
+  }, [isFetching, isLoadingMore]);
 
   const loadMore = useCallback(async () => {
     if (isLoadingMore || isFetching || !pagination.hasNextPage) {
@@ -54,15 +90,10 @@ export const useBillPagination = ({
     }
 
     setIsLoadingMore(true);
-    try {
-      const nextPage = currentPage + 1;
-      if (nextPage <= pagination.totalPages) {
-        setCurrentPage(nextPage);
-      } else {
-        setIsLoadingMore(false);
-      }
-    } catch (error) {
-      console.error('Error loading more extracts:', error);
+    const nextPage = currentPage + 1;
+    if (nextPage <= pagination.totalPages) {
+      setCurrentPage(nextPage);
+    } else {
       setIsLoadingMore(false);
     }
   }, [isLoadingMore, isFetching, pagination.hasNextPage, pagination.totalPages, currentPage]);
@@ -73,5 +104,9 @@ export const useBillPagination = ({
     pagination,
     loadMore,
     hasMore: pagination.hasNextPage,
+    isFetching,
+    billData,
+    isLoadingBill,
+    billError,
   };
 };
