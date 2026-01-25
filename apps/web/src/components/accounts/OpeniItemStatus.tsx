@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
-import { AlertCircle, CheckCircle2, Clock, RefreshCw, ExternalLink, AlertTriangle } from 'lucide-react';
+import { RefreshCw, ExternalLink, AlertTriangle } from 'lucide-react';
 import { type OpeniItemResponse } from '@/services/openiService';
+import { translateOpeniStatus } from './utils/openiStatusTranslations';
 
 interface OpeniItemStatusProps {
   item: OpeniItemResponse;
@@ -9,76 +10,91 @@ interface OpeniItemStatusProps {
   onOpenAuthUrl: (url: string) => void;
 }
 
+const getStatusDescription = (status: string): string => {
+  const upperStatus = status.toUpperCase();
+  switch (upperStatus) {
+    case 'CONNECTED':
+      return 'Sua conta está conectada e sincronizada';
+    case 'SYNCING':
+      return 'Sincronizando dados da conta';
+    case 'SYNCED':
+      return 'Conta sincronizada com sucesso';
+    case 'PENDING':
+      return 'A conexão está sendo processada';
+    case 'WAITING_USER_INPUT':
+      return 'É necessário autenticar no site do banco';
+    case 'ERROR':
+    case 'AUTH_ERROR':
+      return 'Ocorreu um erro na conexão';
+    case 'OUT_OF_SYNC':
+      return 'A conexão precisa ser ressincronizada';
+    case 'DELETED':
+      return 'Esta conexão foi excluída';
+    default:
+      return 'Status desconhecido';
+  }
+};
+
 export function OpeniItemStatus({
   item,
   isLoading,
   onResync,
   onOpenAuthUrl,
 }: Readonly<OpeniItemStatusProps>) {
-  const getStatusConfig = () => {
-    switch (item.status) {
-      case 'CONNECTED':
-        return {
-          icon: CheckCircle2,
-          color: 'text-green-600 dark:text-green-400',
-          bgColor: 'bg-green-50 dark:bg-green-900/20',
-          borderColor: 'border-green-200 dark:border-green-800',
-          label: 'Conectado',
-          description: 'Sua conta está conectada e sincronizada',
-        };
-      case 'PENDING':
-        return {
-          icon: Clock,
-          color: 'text-yellow-600 dark:text-yellow-400',
-          bgColor: 'bg-yellow-50 dark:bg-yellow-900/20',
-          borderColor: 'border-yellow-200 dark:border-yellow-800',
-          label: 'Pendente',
-          description: 'A conexão está sendo processada',
-        };
-      case 'WAITING_USER_INPUT':
-        return {
-          icon: AlertCircle,
-          color: 'text-blue-600 dark:text-blue-400',
-          bgColor: 'bg-blue-50 dark:bg-blue-900/20',
-          borderColor: 'border-blue-200 dark:border-blue-800',
-          label: 'Aguardando Autenticação',
-          description: 'É necessário autenticar no site do banco',
-        };
-      case 'ERROR':
-        return {
-          icon: AlertTriangle,
-          color: 'text-red-600 dark:text-red-400',
-          bgColor: 'bg-red-50 dark:bg-red-900/20',
-          borderColor: 'border-red-200 dark:border-red-800',
-          label: 'Erro',
-          description: 'Ocorreu um erro na conexão',
-        };
-      default:
-        return {
-          icon: AlertCircle,
-          color: 'text-gray-600 dark:text-gray-400',
-          bgColor: 'bg-gray-50 dark:bg-gray-900/20',
-          borderColor: 'border-gray-200 dark:border-gray-800',
-          label: 'Desconhecido',
-          description: 'Status desconhecido',
-        };
-    }
+  const statusConfig = translateOpeniStatus(item.status);
+  const StatusIcon = statusConfig.icon;
+  const description = getStatusDescription(item.status);
+  
+  const colorMap: Record<string, string> = {
+    CONNECTED: 'text-green-600 dark:text-green-400',
+    SYNCING: 'text-blue-600 dark:text-blue-400',
+    SYNCED: 'text-green-600 dark:text-green-400',
+    PENDING: 'text-yellow-600 dark:text-yellow-400',
+    WAITING_USER_INPUT: 'text-orange-600 dark:text-orange-400',
+    ERROR: 'text-red-600 dark:text-red-400',
+    AUTH_ERROR: 'text-red-600 dark:text-red-400',
+    OUT_OF_SYNC: 'text-orange-600 dark:text-orange-400',
+    DELETED: 'text-gray-600 dark:text-gray-400',
   };
 
-  const statusConfig = getStatusConfig();
-  const StatusIcon = statusConfig.icon;
+  const bgColorMap: Record<string, string> = {
+    CONNECTED: 'bg-green-50 dark:bg-green-900/20',
+    SYNCING: 'bg-blue-50 dark:bg-blue-900/20',
+    SYNCED: 'bg-green-50 dark:bg-green-900/20',
+    PENDING: 'bg-yellow-50 dark:bg-yellow-900/20',
+    WAITING_USER_INPUT: 'bg-orange-50 dark:bg-orange-900/20',
+    ERROR: 'bg-red-50 dark:bg-red-900/20',
+    AUTH_ERROR: 'bg-red-50 dark:bg-red-900/20',
+    OUT_OF_SYNC: 'bg-orange-50 dark:bg-orange-900/20',
+    DELETED: 'bg-gray-50 dark:bg-gray-900/20',
+  };
+
+  const borderColorMap: Record<string, string> = {
+    CONNECTED: 'border-green-200 dark:border-green-800',
+    SYNCING: 'border-blue-200 dark:border-blue-800',
+    SYNCED: 'border-green-200 dark:border-green-800',
+    PENDING: 'border-yellow-200 dark:border-yellow-800',
+    WAITING_USER_INPUT: 'border-orange-200 dark:border-orange-800',
+    ERROR: 'border-red-200 dark:border-red-800',
+    AUTH_ERROR: 'border-red-200 dark:border-red-800',
+    OUT_OF_SYNC: 'border-orange-200 dark:border-orange-800',
+    DELETED: 'border-gray-200 dark:border-gray-800',
+  };
+
+  const upperStatus = item.status.toUpperCase();
+  const color = colorMap[upperStatus] ?? 'text-gray-600 dark:text-gray-400';
+  const bgColor = bgColorMap[upperStatus] ?? 'bg-gray-50 dark:bg-gray-900/20';
+  const borderColor = borderColorMap[upperStatus] ?? 'border-gray-200 dark:border-gray-800';
 
   return (
     <div className="space-y-4">
-      <div
-        className={`p-4 rounded-lg border-2 ${statusConfig.bgColor} ${statusConfig.borderColor}`}
-      >
+      <div className={`p-4 rounded-lg border-2 ${bgColor} ${borderColor}`}>
         <div className="flex items-start gap-3">
-          <StatusIcon className={`h-5 w-5 ${statusConfig.color} flex-shrink-0 mt-0.5`} />
+          <StatusIcon className={`h-5 w-5 ${color} flex-shrink-0 mt-0.5 ${upperStatus === 'SYNCING' ? 'animate-spin' : ''}`} />
           <div className="flex-1">
-            <h3 className={`text-sm font-medium ${statusConfig.color}`}>{statusConfig.label}</h3>
+            <h3 className={`text-sm font-medium ${color}`}>{statusConfig.label}</h3>
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-              {statusConfig.description}
+              {description}
             </p>
           </div>
         </div>

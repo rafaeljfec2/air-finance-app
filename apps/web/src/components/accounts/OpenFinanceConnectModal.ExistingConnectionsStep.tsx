@@ -1,10 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle2, Loader2, Link2, Building2 } from 'lucide-react';
+import { Link2, Building2 } from 'lucide-react';
 import { type OpeniItem } from '@/services/openiService';
 import { LoadingState } from './OpenFinanceConnectModal.LoadingState';
 import { StatusCard } from './OpenFinanceConnectModal.StatusCard';
 import { BUTTON_FULL_WIDTH, BUTTON_HEIGHT } from './OpenFinanceConnectModal.constants';
+import { translateOpeniStatus } from './utils/openiStatusTranslations';
 
 interface ExistingConnectionsStepProps {
   readonly items: readonly OpeniItem[];
@@ -14,26 +15,14 @@ interface ExistingConnectionsStepProps {
 }
 
 function getStatusBadge(status: string) {
-  const upperStatus = status.toUpperCase();
-  if (upperStatus === 'CONNECTED') {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800">
-        <CheckCircle2 className="h-3.5 w-3.5" />
-        Conectado
-      </span>
-    );
-  }
-  if (upperStatus === 'SYNCING') {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800">
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        Sincronizando
-      </span>
-    );
-  }
+  const config = translateOpeniStatus(status);
+  const Icon = config.icon;
+  const isAnimating = status.toUpperCase() === 'SYNCING';
+
   return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800">
-      {status}
+    <span className={config.className}>
+      <Icon className={`h-3.5 w-3.5 ${isAnimating ? 'animate-spin' : ''}`} />
+      {config.label}
     </span>
   );
 }
