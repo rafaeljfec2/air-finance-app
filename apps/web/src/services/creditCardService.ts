@@ -227,8 +227,16 @@ export const ExtractSchema = z.object({
   accountId: z.string(),
   header: ExtractHeaderSchema,
   transactions: z.array(ExtractTransactionSchema),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  createdAt: z.union([z.string(), z.date(), z.object({}).passthrough()]).transform((val) => {
+    if (val instanceof Date) return val.toISOString();
+    if (typeof val === 'object' && val !== null && Object.keys(val).length === 0) return new Date().toISOString();
+    return typeof val === 'string' ? val : new Date().toISOString();
+  }),
+  updatedAt: z.union([z.string(), z.date(), z.object({}).passthrough()]).transform((val) => {
+    if (val instanceof Date) return val.toISOString();
+    if (typeof val === 'object' && val !== null && Object.keys(val).length === 0) return new Date().toISOString();
+    return typeof val === 'string' ? val : new Date().toISOString();
+  }),
 });
 
 export const CreditCardBillSchema = z.object({
