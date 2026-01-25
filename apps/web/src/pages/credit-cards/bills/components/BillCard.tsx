@@ -1,6 +1,13 @@
 import { ChevronLeft, ChevronRight, Receipt } from 'lucide-react';
 import { BillTransactionList } from './BillTransactionList';
-import { formatCurrency, formatMonthYear, formatDueDate, type BillStatus, getStatusBadgeClasses } from '../utils';
+import {
+  formatCurrency,
+  formatMonthYear,
+  formatDueDate,
+  type BillStatus,
+  getStatusBadgeClasses,
+} from '../utils';
+import React from 'react';
 
 const STATUS_LABELS: Record<BillStatus, string> = {
   PAID: 'Paga',
@@ -92,19 +99,13 @@ export function BillCard({
                 Vencimento em {formatDueDate(dueDate)}
               </p>
             </div>
-            <NavigationButton
-              onClick={onNextMonth}
-              disabled={!canGoNext}
-              ariaLabel="Próximo mês"
-            >
+            <NavigationButton onClick={onNextMonth} disabled={!canGoNext} ariaLabel="Próximo mês">
               <ChevronRight className="h-4 w-4 text-text dark:text-text-dark" />
             </NavigationButton>
           </div>
 
           <div className="text-right">
-            <span className={getStatusBadgeClasses(status)}>
-              {statusLabel}
-            </span>
+            <span className={getStatusBadgeClasses(status)}>{statusLabel}</span>
             <p className="text-2xl font-bold text-text dark:text-text-dark mt-1">
               {formatCurrency(billTotal)}
             </p>
