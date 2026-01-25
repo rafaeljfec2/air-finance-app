@@ -90,7 +90,7 @@ export function CreditCardBillsPage() {
             canGoPrevious={canGoPrevious}
             canGoNext={canGoNext}
           />
-          <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950">
+          <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
             <BillErrorState error={error} />
           </div>
         </div>
@@ -117,7 +117,7 @@ export function CreditCardBillsPage() {
             canGoPrevious={canGoPrevious}
             canGoNext={canGoNext}
           />
-          <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950">
+          <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 flex flex-col">
             <BillEmptyState />
           </div>
         </div>
@@ -148,7 +148,7 @@ export function CreditCardBillsPage() {
           canGoNext={canGoNext}
         />
 
-        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950 relative">
+        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 relative flex flex-col">
           {isLoading && !isInitialLoad && (
             <div className="absolute inset-0 bg-background/50 dark:bg-background-dark/50 backdrop-blur-sm z-10 flex items-center justify-center">
               <Loading size="medium">Carregando...</Loading>
@@ -160,12 +160,14 @@ export function CreditCardBillsPage() {
             total={currentBill.total}
           />
 
-          <BillTransactionList
-            transactions={currentBill.transactions}
-            isLoadingMore={isLoadingMore}
-            hasMore={hasMore}
-            onLoadMore={loadMore}
-          />
+          <div className="flex-1">
+            <BillTransactionList
+              transactions={currentBill.transactions}
+              isLoadingMore={isLoadingMore}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+            />
+          </div>
         </div>
       </div>
 
