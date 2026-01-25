@@ -4,11 +4,11 @@ import { type OpeniConnector } from '@/services/openiService';
 import { useState, useMemo } from 'react';
 
 interface OpeniConnectorSelectorProps {
-  connectors: OpeniConnector[];
-  isLoading: boolean;
-  selectedConnector: OpeniConnector | null;
-  onSearch: (query: string) => void;
-  onSelect: (connector: OpeniConnector) => void;
+  readonly connectors: readonly OpeniConnector[];
+  readonly isLoading: boolean;
+  readonly selectedConnector: OpeniConnector | null;
+  readonly onSearch: (query: string) => void;
+  readonly onSelect: (connector: OpeniConnector) => void;
 }
 
 export function OpeniConnectorSelector({
