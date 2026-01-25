@@ -84,19 +84,29 @@ export const useBillPagination = ({
     }
   }, [isFetching, isLoadingMore]);
 
+  const loadMoreRef = useRef<boolean>(false);
+
   const loadMore = useCallback(async () => {
-    if (isLoadingMore || isFetching || !pagination.hasNextPage) {
+    if (isLoadingMore || isFetching || !pagination.hasNextPage || loadMoreRef.current) {
       return;
     }
 
+    loadMoreRef.current = true;
     setIsLoadingMore(true);
     const nextPage = currentPage + 1;
     if (nextPage <= pagination.totalPages) {
       setCurrentPage(nextPage);
     } else {
       setIsLoadingMore(false);
+      loadMoreRef.current = false;
     }
   }, [isLoadingMore, isFetching, pagination.hasNextPage, pagination.totalPages, currentPage]);
+
+  useEffect(() => {
+    if (!isFetching && isLoadingMore) {
+      loadMoreRef.current = false;
+    }
+  }, [isFetching, isLoadingMore]);
 
   return {
     currentPage,

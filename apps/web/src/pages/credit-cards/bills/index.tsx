@@ -29,8 +29,16 @@ export function CreditCardBillsPage() {
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useBillNavigation();
 
-  const { creditCard, currentBill, isLoading, isLoadingMore, error, loadMore, hasMore, isInitialLoad } =
-    useCreditCardBills(selectedCardId, currentMonth);
+  const {
+    creditCard,
+    currentBill,
+    isLoading,
+    isLoadingMore,
+    error,
+    loadMore,
+    hasMore,
+    isInitialLoad,
+  } = useCreditCardBills(selectedCardId, currentMonth);
 
   useEffect(() => {
     if (cardId) {

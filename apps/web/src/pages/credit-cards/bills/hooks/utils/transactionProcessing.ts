@@ -35,14 +35,27 @@ export const mapTransactionToBillTransaction = (
   };
 };
 
-export const processExtractTransactions = (extracts: Extract[]): BillTransaction[] => {
-  return extracts.flatMap((extract, extractIndex) => {
+export const processExtractTransactions = (
+  extracts: Extract[],
+): BillTransaction[] => {
+  // Backend already handles pagination, so we just process all transactions received
+  const allTransactions = extracts.flatMap((extract, extractIndex) => {
     if (!extract?.transactions || !Array.isArray(extract.transactions) || extract.transactions.length === 0) {
       return [];
     }
     return extract.transactions.map((tx: ExtractTransaction, txIndex) =>
       mapTransactionToBillTransaction(tx, extract.id, extractIndex, txIndex),
     );
+  });
+
+  // Sort by date descending, then by id for consistent ordering
+  return allTransactions.sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    if (dateA !== dateB) {
+      return dateB - dateA;
+    }
+    return a.id.localeCompare(b.id);
   });
 };
 

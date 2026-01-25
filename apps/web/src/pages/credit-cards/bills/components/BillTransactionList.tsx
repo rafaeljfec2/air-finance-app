@@ -39,11 +39,16 @@ export function BillTransactionList({
       return;
     }
 
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry?.isIntersecting && hasMore && !isLoadingRef.current) {
+        if (entry?.isIntersecting && hasMore && !isLoadingRef.current && !isLoadingMore) {
           isLoadingRef.current = true;
+          observer.disconnect();
           onLoadMore()
             .catch((error) => {
               console.error('Error in loadMore:', error);
