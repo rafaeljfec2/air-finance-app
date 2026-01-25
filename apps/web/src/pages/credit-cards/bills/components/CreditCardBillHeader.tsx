@@ -92,8 +92,8 @@ export function CreditCardBillHeader({
                       onClick={() => handleCardSelect(card.id)}
                       className={`w-full text-left px-3 py-2 text-sm rounded-sm transition-colors ${
                         card.id === creditCard?.id
-                          ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium'
-                          : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-text dark:text-text-dark'
+                          ? 'bg-gray-100 dark:bg-gray-800/50 text-text dark:text-text-dark font-medium'
+                          : 'hover:bg-gray-50 dark:hover:bg-gray-800/30 text-text dark:text-text-dark'
                       }`}
                     >
                       {card.name}

@@ -204,7 +204,7 @@ export const BillPeriodSchema = z.object({
 export const ExtractTransactionSchema = z.object({
   date: z.string(),
   description: z.string(),
-  amount: z.number(),
+  amount: z.coerce.number(),
   fitId: z.string().optional(),
 });
 
@@ -216,7 +216,7 @@ export const ExtractHeaderSchema = z.object({
   periodStart: z.string().optional(),
   periodEnd: z.string().optional(),
   generatedAt: z.string().optional(),
-  ledgerBalance: z.number().optional().nullable(),
+  ledgerBalance: z.coerce.number().optional().nullable(),
   ledgerBalanceDate: z.string().optional().nullable(),
 });
 
@@ -235,7 +235,7 @@ export const CreditCardBillSchema = z.object({
   id: z.string(),
   cardId: z.string(),
   month: z.string(),
-  total: z.number(),
+  total: z.coerce.number(),
   dueDate: z.string(),
   status: z.enum(['OPEN', 'CLOSED', 'PAID']),
   period: BillPeriodSchema,
@@ -243,11 +243,11 @@ export const CreditCardBillSchema = z.object({
 });
 
 export const PaginationSchema = z.object({
-  page: z.number(),
-  limit: z.number(),
-  total: z.number(),
-  totalPages: z.number(),
-  totalAmount: z.number(),
+  page: z.coerce.number(),
+  limit: z.coerce.number(),
+  total: z.coerce.number(),
+  totalPages: z.coerce.number(),
+  totalAmount: z.coerce.number(),
   hasNextPage: z.boolean(),
   hasPreviousPage: z.boolean(),
 });
