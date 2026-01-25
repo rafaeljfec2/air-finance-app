@@ -1,4 +1,4 @@
-import { CalendarDays, ShoppingBag, CreditCard } from 'lucide-react';
+import { CalendarDays, ShoppingBag } from 'lucide-react';
 
 interface LimitUsageCardProps {
   readonly limitTotal: number;
@@ -7,7 +7,6 @@ interface LimitUsageCardProps {
   readonly dueDay: number;
   readonly bestPurchaseDay: number;
   readonly billStatus?: 'OPEN' | 'CLOSED' | 'PAID';
-  readonly onPayBill?: () => void;
 }
 
 export function LimitUsageCard({
@@ -17,7 +16,6 @@ export function LimitUsageCard({
   dueDay,
   bestPurchaseDay,
   billStatus = 'OPEN',
-  onPayBill,
 }: LimitUsageCardProps) {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -78,39 +76,29 @@ export function LimitUsageCard({
         </div>
       </div>
 
-      <div className="p-5 space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
-            <CalendarDays className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+      <div className="p-5">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0">
+              <CalendarDays className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+            </div>
+            <div>
+              <p className="text-[10px] text-text-muted dark:text-text-muted-dark uppercase">Vencimento</p>
+              <p className="text-sm font-semibold text-text dark:text-text-dark">Dia {dueDay}</p>
+            </div>
           </div>
-          <div className="flex-1">
-            <p className="text-xs text-text-muted dark:text-text-muted-dark">Vencimento</p>
-            <p className="text-sm font-semibold text-text dark:text-text-dark">Dia {dueDay}</p>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
-            <ShoppingBag className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-          </div>
-          <div className="flex-1">
-            <p className="text-xs text-text-muted dark:text-text-muted-dark">Melhor dia para compras</p>
-            <p className="text-sm font-semibold text-text dark:text-text-dark">Dia {bestPurchaseDay}</p>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center flex-shrink-0">
+              <ShoppingBag className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <p className="text-[10px] text-text-muted dark:text-text-muted-dark uppercase">Melhor dia</p>
+              <p className="text-sm font-semibold text-text dark:text-text-dark">Dia {bestPurchaseDay}</p>
+            </div>
           </div>
         </div>
       </div>
-
-      {billStatus !== 'PAID' && (
-        <div className="p-5 pt-0">
-          <button
-            onClick={onPayBill}
-            className="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-4 rounded-xl transition-colors"
-          >
-            <CreditCard className="h-4 w-4" />
-            Registrar Pagamento
-          </button>
-        </div>
-      )}
     </div>
   );
 }

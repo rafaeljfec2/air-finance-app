@@ -81,17 +81,22 @@ export function CreditCardBillsPageDesktop() {
           <ArrowLeft className="h-5 w-5 text-text dark:text-text-dark" />
         </button>
         {creditCards && creditCards.length > 1 ? (
-          <select
-            value={selectedCardId}
-            onChange={(e) => handleCardSelect(e.target.value)}
-            className="text-xl font-semibold text-text dark:text-text-dark bg-transparent border-none outline-none cursor-pointer"
-          >
-            {creditCards.map((card) => (
-              <option key={card.id} value={card.id} className="bg-card dark:bg-card-dark">
-                {card.name}
-              </option>
-            ))}
-          </select>
+          <div className="relative inline-flex items-center">
+            <select
+              value={selectedCardId}
+              onChange={(e) => handleCardSelect(e.target.value)}
+              className="text-xl font-semibold text-text dark:text-text-dark bg-transparent pr-8 cursor-pointer appearance-none focus:outline-none hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+            >
+              {creditCards.map((card) => (
+                <option key={card.id} value={card.id} className="bg-card dark:bg-card-dark text-text dark:text-text-dark">
+                  {card.name}
+                </option>
+              ))}
+            </select>
+            <svg className="h-4 w-4 text-text-muted dark:text-text-muted-dark absolute right-0 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
         ) : (
           <h1 className="text-xl font-semibold text-text dark:text-text-dark">
             {creditCard?.name ?? 'Cartão de Crédito'}
@@ -150,7 +155,20 @@ export function CreditCardBillsPageDesktop() {
           />
 
           <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-1 order-2 lg:order-1">
+              <div className="sticky top-6">
+                <LimitUsageCard
+                  limitTotal={limitInfo.limitTotal}
+                  limitUsed={limitInfo.limitUsed}
+                  limitAvailable={limitInfo.limitAvailable}
+                  dueDay={creditCard?.dueDay ?? 1}
+                  bestPurchaseDay={bestPurchaseDay}
+                  billStatus={currentBill.status}
+                />
+              </div>
+            </div>
+
+            <div className="lg:col-span-2 order-1 lg:order-2">
               <BillCard
                 month={currentMonth}
                 billTotal={currentBill.total}
@@ -166,19 +184,6 @@ export function CreditCardBillsPageDesktop() {
                 canGoPrevious={canGoPrevious}
                 canGoNext={canGoNext}
               />
-            </div>
-
-            <div className="lg:col-span-1">
-              <div className="sticky top-6">
-                <LimitUsageCard
-                  limitTotal={limitInfo.limitTotal}
-                  limitUsed={limitInfo.limitUsed}
-                  limitAvailable={limitInfo.limitAvailable}
-                  dueDay={creditCard?.dueDay ?? 1}
-                  bestPurchaseDay={bestPurchaseDay}
-                  billStatus={currentBill.status}
-                />
-              </div>
             </div>
           </div>
         </div>
