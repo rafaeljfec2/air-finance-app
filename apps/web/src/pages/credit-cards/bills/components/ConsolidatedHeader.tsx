@@ -1,3 +1,5 @@
+import { formatCurrency, calculateUsagePercentage } from '../utils';
+
 interface ConsolidatedHeaderProps {
   readonly limitTotal: number;
   readonly limitUsed: number;
@@ -5,26 +7,23 @@ interface ConsolidatedHeaderProps {
   readonly cardColor?: string;
 }
 
+const DEFAULT_CARD_COLOR = '#2D6B4E';
+
+const getUsageColorClass = (percentage: number): string => {
+  if (percentage >= 80) return 'bg-red-500';
+  if (percentage >= 50) return 'bg-amber-500';
+  return 'bg-primary-500';
+};
+
 export function ConsolidatedHeader({
   limitTotal,
   limitUsed,
   limitAvailable,
-  cardColor = '#2D6B4E',
+  cardColor = DEFAULT_CARD_COLOR,
 }: ConsolidatedHeaderProps) {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
-
-  const usagePercentage = limitTotal > 0 ? (limitUsed / limitTotal) * 100 : 0;
-
-  const getUsageColor = () => {
-    if (usagePercentage >= 80) return 'bg-red-500';
-    if (usagePercentage >= 50) return 'bg-amber-500';
-    return 'bg-primary-500';
-  };
+  const usagePercentage = calculateUsagePercentage(limitUsed, limitTotal);
+  const usageColorClass = getUsageColorClass(usagePercentage);
+  const progressWidth = Math.min(usagePercentage, 100);
 
   return (
     <div
@@ -42,8 +41,8 @@ export function ConsolidatedHeader({
           </div>
           <div className="mt-3 h-2 bg-white/20 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${getUsageColor()}`}
-              style={{ width: `${Math.min(usagePercentage, 100)}%` }}
+              className={`h-full rounded-full transition-all duration-500 ${usageColorClass}`}
+              style={{ width: `${progressWidth}%` }}
             />
           </div>
           <p className="text-white/60 text-xs mt-1.5">{usagePercentage.toFixed(1)}% utilizado</p>

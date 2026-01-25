@@ -1,4 +1,5 @@
 import { CalendarDays, ShoppingBag } from 'lucide-react';
+import { formatCurrency, calculateUsagePercentage, type BillStatus, getStatusConfig } from '../utils';
 
 interface LimitUsageCardProps {
   readonly limitTotal: number;
@@ -6,7 +7,7 @@ interface LimitUsageCardProps {
   readonly limitAvailable: number;
   readonly dueDay: number;
   readonly bestPurchaseDay: number;
-  readonly billStatus?: 'OPEN' | 'CLOSED' | 'PAID';
+  readonly billStatus?: BillStatus;
 }
 
 export function LimitUsageCard({
@@ -17,27 +18,9 @@ export function LimitUsageCard({
   bestPurchaseDay,
   billStatus = 'OPEN',
 }: LimitUsageCardProps) {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
-
-  const usagePercentage = limitTotal > 0 ? (limitUsed / limitTotal) * 100 : 0;
-
-  const getStatusConfig = () => {
-    switch (billStatus) {
-      case 'PAID':
-        return { label: 'Fatura Paga', color: 'text-primary-500', bg: 'bg-primary-50 dark:bg-primary-900/20' };
-      case 'CLOSED':
-        return { label: 'Fatura Fechada', color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/20' };
-      default:
-        return { label: 'Fatura Aberta', color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' };
-    }
-  };
-
-  const statusConfig = getStatusConfig();
+  const usagePercentage = calculateUsagePercentage(limitUsed, limitTotal);
+  const statusConfig = getStatusConfig(billStatus);
+  const progressWidth = Math.min(usagePercentage, 100);
 
   return (
     <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark overflow-hidden">
@@ -58,7 +41,7 @@ export function LimitUsageCard({
             <div className="h-2.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(usagePercentage, 100)}%` }}
+                style={{ width: `${progressWidth}%` }}
               />
             </div>
           </div>

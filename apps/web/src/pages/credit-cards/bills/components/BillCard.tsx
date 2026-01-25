@@ -1,19 +1,28 @@
 import { ChevronLeft, ChevronRight, Receipt } from 'lucide-react';
 import { BillTransactionList } from './BillTransactionList';
+import { formatCurrency, formatMonthYear, formatDueDate, type BillStatus, getStatusBadgeClasses } from '../utils';
+
+const STATUS_LABELS: Record<BillStatus, string> = {
+  PAID: 'Paga',
+  CLOSED: 'Fechada',
+  OPEN: 'Aberta',
+};
+
+interface Transaction {
+  readonly id: string;
+  readonly date: string;
+  readonly description: string;
+  readonly amount: number;
+  readonly category?: string;
+  readonly installment?: string;
+}
 
 interface BillCardProps {
   readonly month: string;
   readonly billTotal: number;
   readonly dueDate: string;
-  readonly status: 'OPEN' | 'CLOSED' | 'PAID';
-  readonly transactions: ReadonlyArray<{
-    readonly id: string;
-    readonly date: string;
-    readonly description: string;
-    readonly amount: number;
-    readonly category?: string;
-    readonly installment?: string;
-  }>;
+  readonly status: BillStatus;
+  readonly transactions: ReadonlyArray<Transaction>;
   readonly totalTransactions: number;
   readonly isLoadingMore: boolean;
   readonly hasMore: boolean;
@@ -23,6 +32,27 @@ interface BillCardProps {
   readonly canGoPrevious: boolean;
   readonly canGoNext: boolean;
 }
+
+const NavigationButton = ({
+  onClick,
+  disabled,
+  ariaLabel,
+  children,
+}: {
+  readonly onClick: () => void;
+  readonly disabled: boolean;
+  readonly ariaLabel: string;
+  readonly children: React.ReactNode;
+}) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className="p-2 rounded-lg border border-border dark:border-border-dark hover:bg-background dark:hover:bg-background-dark disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+    aria-label={ariaLabel}
+  >
+    {children}
+  </button>
+);
 
 export function BillCard({
   month,
@@ -39,61 +69,21 @@ export function BillCard({
   canGoPrevious,
   canGoNext,
 }: BillCardProps) {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
-
-  const formatMonthYear = (monthStr: string) => {
-    const [year, monthNum] = monthStr.split('-').map(Number);
-    const date = new Date(year, monthNum - 1, 1);
-    return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-  };
-
-  const formatDueDate = (dateStr: string) => {
-    const [year, month, day] = dateStr.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
-  };
-
-  const getStatusBadge = () => {
-    switch (status) {
-      case 'PAID':
-        return (
-          <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
-            Paga
-          </span>
-        );
-      case 'CLOSED':
-        return (
-          <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400">
-            Fechada
-          </span>
-        );
-      default:
-        return (
-          <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
-            Aberta
-          </span>
-        );
-    }
-  };
+  const statusLabel = STATUS_LABELS[status];
+  const transactionLabel = totalTransactions === 1 ? 'item' : 'itens';
 
   return (
     <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark overflow-hidden">
       <div className="p-5 border-b border-border dark:border-border-dark">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <button
+            <NavigationButton
               onClick={onPreviousMonth}
               disabled={!canGoPrevious}
-              className="p-2 rounded-lg border border-border dark:border-border-dark hover:bg-background dark:hover:bg-background-dark disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              aria-label="Mês anterior"
+              ariaLabel="Mês anterior"
             >
               <ChevronLeft className="h-4 w-4 text-text dark:text-text-dark" />
-            </button>
+            </NavigationButton>
             <div>
               <h3 className="text-lg font-semibold text-text dark:text-text-dark capitalize">
                 {formatMonthYear(month)}
@@ -102,18 +92,19 @@ export function BillCard({
                 Vencimento em {formatDueDate(dueDate)}
               </p>
             </div>
-            <button
+            <NavigationButton
               onClick={onNextMonth}
               disabled={!canGoNext}
-              className="p-2 rounded-lg border border-border dark:border-border-dark hover:bg-background dark:hover:bg-background-dark disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              aria-label="Próximo mês"
+              ariaLabel="Próximo mês"
             >
               <ChevronRight className="h-4 w-4 text-text dark:text-text-dark" />
-            </button>
+            </NavigationButton>
           </div>
 
           <div className="text-right">
-            {getStatusBadge()}
+            <span className={getStatusBadgeClasses(status)}>
+              {statusLabel}
+            </span>
             <p className="text-2xl font-bold text-text dark:text-text-dark mt-1">
               {formatCurrency(billTotal)}
             </p>
@@ -128,7 +119,7 @@ export function BillCard({
             <span className="text-sm font-medium text-text dark:text-text-dark">Transações</span>
           </div>
           <span className="text-xs text-text-muted dark:text-text-muted-dark bg-background dark:bg-background-dark px-2 py-1 rounded-full">
-            {totalTransactions} {totalTransactions === 1 ? 'item' : 'itens'}
+            {totalTransactions} {transactionLabel}
           </span>
         </div>
       </div>
