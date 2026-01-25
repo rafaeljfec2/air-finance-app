@@ -2,16 +2,17 @@ import { useEffect, useRef, useMemo } from 'react';
 import { BillTransactionItem } from './BillTransactionItem';
 
 interface BillTransactionListProps {
-  transactions: Array<{
-    id: string;
-    date: string;
-    description: string;
-    amount: number;
-    category?: string;
+  readonly transactions: ReadonlyArray<{
+    readonly id: string;
+    readonly date: string;
+    readonly description: string;
+    readonly amount: number;
+    readonly category?: string;
+    readonly installment?: string;
   }>;
-  isLoadingMore: boolean;
-  hasMore: boolean;
-  onLoadMore: () => Promise<void>;
+  readonly isLoadingMore: boolean;
+  readonly hasMore: boolean;
+  readonly onLoadMore: () => Promise<void>;
 }
 
 export function BillTransactionList({
@@ -77,7 +78,8 @@ export function BillTransactionList({
   }, [hasMore, isLoadingMore, onLoadMore]);
 
   const groupedTransactions = useMemo(() => {
-    const grouped: Record<string, typeof transactions> = {};
+    type Transaction = (typeof transactions)[number];
+    const grouped: Record<string, Transaction[]> = {};
     transactions.forEach((transaction) => {
       const dateKey = transaction.date.split('T')[0];
       if (!grouped[dateKey]) {
