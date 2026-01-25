@@ -61,7 +61,7 @@ export function OpenFinanceConnectModal({
     open,
   });
 
-  const isLoading = isLoadingConnectors || isCreatingAccount || isCreatingItem || isInitializing;
+  const isLoading = isLoadingConnectors || isCreatingAccount || isCreatingItem || isInitializing || isLoadingExistingItems;
   const canClose = !isLoading && step !== 'oauth-waiting';
 
   const handleModalClose = () => {
@@ -85,7 +85,7 @@ export function OpenFinanceConnectModal({
         <ModalHeader />
 
         <div className="px-6 py-4 min-h-0 flex-1 overflow-y-auto">
-          {isInitializing ? (
+          {isInitializing || isLoadingExistingItems ? (
             <LoadingState
               message="Carregando informações..."
               subMessage="Aguarde enquanto verificamos suas conexões..."

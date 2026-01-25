@@ -279,32 +279,64 @@ export function useOpenFinanceModal({
   const {
     data: existingItems,
     isLoading: isLoadingExistingItems,
+    isFetching: isFetchingExistingItems,
   } = useQuery<OpeniItem[]>({
     queryKey: ['openi-items', companyId],
     queryFn: () => getItems(companyId),
     enabled: !!companyId && !!open && !!openiTenantId,
-    staleTime: 30 * 1000,
+    staleTime: 0,
+    gcTime: 0,
     retry: false,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
   });
 
   const [isInitializing, setIsInitializing] = useState(false);
   const [importedItems, setImportedItems] = useState<Set<string>>(new Set());
+  const [hasJustOpened, setHasJustOpened] = useState(false);
+
+  // Invalidate query when modal opens to ensure fresh data
+  useEffect(() => {
+    if (open && companyId && openiTenantId) {
+      setHasJustOpened(true);
+      setIsInitializing(true);
+      queryClient.invalidateQueries({ queryKey: ['openi-items', companyId] });
+    } else if (!open) {
+      setHasJustOpened(false);
+      setIsInitializing(false);
+    }
+  }, [open, companyId, openiTenantId, queryClient]);
 
   useEffect(() => {
     if (open) {
       const hasOpeniTenant = openiTenantId && openiTenantId.trim() !== '';
       
-      if (hasOpeniTenant && isLoadingExistingItems) {
-        setIsInitializing(true);
-        setStep('cpf-input');
-      } else if (hasOpeniTenant && !isLoadingExistingItems) {
-        setIsInitializing(false);
-        if (existingItems && existingItems.length > 0) {
-          setStep('existing-connections');
-        } else {
+      // Always show loading when modal just opened or when fetching existing items
+      if (hasOpeniTenant) {
+        // Show loading if: still loading/fetching OR (modal just opened AND query hasn't finished)
+        // When query finishes (isLoadingExistingItems and isFetchingExistingItems are false), hide loading immediately
+        const isQueryLoading = isLoadingExistingItems || isFetchingExistingItems;
+        
+        if (isQueryLoading) {
+          // Query is still loading, show loading
+          setIsInitializing(true);
           setStep('cpf-input');
+        } else if (hasJustOpened && existingItems === undefined) {
+          // Modal just opened but query hasn't started yet, show loading
+          setIsInitializing(true);
+          setStep('cpf-input');
+        } else {
+          // Query finished loading (or never started), hide loading and set step
+          setIsInitializing(false);
+          setHasJustOpened(false);
+          if (Array.isArray(existingItems) && existingItems.length > 0) {
+            setStep('existing-connections');
+          } else {
+            setStep('cpf-input');
+          }
         }
       } else {
+        // No tenant, go directly to CPF input (no loading needed)
         setIsInitializing(false);
         setStep('cpf-input');
       }
@@ -317,6 +349,7 @@ export function useOpenFinanceModal({
       setCreatedItemId(null);
     } else {
       setIsInitializing(false);
+      setHasJustOpened(false);
       setStep('cpf-input');
       setCpfCnpj(companyDocument ?? '');
       setSelectedConnector(null);
@@ -324,7 +357,7 @@ export function useOpenFinanceModal({
       setCreatedItemId(null);
       setImportedItems(new Set());
     }
-  }, [open, openiTenantId, companyDocument, existingItems, isLoadingExistingItems]);
+  }, [open, openiTenantId, companyDocument, existingItems, isLoadingExistingItems, isFetchingExistingItems, hasJustOpened]);
 
   useEffect(() => {
     if (
