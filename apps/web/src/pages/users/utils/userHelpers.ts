@@ -4,8 +4,7 @@ import { UserRole, UserStatus } from '@/types/user';
  * Get badge color class for user role
  */
 export function getRoleBadgeColor(role: UserRole | string): string {
-  const roleValue = typeof role === 'string' ? role : role;
-  switch (roleValue) {
+  switch (role) {
     case UserRole.GOD:
     case 'god':
       return 'bg-red-500/20 text-red-400 border-red-500/30';
@@ -39,8 +38,7 @@ export function getRoleBadgeColor(role: UserRole | string): string {
  * Get badge color class for user status
  */
 export function getStatusBadgeColor(status: UserStatus | string): string {
-  const statusValue = typeof status === 'string' ? status : status;
-  return statusValue === UserStatus.ACTIVE || statusValue === 'active'
+  return status === UserStatus.ACTIVE || status === 'active'
     ? 'bg-green-500/20 text-green-400 border-green-500/30'
     : 'bg-red-500/20 text-red-400 border-red-500/30';
 }

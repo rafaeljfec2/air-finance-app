@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
@@ -127,7 +127,7 @@ const hasConflictMessage = (errorMessage: string): boolean => {
   );
 };
 
-const handleItemStatus = (
+interface HandleItemStatusParams {
   itemData: {
     id: string;
     connectorId?: string;
@@ -139,15 +139,27 @@ const handleItemStatus = (
     warnings: string[];
     updatedAt: string;
     createdAt: string;
-  },
-  companyId: string,
-  accountId: string,
-  itemId: string,
-  queryClient: ReturnType<typeof useQueryClient>,
-  onSuccess: (() => void) | undefined,
-  setCreatedItemId: (id: string) => void,
-  setStep: (step: ModalStep) => void,
-): void => {
+  };
+  itemInfo: {
+    companyId: string;
+    accountId: string;
+    itemId: string;
+  };
+  queryClient: ReturnType<typeof useQueryClient>;
+  onSuccess: (() => void) | undefined;
+  setCreatedItemId: (id: string) => void;
+  setStep: (step: ModalStep) => void;
+}
+
+const handleItemStatus = ({
+  itemData,
+  itemInfo,
+  queryClient,
+  onSuccess,
+  setCreatedItemId,
+  setStep,
+}: HandleItemStatusParams): void => {
+  const { companyId, accountId, itemId } = itemInfo;
   const status = itemData.status?.toLowerCase();
 
   if (status === 'waiting_user_input' && itemData.auth?.authUrl) {
@@ -182,16 +194,28 @@ const handleItemStatus = (
   }
 };
 
-const processConflictError = (
-  error: unknown,
-  variables: { accountId: string; connectorId: string; parameters: Record<string, string> },
-  accounts: ReturnType<typeof useAccounts>['accounts'],
-  companyId: string,
-  queryClient: ReturnType<typeof useQueryClient>,
-  onSuccess: (() => void) | undefined,
-  setCreatedItemId: (id: string) => void,
-  setStep: (step: ModalStep) => void,
-): void => {
+interface ProcessConflictErrorParams {
+  error: unknown;
+  context: {
+    variables: { accountId: string; connectorId: string; parameters: Record<string, string> };
+    accounts: ReturnType<typeof useAccounts>['accounts'];
+    companyId: string;
+  };
+  queryClient: ReturnType<typeof useQueryClient>;
+  onSuccess: (() => void) | undefined;
+  setCreatedItemId: (id: string) => void;
+  setStep: (step: ModalStep) => void;
+}
+
+const processConflictError = ({
+  error,
+  context,
+  queryClient,
+  onSuccess,
+  setCreatedItemId,
+  setStep,
+}: ProcessConflictErrorParams): void => {
+  const { variables, accounts, companyId } = context;
   const errorStatus = getErrorStatus(error);
   const errorData = getErrorData(error);
   const errorMessage = extractErrorMessage(errorData);
@@ -247,7 +271,14 @@ const processConflictError = (
           updatedAt: string;
           createdAt: string;
         };
-        handleItemStatus(detail, companyId, variables.accountId, itemId, queryClient, onSuccess, setCreatedItemId, setStep);
+        handleItemStatus({
+          itemData: detail,
+          itemInfo: { companyId, accountId: variables.accountId, itemId },
+          queryClient,
+          onSuccess,
+          setCreatedItemId,
+          setStep,
+        });
         return;
       }
     }
@@ -307,38 +338,30 @@ export function useOpenFinanceModal({
     }
   }, [open, companyId, openiTenantId, queryClient]);
 
+  const shouldShowLoading = useMemo(() => {
+    if (!open) return false;
+    const hasOpeniTenant = openiTenantId && openiTenantId.trim() !== '';
+    if (!hasOpeniTenant) return false;
+    const isQueryLoading = isLoadingExistingItems || isFetchingExistingItems;
+    return isQueryLoading || (hasJustOpened && existingItems === undefined);
+  }, [open, openiTenantId, isLoadingExistingItems, isFetchingExistingItems, hasJustOpened, existingItems]);
+
+  const determineStep = useMemo(() => {
+    if (!open) return 'cpf-input';
+    const hasOpeniTenant = openiTenantId && openiTenantId.trim() !== '';
+    if (!hasOpeniTenant) return 'cpf-input';
+    if (shouldShowLoading) return 'cpf-input';
+    if (Array.isArray(existingItems) && existingItems.length > 0) return 'existing-connections';
+    return 'cpf-input';
+  }, [open, openiTenantId, shouldShowLoading, existingItems]);
+
   useEffect(() => {
     if (open) {
-      const hasOpeniTenant = openiTenantId && openiTenantId.trim() !== '';
+      setIsInitializing(shouldShowLoading);
+      setStep(determineStep);
       
-      // Always show loading when modal just opened or when fetching existing items
-      if (hasOpeniTenant) {
-        // Show loading if: still loading/fetching OR (modal just opened AND query hasn't finished)
-        // When query finishes (isLoadingExistingItems and isFetchingExistingItems are false), hide loading immediately
-        const isQueryLoading = isLoadingExistingItems || isFetchingExistingItems;
-        
-        if (isQueryLoading) {
-          // Query is still loading, show loading
-          setIsInitializing(true);
-          setStep('cpf-input');
-        } else if (hasJustOpened && existingItems === undefined) {
-          // Modal just opened but query hasn't started yet, show loading
-          setIsInitializing(true);
-          setStep('cpf-input');
-        } else {
-          // Query finished loading (or never started), hide loading and set step
-          setIsInitializing(false);
-          setHasJustOpened(false);
-          if (Array.isArray(existingItems) && existingItems.length > 0) {
-            setStep('existing-connections');
-          } else {
-            setStep('cpf-input');
-          }
-        }
-      } else {
-        // No tenant, go directly to CPF input (no loading needed)
-        setIsInitializing(false);
-        setStep('cpf-input');
+      if (!shouldShowLoading) {
+        setHasJustOpened(false);
       }
       
       if (companyDocument) {
@@ -357,7 +380,7 @@ export function useOpenFinanceModal({
       setCreatedItemId(null);
       setImportedItems(new Set());
     }
-  }, [open, openiTenantId, companyDocument, existingItems, isLoadingExistingItems, isFetchingExistingItems, hasJustOpened]);
+  }, [open, companyDocument, shouldShowLoading, determineStep, setStep]);
 
   useEffect(() => {
     if (
@@ -503,16 +526,14 @@ export function useOpenFinanceModal({
       }
     },
     onError: async (error: unknown, variables) => {
-      processConflictError(
+      processConflictError({
         error,
-        variables,
-        accounts,
-        companyId,
+        context: { variables, accounts, companyId },
         queryClient,
         onSuccess,
         setCreatedItemId,
         setStep,
-      );
+      });
     },
   });
 
@@ -544,6 +565,84 @@ export function useOpenFinanceModal({
     onSuccessRef.current = onSuccess;
   }, [onSuccess]);
 
+  const handleSuccessfulImport = useCallback(
+    (importResult: { data: { imported: number } }, status: string): void => {
+      const successMessage = status === 'syncing'
+        ? `Conexão estabelecida! ${importResult.data.imported} conta(s) importada(s) com sucesso!`
+        : `${importResult.data.imported} conta(s) importada(s) com sucesso!`;
+      
+      toast.success(successMessage);
+      queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+      onSuccessRef.current?.();
+    },
+    [companyId, queryClient, onSuccessRef],
+  );
+
+  const handleImportError = useCallback(
+    (error: unknown, attempt: number, maxRetries: number, retryDelays: number[]): Promise<void> => {
+      console.error(`[OpenFinanceModal] Error importing accounts (attempt ${attempt + 1}):`, error);
+      
+      if (attempt === maxRetries - 1) {
+        const errorMessage = error instanceof Error ? error.message : 'Erro ao importar contas';
+        toast.error(`Erro ao importar contas: ${errorMessage}`);
+        queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+        onSuccessRef.current?.();
+        return Promise.resolve();
+      }
+      
+      const delay = retryDelays[attempt] ?? 10000;
+      return new Promise(resolve => setTimeout(resolve, delay));
+    },
+    [companyId, queryClient],
+  );
+
+  const handleNoAccountsFound = useCallback(
+    (attempt: number, maxRetries: number, retryDelays: number[]): Promise<void> => {
+      if (attempt < maxRetries - 1) {
+        const delay = retryDelays[attempt] ?? 10000;
+        console.log(`[OpenFinanceModal] No accounts found yet. Retrying in ${delay}ms...`);
+        return new Promise(resolve => setTimeout(resolve, delay));
+      }
+      
+      console.warn('[OpenFinanceModal] No accounts found after all retries');
+      toast.warning('Nenhuma conta encontrada para importar. Tente novamente mais tarde.');
+      queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+      onSuccessRef.current?.();
+      return Promise.resolve();
+    },
+    [companyId, queryClient],
+  );
+
+  const importAccountsWithRetry = useCallback(
+    async (itemId: string, status: string): Promise<void> => {
+      const maxRetries = 5;
+      const retryDelays = [2000, 3000, 5000, 8000, 10000];
+      
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          console.log(`[OpenFinanceModal] Fetching available accounts for itemId: ${itemId} (attempt ${attempt + 1}/${maxRetries})`);
+          const availableAccounts = await getAccounts(companyId, itemId);
+          
+          if (availableAccounts && availableAccounts.length > 0) {
+            const accountIds = availableAccounts.map(acc => acc.id);
+            console.log('[OpenFinanceModal] Importing accounts:', accountIds);
+
+            const importResult = await importAccounts(companyId, itemId, accountIds);
+            console.log('[OpenFinanceModal] Accounts imported successfully:', importResult);
+            
+            handleSuccessfulImport(importResult, status);
+            return;
+          }
+
+          await handleNoAccountsFound(attempt, maxRetries, retryDelays);
+        } catch (error) {
+          await handleImportError(error, attempt, maxRetries, retryDelays);
+        }
+      }
+    },
+    [companyId, handleSuccessfulImport, handleNoAccountsFound, handleImportError],
+  );
+
   const handleSseEvent = useCallback(
     (event: { event: string; itemId: string; status?: string; auth?: { authUrl: string; expiresAt: string }; warnings?: string[]; timestamp: string }) => {
       console.log('[OpenFinanceModal] SSE event received:', event);
@@ -569,58 +668,9 @@ export function useOpenFinanceModal({
           toast.info('Conexão estabelecida! Importando contas...');
         }
 
-        (async () => {
-          const maxRetries = 5;
-          const retryDelays = [2000, 3000, 5000, 8000, 10000];
-          
-          for (let attempt = 0; attempt < maxRetries; attempt++) {
-            try {
-              console.log(`[OpenFinanceModal] Fetching available accounts for itemId: ${itemId} (attempt ${attempt + 1}/${maxRetries})`);
-              const availableAccounts = await getAccounts(companyId, itemId);
-              
-              if (availableAccounts && availableAccounts.length > 0) {
-                const accountIds = availableAccounts.map(acc => acc.id);
-                console.log('[OpenFinanceModal] Importing accounts:', accountIds);
-
-                const importResult = await importAccounts(companyId, itemId, accountIds);
-                
-                console.log('[OpenFinanceModal] Accounts imported successfully:', importResult);
-                
-                const successMessage = status === 'syncing'
-                  ? `Conexão estabelecida! ${importResult.data.imported} conta(s) importada(s) com sucesso!`
-                  : `${importResult.data.imported} conta(s) importada(s) com sucesso!`;
-                
-                toast.success(successMessage);
-                queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
-                onSuccessRef.current?.();
-                return;
-              }
-
-              if (attempt < maxRetries - 1) {
-                const delay = retryDelays[attempt] ?? 10000;
-                console.log(`[OpenFinanceModal] No accounts found yet. Retrying in ${delay}ms...`);
-                await new Promise(resolve => setTimeout(resolve, delay));
-              } else {
-                console.warn('[OpenFinanceModal] No accounts found after all retries');
-                toast.warning('Nenhuma conta encontrada para importar. Tente novamente mais tarde.');
-                queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
-                onSuccessRef.current?.();
-              }
-            } catch (error) {
-              console.error(`[OpenFinanceModal] Error importing accounts (attempt ${attempt + 1}):`, error);
-              
-              if (attempt === maxRetries - 1) {
-                const errorMessage = error instanceof Error ? error.message : 'Erro ao importar contas';
-                toast.error(`Erro ao importar contas: ${errorMessage}`);
-                queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
-                onSuccessRef.current?.();
-              } else {
-                const delay = retryDelays[attempt] ?? 10000;
-                await new Promise(resolve => setTimeout(resolve, delay));
-              }
-            }
-          }
-        })();
+        if (itemId) {
+          importAccountsWithRetry(itemId, status ?? '');
+        }
       }
 
       if (event.event === 'ITEM_ERROR') {
@@ -628,7 +678,7 @@ export function useOpenFinanceModal({
         toast.error('Erro na conexão Open Finance');
       }
     },
-    [companyId, queryClient],
+    [importAccountsWithRetry],
   );
 
   const handleSseError = useCallback((error: Error) => {
@@ -712,16 +762,18 @@ export function useOpenFinanceModal({
         });
       } catch (error) {
         console.error('[OpenFinanceModal] Error creating Openi item:', error);
-        processConflictError(
+        processConflictError({
           error,
-          { accountId: accountId ?? '', connectorId: connector.id, parameters: {} },
-          accounts,
-          companyId,
+          context: {
+            variables: { accountId: accountId ?? '', connectorId: connector.id, parameters: {} },
+            accounts,
+            companyId,
+          },
           queryClient,
           onSuccess,
           setCreatedItemId,
           setStep,
-        );
+        });
       }
     },
     [
