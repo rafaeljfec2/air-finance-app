@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   getCreditCardById,
@@ -32,6 +32,7 @@ interface UseCreditCardBillsReturn {
   currentBill: CurrentBill | null;
   isLoading: boolean;
   isLoadingMore: boolean;
+  isInitialLoad: boolean;
   error: Error | null;
   pagination: PaginationState;
   loadMore: () => Promise<void>;
@@ -46,6 +47,7 @@ export function useCreditCardBills(cardId: string, month: string): UseCreditCard
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [pagination, setPagination] = useState<PaginationState>(createInitialPaginationState());
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const {
     data: creditCard,
@@ -82,10 +84,10 @@ export function useCreditCardBills(cardId: string, month: string): UseCreditCard
     staleTime: 0,
     gcTime: 0,
     refetchOnWindowFocus: false,
-    refetchOnMount: true,
+    refetchOnMount: false,
     refetchOnReconnect: false,
     retry: false,
-    placeholderData: undefined,
+    placeholderData: (previousData) => previousData,
   });
 
   useEffect(() => {
@@ -113,32 +115,48 @@ export function useCreditCardBills(cardId: string, month: string): UseCreditCard
       previousMonthRef.current = month;
       previousCardIdRef.current = cardId;
       setCurrentPage(1);
-      setAllTransactions([]);
       setIsLoadingMore(false);
       setPagination(createInitialPaginationState());
-      return;
+      if (isInitialLoad) {
+        setIsInitialLoad(false);
+      }
+      if (!billData?.data) {
+        return;
+      }
+    }
+
+    if (billData && isInitialLoad) {
+      setIsInitialLoad(false);
     }
 
     if (!billData?.data) {
-      setAllTransactions([]);
-      setIsLoadingMore(false);
+      if (!(monthChanged || cardChanged)) {
+        setAllTransactions([]);
+        setIsLoadingMore(false);
+      }
       return;
     }
 
     const pageTransactions = processExtractTransactions(billData.data.transactions);
 
     if (pageTransactions.length === 0) {
-      setAllTransactions([]);
-      setIsLoadingMore(false);
+      if (!(monthChanged || cardChanged)) {
+        setAllTransactions([]);
+        setIsLoadingMore(false);
+      }
       return;
     }
 
-    updateTransactionsState(pageTransactions, currentPage, allTransactions, setAllTransactions);
+    if (monthChanged || cardChanged) {
+      setAllTransactions(pageTransactions);
+    } else {
+      updateTransactionsState(pageTransactions, currentPage, allTransactions, setAllTransactions);
+    }
 
     if (isLoadingMore) {
       setIsLoadingMore(false);
     }
-  }, [billData, currentPage, isLoadingMore, cardId, month, allTransactions]);
+  }, [billData, currentPage, isLoadingMore, cardId, month, allTransactions, isInitialLoad]);
 
   const loadMore = useCallback(async () => {
     if (isLoadingMore || isFetching || !pagination.hasNextPage) {
@@ -159,18 +177,24 @@ export function useCreditCardBills(cardId: string, month: string): UseCreditCard
     }
   }, [isLoadingMore, isFetching, pagination.hasNextPage, pagination.totalPages, currentPage]);
 
-  const currentBill: CurrentBill | null =
-    billData?.data && creditCard && month && account
-      ? {
-          id: billData.data.id,
-          cardId: billData.data.cardId,
-          month: billData.data.month,
-          total: billData.data.total,
-          dueDate: billData.data.dueDate,
-          status: billData.data.status,
-          transactions: allTransactions,
-        }
-      : null;
+  const previousBillRef = useRef<CurrentBill | null>(null);
+
+  const currentBill: CurrentBill | null = useMemo(() => {
+    if (billData?.data && creditCard && month && account) {
+      const bill: CurrentBill = {
+        id: billData.data.id,
+        cardId: billData.data.cardId,
+        month: billData.data.month,
+        total: billData.data.total,
+        dueDate: billData.data.dueDate,
+        status: billData.data.status,
+        transactions: allTransactions.length > 0 ? allTransactions : [],
+      };
+      previousBillRef.current = bill;
+      return bill;
+    }
+    return previousBillRef.current;
+  }, [billData?.data, creditCard, month, account, allTransactions]);
 
   const isLoading = isLoadingCard || isLoadingAccounts || (isLoadingBill && currentPage === 1);
   const error = cardError ?? accountsError ?? billError;
@@ -181,6 +205,7 @@ export function useCreditCardBills(cardId: string, month: string): UseCreditCard
     currentBill,
     isLoading,
     isLoadingMore,
+    isInitialLoad,
     error: error ?? null,
     pagination,
     loadMore,

@@ -29,7 +29,7 @@ export function CreditCardBillsPage() {
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useBillNavigation();
 
-  const { creditCard, currentBill, isLoading, isLoadingMore, error, loadMore, hasMore } =
+  const { creditCard, currentBill, isLoading, isLoadingMore, error, loadMore, hasMore, isInitialLoad } =
     useCreditCardBills(selectedCardId, currentMonth);
 
   useEffect(() => {
@@ -103,7 +103,7 @@ export function CreditCardBillsPage() {
     );
   }
 
-  if (!currentBill) {
+  if (!currentBill && !isLoading) {
     return (
       <>
         <div className="flex flex-col h-screen bg-background dark:bg-background-dark overflow-hidden pb-20 lg:pb-0">
@@ -130,6 +130,10 @@ export function CreditCardBillsPage() {
     );
   }
 
+  if (!currentBill) {
+    return null;
+  }
+
   return (
     <>
       <div className="flex flex-col h-screen bg-background dark:bg-background-dark overflow-hidden pb-20 lg:pb-0">
@@ -144,7 +148,12 @@ export function CreditCardBillsPage() {
           canGoNext={canGoNext}
         />
 
-        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950">
+        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950 relative">
+          {isLoading && !isInitialLoad && (
+            <div className="absolute inset-0 bg-background/50 dark:bg-background-dark/50 backdrop-blur-sm z-10 flex items-center justify-center">
+              <Loading size="medium">Carregando...</Loading>
+            </div>
+          )}
           <BillSummary
             dueDate={currentBill.dueDate}
             status={currentBill.status}
