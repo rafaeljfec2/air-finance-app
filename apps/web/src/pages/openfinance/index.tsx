@@ -67,6 +67,7 @@ export function OpenFinancePage() {
   const [createdAccountId, setCreatedAccountId] = useState<string | null>(null);
   const [createdItemId, setCreatedItemId] = useState<string | null>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [importedItemIds, setImportedItemIds] = useState<Set<string>>(new Set());
 
   const hasOpeniTenant = Boolean(openiTenantId?.trim());
   const isCompanyLoaded = Boolean(activeCompany);
@@ -119,10 +120,37 @@ export function OpenFinancePage() {
     navigate('/accounts');
   }, [navigate]);
 
+  // For manual connection flow - redirects to accounts after success
   const { importAccountsWithRetry } = useOpeniAccountImport({
     companyId,
     onSuccess,
   });
+
+  // For auto-import - stays on page, just refreshes queries
+  const { importAccountsWithRetry: importAccountsSilent } = useOpeniAccountImport({
+    companyId,
+    onSuccess: undefined, // No redirect
+  });
+
+  // Auto-import accounts for items with SYNCED status
+  useEffect(() => {
+    if (!existingItems || existingItems.length === 0) return;
+
+    const syncedItems = existingItems.filter(
+      (item) => item.status.toUpperCase() === 'SYNCED' && !importedItemIds.has(item.itemId),
+    );
+
+    if (syncedItems.length > 0) {
+      console.log('[OpenFinancePage] Found SYNCED items, importing accounts:', syncedItems);
+
+      for (const item of syncedItems) {
+        setImportedItemIds((prev) => new Set(prev).add(item.itemId));
+        importAccountsSilent(item.itemId, item.status).catch((error) => {
+          console.error('[OpenFinancePage] Error importing accounts for item:', item.itemId, error);
+        });
+      }
+    }
+  }, [existingItems, importedItemIds, importAccountsSilent]);
 
   const sseStep: ModalStep = step === 'loading' ? 'cpf-input' : step;
 
