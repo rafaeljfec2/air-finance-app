@@ -14,6 +14,7 @@ import { processConflictError, type ModalStep } from '@/pages/accounts/hooks/han
 import { LoadingState } from '@/components/accounts/OpenFinanceConnectModal.LoadingState';
 import { OAuthWaitingStep } from '@/components/accounts/OpenFinanceConnectModal.OAuthWaitingStep';
 import { PageExistingConnections, PageCpfInput, PageConnectorSelection } from './components';
+import { usePageVisibility } from './hooks/usePageVisibility';
 
 type PageStep = 'loading' | 'existing-connections' | 'cpf-input' | 'connector-selection' | 'creating-item' | 'oauth-waiting';
 
@@ -40,6 +41,7 @@ export function OpenFinancePage() {
   const queryClient = useQueryClient();
   const { activeCompany } = useCompanyStore();
   const { accounts } = useAccounts();
+  const isPageVisible = usePageVisibility();
   
   const companyId = activeCompany?.id ?? '';
   const openiTenantId = activeCompany?.openiTenantId;
@@ -121,6 +123,7 @@ export function OpenFinancePage() {
     createdItemId,
     step: sseStep,
     onImportAccounts: importAccountsWithRetry,
+    isPageVisible,
   });
 
   const { createAccountMutation, createItemMutation } = useOpenFinanceMutations({

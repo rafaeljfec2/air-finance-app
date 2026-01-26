@@ -49,7 +49,7 @@ export const navigation: NavigationSection[] = [
     items: [
       { name: 'Empresas', href: '/companies', icon: Building2 },
       { name: 'Contas Bancárias', href: '/accounts', icon: Banknote },
-      { name: 'Open Finance', href: '/openfinance', icon: Link2 },
+      { name: 'Open Finance', href: '/openfinance', icon: Link2, roles: [UserRole.GOD] },
       { name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCard },
       { name: 'Categorias', href: '/categories', icon: Tag },
       { name: 'Recorrências', href: '/recurring-transactions', icon: RefreshCcw },

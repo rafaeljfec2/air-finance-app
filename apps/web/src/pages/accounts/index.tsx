@@ -308,7 +308,7 @@ export function AccountsPage() {
         />
       )}
 
-      {isGod && activeCompany && (
+      {isGod && activeCompany && showOpenFinanceModal && (
         <OpenFinanceConnectModal
           key={`openi-modal-${activeCompany.id}-${openFinanceCompanyData?.openiTenantId ?? 'no-tenant'}`}
           open={showOpenFinanceModal}

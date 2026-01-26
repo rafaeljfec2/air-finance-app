@@ -17,29 +17,22 @@ export const useOpeniSseHandler = ({
   createdItemId,
   step,
   onImportAccounts,
+  isPageVisible = true,
 }: UseOpeniSseHandlerParams) => {
   const [sseReady, setSseReady] = useState(false);
 
   useEffect(() => {
-    if (createdItemId && step === 'oauth-waiting') {
+    if (createdItemId && step === 'oauth-waiting' && isPageVisible) {
       const timer = setTimeout(() => {
         setSseReady(true);
-        console.log('[OpenFinanceModal] SSE ready after delay', { createdItemId, step });
       }, 100);
       return () => clearTimeout(timer);
     } else {
       setSseReady(false);
     }
-  }, [createdItemId, step]);
+  }, [createdItemId, step, isPageVisible]);
 
-  const sseEnabled = sseReady && !!createdItemId && step === 'oauth-waiting';
-  console.log('[OpenFinanceModal] SSE hook config', {
-    createdItemId,
-    step,
-    sseEnabled,
-    sseReady,
-    companyId,
-  });
+  const sseEnabled = sseReady && !!createdItemId && step === 'oauth-waiting' && isPageVisible;
 
   const handleSseEvent = useCallback(
     (event: { event: string; itemId: string; status?: string; auth?: { authUrl: string; expiresAt: string }; warnings?: string[]; timestamp: string }) => {

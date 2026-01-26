@@ -10,8 +10,7 @@ const getTokenFromStorage = (): string | null => {
 
     const parsed = JSON.parse(authStorage);
     return parsed.state?.token ?? null;
-  } catch (error) {
-    console.error('[useOpeniItemEvents] Error reading token from storage:', error);
+  } catch {
     return null;
   }
 };
@@ -33,8 +32,7 @@ const getTokenFromApi = async (): Promise<string | null> => {
       return data.token ?? null;
     }
     return null;
-  } catch (error) {
-    console.error('[useOpeniItemEvents] Error fetching SSE token from API:', error);
+  } catch {
     return null;
   }
 };
@@ -60,15 +58,13 @@ const retrieveToken = async (currentState: ReturnType<typeof useAuthStore.getSta
   }
 
   if (!tokenToUse && currentState.user && currentState.isAuthenticated) {
-    console.log('[useOpeniItemEvents] No token found, attempting to fetch SSE token from API (cookies may be in use)...');
     try {
       const apiToken = await getTokenFromApi();
       if (apiToken) {
         tokenToUse = apiToken;
-        console.log('[useOpeniItemEvents] SSE token obtained from API');
       }
-    } catch (error) {
-      console.error('[useOpeniItemEvents] Error fetching SSE token:', error);
+    } catch {
+      // Silently fail, will retry
     }
   }
 
@@ -117,20 +113,6 @@ export const useOpeniItemEvents = ({
   onEvent,
   onError,
 }: UseOpeniItemEventsOptions): UseOpeniItemEventsReturn => {
-  const token = useAuthStore(state => state.token);
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const user = useAuthStore(state => state.user);
-
-  console.log('[useOpeniItemEvents] Hook initialized', {
-    itemId,
-    enabled,
-    hasToken: !!token,
-    hasUser: !!user,
-    isAuthenticated,
-    tokenLength: token?.length ?? 0,
-    usingCookies: !token && !!user,
-  });
-
   const [lastEvent, setLastEvent] = useState<OpeniItemEvent | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
   const [error, setError] = useState<Error | null>(null);
@@ -145,12 +127,6 @@ export const useOpeniItemEvents = ({
   const connectRef = useRef<(() => Promise<void>) | null>(null);
 
   const disconnect = useCallback((resetItemId = true) => {
-    console.log('[useOpeniItemEvents] disconnect() called', {
-      hasEventSource: !!eventSourceRef.current,
-      currentItemId: currentItemIdRef.current,
-      resetItemId,
-    });
-
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
@@ -197,14 +173,8 @@ export const useOpeniItemEvents = ({
 
   const handleEventError = useCallback(
     async (eventSource: EventSource) => {
-      console.error('SSE connection error:', {
-        readyState: eventSource.readyState,
-        url: eventSource.url,
-      });
-
       if (eventSource.readyState === EventSource.CLOSED) {
         if (!enabled || !itemId) {
-          console.log('[useOpeniItemEvents] Connection closed: SSE disabled or itemId cleared, not reconnecting');
           disconnect();
           return;
         }
@@ -216,7 +186,6 @@ export const useOpeniItemEvents = ({
           const error = new Error('Authentication token lost during connection');
           setError(error);
           setConnectionStatus('error');
-          console.warn('[useOpeniItemEvents] Connection closed: token no longer available');
           onError?.(error);
           disconnect();
           return;
@@ -231,13 +200,10 @@ export const useOpeniItemEvents = ({
             30000,
           );
 
-          console.log(`[useOpeniItemEvents] Scheduling reconnect attempt ${reconnectAttemptsRef.current}/${MAX_RECONNECT_ATTEMPTS} in ${delay}ms`);
-
           reconnectTimeoutRef.current = setTimeout(async () => {
             if (enabled && itemId && connectRef.current) {
               await connectRef.current();
             } else {
-              console.log('[useOpeniItemEvents] Skipping reconnect: SSE disabled or itemId cleared');
               disconnect();
             }
           }, delay);
@@ -245,42 +211,24 @@ export const useOpeniItemEvents = ({
           const error = new Error('SSE connection failed after maximum reconnect attempts');
           setError(error);
           setConnectionStatus('error');
-          console.error('[useOpeniItemEvents] Max reconnect attempts reached, stopping');
           onError?.(error);
           disconnect();
         }
-      } else if (eventSource.readyState === EventSource.CONNECTING) {
-        console.log('[useOpeniItemEvents] SSE is still connecting, waiting...');
       }
     },
     [enabled, itemId, onError, disconnect],
   );
 
   const connect = useCallback(async () => {
-    console.log('[useOpeniItemEvents] connect() called', {
-      itemId,
-      enabled,
-      companyId,
-      currentItemId: currentItemIdRef.current,
-      isConnecting: isConnectingRef.current,
-      hasEventSource: !!eventSourceRef.current,
-    });
-
     if (!itemId || !enabled) {
-      console.log('[useOpeniItemEvents] Skipping connection - missing itemId or disabled', {
-        itemId,
-        enabled,
-      });
       return;
     }
 
     if (isConnectingRef.current) {
-      console.log('[useOpeniItemEvents] Already connecting, skipping duplicate connection attempt');
       return;
     }
 
     if (currentItemIdRef.current === itemId && eventSourceRef.current && eventSourceRef.current.readyState === EventSource.OPEN) {
-      console.log('[useOpeniItemEvents] Already connected to this itemId, skipping');
       return;
     }
 
@@ -293,13 +241,6 @@ export const useOpeniItemEvents = ({
         const err = new Error('No authentication token available');
         setError(err);
         setConnectionStatus('error');
-        console.warn('[useOpeniItemEvents] Cannot connect: authentication token not available');
-        console.warn('[useOpeniItemEvents] Token sources checked:', {
-          zustandToken: currentState.token,
-          storageToken: getTokenFromStorage(),
-          hasUser: !!currentState.user,
-          isAuthenticated: currentState.isAuthenticated,
-        });
         onError?.(err);
       }
       return;
@@ -309,10 +250,6 @@ export const useOpeniItemEvents = ({
     isConnectingRef.current = true;
 
     if (currentItemIdRef.current !== itemId && eventSourceRef.current) {
-      console.log('[useOpeniItemEvents] ItemId changed, disconnecting previous connection', {
-        oldItemId: currentItemIdRef.current,
-        newItemId: itemId,
-      });
       disconnect();
     }
 
@@ -322,20 +259,7 @@ export const useOpeniItemEvents = ({
 
     const url = buildSseUrl(tokenToUse);
 
-    console.log('[useOpeniItemEvents] Attempting SSE connection', {
-      url: url.replace(tokenToUse, '***'),
-      itemId,
-      companyId,
-      hasToken: !!tokenToUse,
-      tokenLength: tokenToUse?.length ?? 0,
-    });
-
     try {
-      console.log('[useOpeniItemEvents] Creating EventSource', {
-        url: url.replace(tokenToUse, '***'),
-        hasToken: !!tokenToUse,
-      });
-
       const eventSource = new EventSource(url);
       eventSourceRef.current = eventSource;
 
@@ -343,9 +267,6 @@ export const useOpeniItemEvents = ({
         isConnectingRef.current = false;
         setConnectionStatus('connected');
         reconnectAttemptsRef.current = 0;
-        console.log(`[useOpeniItemEvents] SSE connected successfully for itemId: ${itemId}`, {
-          hasToken: !!tokenToUse,
-        });
       };
 
       eventSource.onmessage = handleEventMessage;
@@ -370,19 +291,7 @@ export const useOpeniItemEvents = ({
   }, []);
 
   useEffect(() => {
-    console.log('[useOpeniItemEvents] useEffect triggered', {
-      itemId,
-      enabled,
-      currentItemId: currentItemIdRef.current,
-      isConnecting: isConnectingRef.current,
-      hasEventSource: !!eventSourceRef.current,
-    });
-
     if (!itemId || !enabled) {
-      console.log('[useOpeniItemEvents] Disconnecting - missing itemId or disabled', {
-        itemId,
-        enabled,
-      });
       if (currentItemIdRef.current !== null) {
         disconnect();
       }
@@ -391,7 +300,6 @@ export const useOpeniItemEvents = ({
     }
 
     if (currentItemIdRef.current === itemId && eventSourceRef.current && eventSourceRef.current.readyState === EventSource.OPEN) {
-      console.log('[useOpeniItemEvents] Already connected to this itemId, skipping useEffect connection');
       return;
     }
 
@@ -400,22 +308,8 @@ export const useOpeniItemEvents = ({
       const tokenToUse = await retrieveToken(currentState);
 
       if (!tokenToUse) {
-        console.warn('[useOpeniItemEvents] Token not available, will retry...', {
-          itemId,
-          enabled,
-          zustandToken: currentState.token,
-          storageToken: getTokenFromStorage(),
-          hasUser: !!currentState.user,
-          isAuthenticated: currentState.isAuthenticated,
-        });
         return false;
       }
-
-      console.log('[useOpeniItemEvents] Conditions met, calling connect()', {
-        itemId,
-        enabled,
-        hasToken: !!tokenToUse,
-      });
 
       hasAttemptedConnectionRef.current = false;
       if (connectRef.current) {
@@ -429,14 +323,6 @@ export const useOpeniItemEvents = ({
         retryIntervalRef.current = setInterval(async () => {
           const currentState = useAuthStore.getState();
           const currentToken = await retrieveToken(currentState);
-
-          console.log('[useOpeniItemEvents] Retrying connection - checking token availability', {
-            zustandToken: currentState.token,
-            storageToken: getTokenFromStorage(),
-            hasUser: !!currentState.user,
-            isAuthenticated: currentState.isAuthenticated,
-            hasToken: !!currentToken,
-          });
 
           if (currentToken && connectRef.current) {
             if (await attemptConnection()) {
@@ -454,14 +340,7 @@ export const useOpeniItemEvents = ({
             retryIntervalRef.current = null;
           }
           if (!hasAttemptedConnectionRef.current) {
-            const finalState = useAuthStore.getState();
             hasAttemptedConnectionRef.current = true;
-            console.error('[useOpeniItemEvents] Token not available after retries', {
-              finalZustandToken: finalState.token,
-              finalStorageToken: getTokenFromStorage(),
-              hasUser: !!finalState.user,
-              isAuthenticated: finalState.isAuthenticated,
-            });
             setConnectionStatus('error');
             setError(new Error('No authentication token available'));
           }
@@ -478,11 +357,6 @@ export const useOpeniItemEvents = ({
         clearTimeout(retryTimeoutRef.current);
         retryTimeoutRef.current = null;
       }
-      console.log('[useOpeniItemEvents] useEffect cleanup', {
-        currentItemId: currentItemIdRef.current,
-        itemId,
-        enabled,
-      });
       if (currentItemIdRef.current === itemId && (!itemId || !enabled)) {
         disconnect(false);
       }
