@@ -58,7 +58,11 @@ function ConnectionCard({ item }: { readonly item: OpeniItem }) {
                   {item.connectorName ?? 'Banco desconhecido'}
                 </p>
                 <p className="text-xs text-muted-foreground dark:text-gray-400 mt-0.5">
-                  {item.connectorType === 'PERSONAL_BANK' ? 'Banco Pessoal' : 'Banco Empresarial'}
+                  {item.connectorType === 'PERSONAL_BANK'
+                    ? 'Banco Pessoal'
+                    : item.connectorType === 'BUSINESS_BANK'
+                      ? 'Banco Empresarial'
+                      : 'Banco'}
                 </p>
               </div>
               <StatusBadge status={item.status} />
@@ -80,13 +84,10 @@ function EmptyState({ onAddAnother }: { readonly onAddAnother: () => void }) {
         Nenhuma conexão encontrada
       </h3>
       <p className="text-sm text-muted-foreground dark:text-gray-400 mb-6 max-w-sm mx-auto">
-        Você ainda não possui conexões ativas com bancos via Open Finance.
-        Conecte sua conta para sincronizar transações automaticamente.
+        Você ainda não possui conexões ativas com bancos via Open Finance. Conecte sua conta para
+        sincronizar transações automaticamente.
       </p>
-      <Button
-        onClick={onAddAnother}
-        className="bg-purple-600 hover:bg-purple-700 text-white"
-      >
+      <Button onClick={onAddAnother} className="bg-purple-600 hover:bg-purple-700 text-white">
         <Link2 className="h-4 w-4 mr-2" />
         Conectar conta bancária
       </Button>
@@ -94,10 +95,7 @@ function EmptyState({ onAddAnother }: { readonly onAddAnother: () => void }) {
   );
 }
 
-export function PageExistingConnections({
-  items,
-  onAddAnother,
-}: PageExistingConnectionsProps) {
+export function PageExistingConnections({ items, onAddAnother }: PageExistingConnectionsProps) {
   if (items.length === 0) {
     return <EmptyState onAddAnother={onAddAnother} />;
   }
@@ -106,11 +104,10 @@ export function PageExistingConnections({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base font-semibold text-text dark:text-text-dark">
-            Conexões Ativas
-          </h3>
+          <h3 className="text-base font-semibold text-text dark:text-text-dark">Conexões Ativas</h3>
           <p className="text-sm text-muted-foreground dark:text-gray-400">
-            {items.length} {items.length === 1 ? 'banco conectado' : 'bancos conectados'} via Open Finance
+            {items.length} {items.length === 1 ? 'banco conectado' : 'bancos conectados'} via Open
+            Finance
           </p>
         </div>
         <Button
@@ -132,7 +129,8 @@ export function PageExistingConnections({
       <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
         <RefreshCw className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
         <p className="text-xs text-blue-700 dark:text-blue-300">
-          As transações são sincronizadas automaticamente. Últimas atualizações podem levar alguns minutos.
+          As transações são sincronizadas automaticamente. Últimas atualizações podem levar alguns
+          minutos.
         </p>
       </div>
     </div>

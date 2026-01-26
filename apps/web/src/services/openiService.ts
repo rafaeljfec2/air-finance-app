@@ -150,7 +150,7 @@ const OpeniItemSchema = z.object({
   itemId: z.string(),
   connectorId: z.string(),
   connectorName: z.string().nullable(),
-  connectorType: z.string(),
+  connectorType: z.string().nullable(),
   connectorImageUrl: z.string().nullable(),
   status: z.string(),
   isActive: z.boolean(),
@@ -228,10 +228,7 @@ const ImportOpeniAccountsResponseSchema = z.object({
 export type OpeniAccount = z.infer<typeof OpeniAccountSchema>;
 export type ImportOpeniAccountsResponse = z.infer<typeof ImportOpeniAccountsResponseSchema>;
 
-export const getAccounts = async (
-  companyId: string,
-  itemId: string,
-): Promise<OpeniAccount[]> => {
+export const getAccounts = async (companyId: string, itemId: string): Promise<OpeniAccount[]> => {
   try {
     const response = await apiClient.get<{ success: boolean; data: { accounts: OpeniAccount[] } }>(
       `/companies/${companyId}/banking/openi/items/${itemId}/accounts`,

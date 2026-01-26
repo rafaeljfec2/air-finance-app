@@ -6,17 +6,31 @@ import { Link2 } from 'lucide-react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
 import { useAccounts } from '@/hooks/useAccounts';
-import { getConnectors, getItems, type OpeniConnector, type OpeniItem } from '@/services/openiService';
+import {
+  getConnectors,
+  getItems,
+  type OpeniConnector,
+  type OpeniItem,
+} from '@/services/openiService';
 import { useOpenFinanceMutations } from '@/pages/accounts/hooks/useOpenFinanceMutations';
 import { useOpeniAccountImport } from '@/pages/accounts/hooks/useOpeniAccountImport';
 import { useOpeniSseHandler } from '@/pages/accounts/hooks/useOpeniSseHandler';
-import { processConflictError, type ModalStep } from '@/pages/accounts/hooks/handlers/openiStatusHandlers';
+import {
+  processConflictError,
+  type ModalStep,
+} from '@/pages/accounts/hooks/handlers/openiStatusHandlers';
 import { LoadingState } from '@/components/accounts/OpenFinanceConnectModal.LoadingState';
 import { OAuthWaitingStep } from '@/components/accounts/OpenFinanceConnectModal.OAuthWaitingStep';
 import { PageExistingConnections, PageCpfInput, PageConnectorSelection } from './components';
 import { usePageVisibility } from './hooks/usePageVisibility';
 
-type PageStep = 'loading' | 'existing-connections' | 'cpf-input' | 'connector-selection' | 'creating-item' | 'oauth-waiting';
+type PageStep =
+  | 'loading'
+  | 'existing-connections'
+  | 'cpf-input'
+  | 'connector-selection'
+  | 'creating-item'
+  | 'oauth-waiting';
 
 function PageHeader() {
   return (
@@ -42,7 +56,7 @@ export function OpenFinancePage() {
   const { activeCompany } = useCompanyStore();
   const { accounts } = useAccounts();
   const isPageVisible = usePageVisibility();
-  
+
   const companyId = activeCompany?.id ?? '';
   const openiTenantId = activeCompany?.openiTenantId;
   const companyDocument = activeCompany?.cnpj ?? '';
@@ -57,10 +71,7 @@ export function OpenFinancePage() {
   const hasOpeniTenant = Boolean(openiTenantId?.trim());
   const isCompanyLoaded = Boolean(activeCompany);
 
-  const {
-    data: existingItems,
-    isLoading: isLoadingExistingItems,
-  } = useQuery<OpeniItem[]>({
+  const { data: existingItems, isLoading: isLoadingExistingItems } = useQuery<OpeniItem[]>({
     queryKey: ['openi-items', companyId],
     queryFn: () => getItems(companyId),
     enabled: !!companyId && hasOpeniTenant,
@@ -70,28 +81,30 @@ export function OpenFinancePage() {
   });
 
   useEffect(() => {
+    // Wait for company to load
     if (!isCompanyLoaded) {
       setStep('loading');
       return;
     }
 
+    // If no OpenI tenant, go directly to CPF input
     if (!hasOpeniTenant) {
-      setStep('cpf-input');
-      setHasInitialized(true);
+      if (!hasInitialized) {
+        setStep('cpf-input');
+        setHasInitialized(true);
+      }
       return;
     }
 
+    // Wait for items to load
     if (isLoadingExistingItems) {
       setStep('loading');
       return;
     }
 
+    // Only set initial step once when data arrives
     if (!hasInitialized && existingItems !== undefined) {
-      if (existingItems.length > 0) {
-        setStep('existing-connections');
-      } else {
-        setStep('cpf-input');
-      }
+      setStep(existingItems.length > 0 ? 'existing-connections' : 'cpf-input');
       setHasInitialized(true);
     }
   }, [isCompanyLoaded, hasOpeniTenant, isLoadingExistingItems, existingItems, hasInitialized]);
@@ -113,12 +126,7 @@ export function OpenFinancePage() {
 
   const sseStep: ModalStep = step === 'loading' ? 'cpf-input' : step;
 
-  const {
-    itemStatus,
-    isLoadingItemStatus,
-    sseConnectionStatus,
-    sseError,
-  } = useOpeniSseHandler({
+  const { itemStatus, isLoadingItemStatus, sseConnectionStatus, sseError } = useOpeniSseHandler({
     companyId,
     createdItemId,
     step: sseStep,
@@ -149,7 +157,8 @@ export function OpenFinancePage() {
   } = useQuery<OpeniConnector[]>({
     queryKey: ['openi-connectors', companyId, getDocumentType()],
     queryFn: () => getConnectors(companyId, undefined, getDocumentType()),
-    enabled: !!companyId && step === 'connector-selection' && (!!getDocumentType() || hasOpeniTenant),
+    enabled:
+      !!companyId && step === 'connector-selection' && (!!getDocumentType() || hasOpeniTenant),
     staleTime: 5 * 60 * 1000,
   });
 
@@ -266,7 +275,8 @@ export function OpenFinancePage() {
 
   const hasExistingConnections = (existingItems?.length ?? 0) > 0;
 
-  const isLoading = isLoadingConnectors || createAccountMutation.isPending || createItemMutation.isPending;
+  const isLoading =
+    isLoadingConnectors || createAccountMutation.isPending || createItemMutation.isPending;
 
   return (
     <ViewDefault>
@@ -332,19 +342,22 @@ export function OpenFinancePage() {
             </div>
           </div>
 
-          {!isLoading && step !== 'oauth-waiting' && step !== 'creating-item' && step !== 'loading' && (
-            <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
-              <h3 className="text-sm font-semibold text-purple-800 dark:text-purple-200 mb-2">
-                Como funciona o Open Finance?
-              </h3>
-              <ul className="text-xs text-purple-700 dark:text-purple-300 space-y-1.5">
-                <li>• Seus dados são compartilhados de forma segura e criptografada</li>
-                <li>• Você autoriza diretamente no site do seu banco</li>
-                <li>• Transações são sincronizadas automaticamente</li>
-                <li>• Você pode revogar o acesso a qualquer momento</li>
-              </ul>
-            </div>
-          )}
+          {!isLoading &&
+            step !== 'oauth-waiting' &&
+            step !== 'creating-item' &&
+            step !== 'loading' && (
+              <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
+                <h3 className="text-sm font-semibold text-purple-800 dark:text-purple-200 mb-2">
+                  Como funciona o Open Finance?
+                </h3>
+                <ul className="text-xs text-purple-700 dark:text-purple-300 space-y-1.5">
+                  <li>• Seus dados são compartilhados de forma segura e criptografada</li>
+                  <li>• Você autoriza diretamente no site do seu banco</li>
+                  <li>• Transações são sincronizadas automaticamente</li>
+                  <li>• Você pode revogar o acesso a qualquer momento</li>
+                </ul>
+              </div>
+            )}
         </div>
       </div>
     </ViewDefault>

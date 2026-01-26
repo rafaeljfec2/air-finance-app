@@ -24,5 +24,6 @@
     "./apps/web",
     "./apps/mobile-webview",
     "./packages/shared"
-  ]
+  ],
+  "snyk.advanced.autoSelectOrganization": true
 }
