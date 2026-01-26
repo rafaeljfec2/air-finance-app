@@ -14,11 +14,20 @@
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "typecheck": "turbo run type-check",
-    "clean": "turbo run clean && rm -rf node_modules apps/*/node_modules packages/*/node_modules"
+    "clean": "turbo run clean && rm -rf node_modules apps/*/node_modules packages/*/node_modules",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
     "turbo": "^2.7.6"
+  },
+  "lint-staged": {
+    "apps/web/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "packageManager": "yarn@4.0.0",
   "engines": {
