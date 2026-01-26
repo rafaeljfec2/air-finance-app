@@ -379,10 +379,11 @@ export function OpenFinancePage() {
                   Como funciona o Open Finance?
                 </h3>
                 <ul className="text-xs text-purple-700 dark:text-purple-300 space-y-1.5">
-                  <li>• Seus dados são compartilhados de forma segura e criptografada</li>
-                  <li>• Você autoriza diretamente no site do seu banco</li>
-                  <li>• Transações são sincronizadas automaticamente</li>
-                  <li>• Você pode revogar o acesso a qualquer momento</li>
+                  <li>✅ Seus dados são compartilhados de forma segura e criptografada</li>
+                  <li>✅ Você autoriza diretamente no site do seu banco</li>
+                  <li>✅ Novas transações são sincronizadas automaticamente</li>
+                  <li>✅ Seu extrato é sincronizado entre 6h e 24h após a conexão</li>
+                  <li>✅ Você pode revogar o acesso a qualquer momento no site do seu banco</li>
                 </ul>
               </div>
             )}
