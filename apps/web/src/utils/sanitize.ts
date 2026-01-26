@@ -51,6 +51,7 @@ export const sanitizeCompany = (company: Company | null): Company | null => {
     updatedAt: company.updatedAt,
     documentType: company.documentType,
     pierreFinanceTenantId: company.pierreFinanceTenantId,
+    openiTenantId: company.openiTenantId,
   } as Company;
 };
 

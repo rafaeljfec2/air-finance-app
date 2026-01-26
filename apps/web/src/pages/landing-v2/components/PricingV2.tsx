@@ -6,7 +6,7 @@ const plans = [
   {
     id: 'free',
     name: 'Gratuito',
-    price: 'R$ 0',
+    price: 'R$ 10',
     period: '/mês',
     features: [
       '1 conta bancária',

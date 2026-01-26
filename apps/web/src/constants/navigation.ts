@@ -12,6 +12,7 @@ import {
   Import,
   LayoutDashboard,
   LineChart,
+  Link2,
   Pencil,
   Plus,
   RefreshCcw,
@@ -48,6 +49,7 @@ export const navigation: NavigationSection[] = [
     items: [
       { name: 'Empresas', href: '/companies', icon: Building2 },
       { name: 'Contas Bancárias', href: '/accounts', icon: Banknote },
+      { name: 'Open Finance', href: '/openfinance', icon: Link2 },
       { name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCard },
       { name: 'Categorias', href: '/categories', icon: Tag },
       { name: 'Recorrências', href: '/recurring-transactions', icon: RefreshCcw },

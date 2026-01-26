@@ -9,6 +9,7 @@ interface UseOpeniSseHandlerParams {
   createdItemId: string | null;
   step: ModalStep;
   onImportAccounts: (itemId: string, status: string) => Promise<void>;
+  isPageVisible?: boolean;
 }
 
 export const useOpeniSseHandler = ({

@@ -1,210 +1,348 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Link2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { Link2 } from 'lucide-react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
-import { useOpeniIntegration } from '@/pages/accounts/hooks/useOpeniIntegration';
-import { OpeniConnectorSelector } from '@/components/accounts/OpeniConnectorSelector';
-import { OpeniItemForm } from '@/components/accounts/OpeniItemForm';
-import { OpeniItemStatus } from '@/components/accounts/OpeniItemStatus';
 import { useAccounts } from '@/hooks/useAccounts';
+import { getConnectors, getItems, type OpeniConnector, type OpeniItem } from '@/services/openiService';
+import { useOpenFinanceMutations } from '@/pages/accounts/hooks/useOpenFinanceMutations';
+import { useOpeniAccountImport } from '@/pages/accounts/hooks/useOpeniAccountImport';
+import { useOpeniSseHandler } from '@/pages/accounts/hooks/useOpeniSseHandler';
+import { processConflictError, type ModalStep } from '@/pages/accounts/hooks/handlers/openiStatusHandlers';
+import { LoadingState } from '@/components/accounts/OpenFinanceConnectModal.LoadingState';
+import { OAuthWaitingStep } from '@/components/accounts/OpenFinanceConnectModal.OAuthWaitingStep';
+import { PageExistingConnections, PageCpfInput, PageConnectorSelection } from './components';
+
+type PageStep = 'loading' | 'existing-connections' | 'cpf-input' | 'connector-selection' | 'creating-item' | 'oauth-waiting';
+
+function PageHeader() {
+  return (
+    <div className="flex items-center gap-3 px-6 pt-5 pb-4 border-b border-border dark:border-border-dark">
+      <div className="p-2 rounded-lg bg-purple-500/10 dark:bg-purple-400/10">
+        <Link2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+      </div>
+      <div>
+        <h2 className="text-lg font-semibold text-text dark:text-text-dark">
+          Conectar com Open Finance
+        </h2>
+        <p className="text-xs text-muted-foreground dark:text-gray-400">
+          Conecte suas contas bancárias via Open Finance
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export function OpenFinancePage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { activeCompany } = useCompanyStore();
-  const companyId = activeCompany?.id ?? '';
   const { accounts } = useAccounts();
-  const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>();
-  const [step, setStep] = useState<
-    'select-account' | 'select-connector' | 'create-item' | 'view-status'
-  >('select-account');
+  
+  const companyId = activeCompany?.id ?? '';
+  const openiTenantId = activeCompany?.openiTenantId;
+  const companyDocument = activeCompany?.cnpj ?? '';
 
-  const openiIntegration = useOpeniIntegration({
-    companyId,
-    accountId: selectedAccountId,
-    onSuccess: () => {
-      setStep('view-status');
-    },
+  const [step, setStep] = useState<PageStep>('loading');
+  const [cpfCnpj, setCpfCnpj] = useState(companyDocument);
+  const [selectedConnector, setSelectedConnector] = useState<OpeniConnector | null>(null);
+  const [createdAccountId, setCreatedAccountId] = useState<string | null>(null);
+  const [createdItemId, setCreatedItemId] = useState<string | null>(null);
+  const [hasInitialized, setHasInitialized] = useState(false);
+
+  const hasOpeniTenant = Boolean(openiTenantId?.trim());
+  const isCompanyLoaded = Boolean(activeCompany);
+
+  const {
+    data: existingItems,
+    isLoading: isLoadingExistingItems,
+  } = useQuery<OpeniItem[]>({
+    queryKey: ['openi-items', companyId],
+    queryFn: () => getItems(companyId),
+    enabled: !!companyId && hasOpeniTenant,
+    staleTime: 0,
+    gcTime: 0,
+    retry: false,
   });
 
-  const accountsWithOpeni = accounts?.filter((acc) => acc.openiItemId && acc.openiItemStatus) ?? [];
-
-  const handleSelectAccount = (accountId: string) => {
-    setSelectedAccountId(accountId);
-    setStep('select-connector');
-  };
-
-  const handleCreateItem = () => {
-    openiIntegration.handleCreateItem();
-  };
-
-  const handleBack = () => {
-    if (step === 'select-connector' || step === 'view-status') {
-      setStep('select-account');
-      setSelectedAccountId(undefined);
-    } else if (step === 'create-item') {
-      setStep('select-connector');
+  useEffect(() => {
+    if (!isCompanyLoaded) {
+      setStep('loading');
+      return;
     }
-  };
+
+    if (!hasOpeniTenant) {
+      setStep('cpf-input');
+      setHasInitialized(true);
+      return;
+    }
+
+    if (isLoadingExistingItems) {
+      setStep('loading');
+      return;
+    }
+
+    if (!hasInitialized && existingItems !== undefined) {
+      if (existingItems.length > 0) {
+        setStep('existing-connections');
+      } else {
+        setStep('cpf-input');
+      }
+      setHasInitialized(true);
+    }
+  }, [isCompanyLoaded, hasOpeniTenant, isLoadingExistingItems, existingItems, hasInitialized]);
+
+  useEffect(() => {
+    if (companyDocument) {
+      setCpfCnpj(companyDocument);
+    }
+  }, [companyDocument]);
+
+  const onSuccess = useCallback(() => {
+    navigate('/accounts');
+  }, [navigate]);
+
+  const { importAccountsWithRetry } = useOpeniAccountImport({
+    companyId,
+    onSuccess,
+  });
+
+  const sseStep: ModalStep = step === 'loading' ? 'cpf-input' : step;
+
+  const {
+    itemStatus,
+    isLoadingItemStatus,
+    sseConnectionStatus,
+    sseError,
+  } = useOpeniSseHandler({
+    companyId,
+    createdItemId,
+    step: sseStep,
+    onImportAccounts: importAccountsWithRetry,
+  });
+
+  const { createAccountMutation, createItemMutation } = useOpenFinanceMutations({
+    companyId,
+    onSuccess,
+    setCreatedAccountId,
+    setCreatedItemId,
+    setStep,
+  });
+
+  const getDocumentType = useCallback((): 'CPF' | 'CNPJ' | undefined => {
+    if (!cpfCnpj) return undefined;
+    const cleaned = cpfCnpj.replaceAll(/\D/g, '');
+    if (cleaned.length === 11) return 'CPF';
+    if (cleaned.length === 14) return 'CNPJ';
+    return undefined;
+  }, [cpfCnpj]);
+
+  const {
+    data: connectors,
+    isLoading: isLoadingConnectors,
+    error: connectorsError,
+  } = useQuery<OpeniConnector[]>({
+    queryKey: ['openi-connectors', companyId, getDocumentType()],
+    queryFn: () => getConnectors(companyId, undefined, getDocumentType()),
+    enabled: !!companyId && step === 'connector-selection' && (!!getDocumentType() || hasOpeniTenant),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const validateCpfCnpj = useCallback((value: string): boolean => {
+    const cleaned = value.replaceAll(/\D/g, '');
+    return cleaned.length === 11 || cleaned.length === 14;
+  }, []);
+
+  const handleCpfCnpjChange = useCallback((value: string) => {
+    const cleaned = value.replaceAll(/\D/g, '');
+    setCpfCnpj(cleaned);
+  }, []);
+
+  const handleSearchConnectors = useCallback(() => {
+    if (!validateCpfCnpj(cpfCnpj)) {
+      toast.error('CPF/CNPJ inválido. Digite 11 dígitos para CPF ou 14 para CNPJ.');
+      return;
+    }
+    setStep('connector-selection');
+  }, [cpfCnpj, validateCpfCnpj]);
+
+  const handleConnectorSearch = useCallback(() => {
+    // Search is handled locally by OpeniConnectorSelector component
+  }, []);
+
+  const handleSelectConnector = useCallback(
+    async (connector: OpeniConnector) => {
+      setSelectedConnector(connector);
+      setStep('creating-item');
+
+      let accountId: string | null = createdAccountId ?? null;
+      try {
+        if (!accountId) {
+          const existingAccount = accounts?.find((acc) => !acc.openiItemId && acc.bankingTenantId);
+
+          if (existingAccount) {
+            accountId = existingAccount.id;
+            setCreatedAccountId(accountId);
+          } else {
+            const newAccount = await createAccountMutation.mutateAsync({
+              companyId,
+              name: `${connector.name} - Open Finance`,
+              type: 'checking',
+              institution: connector.name,
+              bankCode: 'OPENI',
+              color: '#8A05BE',
+              icon: 'BanknotesIcon',
+              initialBalance: 0,
+              initialBalanceDate: new Date().toISOString(),
+              useInitialBalanceInExtract: true,
+              useInitialBalanceInCashFlow: true,
+              hasBankingIntegration: false,
+            });
+            accountId = newAccount.id;
+            setCreatedAccountId(accountId);
+          }
+        }
+
+        const cpfField = connector.rules.find((r) => r.field === 'cpf' || r.field === 'document');
+        const fieldName = cpfField?.field ?? 'cpf';
+        const documentToUse = cpfCnpj || companyDocument || '';
+
+        await createItemMutation.mutateAsync({
+          accountId,
+          connectorId: connector.id,
+          parameters: {
+            [fieldName]: documentToUse,
+          },
+        });
+      } catch (error) {
+        console.error('[OpenFinancePage] Error creating Openi item:', error);
+        processConflictError({
+          error,
+          context: {
+            variables: { accountId: accountId ?? '', connectorId: connector.id, parameters: {} },
+            accounts,
+            companyId,
+          },
+          queryClient,
+          onSuccess,
+          setCreatedItemId,
+          setStep,
+        });
+      }
+    },
+    [
+      companyId,
+      cpfCnpj,
+      companyDocument,
+      createdAccountId,
+      accounts,
+      createAccountMutation,
+      createItemMutation,
+      queryClient,
+      onSuccess,
+    ],
+  );
+
+  const handleOpenAuthUrl = useCallback((authUrl: string) => {
+    window.open(authUrl, '_blank');
+  }, []);
+
+  const handleAddAnotherConnection = useCallback(() => {
+    setStep('cpf-input');
+  }, []);
+
+  const handleBackToExistingConnections = useCallback(() => {
+    setStep('existing-connections');
+  }, []);
+
+  const handleBackToCpfInput = useCallback(() => {
+    setStep('cpf-input');
+  }, []);
+
+  const hasExistingConnections = (existingItems?.length ?? 0) > 0;
+
+  const isLoading = isLoadingConnectors || createAccountMutation.isPending || createItemMutation.isPending;
 
   return (
     <ViewDefault>
-      <div className="container mx-auto px-4 py-6 max-w-4xl">
-        <div className="mb-6">
-          <Button variant="ghost" onClick={() => navigate('/home')} className="mb-4" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
-          </Button>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-lg bg-primary-500/10">
-              <Link2 className="h-6 w-6 text-primary-600 dark:text-primary-400" />
+      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
+        <div className="container mx-auto px-4 py-4 lg:py-6 max-w-2xl">
+          <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark overflow-hidden">
+            <PageHeader />
+
+            <div className="px-6 py-4">
+              {step === 'loading' && (
+                <LoadingState
+                  message="Carregando informações..."
+                  subMessage="Aguarde enquanto verificamos suas conexões..."
+                />
+              )}
+
+              {step === 'existing-connections' && (
+                <PageExistingConnections
+                  items={existingItems ?? []}
+                  onAddAnother={handleAddAnotherConnection}
+                />
+              )}
+
+              {step === 'cpf-input' && (
+                <PageCpfInput
+                  cpfCnpj={cpfCnpj}
+                  onCpfCnpjChange={handleCpfCnpjChange}
+                  onSearchConnectors={handleSearchConnectors}
+                  validateCpfCnpj={validateCpfCnpj}
+                  onBack={handleBackToExistingConnections}
+                  showBackButton={hasExistingConnections}
+                />
+              )}
+
+              {step === 'connector-selection' && (
+                <PageConnectorSelection
+                  connectors={connectors ?? []}
+                  isLoadingConnectors={isLoadingConnectors}
+                  connectorsError={connectorsError}
+                  selectedConnector={selectedConnector}
+                  onSearch={handleConnectorSearch}
+                  onSelect={handleSelectConnector}
+                  onBack={handleBackToCpfInput}
+                />
+              )}
+
+              {step === 'creating-item' && (
+                <LoadingState
+                  message="Criando conexão com o banco..."
+                  subMessage="Aguarde enquanto preparamos a conexão..."
+                />
+              )}
+
+              {step === 'oauth-waiting' && (
+                <OAuthWaitingStep
+                  itemStatus={itemStatus}
+                  isLoadingItemStatus={isLoadingItemStatus}
+                  sseConnectionStatus={sseConnectionStatus}
+                  sseError={sseError}
+                  onOpenAuthUrl={handleOpenAuthUrl}
+                />
+              )}
             </div>
-            <h1 className="text-2xl font-bold text-text dark:text-text-dark">Open Finance</h1>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Conecte suas contas bancárias via Open Finance de forma segura e automatizada
-          </p>
+
+          {!isLoading && step !== 'oauth-waiting' && step !== 'creating-item' && step !== 'loading' && (
+            <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
+              <h3 className="text-sm font-semibold text-purple-800 dark:text-purple-200 mb-2">
+                Como funciona o Open Finance?
+              </h3>
+              <ul className="text-xs text-purple-700 dark:text-purple-300 space-y-1.5">
+                <li>• Seus dados são compartilhados de forma segura e criptografada</li>
+                <li>• Você autoriza diretamente no site do seu banco</li>
+                <li>• Transações são sincronizadas automaticamente</li>
+                <li>• Você pode revogar o acesso a qualquer momento</li>
+              </ul>
+            </div>
+          )}
         </div>
-
-        {step === 'select-account' && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-lg font-semibold text-text dark:text-text-dark mb-4">
-                Conectar Nova Conta
-              </h2>
-              <div className="bg-background dark:bg-background-dark rounded-lg border border-border dark:border-border-dark p-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Selecione uma conta para conectar via Open Finance:
-                </p>
-                <div className="space-y-2">
-                  {accounts
-                    ?.filter((acc) => !acc.openiItemId)
-                    .map((account) => (
-                      <button
-                        key={account.id}
-                        type="button"
-                        onClick={() => handleSelectAccount(account.id)}
-                        className="w-full p-4 rounded-lg border border-border dark:border-border-dark bg-background dark:bg-background-dark hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium text-text dark:text-text-dark">
-                              {account.name}
-                            </p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              {account.institution}
-                            </p>
-                          </div>
-                          <Link2 className="h-5 w-5 text-primary-500" />
-                        </div>
-                      </button>
-                    ))}
-                </div>
-              </div>
-            </div>
-
-            {accountsWithOpeni.length > 0 && (
-              <div>
-                <h2 className="text-lg font-semibold text-text dark:text-text-dark mb-4">
-                  Conexões Existentes
-                </h2>
-                <div className="space-y-2">
-                  {accountsWithOpeni.map((account) => (
-                    <div
-                      key={account.id}
-                      className="p-4 rounded-lg border border-border dark:border-border-dark bg-background dark:bg-background-dark"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-text dark:text-text-dark">
-                            {account.name}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Status: {account.openiItemStatus}
-                          </p>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedAccountId(account.id);
-                            setStep('view-status');
-                          }}
-                        >
-                          Ver Detalhes
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {step === 'select-connector' && (
-          <div className="space-y-4">
-            <Button variant="ghost" onClick={handleBack} size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar
-            </Button>
-            <h2 className="text-lg font-semibold text-text dark:text-text-dark">
-              Selecione o Banco
-            </h2>
-            <OpeniConnectorSelector
-              connectors={openiIntegration.connectors}
-              isLoading={openiIntegration.isLoadingConnectors}
-              selectedConnector={openiIntegration.selectedConnector}
-              onSearch={openiIntegration.handleSearchConnectors}
-              onSelect={(connector) => {
-                openiIntegration.handleSelectConnector(connector);
-                setStep('create-item');
-              }}
-            />
-          </div>
-        )}
-
-        {step === 'create-item' && openiIntegration.selectedConnector && (
-          <div className="space-y-4">
-            <Button variant="ghost" onClick={handleBack} size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar
-            </Button>
-            <h2 className="text-lg font-semibold text-text dark:text-text-dark">
-              Conectar com {openiIntegration.selectedConnector.name}
-            </h2>
-            <OpeniItemForm
-              connector={openiIntegration.selectedConnector}
-              parameters={openiIntegration.itemParameters}
-              isLoading={openiIntegration.isCreatingItem}
-              onParameterChange={openiIntegration.handleParameterChange}
-              onSubmit={handleCreateItem}
-            />
-          </div>
-        )}
-
-        {step === 'view-status' && selectedAccountId && openiIntegration.itemStatus && (
-          <div className="space-y-4">
-            <Button variant="ghost" onClick={handleBack} size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar
-            </Button>
-            <h2 className="text-lg font-semibold text-text dark:text-text-dark">
-              Status da Conexão
-            </h2>
-            <OpeniItemStatus
-              item={openiIntegration.itemStatus}
-              isLoading={openiIntegration.isResyncingItem}
-              onResync={() => {
-                if (openiIntegration.itemStatus) {
-                  openiIntegration.handleResyncItem(openiIntegration.itemStatus.id);
-                }
-              }}
-              onOpenAuthUrl={openiIntegration.handleOpenAuthUrl}
-            />
-          </div>
-        )}
       </div>
     </ViewDefault>
   );
