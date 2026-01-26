@@ -2,6 +2,14 @@ import { parseApiError } from '@/utils/apiErrorHandler';
 import { z } from 'zod';
 import { apiClient } from './apiClient';
 
+// Schema para subdocumento balance (nova estrutura)
+const BalanceSubdocSchema = z.object({
+  initial: z.number().default(0),
+  date: z.string().nullable().optional(),
+  useInExtract: z.boolean().default(true),
+  useInCashFlow: z.boolean().default(true),
+});
+
 export const AccountSchema = z.object({
   id: z.string(),
   companyId: z.string(),
@@ -15,7 +23,8 @@ export const AccountSchema = z.object({
   accountNumber: z.string().optional().nullable(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida'),
   icon: z.string().min(1, 'Ícone é obrigatório'),
-  balance: z.number().default(0),
+  // Nova estrutura: balance é objeto, mas mantemos compatibilidade
+  balance: z.union([z.number(), BalanceSubdocSchema]).default(0),
   initialBalance: z.number().default(0),
   initialBalanceDate: z
     .string()
@@ -36,9 +45,57 @@ export const AccountSchema = z.object({
   // Openi fields
   openiItemId: z.string().optional().nullable(),
   openiConnectorId: z.string().optional().nullable(),
-  openiItemStatus: z.enum(['PENDING', 'CONNECTED', 'ERROR', 'WAITING_USER_INPUT']).optional().nullable(),
+  openiItemStatus: z
+    .enum(['PENDING', 'CONNECTED', 'ERROR', 'WAITING_USER_INPUT', 'SYNCING', 'SYNCED'])
+    .optional()
+    .nullable(),
   openiAuthUrl: z.string().optional().nullable(),
   openiAuthExpiresAt: z.string().datetime().optional().nullable(),
+  // Nova estrutura (subdocumentos) - opcional para compatibilidade
+  bankDetails: z
+    .object({
+      institution: z.string().optional(),
+      bankCode: z.string().optional(),
+      agency: z.string().optional(),
+      accountNumber: z.string().optional(),
+      pixKey: z.string().optional().nullable(),
+    })
+    .optional(),
+  creditCard: z
+    .object({
+      limit: z.number().optional(),
+      closingDay: z.number().optional(),
+      dueDay: z.number().optional(),
+    })
+    .optional(),
+  integration: z
+    .object({
+      enabled: z.boolean().default(false),
+      tenantId: z.string().optional().nullable(),
+      sync: z
+        .object({
+          enabled: z.boolean().default(false),
+          cronExpression: z.string().optional().nullable(),
+          lastSyncAt: z.string().optional().nullable(),
+          autoImportToCashFlow: z.boolean().default(false),
+        })
+        .optional(),
+      openFinance: z
+        .object({
+          itemId: z.string().optional().nullable(),
+          accountId: z.string().optional().nullable(),
+          connectorId: z.string().optional().nullable(),
+          status: z.string().optional().nullable(),
+          auth: z
+            .object({
+              url: z.string().optional().nullable(),
+              expiresAt: z.string().optional().nullable(),
+            })
+            .optional(),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 export const CreateAccountSchema = AccountSchema.omit({
