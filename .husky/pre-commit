@@ -1,8 +1,1 @@
-#!/bin/sh
-
-# Run lint-staged for staged files
 npx lint-staged
-
-# Run type-check on the web app
-echo "Running type-check..."
-yarn workspace @air-finance/web type-check

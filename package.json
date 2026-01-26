@@ -25,8 +25,10 @@
   },
   "lint-staged": {
     "apps/web/**/*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
+      "prettier --write",
+      "turbo run lint",
+      "turbo run type-check",
+      "turbo run build"
     ]
   },
   "packageManager": "yarn@4.0.0",

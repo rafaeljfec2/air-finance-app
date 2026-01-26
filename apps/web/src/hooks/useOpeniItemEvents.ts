@@ -50,7 +50,9 @@ const getTokenFromAuthStorage = (): string | null => {
   }
 };
 
-const retrieveToken = async (currentState: ReturnType<typeof useAuthStore.getState>): Promise<string | null> => {
+const retrieveToken = async (
+  currentState: ReturnType<typeof useAuthStore.getState>,
+): Promise<string | null> => {
   let tokenToUse = currentState.token ?? getTokenFromStorage();
 
   if (!tokenToUse && currentState.user && currentState.isAuthenticated) {
@@ -83,7 +85,13 @@ export interface OpeniItemEvent {
   timestamp: string;
 }
 
-type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'error' | 'closed';
+type ConnectionStatus =
+  | 'disconnected'
+  | 'connecting'
+  | 'connected'
+  | 'reconnecting'
+  | 'error'
+  | 'closed';
 
 interface UseOpeniItemEventsOptions {
   companyId: string;
@@ -228,7 +236,11 @@ export const useOpeniItemEvents = ({
       return;
     }
 
-    if (currentItemIdRef.current === itemId && eventSourceRef.current && eventSourceRef.current.readyState === EventSource.OPEN) {
+    if (
+      currentItemIdRef.current === itemId &&
+      eventSourceRef.current &&
+      eventSourceRef.current.readyState === EventSource.OPEN
+    ) {
       return;
     }
 
@@ -279,7 +291,7 @@ export const useOpeniItemEvents = ({
       setConnectionStatus('error');
       onError?.(error);
     }
-  }, [companyId, itemId, enabled, onError, disconnect, handleEventMessage, handleEventError, buildSseUrl]);
+  }, [itemId, enabled, onError, disconnect, handleEventMessage, handleEventError, buildSseUrl]);
 
   connectRef.current = connect;
 
@@ -299,7 +311,11 @@ export const useOpeniItemEvents = ({
       return;
     }
 
-    if (currentItemIdRef.current === itemId && eventSourceRef.current && eventSourceRef.current.readyState === EventSource.OPEN) {
+    if (
+      currentItemIdRef.current === itemId &&
+      eventSourceRef.current &&
+      eventSourceRef.current.readyState === EventSource.OPEN
+    ) {
       return;
     }
 
