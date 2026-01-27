@@ -64,7 +64,6 @@ export function OpenFinancePage() {
   const [step, setStep] = useState<PageStep>('loading');
   const [cpfCnpj, setCpfCnpj] = useState(companyDocument);
   const [selectedConnector, setSelectedConnector] = useState<OpeniConnector | null>(null);
-  const [createdAccountId, setCreatedAccountId] = useState<string | null>(null);
   const [createdItemId, setCreatedItemId] = useState<string | null>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
   const [importedItemIds, setImportedItemIds] = useState<Set<string>>(new Set());
@@ -162,10 +161,10 @@ export function OpenFinancePage() {
     isPageVisible,
   });
 
-  const { createAccountMutation, createItemMutation } = useOpenFinanceMutations({
+  const { createItemMutation } = useOpenFinanceMutations({
     companyId,
     onSuccess,
-    setCreatedAccountId,
+    setCreatedAccountId: () => {},
     setCreatedItemId,
     setStep,
   });
@@ -217,40 +216,12 @@ export function OpenFinancePage() {
       setSelectedConnector(connector);
       setStep('creating-item');
 
-      let accountId: string | null = createdAccountId ?? null;
       try {
-        if (!accountId) {
-          const existingAccount = accounts?.find((acc) => !acc.openiItemId && acc.bankingTenantId);
-
-          if (existingAccount) {
-            accountId = existingAccount.id;
-            setCreatedAccountId(accountId);
-          } else {
-            const newAccount = await createAccountMutation.mutateAsync({
-              companyId,
-              name: `${connector.name} - Open Finance`,
-              type: 'checking',
-              institution: connector.name,
-              bankCode: 'OPENI',
-              color: '#8A05BE',
-              icon: 'BanknotesIcon',
-              initialBalance: 0,
-              initialBalanceDate: new Date().toISOString(),
-              useInitialBalanceInExtract: true,
-              useInitialBalanceInCashFlow: true,
-              hasBankingIntegration: false,
-            });
-            accountId = newAccount.id;
-            setCreatedAccountId(accountId);
-          }
-        }
-
         const cpfField = connector.rules.find((r) => r.field === 'cpf' || r.field === 'document');
         const fieldName = cpfField?.field ?? 'cpf';
         const documentToUse = cpfCnpj || companyDocument || '';
 
         await createItemMutation.mutateAsync({
-          accountId,
           connectorId: connector.id,
           parameters: {
             [fieldName]: documentToUse,
@@ -261,7 +232,7 @@ export function OpenFinancePage() {
         processConflictError({
           error,
           context: {
-            variables: { accountId: accountId ?? '', connectorId: connector.id, parameters: {} },
+            variables: { accountId: '', connectorId: connector.id, parameters: {} },
             accounts,
             companyId,
           },
@@ -272,17 +243,7 @@ export function OpenFinancePage() {
         });
       }
     },
-    [
-      companyId,
-      cpfCnpj,
-      companyDocument,
-      createdAccountId,
-      accounts,
-      createAccountMutation,
-      createItemMutation,
-      queryClient,
-      onSuccess,
-    ],
+    [companyId, cpfCnpj, companyDocument, accounts, createItemMutation, queryClient, onSuccess],
   );
 
   const handleOpenAuthUrl = useCallback((authUrl: string) => {
@@ -303,8 +264,7 @@ export function OpenFinancePage() {
 
   const hasExistingConnections = (existingItems?.length ?? 0) > 0;
 
-  const isLoading =
-    isLoadingConnectors || createAccountMutation.isPending || createItemMutation.isPending;
+  const isLoading = isLoadingConnectors || createItemMutation.isPending;
 
   return (
     <ViewDefault>
