@@ -31,11 +31,15 @@ export function CustomizationSection({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
         <FormField label="Cor">
-          <ColorPicker value={form.color} onChange={onColorChange} />
+          <ColorPicker value={form.color ?? '#8A05BE'} onChange={onColorChange} />
         </FormField>
 
         <FormField label="Ícone">
-          <IconPicker value={form.icon} onChange={onIconChange} options={iconOptions} />
+          <IconPicker
+            value={form.icon ?? 'Banknote'}
+            onChange={onIconChange}
+            options={iconOptions}
+          />
         </FormField>
       </div>
     </div>

@@ -86,7 +86,7 @@ export function AccountListItem({
       {/* Saldo */}
       <div className="text-right shrink-0">
         <span className="text-[13px] font-bold text-text dark:text-text-dark block">
-          {formatCurrency(account.balance)}
+          {formatCurrency(account.currentBalance)}
         </span>
       </div>
 

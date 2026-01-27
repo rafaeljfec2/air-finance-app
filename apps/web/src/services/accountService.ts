@@ -107,6 +107,11 @@ const AccountBaseSchema = z.object({
 // Schema com transform para normalizar dados (extrai subdocuments para campos flat)
 export const AccountSchema = AccountBaseSchema.transform((data) => ({
   ...data,
+  // Garantir valores padrão para campos obrigatórios em componentes
+  color: data.color ?? '#8A05BE',
+  icon: data.icon ?? 'Banknote',
+  // Campo currentBalance para compatibilidade (saldo numérico)
+  currentBalance: data.balance?.initial ?? 0,
   // Extrair campos de bankDetails para root (compatibilidade)
   institution: data.institution ?? data.bankDetails?.institution ?? '',
   bankCode: data.bankCode ?? data.bankDetails?.bankCode ?? undefined,

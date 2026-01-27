@@ -131,7 +131,7 @@ export function AccountTableRow({
       </td>
       <td className="p-4">
         <div className="text-sm font-semibold text-text dark:text-text-dark">
-          {formatCurrency(account.balance)}
+          {formatCurrency(account.currentBalance)}
         </div>
       </td>
       <td className="p-4">

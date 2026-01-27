@@ -174,12 +174,12 @@ export function AccountCard({
                 <span
                   className={cn(
                     'font-bold text-sm',
-                    account.balance >= 0
+                    account.currentBalance >= 0
                       ? 'text-emerald-600 dark:text-emerald-400'
                       : 'text-red-600 dark:text-red-400',
                   )}
                 >
-                  {formatCurrency(account.balance)}
+                  {formatCurrency(account.currentBalance)}
                 </span>
               </div>
             </div>

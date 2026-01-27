@@ -171,7 +171,7 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
   const validate = useCallback(() => {
     const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Nome obrigatório';
-    if (!form.institution.trim()) errs.institution = 'Instituição obrigatória';
+    if (!(form.institution ?? '').trim()) errs.institution = 'Instituição obrigatória';
     validateBankingFields(errs);
     if (!form.companyId) errs.companyId = 'Selecione uma empresa';
     return errs;

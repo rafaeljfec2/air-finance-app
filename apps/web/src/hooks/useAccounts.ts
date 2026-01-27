@@ -81,7 +81,9 @@ export const useAccounts = () => {
       if (previousAccounts) {
         queryClient.setQueryData<Account[]>(['accounts', companyId], (prev) =>
           (prev ?? []).map((acc) =>
-            acc.id === id ? { ...acc, ...data, updatedAt: new Date().toISOString() } : acc,
+            acc.id === id
+              ? ({ ...acc, ...data, updatedAt: new Date().toISOString() } as Account)
+              : acc,
           ),
         );
       }
@@ -91,7 +93,7 @@ export const useAccounts = () => {
           ...previousAccount,
           ...data,
           updatedAt: new Date().toISOString(),
-        });
+        } as Account);
       }
 
       return { previousAccounts, previousAccount };
