@@ -134,6 +134,21 @@ export function getDisplayName(account: Account): string {
   return institution ? `${account.name} - ${institution}` : account.name;
 }
 
+export function getAccountTypeLabel(account: Account): string {
+  switch (account.type) {
+    case 'checking':
+      return 'CC';
+    case 'savings':
+      return 'CP';
+    case 'credit_card':
+      return 'Cartão';
+    case 'investment':
+      return 'Invest.';
+    default:
+      return 'Conta';
+  }
+}
+
 export function isOpenFinanceAccount(account: Account): boolean {
   return Boolean(getOpeniItemId(account));
 }

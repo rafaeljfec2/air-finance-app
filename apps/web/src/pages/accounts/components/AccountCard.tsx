@@ -5,6 +5,7 @@ import {
   getBankCode,
   getAgency,
   getAccountNumber,
+  getAccountTypeLabel,
   hasBankingIntegration as hasIntegration,
 } from '@/services/accountHelpers';
 import { formatCurrency } from '@/utils/formatters';
@@ -162,7 +163,7 @@ export function AccountCard({
                 <div className="flex items-center gap-1.5 min-w-0">
                   <Hash className="h-3.5 w-3.5 text-gray-400 shrink-0" />
                   <span className="text-gray-600 dark:text-gray-300 truncate font-mono text-[11px]">
-                    Cc: {accountNumber}
+                    {getAccountTypeLabel(account)}: {accountNumber}
                   </span>
                 </div>
               )}

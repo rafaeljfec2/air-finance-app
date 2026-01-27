@@ -6,6 +6,7 @@ import {
   getBankCode,
   getAgency,
   getAccountNumber,
+  getAccountTypeLabel,
   hasBankingIntegration as hasIntegration,
 } from '@/services/accountHelpers';
 import { formatCurrency } from '@/utils/formatters';
@@ -124,7 +125,9 @@ export function AccountTableRow({
             <span className="text-text dark:text-text-dark font-mono text-xs">{agency}</span>
           </div>
           <div className="text-sm">
-            <span className="text-gray-500 dark:text-gray-400 text-xs">Cc: </span>
+            <span className="text-gray-500 dark:text-gray-400 text-xs">
+              {getAccountTypeLabel(account)}:{' '}
+            </span>
             <span className="text-text dark:text-text-dark font-mono text-xs">{accountNumber}</span>
           </div>
         </div>

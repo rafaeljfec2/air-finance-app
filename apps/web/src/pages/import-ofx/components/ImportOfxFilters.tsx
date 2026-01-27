@@ -6,6 +6,21 @@ import { formatDateToLocalISO } from '@/utils/date';
 import { Download, Search, Calendar } from 'lucide-react';
 import { useState } from 'react';
 
+function getAccountTypeLabel(type?: string): string {
+  switch (type) {
+    case 'checking':
+      return 'CC';
+    case 'savings':
+      return 'CP';
+    case 'credit_card':
+      return 'Cartão';
+    case 'investment':
+      return 'Invest.';
+    default:
+      return 'Conta';
+  }
+}
+
 interface ImportOfxFiltersProps {
   startDate: Date | undefined;
   setStartDate: (date: Date | undefined) => void;
@@ -138,7 +153,10 @@ export function ImportOfxFilters({
                 if (account) {
                   const parts = [];
                   if (account.agency) parts.push(`Ag: ${account.agency}`);
-                  if (account.accountNumber) parts.push(`CC: ${account.accountNumber}`);
+                  if (account.accountNumber) {
+                    const typeLabel = getAccountTypeLabel(account.type);
+                    parts.push(`${typeLabel}: ${account.accountNumber}`);
+                  }
                   subtitle = parts.join(' • ');
                 }
 
