@@ -5,6 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBanks } from '@/hooks/useBanks';
+import {
+  getInstitution,
+  getBankCode,
+  getAgency,
+  getAccountNumber,
+} from '@/services/accountHelpers';
 import { Building2 } from 'lucide-react';
 import { BankIcon } from '@/components/bank/BankIcon';
 
@@ -35,7 +41,7 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
     () =>
       accounts?.map((account) => ({
         value: account.id,
-        label: `${account.name} • ${account.institution}`,
+        label: `${account.name} • ${getInstitution(account)}`,
       })) ?? [],
     [accounts],
   );
@@ -51,10 +57,10 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
     if (selectedAccount) {
       setForm({
         name: selectedAccount.name ?? '',
-        institution: selectedAccount.institution ?? '',
-        bankCode: selectedAccount.bankCode ?? '',
-        agency: selectedAccount.agency ?? '',
-        accountNumber: selectedAccount.accountNumber ?? '',
+        institution: getInstitution(selectedAccount),
+        bankCode: getBankCode(selectedAccount) ?? '',
+        agency: getAgency(selectedAccount) ?? '',
+        accountNumber: getAccountNumber(selectedAccount) ?? '',
       });
       setErrors({});
     }
@@ -68,7 +74,7 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
 
   const handleBankChange = (bankCode: string | null) => {
     if (bankCode) {
-      const selectedBank = bankOptions.find(b => b.value === bankCode);
+      const selectedBank = bankOptions.find((b) => b.value === bankCode);
       if (selectedBank) {
         // Extract bank name from label (format: "001 - Banco do Brasil")
         const bankName = selectedBank.label.split(' - ')[1] || selectedBank.label;
@@ -160,7 +166,7 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
               options={bankOptions}
               value={form.bankCode || null}
               onValueChange={handleBankChange}
-              placeholder={isLoadingBanks ? "Carregando bancos..." : "Selecione o banco"}
+              placeholder={isLoadingBanks ? 'Carregando bancos...' : 'Selecione o banco'}
               disabled={isLoadingBanks}
               searchable
               searchPlaceholder="Buscar banco..."
@@ -205,7 +211,9 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
                       size="sm"
                       className="flex-shrink-0"
                     />
-                    <span className="truncate text-gray-900 dark:text-gray-100">{option.label}</span>
+                    <span className="truncate text-gray-900 dark:text-gray-100">
+                      {option.label}
+                    </span>
                   </div>
                 );
               }}

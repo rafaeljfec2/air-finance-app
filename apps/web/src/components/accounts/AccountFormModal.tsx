@@ -2,6 +2,7 @@ import { ComboBoxOption } from '@/components/ui/ComboBox';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
 import type { Account, CreateAccount } from '@/services/accountService';
+import { getBankCode, hasBankingIntegration as hasIntegration } from '@/services/accountHelpers';
 import { CreditCard, X, Link2 } from 'lucide-react';
 import { useMemo } from 'react';
 import { BankingFieldsSection } from './components/BankingFieldsSection';
@@ -22,7 +23,7 @@ function getModalDescription(account: Account | null | undefined): string {
 }
 
 function BankingIntegrationStatus({ account }: Readonly<{ account?: Account | null }>) {
-  if (account?.hasBankingIntegration) {
+  if (account && hasIntegration(account)) {
     return (
       <div className="flex items-center gap-2">
         <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
@@ -32,7 +33,7 @@ function BankingIntegrationStatus({ account }: Readonly<{ account?: Account | nu
       </div>
     );
   }
-  
+
   if (account) {
     return (
       <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
@@ -40,7 +41,7 @@ function BankingIntegrationStatus({ account }: Readonly<{ account?: Account | nu
       </p>
     );
   }
-  
+
   return (
     <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
       Após criar a conta, você poderá configurar a integração
@@ -99,9 +100,9 @@ export function AccountFormModal({
 
   // Verifica se o banco selecionado tem integração disponível
   const bankSupportsIntegration = useMemo(() => {
-    const bankCode = account?.bankCode || form.bankCode;
+    const bankCode = account ? getBankCode(account) : form.bankCode;
     return hasBankingIntegration(bankCode);
-  }, [account?.bankCode, form.bankCode, hasBankingIntegration]);
+  }, [account, form.bankCode, hasBankingIntegration]);
 
   const getSubmitButtonText = (): string => {
     if (isLoading) return 'Salvando...';
@@ -187,14 +188,14 @@ export function AccountFormModal({
                         variant="outline"
                         size="sm"
                         className={
-                          account.hasBankingIntegration
+                          hasIntegration(account)
                             ? 'border-green-500 text-green-600 hover:bg-green-50 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-900/20 h-8 text-xs'
                             : 'border-primary-500 text-primary-600 hover:bg-primary-50 dark:border-primary-400 dark:text-primary-400 dark:hover:bg-primary-900/20 h-8 text-xs'
                         }
                         disabled={isLoading}
                       >
                         <Link2 className="h-3 w-3 mr-1.5" />
-                        {account.hasBankingIntegration ? 'Ver' : 'Configurar'}
+                        {hasIntegration(account) ? 'Ver' : 'Configurar'}
                       </Button>
                     )}
                   </div>

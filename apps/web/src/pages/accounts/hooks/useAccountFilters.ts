@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Account } from '@/services/accountService';
+import { getInstitution, getAgency, getAccountNumber } from '@/services/accountHelpers';
 
 export function useAccountFilters() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,11 +13,14 @@ export function useAccountFilters() {
         if (account.type === 'credit_card') {
           return false;
         }
+        const institution = getInstitution(account);
+        const agency = getAgency(account);
+        const accountNumber = getAccountNumber(account);
         const matchesSearch =
           account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          account.institution.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (account.agency && account.agency.includes(searchTerm)) ||
-          (account.accountNumber && account.accountNumber.includes(searchTerm));
+          institution.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (agency && agency.includes(searchTerm)) ||
+          (accountNumber && accountNumber.includes(searchTerm));
         const matchesType = filterType === 'all' || account.type === filterType;
         return matchesSearch && matchesType;
       });

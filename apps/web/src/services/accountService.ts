@@ -10,48 +10,23 @@ const BalanceSubdocSchema = z.object({
   useInCashFlow: z.boolean().default(true),
 });
 
-export const AccountSchema = z.object({
+// Schema base para Account (sem transform)
+const AccountBaseSchema = z.object({
   id: z.string(),
-  companyId: z.string(),
+  companyId: z.string().optional(),
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   type: z.enum(['checking', 'savings', 'investment', 'credit_card', 'digital_wallet'], {
     errorMap: () => ({ message: 'Tipo de conta inválido' }),
   }),
-  institution: z.string().min(2, 'Instituição deve ter pelo menos 2 caracteres'),
-  bankCode: z.string().optional().nullable(),
-  agency: z.string().optional().nullable(),
-  accountNumber: z.string().optional().nullable(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida'),
-  icon: z.string().min(1, 'Ícone é obrigatório'),
-  // Nova estrutura: balance é objeto, mas mantemos compatibilidade
-  balance: z.union([z.number(), BalanceSubdocSchema]).default(0),
-  initialBalance: z.number().default(0),
-  initialBalanceDate: z
+  color: z
     .string()
-    .transform((date) => {
-      if (!date) return null;
-      return new Date(date).toISOString();
-    })
-    .nullable(),
-  useInitialBalanceInExtract: z.boolean().optional().default(true),
-  useInitialBalanceInCashFlow: z.boolean().optional().default(true),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  creditLimit: z.number().optional(),
-  // Banking Integration fields
-  bankingTenantId: z.string().optional().nullable(),
-  pixKey: z.string().optional().nullable(),
-  hasBankingIntegration: z.boolean().optional().default(false),
-  // Openi fields
-  openiItemId: z.string().optional().nullable(),
-  openiConnectorId: z.string().optional().nullable(),
-  openiItemStatus: z
-    .enum(['PENDING', 'CONNECTED', 'ERROR', 'WAITING_USER_INPUT', 'SYNCING', 'SYNCED'])
-    .optional()
-    .nullable(),
-  openiAuthUrl: z.string().optional().nullable(),
-  openiAuthExpiresAt: z.string().datetime().optional().nullable(),
-  // Nova estrutura (subdocumentos) - opcional para compatibilidade
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida')
+    .optional(),
+  icon: z.string().min(1, 'Ícone é obrigatório').optional(),
+  createdAt: z.string().nullable().optional(),
+  updatedAt: z.string().nullable().optional(),
+
+  // === Nova estrutura (subdocumentos) - campos principais ===
   bankDetails: z
     .object({
       institution: z.string().optional(),
@@ -61,6 +36,14 @@ export const AccountSchema = z.object({
       pixKey: z.string().optional().nullable(),
     })
     .optional(),
+
+  balance: BalanceSubdocSchema.optional().default({
+    initial: 0,
+    date: null,
+    useInExtract: true,
+    useInCashFlow: true,
+  }),
+
   creditCard: z
     .object({
       limit: z.number().optional(),
@@ -68,6 +51,7 @@ export const AccountSchema = z.object({
       dueDay: z.number().optional(),
     })
     .optional(),
+
   integration: z
     .object({
       enabled: z.boolean().default(false),
@@ -96,9 +80,61 @@ export const AccountSchema = z.object({
         .optional(),
     })
     .optional(),
+
+  // === Campos legados (para compatibilidade) - todos opcionais ===
+  institution: z.string().optional(),
+  bankCode: z.string().optional().nullable(),
+  agency: z.string().optional().nullable(),
+  accountNumber: z.string().optional().nullable(),
+  initialBalance: z.number().optional().default(0),
+  initialBalanceDate: z.string().nullable().optional(),
+  useInitialBalanceInExtract: z.boolean().optional().default(true),
+  useInitialBalanceInCashFlow: z.boolean().optional().default(true),
+  creditLimit: z.number().optional(),
+  bankingTenantId: z.string().optional().nullable(),
+  pixKey: z.string().optional().nullable(),
+  hasBankingIntegration: z.boolean().optional().default(false),
+  openiItemId: z.string().optional().nullable(),
+  openiConnectorId: z.string().optional().nullable(),
+  openiItemStatus: z
+    .enum(['PENDING', 'CONNECTED', 'ERROR', 'WAITING_USER_INPUT', 'SYNCING', 'SYNCED'])
+    .optional()
+    .nullable(),
+  openiAuthUrl: z.string().optional().nullable(),
+  openiAuthExpiresAt: z.string().nullable().optional(),
 });
 
-export const CreateAccountSchema = AccountSchema.omit({
+// Schema com transform para normalizar dados (extrai subdocuments para campos flat)
+export const AccountSchema = AccountBaseSchema.transform((data) => ({
+  ...data,
+  // Extrair campos de bankDetails para root (compatibilidade)
+  institution: data.institution ?? data.bankDetails?.institution ?? '',
+  bankCode: data.bankCode ?? data.bankDetails?.bankCode ?? undefined,
+  agency: data.agency ?? data.bankDetails?.agency ?? undefined,
+  accountNumber: data.accountNumber ?? data.bankDetails?.accountNumber ?? undefined,
+  pixKey: data.pixKey ?? data.bankDetails?.pixKey ?? undefined,
+  // Extrair campos de balance para root (compatibilidade)
+  initialBalance: data.initialBalance ?? data.balance?.initial ?? 0,
+  initialBalanceDate: data.initialBalanceDate ?? data.balance?.date ?? null,
+  useInitialBalanceInExtract: data.useInitialBalanceInExtract ?? data.balance?.useInExtract ?? true,
+  useInitialBalanceInCashFlow:
+    data.useInitialBalanceInCashFlow ?? data.balance?.useInCashFlow ?? true,
+  // Extrair campos de creditCard para root (compatibilidade)
+  creditLimit: data.creditLimit ?? data.creditCard?.limit ?? undefined,
+  // Extrair campos de integration para root (compatibilidade)
+  hasBankingIntegration: data.hasBankingIntegration ?? data.integration?.enabled ?? false,
+  bankingTenantId: data.bankingTenantId ?? data.integration?.tenantId ?? undefined,
+  openiItemId: data.openiItemId ?? data.integration?.openFinance?.itemId ?? undefined,
+  openiConnectorId:
+    data.openiConnectorId ?? data.integration?.openFinance?.connectorId ?? undefined,
+  openiItemStatus: data.openiItemStatus ?? data.integration?.openFinance?.status ?? undefined,
+  openiAuthUrl: data.openiAuthUrl ?? data.integration?.openFinance?.auth?.url ?? undefined,
+  openiAuthExpiresAt:
+    data.openiAuthExpiresAt ?? data.integration?.openFinance?.auth?.expiresAt ?? undefined,
+}));
+
+// CreateAccountSchema usa o schema base (sem transform) para poder usar .omit()
+export const CreateAccountSchema = AccountBaseSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -112,7 +148,7 @@ export type CreateAccount = z.infer<typeof CreateAccountSchema>;
 export const AccountSummaryItemSchema = z.object({
   id: z.string(),
   name: z.string(),
-  institution: z.string(),
+  institution: z.string().optional(),
   bankCode: z.string().optional(),
   type: z.string(),
   balance: z.number(),

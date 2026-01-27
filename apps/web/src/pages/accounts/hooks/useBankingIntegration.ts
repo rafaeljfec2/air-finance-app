@@ -1,5 +1,6 @@
 import { useState, useCallback, type FormEvent } from 'react';
 import { Account } from '@/services/accountService';
+import { getBankCode, getAccountNumber, getPixKey } from '@/services/accountHelpers';
 import {
   setupBankingIntegration,
   fileToText,
@@ -25,11 +26,7 @@ interface FormData {
   clientSecret: string;
 }
 
-export function useBankingIntegration({
-  account,
-  onClose,
-  onSuccess,
-}: UseBankingIntegrationProps) {
+export function useBankingIntegration({ account, onClose, onSuccess }: UseBankingIntegrationProps) {
   const { companies } = useCompanies();
   const [isLoading, setIsLoading] = useState(false);
   const [certificateFile, setCertificateFile] = useState<File | null>(null);
@@ -39,9 +36,9 @@ export function useBankingIntegration({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState<FormData>({
-    pixKey: account.pixKey || '',
-    bankCode: account.bankCode || '077',
-    accountNumber: account.accountNumber || '',
+    pixKey: getPixKey(account) ?? '',
+    bankCode: getBankCode(account) ?? '077',
+    accountNumber: getAccountNumber(account) ?? '',
     clientId: '',
     clientSecret: '',
   });
@@ -54,7 +51,7 @@ export function useBankingIntegration({
   const handleCertificateUpload = useCallback(async (file: File) => {
     try {
       const content = await fileToText(file);
-      
+
       if (!validateCertificate(content)) {
         setErrors((prev) => ({
           ...prev,
@@ -84,7 +81,7 @@ export function useBankingIntegration({
   const handlePrivateKeyUpload = useCallback(async (file: File) => {
     try {
       const content = await fileToText(file);
-      
+
       if (!validatePrivateKey(content)) {
         setErrors((prev) => ({
           ...prev,
@@ -176,19 +173,25 @@ export function useBankingIntegration({
       try {
         // Get company info from account
         const company = companies?.find((c) => c.id === account.companyId);
-        
+
         if (!company) {
-          throw new Error('Empresa não encontrada. Verifique se a conta está associada a uma empresa válida.');
+          throw new Error(
+            'Empresa não encontrada. Verifique se a conta está associada a uma empresa válida.',
+          );
         }
 
         if (!company.cnpj) {
-          throw new Error('CNPJ da empresa não cadastrado. Atualize os dados da empresa antes de configurar a integração.');
+          throw new Error(
+            'CNPJ da empresa não cadastrado. Atualize os dados da empresa antes de configurar a integração.',
+          );
         }
 
         if (!company.email) {
-          throw new Error('Email da empresa não cadastrado. Atualize os dados da empresa antes de configurar a integração.');
+          throw new Error(
+            'Email da empresa não cadastrado. Atualize os dados da empresa antes de configurar a integração.',
+          );
         }
-        
+
         // Prepare bank credentials
         const bankCredentials: BankCredentials = {
           bankCode: formData.bankCode,
@@ -219,9 +222,12 @@ export function useBankingIntegration({
           onClose();
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro ao configurar a integração bancária.';
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'Ocorreu um erro ao configurar a integração bancária.';
         console.error('Error setting up banking integration:', error);
-        
+
         toast({
           title: 'Erro ao configurar integração',
           description: errorMessage,

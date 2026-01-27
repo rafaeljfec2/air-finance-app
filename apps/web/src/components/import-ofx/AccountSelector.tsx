@@ -1,5 +1,6 @@
 import { ComboBox, type ComboBoxOption } from '@/components/ui/ComboBox';
 import type { Account } from '@/services/accountService';
+import { getAccountNumber } from '@/services/accountHelpers';
 import { useMemo } from 'react';
 
 interface AccountSelectorProps {
@@ -19,7 +20,7 @@ export function AccountSelector({
     );
     return sortedAccounts.map((account) => ({
       value: account.id,
-      label: `${account.name} ${account.accountNumber}`,
+      label: `${account.name} ${getAccountNumber(account) ?? ''}`,
     }));
   }, [accounts]);
 
@@ -44,7 +45,7 @@ export function AccountSelector({
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">{account.name}</span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {account.accountNumber}
+                {getAccountNumber(account)}
               </span>
             </div>
           );
@@ -61,7 +62,7 @@ export function AccountSelector({
                 {account.name}
               </span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {account.accountNumber}
+                {getAccountNumber(account)}
               </span>
             </div>
           );

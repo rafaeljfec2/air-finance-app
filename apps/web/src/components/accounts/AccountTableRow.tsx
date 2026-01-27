@@ -1,6 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Account } from '@/services/accountService';
+import {
+  getInstitution,
+  getBankCode,
+  getAgency,
+  getAccountNumber,
+  hasBankingIntegration as hasIntegration,
+} from '@/services/accountHelpers';
 import { formatCurrency } from '@/utils/formatters';
 import { Banknote, Edit, Landmark, Trash2, Wallet, Link2, Clock } from 'lucide-react';
 import { useBanks } from '@/hooks/useBanks';
@@ -49,15 +56,22 @@ export function AccountTableRow({
   isUpdating,
   isDeleting,
 }: Readonly<AccountTableRowProps>) {
-  const { hasBankingIntegration } = useBanks();
-  
+  const { hasBankingIntegration: bankHasIntegration } = useBanks();
+
   // Filter out credit_card type as it has its own page
   if (account.type === 'credit_card') {
     return null;
   }
 
-  const bankSupportsIntegration = hasBankingIntegration(account.bankCode);
-  const hasLogo = hasBankLogo(account.bankCode ?? undefined, account.institution ?? undefined);
+  // Extrai valores usando helpers (suporta nova e antiga estrutura)
+  const institution = getInstitution(account);
+  const bankCode = getBankCode(account);
+  const agency = getAgency(account);
+  const accountNumber = getAccountNumber(account);
+  const accountHasIntegration = hasIntegration(account);
+
+  const bankSupportsIntegration = bankHasIntegration(bankCode);
+  const hasLogo = hasBankLogo(bankCode, institution);
 
   return (
     <tr className="border-b border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark transition-colors">
@@ -66,14 +80,14 @@ export function AccountTableRow({
           <div
             className={cn(
               'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden',
-              !hasLogo && 'rounded-full'
+              !hasLogo && 'rounded-full',
             )}
             style={hasLogo ? undefined : { backgroundColor: account.color }}
           >
             <BankIcon
-              bankCode={account.bankCode ?? undefined}
-              institution={account.institution ?? undefined}
-              iconName={hasLogo ? undefined : account.icon ?? undefined}
+              bankCode={bankCode}
+              institution={institution}
+              iconName={hasLogo ? undefined : (account.icon ?? undefined)}
               size="sm"
               fillContainer={hasLogo}
               className={hasLogo ? 'p-0.5' : 'text-white'}
@@ -90,7 +104,7 @@ export function AccountTableRow({
               >
                 {getTypeLabel(account.type as AccountType)}
               </span>
-              {account.hasBankingIntegration && (
+              {accountHasIntegration && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-700">
                   <Link2 className="h-3 w-3" />
                   Integração Ativa
@@ -101,34 +115,28 @@ export function AccountTableRow({
         </div>
       </td>
       <td className="p-4">
-        <div className="text-sm text-text dark:text-text-dark">
-          {account.institution}
-        </div>
+        <div className="text-sm text-text dark:text-text-dark">{institution}</div>
       </td>
       <td className="p-4">
         <div className="space-y-1">
           <div className="text-sm">
             <span className="text-gray-500 dark:text-gray-400 text-xs">Ag: </span>
-            <span className="text-text dark:text-text-dark font-mono text-xs">
-              {account.agency}
-            </span>
+            <span className="text-text dark:text-text-dark font-mono text-xs">{agency}</span>
           </div>
           <div className="text-sm">
             <span className="text-gray-500 dark:text-gray-400 text-xs">Cc: </span>
-            <span className="text-text dark:text-text-dark font-mono text-xs">
-              {account.accountNumber}
-            </span>
+            <span className="text-text dark:text-text-dark font-mono text-xs">{accountNumber}</span>
           </div>
         </div>
       </td>
-       <td className="p-4">
-         <div className="text-sm font-semibold text-text dark:text-text-dark">
+      <td className="p-4">
+        <div className="text-sm font-semibold text-text dark:text-text-dark">
           {formatCurrency(account.balance)}
         </div>
       </td>
       <td className="p-4">
         <div className="flex justify-end gap-2">
-          {!account.hasBankingIntegration && onConfigureIntegration && bankSupportsIntegration && (
+          {!accountHasIntegration && onConfigureIntegration && bankSupportsIntegration && (
             <Button
               size="sm"
               variant="outline"
@@ -140,7 +148,7 @@ export function AccountTableRow({
               <Link2 className="h-4 w-4" />
             </Button>
           )}
-          {account.hasBankingIntegration && onConfigureSchedule && (
+          {accountHasIntegration && onConfigureSchedule && (
             <Button
               size="sm"
               variant="outline"

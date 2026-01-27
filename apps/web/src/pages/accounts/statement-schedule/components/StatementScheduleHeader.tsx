@@ -4,6 +4,7 @@ import { BankIcon } from '@/components/bank/BankIcon';
 import { hasBankLogo } from '@/utils/bankIcons';
 import { cn } from '@/lib/utils';
 import type { Account } from '@/services/accountService';
+import { getBankCode, getInstitution } from '@/services/accountHelpers';
 
 interface StatementScheduleHeaderProps {
   account: Account | undefined;
@@ -31,32 +32,31 @@ export function StatementScheduleHeader({
         </h1>
       </div>
       <div className="flex items-center gap-2 ml-11">
-        {account && (() => {
-          const bankCode = account.bankCode ?? undefined;
-          const institution = account.institution ?? undefined;
-          const hasLogo = hasBankLogo(bankCode, institution);
-          return (
-            <div
-              className={cn(
-                'w-6 h-6 rounded flex items-center justify-center shrink-0 overflow-hidden',
-                hasLogo ? '' : 'p-1',
-              )}
-              style={hasLogo ? undefined : { backgroundColor: account.color ?? '#8A05BE' }}
-            >
-              <BankIcon
-                bankCode={bankCode}
-                institution={institution}
-                iconName={hasLogo ? undefined : account.icon ?? undefined}
-                size="sm"
-                fillContainer={hasLogo}
-                className={hasLogo ? 'p-0.5' : 'text-white'}
-              />
-            </div>
-          );
-        })()}
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {account?.name ?? 'Conta'}
-        </p>
+        {account &&
+          (() => {
+            const bankCode = getBankCode(account);
+            const institution = getInstitution(account);
+            const hasLogo = hasBankLogo(bankCode, institution);
+            return (
+              <div
+                className={cn(
+                  'w-6 h-6 rounded flex items-center justify-center shrink-0 overflow-hidden',
+                  hasLogo ? '' : 'p-1',
+                )}
+                style={hasLogo ? undefined : { backgroundColor: account.color ?? '#8A05BE' }}
+              >
+                <BankIcon
+                  bankCode={bankCode}
+                  institution={institution}
+                  iconName={hasLogo ? undefined : (account.icon ?? undefined)}
+                  size="sm"
+                  fillContainer={hasLogo}
+                  className={hasLogo ? 'p-0.5' : 'text-white'}
+                />
+              </div>
+            );
+          })()}
+        <p className="text-sm text-gray-600 dark:text-gray-400">{account?.name ?? 'Conta'}</p>
       </div>
     </div>
   );

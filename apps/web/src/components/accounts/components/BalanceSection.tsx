@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import type { Account, CreateAccount } from '@/services/accountService';
+import { getCreditLimit } from '@/services/accountHelpers';
 import { DollarSign } from 'lucide-react';
 import { formatCurrencyInput } from '@/utils/formatters';
 
@@ -87,8 +88,8 @@ export function BalanceSection({
                 type="text"
                 inputMode="decimal"
                 defaultValue={
-                  account?.creditLimit
-                    ? formatCurrencyInput(account.creditLimit.toFixed(2).replace('.', ''))
+                  account && getCreditLimit(account)
+                    ? formatCurrencyInput(getCreditLimit(account)!.toFixed(2).replace('.', ''))
                     : ''
                 }
                 onChange={(e) => onCreditLimitChange(e.target.value, e.target)}

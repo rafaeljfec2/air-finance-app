@@ -1,5 +1,6 @@
 import { useSortable } from '@/hooks/useSortable';
 import { Account } from '@/services/accountService';
+import { getInstitution, getAgency, getAccountNumber } from '@/services/accountHelpers';
 
 export function useAccountSorting() {
   const { sortConfig, handleSort, sortData } = useSortable<
@@ -15,11 +16,11 @@ export function useAccountSorting() {
         case 'type':
           return account.type;
         case 'institution':
-          return account.institution;
+          return getInstitution(account);
         case 'agency':
-          return account.agency ?? '';
+          return getAgency(account) ?? '';
         case 'accountNumber':
-          return account.accountNumber ?? '';
+          return getAccountNumber(account) ?? '';
         case 'balance':
           return account.balance;
         default:

@@ -1,4 +1,9 @@
 import { Account } from '@/services/accountService';
+import {
+  getInstitution,
+  getBankCode,
+  hasBankingIntegration as hasIntegration,
+} from '@/services/accountHelpers';
 import { formatCurrency } from '@/utils/formatters';
 import { MoreVertical, Edit, Trash2, Link2, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -27,15 +32,20 @@ export function AccountListItem({
   isUpdating = false,
   isDeleting = false,
 }: Readonly<AccountListItemProps>) {
-  const { hasBankingIntegration } = useBanks();
+  const { hasBankingIntegration: bankHasIntegration } = useBanks();
 
   if (account.type === 'credit_card') {
     return null;
   }
 
+  // Extrai valores usando helpers (suporta nova e antiga estrutura)
+  const institution = getInstitution(account);
+  const bankCode = getBankCode(account);
+  const accountHasIntegration = hasIntegration(account);
+
   // Verifica se o banco suporta integração
-  const bankSupportsIntegration = hasBankingIntegration(account.bankCode);
-  const hasLogo = hasBankLogo(account.bankCode ?? undefined, account.institution ?? undefined);
+  const bankSupportsIntegration = bankHasIntegration(bankCode);
+  const hasLogo = hasBankLogo(bankCode, institution);
 
   return (
     <div className="flex items-center gap-2.5 p-2 bg-card dark:bg-card-dark hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors rounded-lg border border-border/50 dark:border-border-dark/50">
@@ -43,14 +53,14 @@ export function AccountListItem({
       <div
         className={cn(
           'w-9 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden',
-          !hasLogo && 'p-1.5'
+          !hasLogo && 'p-1.5',
         )}
         style={!hasLogo ? { backgroundColor: account.color } : undefined}
       >
         <BankIcon
-          bankCode={account.bankCode ?? undefined}
-          institution={account.institution ?? undefined}
-          iconName={!hasLogo ? account.icon ?? undefined : undefined}
+          bankCode={bankCode}
+          institution={institution}
+          iconName={!hasLogo ? (account.icon ?? undefined) : undefined}
           size="md"
           fillContainer={hasLogo}
           className={hasLogo ? 'p-1' : 'text-white'}
@@ -63,16 +73,14 @@ export function AccountListItem({
           <h3 className="font-semibold text-[13px] text-text dark:text-text-dark truncate leading-tight flex-1 min-w-0">
             {account.name}
           </h3>
-          {account.hasBankingIntegration && (
+          {accountHasIntegration && (
             <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-700 shrink-0">
               <Link2 className="h-2.5 w-2.5" />
               API
             </span>
           )}
         </div>
-        <p className="text-[11px] text-gray-500 dark:text-gray-400">
-          {account.institution}
-        </p>
+        <p className="text-[11px] text-gray-500 dark:text-gray-400">{institution}</p>
       </div>
 
       {/* Saldo */}
@@ -96,7 +104,7 @@ export function AccountListItem({
         </PopoverTrigger>
         <PopoverContent className="w-56 p-1" align="end">
           <div className="flex flex-col gap-1">
-            {!account.hasBankingIntegration && onConfigureIntegration && bankSupportsIntegration && (
+            {!accountHasIntegration && onConfigureIntegration && bankSupportsIntegration && (
               <button
                 onClick={() => onConfigureIntegration(account)}
                 className="flex items-center w-full px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-primary-50 dark:hover:bg-primary-900/10 text-primary-600 dark:text-primary-400 transition-colors text-left gap-2"
@@ -106,7 +114,7 @@ export function AccountListItem({
                 Configurar Integração
               </button>
             )}
-            {account.hasBankingIntegration && onConfigureSchedule && (
+            {accountHasIntegration && onConfigureSchedule && (
               <button
                 onClick={() => onConfigureSchedule(account)}
                 className="flex items-center w-full px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-blue-50 dark:hover:bg-blue-900/10 text-blue-600 dark:text-blue-400 transition-colors text-left gap-2"

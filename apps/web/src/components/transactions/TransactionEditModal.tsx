@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useTransactions } from '@/hooks/useTransactions';
 import type { Account } from '@/services/accountService';
+import { getInstitution } from '@/services/accountHelpers';
 import type { Category } from '@/services/categoryService';
 import { useCompanyStore } from '@/stores/company';
 import { formatDateToLocalISO } from '@/utils/date';
@@ -60,7 +61,7 @@ export function TransactionEditModal({
     () =>
       accounts.map((account) => ({
         value: account.id,
-        label: `${account.name} • ${account.institution}`,
+        label: `${account.name} • ${getInstitution(account)}`,
       })),
     [accounts],
   );
@@ -102,8 +103,7 @@ export function TransactionEditModal({
   const handleChange = (field: keyof typeof form, value: string | Date | undefined) => {
     // DatePicker returns Date objects, but we store as strings in form state
     // Convert Date to string using formatDateToLocalISO
-    const formValue =
-      value instanceof Date ? formatDateToLocalISO(value) : value ?? undefined;
+    const formValue = value instanceof Date ? formatDateToLocalISO(value) : (value ?? undefined);
     setForm((prev) => ({ ...prev, [field]: formValue }));
   };
 
@@ -215,7 +215,10 @@ export function TransactionEditModal({
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="launchType" className="text-xs text-muted-foreground dark:text-gray-400">
+            <label
+              htmlFor="launchType"
+              className="text-xs text-muted-foreground dark:text-gray-400"
+            >
               Tipo
             </label>
             <ComboBox

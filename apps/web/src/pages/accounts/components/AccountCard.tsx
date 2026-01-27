@@ -1,7 +1,25 @@
 import { cn } from '@/lib/utils';
 import { Account } from '@/services/accountService';
+import {
+  getInstitution,
+  getBankCode,
+  getAgency,
+  getAccountNumber,
+  hasBankingIntegration as hasIntegration,
+} from '@/services/accountHelpers';
 import { formatCurrency } from '@/utils/formatters';
-import { Banknote, Landmark, Wallet, Building, Hash, MoreVertical, Edit, Trash2, Link2, Clock } from 'lucide-react';
+import {
+  Banknote,
+  Landmark,
+  Wallet,
+  Building,
+  Hash,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Link2,
+  Clock,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useBanks } from '@/hooks/useBanks';
@@ -23,10 +41,14 @@ function getTypeLabel(type: AccountType): string {
 
 function getTypeBadgeColor(type: AccountType): string {
   const colors: Record<AccountType, string> = {
-    checking: 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700',
-    savings: 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700',
-    digital_wallet: 'bg-orange-100 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-700',
-    investment: 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700',
+    checking:
+      'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700',
+    savings:
+      'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700',
+    digital_wallet:
+      'bg-orange-100 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-700',
+    investment:
+      'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700',
   };
   return colors[type] ?? colors.checking;
 }
@@ -50,16 +72,23 @@ export function AccountCard({
   isUpdating = false,
   isDeleting = false,
 }: Readonly<AccountCardProps>) {
-  const { hasBankingIntegration } = useBanks();
+  const { hasBankingIntegration: bankHasIntegration } = useBanks();
 
   // Skip credit_card type as it has its own page
   if (account.type === 'credit_card') {
     return null;
   }
 
+  // Extrai valores usando helpers (suporta nova e antiga estrutura)
+  const institution = getInstitution(account);
+  const bankCode = getBankCode(account);
+  const agency = getAgency(account);
+  const accountNumber = getAccountNumber(account);
+  const accountHasIntegration = hasIntegration(account);
+
   // Verifica se o banco suporta integração
-  const bankSupportsIntegration = hasBankingIntegration(account.bankCode);
-  const hasLogo = hasBankLogo(account.bankCode ?? undefined, account.institution ?? undefined);
+  const bankSupportsIntegration = bankHasIntegration(bankCode);
+  const hasLogo = hasBankLogo(bankCode, institution);
 
   return (
     <div className="w-full rounded-lg transition-all text-left bg-white dark:bg-card-dark hover:shadow-md p-3 border border-border/50 dark:border-border-dark/50">
@@ -69,14 +98,14 @@ export function AccountCard({
           <div
             className={cn(
               'w-9 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden',
-              !hasLogo && 'p-1.5'
+              !hasLogo && 'p-1.5',
             )}
             style={!hasLogo ? { backgroundColor: account.color } : undefined}
           >
             <BankIcon
-              bankCode={account.bankCode ?? undefined}
-              institution={account.institution ?? undefined}
-              iconName={!hasLogo ? account.icon ?? undefined : undefined}
+              bankCode={bankCode}
+              institution={institution}
+              iconName={!hasLogo ? (account.icon ?? undefined) : undefined}
               size="md"
               fillContainer={hasLogo}
               className={hasLogo ? 'p-1' : 'text-white'}
@@ -90,7 +119,7 @@ export function AccountCard({
               <h3 className="font-bold text-sm text-text dark:text-text-dark line-clamp-1 flex-1 min-w-0">
                 {account.name}
               </h3>
-              {account.hasBankingIntegration && (
+              {accountHasIntegration && (
                 <div className="shrink-0">
                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-700">
                     <Link2 className="h-2.5 w-2.5" />
@@ -115,27 +144,25 @@ export function AccountCard({
               {/* Instituição */}
               <div className="flex items-center gap-1.5 min-w-0 col-span-2">
                 <Building className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                <span className="text-gray-600 dark:text-gray-300 truncate">
-                  {account.institution}
-                </span>
+                <span className="text-gray-600 dark:text-gray-300 truncate">{institution}</span>
               </div>
 
               {/* Agência */}
-              {account.agency && (
+              {agency && (
                 <div className="flex items-center gap-1.5 min-w-0">
                   <Hash className="h-3.5 w-3.5 text-gray-400 shrink-0" />
                   <span className="text-gray-600 dark:text-gray-300 truncate font-mono text-[11px]">
-                    Ag: {account.agency}
+                    Ag: {agency}
                   </span>
                 </div>
               )}
 
               {/* Conta */}
-              {account.accountNumber && (
+              {accountNumber && (
                 <div className="flex items-center gap-1.5 min-w-0">
                   <Hash className="h-3.5 w-3.5 text-gray-400 shrink-0" />
                   <span className="text-gray-600 dark:text-gray-300 truncate font-mono text-[11px]">
-                    Cc: {account.accountNumber}
+                    Cc: {accountNumber}
                   </span>
                 </div>
               )}
@@ -144,12 +171,14 @@ export function AccountCard({
               <div className="col-span-2 flex items-center gap-1.5 pt-1.5 border-t border-border/50 dark:border-border-dark/50">
                 <Wallet className="h-3.5 w-3.5 text-gray-400 shrink-0" />
                 <span className="text-gray-500 dark:text-gray-400 text-[10px]">Saldo:</span>
-                <span className={cn(
-                  "font-bold text-sm",
-                  account.balance >= 0 
-                    ? "text-emerald-600 dark:text-emerald-400"
-                    : "text-red-600 dark:text-red-400"
-                )}>
+                <span
+                  className={cn(
+                    'font-bold text-sm',
+                    account.balance >= 0
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : 'text-red-600 dark:text-red-400',
+                  )}
+                >
                   {formatCurrency(account.balance)}
                 </span>
               </div>
@@ -172,7 +201,7 @@ export function AccountCard({
             </PopoverTrigger>
             <PopoverContent className="w-56 p-1" align="end">
               <div className="flex flex-col gap-1">
-                {!account.hasBankingIntegration && onConfigureIntegration && bankSupportsIntegration && (
+                {!accountHasIntegration && onConfigureIntegration && bankSupportsIntegration && (
                   <button
                     onClick={() => onConfigureIntegration(account)}
                     className="flex items-center w-full px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-primary-50 dark:hover:bg-primary-900/10 text-primary-600 dark:text-primary-400 transition-colors text-left gap-2"
@@ -182,7 +211,7 @@ export function AccountCard({
                     Configurar Integração
                   </button>
                 )}
-                {account.hasBankingIntegration && onConfigureSchedule && (
+                {accountHasIntegration && onConfigureSchedule && (
                   <button
                     onClick={() => onConfigureSchedule(account)}
                     className="flex items-center w-full px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-blue-50 dark:hover:bg-blue-900/10 text-blue-600 dark:text-blue-400 transition-colors text-left gap-2"
