@@ -87,7 +87,6 @@ export function useOpenFinanceModal({
     createdItemId,
     step,
     onImportAccounts: importAccountsWithRetry,
-    isPageVisible: open,
   });
 
   const { createAccountMutation, createItemMutation } = useOpenFinanceMutations({

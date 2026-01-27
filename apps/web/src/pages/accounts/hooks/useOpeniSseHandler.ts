@@ -9,7 +9,6 @@ interface UseOpeniSseHandlerParams {
   createdItemId: string | null;
   step: ModalStep;
   onImportAccounts: (itemId: string, status: string) => Promise<void>;
-  isPageVisible?: boolean;
 }
 
 export const useOpeniSseHandler = ({
@@ -17,12 +16,11 @@ export const useOpeniSseHandler = ({
   createdItemId,
   step,
   onImportAccounts,
-  isPageVisible = true,
 }: UseOpeniSseHandlerParams) => {
   const [sseReady, setSseReady] = useState(false);
 
   useEffect(() => {
-    if (createdItemId && step === 'oauth-waiting' && isPageVisible) {
+    if (createdItemId && step === 'oauth-waiting') {
       const timer = setTimeout(() => {
         setSseReady(true);
       }, 100);
@@ -30,12 +28,20 @@ export const useOpeniSseHandler = ({
     } else {
       setSseReady(false);
     }
-  }, [createdItemId, step, isPageVisible]);
+  }, [createdItemId, step]);
 
-  const sseEnabled = sseReady && !!createdItemId && step === 'oauth-waiting' && isPageVisible;
+  // Mantém SSE ativo mesmo quando página não está visível (usuário pode estar autenticando em outra aba)
+  const sseEnabled = sseReady && !!createdItemId && step === 'oauth-waiting';
 
   const handleSseEvent = useCallback(
-    (event: { event: string; itemId: string; status?: string; auth?: { authUrl: string; expiresAt: string }; warnings?: string[]; timestamp: string }) => {
+    (event: {
+      event: string;
+      itemId: string;
+      status?: string;
+      auth?: { authUrl: string; expiresAt: string };
+      warnings?: string[];
+      timestamp: string;
+    }) => {
       console.log('[OpenFinanceModal] SSE event received:', event);
 
       const status = event.status?.toLowerCase();
@@ -48,11 +54,20 @@ export const useOpeniSseHandler = ({
         }
       }
 
-      if (status === 'connected' || status === 'syncing' || status === 'synced' || event.event === 'ITEM_CONNECTED' || (event.event === 'ITEM_UPDATED' && (status === 'connected' || status === 'syncing' || status === 'synced'))) {
+      if (
+        status === 'connected' ||
+        status === 'syncing' ||
+        status === 'synced' ||
+        event.event === 'ITEM_CONNECTED' ||
+        (event.event === 'ITEM_UPDATED' &&
+          (status === 'connected' || status === 'syncing' || status === 'synced'))
+      ) {
         const itemId = event.itemId;
-        
+
         if (status === 'syncing') {
-          console.log('[OpenFinanceModal] SSE: status is syncing, connection established and syncing accounts!');
+          console.log(
+            '[OpenFinanceModal] SSE: status is syncing, connection established and syncing accounts!',
+          );
           toast.info('Conexão estabelecida! Importando contas...');
         } else {
           console.log('[OpenFinanceModal] SSE: status is connected, connection established!');
@@ -77,7 +92,11 @@ export const useOpeniSseHandler = ({
     toast.error('Erro na conexão com o servidor. Tentando reconectar...');
   }, []);
 
-  const { lastEvent, connectionStatus, error: sseError } = useOpeniItemEvents({
+  const {
+    lastEvent,
+    connectionStatus,
+    error: sseError,
+  } = useOpeniItemEvents({
     companyId,
     itemId: createdItemId,
     enabled: sseEnabled,
@@ -94,7 +113,8 @@ export const useOpeniSseHandler = ({
       } as OpeniItemResponse)
     : null;
 
-  const isLoadingItemStatus = connectionStatus === 'connecting' || connectionStatus === 'reconnecting';
+  const isLoadingItemStatus =
+    connectionStatus === 'connecting' || connectionStatus === 'reconnecting';
 
   return {
     itemStatus,
