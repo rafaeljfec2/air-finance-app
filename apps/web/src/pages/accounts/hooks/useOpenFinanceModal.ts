@@ -1,7 +1,12 @@
 import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { getConnectors, getItems, type OpeniConnector, type OpeniItem } from '@/services/openiService';
+import {
+  getConnectors,
+  getItems,
+  type OpeniConnector,
+  type OpeniItem,
+} from '@/services/openiService';
 import { useOpenFinanceModalState } from './useOpenFinanceModalState';
 import { useOpenFinanceMutations } from './useOpenFinanceMutations';
 import { useOpeniAccountImport } from './useOpeniAccountImport';
@@ -77,12 +82,7 @@ export function useOpenFinanceModal({
     onSuccess,
   });
 
-  const {
-    itemStatus,
-    isLoadingItemStatus,
-    sseConnectionStatus,
-    sseError,
-  } = useOpeniSseHandler({
+  const { itemStatus, isLoadingItemStatus, sseConnectionStatus, sseError } = useOpeniSseHandler({
     companyId,
     createdItemId,
     step,
@@ -123,10 +123,13 @@ export function useOpenFinanceModal({
     return cleaned.length === 11 || cleaned.length === 14;
   }, []);
 
-  const handleCpfCnpjChange = useCallback((value: string) => {
-    const cleaned = value.replaceAll(/\D/g, '');
-    setCpfCnpj(cleaned);
-  }, [setCpfCnpj]);
+  const handleCpfCnpjChange = useCallback(
+    (value: string) => {
+      const cleaned = value.replaceAll(/\D/g, '');
+      setCpfCnpj(cleaned);
+    },
+    [setCpfCnpj],
+  );
 
   const handleSearchConnectors = useCallback(() => {
     if (!validateCpfCnpj(cpfCnpj)) {
@@ -145,40 +148,12 @@ export function useOpenFinanceModal({
       setSelectedConnector(connector);
       setStep('creating-item');
 
-      let accountId: string | null = createdAccountId ?? null;
       try {
-        if (!accountId) {
-          const existingAccount = accounts?.find((acc) => !acc.openiItemId && acc.bankingTenantId);
-
-          if (existingAccount) {
-            accountId = existingAccount.id;
-            setCreatedAccountId(accountId);
-          } else {
-            const newAccount = await createAccountMutation.mutateAsync({
-              companyId,
-              name: `${connector.name} - Open Finance`,
-              type: 'checking',
-              institution: connector.name,
-              bankCode: 'OPENI',
-              color: '#8A05BE',
-              icon: 'BanknotesIcon',
-              initialBalance: 0,
-              initialBalanceDate: new Date().toISOString(),
-              useInitialBalanceInExtract: true,
-              useInitialBalanceInCashFlow: true,
-              hasBankingIntegration: false,
-            });
-            accountId = newAccount.id;
-            setCreatedAccountId(accountId);
-          }
-        }
-
         const cpfField = connector.rules.find((r) => r.field === 'cpf' || r.field === 'document');
         const fieldName = cpfField?.field ?? 'cpf';
         const documentToUse = cpfCnpj || companyDocument || '';
 
         await createItemMutation.mutateAsync({
-          accountId,
           connectorId: connector.id,
           parameters: {
             [fieldName]: documentToUse,
@@ -189,7 +164,7 @@ export function useOpenFinanceModal({
         processConflictError({
           error,
           context: {
-            variables: { accountId: accountId ?? '', connectorId: connector.id, parameters: {} },
+            variables: { accountId: '', connectorId: connector.id, parameters: {} },
             accounts,
             companyId,
           },
@@ -204,15 +179,12 @@ export function useOpenFinanceModal({
       companyId,
       cpfCnpj,
       companyDocument,
-      createdAccountId,
       accounts,
-      createAccountMutation,
       createItemMutation,
       queryClient,
       onSuccess,
       setSelectedConnector,
       setStep,
-      setCreatedAccountId,
       setCreatedItemId,
     ],
   );

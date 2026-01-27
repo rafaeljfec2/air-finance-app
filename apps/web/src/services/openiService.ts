@@ -89,7 +89,7 @@ export const getConnectors = async (
 
 export const createItem = async (
   companyId: string,
-  accountId: string,
+  accountId: string | undefined,
   params: CreateOpeniItemParams,
 ): Promise<OpeniItemResponse> => {
   try {
@@ -100,7 +100,7 @@ export const createItem = async (
         parameters: params.parameters,
       },
       {
-        params: { accountId },
+        params: accountId ? { accountId } : undefined,
       },
     );
     return CreateOpeniItemResponseSchema.parse(response.data).data;

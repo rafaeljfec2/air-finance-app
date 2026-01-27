@@ -10,7 +10,12 @@ import {
   hasConflictMessage,
 } from '../utils/openiErrorUtils';
 
-export type ModalStep = 'existing-connections' | 'cpf-input' | 'connector-selection' | 'creating-item' | 'oauth-waiting';
+export type ModalStep =
+  | 'existing-connections'
+  | 'cpf-input'
+  | 'connector-selection'
+  | 'creating-item'
+  | 'oauth-waiting';
 
 export interface HandleItemStatusParams {
   itemData: {
@@ -27,7 +32,7 @@ export interface HandleItemStatusParams {
   };
   itemInfo: {
     companyId: string;
-    accountId: string;
+    accountId?: string;
     itemId: string;
   };
   queryClient: ReturnType<typeof useQueryClient>;
@@ -51,14 +56,22 @@ export const handleItemStatus = ({
     window.open(itemData.auth.authUrl, '_blank');
     toast.info('Redirecionando para autenticação...');
   } else if (status === 'connected' || status === 'syncing' || status === 'synced') {
-    const message = status === 'syncing' 
-      ? 'Conexão estabelecida! Sincronizando contas...' 
-      : 'Conexão já existe e está ativa!';
+    const message =
+      status === 'syncing'
+        ? 'Conexão estabelecida! Sincronizando contas...'
+        : 'Conexão já existe e está ativa!';
     toast.success(message);
     queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
     onSuccess?.();
   } else if (status === 'out_of_sync') {
     console.log('[OpenFinanceModal] Item is out_of_sync, requesting new connection...');
+
+    if (!accountId) {
+      toast.error('Não é possível ressincronizar sem uma conta vinculada.');
+      setStep('connector-selection');
+      return;
+    }
+
     toast.info('Item desincronizado. Solicitando nova conexão...');
 
     resyncItem(companyId, accountId, itemId)
@@ -82,7 +95,7 @@ export const handleItemStatus = ({
 export interface ProcessConflictErrorParams {
   error: unknown;
   context: {
-    variables: { accountId: string; connectorId: string; parameters: Record<string, string> };
+    variables: { accountId?: string; connectorId: string; parameters: Record<string, string> };
     accounts: ReturnType<typeof useAccounts>['accounts'];
     companyId: string;
   };
@@ -123,7 +136,7 @@ export const processConflictError = ({
   try {
     let itemId = extractItemIdFromError(errorData, errorMessage);
     const existingAccount = accounts?.find((acc) => acc.id === variables.accountId);
-    itemId = itemId ?? (existingAccount?.openiItemId ?? undefined);
+    itemId = itemId ?? existingAccount?.openiItemId ?? undefined;
 
     if (!itemId) {
       console.error('[OpenFinanceModal] Could not extract itemId from error:', {

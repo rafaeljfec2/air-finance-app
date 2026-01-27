@@ -45,7 +45,7 @@ export const useOpenFinanceMutations = ({
       connectorId,
       parameters,
     }: {
-      accountId: string;
+      accountId?: string;
       connectorId: string;
       parameters: Record<string, string>;
     }) => {
@@ -67,10 +67,18 @@ export const useOpenFinanceMutations = ({
         } else {
           console.warn('[OpenFinanceModal] No authUrl found in item');
         }
-      } else if (item.status === 'CONNECTED' || item.status === 'connected' || item.status === 'SYNCING' || item.status === 'syncing' || item.status === 'SYNCED' || item.status === 'synced') {
-        const message = item.status === 'SYNCING' || item.status === 'syncing'
-          ? 'Conexão estabelecida! Sincronizando contas...'
-          : 'Conexão estabelecida com sucesso!';
+      } else if (
+        item.status === 'CONNECTED' ||
+        item.status === 'connected' ||
+        item.status === 'SYNCING' ||
+        item.status === 'syncing' ||
+        item.status === 'SYNCED' ||
+        item.status === 'synced'
+      ) {
+        const message =
+          item.status === 'SYNCING' || item.status === 'syncing'
+            ? 'Conexão estabelecida! Sincronizando contas...'
+            : 'Conexão estabelecida com sucesso!';
         toast.success(message);
         queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
         onSuccess?.();
