@@ -19,8 +19,8 @@ export function useAccountFilters() {
         const matchesSearch =
           account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           institution.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (agency && agency.includes(searchTerm)) ||
-          (accountNumber && accountNumber.includes(searchTerm));
+          agency?.includes(searchTerm) ||
+          accountNumber?.includes(searchTerm);
         const matchesType = filterType === 'all' || account.type === filterType;
         return matchesSearch && matchesType;
       });

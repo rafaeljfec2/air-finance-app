@@ -35,11 +35,11 @@ const accountTypes = [
 
 type AccountType = (typeof accountTypes)[number]['value'];
 
-function getTypeLabel(type: AccountType): string {
+function getTypeLabel(type: string): string {
   return accountTypes.find((t) => t.value === type)?.label ?? type;
 }
 
-function getTypeBadgeColor(type: AccountType): string {
+function getTypeBadgeColor(type: string): string {
   const colors: Record<AccountType, string> = {
     checking:
       'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700',
@@ -50,7 +50,7 @@ function getTypeBadgeColor(type: AccountType): string {
     investment:
       'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700',
   };
-  return colors[type] ?? colors.checking;
+  return colors[type as AccountType] ?? colors.checking;
 }
 
 interface AccountCardProps {
@@ -98,14 +98,14 @@ export function AccountCard({
           <div
             className={cn(
               'w-9 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden',
-              !hasLogo && 'p-1.5',
+              hasLogo ? undefined : 'p-1.5',
             )}
-            style={!hasLogo ? { backgroundColor: account.color } : undefined}
+            style={hasLogo ? undefined : { backgroundColor: account.color }}
           >
             <BankIcon
               bankCode={bankCode}
               institution={institution}
-              iconName={!hasLogo ? (account.icon ?? undefined) : undefined}
+              iconName={hasLogo ? undefined : (account.icon ?? undefined)}
               size="md"
               fillContainer={hasLogo}
               className={hasLogo ? 'p-1' : 'text-white'}
@@ -133,10 +133,10 @@ export function AccountCard({
             <span
               className={cn(
                 'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border mb-2',
-                getTypeBadgeColor(account.type as AccountType),
+                getTypeBadgeColor(account.type),
               )}
             >
-              {getTypeLabel(account.type as AccountType)}
+              {getTypeLabel(account.type)}
             </span>
 
             {/* Informações em Grid */}

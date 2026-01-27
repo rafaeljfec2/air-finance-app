@@ -53,14 +53,14 @@ export function AccountListItem({
       <div
         className={cn(
           'w-9 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden',
-          !hasLogo && 'p-1.5',
+          hasLogo ? undefined : 'p-1.5',
         )}
-        style={!hasLogo ? { backgroundColor: account.color } : undefined}
+        style={hasLogo ? undefined : { backgroundColor: account.color }}
       >
         <BankIcon
           bankCode={bankCode}
           institution={institution}
-          iconName={!hasLogo ? (account.icon ?? undefined) : undefined}
+          iconName={hasLogo ? undefined : (account.icon ?? undefined)}
           size="md"
           fillContainer={hasLogo}
           className={hasLogo ? 'p-1' : 'text-white'}

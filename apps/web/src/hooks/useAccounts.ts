@@ -32,7 +32,9 @@ export const useAccounts = () => {
     return useQuery<Account>({
       queryKey: ['account', companyId, id],
       queryFn: () =>
-        companyId && id ? getAccountById(companyId, id) : Promise.reject('No companyId or id'),
+        companyId && id
+          ? getAccountById(companyId, id)
+          : Promise.reject(new Error('No companyId or id')),
       enabled: !!companyId && !!id,
     });
   };
@@ -41,14 +43,14 @@ export const useAccounts = () => {
     return useQuery<number>({
       queryKey: ['account-balance', companyId, id],
       queryFn: () =>
-        companyId && id ? getAccountBalance(id) : Promise.reject('No companyId or id'),
+        companyId && id ? getAccountBalance(id) : Promise.reject(new Error('No companyId or id')),
       enabled: !!companyId && !!id,
     });
   };
 
   const createMutation = useMutation({
     mutationFn: (data: CreateAccount) =>
-      companyId ? createAccount(companyId, data) : Promise.reject('No companyId'),
+      companyId ? createAccount(companyId, data) : Promise.reject(new Error('No companyId')),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
       toast({
@@ -70,7 +72,9 @@ export const useAccounts = () => {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateAccount> }) =>
-      companyId && id ? updateAccount(companyId, id, data) : Promise.reject('No companyId or id'),
+      companyId && id
+        ? updateAccount(companyId, id, data)
+        : Promise.reject(new Error('No companyId or id')),
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: ['accounts', companyId] });
       await queryClient.cancelQueries({ queryKey: ['account', companyId, id] });
@@ -140,7 +144,9 @@ export const useAccounts = () => {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) =>
-      companyId && id ? deleteAccount(companyId, id) : Promise.reject('No companyId or id'),
+      companyId && id
+        ? deleteAccount(companyId, id)
+        : Promise.reject(new Error('No companyId or id')),
     onMutate: async (id) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({ queryKey: ['accounts', companyId] });

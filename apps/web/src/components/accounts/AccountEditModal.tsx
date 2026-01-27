@@ -49,7 +49,7 @@ export function AccountEditModal({ open, onClose }: Readonly<AccountEditModalPro
   useEffect(() => {
     if (open && accounts && accounts.length > 0) {
       const firstId = accounts[0].id;
-      setSelectedId((prev) => (prev ? prev : firstId));
+      setSelectedId((prev) => prev ?? firstId);
     }
   }, [open, accounts]);
 

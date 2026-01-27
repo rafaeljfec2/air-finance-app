@@ -33,18 +33,18 @@ const accountTypes = [
 
 type AccountType = (typeof accountTypes)[number]['value'];
 
-function getTypeLabel(type: AccountType): string {
+function getTypeLabel(type: string): string {
   return accountTypes.find((t) => t.value === type)?.label ?? type;
 }
 
-function getTypeBadgeColor(type: AccountType): string {
+function getTypeBadgeColor(type: string): string {
   const colors: Record<AccountType, string> = {
     checking: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     savings: 'bg-green-500/20 text-green-400 border-green-500/30',
     digital_wallet: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
     investment: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
   };
-  return colors[type] ?? colors.checking;
+  return colors[type as AccountType] ?? colors.checking;
 }
 
 export function AccountTableRow({
@@ -99,10 +99,10 @@ export function AccountTableRow({
               <span
                 className={cn(
                   'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border',
-                  getTypeBadgeColor(account.type as AccountType),
+                  getTypeBadgeColor(account.type),
                 )}
               >
-                {getTypeLabel(account.type as AccountType)}
+                {getTypeLabel(account.type)}
               </span>
               {accountHasIntegration && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-700">
