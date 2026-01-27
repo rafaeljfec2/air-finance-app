@@ -168,19 +168,27 @@ export function AccountCard({
               )}
 
               {/* Saldo - Destaque */}
-              <div className="col-span-2 flex items-center gap-1.5 pt-1.5 border-t border-border/50 dark:border-border-dark/50">
-                <Wallet className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                <span className="text-gray-500 dark:text-gray-400 text-[10px]">Saldo:</span>
-                <span
-                  className={cn(
-                    'font-bold text-sm',
-                    account.currentBalance >= 0
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-red-600 dark:text-red-400',
+              <div className="col-span-2 pt-1.5 border-t border-border/50 dark:border-border-dark/50">
+                <div className="flex items-center gap-1.5">
+                  <Wallet className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                  <span className="text-gray-500 dark:text-gray-400 text-[10px]">Saldo:</span>
+                  <span
+                    className={cn(
+                      'font-bold text-sm',
+                      account.currentBalance >= 0
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-red-600 dark:text-red-400',
+                    )}
+                  >
+                    {formatCurrency(account.currentBalance)}
+                  </span>
+                </div>
+                {account.bankCurrentBalance !== null &&
+                  account.bankCurrentBalance !== undefined && (
+                    <div className="text-[9px] text-gray-500 dark:text-gray-400 ml-5">
+                      Inicial: {formatCurrency(account.initialBalance)}
+                    </div>
                   )}
-                >
-                  {formatCurrency(account.currentBalance)}
-                </span>
               </div>
             </div>
           </div>

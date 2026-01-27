@@ -130,8 +130,21 @@ export function AccountTableRow({
         </div>
       </td>
       <td className="p-4">
-        <div className="text-sm font-semibold text-text dark:text-text-dark">
-          {formatCurrency(account.currentBalance)}
+        <div className="space-y-1">
+          {account.bankCurrentBalance !== null && account.bankCurrentBalance !== undefined ? (
+            <>
+              <div className="text-sm font-semibold text-text dark:text-text-dark">
+                {formatCurrency(account.bankCurrentBalance)}
+              </div>
+              <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                Inicial: {formatCurrency(account.initialBalance)}
+              </div>
+            </>
+          ) : (
+            <div className="text-sm font-semibold text-text dark:text-text-dark">
+              {formatCurrency(account.initialBalance)}
+            </div>
+          )}
         </div>
       </td>
       <td className="p-4">

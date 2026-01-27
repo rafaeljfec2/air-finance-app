@@ -8,6 +8,8 @@ const BalanceSubdocSchema = z.object({
   date: z.string().nullable().optional(),
   useInExtract: z.boolean().default(true),
   useInCashFlow: z.boolean().default(true),
+  current: z.number().optional().nullable(),
+  currentDate: z.string().optional().nullable(),
 });
 
 // Schema base para Account (sem transform)
@@ -105,38 +107,48 @@ const AccountBaseSchema = z.object({
 });
 
 // Schema com transform para normalizar dados (extrai subdocuments para campos flat)
-export const AccountSchema = AccountBaseSchema.transform((data) => ({
-  ...data,
-  // Garantir valores padrão para campos obrigatórios em componentes
-  color: data.color ?? '#8A05BE',
-  icon: data.icon ?? 'Banknote',
-  // Campo currentBalance para compatibilidade (saldo numérico)
-  currentBalance: data.balance?.initial ?? 0,
-  // Extrair campos de bankDetails para root (compatibilidade)
-  institution: data.institution ?? data.bankDetails?.institution ?? '',
-  bankCode: data.bankCode ?? data.bankDetails?.bankCode ?? undefined,
-  agency: data.agency ?? data.bankDetails?.agency ?? undefined,
-  accountNumber: data.accountNumber ?? data.bankDetails?.accountNumber ?? undefined,
-  pixKey: data.pixKey ?? data.bankDetails?.pixKey ?? undefined,
-  // Extrair campos de balance para root (compatibilidade)
-  initialBalance: data.initialBalance ?? data.balance?.initial ?? 0,
-  initialBalanceDate: data.initialBalanceDate ?? data.balance?.date ?? null,
-  useInitialBalanceInExtract: data.useInitialBalanceInExtract ?? data.balance?.useInExtract ?? true,
-  useInitialBalanceInCashFlow:
-    data.useInitialBalanceInCashFlow ?? data.balance?.useInCashFlow ?? true,
-  // Extrair campos de creditCard para root (compatibilidade)
-  creditLimit: data.creditLimit ?? data.creditCard?.limit ?? undefined,
-  // Extrair campos de integration para root (compatibilidade)
-  hasBankingIntegration: data.hasBankingIntegration ?? data.integration?.enabled ?? false,
-  bankingTenantId: data.bankingTenantId ?? data.integration?.tenantId ?? undefined,
-  openiItemId: data.openiItemId ?? data.integration?.openFinance?.itemId ?? undefined,
-  openiConnectorId:
-    data.openiConnectorId ?? data.integration?.openFinance?.connectorId ?? undefined,
-  openiItemStatus: data.openiItemStatus ?? data.integration?.openFinance?.status ?? undefined,
-  openiAuthUrl: data.openiAuthUrl ?? data.integration?.openFinance?.auth?.url ?? undefined,
-  openiAuthExpiresAt:
-    data.openiAuthExpiresAt ?? data.integration?.openFinance?.auth?.expiresAt ?? undefined,
-}));
+export const AccountSchema = AccountBaseSchema.transform((data) => {
+  // Prioriza subdocumento balance sobre campos legados (que podem ter default 0)
+  const balanceInitial = data.balance?.initial ?? data.initialBalance ?? 0;
+  const balanceCurrent = data.balance?.current ?? null;
+
+  return {
+    ...data,
+    // Garantir valores padrão para campos obrigatórios em componentes
+    color: data.color ?? '#8A05BE',
+    icon: data.icon ?? 'Banknote',
+    // Campo currentBalance: usa saldo atual se disponível, senão saldo inicial
+    currentBalance: balanceCurrent ?? balanceInitial,
+    // Saldo atual do banco (atualizado a cada sync)
+    bankCurrentBalance: balanceCurrent,
+    bankCurrentBalanceDate: data.balance?.currentDate ?? null,
+    // Extrair campos de bankDetails para root (compatibilidade)
+    institution: data.institution ?? data.bankDetails?.institution ?? '',
+    bankCode: data.bankCode ?? data.bankDetails?.bankCode ?? undefined,
+    agency: data.agency ?? data.bankDetails?.agency ?? undefined,
+    accountNumber: data.accountNumber ?? data.bankDetails?.accountNumber ?? undefined,
+    pixKey: data.pixKey ?? data.bankDetails?.pixKey ?? undefined,
+    // Extrair campos de balance para root (prioriza subdocumento)
+    initialBalance: balanceInitial,
+    initialBalanceDate: data.balance?.date ?? data.initialBalanceDate ?? null,
+    useInitialBalanceInExtract:
+      data.balance?.useInExtract ?? data.useInitialBalanceInExtract ?? true,
+    useInitialBalanceInCashFlow:
+      data.balance?.useInCashFlow ?? data.useInitialBalanceInCashFlow ?? true,
+    // Extrair campos de creditCard para root (compatibilidade)
+    creditLimit: data.creditLimit ?? data.creditCard?.limit ?? undefined,
+    // Extrair campos de integration para root (compatibilidade)
+    hasBankingIntegration: data.hasBankingIntegration ?? data.integration?.enabled ?? false,
+    bankingTenantId: data.bankingTenantId ?? data.integration?.tenantId ?? undefined,
+    openiItemId: data.openiItemId ?? data.integration?.openFinance?.itemId ?? undefined,
+    openiConnectorId:
+      data.openiConnectorId ?? data.integration?.openFinance?.connectorId ?? undefined,
+    openiItemStatus: data.openiItemStatus ?? data.integration?.openFinance?.status ?? undefined,
+    openiAuthUrl: data.openiAuthUrl ?? data.integration?.openFinance?.auth?.url ?? undefined,
+    openiAuthExpiresAt:
+      data.openiAuthExpiresAt ?? data.integration?.openFinance?.auth?.expiresAt ?? undefined,
+  };
+});
 
 // CreateAccountSchema usa o schema base (sem transform) para poder usar .omit()
 export const CreateAccountSchema = AccountBaseSchema.omit({
