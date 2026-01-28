@@ -21,6 +21,8 @@ export const ExtractTransactionSchema = z.object({
   description: z.string(),
   amount: z.union([z.number(), z.string().transform((v) => Number.parseFloat(v))]),
   fitId: z.string().optional().nullable(),
+  categoryId: z.string().optional().nullable(),
+  classificationConfidence: z.number().optional().nullable(),
 });
 
 export const ExtractSchema = z.object({
@@ -41,4 +43,3 @@ export const ExtractSchema = z.object({
 export type ExtractHeader = z.infer<typeof ExtractHeaderSchema>;
 export type ExtractTransaction = z.infer<typeof ExtractTransactionSchema>;
 export type ExtractResponse = z.infer<typeof ExtractSchema>;
-

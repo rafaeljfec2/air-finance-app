@@ -10,6 +10,7 @@ import {
 import { toast } from '@/components/ui/toast';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useActiveCompany } from '@/hooks/useActiveCompany';
+import { useCategories } from '@/hooks/useCategories';
 import { useExtracts } from '@/hooks/useExtracts';
 import { usePreviousBalance } from '@/hooks/useTransactions';
 import { ViewDefault } from '@/layouts/ViewDefault';
@@ -56,6 +57,7 @@ export function ImportOfxPage() {
   const [showImportModal, setShowImportModal] = useState(false);
 
   const { accounts } = useAccounts();
+  const { categories } = useCategories(companyId);
 
   const {
     data: extracts = [],
@@ -63,7 +65,20 @@ export function ImportOfxPage() {
     isFetching,
     refetch,
   } = useExtracts(companyId, startDate, endDate, selectedAccountId);
-  const { previousBalance = 0 } = usePreviousBalance(companyId, startDate, selectedAccountId, 'extracts');
+  const { previousBalance = 0 } = usePreviousBalance(
+    companyId,
+    startDate,
+    selectedAccountId,
+    'extracts',
+  );
+
+  const categoryMap = useMemo(() => {
+    const map = new Map<string, string>();
+    categories?.forEach((cat) => {
+      map.set(cat.id, cat.name);
+    });
+    return map;
+  }, [categories]);
 
   const importMutation = useMutation({
     mutationFn: async ({
@@ -196,22 +211,24 @@ export function ImportOfxPage() {
         matchedAccount = accounts?.find((acc) => acc.accountNumber === extract.header?.account);
       }
 
-      const accountNumberDisplay = matchedAccount?.accountNumber || extract.header?.account || extract.accountId || '';
-      
-      const accountLabel = matchedAccount 
+      const accountNumberDisplay =
+        matchedAccount?.accountNumber || extract.header?.account || extract.accountId || '';
+
+      const accountLabel = matchedAccount
         ? `${matchedAccount.name} (${matchedAccount.accountNumber})`
         : accountNumberDisplay;
 
       // Ensure we have a consistent key for filtering
-      const accountKey = matchedAccount?.id || extract.accountId || extract.header?.account || 'unknown';
+      const accountKey =
+        matchedAccount?.id || extract.accountId || extract.header?.account || 'unknown';
 
       return extract.transactions.flatMap((tx: ExtractTransaction, index: number) => {
         // Deduplication Logic
         // Some banks reuse fitId for linked transactions (e.g. IOF and Credits).
         // uniqueKey must consider amount and date to distinguish these valid collisions
         // while still catching true duplicates (same file imported twice).
-        const compositeKey = tx.fitId 
-          ? `${tx.fitId}-${tx.amount}-${tx.date}` 
+        const compositeKey = tx.fitId
+          ? `${tx.fitId}-${tx.amount}-${tx.date}`
           : `${extract.id}-${extractIndex}-${index}`; // Fallback for items without fitId
 
         if (seenKeys.has(compositeKey)) {
@@ -226,32 +243,38 @@ export function ImportOfxPage() {
 
         // Generate a truly unique ID for the grid to prevent React key collisions ("stuck data")
         // combining fitId (if present) with extract index + transaction index
-        const uniqueId = tx.fitId 
+        const uniqueId = tx.fitId
           ? `${tx.fitId}_${extractIndex}_${index}`
           : `${extract.id ?? 'extract'}_${extractIndex}_${index}`;
 
-        return [{
-          id: uniqueId,
-          description: tx.description || 'Sem descrição',
-          value: normalizedValue, 
-          launchType: isRevenue ? 'revenue' : 'expense',
-          valueType: 'fixed',
-          companyId: extract.companyId || companyId || 'sem-company',
-          accountId: accountLabel,
-          accountKey, 
-          categoryId: 'Extrato bancário',
-          paymentDate: isoDate,
-          issueDate: isoDate,
-          quantityInstallments: 1,
-          repeatMonthly: false,
-          observation: tx.fitId,
-          reconciled: true,
-          createdAt: isoDate,
-          updatedAt: isoDate,
-        } as TransactionGridTransaction & { accountKey?: string }];
+        const categoryName = tx.categoryId
+          ? (categoryMap.get(tx.categoryId) ?? 'Extrato bancário')
+          : 'Extrato bancário';
+
+        return [
+          {
+            id: uniqueId,
+            description: tx.description || 'Sem descrição',
+            value: normalizedValue,
+            launchType: isRevenue ? 'revenue' : 'expense',
+            valueType: 'fixed',
+            companyId: extract.companyId || companyId || 'sem-company',
+            accountId: accountLabel,
+            accountKey,
+            categoryId: categoryName,
+            paymentDate: isoDate,
+            issueDate: isoDate,
+            quantityInstallments: 1,
+            repeatMonthly: false,
+            observation: tx.fitId,
+            reconciled: true,
+            createdAt: isoDate,
+            updatedAt: isoDate,
+          } as TransactionGridTransaction & { accountKey?: string },
+        ];
       });
     });
-  }, [companyId, extracts, accounts]); // Removed dependency on startDate/endDate/selectedAccountId here to process raw data first
+  }, [companyId, extracts, accounts, categoryMap]);
 
   // Get ledger balance for the period if available
   const ledgerBalanceData = useMemo(() => {
@@ -275,15 +298,15 @@ export function ImportOfxPage() {
         // tx.paymentDate is ISO string (YYYY-MM-DDTHH:mm:ss.sssZ) or similar
         // We only care about YYYY-MM-DD part
         if (!tx.paymentDate) return true;
-        
+
         try {
           const txDate = tx.paymentDate.split('T')[0];
-          
+
           if (startDate && txDate < startDate) return false;
           if (endDate && txDate > endDate) return false;
           return true;
         } catch (e) {
-          console.error("Invalid date format", tx.paymentDate);
+          console.error('Invalid date format', tx.paymentDate);
           return true;
         }
       });
@@ -301,9 +324,9 @@ export function ImportOfxPage() {
     filtered.sort((a, b) => {
       const dateA = new Date(a.paymentDate).getTime();
       const dateB = new Date(b.paymentDate).getTime();
-       if (dateA === dateB) {
+      if (dateA === dateB) {
         // Stable sort by creation or index ID
-        return (a.id > b.id) ? 1 : -1;
+        return a.id > b.id ? 1 : -1;
       }
       return dateA - dateB;
     });
@@ -331,10 +354,10 @@ export function ImportOfxPage() {
       const lastTransaction = transactionsWithBalance[transactionsWithBalance.length - 1];
       const calculatedBalance = lastTransaction.balance ?? 0;
       const officialBalance = ledgerBalanceData.balance;
-      
+
       // Calculate difference to adjust all balances proportionally
       const difference = officialBalance - calculatedBalance;
-      
+
       // Adjust all transaction balances by the difference
       transactionsWithBalance = transactionsWithBalance.map((tx) => {
         if (tx.id === 'previous-balance') {
@@ -348,7 +371,15 @@ export function ImportOfxPage() {
     }
 
     return transactionsWithBalance;
-  }, [rawTransactions, startDate, endDate, selectedAccountId, previousBalance, accounts, ledgerBalanceData]);
+  }, [
+    rawTransactions,
+    startDate,
+    endDate,
+    selectedAccountId,
+    previousBalance,
+    accounts,
+    ledgerBalanceData,
+  ]);
 
   // 3. Search Filter (Text)
   const searchingTransactions = useMemo(() => {
@@ -392,9 +423,9 @@ export function ImportOfxPage() {
       }
     });
 
-    return { 
-      totalCredits, 
-      totalDebits, 
+    return {
+      totalCredits,
+      totalDebits,
       finalBalance,
       ledgerBalanceDate: ledgerBalanceData?.date ?? null,
     };
