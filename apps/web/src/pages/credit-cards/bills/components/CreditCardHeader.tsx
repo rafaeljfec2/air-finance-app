@@ -44,7 +44,7 @@ export function CreditCardHeader({
   };
 
   return (
-    <div className="shrink-0 bg-background dark:bg-background-dark pt-4 pb-2 lg:pt-6">
+    <div className="sticky top-0 z-20 bg-background dark:bg-background-dark pt-4 pb-2 lg:pt-6">
       <div
         className="relative overflow-hidden mx-4 lg:mx-6 rounded-2xl"
         style={{
