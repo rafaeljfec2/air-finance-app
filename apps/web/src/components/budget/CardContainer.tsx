@@ -2,12 +2,17 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 interface CardContainerProps {
-  color?: 'emerald' | 'amber' | 'rose' | 'violet';
-  children: React.ReactNode;
-  className?: string;
+  readonly color?: 'emerald' | 'amber' | 'rose' | 'violet';
+  readonly children: React.ReactNode;
+  readonly className?: string;
 }
 
-
+const colorClasses: Record<string, string> = {
+  emerald: 'bg-emerald-500',
+  amber: 'bg-amber-500',
+  rose: 'bg-rose-500',
+  violet: 'bg-violet-500',
+};
 
 export const CardContainer: React.FC<CardContainerProps> = ({
   color = 'emerald',
@@ -26,7 +31,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
       ${className ?? ''}
     `}
   >
-    <div className={`absolute top-0 left-0 right-0 h-1 bg-${color}-500 opacity-80`} />
+    <div className={`absolute top-0 left-0 right-0 h-1 ${colorClasses[color]} opacity-80`} />
     {children}
   </motion.div>
 );
