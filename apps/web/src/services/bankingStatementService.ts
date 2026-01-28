@@ -2,74 +2,90 @@ import { parseApiError } from '@/utils/apiErrorHandler';
 import { z } from 'zod';
 import { apiClient } from './apiClient';
 
-const StatementTransactionSchema = z.object({
-  id: z.string(),
-  account_id: z.string().optional(),
-  date: z.string(),
-  type: z.string(),
+const dateSchema = z.union([z.string(), z.date(), z.object({}).passthrough()]).transform((val) => {
+  if (val instanceof Date) return val.toISOString();
+  if (typeof val === 'string') return val;
+  return new Date().toISOString();
+});
+
+const ExtractTransactionSchema = z.object({
+  fitId: z.string().optional().nullable(),
+  date: dateSchema,
   amount: z.number(),
   description: z.string(),
-  balance: z.number().optional(),
-  category: z.string().optional(),
-  currency_code: z.string().optional(),
-  status: z.string().optional(),
-  account_name: z.string().optional(),
-  account_type: z.string().optional(),
-  account_subtype: z.string().optional(),
-  account_marketing_name: z.string().optional(),
+  type: z.string().optional().nullable(),
+  memo: z.string().optional().nullable(),
 });
 
-const StatementAccountSchema = z.object({
+const ExtractHeaderSchema = z.object({
+  account: z.string().optional().nullable(),
+  bankId: z.string().optional().nullable(),
+  bank: z.string().optional().nullable(),
+  agency: z.string().optional().nullable(),
+  periodStart: z.string().optional().nullable(),
+  periodEnd: z.string().optional().nullable(),
+  ledgerBalance: z.number().optional().nullable(),
+  ledgerBalanceDate: z.string().optional().nullable(),
+});
+
+const ExtractSchema = z.object({
   id: z.string(),
-  name: z.string(),
-  type: z.enum(['BANK', 'CREDIT']),
-  subtype: z.string(),
-  balance: z.number(),
-  currency: z.string(),
-  bankCode: z.string(),
-  accountNumber: z.string(),
-  branchNumber: z.string(),
-  marketingName: z.string(),
+  companyId: z.string(),
+  userId: z.string(),
+  accountId: z.string(),
+  header: ExtractHeaderSchema.optional().nullable(),
+  transactions: z.array(ExtractTransactionSchema),
+  createdAt: dateSchema,
+  updatedAt: dateSchema,
 });
 
-const StatementEndBalanceSchema = z.object({
-  available: z.number(),
-  blocked: z.number(),
+const PaginationSchema = z.object({
+  page: z.number(),
+  limit: z.number(),
   total: z.number(),
-  date: z.string(),
+  totalPages: z.number(),
+  totalAmount: z.number(),
+  hasNextPage: z.boolean(),
+  hasPreviousPage: z.boolean(),
 });
 
-const StatementResponseSchema = z.object({
-  transactions: z.array(StatementTransactionSchema),
-  accounts: z.array(StatementAccountSchema).optional(),
-  summary: z
-    .object({
-      startBalance: z.number(),
-      endBalance: z.number(),
-      totalCredits: z.number(),
-      totalDebits: z.number(),
-    })
-    .optional(),
-  endBalance: StatementEndBalanceSchema.optional(),
-  periodStart: z.string().optional(),
-  periodEnd: z.string().optional(),
-  total: z.number().optional(),
-  page: z.number().optional(),
-  limit: z.number().optional(),
+const ExtractResponseSchema = z.object({
+  data: z.array(ExtractSchema),
+  pagination: PaginationSchema,
 });
 
-export type StatementTransaction = z.infer<typeof StatementTransactionSchema>;
-export type StatementAccount = z.infer<typeof StatementAccountSchema>;
-export type StatementEndBalance = z.infer<typeof StatementEndBalanceSchema>;
-export type StatementResponse = z.infer<typeof StatementResponseSchema>;
+export type ExtractTransaction = z.infer<typeof ExtractTransactionSchema>;
+export type Extract = z.infer<typeof ExtractSchema>;
+export type ExtractResponse = z.infer<typeof ExtractResponseSchema>;
+
+export interface StatementTransaction {
+  id: string;
+  date: string;
+  amount: number;
+  description: string;
+  type?: string;
+  balance?: number;
+}
+
+export interface StatementResponse {
+  transactions: StatementTransaction[];
+  summary: {
+    startBalance: number;
+    endBalance: number;
+    totalCredits: number;
+    totalDebits: number;
+  };
+  total: number;
+  page: number;
+  limit: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
 
 export interface GetStatementParams {
   accountId: string;
   startDate?: string;
   endDate?: string;
-  includeAccounts?: boolean;
-  accountIdFilter?: string;
-  itemId?: string;
   limit?: number;
   page?: number;
 }
@@ -79,61 +95,99 @@ export const getStatement = async (
   params: GetStatementParams,
 ): Promise<StatementResponse> => {
   try {
-    const queryParams: Record<string, string | number | boolean> = {};
+    const queryParams: Record<string, string | number> = {};
     if (params.startDate) queryParams.startDate = params.startDate;
     if (params.endDate) queryParams.endDate = params.endDate;
-    if (params.includeAccounts !== undefined) queryParams.includeAccounts = params.includeAccounts;
-    if (params.accountIdFilter) queryParams.accountId = params.accountIdFilter;
-    if (params.itemId) queryParams.itemId = params.itemId;
+    if (params.accountId) queryParams.accountId = params.accountId;
     if (params.limit) queryParams.limit = params.limit;
     if (params.page) queryParams.page = params.page;
 
-    const response = await apiClient.get<StatementResponse>(
-      `/companies/${companyId}/banking/accounts/${params.accountId}/statement`,
+    const response = await apiClient.get<ExtractResponse | Extract[]>(
+      `/companies/${companyId}/transactions/extracts`,
       { params: queryParams },
     );
-    return StatementResponseSchema.parse(response.data);
+
+    if (Array.isArray(response.data)) {
+      const transactions = flattenExtractsToTransactions(response.data);
+      return {
+        transactions,
+        summary: calculateSummary(transactions),
+        total: transactions.length,
+        page: 1,
+        limit: transactions.length,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      };
+    }
+
+    const parsed = ExtractResponseSchema.parse(response.data);
+    const transactions = flattenExtractsToTransactions(parsed.data);
+
+    return {
+      transactions,
+      summary: calculateSummaryFromPagination(transactions, parsed.pagination.totalAmount),
+      total: parsed.pagination.total,
+      page: parsed.pagination.page,
+      limit: parsed.pagination.limit,
+      hasNextPage: parsed.pagination.hasNextPage,
+      hasPreviousPage: parsed.pagination.hasPreviousPage,
+    };
   } catch (error) {
     throw parseApiError(error);
   }
 };
 
-export const getStatementAccounts = async (
-  companyId: string,
-  accountId: string,
-  itemId?: string,
-): Promise<StatementAccount[]> => {
-  try {
-    const queryParams: Record<string, string> = {};
-    if (itemId) queryParams.itemId = itemId;
+function flattenExtractsToTransactions(extracts: Extract[]): StatementTransaction[] {
+  const transactions: StatementTransaction[] = [];
 
-    const response = await apiClient.get<{ accounts: StatementAccount[] }>(
-      `/companies/${companyId}/banking/accounts/${accountId}/statement/accounts`,
-      { params: queryParams },
-    );
-    return z.array(StatementAccountSchema).parse(response.data.accounts ?? []);
-  } catch (error) {
-    throw parseApiError(error);
+  for (const extract of extracts) {
+    for (const tx of extract.transactions) {
+      transactions.push({
+        id: tx.fitId ?? `${extract.id}-${tx.date}-${tx.amount}`,
+        date: tx.date,
+        amount: tx.amount,
+        description: tx.description,
+        type: tx.type ?? (tx.amount >= 0 ? 'CREDIT' : 'DEBIT'),
+      });
+    }
   }
-};
 
-export const getStatementBalance = async (
-  companyId: string,
-  accountId: string,
-  accountIdFilter?: string,
-): Promise<StatementEndBalance> => {
-  try {
-    const queryParams: Record<string, string> = {};
-    if (accountIdFilter) queryParams.accountId = accountIdFilter;
+  return transactions;
+}
 
-    const response = await apiClient.get<StatementEndBalance>(
-      `/companies/${companyId}/banking/accounts/${accountId}/statement/balance${
-        accountIdFilter ? `/${accountIdFilter}` : ''
-      }`,
-      { params: queryParams },
-    );
-    return StatementEndBalanceSchema.parse(response.data);
-  } catch (error) {
-    throw parseApiError(error);
-  }
-};
+function calculateSummary(transactions: StatementTransaction[]): StatementResponse['summary'] {
+  const totalCredits = transactions
+    .filter((t) => t.amount > 0)
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const totalDebits = transactions
+    .filter((t) => t.amount < 0)
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+  return {
+    startBalance: 0,
+    endBalance: totalCredits - totalDebits,
+    totalCredits,
+    totalDebits,
+  };
+}
+
+function calculateSummaryFromPagination(
+  transactions: StatementTransaction[],
+  totalAmount: number,
+): StatementResponse['summary'] {
+  const totalCredits = transactions
+    .filter((t) => t.amount > 0)
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const totalDebits = transactions
+    .filter((t) => t.amount < 0)
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+  return {
+    startBalance: 0,
+    endBalance: totalAmount,
+    totalCredits,
+    totalDebits,
+  };
+}

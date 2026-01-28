@@ -23,6 +23,11 @@ const StatementSchedulePage = lazy(() =>
     default: m.StatementSchedulePage,
   })),
 );
+const AccountDetailsPage = lazy(() =>
+  import('@/pages/accounts/details').then((m) => ({
+    default: m.AccountDetailsPage,
+  })),
+);
 const OpenFinancePage = lazy(() =>
   import('@/pages/openfinance').then((m) => ({ default: m.OpenFinancePage })),
 );
@@ -323,6 +328,7 @@ export const router = createBrowserRouter([
   createSimpleProtectedRoute('/categories', CategoriesPage),
   createSimpleProtectedRoute('/accounts', AccountsPage),
   createSimpleProtectedRoute('/accounts/:accountId/statement-schedule', StatementSchedulePage),
+  createSimpleProtectedRoute('/accounts/:accountId/details', AccountDetailsPage),
   createSimpleProtectedRoute('/openfinance', OpenFinancePage),
   createSimpleProtectedRoute('/business-logs', BusinessLogsPage),
   createSimpleProtectedRoute('/profile', Profile),

@@ -10,6 +10,7 @@ import { RecentTransactionsList } from './components/RecentTransactionsList';
 import { createQuickActions } from './constants/quickActions';
 import { useHomePageData } from './hooks/useHomePageData';
 import { useCreditCards } from '@/hooks/useCreditCards';
+import { useAccounts } from '@/hooks/useAccounts';
 import { useCompanyStore } from '@/stores/company';
 
 export function HomePage() {
@@ -19,6 +20,7 @@ export function HomePage() {
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
   const { creditCards } = useCreditCards(companyId);
+  const { accounts } = useAccounts();
 
   const {
     balance,
@@ -40,7 +42,20 @@ export function HomePage() {
     }
   };
 
-  const quickActions = createQuickActions(() => setIsTypeModalOpen(true), handleCreditCardClick);
+  const handleAccountsClick = () => {
+    const bankAccounts = accounts?.filter((acc) => acc.type !== 'credit_card') ?? [];
+    if (bankAccounts.length > 0) {
+      navigate(`/accounts/${bankAccounts[0].id}/details`);
+    } else {
+      navigate('/accounts');
+    }
+  };
+
+  const quickActions = createQuickActions(
+    () => setIsTypeModalOpen(true),
+    handleCreditCardClick,
+    handleAccountsClick,
+  );
 
   return (
     <ViewDefault>
