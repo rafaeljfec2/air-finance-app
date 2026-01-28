@@ -1,4 +1,4 @@
-import { CardContainer, CardEmpty, CardHeader, CardStat, CardTotal } from '@/components/budget';
+import { CardContainer, CardEmpty, CardHeader, CardStat } from '@/components/budget';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import type { CashFlow } from '@/types/budget';
@@ -35,11 +35,6 @@ export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlo
           Expandir
         </Button>
       </CardHeader>
-      <CardTotal
-        value={cashFlow?.currentBalance ?? 0}
-        color={(cashFlow?.currentBalance ?? 0) >= 0 ? 'blue' : 'rose'}
-        label="Saldo Final"
-      />
       <AnimatePresence initial={false}>
         {!isCollapsed && (
           <motion.div
@@ -55,14 +50,15 @@ export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlo
               </div>
             )}
             {!isLoading && cashFlow && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
-                <CardStat label="Entradas" value={cashFlow.totalIncome} positive />
-                <CardStat label="Saídas" value={cashFlow.totalExpense} negative />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-2">
+                <CardStat label="Entradas" value={cashFlow.totalIncome} positive compact />
+                <CardStat label="Saídas" value={cashFlow.totalExpense} negative compact />
                 <CardStat
                   label="Saldo Final"
                   value={cashFlow.currentBalance}
                   blue={cashFlow.currentBalance >= 0}
                   negative={cashFlow.currentBalance < 0}
+                  compact
                 />
               </div>
             )}

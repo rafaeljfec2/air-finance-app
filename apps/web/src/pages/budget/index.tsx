@@ -69,7 +69,8 @@ export function BudgetPage() {
             </h1>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 ml-11 max-w-2xl">
-            Visão geral do seu orçamento.
+            Visão geral do seu orçamento. Essa tela utiliza o fluxo de caixa, recebíveis, pagáveis e
+            cartões de crédito para fornecer uma visão geral do seu orçamento.
           </p>
         </motion.div>
 
@@ -94,7 +95,7 @@ export function BudgetPage() {
         {/* Cards secundarios - 3 colunas em telas grandes */}
         <motion.div
           variants={container}
-          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 items-start"
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 items-stretch"
         >
           <motion.div variants={item} className="h-full">
             <ReceivablesCard
