@@ -108,13 +108,13 @@ export function StatementCard({
         </div>
       </div>
 
-      <div className="px-5 py-3 bg-background/50 dark:bg-background-dark/50 border-b border-border dark:border-border-dark">
+      <div className="px-4 py-2 bg-background/50 dark:bg-background-dark/50 border-b border-border dark:border-border-dark">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Receipt className="h-4 w-4 text-text-muted dark:text-text-muted-dark" />
-            <span className="text-sm font-medium text-text dark:text-text-dark">Transações</span>
+            <Receipt className="h-3.5 w-3.5 text-text-muted dark:text-text-muted-dark" />
+            <span className="text-xs font-medium text-text dark:text-text-dark">Transações</span>
           </div>
-          <span className="text-xs text-text-muted dark:text-text-muted-dark bg-background dark:bg-background-dark px-2 py-1 rounded-full">
+          <span className="text-[10px] text-text-muted dark:text-text-muted-dark bg-background dark:bg-background-dark px-2 py-0.5 rounded-full">
             {totalTransactions} {transactionLabel}
           </span>
         </div>
