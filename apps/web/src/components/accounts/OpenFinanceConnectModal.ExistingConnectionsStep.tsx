@@ -110,9 +110,9 @@ export function ExistingConnectionsStep({
                             ? 'Banco Pessoal'
                             : 'Banco Empresarial'}
                         </p>
-                        {item.updatedAt && (
+                        {item.lastSyncAt && (
                           <p className="text-xs text-muted-foreground dark:text-gray-500 mt-1">
-                            Última sincronização: {formatDateTime(item.updatedAt)}
+                            Última sincronização: {formatDateTime(item.lastSyncAt)}
                           </p>
                         )}
                       </div>

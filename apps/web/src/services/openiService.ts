@@ -158,6 +158,7 @@ const OpeniItemSchema = z.object({
   authExpiresAt: z.string().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  lastSyncAt: z.string().nullable(),
 });
 
 const OpeniItemsResponseSchema = z.object({
