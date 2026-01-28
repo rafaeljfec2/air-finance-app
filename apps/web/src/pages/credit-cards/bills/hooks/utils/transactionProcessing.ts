@@ -6,6 +6,7 @@ export interface BillTransaction {
   description: string;
   amount: number;
   category?: string;
+  categoryId?: string;
 }
 
 export const generateTransactionId = (
@@ -31,16 +32,18 @@ export const mapTransactionToBillTransaction = (
     date: tx.date,
     description: tx.description,
     amount: typeof tx.amount === 'string' ? Number.parseFloat(tx.amount) : tx.amount,
-    category: undefined,
+    categoryId: tx.categoryId ?? undefined,
   };
 };
 
-export const processExtractTransactions = (
-  extracts: Extract[],
-): BillTransaction[] => {
+export const processExtractTransactions = (extracts: Extract[]): BillTransaction[] => {
   // Backend already handles pagination, so we just process all transactions received
   const allTransactions = extracts.flatMap((extract, extractIndex) => {
-    if (!extract?.transactions || !Array.isArray(extract.transactions) || extract.transactions.length === 0) {
+    if (
+      !extract?.transactions ||
+      !Array.isArray(extract.transactions) ||
+      extract.transactions.length === 0
+    ) {
       return [];
     }
     return extract.transactions.map((tx: ExtractTransaction, txIndex) =>

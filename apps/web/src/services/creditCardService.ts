@@ -206,6 +206,8 @@ export const ExtractTransactionSchema = z.object({
   description: z.string(),
   amount: z.coerce.number(),
   fitId: z.string().optional(),
+  categoryId: z.string().optional().nullable(),
+  classificationConfidence: z.number().optional().nullable(),
 });
 
 export const ExtractHeaderSchema = z.object({
@@ -229,12 +231,14 @@ export const ExtractSchema = z.object({
   transactions: z.array(ExtractTransactionSchema),
   createdAt: z.union([z.string(), z.date(), z.object({}).passthrough()]).transform((val) => {
     if (val instanceof Date) return val.toISOString();
-    if (typeof val === 'object' && val !== null && Object.keys(val).length === 0) return new Date().toISOString();
+    if (typeof val === 'object' && val !== null && Object.keys(val).length === 0)
+      return new Date().toISOString();
     return typeof val === 'string' ? val : new Date().toISOString();
   }),
   updatedAt: z.union([z.string(), z.date(), z.object({}).passthrough()]).transform((val) => {
     if (val instanceof Date) return val.toISOString();
-    if (typeof val === 'object' && val !== null && Object.keys(val).length === 0) return new Date().toISOString();
+    if (typeof val === 'object' && val !== null && Object.keys(val).length === 0)
+      return new Date().toISOString();
     return typeof val === 'string' ? val : new Date().toISOString();
   }),
 });

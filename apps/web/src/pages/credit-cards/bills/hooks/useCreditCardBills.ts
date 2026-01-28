@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import { useCompanyStore } from '@/stores/company';
+import { useCategories } from '@/hooks/useCategories';
 import { useCreditCardQueries } from './useCreditCardQueries';
 import { useBillTransactions } from './useBillTransactions';
 import { useBillPagination } from './useBillPagination';
@@ -9,6 +11,16 @@ import type { UseCreditCardBillsReturn } from './types';
 export function useCreditCardBills(cardId: string, month: string): UseCreditCardBillsReturn {
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
+
+  const { categories } = useCategories(companyId);
+
+  const categoryMap = useMemo(() => {
+    const map = new Map<string, string>();
+    categories?.forEach((cat) => {
+      map.set(cat.id, cat.name);
+    });
+    return map;
+  }, [categories]);
 
   const { creditCard, account, isLoadingCard, isLoadingAccounts, cardError, accountsError } =
     useCreditCardQueries({
@@ -39,6 +51,7 @@ export function useCreditCardBills(cardId: string, month: string): UseCreditCard
     currentPage,
     cardId,
     month,
+    categoryMap,
   });
 
   const currentBill = useCurrentBill({

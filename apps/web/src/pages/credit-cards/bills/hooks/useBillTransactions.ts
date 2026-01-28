@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { processExtractTransactions, type BillTransaction } from './utils/transactionProcessing';
 import type { CreditCardBillResponse } from '@/services/creditCardService';
 
@@ -7,6 +7,7 @@ interface UseBillTransactionsParams {
   readonly currentPage: number;
   readonly cardId: string;
   readonly month: string;
+  readonly categoryMap?: Map<string, string>;
 }
 
 export const useBillTransactions = ({
@@ -14,6 +15,7 @@ export const useBillTransactions = ({
   currentPage,
   cardId,
   month,
+  categoryMap,
 }: UseBillTransactionsParams) => {
   const [allTransactions, setAllTransactions] = useState<BillTransaction[]>([]);
   const loadedPagesRef = useRef<Set<number>>(new Set());
@@ -27,7 +29,7 @@ export const useBillTransactions = ({
 
   useEffect(() => {
     const currentContextKey = `${cardId}-${month}`;
-    
+
     // Reset if context changed (different card or month)
     if (contextKeyRef.current !== currentContextKey) {
       contextKeyRef.current = currentContextKey;
@@ -70,7 +72,17 @@ export const useBillTransactions = ({
     }
   }, [billData, currentPage]);
 
+  const transactionsWithCategories = useMemo(() => {
+    if (!categoryMap || categoryMap.size === 0) {
+      return allTransactions;
+    }
+    return allTransactions.map((tx) => ({
+      ...tx,
+      category: tx.categoryId ? categoryMap.get(tx.categoryId) : undefined,
+    }));
+  }, [allTransactions, categoryMap]);
+
   return {
-    allTransactions,
+    allTransactions: transactionsWithCategories,
   };
 };
