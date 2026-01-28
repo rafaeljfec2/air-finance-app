@@ -1,6 +1,12 @@
 import { BadgeStatus } from '@/components/budget';
 import { EditableValueCell } from '@/components/budget/EditableValueCell';
-import { Spinner } from '@/components/ui/spinner';
+import {
+  EmptyState,
+  GroupContainer,
+  GroupHeader,
+  SectionLoader,
+  TotalFooter,
+} from '@/components/budget/shared';
 import type { Payable } from '@/types/budget';
 import { formatDate } from '@/utils/date';
 import { useMemo } from 'react';
@@ -18,7 +24,15 @@ function isCreditCardPayable(description: string): boolean {
   return CREDIT_CARD_KEYWORDS.some((keyword) => lowerDesc.includes(keyword));
 }
 
-export function PayablesSection({ payables, isLoading }: Readonly<PayablesSectionProps>) {
+function sortByDueDate(a: Payable, b: Payable): number {
+  return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+}
+
+function calculateTotal(items: Payable[]): number {
+  return items.reduce((sum, item) => sum + item.value, 0);
+}
+
+export function PayablesSection({ payables, isLoading }: PayablesSectionProps) {
   const {
     editingId,
     editingValue,
@@ -42,33 +56,22 @@ export function PayablesSection({ payables, isLoading }: Readonly<PayablesSectio
       }
     });
 
-    const sortByDate = (a: Payable, b: Payable) =>
-      new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-
-    creditCards.sort(sortByDate);
-    recurring.sort(sortByDate);
+    creditCards.sort(sortByDueDate);
+    recurring.sort(sortByDueDate);
 
     return {
       creditCardPayables: creditCards,
       recurringPayables: recurring,
-      total: payables.reduce((sum, p) => sum + p.value, 0),
+      total: calculateTotal(payables),
     };
   }, [payables]);
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-8">
-        <Spinner size="lg" className="text-rose-500" />
-      </div>
-    );
+    return <SectionLoader color="rose" />;
   }
 
   if (payables.length === 0) {
-    return (
-      <p className="px-3 py-4 text-center text-gray-500 dark:text-gray-400">
-        Nenhuma conta a pagar neste período.
-      </p>
-    );
+    return <EmptyState message="Nenhuma conta a pagar neste período." />;
   }
 
   const renderTable = (items: Payable[]) => (
@@ -127,50 +130,29 @@ export function PayablesSection({ payables, isLoading }: Readonly<PayablesSectio
     <div className="space-y-6">
       {recurringPayables.length > 0 && (
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="h-2 w-2 rounded-full bg-rose-500" />
-            <h4 className="text-sm font-semibold text-rose-600 dark:text-rose-400">
-              Contas Recorrentes ({recurringPayables.length})
-            </h4>
-            <span className="text-xs text-gray-500 ml-auto">
-              Total: R${' '}
-              {recurringPayables
-                .reduce((acc, p) => acc + p.value, 0)
-                .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-            </span>
-          </div>
-          <div className="rounded-lg border border-rose-500/20 bg-rose-500/5 overflow-hidden">
-            {renderTable(recurringPayables)}
-          </div>
+          <GroupHeader
+            title="Contas Recorrentes"
+            count={recurringPayables.length}
+            total={calculateTotal(recurringPayables)}
+            color="rose"
+          />
+          <GroupContainer color="rose">{renderTable(recurringPayables)}</GroupContainer>
         </div>
       )}
 
       {creditCardPayables.length > 0 && (
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="h-2 w-2 rounded-full bg-violet-500" />
-            <h4 className="text-sm font-semibold text-violet-600 dark:text-violet-400">
-              Faturas de Cartão ({creditCardPayables.length})
-            </h4>
-            <span className="text-xs text-gray-500 ml-auto">
-              Total: R${' '}
-              {creditCardPayables
-                .reduce((acc, p) => acc + p.value, 0)
-                .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-            </span>
-          </div>
-          <div className="rounded-lg border border-violet-500/20 bg-violet-500/5 overflow-hidden">
-            {renderTable(creditCardPayables)}
-          </div>
+          <GroupHeader
+            title="Faturas de Cartão"
+            count={creditCardPayables.length}
+            total={calculateTotal(creditCardPayables)}
+            color="violet"
+          />
+          <GroupContainer color="violet">{renderTable(creditCardPayables)}</GroupContainer>
         </div>
       )}
 
-      <div className="flex justify-between items-center pt-4 border-t-2 border-border dark:border-border-dark">
-        <span className="font-semibold text-text dark:text-text-dark">Total Geral</span>
-        <span className="font-bold text-lg text-rose-600 dark:text-rose-400">
-          R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-        </span>
-      </div>
+      <TotalFooter total={total} color="rose" />
     </div>
   );
 }

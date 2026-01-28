@@ -30,7 +30,6 @@ export function BudgetPage() {
     activeBill,
     activeCardLimit,
     activeCardBillTotal,
-    activeCardAvailable,
     activeCardRealBalance,
   } = useBudgetPageController();
 
@@ -146,7 +145,6 @@ export function BudgetPage() {
         activeBill={activeBill}
         activeCardLimit={activeCardLimit}
         activeCardBillTotal={activeCardBillTotal}
-        activeCardAvailable={activeCardAvailable}
         activeCardTab={activeCardTab}
         onActiveCardChange={setActiveCardTab}
         onClose={() => setExpandedCard(null)}

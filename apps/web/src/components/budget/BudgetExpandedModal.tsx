@@ -16,19 +16,18 @@ function getExpandedCardTitle(expandedCard: ExpandedCard): string | undefined {
 }
 
 interface BudgetExpandedModalProps {
-  expandedCard: ExpandedCard;
-  isLoading: boolean;
-  cashFlow: CashFlow | null;
-  receivables: Receivable[];
-  payables: Payable[];
-  cards: CreditCard[];
-  activeBill: CreditCardBill | undefined;
-  activeCardLimit: number;
-  activeCardBillTotal: number;
-  activeCardAvailable: number | null;
-  activeCardTab: string;
-  onActiveCardChange: (cardId: string) => void;
-  onClose: () => void;
+  readonly expandedCard: ExpandedCard;
+  readonly isLoading: boolean;
+  readonly cashFlow: CashFlow | null;
+  readonly receivables: Receivable[];
+  readonly payables: Payable[];
+  readonly cards: CreditCard[];
+  readonly activeBill: CreditCardBill | undefined;
+  readonly activeCardLimit: number;
+  readonly activeCardBillTotal: number;
+  readonly activeCardTab: string;
+  readonly onActiveCardChange: (cardId: string) => void;
+  readonly onClose: () => void;
 }
 
 export function BudgetExpandedModal({
@@ -41,11 +40,10 @@ export function BudgetExpandedModal({
   activeBill,
   activeCardLimit,
   activeCardBillTotal,
-  activeCardAvailable,
   activeCardTab,
   onActiveCardChange,
   onClose,
-}: Readonly<BudgetExpandedModalProps>) {
+}: BudgetExpandedModalProps) {
   return (
     <Modal
       open={expandedCard !== null}
@@ -72,7 +70,6 @@ export function BudgetExpandedModal({
             activeBill={activeBill}
             activeCardLimit={activeCardLimit}
             activeCardBillTotal={activeCardBillTotal}
-            activeCardAvailable={activeCardAvailable}
             activeCardTab={activeCardTab}
             isLoading={isLoading}
             onActiveCardChange={onActiveCardChange}
