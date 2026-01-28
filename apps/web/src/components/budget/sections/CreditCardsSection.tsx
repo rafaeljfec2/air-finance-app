@@ -70,10 +70,10 @@ export function CreditCardsSection({
       ];
 
       // Check if description contains credit keywords
-      const hasCreditKeyword = creditKeywords.some(keyword => description.includes(keyword));
+      const hasCreditKeyword = creditKeywords.some((keyword) => description.includes(keyword));
 
       // Check if category indicates credit
-      const hasCreditCategory = creditCategories.some(cat => category.includes(cat));
+      const hasCreditCategory = creditCategories.some((cat) => category.includes(cat));
 
       // Exclude if it's a credit transaction
       return !hasCreditKeyword && !hasCreditCategory;
@@ -137,11 +137,11 @@ export function CreditCardsSection({
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mb-6">
         <CardStat label="Limite do cartão" value={activeCardLimit} highlight />
-        <CardStat label="Total da fatura" value={activeCardBillTotal} negative />
-        <CardStat label="Total parcelado" value={totals.totalParcelado} />
-        <CardStat label="Total crédito à vista" value={totals.totalVista} />
+        <CardStat label="Fatura" value={activeCardBillTotal} negative />
+        <CardStat label="Parcelado" value={totals.totalParcelado} />
+        <CardStat label="Crédito à vista" value={totals.totalVista} />
         <CardStat
-          label="Parcelas finalizando"
+          label="Finalizando"
           value={totals.totalFinalizando}
           highlight={totals.totalFinalizando > 0}
         />
@@ -186,72 +186,116 @@ export function CreditCardsSection({
         })}
       </div>
       <div className="max-h-[50vh] overflow-y-auto pr-1">
-        <table className="w-full text-sm">
-          <thead>
-            <tr>
-              <th className="px-3 py-2 text-left text-gray-400 w-[45%]">Descrição</th>
-              <th className="px-3 py-2 text-center text-gray-400 w-[30%]">Categoria</th>
-              <th className="px-3 py-2 text-right text-gray-400 w-[25%]">Valor</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/60 dark:divide-border-dark/60">
-            {(() => {
-              if (debitTransactions.length === 0) {
-                return (
-                  <tr>
-                    <td
-                      className="px-3 py-4 text-center text-gray-500 dark:text-gray-400"
-                      colSpan={3}
-                    >
-                      Nenhuma transação de cartão neste período.
+        {(() => {
+          if (debitTransactions.length === 0) {
+            return (
+              <p className="px-3 py-4 text-center text-gray-500 dark:text-gray-400">
+                Nenhuma transação de cartão neste período.
+              </p>
+            );
+          }
+
+          // Separate finishing installments from other transactions
+          const finishingTransactions: typeof debitTransactions = [];
+          const otherTransactions: typeof debitTransactions = [];
+
+          debitTransactions.forEach((t) => {
+            const installment = extractInstallment(t.description);
+            if (installment && installment.current === installment.total) {
+              finishingTransactions.push(t);
+            } else {
+              otherTransactions.push(t);
+            }
+          });
+
+          // Sort by date (most recent first)
+          const sortByDate = (
+            a: (typeof debitTransactions)[0],
+            b: (typeof debitTransactions)[0],
+          ) => {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+          };
+
+          finishingTransactions.sort(sortByDate);
+          otherTransactions.sort(sortByDate);
+
+          const renderTable = (transactions: typeof debitTransactions) => (
+            <table className="w-full text-xs">
+              <thead>
+                <tr>
+                  <th className="px-2 py-1.5 text-left text-gray-400 w-[15%]">Data</th>
+                  <th className="px-2 py-1.5 text-left text-gray-400 w-[40%]">Descrição</th>
+                  <th className="px-2 py-1.5 text-center text-gray-400 w-[25%]">Categoria</th>
+                  <th className="px-2 py-1.5 text-right text-gray-400 w-[20%]">Valor</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/60 dark:divide-border-dark/60">
+                {transactions.map((t) => (
+                  <tr key={t.id}>
+                    <td className="px-2 py-1.5 text-left text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                      {formatDate(t.date)}
+                    </td>
+                    <td className="px-2 py-1.5 text-left text-text dark:text-text-dark truncate max-w-[200px]">
+                      {t.description}
+                    </td>
+                    <td className="px-2 py-1.5 text-center">
+                      <BadgeStatus status={t.category === 'Parcelado' ? 'success' : 'default'}>
+                        {t.category}
+                      </BadgeStatus>
+                    </td>
+                    <td className="px-2 py-1.5 text-right font-medium whitespace-nowrap text-text dark:text-text-dark">
+                      R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </td>
                   </tr>
-                );
-              }
+                ))}
+              </tbody>
+            </table>
+          );
 
-              // Sort transactions: first those that are finishing (fewer remaining installments), then the rest
-              const sortedTransactions = [...debitTransactions].sort((a, b) => {
-                const installmentA = extractInstallment(a.description);
-                const installmentB = extractInstallment(b.description);
+          return (
+            <div className="space-y-6">
+              {finishingTransactions.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <h4 className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                      Parcelas Finalizando ({finishingTransactions.length})
+                    </h4>
+                    <span className="text-xs text-gray-500 ml-auto">
+                      Total: R${' '}
+                      {finishingTransactions
+                        .reduce((acc, t) => acc + t.value, 0)
+                        .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 overflow-hidden">
+                    {renderTable(finishingTransactions)}
+                  </div>
+                </div>
+              )}
 
-                // If neither has installment info, keep original order
-                if (!installmentA && !installmentB) return 0;
-
-                // Transactions with installments come first
-                if (!installmentA) return 1;
-                if (!installmentB) return -1;
-
-                // Calculate remaining installments
-                const remainingA = installmentA.total - installmentA.current;
-                const remainingB = installmentB.total - installmentB.current;
-
-                // First: those with fewer remaining installments (finishing first)
-                if (remainingA !== remainingB) {
-                  return remainingA - remainingB;
-                }
-
-                // If same remaining, sort by current installment (higher current first)
-                return installmentB.current - installmentA.current;
-              });
-
-              return sortedTransactions.map((t) => (
-                <tr key={t.id}>
-                  <td className="px-3 py-2 text-left text-text dark:text-text-dark truncate">
-                    {t.description}
-                  </td>
-                  <td className="px-3 py-2 text-center">
-                    <BadgeStatus status={t.category === 'Parcelado' ? 'success' : 'default'}>
-                      {t.category}
-                    </BadgeStatus>
-                  </td>
-                  <td className="px-3 py-2 text-right font-medium whitespace-nowrap text-text dark:text-text-dark">
-                    R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </td>
-                </tr>
-              ));
-            })()}
-          </tbody>
-        </table>
+              {otherTransactions.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="h-2 w-2 rounded-full bg-gray-400" />
+                    <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+                      Outras Compras ({otherTransactions.length})
+                    </h4>
+                    <span className="text-xs text-gray-500 ml-auto">
+                      Total: R${' '}
+                      {otherTransactions
+                        .reduce((acc, t) => acc + t.value, 0)
+                        .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="rounded-lg border border-border dark:border-border-dark overflow-hidden">
+                    {renderTable(otherTransactions)}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </>
   );
