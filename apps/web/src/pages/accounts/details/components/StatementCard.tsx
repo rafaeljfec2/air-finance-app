@@ -81,8 +81,8 @@ export function StatementCard({
   return (
     <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark overflow-hidden">
       <div className="px-4 py-3 border-b border-border dark:border-border-dark">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <NavigationButton
               onClick={onPreviousMonth}
               disabled={!canGoPrevious}
@@ -103,13 +103,34 @@ export function StatementCard({
             </NavigationButton>
           </div>
 
+          <div className="text-right">
+            <span className="text-[10px] text-text-muted dark:text-text-muted-dark">
+              Saldo final
+            </span>
+            <p className={`text-xl font-bold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+              {formatCurrency(endBalance)}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-4 py-2 bg-background/50 dark:bg-background-dark/50 border-b border-border dark:border-border-dark">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 shrink-0">
+            <Receipt className="h-3.5 w-3.5 text-text-muted dark:text-text-muted-dark" />
+            <span className="text-xs font-medium text-text dark:text-text-dark">Transações</span>
+            <span className="text-[10px] text-text-muted dark:text-text-muted-dark bg-background dark:bg-background-dark px-2 py-0.5 rounded-full">
+              {totalTransactions} {transactionLabel}
+            </span>
+          </div>
+
           {onSearchChange && (
             <div className="flex-1 max-w-xs">
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-muted dark:text-text-muted-dark" />
                 <input
                   type="text"
-                  placeholder="Pesquisar..."
+                  placeholder="Pesquisar transações..."
                   value={searchTerm}
                   onChange={(e) => onSearchChange(e.target.value)}
                   className="w-full pl-8 pr-8 py-1.5 text-xs bg-background dark:bg-background-dark border border-border dark:border-border-dark rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 text-text dark:text-text-dark placeholder:text-text-muted dark:placeholder:text-text-muted-dark"
@@ -131,27 +152,6 @@ export function StatementCard({
               </div>
             </div>
           )}
-
-          <div className="text-right shrink-0">
-            <span className="text-[10px] text-text-muted dark:text-text-muted-dark">
-              Saldo final
-            </span>
-            <p className={`text-xl font-bold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-              {formatCurrency(endBalance)}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-4 py-2 bg-background/50 dark:bg-background-dark/50 border-b border-border dark:border-border-dark">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Receipt className="h-3.5 w-3.5 text-text-muted dark:text-text-muted-dark" />
-            <span className="text-xs font-medium text-text dark:text-text-dark">Transações</span>
-          </div>
-          <span className="text-[10px] text-text-muted dark:text-text-muted-dark bg-background dark:bg-background-dark px-2 py-0.5 rounded-full">
-            {totalTransactions} {transactionLabel}
-          </span>
         </div>
       </div>
 
