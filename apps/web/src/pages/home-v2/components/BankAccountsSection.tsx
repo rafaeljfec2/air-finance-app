@@ -31,9 +31,7 @@ export function BankAccountsSection({
   return (
     <div className="bg-white dark:bg-card-dark rounded-2xl p-6 shadow-sm">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Contas Bancárias
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Contas Bancárias</h3>
         <Link
           to="/accounts"
           className="text-sm text-primary-600 dark:text-primary-400 hover:underline font-medium flex items-center gap-1"
@@ -67,14 +65,15 @@ export function BankAccountsSection({
         <div className="space-y-3">
           {displayAccounts.map((account) => {
             return (
-              <div
+              <Link
                 key={account.id}
-                className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                to={`/accounts/${account.id}/details`}
+                className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
               >
                 <div
                   className={cn(
                     'w-10 h-10 rounded-lg flex items-center justify-center shrink-0 overflow-hidden',
-                    !hasBankLogo(account.bankCode, account.institution) && 'p-1.5'
+                    !hasBankLogo(account.bankCode, account.institution) && 'p-1.5',
                   )}
                   style={
                     !hasBankLogo(account.bankCode, account.institution)
@@ -88,7 +87,9 @@ export function BankAccountsSection({
                     iconName={account.icon}
                     size="md"
                     fillContainer={hasBankLogo(account.bankCode, account.institution)}
-                    className={hasBankLogo(account.bankCode, account.institution) ? 'p-1' : 'text-white'}
+                    className={
+                      hasBankLogo(account.bankCode, account.institution) ? 'p-1' : 'text-white'
+                    }
                   />
                 </div>
 
@@ -97,14 +98,12 @@ export function BankAccountsSection({
                     {account.name}
                   </h4>
                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    {account.institution} • {accountTypeLabels[account.type] || account.type}
+                    {account.institution} • {accountTypeLabels[account.type] ?? account.type}
                   </p>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
-                    Saldo atual
-                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Saldo atual</p>
                   <span
                     className={`text-sm font-bold ${
                       account.balance >= 0
@@ -115,7 +114,7 @@ export function BankAccountsSection({
                     {isPrivacyModeEnabled ? 'R$ •••' : formatCurrency(account.balance)}
                   </span>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
