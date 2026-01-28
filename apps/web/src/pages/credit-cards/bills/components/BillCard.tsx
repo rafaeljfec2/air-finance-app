@@ -81,9 +81,9 @@ export function BillCard({
 
   return (
     <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark overflow-hidden">
-      <div className="p-5 border-b border-border dark:border-border-dark">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
+      <div className="px-4 py-3 border-b border-border dark:border-border-dark">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <NavigationButton
               onClick={onPreviousMonth}
               disabled={!canGoPrevious}
@@ -92,10 +92,10 @@ export function BillCard({
               <ChevronLeft className="h-4 w-4 text-text dark:text-text-dark" />
             </NavigationButton>
             <div>
-              <h3 className="text-lg font-semibold text-text dark:text-text-dark capitalize">
+              <h3 className="text-base font-semibold text-text dark:text-text-dark capitalize">
                 {formatMonthYear(month)}
               </h3>
-              <p className="text-xs text-text-muted dark:text-text-muted-dark">
+              <p className="text-[10px] text-text-muted dark:text-text-muted-dark">
                 Vencimento em {formatDueDate(dueDate)}
               </p>
             </div>
@@ -106,20 +106,20 @@ export function BillCard({
 
           <div className="text-right">
             <span className={getStatusBadgeClasses(status)}>{statusLabel}</span>
-            <p className="text-2xl font-bold text-text dark:text-text-dark mt-1">
+            <p className="text-xl font-bold text-text dark:text-text-dark">
               {formatCurrency(billTotal)}
             </p>
           </div>
         </div>
       </div>
 
-      <div className="px-5 py-3 bg-background/50 dark:bg-background-dark/50 border-b border-border dark:border-border-dark">
+      <div className="px-4 py-2 bg-background/50 dark:bg-background-dark/50 border-b border-border dark:border-border-dark">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Receipt className="h-4 w-4 text-text-muted dark:text-text-muted-dark" />
-            <span className="text-sm font-medium text-text dark:text-text-dark">Transações</span>
+            <Receipt className="h-3.5 w-3.5 text-text-muted dark:text-text-muted-dark" />
+            <span className="text-xs font-medium text-text dark:text-text-dark">Transações</span>
           </div>
-          <span className="text-xs text-text-muted dark:text-text-muted-dark bg-background dark:bg-background-dark px-2 py-1 rounded-full">
+          <span className="text-[10px] text-text-muted dark:text-text-muted-dark bg-background dark:bg-background-dark px-2 py-0.5 rounded-full">
             {totalTransactions} {transactionLabel}
           </span>
         </div>
