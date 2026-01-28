@@ -31,9 +31,9 @@ export function BudgetPage() {
     activeCardLimit,
     activeCardBillTotal,
     activeCardAvailable,
-    activeCardRealBalance
+    activeCardRealBalance,
   } = useBudgetPageController();
- 
+
   // Define variants
   const container = {
     hidden: { opacity: 0 },
@@ -52,7 +52,7 @@ export function BudgetPage() {
 
   return (
     <ViewDefault>
-      <motion.div 
+      <motion.div
         variants={container}
         initial="hidden"
         animate="show"
@@ -72,19 +72,19 @@ export function BudgetPage() {
             Visão geral do seu orçamento.
           </p>
         </motion.div>
-        
+
         {/* Filtro centralizado */}
         <motion.div variants={item} className="flex justify-center mb-6">
-            <MonthNavigator
-              month={filter.month}
-              year={filter.year}
-              onChange={(month, year) => setFilter({ month, year })}
-            />
+          <MonthNavigator
+            month={filter.month}
+            year={filter.year}
+            onChange={(month, year) => setFilter({ month, year })}
+          />
         </motion.div>
 
-        <motion.div 
-          variants={container} 
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start"
+        <motion.div
+          variants={container}
+          className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4 lg:gap-6 items-start"
         >
           <motion.div variants={item} className="h-full">
             <CashFlowCard
