@@ -34,6 +34,13 @@ export const navigation: NavigationSection[] = [
       { name: 'Relatórios', href: '/reports', icon: ChartBar },
     ],
   },
+  {
+    section: '🎯 Planejamento',
+    items: [
+      { name: 'Orçamento', href: '/budget', icon: Wallet },
+      { name: 'Metas Financeiras', href: '/goals', icon: Flag },
+    ],
+  },
 
   {
     section: '💸 Movimentações',
@@ -53,14 +60,6 @@ export const navigation: NavigationSection[] = [
       { name: 'Cartões de Crédito', href: '/credit-cards', icon: CreditCard },
       { name: 'Categorias', href: '/categories', icon: Tag },
       { name: 'Recorrências', href: '/recurring-transactions', icon: RefreshCcw },
-    ],
-  },
-
-  {
-    section: '🎯 Planejamento',
-    items: [
-      { name: 'Orçamento', href: '/budget', icon: Wallet },
-      { name: 'Metas Financeiras', href: '/goals', icon: Flag },
     ],
   },
 

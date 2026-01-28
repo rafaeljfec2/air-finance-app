@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Link2, Building2, RefreshCw } from 'lucide-react';
 import { type OpeniItem } from '@/services/openiService';
+import { formatDateTime } from '@/utils/formatters';
 import { translateOpeniStatus } from '@/components/accounts/utils/openiStatusTranslations';
 
 interface PageExistingConnectionsProps {
@@ -64,6 +65,11 @@ function ConnectionCard({ item }: { readonly item: OpeniItem }) {
                       ? 'Banco Empresarial'
                       : 'Banco'}
                 </p>
+                {item.updatedAt && (
+                  <p className="text-xs text-muted-foreground dark:text-gray-500 mt-1">
+                    Última sincronização: {formatDateTime(item.updatedAt)}
+                  </p>
+                )}
               </div>
               <StatusBadge status={item.status} />
             </div>

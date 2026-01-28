@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Link2, Building2 } from 'lucide-react';
 import { type OpeniItem } from '@/services/openiService';
+import { formatDateTime } from '@/utils/formatters';
 import { LoadingState } from './OpenFinanceConnectModal.LoadingState';
 import { StatusCard } from './OpenFinanceConnectModal.StatusCard';
 import { BUTTON_FULL_WIDTH, BUTTON_HEIGHT } from './OpenFinanceConnectModal.constants';
@@ -49,7 +50,8 @@ export function ExistingConnectionsStep({
           Conexões Existentes
         </h3>
         <p className="text-sm text-muted-foreground dark:text-gray-400">
-          Você já possui <span className="font-medium text-text dark:text-text-dark">{items.length}</span>{' '}
+          Você já possui{' '}
+          <span className="font-medium text-text dark:text-text-dark">{items.length}</span>{' '}
           {items.length === 1 ? 'conexão ativa' : 'conexões ativas'} com bancos via Open Finance.
         </p>
       </div>
@@ -82,7 +84,8 @@ export function ExistingConnectionsStep({
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
-                            const fallback = target.parentElement?.nextElementSibling as HTMLElement;
+                            const fallback = target.parentElement
+                              ?.nextElementSibling as HTMLElement;
                             if (fallback) fallback.classList.remove('hidden');
                           }}
                         />
@@ -103,8 +106,15 @@ export function ExistingConnectionsStep({
                           {item.connectorName ?? 'Banco desconhecido'}
                         </p>
                         <p className="text-xs text-muted-foreground dark:text-gray-400 mt-0.5">
-                          {item.connectorType === 'PERSONAL_BANK' ? 'Banco Pessoal' : 'Banco Empresarial'}
+                          {item.connectorType === 'PERSONAL_BANK'
+                            ? 'Banco Pessoal'
+                            : 'Banco Empresarial'}
                         </p>
+                        {item.updatedAt && (
+                          <p className="text-xs text-muted-foreground dark:text-gray-500 mt-1">
+                            Última sincronização: {formatDateTime(item.updatedAt)}
+                          </p>
+                        )}
                       </div>
                       <div className="flex-shrink-0">{getStatusBadge(item.status)}</div>
                     </div>

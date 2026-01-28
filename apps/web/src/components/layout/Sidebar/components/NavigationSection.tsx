@@ -45,8 +45,8 @@ export function NavigationSection({
           </button>
         )
       ) : (
-        <div className="flex items-center justify-between mb-1 pl-2 pr-1">
-          <span className="text-[10px] font-semibold text-gray-500 tracking-widest uppercase">
+        <div className="flex items-center justify-between mb-1.5 pl-2.5 pr-1">
+          <span className="text-[10px] font-medium text-gray-400 dark:text-gray-600 tracking-wider uppercase">
             {section.section}
           </span>
           {isFirstSection && (
