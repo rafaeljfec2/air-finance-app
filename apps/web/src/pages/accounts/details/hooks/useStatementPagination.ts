@@ -4,8 +4,10 @@ import { getStatement, type StatementResponse } from '@/services/bankingStatemen
 import { endOfMonth, format, parseISO } from 'date-fns';
 import {
   createInitialPaginationState,
+  createInitialSummary,
   type PaginationState,
   type UseStatementPaginationParams,
+  type StatementSummary,
 } from './types';
 
 const ITEMS_PER_PAGE = 20;
@@ -18,8 +20,10 @@ export function useStatementPagination({
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [pagination, setPagination] = useState<PaginationState>(createInitialPaginationState());
+  const [monthSummary, setMonthSummary] = useState<StatementSummary>(createInitialSummary());
   const previousMonthRef = useRef<string>(month);
   const previousAccountIdRef = useRef<string>(accountId);
+  const summaryLoadedRef = useRef<boolean>(false);
 
   const startDate = `${month}-01`;
   const endDate = format(endOfMonth(parseISO(startDate)), 'yyyy-MM-dd');
@@ -64,6 +68,8 @@ export function useStatementPagination({
       setCurrentPage(1);
       setIsLoadingMore(false);
       setPagination(createInitialPaginationState());
+      setMonthSummary(createInitialSummary());
+      summaryLoadedRef.current = false;
     }
   }, [accountId, month]);
 
@@ -84,6 +90,11 @@ export function useStatementPagination({
         hasNextPage,
         hasPreviousPage,
       });
+
+      if (!summaryLoadedRef.current && statementData.summary) {
+        setMonthSummary(statementData.summary);
+        summaryLoadedRef.current = true;
+      }
     }
   }, [statementData, currentPage]);
 
@@ -132,5 +143,6 @@ export function useStatementPagination({
     statementData,
     isLoadingStatement,
     statementError,
+    monthSummary,
   };
 }

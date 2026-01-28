@@ -6,7 +6,6 @@ import { useStatementPagination } from './useStatementPagination';
 import { useStatementTransactions } from './useStatementTransactions';
 import { useInitialLoad } from './useInitialLoad';
 import type { UseAccountDetailsReturn, CurrentStatement } from './types';
-import { createInitialSummary } from './types';
 
 export function useAccountDetails(accountId: string, month: string): UseAccountDetailsReturn {
   const { activeCompany } = useCompanyStore();
@@ -27,6 +26,7 @@ export function useAccountDetails(accountId: string, month: string): UseAccountD
     statementData,
     isLoadingStatement,
     statementError,
+    monthSummary,
   } = useStatementPagination({
     accountId,
     month,
@@ -50,20 +50,13 @@ export function useAccountDetails(accountId: string, month: string): UseAccountD
     const startDate = `${month}-01`;
     const endDate = format(endOfMonth(parseISO(startDate)), 'yyyy-MM-dd');
 
-    const summary = statementData?.summary ?? createInitialSummary();
-
     return {
       transactions: allTransactions,
-      summary: {
-        startBalance: summary.startBalance,
-        endBalance: summary.endBalance,
-        totalCredits: summary.totalCredits,
-        totalDebits: summary.totalDebits,
-      },
+      summary: monthSummary,
       periodStart: startDate,
       periodEnd: endDate,
     };
-  }, [statementData, allTransactions, month]);
+  }, [statementData, allTransactions, month, monthSummary]);
 
   const isLoading =
     isLoadingAccount || isLoadingAccounts || (isLoadingStatement && currentPage === 1);
