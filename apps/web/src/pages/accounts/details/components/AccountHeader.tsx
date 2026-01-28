@@ -98,12 +98,12 @@ export function AccountHeader({
 
   return (
     <div
-      className="relative overflow-hidden"
+      className="relative overflow-hidden mx-4 mt-4 lg:mx-6 lg:mt-6 rounded-2xl"
       style={{
         background: `linear-gradient(135deg, ${accountColor} 0%, ${accountColor}dd 100%)`,
       }}
     >
-      <div className="absolute inset-0 bg-black/10 dark:bg-black/20" />
+      <div className="absolute inset-0 bg-black/10 dark:bg-black/20 rounded-2xl" />
 
       <div className="relative px-4 py-4 lg:px-6">
         <div className="flex items-center justify-between mb-4">
