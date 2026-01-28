@@ -102,6 +102,7 @@ export function AccountDetailsPageDesktop() {
             onNextMonth={goToNextMonth}
             canGoPrevious={canGoPrevious}
             canGoNext={canGoNext}
+            summary={summary}
           />
         </div>
       </div>

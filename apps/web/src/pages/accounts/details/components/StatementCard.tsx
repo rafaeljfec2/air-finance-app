@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Receipt } from 'lucide-react';
 import { StatementTransactionList } from './StatementTransactionList';
 import { AccountEmptyState } from './AccountEmptyState';
 import type { StatementTransaction } from '@/services/bankingStatementService';
+import type { StatementSummary } from '../hooks/types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -17,12 +18,20 @@ interface StatementCardProps {
   readonly onNextMonth: () => void;
   readonly canGoPrevious: boolean;
   readonly canGoNext: boolean;
+  readonly summary?: StatementSummary;
 }
 
 const formatMonthYear = (monthStr: string): string => {
   const [year, monthNum] = monthStr.split('-').map(Number);
   const date = new Date(year, monthNum - 1, 1);
-  return format(date, 'MMMM yyyy', { locale: ptBR });
+  return format(date, "MMMM 'de' yyyy", { locale: ptBR });
+};
+
+const formatCurrency = (value: number): string => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
 };
 
 const NavigationButton = ({
@@ -39,7 +48,7 @@ const NavigationButton = ({
   <button
     onClick={onClick}
     disabled={disabled}
-    className="p-2 rounded-lg hover:bg-background dark:hover:bg-background-dark disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+    className="p-2 rounded-lg border border-border dark:border-border-dark hover:bg-background dark:hover:bg-background-dark disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
     aria-label={ariaLabel}
   >
     {children}
@@ -57,42 +66,61 @@ export function StatementCard({
   onNextMonth,
   canGoPrevious,
   canGoNext,
+  summary,
 }: StatementCardProps) {
   const transactionLabel = totalTransactions === 1 ? 'item' : 'itens';
+  const endBalance = summary?.endBalance ?? 0;
+  const isPositive = endBalance >= 0;
 
   return (
     <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark overflow-hidden">
       <div className="px-4 py-3 border-b border-border dark:border-border-dark">
-        <div className="flex items-center justify-center gap-2">
-          <NavigationButton
-            onClick={onPreviousMonth}
-            disabled={!canGoPrevious}
-            ariaLabel="Mês anterior"
-          >
-            <ChevronLeft className="h-5 w-5 text-text dark:text-text-dark" />
-          </NavigationButton>
-          <h3 className="text-base font-semibold text-text dark:text-text-dark capitalize min-w-[160px] text-center">
-            {formatMonthYear(month)}
-          </h3>
-          <NavigationButton onClick={onNextMonth} disabled={!canGoNext} ariaLabel="Próximo mês">
-            <ChevronRight className="h-5 w-5 text-text dark:text-text-dark" />
-          </NavigationButton>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <NavigationButton
+              onClick={onPreviousMonth}
+              disabled={!canGoPrevious}
+              ariaLabel="Mês anterior"
+            >
+              <ChevronLeft className="h-4 w-4 text-text dark:text-text-dark" />
+            </NavigationButton>
+            <div>
+              <h3 className="text-base font-semibold text-text dark:text-text-dark capitalize">
+                {formatMonthYear(month)}
+              </h3>
+              <p className="text-[10px] text-text-muted dark:text-text-muted-dark">
+                Extrato do período
+              </p>
+            </div>
+            <NavigationButton onClick={onNextMonth} disabled={!canGoNext} ariaLabel="Próximo mês">
+              <ChevronRight className="h-4 w-4 text-text dark:text-text-dark" />
+            </NavigationButton>
+          </div>
+
+          <div className="text-right">
+            <span className="text-[10px] text-text-muted dark:text-text-muted-dark">
+              Saldo final
+            </span>
+            <p className={`text-xl font-bold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+              {formatCurrency(endBalance)}
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="px-4 py-2.5 bg-background/50 dark:bg-background-dark/50 border-b border-border dark:border-border-dark">
+      <div className="px-5 py-3 bg-background/50 dark:bg-background-dark/50 border-b border-border dark:border-border-dark">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Receipt className="h-4 w-4 text-text-muted dark:text-text-muted-dark" />
             <span className="text-sm font-medium text-text dark:text-text-dark">Transações</span>
           </div>
-          <span className="text-xs text-text-muted dark:text-text-muted-dark">
+          <span className="text-xs text-text-muted dark:text-text-muted-dark bg-background dark:bg-background-dark px-2 py-1 rounded-full">
             {totalTransactions} {transactionLabel}
           </span>
         </div>
       </div>
 
-      <div className="max-h-[520px] overflow-y-auto">
+      <div className="max-h-[480px] overflow-y-auto">
         {transactions.length > 0 ? (
           <StatementTransactionList
             transactions={transactions}

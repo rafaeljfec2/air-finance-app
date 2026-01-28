@@ -13,7 +13,7 @@ export function CreditCardSummary({
   billTotal,
 }: Readonly<CreditCardSummaryProps>) {
   return (
-    <div className="grid grid-cols-3 gap-2 px-4 py-3 lg:gap-3 lg:px-6 lg:py-4">
+    <div className="grid grid-cols-3 gap-2 px-4 pt-6 pb-3 lg:gap-3 lg:px-6 lg:pt-8 lg:pb-4">
       <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark p-3 lg:p-4">
         <div className="flex items-center gap-1.5 lg:gap-2 mb-1.5 lg:mb-2">
           <div className="w-5 h-5 lg:w-6 lg:h-6 rounded-full bg-green-500/20 flex items-center justify-center">
