@@ -45,6 +45,8 @@ const PaginationSchema = z.object({
   total: z.number(),
   totalPages: z.number(),
   totalAmount: z.number(),
+  totalCredits: z.number().optional().default(0),
+  totalDebits: z.number().optional().default(0),
   hasNextPage: z.boolean(),
   hasPreviousPage: z.boolean(),
 });
@@ -122,10 +124,16 @@ export const getStatement = async (
 
     const parsed = ExtractResponseSchema.parse(response.data);
     const transactions = flattenExtractsToTransactions(parsed.data);
+    const { totalCredits, totalDebits, totalAmount } = parsed.pagination;
 
     return {
       transactions,
-      summary: calculateSummaryFromPagination(transactions, parsed.pagination.totalAmount),
+      summary: {
+        startBalance: 0,
+        endBalance: totalAmount,
+        totalCredits,
+        totalDebits,
+      },
       total: parsed.pagination.total,
       page: parsed.pagination.page,
       limit: parsed.pagination.limit,
@@ -175,26 +183,6 @@ function calculateSummary(transactions: StatementTransaction[]): StatementRespon
   return {
     startBalance: 0,
     endBalance: totalCredits - totalDebits,
-    totalCredits,
-    totalDebits,
-  };
-}
-
-function calculateSummaryFromPagination(
-  transactions: StatementTransaction[],
-  totalAmount: number,
-): StatementResponse['summary'] {
-  const totalCredits = transactions
-    .filter((t) => t.amount > 0)
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const totalDebits = transactions
-    .filter((t) => t.amount < 0)
-    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-  return {
-    startBalance: 0,
-    endBalance: totalAmount,
     totalCredits,
     totalDebits,
   };
