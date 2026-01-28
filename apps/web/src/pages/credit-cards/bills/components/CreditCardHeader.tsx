@@ -45,7 +45,7 @@ export function CreditCardHeader({
 
   return (
     <div
-      className="relative overflow-hidden mx-4 mt-4 lg:mx-6 lg:mt-6 rounded-2xl"
+      className="relative overflow-hidden mx-4 lg:mx-6 rounded-2xl"
       style={{
         background: `linear-gradient(135deg, ${cardColor} 0%, ${cardColor}dd 100%)`,
       }}
