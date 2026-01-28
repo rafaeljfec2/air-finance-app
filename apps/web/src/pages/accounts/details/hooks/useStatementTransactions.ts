@@ -53,7 +53,8 @@ export function useStatementTransactions({
       setAllTransactions((prev) => {
         const existingIds = new Set(prev.map((t) => t.id));
         const newTransactions = pageTransactions.filter((t) => !existingIds.has(t.id));
-        return [...prev, ...newTransactions];
+        const merged = [...prev, ...newTransactions];
+        return merged.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       });
     }
   }, [statementData, currentPage]);

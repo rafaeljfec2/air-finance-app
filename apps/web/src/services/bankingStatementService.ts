@@ -152,7 +152,15 @@ function flattenExtractsToTransactions(extracts: Extract[]): StatementTransactio
     }
   }
 
-  return transactions;
+  return sortTransactionsByDate(transactions);
+}
+
+function sortTransactionsByDate(transactions: StatementTransaction[]): StatementTransaction[] {
+  return [...transactions].sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    return dateB - dateA;
+  });
 }
 
 function calculateSummary(transactions: StatementTransaction[]): StatementResponse['summary'] {

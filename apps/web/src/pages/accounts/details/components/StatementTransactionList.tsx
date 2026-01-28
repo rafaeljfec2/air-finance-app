@@ -74,13 +74,19 @@ export function StatementTransactionList({
   const groupedTransactions = useMemo(() => {
     type Transaction = (typeof transactions)[number];
     const grouped: Record<string, Transaction[]> = {};
-    transactions.forEach((transaction) => {
+
+    const sortedTransactions = [...transactions].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+
+    sortedTransactions.forEach((transaction) => {
       const dateKey = transaction.date.split('T')[0];
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
       }
       grouped[dateKey].push(transaction);
     });
+
     return grouped;
   }, [transactions]);
 
