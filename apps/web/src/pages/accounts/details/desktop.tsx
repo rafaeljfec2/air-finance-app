@@ -16,7 +16,8 @@ export function AccountDetailsPageDesktop() {
   const navigate = useNavigate();
   const [selectedAccountId, setSelectedAccountId] = useState<string>(accountId ?? '');
   const [searchInput, setSearchInput] = useState('');
-  const debouncedSearch = useDebouncedValue(searchInput, 300);
+  const debouncedSearch = useDebouncedValue(searchInput, 500);
+  const searchTermToSend = debouncedSearch.length >= 3 ? debouncedSearch : undefined;
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useStatementNavigation();
 
@@ -31,7 +32,7 @@ export function AccountDetailsPageDesktop() {
     hasMore,
     pagination,
     isFetching,
-  } = useAccountDetails(selectedAccountId, currentMonth, debouncedSearch || undefined);
+  } = useAccountDetails(selectedAccountId, currentMonth, searchTermToSend);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchInput(value);

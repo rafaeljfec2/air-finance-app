@@ -25,6 +25,8 @@ export function CreditCardBillsPageDesktop() {
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useBillNavigation();
 
+  const searchTermToSend = debouncedSearch.length >= 3 ? debouncedSearch : undefined;
+
   const {
     creditCard,
     currentBill,
@@ -35,7 +37,7 @@ export function CreditCardBillsPageDesktop() {
     hasMore,
     pagination,
     isFetching,
-  } = useCreditCardBills(selectedCardId, currentMonth, debouncedSearch || undefined);
+  } = useCreditCardBills(selectedCardId, currentMonth, searchTermToSend);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchInput(value);
