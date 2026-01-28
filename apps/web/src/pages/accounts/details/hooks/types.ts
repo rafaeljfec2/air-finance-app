@@ -48,6 +48,7 @@ export interface UseStatementTransactionsParams {
   readonly currentPage: number;
   readonly accountId: string;
   readonly month: string;
+  readonly categoryMap?: Map<string, string>;
 }
 
 export const createInitialPaginationState = (): PaginationState => ({

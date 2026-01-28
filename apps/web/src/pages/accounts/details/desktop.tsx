@@ -79,7 +79,7 @@ export function AccountDetailsPageDesktop() {
 
   return (
     <ViewDefault>
-      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
+      <div className="flex flex-col h-full -m-4 sm:-m-6 lg:-m-6">
         <AccountHeader
           account={account}
           accounts={accounts}
@@ -88,21 +88,23 @@ export function AccountDetailsPageDesktop() {
           selectedAccountId={selectedAccountId}
         />
 
-        <AccountSummary summary={summary} />
+        <div className="flex-1 overflow-y-auto bg-background dark:bg-background-dark">
+          <AccountSummary summary={summary} />
 
-        <div className="px-4 pb-6 lg:px-6">
-          <StatementCard
-            month={currentMonth}
-            transactions={currentStatement?.transactions ?? []}
-            totalTransactions={pagination.total}
-            isLoadingMore={isLoadingMore}
-            hasMore={hasMore}
-            onLoadMore={loadMore}
-            onPreviousMonth={goToPreviousMonth}
-            onNextMonth={goToNextMonth}
-            canGoPrevious={canGoPrevious}
-            canGoNext={canGoNext}
-          />
+          <div className="px-4 pb-6 lg:px-6">
+            <StatementCard
+              month={currentMonth}
+              transactions={currentStatement?.transactions ?? []}
+              totalTransactions={pagination.total}
+              isLoadingMore={isLoadingMore}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+              onPreviousMonth={goToPreviousMonth}
+              onNextMonth={goToNextMonth}
+              canGoPrevious={canGoPrevious}
+              canGoNext={canGoNext}
+            />
+          </div>
         </div>
       </div>
     </ViewDefault>

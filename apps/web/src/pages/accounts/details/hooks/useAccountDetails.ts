@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useCompanyStore } from '@/stores/company';
+import { useCategories } from '@/hooks/useCategories';
 import { endOfMonth, format, parseISO } from 'date-fns';
 import { useAccountQueries } from './useAccountQueries';
 import { useStatementPagination } from './useStatementPagination';
@@ -10,6 +11,16 @@ import type { UseAccountDetailsReturn, CurrentStatement } from './types';
 export function useAccountDetails(accountId: string, month: string): UseAccountDetailsReturn {
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
+
+  const { categories } = useCategories(companyId);
+
+  const categoryMap = useMemo(() => {
+    const map = new Map<string, string>();
+    categories?.forEach((cat) => {
+      map.set(cat.id, cat.name);
+    });
+    return map;
+  }, [categories]);
 
   const { account, accounts, isLoadingAccount, isLoadingAccounts, accountError, accountsError } =
     useAccountQueries({
@@ -40,6 +51,7 @@ export function useAccountDetails(accountId: string, month: string): UseAccountD
     currentPage,
     accountId,
     month,
+    categoryMap,
   });
 
   const currentStatement = useMemo<CurrentStatement | null>(() => {

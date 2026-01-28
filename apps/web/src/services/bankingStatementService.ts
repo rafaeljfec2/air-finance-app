@@ -67,6 +67,8 @@ export interface StatementTransaction {
   description: string;
   type?: string;
   balance?: number;
+  categoryId?: string;
+  category?: string;
 }
 
 export interface StatementResponse {

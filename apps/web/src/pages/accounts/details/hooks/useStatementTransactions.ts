@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { StatementTransaction } from '@/services/bankingStatementService';
 import type { UseStatementTransactionsParams } from './types';
 
@@ -7,6 +7,7 @@ export function useStatementTransactions({
   currentPage,
   accountId,
   month,
+  categoryMap,
 }: UseStatementTransactionsParams) {
   const [allTransactions, setAllTransactions] = useState<StatementTransaction[]>([]);
   const loadedPagesRef = useRef<Set<number>>(new Set());
@@ -59,7 +60,17 @@ export function useStatementTransactions({
     }
   }, [statementData, currentPage]);
 
+  const transactionsWithCategories = useMemo(() => {
+    if (!categoryMap || categoryMap.size === 0) {
+      return allTransactions;
+    }
+    return allTransactions.map((tx) => ({
+      ...tx,
+      category: tx.categoryId ? categoryMap.get(tx.categoryId) : undefined,
+    }));
+  }, [allTransactions, categoryMap]);
+
   return {
-    allTransactions,
+    allTransactions: transactionsWithCategories,
   };
 }
