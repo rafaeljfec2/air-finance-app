@@ -8,6 +8,7 @@ interface UseBillPaginationParams {
   month: string;
   companyId: string;
   creditCardId?: string;
+  searchTerm?: string;
 }
 
 export const useBillPagination = ({
@@ -15,12 +16,14 @@ export const useBillPagination = ({
   month,
   companyId,
   creditCardId,
+  searchTerm,
 }: UseBillPaginationParams) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [pagination, setPagination] = useState<PaginationState>(createInitialPaginationState());
   const previousMonthRef = useRef<string>(month);
   const previousCardIdRef = useRef<string>(cardId);
+  const previousSearchRef = useRef<string | undefined>(searchTerm);
 
   const {
     data: billData,
@@ -28,8 +31,9 @@ export const useBillPagination = ({
     isFetching,
     error: billError,
   } = useQuery<CreditCardBillResponse>({
-    queryKey: ['credit-card-bill', companyId, cardId, month, currentPage],
-    queryFn: () => getCreditCardBill(companyId, cardId, month, { page: currentPage, limit: 10 }),
+    queryKey: ['credit-card-bill', companyId, cardId, month, currentPage, searchTerm],
+    queryFn: () =>
+      getCreditCardBill(companyId, cardId, month, { page: currentPage, limit: 10 }, searchTerm),
     enabled: !!companyId && !!cardId && !!month && !!creditCardId,
     staleTime: 0,
     gcTime: 0,
@@ -48,15 +52,17 @@ export const useBillPagination = ({
   useEffect(() => {
     const monthChanged = previousMonthRef.current !== month;
     const cardChanged = previousCardIdRef.current !== cardId;
+    const searchChanged = previousSearchRef.current !== searchTerm;
 
-    if (monthChanged || cardChanged) {
+    if (monthChanged || cardChanged || searchChanged) {
       previousMonthRef.current = month;
       previousCardIdRef.current = cardId;
+      previousSearchRef.current = searchTerm;
       setCurrentPage(1);
       setIsLoadingMore(false);
       setPagination(createInitialPaginationState());
     }
-  }, [cardId, month]);
+  }, [cardId, month, searchTerm]);
 
   useEffect(() => {
     if (billData?.pagination) {
@@ -74,7 +80,7 @@ export const useBillPagination = ({
   }, [billData?.pagination]);
 
   const previousIsFetchingRef = useRef<boolean>(isFetching);
-  
+
   useEffect(() => {
     const wasFetching = previousIsFetchingRef.current;
     previousIsFetchingRef.current = isFetching;

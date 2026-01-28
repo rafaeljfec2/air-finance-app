@@ -92,6 +92,7 @@ export interface GetStatementParams {
   endDate?: string;
   limit?: number;
   page?: number;
+  search?: string;
 }
 
 export const getStatement = async (
@@ -105,6 +106,7 @@ export const getStatement = async (
     if (params.accountId) queryParams.accountId = params.accountId;
     if (params.limit) queryParams.limit = params.limit;
     if (params.page) queryParams.page = params.page;
+    if (params.search) queryParams.search = params.search;
 
     const response = await apiClient.get<ExtractResponse | Extract[]>(
       `/companies/${companyId}/transactions/extracts`,

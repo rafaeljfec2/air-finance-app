@@ -35,12 +35,14 @@ export interface UseAccountDetailsReturn {
   readonly pagination: PaginationState;
   readonly loadMore: () => Promise<void>;
   readonly hasMore: boolean;
+  readonly isFetching: boolean;
 }
 
 export interface UseStatementPaginationParams {
   readonly accountId: string;
   readonly month: string;
   readonly companyId: string;
+  readonly searchTerm?: string;
 }
 
 export interface UseStatementTransactionsParams {
@@ -49,6 +51,7 @@ export interface UseStatementTransactionsParams {
   readonly accountId: string;
   readonly month: string;
   readonly categoryMap?: Map<string, string>;
+  readonly searchTerm?: string;
 }
 
 export const createInitialPaginationState = (): PaginationState => ({

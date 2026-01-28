@@ -282,12 +282,16 @@ export const getCreditCardBill = async (
   cardId: string,
   month: string,
   pagination?: { page: number; limit: number },
+  search?: string,
 ): Promise<CreditCardBillResponse> => {
   try {
     const params: Record<string, string | number> = {};
     if (pagination) {
       params.page = pagination.page;
       params.limit = pagination.limit;
+    }
+    if (search) {
+      params.search = search;
     }
     const response = await apiClient.get<CreditCardBillResponse>(
       `/companies/${companyId}/credit-cards/${cardId}/bills/${month}`,

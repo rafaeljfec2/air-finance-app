@@ -8,6 +8,7 @@ interface UseBillTransactionsParams {
   readonly cardId: string;
   readonly month: string;
   readonly categoryMap?: Map<string, string>;
+  readonly searchTerm?: string;
 }
 
 export const useBillTransactions = ({
@@ -16,26 +17,25 @@ export const useBillTransactions = ({
   cardId,
   month,
   categoryMap,
+  searchTerm,
 }: UseBillTransactionsParams) => {
   const [allTransactions, setAllTransactions] = useState<BillTransaction[]>([]);
   const loadedPagesRef = useRef<Set<number>>(new Set());
-  const contextKeyRef = useRef<string>(`${cardId}-${month}`);
+  const contextKeyRef = useRef<string>(`${cardId}-${month}-${searchTerm ?? ''}`);
 
-  // Reset when card or month changes
   const resetTransactions = useCallback(() => {
     setAllTransactions([]);
     loadedPagesRef.current.clear();
   }, []);
 
   useEffect(() => {
-    const currentContextKey = `${cardId}-${month}`;
+    const currentContextKey = `${cardId}-${month}-${searchTerm ?? ''}`;
 
-    // Reset if context changed (different card or month)
     if (contextKeyRef.current !== currentContextKey) {
       contextKeyRef.current = currentContextKey;
       resetTransactions();
     }
-  }, [cardId, month, resetTransactions]);
+  }, [cardId, month, searchTerm, resetTransactions]);
 
   useEffect(() => {
     if (!billData?.data?.transactions) {
@@ -45,25 +45,20 @@ export const useBillTransactions = ({
     const billPage = billData.pagination?.page ?? currentPage;
     const pageNumber = typeof billPage === 'string' ? Number.parseInt(billPage, 10) : billPage;
 
-    // Skip if this page was already loaded
     if (loadedPagesRef.current.has(pageNumber)) {
       return;
     }
 
     const pageTransactions = processExtractTransactions(billData.data.transactions);
 
-    if (pageTransactions.length === 0) {
-      return;
-    }
-
-    // Mark page as loaded
     loadedPagesRef.current.add(pageNumber);
 
     if (pageNumber === 1) {
-      // First page: replace all transactions
       setAllTransactions(pageTransactions);
     } else {
-      // Subsequent pages: accumulate transactions
+      if (pageTransactions.length === 0) {
+        return;
+      }
       setAllTransactions((prev) => {
         const existingIds = new Set(prev.map((t) => t.id));
         const newTransactions = pageTransactions.filter((t) => !existingIds.has(t.id));

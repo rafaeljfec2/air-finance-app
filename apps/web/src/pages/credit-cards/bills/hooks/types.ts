@@ -14,4 +14,5 @@ export interface UseCreditCardBillsReturn {
   pagination: PaginationState;
   loadMore: () => Promise<void>;
   hasMore: boolean;
+  isFetching: boolean;
 }

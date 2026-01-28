@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight, Receipt } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Receipt, Search, X } from 'lucide-react';
 import { StatementTransactionList } from './StatementTransactionList';
 import { AccountEmptyState } from './AccountEmptyState';
 import type { StatementTransaction } from '@/services/bankingStatementService';
@@ -19,6 +19,9 @@ interface StatementCardProps {
   readonly canGoPrevious: boolean;
   readonly canGoNext: boolean;
   readonly summary?: StatementSummary;
+  readonly searchTerm?: string;
+  readonly onSearchChange?: (term: string) => void;
+  readonly isSearching?: boolean;
 }
 
 const formatMonthYear = (monthStr: string): string => {
@@ -67,6 +70,9 @@ export function StatementCard({
   canGoPrevious,
   canGoNext,
   summary,
+  searchTerm = '',
+  onSearchChange,
+  isSearching = false,
 }: StatementCardProps) {
   const transactionLabel = totalTransactions === 1 ? 'item' : 'itens';
   const endBalance = summary?.endBalance ?? 0;
@@ -75,8 +81,8 @@ export function StatementCard({
   return (
     <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark overflow-hidden">
       <div className="px-4 py-3 border-b border-border dark:border-border-dark">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 shrink-0">
             <NavigationButton
               onClick={onPreviousMonth}
               disabled={!canGoPrevious}
@@ -97,7 +103,36 @@ export function StatementCard({
             </NavigationButton>
           </div>
 
-          <div className="text-right">
+          {onSearchChange && (
+            <div className="flex-1 max-w-xs">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-muted dark:text-text-muted-dark" />
+                <input
+                  type="text"
+                  placeholder="Pesquisar..."
+                  value={searchTerm}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  className="w-full pl-8 pr-8 py-1.5 text-xs bg-background dark:bg-background-dark border border-border dark:border-border-dark rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 text-text dark:text-text-dark placeholder:text-text-muted dark:placeholder:text-text-muted-dark"
+                />
+                {searchTerm && !isSearching && (
+                  <button
+                    onClick={() => onSearchChange('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-background-dark/10 dark:hover:bg-background/10 rounded"
+                    aria-label="Limpar busca"
+                  >
+                    <X className="h-3.5 w-3.5 text-text-muted dark:text-text-muted-dark" />
+                  </button>
+                )}
+                {isSearching && (
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                    <div className="h-3.5 w-3.5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="text-right shrink-0">
             <span className="text-[10px] text-text-muted dark:text-text-muted-dark">
               Saldo final
             </span>

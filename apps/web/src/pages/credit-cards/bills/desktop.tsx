@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Loading } from '@/components/Loading';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCreditCardBills } from './hooks/useCreditCardBills';
@@ -11,6 +11,7 @@ import { BillEmptyState } from './components/BillEmptyState';
 import { BillErrorState } from './components/BillErrorState';
 import { useCreditCards } from '@/hooks/useCreditCards';
 import { useCompanyStore } from '@/stores/company';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 export function CreditCardBillsPageDesktop() {
   const { cardId } = useParams<{ cardId: string }>();
@@ -18,6 +19,8 @@ export function CreditCardBillsPageDesktop() {
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
   const [selectedCardId, setSelectedCardId] = useState<string>(cardId ?? '');
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebouncedValue(searchInput, 500);
   const { creditCards } = useCreditCards(companyId);
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useBillNavigation();
@@ -31,7 +34,14 @@ export function CreditCardBillsPageDesktop() {
     loadMore,
     hasMore,
     pagination,
-  } = useCreditCardBills(selectedCardId, currentMonth);
+    isFetching,
+  } = useCreditCardBills(selectedCardId, currentMonth, debouncedSearch || undefined);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchInput(value);
+  }, []);
+
+  const isSearching = searchInput !== debouncedSearch;
 
   useEffect(() => {
     if (cardId) {
@@ -125,6 +135,9 @@ export function CreditCardBillsPageDesktop() {
               onNextMonth={goToNextMonth}
               canGoPrevious={canGoPrevious}
               canGoNext={canGoNext}
+              searchTerm={searchInput}
+              onSearchChange={handleSearchChange}
+              isSearching={isSearching || isFetching}
             />
           ) : (
             <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark">

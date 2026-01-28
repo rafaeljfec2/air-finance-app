@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Loading } from '@/components/Loading';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useAccountDetails } from './hooks/useAccountDetails';
@@ -9,11 +9,14 @@ import { AccountSummary } from './components/AccountSummary';
 import { StatementCard } from './components/StatementCard';
 import { AccountErrorState } from './components/AccountErrorState';
 import { createInitialSummary } from './hooks/types';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 export function AccountDetailsPageDesktop() {
   const { accountId } = useParams<{ accountId: string }>();
   const navigate = useNavigate();
   const [selectedAccountId, setSelectedAccountId] = useState<string>(accountId ?? '');
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebouncedValue(searchInput, 300);
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useStatementNavigation();
 
@@ -27,7 +30,14 @@ export function AccountDetailsPageDesktop() {
     loadMore,
     hasMore,
     pagination,
-  } = useAccountDetails(selectedAccountId, currentMonth);
+    isFetching,
+  } = useAccountDetails(selectedAccountId, currentMonth, debouncedSearch || undefined);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchInput(value);
+  }, []);
+
+  const isSearching = searchInput !== debouncedSearch;
 
   useEffect(() => {
     if (accountId) {
@@ -103,6 +113,9 @@ export function AccountDetailsPageDesktop() {
             canGoPrevious={canGoPrevious}
             canGoNext={canGoNext}
             summary={summary}
+            searchTerm={searchInput}
+            onSearchChange={handleSearchChange}
+            isSearching={isSearching || isFetching}
           />
         </div>
       </div>

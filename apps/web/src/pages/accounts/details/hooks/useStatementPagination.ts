@@ -16,6 +16,7 @@ export function useStatementPagination({
   accountId,
   month,
   companyId,
+  searchTerm,
 }: UseStatementPaginationParams) {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -23,6 +24,7 @@ export function useStatementPagination({
   const [monthSummary, setMonthSummary] = useState<StatementSummary>(createInitialSummary());
   const previousMonthRef = useRef<string>(month);
   const previousAccountIdRef = useRef<string>(accountId);
+  const previousSearchRef = useRef<string | undefined>(searchTerm);
   const summaryLoadedRef = useRef<boolean>(false);
 
   const startDate = `${month}-01`;
@@ -34,7 +36,7 @@ export function useStatementPagination({
     isFetching,
     error: statementError,
   } = useQuery<StatementResponse>({
-    queryKey: ['account-statement', companyId, accountId, month, currentPage],
+    queryKey: ['account-statement', companyId, accountId, month, currentPage, searchTerm],
     queryFn: () =>
       getStatement(companyId, {
         accountId,
@@ -42,6 +44,7 @@ export function useStatementPagination({
         endDate,
         page: currentPage,
         limit: ITEMS_PER_PAGE,
+        search: searchTerm,
       }),
     enabled: !!companyId && !!accountId && !!month,
     staleTime: 0,
@@ -61,17 +64,21 @@ export function useStatementPagination({
   useEffect(() => {
     const monthChanged = previousMonthRef.current !== month;
     const accountChanged = previousAccountIdRef.current !== accountId;
+    const searchChanged = previousSearchRef.current !== searchTerm;
 
-    if (monthChanged || accountChanged) {
+    if (monthChanged || accountChanged || searchChanged) {
       previousMonthRef.current = month;
       previousAccountIdRef.current = accountId;
+      previousSearchRef.current = searchTerm;
       setCurrentPage(1);
       setIsLoadingMore(false);
       setPagination(createInitialPaginationState());
-      setMonthSummary(createInitialSummary());
-      summaryLoadedRef.current = false;
+      if (!searchChanged) {
+        setMonthSummary(createInitialSummary());
+        summaryLoadedRef.current = false;
+      }
     }
-  }, [accountId, month]);
+  }, [accountId, month, searchTerm]);
 
   useEffect(() => {
     if (statementData) {

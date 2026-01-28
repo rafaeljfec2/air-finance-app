@@ -8,10 +8,11 @@ export function useStatementTransactions({
   accountId,
   month,
   categoryMap,
+  searchTerm,
 }: UseStatementTransactionsParams) {
   const [allTransactions, setAllTransactions] = useState<StatementTransaction[]>([]);
   const loadedPagesRef = useRef<Set<number>>(new Set());
-  const contextKeyRef = useRef<string>(`${accountId}-${month}`);
+  const contextKeyRef = useRef<string>(`${accountId}-${month}-${searchTerm ?? ''}`);
 
   const resetTransactions = useCallback(() => {
     setAllTransactions([]);
@@ -19,13 +20,13 @@ export function useStatementTransactions({
   }, []);
 
   useEffect(() => {
-    const currentContextKey = `${accountId}-${month}`;
+    const currentContextKey = `${accountId}-${month}-${searchTerm ?? ''}`;
 
     if (contextKeyRef.current !== currentContextKey) {
       contextKeyRef.current = currentContextKey;
       resetTransactions();
     }
-  }, [accountId, month, resetTransactions]);
+  }, [accountId, month, searchTerm, resetTransactions]);
 
   useEffect(() => {
     if (!statementData?.transactions) {
@@ -42,15 +43,14 @@ export function useStatementTransactions({
 
     const pageTransactions = statementData.transactions;
 
-    if (pageTransactions.length === 0) {
-      return;
-    }
-
     loadedPagesRef.current.add(pageNumber);
 
     if (pageNumber === 1) {
       setAllTransactions(pageTransactions);
     } else {
+      if (pageTransactions.length === 0) {
+        return;
+      }
       setAllTransactions((prev) => {
         const existingIds = new Set(prev.map((t) => t.id));
         const newTransactions = pageTransactions.filter((t) => !existingIds.has(t.id));

@@ -8,7 +8,11 @@ import { useStatementTransactions } from './useStatementTransactions';
 import { useInitialLoad } from './useInitialLoad';
 import type { UseAccountDetailsReturn, CurrentStatement } from './types';
 
-export function useAccountDetails(accountId: string, month: string): UseAccountDetailsReturn {
+export function useAccountDetails(
+  accountId: string,
+  month: string,
+  searchTerm?: string,
+): UseAccountDetailsReturn {
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
 
@@ -38,10 +42,12 @@ export function useAccountDetails(accountId: string, month: string): UseAccountD
     isLoadingStatement,
     statementError,
     monthSummary,
+    isFetching,
   } = useStatementPagination({
     accountId,
     month,
     companyId,
+    searchTerm,
   });
 
   const { isInitialLoad } = useInitialLoad({ statementData, accountId, month });
@@ -52,6 +58,7 @@ export function useAccountDetails(accountId: string, month: string): UseAccountD
     accountId,
     month,
     categoryMap,
+    searchTerm,
   });
 
   const currentStatement = useMemo<CurrentStatement | null>(() => {
@@ -85,5 +92,6 @@ export function useAccountDetails(accountId: string, month: string): UseAccountD
     pagination: finalPagination,
     loadMore: finalLoadMore,
     hasMore: finalHasMore,
+    isFetching,
   };
 }

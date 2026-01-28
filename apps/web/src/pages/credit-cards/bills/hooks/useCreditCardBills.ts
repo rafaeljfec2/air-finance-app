@@ -8,7 +8,11 @@ import { useCurrentBill } from './utils/billConstruction';
 import { useInitialLoad } from './useInitialLoad';
 import type { UseCreditCardBillsReturn } from './types';
 
-export function useCreditCardBills(cardId: string, month: string): UseCreditCardBillsReturn {
+export function useCreditCardBills(
+  cardId: string,
+  month: string,
+  searchTerm?: string,
+): UseCreditCardBillsReturn {
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
 
@@ -37,11 +41,13 @@ export function useCreditCardBills(cardId: string, month: string): UseCreditCard
     billData,
     isLoadingBill,
     billError,
+    isFetching,
   } = useBillPagination({
     cardId,
     month,
     companyId,
     creditCardId: creditCard?.id,
+    searchTerm,
   });
 
   const { isInitialLoad } = useInitialLoad({ billData, cardId, month });
@@ -52,6 +58,7 @@ export function useCreditCardBills(cardId: string, month: string): UseCreditCard
     cardId,
     month,
     categoryMap,
+    searchTerm,
   });
 
   const currentBill = useCurrentBill({
@@ -76,5 +83,6 @@ export function useCreditCardBills(cardId: string, month: string): UseCreditCard
     pagination: finalPagination,
     loadMore: finalLoadMore,
     hasMore: finalHasMore,
+    isFetching,
   };
 }
