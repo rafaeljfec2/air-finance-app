@@ -92,7 +92,7 @@ export function CreditCardBillsPageDesktop() {
 
   return (
     <ViewDefault>
-      <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
+      <div className="flex flex-col h-full -m-4 sm:-m-6 lg:-m-6">
         <CreditCardHeader
           creditCard={creditCard}
           creditCards={creditCards ?? []}
@@ -103,34 +103,36 @@ export function CreditCardBillsPageDesktop() {
           limitTotal={limitInfo.limitTotal}
         />
 
-        <CreditCardSummary
-          limitAvailable={limitInfo.limitAvailable}
-          limitTotal={limitInfo.limitTotal}
-          billTotal={billTotal}
-        />
+        <div className="flex-1 overflow-y-auto bg-background dark:bg-background-dark">
+          <CreditCardSummary
+            limitAvailable={limitInfo.limitAvailable}
+            limitTotal={limitInfo.limitTotal}
+            billTotal={billTotal}
+          />
 
-        <div className="px-4 pb-6 lg:px-6">
-          {currentBill ? (
-            <BillCard
-              month={currentMonth}
-              billTotal={currentBill.total}
-              dueDate={currentBill.dueDate}
-              status={currentBill.status}
-              transactions={currentBill.transactions}
-              totalTransactions={pagination.total}
-              isLoadingMore={isLoadingMore}
-              hasMore={hasMore}
-              onLoadMore={loadMore}
-              onPreviousMonth={goToPreviousMonth}
-              onNextMonth={goToNextMonth}
-              canGoPrevious={canGoPrevious}
-              canGoNext={canGoNext}
-            />
-          ) : (
-            <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark">
-              <BillEmptyState />
-            </div>
-          )}
+          <div className="px-4 pb-6 lg:px-6">
+            {currentBill ? (
+              <BillCard
+                month={currentMonth}
+                billTotal={currentBill.total}
+                dueDate={currentBill.dueDate}
+                status={currentBill.status}
+                transactions={currentBill.transactions}
+                totalTransactions={pagination.total}
+                isLoadingMore={isLoadingMore}
+                hasMore={hasMore}
+                onLoadMore={loadMore}
+                onPreviousMonth={goToPreviousMonth}
+                onNextMonth={goToNextMonth}
+                canGoPrevious={canGoPrevious}
+                canGoNext={canGoNext}
+              />
+            ) : (
+              <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark">
+                <BillEmptyState />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </ViewDefault>
