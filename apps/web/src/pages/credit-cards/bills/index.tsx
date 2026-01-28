@@ -98,7 +98,7 @@ export function CreditCardBillsPage() {
             canGoPrevious={canGoPrevious}
             canGoNext={canGoNext}
           />
-          <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+          <div className="flex-1 overflow-y-auto bg-background dark:bg-background-dark">
             <BillErrorState error={error} />
           </div>
         </div>
@@ -125,7 +125,7 @@ export function CreditCardBillsPage() {
             canGoPrevious={canGoPrevious}
             canGoNext={canGoNext}
           />
-          <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 flex flex-col">
+          <div className="flex-1 overflow-y-auto bg-background dark:bg-background-dark flex flex-col">
             <BillEmptyState />
           </div>
         </div>
@@ -154,9 +154,12 @@ export function CreditCardBillsPage() {
           onNextMonth={goToNextMonth}
           canGoPrevious={canGoPrevious}
           canGoNext={canGoNext}
+          billTotal={currentBill.total}
+          billStatus={currentBill.status}
+          dueDate={currentBill.dueDate}
         />
 
-        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 relative flex flex-col">
+        <div className="flex-1 overflow-y-auto bg-background dark:bg-background-dark relative flex flex-col">
           {isLoading && !isInitialLoad && (
             <div className="absolute inset-0 bg-background/50 dark:bg-background-dark/50 backdrop-blur-sm z-10 flex items-center justify-center">
               <Loading size="large">Carregando...</Loading>
@@ -168,13 +171,15 @@ export function CreditCardBillsPage() {
             total={currentBill.total}
           />
 
-          <div className="flex-1">
-            <BillTransactionList
-              transactions={currentBill.transactions}
-              isLoadingMore={isLoadingMore}
-              hasMore={hasMore}
-              onLoadMore={loadMore}
-            />
+          <div className="flex-1 px-4 pb-4">
+            <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark overflow-hidden">
+              <BillTransactionList
+                transactions={currentBill.transactions}
+                isLoadingMore={isLoadingMore}
+                hasMore={hasMore}
+                onLoadMore={loadMore}
+              />
+            </div>
           </div>
         </div>
       </div>

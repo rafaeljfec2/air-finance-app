@@ -1,82 +1,70 @@
-import { Check, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { TrendingUp, TrendingDown, CreditCard } from 'lucide-react';
 
 interface BillSummaryProps {
-  dueDate: string;
-  status: 'OPEN' | 'CLOSED' | 'PAID';
-  total: number;
+  readonly dueDate: string;
+  readonly status: 'OPEN' | 'CLOSED' | 'PAID';
+  readonly total: number;
+  readonly totalNational?: number;
+  readonly totalInternational?: number;
 }
 
-export function BillSummary({ dueDate, status, total }: Readonly<BillSummaryProps>) {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
+const formatCurrency = (value: number): string => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
+};
 
-  const formatDate = (dateStr: string) => {
-    // Parse a data diretamente sem problemas de timezone
-    const [year, month, day] = dateStr.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
-    return format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
-  };
-
-  const getStatusText = () => {
-    switch (status) {
-      case 'OPEN':
-        return 'Aberta';
-      case 'CLOSED':
-        return 'Fechada';
-      case 'PAID':
-        return 'Paga';
-      default:
-        return 'Aberta';
-    }
-  };
-
-  const getStatusColor = () => {
-    switch (status) {
-      case 'OPEN':
-        return 'text-orange-600 dark:text-orange-400';
-      case 'CLOSED':
-        return 'text-green-600 dark:text-green-400';
-      case 'PAID':
-        return 'text-blue-600 dark:text-blue-400';
-      default:
-        return 'text-orange-600 dark:text-orange-400';
-    }
-  };
+export function BillSummary({
+  total,
+  totalNational = 0,
+  totalInternational = 0,
+}: Readonly<BillSummaryProps>) {
+  const nationalAmount = totalNational > 0 ? totalNational : total;
+  const internationalAmount = totalInternational;
 
   return (
-    <div className="bg-white dark:bg-gray-900 px-4 py-5 border-b border-gray-200 dark:border-gray-800">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-              Vencimento
-            </p>
+    <div className="grid grid-cols-3 gap-2 px-4 py-3 lg:gap-3 lg:px-6 lg:py-4">
+      <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark p-3 lg:p-4">
+        <div className="flex items-center gap-1.5 lg:gap-2 mb-1.5 lg:mb-2">
+          <div className="w-5 h-5 lg:w-6 lg:h-6 rounded-full bg-primary-500/20 flex items-center justify-center">
+            <TrendingUp className="h-3 w-3 lg:h-3.5 lg:w-3.5 text-primary-500" />
           </div>
-          <p className="text-base font-semibold text-gray-900 dark:text-white">
-            {formatDate(dueDate)}
-          </p>
+          <span className="text-[10px] lg:text-xs font-medium text-text-muted dark:text-text-muted-dark uppercase tracking-wide">
+            Nacional
+          </span>
         </div>
+        <p className="text-sm lg:text-lg font-bold text-primary-500 truncate">
+          {formatCurrency(nationalAmount)}
+        </p>
+      </div>
 
-        <div className="flex-1 text-right">
-          <div className="flex items-center justify-end gap-2 mb-2">
-            {status === 'CLOSED' || status === 'PAID' ? (
-              <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
-            ) : null}
-            <span className={`text-xs font-semibold uppercase tracking-wide ${getStatusColor()}`}>
-              {getStatusText()}
-            </span>
+      <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark p-3 lg:p-4">
+        <div className="flex items-center gap-1.5 lg:gap-2 mb-1.5 lg:mb-2">
+          <div className="w-5 h-5 lg:w-6 lg:h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
+            <TrendingDown className="h-3 w-3 lg:h-3.5 lg:w-3.5 text-blue-500" />
           </div>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">
-            {formatCurrency(total)}
-          </p>
+          <span className="text-[10px] lg:text-xs font-medium text-text-muted dark:text-text-muted-dark uppercase tracking-wide">
+            Internac.
+          </span>
         </div>
+        <p className="text-sm lg:text-lg font-bold text-blue-500 truncate">
+          {formatCurrency(internationalAmount)}
+        </p>
+      </div>
+
+      <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark p-3 lg:p-4">
+        <div className="flex items-center gap-1.5 lg:gap-2 mb-1.5 lg:mb-2">
+          <div className="w-5 h-5 lg:w-6 lg:h-6 rounded-full bg-red-500/20 flex items-center justify-center">
+            <CreditCard className="h-3 w-3 lg:h-3.5 lg:w-3.5 text-red-500" />
+          </div>
+          <span className="text-[10px] lg:text-xs font-medium text-text-muted dark:text-text-muted-dark uppercase tracking-wide">
+            Total
+          </span>
+        </div>
+        <p className="text-sm lg:text-lg font-bold text-red-500 truncate">
+          {formatCurrency(total)}
+        </p>
       </div>
     </div>
   );
