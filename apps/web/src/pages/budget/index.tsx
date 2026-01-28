@@ -82,18 +82,20 @@ export function BudgetPage() {
           />
         </motion.div>
 
+        {/* Hero Section - Fluxo de Caixa em destaque */}
+        <motion.div variants={item} className="mb-4 lg:mb-6">
+          <CashFlowCard
+            cashFlow={cashFlow}
+            isLoading={isLoading}
+            onExpand={() => setExpandedCard('cashFlow')}
+          />
+        </motion.div>
+
+        {/* Cards secundarios - 3 colunas em telas grandes */}
         <motion.div
           variants={container}
-          className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4 lg:gap-6 items-start"
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 items-start"
         >
-          <motion.div variants={item} className="h-full">
-            <CashFlowCard
-              cashFlow={cashFlow}
-              isLoading={isLoading}
-              onExpand={() => setExpandedCard('cashFlow')}
-            />
-          </motion.div>
-
           <motion.div variants={item} className="h-full">
             <ReceivablesCard
               receivables={receivables}
@@ -116,7 +118,7 @@ export function BudgetPage() {
             />
           </motion.div>
 
-          <motion.div variants={item} className="h-full">
+          <motion.div variants={item} className="h-full md:col-span-2 xl:col-span-1">
             <CreditCardsCard
               cards={cards}
               isLoading={isLoading}

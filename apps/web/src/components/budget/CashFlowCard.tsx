@@ -16,7 +16,7 @@ export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlo
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <CardContainer color="emerald" className={isCollapsed ? "min-h-0" : "min-h-[250px]"}>
+    <CardContainer color="emerald" className={isCollapsed ? 'min-h-0' : ''}>
       <CardHeader
         icon={<Activity className="h-4 w-4 text-primary-600 dark:text-primary-400" />}
         title="Fluxo de Caixa"
@@ -36,17 +36,17 @@ export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlo
         </Button>
       </CardHeader>
       <CardTotal
-        value={cashFlow?.currentBalance ?? 0} 
-        color={(cashFlow?.currentBalance ?? 0) >= 0 ? 'blue' : 'rose'} 
-        label="Saldo Final" 
+        value={cashFlow?.currentBalance ?? 0}
+        color={(cashFlow?.currentBalance ?? 0) >= 0 ? 'blue' : 'rose'}
+        label="Saldo Final"
       />
       <AnimatePresence initial={false}>
         {!isCollapsed && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
+            animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
             {isLoading && (
@@ -55,10 +55,9 @@ export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlo
               </div>
             )}
             {!isLoading && cashFlow && (
-              <div className="flex flex-col gap-2 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
                 <CardStat label="Entradas" value={cashFlow.totalIncome} positive />
                 <CardStat label="Saídas" value={cashFlow.totalExpense} negative />
-                <div className="border-t border-border dark:border-border-dark my-2" />
                 <CardStat
                   label="Saldo Final"
                   value={cashFlow.currentBalance}
