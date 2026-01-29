@@ -10,6 +10,9 @@ interface AccountCardsContainerProps {
   readonly selectedAccountId: string;
   readonly onAccountSelect: (accountId: string) => void;
   readonly onMenuClick?: () => void;
+  readonly onEditAccount?: (account: Account) => void;
+  readonly onToggleAutoSync?: (account: Account) => void;
+  readonly onDeleteAccount?: (account: Account) => void;
 }
 
 const SCROLL_CONFIG = {
@@ -23,6 +26,9 @@ export function AccountCardsContainer({
   selectedAccountId,
   onAccountSelect,
   onMenuClick,
+  onEditAccount,
+  onToggleAutoSync,
+  onDeleteAccount,
 }: Readonly<AccountCardsContainerProps>) {
   const navigate = useNavigate();
 
@@ -93,6 +99,9 @@ export function AccountCardsContainer({
                 account={account}
                 isSelected={account.id === selectedAccountId}
                 onClick={() => onAccountSelect(account.id)}
+                onEdit={onEditAccount}
+                onToggleAutoSync={onToggleAutoSync}
+                onDelete={onDeleteAccount}
               />
             </div>
           ))}

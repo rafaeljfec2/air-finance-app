@@ -1,9 +1,12 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Loading } from '@/components/Loading';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
+import { AccountFormModal } from '@/components/accounts/AccountFormModal';
+import { StatementScheduleConfig } from '@/components/accounts/StatementScheduleConfig';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useAccountDetails } from './hooks/useAccountDetails';
 import { useStatementNavigation } from './hooks/useStatementNavigation';
 import { AccountCardsContainer } from './components/AccountCardsContainer';
@@ -14,6 +17,8 @@ import { AccountEmptyState } from './components/AccountEmptyState';
 import { AccountErrorState } from './components/AccountErrorState';
 import { AccountDetailsPageDesktop } from './desktop';
 import { createInitialSummary } from './hooks/types';
+import { useAccounts } from '@/hooks/useAccounts';
+import type { Account, CreateAccount } from '@/services/accountService';
 
 export function AccountDetailsPage() {
   const { accountId } = useParams<{ accountId: string }>();
@@ -24,6 +29,15 @@ export function AccountDetailsPage() {
   const [isDesktop, setIsDesktop] = useState(false);
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useStatementNavigation();
+
+  const { updateAccount, deleteAccount, isUpdating, isDeleting } = useAccounts();
+
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [schedulingAccount, setSchedulingAccount] = useState<Account | null>(null);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState<Account | null>(null);
 
   const {
     account,
@@ -53,18 +67,126 @@ export function AccountDetailsPage() {
     return () => window.removeEventListener('resize', checkDesktop);
   }, []);
 
+  const handleAccountSelect = useCallback(
+    (newAccountId: string) => {
+      if (newAccountId !== selectedAccountId) {
+        setSelectedAccountId(newAccountId);
+        navigate(`/accounts/${newAccountId}/details`, { replace: true });
+      }
+    },
+    [selectedAccountId, navigate],
+  );
+
+  const handleEditAccount = useCallback((acc: Account) => {
+    setEditingAccount(acc);
+    setShowFormModal(true);
+  }, []);
+
+  const handleSubmitEdit = useCallback(
+    (data: CreateAccount) => {
+      if (editingAccount) {
+        updateAccount({ id: editingAccount.id, data });
+      }
+      setShowFormModal(false);
+      setEditingAccount(null);
+    },
+    [editingAccount, updateAccount],
+  );
+
+  const handleConfigureSchedule = useCallback((acc: Account) => {
+    setSchedulingAccount(acc);
+    setShowScheduleModal(true);
+  }, []);
+
+  const handleDeleteAccount = useCallback((acc: Account) => {
+    setDeletingAccount(acc);
+    setShowConfirmDelete(true);
+  }, []);
+
+  const confirmDelete = useCallback(() => {
+    if (deletingAccount) {
+      deleteAccount(deletingAccount.id);
+      if (deletingAccount.id === selectedAccountId && accounts.length > 1) {
+        const nextAccount = accounts.find((acc) => acc.id !== deletingAccount.id);
+        if (nextAccount) {
+          navigate(`/accounts/${nextAccount.id}/details`, { replace: true });
+        }
+      } else if (accounts.length <= 1) {
+        navigate('/accounts', { replace: true });
+      }
+    }
+    setShowConfirmDelete(false);
+    setDeletingAccount(null);
+  }, [deletingAccount, deleteAccount, selectedAccountId, accounts, navigate]);
+
+  const cancelDelete = useCallback(() => {
+    setShowConfirmDelete(false);
+    setDeletingAccount(null);
+  }, []);
+
+  const summary = currentStatement?.summary ?? createInitialSummary();
+
   if (isDesktop) {
     return <AccountDetailsPageDesktop />;
   }
 
-  const handleAccountSelect = (newAccountId: string) => {
-    if (newAccountId !== selectedAccountId) {
-      setSelectedAccountId(newAccountId);
-      navigate(`/accounts/${newAccountId}/details`, { replace: true });
-    }
-  };
+  const renderModals = () => (
+    <>
+      <AccountFormModal
+        open={showFormModal}
+        onClose={() => {
+          setShowFormModal(false);
+          setEditingAccount(null);
+        }}
+        onSubmit={handleSubmitEdit}
+        account={editingAccount}
+        isLoading={isUpdating}
+      />
 
-  const summary = currentStatement?.summary ?? createInitialSummary();
+      {schedulingAccount && (
+        <StatementScheduleConfig
+          open={showScheduleModal}
+          onClose={() => {
+            setShowScheduleModal(false);
+            setSchedulingAccount(null);
+          }}
+          accountId={schedulingAccount.id}
+          accountName={schedulingAccount.name}
+        />
+      )}
+
+      <ConfirmModal
+        open={showConfirmDelete}
+        title="Confirmar exclusão de conta"
+        description={
+          <div className="space-y-3">
+            <p className="font-semibold">
+              Tem certeza que deseja excluir a conta &quot;{deletingAccount?.name}&quot;?
+            </p>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+              <p className="text-sm text-red-800 dark:text-red-200 font-medium mb-2">
+                ⚠️ Atenção: Esta ação irá deletar:
+              </p>
+              <ul className="text-sm text-red-700 dark:text-red-300 list-disc list-inside space-y-1">
+                <li>Todos os registros de transações vinculados a esta conta</li>
+                <li>Todos os registros de extrato vinculados a esta conta</li>
+                <li>A própria conta</li>
+              </ul>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Esta ação não pode ser desfeita.
+            </p>
+          </div>
+        }
+        confirmLabel="Excluir tudo"
+        cancelLabel="Cancelar"
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        danger
+        isLoading={isDeleting}
+      />
+    </>
+  );
 
   if (isLoading) {
     return (
@@ -75,6 +197,9 @@ export function AccountDetailsPage() {
             selectedAccountId={selectedAccountId}
             onAccountSelect={handleAccountSelect}
             onMenuClick={() => setIsSidebarOpen(true)}
+            onEditAccount={handleEditAccount}
+            onToggleAutoSync={handleConfigureSchedule}
+            onDeleteAccount={handleDeleteAccount}
           />
           <div className="flex-1 flex items-center justify-center">
             <Loading size="large">Carregando extrato, por favor aguarde...</Loading>
@@ -85,6 +210,7 @@ export function AccountDetailsPage() {
           onMenuOpen={() => setIsSidebarOpen(true)}
         />
         <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
+        {renderModals()}
       </>
     );
   }
@@ -98,6 +224,9 @@ export function AccountDetailsPage() {
             selectedAccountId={selectedAccountId}
             onAccountSelect={handleAccountSelect}
             onMenuClick={() => setIsSidebarOpen(true)}
+            onEditAccount={handleEditAccount}
+            onToggleAutoSync={handleConfigureSchedule}
+            onDeleteAccount={handleDeleteAccount}
           />
           <AccountStatementHeader
             month={currentMonth}
@@ -115,6 +244,7 @@ export function AccountDetailsPage() {
           onMenuOpen={() => setIsSidebarOpen(true)}
         />
         <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
+        {renderModals()}
       </>
     );
   }
@@ -128,6 +258,9 @@ export function AccountDetailsPage() {
             selectedAccountId={selectedAccountId}
             onAccountSelect={handleAccountSelect}
             onMenuClick={() => setIsSidebarOpen(true)}
+            onEditAccount={handleEditAccount}
+            onToggleAutoSync={handleConfigureSchedule}
+            onDeleteAccount={handleDeleteAccount}
           />
           <AccountStatementHeader
             month={currentMonth}
@@ -147,6 +280,7 @@ export function AccountDetailsPage() {
           onMenuOpen={() => setIsSidebarOpen(true)}
         />
         <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
+        {renderModals()}
       </>
     );
   }
@@ -163,6 +297,9 @@ export function AccountDetailsPage() {
           selectedAccountId={selectedAccountId}
           onAccountSelect={handleAccountSelect}
           onMenuClick={() => setIsSidebarOpen(true)}
+          onEditAccount={handleEditAccount}
+          onToggleAutoSync={handleConfigureSchedule}
+          onDeleteAccount={handleDeleteAccount}
         />
 
         <AccountStatementHeader
@@ -203,6 +340,7 @@ export function AccountDetailsPage() {
       />
 
       <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
+      {renderModals()}
     </>
   );
 }

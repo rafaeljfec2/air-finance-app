@@ -8,6 +8,9 @@ interface AccountCardsContainerDesktopProps {
   readonly accounts: ReadonlyArray<Account>;
   readonly selectedAccountId: string;
   readonly onAccountSelect: (accountId: string) => void;
+  readonly onEditAccount?: (account: Account) => void;
+  readonly onToggleAutoSync?: (account: Account) => void;
+  readonly onDeleteAccount?: (account: Account) => void;
 }
 
 const SCROLL_CONFIG = {
@@ -20,6 +23,9 @@ export function AccountCardsContainerDesktop({
   accounts,
   selectedAccountId,
   onAccountSelect,
+  onEditAccount,
+  onToggleAutoSync,
+  onDeleteAccount,
 }: Readonly<AccountCardsContainerDesktopProps>) {
   const selectedIndex = useMemo(
     () => accounts.findIndex((acc) => acc.id === selectedAccountId),
@@ -60,6 +66,9 @@ export function AccountCardsContainerDesktop({
                   account={account}
                   isSelected={account.id === selectedAccountId}
                   onClick={() => onAccountSelect(account.id)}
+                  onEdit={onEditAccount}
+                  onToggleAutoSync={onToggleAutoSync}
+                  onDelete={onDeleteAccount}
                 />
               </div>
             ))}
