@@ -7,7 +7,8 @@ import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { CreateCreditCardPayload, CreditCard } from '@/services/creditCardService';
 import { useCompanyStore } from '@/stores/company';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CreditCardsEmptyState } from './components/CreditCardsEmptyState';
 import { CreditCardsErrorState } from './components/CreditCardsErrorState';
 import { CreditCardsFilters } from './components/CreditCardsFilters';
@@ -17,6 +18,7 @@ import { useCreditCardFilters } from './hooks/useCreditCardFilters';
 import { useCreditCardSorting } from './hooks/useCreditCardSorting';
 
 export function CreditCardsPage() {
+  const navigate = useNavigate();
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id || '';
   const {
@@ -32,14 +34,19 @@ export function CreditCardsPage() {
   } = useCreditCards(companyId);
   const { canCreateCreditCard } = usePlanLimits();
 
+  useEffect(() => {
+    if (!isLoading && creditCards && creditCards.length > 0) {
+      navigate('/credit-cards/bills', { replace: true });
+    }
+  }, [creditCards, isLoading, navigate]);
+
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingCreditCard, setEditingCreditCard] = useState<CreditCard | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useViewMode('credit-cards-view-mode');
 
-  const { searchTerm, setSearchTerm, filterCreditCards, hasActiveFilters } =
-    useCreditCardFilters();
+  const { searchTerm, setSearchTerm, filterCreditCards, hasActiveFilters } = useCreditCardFilters();
 
   const { sortConfig, handleSort, sortCreditCards } = useCreditCardSorting();
 

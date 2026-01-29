@@ -1,30 +1,33 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Loading } from '@/components/Loading';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
+import { useResponsiveBreakpoint } from '@/hooks/useResponsiveBreakpoint';
+import { useCreditCards } from '@/hooks/useCreditCards';
+import { useCompanyStore } from '@/stores/company';
 import { useCreditCardBills } from './hooks/useCreditCardBills';
 import { useBillNavigation } from './hooks/useBillNavigation';
+import { useCreditCardManagement } from './hooks/useCreditCardManagement';
 import { CreditCardBillHeader } from './components/CreditCardBillHeader';
 import { BillSummary } from './components/BillSummary';
 import { BillTransactionList } from './components/BillTransactionList';
 import { BillEmptyState } from './components/BillEmptyState';
 import { BillErrorState } from './components/BillErrorState';
-import { useCreditCards } from '@/hooks/useCreditCards';
-import { useCompanyStore } from '@/stores/company';
+import { CreditCardModals } from './components/CreditCardModals';
 import { CreditCardBillsPageDesktop } from './desktop';
 
 export function CreditCardBillsPage() {
-  // All hooks must be called before any conditional returns
-  const { cardId } = useParams<{ cardId: string }>();
   const navigate = useNavigate();
+  const { isDesktop } = useResponsiveBreakpoint();
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
-  const [selectedCardId, setSelectedCardId] = useState<string>(cardId ?? '');
+
+  const [selectedCardId, setSelectedCardId] = useState<string>('');
   const [isFabModalOpen, setIsFabModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
+
   const { creditCards } = useCreditCards(companyId);
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useBillNavigation();
@@ -40,34 +43,73 @@ export function CreditCardBillsPage() {
     isInitialLoad,
   } = useCreditCardBills(selectedCardId, currentMonth);
 
+  const handleCardSelect = useCallback(
+    (newCardId: string) => {
+      if (newCardId !== selectedCardId) {
+        setSelectedCardId(newCardId);
+      }
+    },
+    [selectedCardId],
+  );
+
+  const { formModal, deleteModal, handlers } = useCreditCardManagement({
+    creditCards: creditCards ?? [],
+    selectedCardId,
+    onSelectCard: setSelectedCardId,
+  });
+
   useEffect(() => {
-    if (cardId) {
-      setSelectedCardId(cardId);
+    if (isLoading) return;
+
+    if (!creditCards || creditCards.length === 0) {
+      navigate('/credit-cards/bills', { replace: true });
+      return;
     }
-  }, [cardId]);
 
-  useEffect(() => {
-    const checkDesktop = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
+    if (!selectedCardId || !creditCards.some((card) => card.id === selectedCardId)) {
+      setSelectedCardId(creditCards[0].id);
+    }
+  }, [creditCards, selectedCardId, isLoading, navigate]);
 
-    checkDesktop();
-    window.addEventListener('resize', checkDesktop);
-    return () => window.removeEventListener('resize', checkDesktop);
-  }, []);
-
-  // Render desktop version if on desktop (after all hooks)
   if (isDesktop) {
     return <CreditCardBillsPageDesktop />;
   }
 
-  const handleCardSelect = (newCardId: string) => {
-    if (newCardId !== selectedCardId) {
-      setSelectedCardId(newCardId);
-      // Update URL without full navigation to avoid re-rendering the entire page
-      navigate(`/credit-cards/${newCardId}/bills`, { replace: true });
-    }
-  };
+  const openFabModal = () => setIsFabModalOpen(true);
+  const closeFabModal = () => setIsFabModalOpen(false);
+  const openSidebar = () => setIsSidebarOpen(true);
+  const closeSidebar = () => setIsSidebarOpen(false);
+
+  const renderBillHeader = (billProps?: {
+    billTotal?: number;
+    billStatus?: 'OPEN' | 'CLOSED' | 'PAID';
+    dueDate?: string;
+  }) => (
+    <CreditCardBillHeader
+      creditCard={creditCard}
+      creditCards={creditCards ?? []}
+      onCardSelect={handleCardSelect}
+      month={currentMonth}
+      onPreviousMonth={goToPreviousMonth}
+      onNextMonth={goToNextMonth}
+      canGoPrevious={canGoPrevious}
+      canGoNext={canGoNext}
+      onMenuClick={openSidebar}
+      onEditCard={handlers.onEditCard}
+      onDeleteCard={handlers.onDeleteCard}
+      onAddCard={handlers.onAddCard}
+      {...billProps}
+    />
+  );
+
+  const renderMobileNavigation = () => (
+    <>
+      <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+      <MobileBottomNav onNewTransaction={openFabModal} />
+      <TransactionTypeModal isOpen={isFabModalOpen} onClose={closeFabModal} />
+      <CreditCardModals formModal={formModal} deleteModal={deleteModal} />
+    </>
+  );
 
   if (isLoading) {
     return (
@@ -75,8 +117,7 @@ export function CreditCardBillsPage() {
         <div className="flex items-center justify-center h-screen bg-background dark:bg-background-dark pb-20 lg:pb-0">
           <Loading size="large">Carregando fatura, por favor aguarde...</Loading>
         </div>
-        <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
-        <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
+        {renderMobileNavigation()}
       </>
     );
   }
@@ -85,22 +126,12 @@ export function CreditCardBillsPage() {
     return (
       <>
         <div className="flex flex-col h-screen bg-background dark:bg-background-dark overflow-hidden pb-20 lg:pb-0">
-          <CreditCardBillHeader
-            creditCard={creditCard}
-            creditCards={creditCards ?? []}
-            onCardSelect={handleCardSelect}
-            month={currentMonth}
-            onPreviousMonth={goToPreviousMonth}
-            onNextMonth={goToNextMonth}
-            canGoPrevious={canGoPrevious}
-            canGoNext={canGoNext}
-          />
+          {renderBillHeader()}
           <div className="flex-1 overflow-y-auto bg-background dark:bg-background-dark">
             <BillErrorState error={error} />
           </div>
         </div>
-        <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
-        <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
+        {renderMobileNavigation()}
       </>
     );
   }
@@ -109,22 +140,12 @@ export function CreditCardBillsPage() {
     return (
       <>
         <div className="flex flex-col h-screen bg-background dark:bg-background-dark overflow-hidden pb-20 lg:pb-0">
-          <CreditCardBillHeader
-            creditCard={creditCard}
-            creditCards={creditCards ?? []}
-            onCardSelect={handleCardSelect}
-            month={currentMonth}
-            onPreviousMonth={goToPreviousMonth}
-            onNextMonth={goToNextMonth}
-            canGoPrevious={canGoPrevious}
-            canGoNext={canGoNext}
-          />
+          {renderBillHeader()}
           <div className="flex-1 overflow-y-auto bg-background dark:bg-background-dark flex flex-col">
             <BillEmptyState />
           </div>
         </div>
-        <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
-        <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
+        {renderMobileNavigation()}
       </>
     );
   }
@@ -136,19 +157,11 @@ export function CreditCardBillsPage() {
   return (
     <>
       <div className="flex flex-col h-screen bg-background dark:bg-background-dark overflow-hidden pb-20 lg:pb-0">
-        <CreditCardBillHeader
-          creditCard={creditCard}
-          creditCards={creditCards ?? []}
-          onCardSelect={handleCardSelect}
-          month={currentMonth}
-          onPreviousMonth={goToPreviousMonth}
-          onNextMonth={goToNextMonth}
-          canGoPrevious={canGoPrevious}
-          canGoNext={canGoNext}
-          billTotal={currentBill.total}
-          billStatus={currentBill.status}
-          dueDate={currentBill.dueDate}
-        />
+        {renderBillHeader({
+          billTotal: currentBill.total,
+          billStatus: currentBill.status,
+          dueDate: currentBill.dueDate,
+        })}
 
         <div className="flex-1 overflow-y-auto bg-background dark:bg-background-dark relative flex flex-col">
           {isLoading && !isInitialLoad && (
@@ -175,11 +188,7 @@ export function CreditCardBillsPage() {
         </div>
       </div>
 
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
-      <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
-
-      <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
+      {renderMobileNavigation()}
     </>
   );
 }

@@ -10,9 +10,18 @@ import {
   EyeOff,
   Check,
   CreditCard,
+  Edit,
+  Trash2,
+  Plus,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { CreditCard as CreditCardType } from '@/services/creditCardService';
@@ -30,6 +39,9 @@ interface CreditCardBillHeaderProps {
   readonly billTotal?: number;
   readonly billStatus?: 'OPEN' | 'CLOSED' | 'PAID';
   readonly dueDate?: string;
+  readonly onEditCard?: (card: CreditCardType) => void;
+  readonly onDeleteCard?: (card: CreditCardType) => void;
+  readonly onAddCard?: () => void;
 }
 
 const formatCurrency = (value: number): string => {
@@ -78,6 +90,9 @@ export function CreditCardBillHeader({
   billTotal = 0,
   billStatus = 'OPEN',
   dueDate,
+  onEditCard,
+  onDeleteCard,
+  onAddCard,
 }: Readonly<CreditCardBillHeaderProps>) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -90,6 +105,7 @@ export function CreditCardBillHeader({
 
   const hasMultipleCards = creditCards.length > 1;
   const cardColor = creditCard?.color ?? '#8A05BE';
+  const hasCardActions = onEditCard ?? onDeleteCard ?? onAddCard;
 
   const formatMonth = (monthStr: string) => {
     const [year, monthNum] = monthStr.split('-').map(Number);
@@ -101,6 +117,56 @@ export function CreditCardBillHeader({
     const [year, monthNum, day] = dateStr.split('-').map(Number);
     const date = new Date(year, monthNum - 1, day);
     return format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+  };
+
+  const renderMenuButton = () => {
+    if (hasCardActions) {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="text-white hover:opacity-80 p-2 transition-opacity backdrop-blur-sm bg-white/10 rounded-full shrink-0"
+              aria-label="Menu"
+            >
+              <MoreVertical className="h-5 w-5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            {onAddCard && (
+              <DropdownMenuItem onClick={onAddCard}>
+                <Plus className="h-4 w-4 mr-2" />
+                Novo Cartão
+              </DropdownMenuItem>
+            )}
+            {creditCard && onEditCard && (
+              <DropdownMenuItem onClick={() => onEditCard(creditCard)}>
+                <Edit className="h-4 w-4 mr-2" />
+                Editar Cartão
+              </DropdownMenuItem>
+            )}
+            {creditCard && onDeleteCard && (
+              <DropdownMenuItem
+                onClick={() => onDeleteCard(creditCard)}
+                className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Excluir Cartão
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
+
+    return (
+      <button
+        onClick={onMenuClick}
+        className="text-white hover:opacity-80 p-2 transition-opacity backdrop-blur-sm bg-white/10 rounded-full shrink-0"
+        aria-label="Menu"
+      >
+        <MoreVertical className="h-5 w-5" />
+      </button>
+    );
   };
 
   return (
@@ -185,13 +251,7 @@ export function CreditCardBillHeader({
             </div>
           )}
 
-          <button
-            onClick={onMenuClick}
-            className="text-white hover:opacity-80 p-2 transition-opacity backdrop-blur-sm bg-white/10 rounded-full shrink-0"
-            aria-label="Menu"
-          >
-            <MoreVertical className="h-5 w-5" />
-          </button>
+          {renderMenuButton()}
         </div>
 
         {month && onPreviousMonth && onNextMonth && (

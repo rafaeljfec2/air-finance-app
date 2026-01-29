@@ -328,7 +328,7 @@ export const router = createBrowserRouter([
   createSimpleProtectedRoute('/statement', Statement),
   createSimpleProtectedRoute('/transactions/new', NewTransaction),
   createSimpleProtectedRoute('/credit-cards', CreditCardsPage),
-  createSimpleProtectedRoute('/credit-cards/:cardId/bills', CreditCardBillsPage),
+  createSimpleProtectedRoute('/credit-cards/bills', CreditCardBillsPage),
   createSimpleProtectedRoute('/goals', GoalsPage),
   createSimpleProtectedRoute('/recurring-transactions', RecurringTransactionsPage),
   createSimpleProtectedRoute('/income-sources', IncomeSourcesPage),

@@ -1,31 +1,39 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Loading } from '@/components/Loading';
 import { ViewDefault } from '@/layouts/ViewDefault';
+import { useCreditCards } from '@/hooks/useCreditCards';
+import { useCompanyStore } from '@/stores/company';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useCreditCardBills } from './hooks/useCreditCardBills';
 import { useBillNavigation } from './hooks/useBillNavigation';
-import { CreditCardHeader } from './components/CreditCardHeader';
+import { useCreditCardManagement } from './hooks/useCreditCardManagement';
+import { useAllCardsBillTotals } from './hooks/useAllCardsBillTotals';
+import { CreditCardCardsContainer } from './components/CreditCardCardsContainer';
 import { CreditCardSummary } from './components/CreditCardSummary';
 import { BillCard } from './components/BillCard';
 import { BillEmptyState } from './components/BillEmptyState';
 import { BillErrorState } from './components/BillErrorState';
-import { useCreditCards } from '@/hooks/useCreditCards';
-import { useCompanyStore } from '@/stores/company';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { CreditCardModals } from './components/CreditCardModals';
 
 export function CreditCardBillsPageDesktop() {
-  const { cardId } = useParams<{ cardId: string }>();
   const navigate = useNavigate();
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
-  const [selectedCardId, setSelectedCardId] = useState<string>(cardId ?? '');
+
+  const [selectedCardId, setSelectedCardId] = useState<string>('');
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebouncedValue(searchInput, 500);
+  const searchTermToSend = debouncedSearch.length >= 3 ? debouncedSearch : undefined;
+
   const { creditCards } = useCreditCards(companyId);
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useBillNavigation();
-
-  const searchTermToSend = debouncedSearch.length >= 3 ? debouncedSearch : undefined;
+  const { cardLimitsUsed, aggregated } = useAllCardsBillTotals({
+    companyId,
+    creditCards: creditCards ?? [],
+    month: currentMonth,
+  });
 
   const {
     creditCard,
@@ -39,39 +47,60 @@ export function CreditCardBillsPageDesktop() {
     isFetching,
   } = useCreditCardBills(selectedCardId, currentMonth, searchTermToSend);
 
+  const handleCardSelect = useCallback(
+    (newCardId: string) => {
+      if (newCardId !== selectedCardId) {
+        setSelectedCardId(newCardId);
+      }
+    },
+    [selectedCardId],
+  );
+
+  const { formModal, deleteModal, handlers } = useCreditCardManagement({
+    creditCards: creditCards ?? [],
+    selectedCardId,
+    onSelectCard: setSelectedCardId,
+  });
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (!creditCards || creditCards.length === 0) {
+      navigate('/credit-cards/bills', { replace: true });
+      return;
+    }
+
+    if (!selectedCardId || !creditCards.some((card) => card.id === selectedCardId)) {
+      setSelectedCardId(creditCards[0].id);
+    }
+  }, [creditCards, selectedCardId, isLoading, navigate]);
+
   const handleSearchChange = useCallback((value: string) => {
     setSearchInput(value);
   }, []);
 
   const isSearching = searchInput !== debouncedSearch;
 
-  useEffect(() => {
-    if (cardId) {
-      setSelectedCardId(cardId);
-    }
-  }, [cardId]);
-
-  const handleCardSelect = (newCardId: string) => {
-    if (newCardId !== selectedCardId) {
-      setSelectedCardId(newCardId);
-      navigate(`/credit-cards/${newCardId}/bills`, { replace: true });
-    }
-  };
-
-  const handleBack = () => navigate('/credit-cards');
-
-  const limitInfo = useMemo(() => {
-    const limitTotal = creditCard?.limit ?? 0;
-    const limitUsed = currentBill?.total ?? 0;
-    const limitAvailable = Math.max(0, limitTotal - limitUsed);
-    return { limitTotal, limitUsed, limitAvailable };
-  }, [creditCard?.limit, currentBill?.total]);
+  const renderCardsContainer = () => (
+    <CreditCardCardsContainer
+      creditCards={creditCards ?? []}
+      selectedCardId={selectedCardId}
+      onCardSelect={handleCardSelect}
+      onEditCard={handlers.onEditCard}
+      onDeleteCard={handlers.onDeleteCard}
+      onAddCard={handlers.onAddCard}
+      cardLimitsUsed={cardLimitsUsed}
+    />
+  );
 
   if (isLoading) {
     return (
       <ViewDefault>
-        <div className="flex items-center justify-center min-h-[60vh] bg-background dark:bg-background-dark">
-          <Loading size="large">Carregando fatura, por favor aguarde...</Loading>
+        <div className="-m-4 sm:-m-6 lg:-m-6">
+          {renderCardsContainer()}
+          <div className="flex items-center justify-center min-h-[40vh]">
+            <Loading size="large">Carregando fatura, por favor aguarde...</Loading>
+          </div>
         </div>
       </ViewDefault>
     );
@@ -80,45 +109,33 @@ export function CreditCardBillsPageDesktop() {
   if (error) {
     return (
       <ViewDefault>
-        <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
-          <CreditCardHeader
-            creditCard={creditCard}
-            creditCards={creditCards ?? []}
-            onBack={handleBack}
-            onCardSelect={handleCardSelect}
-            selectedCardId={selectedCardId}
-            limitUsed={limitInfo.limitUsed}
-            limitTotal={limitInfo.limitTotal}
-          />
+        <div className="-m-4 sm:-m-6 lg:-m-6">
+          {renderCardsContainer()}
           <div className="container mx-auto px-4 py-4 lg:px-6">
             <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark">
               <BillErrorState error={error} />
             </div>
           </div>
         </div>
+        <CreditCardModals formModal={formModal} deleteModal={deleteModal} />
       </ViewDefault>
     );
   }
 
   const billTotal = currentBill?.total ?? 0;
+  const limitAvailable = aggregated?.totalAvailable ?? (creditCard?.limit ?? 0) - billTotal;
+  const limitTotal = aggregated?.totalLimit ?? creditCard?.limit ?? 0;
+  const totalUsed = aggregated?.totalUsed ?? billTotal;
 
   return (
     <ViewDefault>
       <div className="-m-4 sm:-m-6 lg:-m-6">
-        <CreditCardHeader
-          creditCard={creditCard}
-          creditCards={creditCards ?? []}
-          onBack={handleBack}
-          onCardSelect={handleCardSelect}
-          selectedCardId={selectedCardId}
-          limitUsed={limitInfo.limitUsed}
-          limitTotal={limitInfo.limitTotal}
-        />
+        {renderCardsContainer()}
 
         <CreditCardSummary
-          limitAvailable={limitInfo.limitAvailable}
-          limitTotal={limitInfo.limitTotal}
-          billTotal={billTotal}
+          limitAvailable={limitAvailable}
+          limitTotal={limitTotal}
+          billTotal={totalUsed}
         />
 
         <div className="px-4 pb-6 lg:px-6">
@@ -148,6 +165,8 @@ export function CreditCardBillsPageDesktop() {
           )}
         </div>
       </div>
+
+      <CreditCardModals formModal={formModal} deleteModal={deleteModal} />
     </ViewDefault>
   );
 }

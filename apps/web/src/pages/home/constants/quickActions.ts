@@ -34,7 +34,7 @@ export const createQuickActions = (
   {
     label: 'Cartão de Crédito',
     icon: CreditCard,
-    href: '/credit-cards',
+    href: '/credit-cards/bills',
     onClick: onCreditCardClick,
     color: 'bg-indigo-500',
   },

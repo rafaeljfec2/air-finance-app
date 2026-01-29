@@ -1,6 +1,23 @@
 import { useState } from 'react';
-import { ArrowLeft, Eye, EyeOff, ChevronDown, CreditCard, Check } from 'lucide-react';
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  ChevronDown,
+  CreditCard,
+  Check,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Plus,
+} from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import type { CreditCard as CreditCardType } from '@/services/creditCardService';
 import { formatCurrency, calculateUsagePercentage } from '../utils';
 
@@ -12,6 +29,9 @@ interface CreditCardHeaderProps {
   readonly selectedCardId: string;
   readonly limitUsed: number;
   readonly limitTotal: number;
+  readonly onEditCard?: (card: CreditCardType) => void;
+  readonly onDeleteCard?: (card: CreditCardType) => void;
+  readonly onAddCard?: () => void;
 }
 
 const getUsageColorClass = (percentage: number): string => {
@@ -28,6 +48,9 @@ export function CreditCardHeader({
   selectedCardId,
   limitUsed,
   limitTotal,
+  onEditCard,
+  onDeleteCard,
+  onAddCard,
 }: CreditCardHeaderProps) {
   const [isValueHidden, setIsValueHidden] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -37,10 +60,51 @@ export function CreditCardHeader({
   const usagePercentage = calculateUsagePercentage(limitUsed, limitTotal);
   const usageColorClass = getUsageColorClass(usagePercentage);
   const progressWidth = Math.min(usagePercentage, 100);
+  const hasCardActions = onEditCard ?? onDeleteCard ?? onAddCard;
 
   const handleCardSelect = (cardId: string) => {
     onCardSelect(cardId);
     setIsDropdownOpen(false);
+  };
+
+  const renderMenuButton = () => {
+    if (!hasCardActions) return null;
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            className="p-2 rounded-full backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors"
+            aria-label="Menu"
+          >
+            <MoreVertical className="h-5 w-5 text-white" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          {onAddCard && (
+            <DropdownMenuItem onClick={onAddCard}>
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Cartão
+            </DropdownMenuItem>
+          )}
+          {creditCard && onEditCard && (
+            <DropdownMenuItem onClick={() => onEditCard(creditCard)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Editar Cartão
+            </DropdownMenuItem>
+          )}
+          {creditCard && onDeleteCard && (
+            <DropdownMenuItem
+              onClick={() => onDeleteCard(creditCard)}
+              className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Excluir Cartão
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
   };
 
   return (
@@ -128,17 +192,20 @@ export function CreditCardHeader({
               )}
             </div>
 
-            <button
-              onClick={() => setIsValueHidden(!isValueHidden)}
-              className="p-2 rounded-full backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors"
-              aria-label={isValueHidden ? 'Mostrar valor' : 'Ocultar valor'}
-            >
-              {isValueHidden ? (
-                <EyeOff className="h-5 w-5 text-white" />
-              ) : (
-                <Eye className="h-5 w-5 text-white" />
-              )}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsValueHidden(!isValueHidden)}
+                className="p-2 rounded-full backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors"
+                aria-label={isValueHidden ? 'Mostrar valor' : 'Ocultar valor'}
+              >
+                {isValueHidden ? (
+                  <EyeOff className="h-5 w-5 text-white" />
+                ) : (
+                  <Eye className="h-5 w-5 text-white" />
+                )}
+              </button>
+              {renderMenuButton()}
+            </div>
           </div>
 
           <div>

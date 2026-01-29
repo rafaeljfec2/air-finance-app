@@ -9,17 +9,12 @@ import { QuickActionsGrid } from './components/QuickActionsGrid';
 import { RecentTransactionsList } from './components/RecentTransactionsList';
 import { createQuickActions } from './constants/quickActions';
 import { useHomePageData } from './hooks/useHomePageData';
-import { useCreditCards } from '@/hooks/useCreditCards';
 import { useAccounts } from '@/hooks/useAccounts';
-import { useCompanyStore } from '@/stores/company';
 
 export function HomePage() {
   const { isPrivacyModeEnabled, togglePrivacyMode } = usePreferencesStore();
   const [isTypeModalOpen, setIsTypeModalOpen] = useState(false);
   const navigate = useNavigate();
-  const { activeCompany } = useCompanyStore();
-  const companyId = activeCompany?.id ?? '';
-  const { creditCards } = useCreditCards(companyId);
   const { accounts } = useAccounts();
 
   const {
@@ -35,11 +30,7 @@ export function HomePage() {
   } = useHomePageData();
 
   const handleCreditCardClick = () => {
-    if (creditCards && creditCards.length > 0) {
-      navigate(`/credit-cards/${creditCards[0].id}/bills`);
-    } else {
-      navigate('/credit-cards');
-    }
+    navigate('/credit-cards/bills');
   };
 
   const handleAccountsClick = () => {
