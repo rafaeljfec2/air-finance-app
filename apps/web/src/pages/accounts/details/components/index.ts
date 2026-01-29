@@ -4,3 +4,7 @@ export { StatementTransactionList } from './StatementTransactionList';
 export { StatementTransactionItem } from './StatementTransactionItem';
 export { AccountEmptyState } from './AccountEmptyState';
 export { AccountErrorState } from './AccountErrorState';
+export { AccountBalanceCard } from './AccountBalanceCard';
+export { AccountCardsContainer } from './AccountCardsContainer';
+export { AccountCardsContainerDesktop } from './AccountCardsContainerDesktop';
+export { AccountStatementHeader } from './AccountStatementHeader';

@@ -4,7 +4,7 @@ import { Loading } from '@/components/Loading';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useAccountDetails } from './hooks/useAccountDetails';
 import { useStatementNavigation } from './hooks/useStatementNavigation';
-import { AccountHeader } from './components/AccountHeader';
+import { AccountCardsContainerDesktop } from './components/AccountCardsContainerDesktop';
 import { AccountSummary } from './components/AccountSummary';
 import { StatementCard } from './components/StatementCard';
 import { AccountErrorState } from './components/AccountErrorState';
@@ -22,7 +22,6 @@ export function AccountDetailsPageDesktop() {
     useStatementNavigation();
 
   const {
-    account,
     accounts,
     currentStatement,
     isLoading,
@@ -58,8 +57,15 @@ export function AccountDetailsPageDesktop() {
   if (isLoading) {
     return (
       <ViewDefault>
-        <div className="flex items-center justify-center min-h-[60vh] bg-background dark:bg-background-dark">
-          <Loading size="large">Carregando extrato, por favor aguarde...</Loading>
+        <div className="-m-4 sm:-m-6 lg:-m-6">
+          <AccountCardsContainerDesktop
+            accounts={accounts}
+            selectedAccountId={selectedAccountId}
+            onAccountSelect={handleAccountSelect}
+          />
+          <div className="flex items-center justify-center min-h-[40vh]">
+            <Loading size="large">Carregando extrato, por favor aguarde...</Loading>
+          </div>
         </div>
       </ViewDefault>
     );
@@ -68,13 +74,11 @@ export function AccountDetailsPageDesktop() {
   if (error) {
     return (
       <ViewDefault>
-        <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
-          <AccountHeader
-            account={account}
+        <div className="-m-4 sm:-m-6 lg:-m-6">
+          <AccountCardsContainerDesktop
             accounts={accounts}
-            onBack={handleBack}
-            onAccountSelect={handleAccountSelect}
             selectedAccountId={selectedAccountId}
+            onAccountSelect={handleAccountSelect}
           />
           <div className="container mx-auto px-4 py-4 lg:px-6">
             <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark">
@@ -91,12 +95,11 @@ export function AccountDetailsPageDesktop() {
   return (
     <ViewDefault>
       <div className="-m-4 sm:-m-6 lg:-m-6">
-        <AccountHeader
-          account={account}
+        <AccountCardsContainerDesktop
           accounts={accounts}
-          onBack={handleBack}
-          onAccountSelect={handleAccountSelect}
           selectedAccountId={selectedAccountId}
+          onAccountSelect={handleAccountSelect}
+          onBack={handleBack}
         />
 
         <AccountSummary summary={summary} />

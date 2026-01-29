@@ -6,7 +6,8 @@ import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
 import { useAccountDetails } from './hooks/useAccountDetails';
 import { useStatementNavigation } from './hooks/useStatementNavigation';
-import { AccountDetailsHeader } from './components/AccountDetailsHeader';
+import { AccountCardsContainer } from './components/AccountCardsContainer';
+import { AccountStatementHeader } from './components/AccountStatementHeader';
 import { AccountSummary } from './components/AccountSummary';
 import { StatementTransactionList } from './components/StatementTransactionList';
 import { AccountEmptyState } from './components/AccountEmptyState';
@@ -68,8 +69,16 @@ export function AccountDetailsPage() {
   if (isLoading) {
     return (
       <>
-        <div className="flex items-center justify-center h-screen bg-background dark:bg-background-dark pb-20 lg:pb-0">
-          <Loading size="large">Carregando extrato, por favor aguarde...</Loading>
+        <div className="flex flex-col h-screen bg-background dark:bg-background-dark pb-20 lg:pb-0">
+          <AccountCardsContainer
+            accounts={accounts}
+            selectedAccountId={selectedAccountId}
+            onAccountSelect={handleAccountSelect}
+            onMenuClick={() => setIsSidebarOpen(true)}
+          />
+          <div className="flex-1 flex items-center justify-center">
+            <Loading size="large">Carregando extrato, por favor aguarde...</Loading>
+          </div>
         </div>
         <MobileBottomNav
           onNewTransaction={() => setIsFabModalOpen(true)}
@@ -84,10 +93,13 @@ export function AccountDetailsPage() {
     return (
       <>
         <div className="flex flex-col h-screen bg-background dark:bg-background-dark overflow-hidden pb-20 lg:pb-0">
-          <AccountDetailsHeader
-            account={account}
+          <AccountCardsContainer
             accounts={accounts}
+            selectedAccountId={selectedAccountId}
             onAccountSelect={handleAccountSelect}
+            onMenuClick={() => setIsSidebarOpen(true)}
+          />
+          <AccountStatementHeader
             month={currentMonth}
             onPreviousMonth={goToPreviousMonth}
             onNextMonth={goToNextMonth}
@@ -111,15 +123,19 @@ export function AccountDetailsPage() {
     return (
       <>
         <div className="flex flex-col h-screen bg-background dark:bg-background-dark overflow-hidden pb-20 lg:pb-0">
-          <AccountDetailsHeader
-            account={account}
+          <AccountCardsContainer
             accounts={accounts}
+            selectedAccountId={selectedAccountId}
             onAccountSelect={handleAccountSelect}
+            onMenuClick={() => setIsSidebarOpen(true)}
+          />
+          <AccountStatementHeader
             month={currentMonth}
             onPreviousMonth={goToPreviousMonth}
             onNextMonth={goToNextMonth}
             canGoPrevious={canGoPrevious}
             canGoNext={canGoNext}
+            summary={summary}
           />
           <div className="flex-1 overflow-y-auto bg-background dark:bg-background-dark flex flex-col">
             <AccountSummary summary={summary} />
@@ -142,15 +158,20 @@ export function AccountDetailsPage() {
   return (
     <>
       <div className="flex flex-col h-screen bg-background dark:bg-background-dark overflow-hidden pb-20 lg:pb-0">
-        <AccountDetailsHeader
-          account={account}
+        <AccountCardsContainer
           accounts={accounts}
+          selectedAccountId={selectedAccountId}
           onAccountSelect={handleAccountSelect}
+          onMenuClick={() => setIsSidebarOpen(true)}
+        />
+
+        <AccountStatementHeader
           month={currentMonth}
           onPreviousMonth={goToPreviousMonth}
           onNextMonth={goToNextMonth}
           canGoPrevious={canGoPrevious}
           canGoNext={canGoNext}
+          summary={currentStatement.summary}
         />
 
         <div className="flex-1 overflow-y-auto bg-background dark:bg-background-dark relative flex flex-col">
