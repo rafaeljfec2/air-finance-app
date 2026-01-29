@@ -12,7 +12,7 @@ import { AuthCallbackPage } from '@/pages/auth-callback';
 import { TermsOfService } from '@/pages/legal/TermsOfService';
 import { PrivacyPolicy } from '@/pages/legal/PrivacyPolicy';
 import React, { Suspense, lazy } from 'react';
-import { createBrowserRouter, RouteObject } from 'react-router-dom';
+import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom';
 
 // Lazy Components
 const AccountsPage = lazy(() =>
@@ -90,12 +90,6 @@ const RecurringTransactionsPage = lazy(() =>
 );
 const Reports = lazy(() => import('@/pages/reports').then((m) => ({ default: m.Reports })));
 const Settings = lazy(() => import('@/pages/settings').then((m) => ({ default: m.Settings })));
-const NotificationsPage = lazy(() =>
-  import('@/pages/settings/notifications').then((m) => ({ default: m.NotificationsPage })),
-);
-const PreferencesPage = lazy(() =>
-  import('@/pages/settings/preferences').then((m) => ({ default: m.PreferencesPage })),
-);
 const OpenAILogsPage = lazy(() =>
   import('@/pages/admin/openai-logs').then((m) => ({ default: m.OpenAILogsPage })),
 );
@@ -114,9 +108,6 @@ const OnboardingPage = lazy(() =>
   import('@/pages/onboarding').then((m) => ({ default: m.default })),
 );
 const PricingPage = lazy(() => import('@/pages/pricing').then((m) => ({ default: m.PricingPage })));
-const SubscriptionManagementPage = lazy(() =>
-  import('@/pages/settings/subscription').then((m) => ({ default: m.SubscriptionManagementPage })),
-);
 const FinancialHealthPage = lazy(() =>
   import('@/pages/financial-health/FinancialHealthPage').then((m) => ({
     default: m.FinancialHealthPage,
@@ -348,8 +339,18 @@ export const router = createBrowserRouter([
   createSimpleProtectedRoute('/monthly-closing', MonthlyClosing),
   createSimpleProtectedRoute('/annual-result', AnnualResult),
   createSimpleProtectedRoute('/planner', PlannerPage),
-  createSimpleProtectedRoute('/settings/preferences', PreferencesPage),
-  createSimpleProtectedRoute('/settings/notifications', NotificationsPage),
+  {
+    path: '/settings/preferences',
+    element: <Navigate to="/profile?tab=preferences" replace />,
+  },
+  {
+    path: '/settings/notifications',
+    element: <Navigate to="/profile?tab=notifications" replace />,
+  },
+  {
+    path: '/settings/integrations',
+    element: <Navigate to="/profile?tab=integrations" replace />,
+  },
   createSimpleProtectedRoute('/ai/classification', AiClassificationPage),
 
   // ==================== ADMIN ROUTES (REQUIRE GOD) ====================
@@ -367,11 +368,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/settings/subscription',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <SubscriptionManagementPage />
-      </Suspense>
-    ),
+    element: <Navigate to="/profile?tab=subscription" replace />,
   },
   {
     path: '/settings/categories',

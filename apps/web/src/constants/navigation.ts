@@ -3,7 +3,6 @@ import { UserRole } from '@/types/user';
 import {
   ArrowRightLeft,
   Banknote,
-  Bell,
   Building2,
   ChartBar,
   CreditCard,
@@ -13,13 +12,13 @@ import {
   LayoutDashboard,
   LineChart,
   Link2,
-  Pencil,
   Plus,
   RefreshCcw,
   Tag,
   User,
   Wallet,
 } from 'lucide-react';
+
 export const navigation: NavigationSection[] = [
   {
     section: '📊 Visão Geral',
@@ -65,12 +64,7 @@ export const navigation: NavigationSection[] = [
 
   {
     section: '⚙️ Conta & Preferências',
-    items: [
-      { name: 'Perfil', href: '/profile', icon: User },
-      { name: 'Preferências', href: '/settings/preferences', icon: Pencil },
-      { name: 'Notificações', href: '/settings/notifications', icon: Bell },
-      { name: 'Assinatura', href: '/settings/subscription', icon: CreditCard },
-    ],
+    items: [{ name: 'Minha Conta', href: '/profile', icon: User }],
   },
 
   {

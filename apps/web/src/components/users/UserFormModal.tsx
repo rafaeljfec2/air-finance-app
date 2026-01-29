@@ -50,7 +50,6 @@ export function UserFormModal({
       plan: 'free',
       companyIds: companyId ? [companyId] : [],
       integrations: {
-        openaiApiKey: '',
         openaiModel: 'gpt-4o-mini',
       },
     }),
@@ -150,7 +149,6 @@ export function UserFormModal({
         plan: user.plan || 'free',
         companyIds: user.companyIds,
         integrations: {
-          openaiApiKey: '',
           openaiModel: user.integrations?.openaiModel || 'gpt-4o-mini',
         },
       });

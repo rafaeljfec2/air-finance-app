@@ -1,16 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { useSearchParams } from 'react-router-dom';
 import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/toast';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { getCurrentUser } from '@/services/authService';
 import { updateUser, type CreateUser } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
+import { useTheme } from '@/stores/useTheme';
 import { mapUserServiceToUserType } from '@/utils/userMapper';
-import { Camera, Edit2, Mail, MapPin, Phone, Save, Shield, User, X } from 'lucide-react';
+import { Bell, Bot, CreditCard, Palette, User } from 'lucide-react';
+import {
+  ProfilePersonalSection,
+  ProfilePreferencesSection,
+  ProfileNotificationsSection,
+  ProfileIntegrationsSection,
+  ProfileSubscriptionSection,
+} from './components';
+
+const VALID_TABS = [
+  'personal',
+  'preferences',
+  'notifications',
+  'integrations',
+  'subscription',
+] as const;
+type TabValue = (typeof VALID_TABS)[number];
 
 type ProfileFormData = {
   name: string;
@@ -20,81 +35,158 @@ type ProfileFormData = {
   bio: string;
 };
 
-export function Profile() {
-  const { user, setUser } = useAuthStore();
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [fullUserData, setFullUserData] = useState<typeof user | null>(null);
-  const [avatar, setAvatar] = useState(user?.avatar || '/avatars/default.png');
+type PreferencesData = {
+  currency: string;
+  language: string;
+  theme: string;
+  dateFormat: string;
+};
 
-  // Fetch full user data from server (includes email and other sensitive fields)
+type NotificationsData = {
+  email: boolean;
+  push: boolean;
+  updates: boolean;
+  marketing: boolean;
+  security: boolean;
+};
+
+type OpenaiModelType = 'gpt-4o-mini' | 'gpt-4o' | 'gpt-4-turbo' | 'gpt-3.5-turbo';
+
+type IntegrationsData = {
+  openaiApiKey: string;
+  openaiModel: OpenaiModelType;
+  hasOpenaiKey: boolean;
+};
+
+export function Profile() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { user, setUser } = useAuthStore();
+  const { setTheme } = useTheme();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isSavingPreferences, setIsSavingPreferences] = useState(false);
+  const [isSavingNotifications, setIsSavingNotifications] = useState(false);
+  const [isSavingIntegrations, setIsSavingIntegrations] = useState(false);
+  const [avatar, setAvatar] = useState(user?.avatar ?? '/avatars/default.png');
+
+  const tabFromUrl = searchParams.get('tab') as TabValue | null;
+  const defaultTab: TabValue = VALID_TABS.includes(tabFromUrl as TabValue)
+    ? (tabFromUrl as TabValue)
+    : 'personal';
+
+  const handleTabChange = (value: string) => {
+    if (value === 'personal') {
+      searchParams.delete('tab');
+    } else {
+      searchParams.set('tab', value);
+    }
+    setSearchParams(searchParams, { replace: true });
+  };
+
+  const [formData, setFormData] = useState<ProfileFormData>({
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    bio: '',
+  });
+
+  const [preferences, setPreferences] = useState<PreferencesData>({
+    currency: 'BRL',
+    language: 'pt-BR',
+    theme: 'system',
+    dateFormat: 'DD/MM/YYYY',
+  });
+
+  const [notifications, setNotifications] = useState<NotificationsData>({
+    email: true,
+    push: true,
+    updates: false,
+    marketing: false,
+    security: true,
+  });
+
+  const [integrations, setIntegrations] = useState<IntegrationsData>({
+    openaiApiKey: '',
+    openaiModel: 'gpt-4o-mini',
+    hasOpenaiKey: false,
+  });
+
   useEffect(() => {
-    const fetchFullUserData = async () => {
+    const fetchUserData = async () => {
       if (!user?.id) return;
 
+      setIsLoading(true);
       try {
         const fullUser = await getCurrentUser();
-        setFullUserData(fullUser);
+
+        setFormData({
+          name: fullUser.name ?? '',
+          email: fullUser.email ?? '',
+          phone: fullUser.phone ?? '',
+          location: fullUser.location ?? '',
+          bio: fullUser.bio ?? '',
+        });
+
+        setAvatar(fullUser.avatar ?? user.avatar ?? '/avatars/default.png');
+
+        if (fullUser.preferences) {
+          setPreferences({
+            currency: fullUser.preferences.currency ?? 'BRL',
+            language: fullUser.preferences.language ?? 'pt-BR',
+            theme: fullUser.preferences.theme ?? 'system',
+            dateFormat: fullUser.preferences.dateFormat ?? 'DD/MM/YYYY',
+          });
+        }
+
+        if (fullUser.notifications) {
+          setNotifications({
+            email: fullUser.notifications.email ?? true,
+            push: fullUser.notifications.push ?? true,
+            updates: fullUser.notifications.updates ?? false,
+            marketing: fullUser.notifications.marketing ?? false,
+            security: fullUser.notifications.security ?? true,
+          });
+        }
+
+        if (fullUser.integrations) {
+          setIntegrations((prev) => ({
+            ...prev,
+            openaiModel: (fullUser.integrations?.openaiModel ?? 'gpt-4o-mini') as OpenaiModelType,
+            hasOpenaiKey: fullUser.integrations?.hasOpenaiKey ?? false,
+          }));
+        }
       } catch (error) {
-        console.error('Error fetching full user data:', error);
-        // Fallback to stored user data
-        setFullUserData(user);
+        console.error('Error fetching user data:', error);
+        toast({
+          title: 'Erro',
+          description: 'Erro ao carregar dados do usuário',
+          type: 'error',
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchFullUserData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+    fetchUserData();
+  }, [user?.id, user?.avatar]);
 
-  const displayUser = fullUserData || user;
-
-  const [formData, setFormData] = useState<ProfileFormData>({
-    name: displayUser?.name || '',
-    email: displayUser?.email || '',
-    phone: displayUser?.phone || '',
-    location: displayUser?.location || '',
-    bio: displayUser?.bio || '',
-  });
-
-  // Update form data when full user data is loaded
-  useEffect(() => {
-    if (fullUserData) {
-      setFormData({
-        name: fullUserData.name || '',
-        email: fullUserData.email || '',
-        phone: fullUserData.phone || '',
-        location: fullUserData.location || '',
-        bio: fullUserData.bio || '',
-      });
-      // Atualiza avatar se disponível, caso contrário usa o do store ou padrão
-      setAvatar(fullUserData.avatar || user?.avatar || '/avatars/default.png');
-    }
-  }, [fullUserData, user?.avatar]);
-
-  // Atualiza avatar quando o user do store mudar (ex: após login)
-  useEffect(() => {
-    if (user?.avatar && user.avatar.trim().length > 0) {
-      setAvatar(user.avatar);
-    }
-  }, [user?.avatar]);
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
-      // Preview imediato
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatar(reader.result as string);
       };
       reader.readAsDataURL(file);
-
-      // Upload real seria feito aqui
-      // const formData = new FormData();
-      // formData.append('avatar', file);
-      // const response = await api.post('/users/avatar', formData);
-      // setAvatar(response.data.avatarUrl);
     } catch (error) {
       toast({
         title: 'Erro',
@@ -104,41 +196,27 @@ export function Profile() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const handleSaveProfile = async () => {
+    if (!user?.id) return;
 
-  const handleSave = async () => {
-    if (!user) return;
-
-    setIsSaving(true);
+    setIsSavingProfile(true);
     try {
-      if (user.id) {
-        // Prepare data for update
-        const updateData: Partial<CreateUser> & Record<string, unknown> = {
-          name: formData.name,
-          email: formData.email, // Email change might require verification logic, careful
-          phone: formData.phone,
-          location: formData.location,
-          bio: formData.bio,
-        };
+      const updateData: Partial<CreateUser> & Record<string, unknown> = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        location: formData.location,
+        bio: formData.bio,
+      };
 
-        const updatedUser = await updateUser(user.id, updateData);
-
-        // Update local store
-        setUser(mapUserServiceToUserType(updatedUser));
-
-        setIsEditing(false);
-        toast({
-          title: 'Sucesso',
-          description: 'Perfil atualizado com sucesso!',
-          type: 'success',
-        });
-      }
+      const updatedUser = await updateUser(user.id, updateData);
+      setUser(mapUserServiceToUserType(updatedUser));
+      setIsEditing(false);
+      toast({
+        title: 'Sucesso',
+        description: 'Perfil atualizado com sucesso!',
+        type: 'success',
+      });
     } catch (error) {
       console.error('Failed to update profile:', error);
       toast({
@@ -147,278 +225,212 @@ export function Profile() {
         type: 'error',
       });
     } finally {
-      setIsSaving(false);
+      setIsSavingProfile(false);
     }
   };
 
-  const handleCancel = () => {
-    if (!displayUser) return;
+  const handleCancelEdit = () => {
+    if (!user) return;
 
-    // Restaurar dados originais
     setFormData({
-      name: displayUser.name,
-      email: displayUser.email,
-      phone: displayUser.phone || '',
-      location: displayUser.location || '',
-      bio: displayUser.bio || '',
+      name: user.name ?? '',
+      email: user.email ?? '',
+      phone: user.phone ?? '',
+      location: user.location ?? '',
+      bio: user.bio ?? '',
     });
-    setAvatar(displayUser.avatar || '/avatars/default.png');
+    setAvatar(user.avatar ?? '/avatars/default.png');
     setIsEditing(false);
   };
+
+  const handlePreferencesChange = (key: keyof PreferencesData, value: string) => {
+    setPreferences((prev) => ({ ...prev, [key]: value }));
+
+    if (key === 'theme') {
+      setTheme(value === 'dark');
+    }
+  };
+
+  const handleSavePreferences = async () => {
+    if (!user?.id) return;
+
+    setIsSavingPreferences(true);
+    try {
+      const updateData = { preferences: { ...preferences } };
+      const updatedUser = await updateUser(
+        user.id,
+        updateData as unknown as Parameters<typeof updateUser>[1],
+      );
+      setUser(mapUserServiceToUserType(updatedUser));
+      toast({
+        title: 'Sucesso',
+        description: 'Preferências atualizadas com sucesso!',
+        type: 'success',
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao salvar preferências',
+        type: 'error',
+      });
+    } finally {
+      setIsSavingPreferences(false);
+    }
+  };
+
+  const handleToggleNotification = (key: keyof NotificationsData) => {
+    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleSaveNotifications = async () => {
+    if (!user?.id) return;
+
+    setIsSavingNotifications(true);
+    try {
+      const updateData = { notifications: { ...notifications } };
+      const updatedUser = await updateUser(user.id, updateData);
+      setUser(mapUserServiceToUserType(updatedUser));
+      toast({
+        title: 'Sucesso',
+        description: 'Notificações atualizadas com sucesso!',
+        type: 'success',
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao salvar notificações',
+        type: 'error',
+      });
+    } finally {
+      setIsSavingNotifications(false);
+    }
+  };
+
+  const handleIntegrationsChange = (key: keyof IntegrationsData, value: string | boolean) => {
+    setIntegrations((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSaveIntegrations = async () => {
+    if (!user?.id) return;
+
+    setIsSavingIntegrations(true);
+    try {
+      const updateData = { integrations: { ...integrations } };
+      const updatedUser = await updateUser(user.id, updateData);
+      setUser(mapUserServiceToUserType(updatedUser));
+      toast({
+        title: 'Sucesso',
+        description: 'Integrações atualizadas com sucesso!',
+        type: 'success',
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao salvar integrações',
+        type: 'error',
+      });
+    } finally {
+      setIsSavingIntegrations(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <ViewDefault>
+        <div className="flex-1 flex items-center justify-center">
+          <Spinner className="text-primary-500" />
+        </div>
+      </ViewDefault>
+    );
+  }
 
   return (
     <ViewDefault>
       <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
-        <div className="container mx-auto">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <User className="h-8 w-8 text-primary-400" />
-                <h1 className="text-2xl font-bold text-text dark:text-text-dark">Meu Perfil</h1>
-              </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Gerencie suas informações pessoais
-              </p>
+        <div className="container mx-auto py-6">
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-2">
+              <User className="h-8 w-8 text-primary-400" />
+              <h1 className="text-2xl font-bold text-text dark:text-text-dark">Minha Conta</h1>
             </div>
-            <div className="flex gap-2">
-              {isEditing ? (
-                <>
-                  <Button
-                    variant="destructive"
-                    onClick={handleCancel}
-                    disabled={isSaving}
-                    className="gap-2"
-                  >
-                    <X className="h-4 w-4" />
-                    Cancelar
-                  </Button>
-                  <Button
-                    variant="success"
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="gap-2"
-                  >
-                    {isSaving ? (
-                      <Spinner size="sm" />
-                    ) : (
-                      <>
-                        <Save className="h-4 w-4" />
-                        Salvar
-                      </>
-                    )}
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  onClick={() => setIsEditing(true)}
-                  className="gap-2 bg-primary-500 hover:bg-primary-600 text-white dark:bg-primary-400 dark:hover:bg-primary-500 dark:text-background font-semibold shadow focus:ring-2 focus:ring-primary-300 focus:outline-none transition-colors"
-                >
-                  <Edit2 className="h-4 w-4" />
-                  Editar Perfil
-                </Button>
-              )}
-            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Gerencie suas informações pessoais, preferências e integrações
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Coluna da Esquerda - Informações Principais */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Card de Perfil */}
-              <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark">
-                <div className="p-6">
-                  <div className="flex flex-col sm:flex-row gap-6">
-                    {/* Avatar */}
-                    <div className="flex flex-col items-center justify-center gap-3 min-w-[8rem]">
-                      <div className="relative flex items-center justify-center">
-                        {avatar && avatar !== '/avatars/default.png' ? (
-                          <img
-                            src={avatar}
-                            alt={formData.name}
-                            className="w-32 h-32 rounded-full object-cover border-4 border-border dark:border-border-dark"
-                            crossOrigin="anonymous"
-                            referrerPolicy="no-referrer"
-                            onError={(e) => {
-                              // Fallback para avatar padrão se a imagem falhar
-                              const target = e.target as HTMLImageElement;
-                              if (target.src !== '/avatars/default.png') {
-                                target.src = '/avatars/default.png';
-                              }
-                            }}
-                          />
-                        ) : (
-                          <div className="w-32 h-32 rounded-full bg-primary-100 dark:bg-primary-900/30 border-4 border-border dark:border-border-dark flex items-center justify-center">
-                            <User className="w-16 h-16 text-primary-600 dark:text-primary-400" />
-                          </div>
-                        )}
-                        {isEditing && (
-                          <label
-                            htmlFor="avatar-upload"
-                            className="absolute bottom-0 right-0 p-2 bg-primary-500 rounded-full cursor-pointer hover:bg-primary-600 transition-colors"
-                          >
-                            <Camera className="h-4 w-4 text-white" />
-                          </label>
-                        )}
-                        <input
-                          type="file"
-                          id="avatar-upload"
-                          className="hidden"
-                          accept="image/*"
-                          onChange={handleAvatarChange}
-                          disabled={!isEditing}
-                        />
-                      </div>
-                      <p className="text-sm font-medium text-text dark:text-text-dark">
-                        {formData.name}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">ID: {user?.id}</p>
-                    </div>
+          <Tabs defaultValue={defaultTab} onValueChange={handleTabChange} className="w-full">
+            <TabsList className="grid w-full grid-cols-5 mb-6">
+              <TabsTrigger value="personal" className="gap-2">
+                <User className="h-4 w-4" />
+                <span className="hidden sm:inline">Pessoal</span>
+              </TabsTrigger>
+              <TabsTrigger value="preferences" className="gap-2">
+                <Palette className="h-4 w-4" />
+                <span className="hidden sm:inline">Preferências</span>
+              </TabsTrigger>
+              <TabsTrigger value="notifications" className="gap-2">
+                <Bell className="h-4 w-4" />
+                <span className="hidden sm:inline">Notificações</span>
+              </TabsTrigger>
+              <TabsTrigger value="integrations" className="gap-2">
+                <Bot className="h-4 w-4" />
+                <span className="hidden sm:inline">Integrações</span>
+              </TabsTrigger>
+              <TabsTrigger value="subscription" className="gap-2">
+                <CreditCard className="h-4 w-4" />
+                <span className="hidden sm:inline">Assinatura</span>
+              </TabsTrigger>
+            </TabsList>
 
-                    {/* Formulário */}
-                    <div className="flex-1 space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <label
-                            htmlFor="name"
-                            className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
-                          >
-                            Nome
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <User className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                            </div>
-                            <Input
-                              id="name"
-                              type="text"
-                              name="name"
-                              value={formData.name}
-                              onChange={handleChange}
-                              disabled={!isEditing}
-                              className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                            />
-                          </div>
-                        </div>
+            <TabsContent value="personal">
+              <ProfilePersonalSection
+                formData={formData}
+                avatar={avatar}
+                userId={user?.id}
+                isEditing={isEditing}
+                isSaving={isSavingProfile}
+                onFormChange={handleFormChange}
+                onAvatarChange={handleAvatarChange}
+                onSave={handleSaveProfile}
+                onCancel={handleCancelEdit}
+                onStartEditing={() => setIsEditing(true)}
+              />
+            </TabsContent>
 
-                        <div>
-                          <label
-                            htmlFor="email"
-                            className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
-                          >
-                            Email
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <Mail className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                            </div>
-                            <Input
-                              id="email"
-                              type="email"
-                              name="email"
-                              value={formData.email}
-                              onChange={handleChange}
-                              disabled={!isEditing}
-                              className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                            />
-                          </div>
-                        </div>
+            <TabsContent value="preferences">
+              <ProfilePreferencesSection
+                preferences={preferences}
+                isSaving={isSavingPreferences}
+                onChange={handlePreferencesChange}
+                onSave={handleSavePreferences}
+              />
+            </TabsContent>
 
-                        <div>
-                          <label
-                            htmlFor="phone"
-                            className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
-                          >
-                            Telefone
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <Phone className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                            </div>
-                            <Input
-                              id="phone"
-                              type="tel"
-                              name="phone"
-                              value={formData.phone}
-                              onChange={handleChange}
-                              disabled={!isEditing}
-                              className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                            />
-                          </div>
-                        </div>
+            <TabsContent value="notifications">
+              <ProfileNotificationsSection
+                notifications={notifications}
+                isSaving={isSavingNotifications}
+                onToggle={handleToggleNotification}
+                onSave={handleSaveNotifications}
+              />
+            </TabsContent>
 
-                        <div>
-                          <label
-                            htmlFor="location"
-                            className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
-                          >
-                            Localização
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <MapPin className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                            </div>
-                            <Input
-                              id="location"
-                              type="text"
-                              name="location"
-                              value={formData.location}
-                              onChange={handleChange}
-                              disabled={!isEditing}
-                              className="pl-10 bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                            />
-                          </div>
-                        </div>
-                      </div>
+            <TabsContent value="integrations">
+              <ProfileIntegrationsSection
+                integrations={integrations}
+                isSaving={isSavingIntegrations}
+                onChange={handleIntegrationsChange}
+                onSave={handleSaveIntegrations}
+              />
+            </TabsContent>
 
-                      <div>
-                        <label
-                          htmlFor="bio"
-                          className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
-                        >
-                          Bio
-                        </label>
-                        <Textarea
-                          id="bio"
-                          name="bio"
-                          value={formData.bio}
-                          onChange={handleChange}
-                          disabled={!isEditing}
-                          rows={3}
-                          className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            {/* Coluna da Direita - Ações Extras / Segurança */}
-            <div className="space-y-6">
-              {/* Card de Segurança */}
-              <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark">
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Shield className="h-5 w-5 text-primary-400" />
-                    <h2 className="text-lg font-semibold text-text dark:text-text-dark">
-                      Segurança
-                    </h2>
-                  </div>
-                  <div className="space-y-4">
-                    <Button variant="outline" className="w-full justify-start">
-                      Alterar Senha
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10"
-                    >
-                      Encerrar Sessões
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          </div>
+            <TabsContent value="subscription">
+              <ProfileSubscriptionSection userId={user?.id} userPlan={user?.plan} />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </ViewDefault>

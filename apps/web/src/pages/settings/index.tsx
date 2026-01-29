@@ -2,13 +2,10 @@ import React from 'react';
 import { useSettings } from '@/hooks/useSettings';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import {
-  Bell,
   ChevronRight,
   CreditCard,
   Download,
   Flag,
-  Palette,
-  Puzzle,
   Settings as SettingsIcon,
   Tag,
 } from 'lucide-react';
@@ -19,29 +16,6 @@ export function Settings() {
   const { appVersion } = useSettings();
 
   const menuItems = [
-    {
-      section: 'Geral',
-      items: [
-        {
-          icon: Palette,
-          label: 'Preferências',
-          description: 'Tema, moeda, idioma e data',
-          onClick: () => navigate('/settings/preferences'),
-        },
-        {
-          icon: Bell,
-          label: 'Notificações',
-          description: 'Alertas por email e push',
-          onClick: () => navigate('/settings/notifications'),
-        },
-        {
-          icon: Puzzle,
-          label: 'Integrações',
-          description: 'Conexões externas e IA',
-          onClick: () => navigate('/settings/integrations'),
-        },
-      ],
-    },
     {
       section: 'Gerenciamento',
       items: [
