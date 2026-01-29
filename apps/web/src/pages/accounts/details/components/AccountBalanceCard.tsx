@@ -1,6 +1,15 @@
+import { Eye, EyeOff } from 'lucide-react';
 import React, { useState } from 'react';
-import { Banknote, Wallet, Landmark, Eye, EyeOff } from 'lucide-react';
 import type { Account } from '@/services/accountService';
+import {
+  formatCurrency,
+  formatHiddenCurrency,
+  getAccountIcon,
+  getAccountSource,
+  getAccountDetails,
+  getAccountBalance,
+  getAccountColor,
+} from '../utils';
 
 interface AccountBalanceCardProps {
   readonly account: Account;
@@ -8,66 +17,35 @@ interface AccountBalanceCardProps {
   readonly onClick: () => void;
 }
 
-const formatCurrency = (value: number): string => {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(value);
-};
-
-const getAccountIcon = (iconName?: string) => {
-  switch (iconName) {
-    case 'Wallet':
-      return Wallet;
-    case 'Landmark':
-      return Landmark;
-    case 'Banknote':
-    default:
-      return Banknote;
-  }
-};
-
-const getAccountSource = (account: Account): string => {
-  if (account.integration?.enabled) {
-    return 'Open Finance';
-  }
-  return 'Manual';
-};
-
-const getAccountDetails = (account: Account): string => {
-  const agency = account.bankDetails?.agency ?? account.agency;
-  const accountNumber = account.bankDetails?.accountNumber ?? account.accountNumber;
-
-  if (agency && accountNumber) {
-    return `Ag ${agency} • Conta ${accountNumber}`;
-  }
-
-  return '';
-};
-
-export function AccountBalanceCard({ account, isSelected, onClick }: AccountBalanceCardProps) {
+export function AccountBalanceCard({
+  account,
+  isSelected,
+  onClick,
+}: Readonly<AccountBalanceCardProps>) {
   const [isBalanceHidden, setIsBalanceHidden] = useState(false);
 
-  const accountColor = account.color ?? '#8A05BE';
+  const accountColor = getAccountColor(account);
   const AccountIcon = getAccountIcon(account.icon);
-  const balance = account.currentBalance ?? account.initialBalance ?? 0;
+  const balance = getAccountBalance(account);
   const source = getAccountSource(account);
   const details = getAccountDetails(account);
 
   const handleToggleBalance = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsBalanceHidden(!isBalanceHidden);
+    setIsBalanceHidden((prev) => !prev);
   };
+
+  const cardClassName = `
+    relative flex-shrink-0 w-[280px] min-w-[280px] rounded-xl overflow-hidden
+    transition-all duration-200 text-left
+    ${isSelected ? 'scale-[1.02] shadow-lg' : 'opacity-80 hover:opacity-100'}
+  `;
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`
-        relative flex-shrink-0 w-[280px] min-w-[280px] rounded-xl overflow-hidden
-        transition-all duration-200 text-left
-        ${isSelected ? 'scale-[1.02] shadow-lg' : 'opacity-80 hover:opacity-100'}
-      `}
+      className={cardClassName}
       style={{
         background: `linear-gradient(135deg, ${accountColor} 0%, ${accountColor}dd 100%)`,
       }}
@@ -107,7 +85,7 @@ export function AccountBalanceCard({ account, isSelected, onClick }: AccountBala
             Saldo disponível
           </p>
           <p className="text-xl font-bold text-white tracking-tight">
-            {isBalanceHidden ? 'R$ ••••••' : formatCurrency(balance)}
+            {isBalanceHidden ? formatHiddenCurrency() : formatCurrency(balance)}
           </p>
         </div>
 

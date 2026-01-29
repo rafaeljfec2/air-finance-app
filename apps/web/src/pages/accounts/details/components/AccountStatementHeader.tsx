@@ -1,8 +1,6 @@
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import type { StatementSummary } from '../hooks/types';
-import { formatCurrency } from '../utils';
+import { formatCurrency, formatMonthTitle } from '../utils';
 
 interface AccountStatementHeaderProps {
   readonly month: string;
@@ -13,11 +11,15 @@ interface AccountStatementHeaderProps {
   readonly summary?: StatementSummary;
 }
 
-const formatMonth = (monthStr: string) => {
-  const [year, monthNum] = monthStr.split('-').map(Number);
-  const date = new Date(year, monthNum - 1, 1);
-  return format(date, "MMMM 'De' yyyy", { locale: ptBR });
-};
+const navButtonClassName = `
+  text-text dark:text-text-dark hover:opacity-90 
+  disabled:opacity-40 disabled:cursor-not-allowed 
+  p-2.5 rounded-xl transition-all 
+  bg-card dark:bg-card-dark 
+  border border-border dark:border-border-dark 
+  hover:bg-background dark:hover:bg-background-dark 
+  active:scale-95 disabled:active:scale-100
+`;
 
 export function AccountStatementHeader({
   month,
@@ -26,7 +28,10 @@ export function AccountStatementHeader({
   canGoPrevious,
   canGoNext,
   summary,
-}: AccountStatementHeaderProps) {
+}: Readonly<AccountStatementHeaderProps>) {
+  const balanceColorClassName =
+    summary && summary.endBalance >= 0 ? 'text-green-500' : 'text-red-500';
+
   return (
     <div className="px-4 py-3">
       <div className="flex items-center justify-between">
@@ -34,7 +39,7 @@ export function AccountStatementHeader({
           type="button"
           onClick={onPreviousMonth}
           disabled={!canGoPrevious}
-          className="text-text dark:text-text-dark hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed p-2.5 rounded-xl transition-all bg-card dark:bg-card-dark border border-border dark:border-border-dark hover:bg-background dark:hover:bg-background-dark active:scale-95 disabled:active:scale-100"
+          className={navButtonClassName}
           aria-label="Mês anterior"
         >
           <ChevronLeft className="h-5 w-5" />
@@ -43,7 +48,7 @@ export function AccountStatementHeader({
         <div className="flex-1 flex items-center justify-center gap-2 px-4">
           <Calendar className="h-4 w-4 text-text-muted dark:text-text-muted-dark shrink-0" />
           <h2 className="text-base font-bold text-text dark:text-text-dark text-center capitalize tracking-wide">
-            {formatMonth(month)}
+            {formatMonthTitle(month)}
           </h2>
         </div>
 
@@ -51,7 +56,7 @@ export function AccountStatementHeader({
           type="button"
           onClick={onNextMonth}
           disabled={!canGoNext}
-          className="text-text dark:text-text-dark hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed p-2.5 rounded-xl transition-all bg-card dark:bg-card-dark border border-border dark:border-border-dark hover:bg-background dark:hover:bg-background-dark active:scale-95 disabled:active:scale-100"
+          className={navButtonClassName}
           aria-label="Próximo mês"
         >
           <ChevronRight className="h-5 w-5" />
@@ -64,9 +69,7 @@ export function AccountStatementHeader({
             <p className="text-[10px] font-medium text-text-muted dark:text-text-muted-dark uppercase tracking-wide">
               Saldo final
             </p>
-            <p
-              className={`text-lg font-bold ${summary.endBalance >= 0 ? 'text-green-500' : 'text-red-500'}`}
-            >
+            <p className={`text-lg font-bold ${balanceColorClassName}`}>
               {formatCurrency(summary.endBalance)}
             </p>
           </div>

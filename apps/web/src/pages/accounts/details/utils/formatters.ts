@@ -33,3 +33,12 @@ export const formatDateHeader = (dateStr: string): string => {
     month: 'long',
   });
 };
+
+export const formatMonthTitle = (monthStr: string): string => {
+  const [year, monthNum] = monthStr.split('-').map(Number);
+  const date = new Date(year, monthNum - 1, 1);
+  const formatted = date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  return formatted.replace(' de ', ' De ');
+};
+
+export const formatHiddenCurrency = (): string => 'R$ ••••••';

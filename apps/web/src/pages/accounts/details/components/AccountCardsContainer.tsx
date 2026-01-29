@@ -1,91 +1,52 @@
-import { useRef, useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { ChevronLeft, ChevronRight, ArrowLeft, MoreVertical } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { Account } from '@/services/accountService';
+import { useHorizontalScroll } from '../hooks/useHorizontalScroll';
 import { AccountBalanceCard } from './AccountBalanceCard';
 
 interface AccountCardsContainerProps {
-  readonly accounts: Account[];
+  readonly accounts: ReadonlyArray<Account>;
   readonly selectedAccountId: string;
   readonly onAccountSelect: (accountId: string) => void;
   readonly onMenuClick?: () => void;
 }
+
+const SCROLL_CONFIG = {
+  cardWidth: 280,
+  gap: 12,
+  padding: 16,
+} as const;
 
 export function AccountCardsContainer({
   accounts,
   selectedAccountId,
   onAccountSelect,
   onMenuClick,
-}: AccountCardsContainerProps) {
+}: Readonly<AccountCardsContainerProps>) {
   const navigate = useNavigate();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
 
-  const checkScrollButtons = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
+  const selectedIndex = useMemo(
+    () => accounts.findIndex((acc) => acc.id === selectedAccountId),
+    [accounts, selectedAccountId],
+  );
 
-    setCanScrollLeft(container.scrollLeft > 0);
-    setCanScrollRight(container.scrollLeft < container.scrollWidth - container.clientWidth - 1);
-  };
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    checkScrollButtons();
-    container.addEventListener('scroll', checkScrollButtons);
-    window.addEventListener('resize', checkScrollButtons);
-
-    return () => {
-      container.removeEventListener('scroll', checkScrollButtons);
-      window.removeEventListener('resize', checkScrollButtons);
-    };
-  }, [accounts]);
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const selectedIndex = accounts.findIndex((acc) => acc.id === selectedAccountId);
-    if (selectedIndex === -1) return;
-
-    const cardWidth = 280;
-    const gap = 12;
-    const padding = 16;
-    const scrollPosition = selectedIndex * (cardWidth + gap) - padding;
-
-    container.scrollTo({
-      left: Math.max(0, scrollPosition),
-      behavior: 'smooth',
-    });
-  }, [selectedAccountId, accounts]);
-
-  const scroll = (direction: 'left' | 'right') => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const scrollAmount = 292;
-    const newPosition =
-      direction === 'left'
-        ? container.scrollLeft - scrollAmount
-        : container.scrollLeft + scrollAmount;
-
-    container.scrollTo({
-      left: newPosition,
-      behavior: 'smooth',
-    });
-  };
+  const { scrollContainerRef, canScrollLeft, canScrollRight, scrollTo } = useHorizontalScroll(
+    accounts.length,
+    selectedIndex,
+    SCROLL_CONFIG,
+  );
 
   const hasMultipleAccounts = accounts.length > 1;
+
+  const handleBack = () => navigate('/accounts');
 
   return (
     <div className="bg-background-dark dark:bg-background-dark sticky top-0 z-10">
       <div className="flex items-center justify-between px-4 pt-safe pb-3 min-h-[56px] gap-2">
         <button
           type="button"
-          onClick={() => navigate('/accounts')}
+          onClick={handleBack}
           className="text-text dark:text-text-dark hover:opacity-80 p-2 transition-opacity bg-card dark:bg-card-dark rounded-full shrink-0 border border-border dark:border-border-dark"
           aria-label="Voltar"
         >
@@ -110,7 +71,7 @@ export function AccountCardsContainer({
         {hasMultipleAccounts && canScrollLeft && (
           <button
             type="button"
-            onClick={() => scroll('left')}
+            onClick={() => scrollTo('left')}
             className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-card dark:bg-card-dark border border-border dark:border-border-dark flex items-center justify-center shadow-lg hover:bg-background dark:hover:bg-background-dark transition-colors"
             aria-label="Rolar para esquerda"
           >
@@ -140,7 +101,7 @@ export function AccountCardsContainer({
         {hasMultipleAccounts && canScrollRight && (
           <button
             type="button"
-            onClick={() => scroll('right')}
+            onClick={() => scrollTo('right')}
             className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-card dark:bg-card-dark border border-border dark:border-border-dark flex items-center justify-center shadow-lg hover:bg-background dark:hover:bg-background-dark transition-colors"
             aria-label="Rolar para direita"
           >
