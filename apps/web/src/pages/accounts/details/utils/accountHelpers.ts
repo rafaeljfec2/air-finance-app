@@ -18,7 +18,7 @@ const BANK_THEMES: Record<string, BankTheme> = {
   '237': { primary: '#CC092F', gradient: 'linear-gradient(135deg, #CC092F 0%, #A00725 100%)' },
   '260': { primary: '#8A05BE', gradient: 'linear-gradient(135deg, #8A05BE 0%, #6B0494 100%)' },
   '140': { primary: '#8A05BE', gradient: 'linear-gradient(135deg, #8A05BE 0%, #6B0494 100%)' },
-  '341': { primary: '#EC7000', gradient: 'linear-gradient(135deg, #EC7000 0%, #003D73 100%)' },
+  '341': { primary: '#EC7000', gradient: 'linear-gradient(135deg, #FF6600 0%, #EC7000 100%)' },
   '623': { primary: '#004C99', gradient: 'linear-gradient(135deg, #004C99 0%, #FF6600 100%)' },
 };
 
