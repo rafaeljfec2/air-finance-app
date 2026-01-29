@@ -164,20 +164,7 @@ export function AccountsPage() {
     }
   };
 
-  const handleOpenFinanceSuccess = async () => {
-    if (activeCompany?.id) {
-      try {
-        const updatedCompany = await companyService.getById(activeCompany.id);
-        setActiveCompany(updatedCompany);
-        await new Promise((resolve) => setTimeout(resolve, 200));
-      } catch (err) {
-        console.error('Failed to refresh company data:', err);
-      }
-    }
-    globalThis.location.reload();
-  };
-
-  const handlePierreSuccess = async () => {
+  const handleIntegrationSuccess = async () => {
     if (activeCompany?.id) {
       try {
         const updatedCompany = await companyService.getById(activeCompany.id);
@@ -304,7 +291,7 @@ export function AccountsPage() {
           onClose={() => setShowPierreModal(false)}
           companyId={activeCompany.id}
           pierreFinanceTenantId={activeCompany.pierreFinanceTenantId}
-          onSuccess={handlePierreSuccess}
+          onSuccess={handleIntegrationSuccess}
         />
       )}
 
@@ -319,7 +306,7 @@ export function AccountsPage() {
           companyId={activeCompany.id}
           openiTenantId={openFinanceCompanyData?.openiTenantId ?? activeCompany.openiTenantId}
           companyDocument={openFinanceCompanyData?.companyDocument ?? activeCompany.cnpj}
-          onSuccess={handleOpenFinanceSuccess}
+          onSuccess={handleIntegrationSuccess}
         />
       )}
 

@@ -319,7 +319,7 @@ export const router = createBrowserRouter([
   createSimpleProtectedRoute('/categories', CategoriesPage),
   createSimpleProtectedRoute('/accounts', AccountsPage),
   createSimpleProtectedRoute('/accounts/:accountId/statement-schedule', StatementSchedulePage),
-  createSimpleProtectedRoute('/accounts/:accountId/details', AccountDetailsPage),
+  createSimpleProtectedRoute('/accounts/details', AccountDetailsPage),
   createSimpleProtectedRoute('/openfinance', OpenFinancePage),
   createSimpleProtectedRoute('/business-logs', BusinessLogsPage),
   createSimpleProtectedRoute('/profile', Profile),

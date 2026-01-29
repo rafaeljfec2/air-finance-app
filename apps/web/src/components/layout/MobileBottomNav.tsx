@@ -12,11 +12,10 @@ interface NavItem {
 }
 
 interface MobileBottomNavProps {
-  onNewTransaction: () => void;
-  onMenuOpen: () => void;
+  readonly onNewTransaction: () => void;
 }
 
-export function MobileBottomNav({ onNewTransaction, onMenuOpen }: Readonly<MobileBottomNavProps>) {
+export function MobileBottomNav({ onNewTransaction }: Readonly<MobileBottomNavProps>) {
   const location = useLocation();
 
   const navItems: NavItem[] = [
@@ -49,7 +48,7 @@ export function MobileBottomNav({ onNewTransaction, onMenuOpen }: Readonly<Mobil
       id: 'profile',
       label: 'Perfil',
       icon: User,
-      onClick: onMenuOpen,
+      href: '/profile',
     },
   ];
 
@@ -62,7 +61,8 @@ export function MobileBottomNav({ onNewTransaction, onMenuOpen }: Readonly<Mobil
     <nav
       className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-card-dark border-t border-border dark:border-border-dark shadow-lg"
       style={{
-        paddingBottom: 'max(env(safe-area-inset-bottom, constant(safe-area-inset-bottom, 0px)), 0.5rem)',
+        paddingBottom:
+          'max(env(safe-area-inset-bottom, constant(safe-area-inset-bottom, 0px)), 0.5rem)',
       }}
       aria-label="Navegação principal móvel"
     >

@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Account } from '@/services/accountService';
 import { useHorizontalScroll } from '../hooks/useHorizontalScroll';
 import { AccountBalanceCard } from './AccountBalanceCard';
+import { AddAccountCard } from './AddAccountCard';
 
 interface AccountCardsContainerDesktopProps {
   readonly accounts: ReadonlyArray<Account>;
@@ -11,6 +12,7 @@ interface AccountCardsContainerDesktopProps {
   readonly onEditAccount?: (account: Account) => void;
   readonly onToggleAutoSync?: (account: Account) => void;
   readonly onDeleteAccount?: (account: Account) => void;
+  readonly onAddAccount?: () => void;
 }
 
 const SCROLL_CONFIG = {
@@ -26,25 +28,28 @@ export function AccountCardsContainerDesktop({
   onEditAccount,
   onToggleAutoSync,
   onDeleteAccount,
+  onAddAccount,
 }: Readonly<AccountCardsContainerDesktopProps>) {
   const selectedIndex = useMemo(
     () => accounts.findIndex((acc) => acc.id === selectedAccountId),
     [accounts, selectedAccountId],
   );
 
+  const totalItems = onAddAccount ? accounts.length + 1 : accounts.length;
+
   const { scrollContainerRef, canScrollLeft, canScrollRight, scrollTo } = useHorizontalScroll(
-    accounts.length,
+    totalItems,
     selectedIndex,
     SCROLL_CONFIG,
   );
 
-  const hasMultipleAccounts = accounts.length > 1;
+  const hasMultipleItems = totalItems > 1;
 
   return (
     <div className="sticky top-0 z-20 bg-background dark:bg-background-dark pt-8 pb-2 lg:pt-6">
       <div className="mx-4 lg:mx-6">
         <div className="relative">
-          {hasMultipleAccounts && canScrollLeft && (
+          {hasMultipleItems && canScrollLeft && (
             <button
               type="button"
               onClick={() => scrollTo('left')}
@@ -60,6 +65,11 @@ export function AccountCardsContainerDesktop({
             className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth py-2 pl-1"
             style={{ scrollSnapType: 'x mandatory' }}
           >
+            {onAddAccount && (
+              <div style={{ scrollSnapAlign: 'start' }}>
+                <AddAccountCard onClick={onAddAccount} />
+              </div>
+            )}
             {accounts.map((account) => (
               <div key={account.id} style={{ scrollSnapAlign: 'start' }}>
                 <AccountBalanceCard
@@ -74,7 +84,7 @@ export function AccountCardsContainerDesktop({
             ))}
           </div>
 
-          {hasMultipleAccounts && canScrollRight && (
+          {hasMultipleItems && canScrollRight && (
             <button
               type="button"
               onClick={() => scrollTo('right')}

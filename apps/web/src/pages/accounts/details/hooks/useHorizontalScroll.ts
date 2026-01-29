@@ -34,8 +34,11 @@ export function useHorizontalScroll(
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    setCanScrollLeft(container.scrollLeft > 0);
-    setCanScrollRight(container.scrollLeft < container.scrollWidth - container.clientWidth - 1);
+    const scrollThreshold = 10;
+    setCanScrollLeft(container.scrollLeft > scrollThreshold);
+    setCanScrollRight(
+      container.scrollLeft < container.scrollWidth - container.clientWidth - scrollThreshold,
+    );
   }, []);
 
   useEffect(() => {

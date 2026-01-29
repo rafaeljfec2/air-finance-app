@@ -75,10 +75,7 @@ export function CreditCardBillsPage() {
         <div className="flex items-center justify-center h-screen bg-background dark:bg-background-dark pb-20 lg:pb-0">
           <Loading size="large">Carregando fatura, por favor aguarde...</Loading>
         </div>
-        <MobileBottomNav
-          onNewTransaction={() => setIsFabModalOpen(true)}
-          onMenuOpen={() => setIsSidebarOpen(true)}
-        />
+        <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
         <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
       </>
     );
@@ -102,10 +99,7 @@ export function CreditCardBillsPage() {
             <BillErrorState error={error} />
           </div>
         </div>
-        <MobileBottomNav
-          onNewTransaction={() => setIsFabModalOpen(true)}
-          onMenuOpen={() => setIsSidebarOpen(true)}
-        />
+        <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
         <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
       </>
     );
@@ -129,10 +123,7 @@ export function CreditCardBillsPage() {
             <BillEmptyState />
           </div>
         </div>
-        <MobileBottomNav
-          onNewTransaction={() => setIsFabModalOpen(true)}
-          onMenuOpen={() => setIsSidebarOpen(true)}
-        />
+        <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
         <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
       </>
     );
@@ -186,10 +177,7 @@ export function CreditCardBillsPage() {
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      <MobileBottomNav
-        onNewTransaction={() => setIsFabModalOpen(true)}
-        onMenuOpen={() => setIsSidebarOpen(true)}
-      />
+      <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
 
       <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
     </>

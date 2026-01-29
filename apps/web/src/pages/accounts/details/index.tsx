@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { Loading } from '@/components/Loading';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
@@ -21,16 +21,16 @@ import { useAccounts } from '@/hooks/useAccounts';
 import type { Account, CreateAccount } from '@/services/accountService';
 
 export function AccountDetailsPage() {
-  const { accountId } = useParams<{ accountId: string }>();
   const navigate = useNavigate();
-  const [selectedAccountId, setSelectedAccountId] = useState<string>(accountId ?? '');
+  const [selectedAccountId, setSelectedAccountId] = useState<string>('');
   const [isFabModalOpen, setIsFabModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useStatementNavigation();
 
-  const { updateAccount, deleteAccount, isUpdating, isDeleting } = useAccounts();
+  const { createAccount, updateAccount, deleteAccount, isCreating, isUpdating, isDeleting } =
+    useAccounts();
 
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
@@ -52,10 +52,23 @@ export function AccountDetailsPage() {
   } = useAccountDetails(selectedAccountId, currentMonth);
 
   useEffect(() => {
-    if (accountId) {
-      setSelectedAccountId(accountId);
+    if (isLoading) return;
+
+    if (accounts.length === 0) {
+      navigate('/accounts', { replace: true });
+      return;
     }
-  }, [accountId]);
+
+    if (!selectedAccountId) {
+      setSelectedAccountId(accounts[0].id);
+      return;
+    }
+
+    const accountExists = accounts.some((acc) => acc.id === selectedAccountId);
+    if (!accountExists) {
+      setSelectedAccountId(accounts[0].id);
+    }
+  }, [accounts, selectedAccountId, isLoading, navigate]);
 
   useEffect(() => {
     const checkDesktop = () => {
@@ -71,26 +84,32 @@ export function AccountDetailsPage() {
     (newAccountId: string) => {
       if (newAccountId !== selectedAccountId) {
         setSelectedAccountId(newAccountId);
-        navigate(`/accounts/${newAccountId}/details`, { replace: true });
       }
     },
-    [selectedAccountId, navigate],
+    [selectedAccountId],
   );
+
+  const handleAddAccount = useCallback(() => {
+    setEditingAccount(null);
+    setShowFormModal(true);
+  }, []);
 
   const handleEditAccount = useCallback((acc: Account) => {
     setEditingAccount(acc);
     setShowFormModal(true);
   }, []);
 
-  const handleSubmitEdit = useCallback(
+  const handleSubmitAccount = useCallback(
     (data: CreateAccount) => {
       if (editingAccount) {
         updateAccount({ id: editingAccount.id, data });
+      } else {
+        createAccount(data);
       }
       setShowFormModal(false);
       setEditingAccount(null);
     },
-    [editingAccount, updateAccount],
+    [editingAccount, updateAccount, createAccount],
   );
 
   const handleConfigureSchedule = useCallback((acc: Account) => {
@@ -109,7 +128,7 @@ export function AccountDetailsPage() {
       if (deletingAccount.id === selectedAccountId && accounts.length > 1) {
         const nextAccount = accounts.find((acc) => acc.id !== deletingAccount.id);
         if (nextAccount) {
-          navigate(`/accounts/${nextAccount.id}/details`, { replace: true });
+          setSelectedAccountId(nextAccount.id);
         }
       } else if (accounts.length <= 1) {
         navigate('/accounts', { replace: true });
@@ -138,9 +157,9 @@ export function AccountDetailsPage() {
           setShowFormModal(false);
           setEditingAccount(null);
         }}
-        onSubmit={handleSubmitEdit}
+        onSubmit={handleSubmitAccount}
         account={editingAccount}
-        isLoading={isUpdating}
+        isLoading={isCreating || isUpdating}
       />
 
       {schedulingAccount && (
@@ -200,15 +219,13 @@ export function AccountDetailsPage() {
             onEditAccount={handleEditAccount}
             onToggleAutoSync={handleConfigureSchedule}
             onDeleteAccount={handleDeleteAccount}
+            onAddAccount={handleAddAccount}
           />
           <div className="flex-1 flex items-center justify-center">
             <Loading size="large">Carregando extrato, por favor aguarde...</Loading>
           </div>
         </div>
-        <MobileBottomNav
-          onNewTransaction={() => setIsFabModalOpen(true)}
-          onMenuOpen={() => setIsSidebarOpen(true)}
-        />
+        <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
         <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
         {renderModals()}
       </>
@@ -227,6 +244,7 @@ export function AccountDetailsPage() {
             onEditAccount={handleEditAccount}
             onToggleAutoSync={handleConfigureSchedule}
             onDeleteAccount={handleDeleteAccount}
+            onAddAccount={handleAddAccount}
           />
           <AccountStatementHeader
             month={currentMonth}
@@ -239,10 +257,7 @@ export function AccountDetailsPage() {
             <AccountErrorState error={error} />
           </div>
         </div>
-        <MobileBottomNav
-          onNewTransaction={() => setIsFabModalOpen(true)}
-          onMenuOpen={() => setIsSidebarOpen(true)}
-        />
+        <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
         <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
         {renderModals()}
       </>
@@ -261,6 +276,7 @@ export function AccountDetailsPage() {
             onEditAccount={handleEditAccount}
             onToggleAutoSync={handleConfigureSchedule}
             onDeleteAccount={handleDeleteAccount}
+            onAddAccount={handleAddAccount}
           />
           <AccountStatementHeader
             month={currentMonth}
@@ -275,10 +291,7 @@ export function AccountDetailsPage() {
             <AccountEmptyState />
           </div>
         </div>
-        <MobileBottomNav
-          onNewTransaction={() => setIsFabModalOpen(true)}
-          onMenuOpen={() => setIsSidebarOpen(true)}
-        />
+        <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
         <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
         {renderModals()}
       </>
@@ -300,6 +313,7 @@ export function AccountDetailsPage() {
           onEditAccount={handleEditAccount}
           onToggleAutoSync={handleConfigureSchedule}
           onDeleteAccount={handleDeleteAccount}
+          onAddAccount={handleAddAccount}
         />
 
         <AccountStatementHeader
@@ -334,10 +348,7 @@ export function AccountDetailsPage() {
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      <MobileBottomNav
-        onNewTransaction={() => setIsFabModalOpen(true)}
-        onMenuOpen={() => setIsSidebarOpen(true)}
-      />
+      <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
 
       <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
       {renderModals()}

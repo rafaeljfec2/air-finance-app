@@ -115,18 +115,22 @@ export function AccountFormModal({
       onClose={handleClose}
       title=""
       dismissible={false}
-      className="max-w-3xl bg-card dark:bg-card-dark p-0 flex flex-col max-h-[95vh]"
+      className="max-w-3xl bg-card dark:bg-card-dark p-0 flex flex-col max-h-[85vh] sm:max-h-[90vh]"
     >
       <div className="flex flex-col flex-1 overflow-hidden min-h-0">
         {/* Header Customizado */}
-        <div className="flex items-center justify-between px-5 pt-3 pb-2 border-b border-border dark:border-border-dark flex-shrink-0">
-          <div className="flex items-center gap-2.5">
+        <div className="flex items-center justify-between px-4 sm:px-5 pt-3 pb-2 border-b border-border dark:border-border-dark flex-shrink-0">
+          <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-primary-500/10 dark:bg-primary-400/10">
               <CreditCard className="h-4 w-4 text-primary-500 dark:text-primary-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-text dark:text-text-dark">{modalTitle}</h2>
-              <p className="text-xs text-muted-foreground dark:text-gray-400">{modalDescription}</p>
+              <h2 className="text-base sm:text-lg font-semibold text-text dark:text-text-dark">
+                {modalTitle}
+              </h2>
+              <p className="text-[11px] sm:text-xs text-muted-foreground dark:text-gray-400">
+                {modalDescription}
+              </p>
             </div>
           </div>
           <button
@@ -138,7 +142,7 @@ export function AccountFormModal({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 min-h-0">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-5 min-h-0">
           <form onSubmit={handleSubmit} id="account-form" className="space-y-2 py-2">
             <BasicInfoSection
               form={form}
@@ -206,13 +210,13 @@ export function AccountFormModal({
         </div>
 
         {/* Footer Fixo */}
-        <div className="flex justify-end gap-2 px-5 py-2.5 border-t border-border dark:border-border-dark bg-card dark:bg-card-dark flex-shrink-0">
+        <div className="flex justify-end gap-2 px-4 sm:px-5 py-3 sm:py-2.5 border-t border-border dark:border-border-dark bg-card dark:bg-card-dark flex-shrink-0 pb-safe">
           <Button
             type="button"
             variant="outline"
             onClick={handleClose}
             size="sm"
-            className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark h-9"
+            className="flex-1 sm:flex-none bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark h-10 sm:h-9"
             disabled={isLoading}
           >
             Cancelar
@@ -221,7 +225,7 @@ export function AccountFormModal({
             type="submit"
             form="account-form"
             size="sm"
-            className="bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/20 h-9"
+            className="flex-1 sm:flex-none bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/20 h-10 sm:h-9"
             disabled={isLoading}
           >
             {getSubmitButtonText()}

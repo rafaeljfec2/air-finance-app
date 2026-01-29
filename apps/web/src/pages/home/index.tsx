@@ -45,7 +45,7 @@ export function HomePage() {
   const handleAccountsClick = () => {
     const bankAccounts = accounts?.filter((acc) => acc.type !== 'credit_card') ?? [];
     if (bankAccounts.length > 0) {
-      navigate(`/accounts/${bankAccounts[0].id}/details`);
+      navigate('/accounts/details');
     } else {
       navigate('/accounts');
     }

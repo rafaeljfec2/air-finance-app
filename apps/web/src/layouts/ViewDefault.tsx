@@ -48,16 +48,17 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
         </div>
       )}
 
-
       <div
         className={cn(
           'flex transition-all duration-300',
-          isHeaderVisible
-            ? 'h-[calc(100dvh-4rem)]'
-            : 'h-[100dvh]',
+          isHeaderVisible ? 'h-[calc(100dvh-4rem)]' : 'h-[100dvh]',
         )}
       >
-        <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} isHeaderVisible={isHeaderVisible} />
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={handleCloseSidebar}
+          isHeaderVisible={isHeaderVisible}
+        />
         <main
           className={cn(
             'flex-1 overflow-auto p-4 sm:p-6 transition-all duration-300 w-full',
@@ -71,10 +72,7 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <MobileBottomNav 
-        onNewTransaction={() => setIsFabModalOpen(true)} 
-        onMenuOpen={handleOpenSidebar}
-      />
+      <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
     </div>
   );
 }

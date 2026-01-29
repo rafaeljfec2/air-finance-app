@@ -67,7 +67,7 @@ export function BankAccountsSection({
             return (
               <Link
                 key={account.id}
-                to={`/accounts/${account.id}/details`}
+                to="/accounts/details"
                 className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
               >
                 <div
