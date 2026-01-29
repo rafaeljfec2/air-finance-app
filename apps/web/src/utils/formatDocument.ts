@@ -3,7 +3,7 @@
  */
 
 // Helper function to remove non-digit characters using regex
- 
+
 function removeNonDigits(value: string): string {
   return value.replace(/\D/g, '');
 }
@@ -49,12 +49,52 @@ export function formatDocument(value: string): string {
   return formatCNPJ(value);
 }
 
-
 /**
  * Removes formatting from a document, returning only digits
  */
 export function unformatDocument(value: string): string {
   return removeNonDigits(value);
+}
+
+const MASK_CHARS = '***';
+const MASK_CHARS_LONG = '*'.repeat(5);
+
+/**
+ * Masks a CPF for privacy, showing only first 3 and last 2 digits
+ */
+export function maskCPF(value: string): string {
+  const digits = removeNonDigits(value);
+  if (digits.length < 11) return formatCPF(value);
+
+  const first3 = digits.slice(0, 3);
+  const last2 = digits.slice(-2);
+
+  return first3 + '.' + MASK_CHARS + '.' + MASK_CHARS + '-' + last2;
+}
+
+/**
+ * Masks a CNPJ for privacy, showing only first 2 and last 2 digits
+ */
+export function maskCNPJ(value: string): string {
+  const digits = removeNonDigits(value);
+  if (digits.length < 14) return formatCNPJ(value);
+
+  const first2 = digits.slice(0, 2);
+  const last2 = digits.slice(-2);
+
+  return first2 + '.' + MASK_CHARS + '.' + MASK_CHARS + '/' + MASK_CHARS_LONG + '-' + last2;
+}
+
+/**
+ * Automatically masks a document (CPF or CNPJ) based on its length
+ */
+export function maskDocument(value: string): string {
+  const digits = removeNonDigits(value);
+  if (digits.length === 0) return '';
+  if (digits.length <= 11) {
+    return maskCPF(value);
+  }
+  return maskCNPJ(value);
 }
 
 export function validateCPF(cpf: string): boolean {
@@ -108,4 +148,3 @@ export function validateCNPJ(cnpj: string): boolean {
 
   return true;
 }
-
