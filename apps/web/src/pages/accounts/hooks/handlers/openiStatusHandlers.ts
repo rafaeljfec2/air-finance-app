@@ -1,4 +1,4 @@
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { resyncItem } from '@/services/openiService';
 import { useAccounts } from '@/hooks/useAccounts';

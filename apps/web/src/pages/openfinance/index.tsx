@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { Link2 } from 'lucide-react';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';

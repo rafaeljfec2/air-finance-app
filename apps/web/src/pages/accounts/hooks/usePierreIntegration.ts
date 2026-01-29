@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import {
   connectPierre,
   importPierreAccounts,
@@ -150,8 +150,7 @@ export function usePierreIntegration({
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      const errorMessage =
-        error.response?.data?.message || 'Erro ao conectar com Pierre Finance';
+      const errorMessage = error.response?.data?.message || 'Erro ao conectar com Pierre Finance';
       setError(errorMessage);
       toast.error(errorMessage);
       console.error('Error connecting to Pierre:', err);

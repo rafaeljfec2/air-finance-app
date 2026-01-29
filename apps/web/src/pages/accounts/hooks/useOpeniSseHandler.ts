@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { useOpeniItemEvents } from '@/hooks/useOpeniItemEvents';
 import type { OpeniItemResponse } from '@/services/openiService';
 import type { ModalStep } from './handlers/openiStatusHandlers';
