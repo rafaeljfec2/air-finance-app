@@ -7,6 +7,7 @@ import { useCompanyStore } from '@/stores/company';
 import { companyService } from '@/services/companyService';
 import { useAuthStore } from '@/stores/auth';
 import { useMemo, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import { AccountsEmptyState } from './components/AccountsEmptyState';
 import { AccountsErrorState } from './components/AccountsErrorState';
 import { AccountsFilters } from './components/AccountsFilters';
@@ -19,6 +20,10 @@ import { useAccountsPageModals } from './hooks/useAccountsPageModals';
 import { UserRole } from '@/types/user';
 
 export function AccountsPage() {
+  return <Navigate to="/accounts/details" replace />;
+}
+
+export function AccountsManagementPage() {
   const { accounts, isLoading, error, isUpdating, isDeleting } = useAccounts();
   const { activeCompany, setActiveCompany } = useCompanyStore();
   const { canCreateAccount } = usePlanLimits();

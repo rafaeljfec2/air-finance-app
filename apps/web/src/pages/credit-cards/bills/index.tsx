@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Loading } from '@/components/Loading';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
@@ -16,10 +15,10 @@ import { BillTransactionList } from './components/BillTransactionList';
 import { BillEmptyState } from './components/BillEmptyState';
 import { BillErrorState } from './components/BillErrorState';
 import { CreditCardModals } from './components/CreditCardModals';
+import { NoCreditCardsState } from './components/NoCreditCardsState';
 import { CreditCardBillsPageDesktop } from './desktop';
 
 export function CreditCardBillsPage() {
-  const navigate = useNavigate();
   const { isDesktop } = useResponsiveBreakpoint();
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
@@ -28,9 +27,11 @@ export function CreditCardBillsPage() {
   const [isFabModalOpen, setIsFabModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const { creditCards } = useCreditCards(companyId);
+  const { creditCards, isLoading: isLoadingCards } = useCreditCards(companyId);
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useBillNavigation();
+
+  const hasCards = creditCards && creditCards.length > 0;
 
   const {
     creditCard,
@@ -59,17 +60,12 @@ export function CreditCardBillsPage() {
   });
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoadingCards || !hasCards) return;
 
-    if (!creditCards || creditCards.length === 0) {
-      navigate('/credit-cards/bills', { replace: true });
-      return;
+    if (!selectedCardId || !creditCards?.some((card) => card.id === selectedCardId)) {
+      setSelectedCardId(creditCards?.[0]?.id ?? '');
     }
-
-    if (!selectedCardId || !creditCards.some((card) => card.id === selectedCardId)) {
-      setSelectedCardId(creditCards[0].id);
-    }
-  }, [creditCards, selectedCardId, isLoading, navigate]);
+  }, [creditCards, selectedCardId, isLoadingCards, hasCards]);
 
   if (isDesktop) {
     return <CreditCardBillsPageDesktop />;
@@ -110,6 +106,28 @@ export function CreditCardBillsPage() {
       <CreditCardModals formModal={formModal} deleteModal={deleteModal} />
     </>
   );
+
+  if (isLoadingCards) {
+    return (
+      <>
+        <div className="flex items-center justify-center h-screen bg-background dark:bg-background-dark pb-20">
+          <Loading size="large">Carregando cartões, por favor aguarde...</Loading>
+        </div>
+        {renderMobileNavigation()}
+      </>
+    );
+  }
+
+  if (!hasCards) {
+    return (
+      <>
+        <div className="flex flex-col h-screen bg-background dark:bg-background-dark overflow-hidden pb-20">
+          <NoCreditCardsState onAddCard={handlers.onAddCard} />
+        </div>
+        {renderMobileNavigation()}
+      </>
+    );
+  }
 
   if (isLoading) {
     return (

@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Loading } from '@/components/Loading';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCreditCards } from '@/hooks/useCreditCards';
@@ -15,9 +14,9 @@ import { BillCard } from './components/BillCard';
 import { BillEmptyState } from './components/BillEmptyState';
 import { BillErrorState } from './components/BillErrorState';
 import { CreditCardModals } from './components/CreditCardModals';
+import { NoCreditCardsState } from './components/NoCreditCardsState';
 
 export function CreditCardBillsPageDesktop() {
-  const navigate = useNavigate();
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
 
@@ -26,7 +25,7 @@ export function CreditCardBillsPageDesktop() {
   const debouncedSearch = useDebouncedValue(searchInput, 500);
   const searchTermToSend = debouncedSearch.length >= 3 ? debouncedSearch : undefined;
 
-  const { creditCards } = useCreditCards(companyId);
+  const { creditCards, isLoading: isLoadingCards } = useCreditCards(companyId);
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useBillNavigation();
   const { cardLimitsUsed, aggregated } = useAllCardsBillTotals({
@@ -34,6 +33,8 @@ export function CreditCardBillsPageDesktop() {
     creditCards: creditCards ?? [],
     month: currentMonth,
   });
+
+  const hasCards = creditCards && creditCards.length > 0;
 
   const {
     creditCard,
@@ -63,17 +64,12 @@ export function CreditCardBillsPageDesktop() {
   });
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoadingCards || !hasCards) return;
 
-    if (!creditCards || creditCards.length === 0) {
-      navigate('/credit-cards/bills', { replace: true });
-      return;
+    if (!selectedCardId || !creditCards?.some((card) => card.id === selectedCardId)) {
+      setSelectedCardId(creditCards?.[0]?.id ?? '');
     }
-
-    if (!selectedCardId || !creditCards.some((card) => card.id === selectedCardId)) {
-      setSelectedCardId(creditCards[0].id);
-    }
-  }, [creditCards, selectedCardId, isLoading, navigate]);
+  }, [creditCards, selectedCardId, isLoadingCards, hasCards]);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchInput(value);
@@ -92,6 +88,25 @@ export function CreditCardBillsPageDesktop() {
       cardLimitsUsed={cardLimitsUsed}
     />
   );
+
+  if (isLoadingCards) {
+    return (
+      <ViewDefault>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loading size="large">Carregando cartões, por favor aguarde...</Loading>
+        </div>
+      </ViewDefault>
+    );
+  }
+
+  if (!hasCards) {
+    return (
+      <ViewDefault>
+        <NoCreditCardsState onAddCard={handlers.onAddCard} />
+        <CreditCardModals formModal={formModal} deleteModal={deleteModal} />
+      </ViewDefault>
+    );
+  }
 
   if (isLoading) {
     return (

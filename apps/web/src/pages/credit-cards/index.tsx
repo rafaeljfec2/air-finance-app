@@ -7,8 +7,8 @@ import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { CreateCreditCardPayload, CreditCard } from '@/services/creditCardService';
 import { useCompanyStore } from '@/stores/company';
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { CreditCardsEmptyState } from './components/CreditCardsEmptyState';
 import { CreditCardsErrorState } from './components/CreditCardsErrorState';
 import { CreditCardsFilters } from './components/CreditCardsFilters';
@@ -18,7 +18,10 @@ import { useCreditCardFilters } from './hooks/useCreditCardFilters';
 import { useCreditCardSorting } from './hooks/useCreditCardSorting';
 
 export function CreditCardsPage() {
-  const navigate = useNavigate();
+  return <Navigate to="/credit-cards/bills" replace />;
+}
+
+export function CreditCardsManagementPage() {
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id || '';
   const {
@@ -33,12 +36,6 @@ export function CreditCardsPage() {
     isDeleting,
   } = useCreditCards(companyId);
   const { canCreateCreditCard } = usePlanLimits();
-
-  useEffect(() => {
-    if (!isLoading && creditCards && creditCards.length > 0) {
-      navigate('/credit-cards/bills', { replace: true });
-    }
-  }, [creditCards, isLoading, navigate]);
 
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingCreditCard, setEditingCreditCard] = useState<CreditCard | null>(null);

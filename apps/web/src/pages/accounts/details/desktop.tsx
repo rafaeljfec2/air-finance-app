@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Loading } from '@/components/Loading';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useAccountDetails } from './hooks/useAccountDetails';
@@ -10,11 +9,11 @@ import { AccountSummary } from './components/AccountSummary';
 import { StatementCard } from './components/StatementCard';
 import { AccountErrorState } from './components/AccountErrorState';
 import { AccountModals } from './components/AccountModals';
+import { NoAccountsState } from './components/NoAccountsState';
 import { createInitialSummary } from './hooks/types';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 export function AccountDetailsPageDesktop() {
-  const navigate = useNavigate();
   const [selectedAccountId, setSelectedAccountId] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebouncedValue(searchInput, 500);
@@ -34,6 +33,8 @@ export function AccountDetailsPageDesktop() {
     isFetching,
   } = useAccountDetails(selectedAccountId, currentMonth, searchTermToSend);
 
+  const hasAccounts = accounts && accounts.length > 0;
+
   const handleAccountSelect = useCallback(
     (newAccountId: string) => {
       if (newAccountId !== selectedAccountId) {
@@ -50,23 +51,41 @@ export function AccountDetailsPageDesktop() {
   });
 
   useEffect(() => {
-    if (isLoading) return;
-
-    if (accounts.length === 0) {
-      navigate('/accounts', { replace: true });
-      return;
-    }
+    if (isLoading || !hasAccounts) return;
 
     if (!selectedAccountId || !accounts.some((acc) => acc.id === selectedAccountId)) {
       setSelectedAccountId(accounts[0].id);
     }
-  }, [accounts, selectedAccountId, isLoading, navigate]);
+  }, [accounts, selectedAccountId, isLoading, hasAccounts]);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchInput(value);
   }, []);
 
   const isSearching = searchInput !== debouncedSearch;
+
+  if (isLoading && !hasAccounts) {
+    return (
+      <ViewDefault>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loading size="large">Carregando contas, por favor aguarde...</Loading>
+        </div>
+      </ViewDefault>
+    );
+  }
+
+  if (!hasAccounts) {
+    return (
+      <ViewDefault>
+        <NoAccountsState onAddAccount={handlers.onAddAccount} />
+        <AccountModals
+          formModal={formModal}
+          scheduleModal={scheduleModal}
+          deleteModal={deleteModal}
+        />
+      </ViewDefault>
+    );
+  }
 
   if (isLoading) {
     return (

@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Loading } from '@/components/Loading';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
@@ -15,11 +14,11 @@ import { StatementTransactionList } from './components/StatementTransactionList'
 import { AccountEmptyState } from './components/AccountEmptyState';
 import { AccountErrorState } from './components/AccountErrorState';
 import { AccountModals } from './components/AccountModals';
+import { NoAccountsState } from './components/NoAccountsState';
 import { AccountDetailsPageDesktop } from './desktop';
 import { createInitialSummary } from './hooks/types';
 
 export function AccountDetailsPage() {
-  const navigate = useNavigate();
   const { isDesktop } = useResponsiveBreakpoint();
   const [selectedAccountId, setSelectedAccountId] = useState('');
   const [isFabModalOpen, setIsFabModalOpen] = useState(false);
@@ -40,6 +39,8 @@ export function AccountDetailsPage() {
     isInitialLoad,
   } = useAccountDetails(selectedAccountId, currentMonth);
 
+  const hasAccounts = accounts && accounts.length > 0;
+
   const handleAccountSelect = useCallback(
     (newAccountId: string) => {
       if (newAccountId !== selectedAccountId) {
@@ -56,23 +57,12 @@ export function AccountDetailsPage() {
   });
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !hasAccounts) return;
 
-    if (accounts.length === 0) {
-      navigate('/accounts', { replace: true });
-      return;
-    }
-
-    if (!selectedAccountId) {
-      setSelectedAccountId(accounts[0].id);
-      return;
-    }
-
-    const accountExists = accounts.some((acc) => acc.id === selectedAccountId);
-    if (!accountExists) {
+    if (!selectedAccountId || !accounts.some((acc) => acc.id === selectedAccountId)) {
       setSelectedAccountId(accounts[0].id);
     }
-  }, [accounts, selectedAccountId, isLoading, navigate]);
+  }, [accounts, selectedAccountId, isLoading, hasAccounts]);
 
   if (isDesktop) {
     return <AccountDetailsPageDesktop />;
@@ -110,6 +100,28 @@ export function AccountDetailsPage() {
       />
     </>
   );
+
+  if (isLoading && !hasAccounts) {
+    return (
+      <>
+        <div className="flex items-center justify-center h-screen bg-background dark:bg-background-dark pb-20">
+          <Loading size="large">Carregando contas, por favor aguarde...</Loading>
+        </div>
+        {renderMobileNavigation()}
+      </>
+    );
+  }
+
+  if (!hasAccounts) {
+    return (
+      <>
+        <div className="flex flex-col h-screen bg-background dark:bg-background-dark overflow-hidden pb-20">
+          <NoAccountsState onAddAccount={handlers.onAddAccount} />
+        </div>
+        {renderMobileNavigation()}
+      </>
+    );
+  }
 
   if (isLoading) {
     return (
