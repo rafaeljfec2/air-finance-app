@@ -3,15 +3,16 @@ import React, { useEffect, useRef } from 'react';
 import { Button } from './button';
 
 interface ConfirmModalProps {
-  open: boolean;
-  title: string;
-  description: string | React.ReactNode;
-  confirmLabel?: string;
-  cancelLabel?: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-  danger?: boolean;
-  icon?: React.ReactNode;
+  readonly open: boolean;
+  readonly title: string;
+  readonly description: string | React.ReactNode;
+  readonly confirmLabel?: string;
+  readonly cancelLabel?: string;
+  readonly onConfirm: () => void;
+  readonly onCancel: () => void;
+  readonly danger?: boolean;
+  readonly icon?: React.ReactNode;
+  readonly isLoading?: boolean;
 }
 
 export function ConfirmModal({
@@ -24,6 +25,7 @@ export function ConfirmModal({
   onCancel,
   danger = false,
   icon,
+  isLoading = false,
 }: ConfirmModalProps) {
   const cancelRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -57,6 +59,7 @@ export function ConfirmModal({
             variant="outline"
             onClick={onCancel}
             ref={cancelRef}
+            disabled={isLoading}
             className="border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
           >
             {cancelLabel}
@@ -64,9 +67,10 @@ export function ConfirmModal({
           <Button
             variant="destructive"
             onClick={onConfirm}
+            disabled={isLoading}
             className={danger ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}
           >
-            {confirmLabel}
+            {isLoading ? 'Aguarde...' : confirmLabel}
           </Button>
         </div>
       </div>
