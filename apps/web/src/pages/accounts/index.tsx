@@ -1,46 +1,30 @@
-import { AccountFormModal } from '@/components/accounts/AccountFormModal';
-import { BankingIntegrationModal } from '@/components/accounts/BankingIntegrationModal';
-import { StatementScheduleConfig } from '@/components/accounts/StatementScheduleConfig';
-import { PierreConnectModal } from '@/components/accounts/PierreConnectModal';
-import { OpenFinanceConnectModal } from '@/components/accounts/OpenFinanceConnectModal';
 import { Loading } from '@/components/Loading';
-import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useAccounts } from '@/hooks/useAccounts';
 import { usePlanLimits } from '@/hooks/usePlanLimits';
 import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { Account, CreateAccount } from '@/services/accountService';
 import { useCompanyStore } from '@/stores/company';
 import { companyService } from '@/services/companyService';
 import { useAuthStore } from '@/stores/auth';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useEffect } from 'react';
 import { AccountsEmptyState } from './components/AccountsEmptyState';
 import { AccountsErrorState } from './components/AccountsErrorState';
 import { AccountsFilters } from './components/AccountsFilters';
 import { AccountsHeader } from './components/AccountsHeader';
 import { AccountsList } from './components/AccountsList';
+import { AccountsPageModals } from './components/AccountsPageModals';
 import { useAccountFilters } from './hooks/useAccountFilters';
 import { useAccountSorting } from './hooks/useAccountSorting';
+import { useAccountsPageModals } from './hooks/useAccountsPageModals';
 import { UserRole } from '@/types/user';
 
 export function AccountsPage() {
-  const {
-    accounts,
-    isLoading,
-    error,
-    createAccount,
-    updateAccount,
-    deleteAccount,
-    isCreating,
-    isUpdating,
-    isDeleting,
-  } = useAccounts();
+  const { accounts, isLoading, error, isUpdating, isDeleting } = useAccounts();
   const { activeCompany, setActiveCompany } = useCompanyStore();
   const { canCreateAccount } = usePlanLimits();
   const user = useAuthStore((state) => state.user);
   const isGod = user?.role === UserRole.GOD;
 
-  // Ensure documentType is loaded (fix for localStorage cache issue)
   useEffect(() => {
     if (activeCompany?.id && !activeCompany.documentType) {
       companyService
@@ -54,20 +38,6 @@ export function AccountsPage() {
     }
   }, [activeCompany?.id, activeCompany?.documentType, setActiveCompany]);
 
-  const [showFormModal, setShowFormModal] = useState(false);
-  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [showBankingIntegrationModal, setShowBankingIntegrationModal] = useState(false);
-  const [configuringAccount, setConfiguringAccount] = useState<Account | null>(null);
-  const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [schedulingAccount, setSchedulingAccount] = useState<Account | null>(null);
-  const [showPierreModal, setShowPierreModal] = useState(false);
-  const [showOpenFinanceModal, setShowOpenFinanceModal] = useState(false);
-  const [openFinanceCompanyData, setOpenFinanceCompanyData] = useState<{
-    openiTenantId?: string;
-    companyDocument?: string;
-  } | null>(null);
   const [viewMode, setViewMode] = useViewMode('accounts-view-mode');
 
   const { searchTerm, setSearchTerm, filterType, setFilterType, filterAccounts, hasActiveFilters } =
@@ -75,109 +45,22 @@ export function AccountsPage() {
 
   const { sortConfig, handleSort, sortAccounts } = useAccountSorting();
 
+  const {
+    formModal,
+    deleteModal,
+    bankingIntegrationModal,
+    scheduleModal,
+    pierreModal,
+    openFinanceModal,
+    handlers,
+  } = useAccountsPageModals();
+
   const filteredAndSortedAccounts = useMemo(() => {
     if (!accounts) return [];
     const filtered = filterAccounts(accounts);
     return sortAccounts(filtered);
   }, [accounts, filterAccounts, sortAccounts]);
 
-  const handleCreate = () => {
-    setEditingAccount(null);
-    setShowFormModal(true);
-  };
-
-  const handleEdit = (account: Account) => {
-    setEditingAccount(account);
-    setShowFormModal(true);
-  };
-
-  const handleSubmit = (data: CreateAccount) => {
-    if (!activeCompany?.id) return;
-
-    if (editingAccount) {
-      updateAccount({ id: editingAccount.id, data });
-    } else {
-      createAccount(data);
-    }
-    setShowFormModal(false);
-    setEditingAccount(null);
-  };
-
-  const handleDelete = (id: string) => {
-    setShowConfirmDelete(true);
-    setDeleteId(id);
-  };
-
-  const confirmDelete = () => {
-    if (deleteId) {
-      deleteAccount(deleteId);
-    }
-    setShowConfirmDelete(false);
-    setDeleteId(null);
-  };
-
-  const cancelDelete = () => {
-    setShowConfirmDelete(false);
-    setDeleteId(null);
-  };
-
-  const handleConfigureIntegration = (account: Account) => {
-    setConfiguringAccount(account);
-    setShowBankingIntegrationModal(true);
-  };
-
-  const handleBankingIntegrationSuccess = () => {
-    // Refresh accounts list to get updated integration status
-    globalThis.location.reload();
-  };
-
-  const handleConfigureSchedule = (account: Account) => {
-    setSchedulingAccount(account);
-    setShowScheduleModal(true);
-  };
-
-  const handleConnectPierre = () => {
-    setShowPierreModal(true);
-  };
-
-  const handleConnectOpenFinance = async () => {
-    if (activeCompany?.id) {
-      try {
-        const company = await companyService.getById(activeCompany.id);
-        setActiveCompany(company);
-        setOpenFinanceCompanyData({
-          openiTenantId: company.openiTenantId,
-          companyDocument: company.cnpj,
-        });
-        setShowOpenFinanceModal(true);
-      } catch (err) {
-        console.error('Failed to refresh company data:', err);
-        setOpenFinanceCompanyData({
-          openiTenantId: activeCompany.openiTenantId,
-          companyDocument: activeCompany.cnpj,
-        });
-        setShowOpenFinanceModal(true);
-      }
-    } else {
-      setOpenFinanceCompanyData(null);
-      setShowOpenFinanceModal(true);
-    }
-  };
-
-  const handleIntegrationSuccess = async () => {
-    if (activeCompany?.id) {
-      try {
-        const updatedCompany = await companyService.getById(activeCompany.id);
-        setActiveCompany(updatedCompany);
-        await new Promise((resolve) => setTimeout(resolve, 200));
-      } catch (err) {
-        console.error('Failed to refresh company data:', err);
-      }
-    }
-    globalThis.location.reload();
-  };
-
-  // Check if company is CPF (to show Pierre button)
   const isPierreAvailable = activeCompany?.documentType === 'CPF';
 
   if (isLoading) {
@@ -214,10 +97,10 @@ export function AccountsPage() {
       <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <AccountsHeader
-            onCreate={handleCreate}
+            onCreate={handlers.onCreate}
             canCreate={canCreateAccount}
-            onConnectPierre={isGod && isPierreAvailable ? handleConnectPierre : undefined}
-            onConnectOpenFinance={isGod ? handleConnectOpenFinance : undefined}
+            onConnectPierre={isGod && isPierreAvailable ? handlers.onConnectPierre : undefined}
+            onConnectOpenFinance={isGod ? handlers.onConnectOpenFinance : undefined}
           />
 
           <AccountsFilters
@@ -230,17 +113,17 @@ export function AccountsPage() {
           />
 
           {filteredAndSortedAccounts.length === 0 ? (
-            <AccountsEmptyState hasFilters={hasActiveFilters} onCreate={handleCreate} />
+            <AccountsEmptyState hasFilters={hasActiveFilters} onCreate={handlers.onCreate} />
           ) : (
             <AccountsList
               accounts={filteredAndSortedAccounts}
               viewMode={viewMode}
               sortConfig={sortConfig}
               onSort={handleSort}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onConfigureIntegration={handleConfigureIntegration}
-              onConfigureSchedule={handleConfigureSchedule}
+              onEdit={handlers.onEdit}
+              onDelete={handlers.onDelete}
+              onConfigureIntegration={handlers.onConfigureIntegration}
+              onConfigureSchedule={handlers.onConfigureSchedule}
               isUpdating={isUpdating}
               isDeleting={isDeleting}
             />
@@ -248,94 +131,17 @@ export function AccountsPage() {
         </div>
       </div>
 
-      {/* Modals */}
-      <AccountFormModal
-        open={showFormModal}
-        onClose={() => {
-          setShowFormModal(false);
-          setEditingAccount(null);
-        }}
-        onSubmit={handleSubmit}
-        onConfigureIntegration={handleConfigureIntegration}
-        account={editingAccount}
-        isLoading={isCreating || isUpdating}
-      />
-
-      {configuringAccount && (
-        <BankingIntegrationModal
-          open={showBankingIntegrationModal}
-          onClose={() => {
-            setShowBankingIntegrationModal(false);
-            setConfiguringAccount(null);
-          }}
-          account={configuringAccount}
-          onSuccess={handleBankingIntegrationSuccess}
-        />
-      )}
-
-      {schedulingAccount && (
-        <StatementScheduleConfig
-          open={showScheduleModal}
-          onClose={() => {
-            setShowScheduleModal(false);
-            setSchedulingAccount(null);
-          }}
-          accountId={schedulingAccount.id}
-          accountName={schedulingAccount.name}
-        />
-      )}
-
-      {isGod && isPierreAvailable && activeCompany && (
-        <PierreConnectModal
-          open={showPierreModal}
-          onClose={() => setShowPierreModal(false)}
-          companyId={activeCompany.id}
-          pierreFinanceTenantId={activeCompany.pierreFinanceTenantId}
-          onSuccess={handleIntegrationSuccess}
-        />
-      )}
-
-      {isGod && activeCompany && showOpenFinanceModal && (
-        <OpenFinanceConnectModal
-          key={`openi-modal-${activeCompany.id}-${openFinanceCompanyData?.openiTenantId ?? 'no-tenant'}`}
-          open={showOpenFinanceModal}
-          onClose={() => {
-            setShowOpenFinanceModal(false);
-            setOpenFinanceCompanyData(null);
-          }}
-          companyId={activeCompany.id}
-          openiTenantId={openFinanceCompanyData?.openiTenantId ?? activeCompany.openiTenantId}
-          companyDocument={openFinanceCompanyData?.companyDocument ?? activeCompany.cnpj}
-          onSuccess={handleIntegrationSuccess}
-        />
-      )}
-
-      <ConfirmModal
-        open={showConfirmDelete}
-        title="Confirmar exclusão de conta"
-        description={
-          <div className="space-y-3">
-            <p className="font-semibold">Tem certeza que deseja excluir esta conta?</p>
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
-              <p className="text-sm text-red-800 dark:text-red-200 font-medium mb-2">
-                ⚠️ Atenção: Esta ação irá deletar:
-              </p>
-              <ul className="text-sm text-red-700 dark:text-red-300 list-disc list-inside space-y-1">
-                <li>Todos os registros de transações vinculados a esta conta</li>
-                <li>Todos os registros de extrato vinculados a esta conta</li>
-                <li>A própria conta</li>
-              </ul>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Esta ação não pode ser desfeita.
-            </p>
-          </div>
-        }
-        confirmLabel="Excluir tudo"
-        cancelLabel="Cancelar"
-        onConfirm={confirmDelete}
-        onCancel={cancelDelete}
-        danger
+      <AccountsPageModals
+        formModal={formModal}
+        deleteModal={deleteModal}
+        bankingIntegrationModal={bankingIntegrationModal}
+        scheduleModal={scheduleModal}
+        pierreModal={pierreModal}
+        openFinanceModal={openFinanceModal}
+        onConfigureIntegration={handlers.onConfigureIntegration}
+        isGod={isGod}
+        isPierreAvailable={isPierreAvailable}
+        activeCompany={activeCompany}
       />
     </ViewDefault>
   );
