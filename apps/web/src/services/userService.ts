@@ -23,10 +23,8 @@ export const UserSchema = z.object({
   companyRoles: z.record(z.string()).optional(),
   integrations: z
     .object({
-      openaiApiKey: z.string().optional(),
-      openaiModel: z
-        .enum(['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo', 'gpt-5.2', 'gpt-5-mini'])
-        .optional(),
+      openaiModel: z.enum(['gpt-4o-mini', 'gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo']).optional(),
+      hasOpenaiKey: z.boolean().optional(),
     })
     .optional(),
   notifications: z

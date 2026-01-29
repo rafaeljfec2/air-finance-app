@@ -20,12 +20,16 @@ export function IntegrationsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
 
+  type OpenaiModelType = 'gpt-4o-mini' | 'gpt-4o' | 'gpt-4-turbo' | 'gpt-3.5-turbo';
+
   const [integrations, setIntegrations] = useState<{
     openaiApiKey: string;
-    openaiModel: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo' | 'gpt-5.2' | 'gpt-5-mini';
+    openaiModel: OpenaiModelType;
+    hasOpenaiKey: boolean;
   }>({
     openaiApiKey: '',
-    openaiModel: 'gpt-3.5-turbo',
+    openaiModel: 'gpt-4o-mini',
+    hasOpenaiKey: false,
   });
 
   useEffect(() => {
@@ -34,19 +38,13 @@ export function IntegrationsPage() {
       setIsLoading(true);
       try {
         const fullUser = await getCurrentUser();
-        // Cast to any because integrations might not be fully typed in the specific hook return type yet
-        const int = (fullUser as { integrations?: { openaiApiKey?: string; openaiModel?: string } })
-          .integrations;
+        const int = fullUser.integrations;
         if (int) {
-          setIntegrations({
-            openaiApiKey: int.openaiApiKey || '',
-            openaiModel: (int.openaiModel || 'gpt-3.5-turbo') as
-              | 'gpt-3.5-turbo'
-              | 'gpt-4'
-              | 'gpt-4-turbo'
-              | 'gpt-5.2'
-              | 'gpt-5-mini',
-          });
+          setIntegrations((prev) => ({
+            ...prev,
+            openaiModel: (int.openaiModel ?? 'gpt-4o-mini') as OpenaiModelType,
+            hasOpenaiKey: int.hasOpenaiKey ?? false,
+          }));
         }
       } catch (error) {
         console.error('Error fetching user integrations:', error);
@@ -162,11 +160,10 @@ export function IntegrationsPage() {
                       {integrations.openaiModel}
                     </SelectTrigger>
                     <SelectContent className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-                      <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo (Rápido)</SelectItem>
-                      <SelectItem value="gpt-4">GPT-4 (Preciso)</SelectItem>
+                      <SelectItem value="gpt-4o-mini">GPT-4o Mini (Recomendado)</SelectItem>
+                      <SelectItem value="gpt-4o">GPT-4o (Mais preciso)</SelectItem>
                       <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
-                      <SelectItem value="gpt-5.2">GPT-5.2 (Beta)</SelectItem>
-                      <SelectItem value="gpt-5-mini">GPT-5 Mini</SelectItem>
+                      <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo (Legacy)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

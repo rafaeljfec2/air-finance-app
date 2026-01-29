@@ -51,7 +51,7 @@ export function UserFormModal({
       companyIds: companyId ? [companyId] : [],
       integrations: {
         openaiApiKey: '',
-        openaiModel: 'gpt-3.5-turbo',
+        openaiModel: 'gpt-4o-mini',
       },
     }),
     [companyId],
@@ -77,23 +77,19 @@ export function UserFormModal({
   );
 
   const openaiModelOptions: ComboBoxOption<
-    'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo' | 'gpt-5.2' | 'gpt-5-mini'
+    'gpt-4o-mini' | 'gpt-4o' | 'gpt-4-turbo' | 'gpt-3.5-turbo'
   >[] = useMemo(
     () => [
-      { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' },
-      { value: 'gpt-4', label: 'GPT-4' },
+      { value: 'gpt-4o-mini', label: 'GPT-4o Mini (Recomendado)' },
+      { value: 'gpt-4o', label: 'GPT-4o (Mais preciso)' },
       { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
-      { value: 'gpt-5.2', label: 'GPT-5.2' },
-      { value: 'gpt-5-mini', label: 'GPT-5 Mini' },
+      { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo (Legacy)' },
     ],
     [],
   );
 
   // Helper function to find missing company IDs
-  const findMissingCompanyIds = (
-    companyIds: string[],
-    existingCompanies: Company[],
-  ): string[] => {
+  const findMissingCompanyIds = (companyIds: string[], existingCompanies: Company[]): string[] => {
     const existingIds = new Set(existingCompanies.map((c) => c.id));
     return companyIds.filter((cId) => !existingIds.has(cId));
   };
@@ -154,8 +150,8 @@ export function UserFormModal({
         plan: user.plan || 'free',
         companyIds: user.companyIds,
         integrations: {
-          openaiApiKey: user.integrations?.openaiApiKey || '',
-          openaiModel: user.integrations?.openaiModel || 'gpt-3.5-turbo',
+          openaiApiKey: '',
+          openaiModel: user.integrations?.openaiModel || 'gpt-4o-mini',
         },
       });
 
@@ -303,15 +299,15 @@ export function UserFormModal({
         <FormField label="Modelo OpenAI (Padrão)">
           <ComboBox
             options={openaiModelOptions}
-            value={form.integrations?.openaiModel ?? 'gpt-3.5-turbo'}
+            value={form.integrations?.openaiModel ?? 'gpt-4o-mini'}
             onValueChange={(
-              value: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo' | 'gpt-5.2' | 'gpt-5-mini' | null,
+              value: 'gpt-4o-mini' | 'gpt-4o' | 'gpt-4-turbo' | 'gpt-3.5-turbo' | null,
             ) =>
               setForm((prev) => ({
                 ...prev,
                 integrations: {
                   ...prev.integrations,
-                  openaiModel: value ?? 'gpt-3.5-turbo',
+                  openaiModel: value ?? 'gpt-4o-mini',
                 },
               }))
             }
