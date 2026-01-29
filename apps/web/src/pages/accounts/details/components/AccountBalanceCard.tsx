@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import type { MouseEvent } from 'react';
+import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import type { Account } from '@/services/accountService';
+import { BankIcon } from '@/components/bank/BankIcon';
 import {
   formatCurrency,
   formatHiddenCurrency,
-  getAccountIcon,
   getAccountSource,
   getAccountDetails,
   getAccountBalance,
-  getAccountColor,
+  getAccountGradient,
+  getAccountBankCode,
+  getAccountInstitution,
 } from '../utils';
 import { AccountCardMenu } from './AccountCardMenu';
 
@@ -31,15 +34,16 @@ export function AccountBalanceCard({
 }: Readonly<AccountBalanceCardProps>) {
   const [isBalanceHidden, setIsBalanceHidden] = useState(false);
 
-  const accountColor = getAccountColor(account);
-  const AccountIcon = getAccountIcon(account.icon);
+  const gradient = getAccountGradient(account);
   const balance = getAccountBalance(account);
   const source = getAccountSource(account);
   const details = getAccountDetails(account);
+  const bankCode = getAccountBankCode(account);
+  const institution = getAccountInstitution(account);
 
   const hasMenuActions = onEdit ?? onToggleAutoSync ?? onDelete;
 
-  const handleToggleBalance = (e: React.MouseEvent) => {
+  const handleToggleBalance = (e: MouseEvent) => {
     e.stopPropagation();
     setIsBalanceHidden((prev) => !prev);
   };
@@ -61,20 +65,25 @@ export function AccountBalanceCard({
         }
       }}
       className={cardClassName}
-      style={{
-        background: `linear-gradient(135deg, ${accountColor} 0%, ${accountColor}dd 100%)`,
-      }}
+      style={{ background: gradient }}
     >
-      <div className="absolute inset-0 bg-black/10 dark:bg-black/30" />
+      <div className="absolute inset-0 bg-black/10 dark:bg-black/20" />
 
       <div className="relative p-4">
         <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-              <AccountIcon className="h-4 w-4 text-white" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-sm overflow-hidden">
+              <BankIcon
+                bankCode={bankCode}
+                institution={institution}
+                iconName={account.icon}
+                size="lg"
+                fillContainer
+                className="p-1"
+              />
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm font-bold text-white truncate max-w-[140px]">
+              <h3 className="text-sm font-bold text-white truncate max-w-[130px]">
                 {account.name}
               </h3>
               {source && <p className="text-[10px] text-white/70 font-medium">{source}</p>}
