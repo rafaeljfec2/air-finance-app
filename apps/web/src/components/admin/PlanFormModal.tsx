@@ -294,10 +294,10 @@ export function PlanFormModal({
                 <div className="flex items-center justify-between p-4 bg-card dark:bg-card-dark rounded-lg border border-border dark:border-border-dark">
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-text dark:text-text-dark">
-                      Múltiplas Empresas
+                      Múltiplos Perfis
                     </span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Criar várias empresas
+                      Criar vários perfis
                     </span>
                   </div>
                   <Switch

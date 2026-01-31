@@ -53,7 +53,7 @@ export const navigation: NavigationSection[] = [
   {
     section: '🏦 Contas & Estrutura',
     items: [
-      { name: 'Empresas', href: '/companies', icon: Building2 },
+      { name: 'Perfis', href: '/companies', icon: Building2 },
       { name: 'Contas Bancárias', href: '/accounts/details', icon: Banknote },
       { name: 'Open Finance', href: '/openfinance', icon: Link2, roles: [UserRole.GOD] },
       { name: 'Cartões de Crédito', href: '/credit-cards/bills', icon: CreditCard },

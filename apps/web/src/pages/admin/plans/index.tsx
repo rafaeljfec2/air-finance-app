@@ -16,7 +16,11 @@ export function PlansAdminPage() {
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
   const [showFormModal, setShowFormModal] = useState(false);
 
-  const { data: plans, isLoading, error } = useQuery<Plan[]>({
+  const {
+    data: plans,
+    isLoading,
+    error,
+  } = useQuery<Plan[]>({
     queryKey: ['admin-plans'],
     queryFn: () => subscriptionService.getPlans(),
   });
@@ -146,14 +150,12 @@ export function PlansAdminPage() {
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Cartões:</span>
                     <span className="text-sm font-semibold text-text dark:text-text-dark">
-                      {plan.limits?.maxCards === -1
-                        ? 'Ilimitados'
-                        : plan.limits?.maxCards || 0}
+                      {plan.limits?.maxCards === -1 ? 'Ilimitados' : plan.limits?.maxCards || 0}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      Múltiplas Empresas:
+                      Múltiplos Perfis:
                     </span>
                     <span className="text-sm font-semibold text-text dark:text-text-dark">
                       {plan.limits?.multiCompany ? 'Sim' : 'Não'}
@@ -189,7 +191,10 @@ export function PlansAdminPage() {
                     </h4>
                     <ul className="space-y-1">
                       {plan.features.map((feature, index) => (
-                        <li key={index} className="text-sm text-gray-600 dark:text-gray-400 flex items-start">
+                        <li
+                          key={index}
+                          className="text-sm text-gray-600 dark:text-gray-400 flex items-start"
+                        >
                           <span className="text-green-500 mr-2">•</span>
                           {feature}
                         </li>

@@ -198,7 +198,7 @@ export function CompanySelectionModal() {
 
         {!isLoading && !isError && !hasCompanies && (
           <div className="rounded-lg bg-gray-100/50 dark:bg-gray-800/50 px-3 sm:px-4 py-4 sm:py-5 text-center text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-            Nenhuma empresa está vinculada à sua conta. Solicite o cadastro de uma empresa para
+            Nenhum perfil está vinculado à sua conta. Solicite o cadastro de um perfil para
             continuar utilizando a plataforma.
           </div>
         )}
@@ -207,13 +207,13 @@ export function CompanySelectionModal() {
           <div className="space-y-4 sm:space-y-5">
             <div className="space-y-2">
               <ComboBox
-                label="Empresa"
+                label="Perfil"
                 options={companyOptions}
                 value={selectedCompanyId}
                 onValueChange={(value) => setSelectedCompanyId(value ?? '')}
-                placeholder="Selecione uma empresa"
+                placeholder="Selecione um perfil"
                 searchable
-                searchPlaceholder="Buscar empresa..."
+                searchPlaceholder="Buscar perfil..."
                 formatSelectedValue={formatSelectedCompany}
                 renderItem={renderCompanyItem}
                 maxHeight="max-h-56"

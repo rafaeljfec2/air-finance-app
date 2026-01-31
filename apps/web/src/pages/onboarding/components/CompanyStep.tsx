@@ -62,9 +62,9 @@ export function CompanyStep({ onNext, onBack, loading, initialData }: Readonly<C
             </Label>
             <Input
               id="companyName"
-              placeholder="Ex: Minha Loja Ltda, Empresa XYZ..."
+              placeholder="Ex: Minha Loja Ltda, MEI João..."
               className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:ring-2 focus:ring-brand-leaf/20 focus:border-brand-leaf"
-              aria-label="Nome da Empresa"
+              aria-label="Nome do Perfil"
               {...companyForm.register('name')}
             />
             {companyForm.formState.errors.name && (

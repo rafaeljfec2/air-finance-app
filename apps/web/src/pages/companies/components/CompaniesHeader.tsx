@@ -16,9 +16,9 @@ export function CompaniesHeader({ onCreate, canCreate }: Readonly<CompaniesHeade
             <Building2 className="h-5 w-5 text-primary-500 dark:text-primary-400" />
           </div>
           <div className="flex-1">
-            <h1 className="text-lg font-bold text-text dark:text-text-dark">Empresas</h1>
+            <h1 className="text-lg font-bold text-text dark:text-text-dark">Perfis</h1>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Gerencie suas empresas e filiais
+              Gerencie seus perfis e filiais
             </p>
           </div>
         </div>
@@ -29,7 +29,7 @@ export function CompaniesHeader({ onCreate, canCreate }: Readonly<CompaniesHeade
             className="w-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center gap-2 h-11 rounded-xl font-medium shadow-lg shadow-primary-500/20"
           >
             <Plus className="h-5 w-5" />
-            Nova Empresa
+            Novo Perfil
           </Button>
         )}
       </div>
@@ -41,11 +41,9 @@ export function CompaniesHeader({ onCreate, canCreate }: Readonly<CompaniesHeade
             <Building2 className="h-8 w-8 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-text dark:text-text-dark mb-1">
-              Empresas
-            </h1>
+            <h1 className="text-3xl font-bold text-text dark:text-text-dark mb-1">Perfis</h1>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Gerencie suas empresas, filiais e dados cadastrais
+              Gerencie seus perfis, filiais e dados cadastrais
             </p>
           </div>
         </div>
@@ -56,7 +54,7 @@ export function CompaniesHeader({ onCreate, canCreate }: Readonly<CompaniesHeade
             className="bg-primary-500 hover:bg-primary-600 text-white flex items-center gap-2 h-12 px-6 rounded-xl font-semibold shadow-lg shadow-primary-500/30 transition-all hover:shadow-xl hover:shadow-primary-500/40"
           >
             <Plus className="h-5 w-5" />
-            Nova Empresa
+            Novo Perfil
           </Button>
         )}
       </div>

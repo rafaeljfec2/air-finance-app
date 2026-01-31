@@ -3,14 +3,18 @@ import { CompanyCard } from './CompanyCard';
 import { CompanyListItem } from './CompanyListItem';
 import { Card } from '@/components/ui/card';
 import { RecordsGrid } from '@/components/ui/RecordsGrid';
-import { SortableColumn , SortConfig } from '@/components/ui/SortableColumn';
+import { SortableColumn, SortConfig } from '@/components/ui/SortableColumn';
 import { Company } from '@/types/company';
 
 interface CompaniesListProps {
   companies: Company[];
   viewMode: 'grid' | 'list';
-  sortConfig: SortConfig<'name' | 'type' | 'cnpj' | 'foundationDate' | 'email' | 'phone' | 'address'> | null;
-  onSort: (field: 'name' | 'type' | 'cnpj' | 'foundationDate' | 'email' | 'phone' | 'address') => void;
+  sortConfig: SortConfig<
+    'name' | 'type' | 'cnpj' | 'foundationDate' | 'email' | 'phone' | 'address'
+  > | null;
+  onSort: (
+    field: 'name' | 'type' | 'cnpj' | 'foundationDate' | 'email' | 'phone' | 'address',
+  ) => void;
   onEdit: (company: Company) => void;
   onDelete: (id: string) => void;
   isUpdating: boolean;
@@ -53,7 +57,7 @@ export function CompaniesList({
             <thead>
               <tr className="border-b border-border dark:border-border-dark">
                 <SortableColumn field="name" currentSort={sortConfig} onSort={onSort}>
-                  Empresa
+                  Perfil
                 </SortableColumn>
                 <SortableColumn field="cnpj" currentSort={sortConfig} onSort={onSort}>
                   Informações

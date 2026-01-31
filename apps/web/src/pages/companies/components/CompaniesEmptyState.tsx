@@ -7,16 +7,11 @@ interface CompaniesEmptyStateProps {
   onCreate: () => void;
 }
 
-export function CompaniesEmptyState({
-  hasFilters,
-  onCreate,
-}: Readonly<CompaniesEmptyStateProps>) {
-  const emptyTitle = hasFilters
-    ? 'Nenhuma empresa encontrada'
-    : 'Nenhuma empresa cadastrada';
+export function CompaniesEmptyState({ hasFilters, onCreate }: Readonly<CompaniesEmptyStateProps>) {
+  const emptyTitle = hasFilters ? 'Nenhum perfil encontrado' : 'Nenhum perfil cadastrado';
   const emptyDescription = hasFilters
     ? 'Tente ajustar os filtros de busca'
-    : 'Comece criando sua primeira empresa';
+    : 'Comece criando seu primeiro perfil';
 
   return (
     <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark backdrop-blur-sm">
@@ -27,7 +22,7 @@ export function CompaniesEmptyState({
         {!hasFilters && (
           <Button onClick={onCreate} className="bg-primary-500 hover:bg-primary-600 text-white">
             <Plus className="h-4 w-4 mr-2" />
-            Criar Primeira Empresa
+            Criar Primeiro Perfil
           </Button>
         )}
       </div>

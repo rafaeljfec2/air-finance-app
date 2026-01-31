@@ -39,7 +39,9 @@ export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<Fi
         >
           <PartyPopper className="h-8 w-8 sm:h-12 sm:w-12 text-green-600" />
         </motion.div>
-        <CardTitle className="text-text dark:text-text-dark text-xl sm:text-2xl">Tudo Pronto!</CardTitle>
+        <CardTitle className="text-text dark:text-text-dark text-xl sm:text-2xl">
+          Tudo Pronto!
+        </CardTitle>
         <CardDescription className="text-text/70 dark:text-text-dark/70 text-base sm:text-lg">
           Configuramos seu ambiente com sucesso.
         </CardDescription>
@@ -55,7 +57,7 @@ export function FinishStep({ onComplete, onBack, summary, loading }: Readonly<Fi
                 <Check className="h-4 w-4 text-green-600" />
               </div>
               <span className="text-text dark:text-text-dark">
-                Empresa <strong>{summary.companyName}</strong> criada
+                Perfil <strong>{summary.companyName}</strong> criado
               </span>
             </div>
             {summary.accountName && (

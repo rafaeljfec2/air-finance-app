@@ -24,7 +24,7 @@ import type {
 // Define steps configuration
 const steps = [
   { icon: Sparkles, label: 'Bem-vindo' },
-  { icon: Building2, label: 'Empresa' },
+  { icon: Building2, label: 'Perfil' },
   { icon: Banknote, label: 'Conta' },
   { icon: CreditCard, label: 'Cartão' },
   { icon: Tags, label: 'Categorias' },

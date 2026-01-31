@@ -24,7 +24,6 @@ const ROLE_OPTIONS: ComboBoxOption<'owner' | 'admin' | 'editor' | 'operator' | '
   { value: 'viewer', label: 'Visualizador' },
 ];
 
-
 export function UserCompanyRolesSection({
   companyRoles,
   onChange,
@@ -75,14 +74,14 @@ export function UserCompanyRolesSection({
       <div className="flex items-center w-full">
         <label className="text-sm font-medium text-text dark:text-text-dark flex items-center gap-1.5">
           <Building2 className="h-4 w-4 text-gray-400" />
-          Empresas ({companyRoles.length})
+          Perfis ({companyRoles.length})
         </label>
         {availableCompanies.length > 0 && (
           <ComboBox
             options={companyOptions}
             value={null}
             onValueChange={handleAddCompany}
-            placeholder="Selecionar empresa"
+            placeholder="Selecionar perfil"
             disabled={disabled || isLoadingCompanies}
             className="w-[180px] h-7 text-xs ml-auto"
           />
@@ -92,7 +91,7 @@ export function UserCompanyRolesSection({
       {/* Company list - compact table style */}
       {companyRoles.length === 0 ? (
         <div className="text-xs text-gray-500 dark:text-gray-400 py-3 text-center border border-dashed border-border dark:border-border-dark rounded-md bg-gray-50/50 dark:bg-gray-900/20">
-          Nenhuma empresa vinculada
+          Nenhum perfil vinculado
         </div>
       ) : (
         <div className="border border-border dark:border-border-dark rounded-md overflow-hidden">
@@ -102,7 +101,7 @@ export function UserCompanyRolesSection({
               <thead className="bg-gray-50 dark:bg-gray-800/50 sticky top-0">
                 <tr>
                   <th className="text-left py-1.5 px-2 font-medium text-gray-500 dark:text-gray-400">
-                    Empresa
+                    Perfil
                   </th>
                   <th className="text-left py-1.5 px-2 font-medium text-gray-500 dark:text-gray-400 w-[110px]">
                     Função

@@ -217,12 +217,10 @@ export function CompanyFormModal({
             </div>
             <div>
               <h2 className="text-xl font-semibold text-text dark:text-text-dark">
-                {company ? 'Editar Empresa/Pessoa' : 'Nova Empresa/Pessoa'}
+                {company ? 'Editar Perfil' : 'Novo Perfil'}
               </h2>
               <p className="text-sm text-muted-foreground dark:text-gray-400 dark:text-gray-400">
-                {company
-                  ? 'Atualize as informações da empresa ou pessoa física'
-                  : 'Preencha os dados da empresa ou pessoa física'}
+                {company ? 'Atualize as informações do perfil' : 'Preencha os dados do perfil'}
               </p>
             </div>
           </div>
@@ -446,7 +444,7 @@ export function CompanyFormModal({
           >
             {(() => {
               if (isLoading) return 'Salvando...';
-              return company ? 'Salvar Alterações' : 'Criar Empresa';
+              return company ? 'Salvar Alterações' : 'Criar Perfil';
             })()}
           </Button>
         </div>
