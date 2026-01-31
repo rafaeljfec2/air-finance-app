@@ -1,4 +1,5 @@
 import { env } from '@/utils/env';
+import { useMaintenanceStore } from '@/stores/maintenance';
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { authUtils } from '../utils/auth';
 
@@ -334,12 +335,20 @@ const refreshClient = axios.create({
 apiClient.interceptors.request.use(addAuthorizationHeader);
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Reset maintenance errors on successful response
+    const maintenanceStore = useMaintenanceStore.getState();
+    if (maintenanceStore.consecutiveErrors > 0) {
+      maintenanceStore.resetErrors();
+    }
+    return response;
+  },
   async (error: AxiosError) => {
     const { response, config } = error;
     const status = response?.status;
+    const maintenanceStore = useMaintenanceStore.getState();
 
-    // Network errors or errors without status
+    // Network errors or errors without status (server unreachable)
     if (!status) {
       if (import.meta.env.DEV) {
         console.error('[API Client] Network error or no status:', {
@@ -348,6 +357,24 @@ apiClient.interceptors.response.use(
           code: error.code,
         });
       }
+
+      // Detect maintenance mode: network errors, timeout, connection refused
+      const isMaintenanceError =
+        error.code === 'ERR_NETWORK' ||
+        error.code === 'ECONNREFUSED' ||
+        error.code === 'ECONNABORTED' ||
+        error.message.includes('Network Error');
+
+      if (isMaintenanceError) {
+        maintenanceStore.incrementError();
+      }
+
+      throw error;
+    }
+
+    // Handle 503 Service Unavailable (explicit maintenance)
+    if (status === 503) {
+      maintenanceStore.setMaintenance(true);
       throw error;
     }
 
@@ -358,6 +385,7 @@ apiClient.interceptors.response.use(
 
     // Handle 5xx Server Errors (retry with backoff)
     if (status >= 500 && status < 600) {
+      maintenanceStore.incrementError();
       return handleServerError(error, config as RetryableRequestConfig);
     }
 

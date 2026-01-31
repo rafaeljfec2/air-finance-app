@@ -6,6 +6,8 @@ const envSchema = z.object({
   VITE_APP_ENV: z.enum(['development', 'production', 'test']),
   VITE_DEBUG: z.string().transform((val) => val === 'true'),
   VITE_LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']),
+  VITE_MAINTENANCE_MODE: z.string().optional().default('false'),
+  VITE_MAINTENANCE_END: z.string().optional(),
 });
 
 type Env = z.infer<typeof envSchema>;

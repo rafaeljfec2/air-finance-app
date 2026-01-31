@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { router } from './routes';
 import { ThemeProvider } from './components/ThemeProvider';
+import { MaintenanceProvider } from './components/maintenance/MaintenanceProvider';
 import { Toaster } from 'sonner';
 import { CompanyProvider } from '@/contexts/companyContext';
 import { useEffect, lazy, Suspense } from 'react';
@@ -49,7 +50,9 @@ export function App() {
       <QueryClientProvider client={queryClient}>
         <CompanyProvider>
           <ThemeProvider>
-            <RouterProvider router={router} />
+            <MaintenanceProvider>
+              <RouterProvider router={router} />
+            </MaintenanceProvider>
             <Toaster
               position="top-right"
               toastOptions={{
