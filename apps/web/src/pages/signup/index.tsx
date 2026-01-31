@@ -42,7 +42,15 @@ export function SignUpPage() {
     const newErrors: { [key: string]: string } = {};
     if (!form.name.trim()) newErrors.name = 'Nome é obrigatório';
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) newErrors.email = 'E-mail inválido';
-    if (form.password.length < 6) newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
+
+    const passwordStrength = calculatePasswordStrength(form.password);
+    if (form.password.length < 8) {
+      newErrors.password = 'Senha deve ter pelo menos 8 caracteres';
+    } else if (passwordStrength < 2) {
+      newErrors.password =
+        'Senha muito fraca. Use letras maiúsculas, números ou caracteres especiais';
+    }
+
     if (form.password !== form.confirmPassword)
       newErrors.confirmPassword = 'As senhas não coincidem';
     return newErrors;
