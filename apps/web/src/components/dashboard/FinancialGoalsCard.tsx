@@ -16,7 +16,7 @@ export function FinancialGoalsCard({ companyId, onViewAll }: Readonly<FinancialG
   const goals: DashboardGoalSummary[] = data ?? [];
 
   return (
-    <Card className="border-border dark:border-border-dark">
+    <Card className="border-border dark:border-border-dark h-full flex flex-col">
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-text dark:text-text-dark">Metas Financeiras</h3>

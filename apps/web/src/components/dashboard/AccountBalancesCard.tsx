@@ -24,8 +24,8 @@ export function AccountBalancesCard({ companyId }: Readonly<AccountBalancesCardP
   const totalBalance = data?.totalBalance ?? 0;
 
   return (
-    <Card className="border-border dark:border-border-dark">
-      <div className="p-4">
+    <Card className="border-border dark:border-border-dark h-full flex flex-col">
+      <div className="p-4 flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-medium text-text dark:text-text-dark">Saldo das Contas</h3>
           <Link

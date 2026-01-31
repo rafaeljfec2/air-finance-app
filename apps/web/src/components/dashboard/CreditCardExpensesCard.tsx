@@ -4,7 +4,16 @@ import { useTransactions } from '@/hooks/useTransactions';
 import type { DashboardFilters } from '@/types/dashboard';
 import { formatDateToLocalISO } from '@/utils/date';
 import { formatCurrency } from '@/utils/formatters';
-import { endOfDay, endOfMonth, endOfWeek, endOfYear, startOfDay, startOfMonth, startOfWeek, startOfYear } from 'date-fns';
+import {
+  endOfDay,
+  endOfMonth,
+  endOfWeek,
+  endOfYear,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+} from 'date-fns';
 import { CreditCard } from 'lucide-react';
 import { useMemo } from 'react';
 
@@ -13,7 +22,10 @@ interface CreditCardExpensesCardProps {
   filters: DashboardFilters;
 }
 
-export function CreditCardExpensesCard({ companyId, filters }: CreditCardExpensesCardProps) {
+export function CreditCardExpensesCard({
+  companyId,
+  filters,
+}: Readonly<CreditCardExpensesCardProps>) {
   const { accounts } = useAccounts();
 
   const creditCardAccounts = useMemo(() => {
@@ -60,9 +72,7 @@ export function CreditCardExpensesCard({ companyId, filters }: CreditCardExpense
 
     const stats = creditCardAccounts.map((account) => {
       const accountTransactions = transactions.filter(
-        (tx) =>
-          tx.accountId === account.id &&
-          tx.launchType === 'expense',
+        (tx) => tx.accountId === account.id && tx.launchType === 'expense',
       );
 
       const total = accountTransactions.reduce((sum, tx) => sum + Math.abs(tx.value), 0);
@@ -87,15 +97,15 @@ export function CreditCardExpensesCard({ companyId, filters }: CreditCardExpense
   }
 
   return (
-    <Card className="col-span-1 bg-card dark:bg-card-dark border-border dark:border-border-dark shadow-sm">
-      <div className="p-6">
+    <Card className="col-span-1 bg-card dark:bg-card-dark border-border dark:border-border-dark shadow-sm h-full flex flex-col">
+      <div className="p-6 flex-1 flex flex-col">
         <div className="flex flex-row items-center justify-between space-y-0 pb-2 mb-4">
           <h3 className="text-sm font-medium text-text dark:text-text-dark">
             Gastos com Cartão de Crédito
           </h3>
           <CreditCard className="h-4 w-4 text-gray-500 dark:text-gray-400" />
         </div>
-        
+
         {isLoading ? (
           <div className="flex h-[200px] items-center justify-center text-sm text-gray-500">
             Carregando...
@@ -105,20 +115,19 @@ export function CreditCardExpensesCard({ companyId, filters }: CreditCardExpense
             <div className="text-2xl font-bold text-text dark:text-text-dark">
               {formatCurrency(totalCreditCardExpenses)}
             </div>
-            
+
             {cardStats.length > 0 ? (
               <div className="space-y-3">
                 {cardStats.map((stat) => {
-                  const percentage = totalCreditCardExpenses > 0 
-                    ? (stat.total / totalCreditCardExpenses) * 100 
-                    : 0;
+                  const percentage =
+                    totalCreditCardExpenses > 0 ? (stat.total / totalCreditCardExpenses) * 100 : 0;
 
                   return (
                     <div key={stat.id} className="space-y-1">
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
-                          <div 
-                            className="h-3 w-3 rounded-full" 
+                          <div
+                            className="h-3 w-3 rounded-full"
                             style={{ backgroundColor: stat.color }}
                           />
                           <span className="font-medium text-gray-700 dark:text-gray-300">
@@ -132,9 +141,9 @@ export function CreditCardExpensesCard({ companyId, filters }: CreditCardExpense
                       <div className="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-300"
-                          style={{ 
+                          style={{
                             width: `${percentage}%`,
-                            backgroundColor: stat.color 
+                            backgroundColor: stat.color,
                           }}
                         />
                       </div>

@@ -295,12 +295,12 @@ export function Dashboard() {
 
           {selectedView === 'overview' ? (
             /* Overview - Charts and Additional Info */
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-fr">
               {/* Row 1 */}
-              <motion.div variants={item} className="md:col-span-2">
+              <motion.div variants={item} className="h-full">
                 <AccountBalancesCard companyId={companyId} />
               </motion.div>
-              <motion.div variants={item} className="md:col-span-1">
+              <motion.div variants={item} className="h-full">
                 <ExpensesDistributionCard
                   companyId={companyId}
                   filters={filters}
@@ -309,13 +309,15 @@ export function Dashboard() {
               </motion.div>
 
               {/* Row 2 */}
-              <motion.div variants={item} className="md:col-span-1">
+              <motion.div variants={item} className="h-full">
                 <MonthlyComparisonCard companyId={companyId} filters={filters} />
               </motion.div>
-              <motion.div variants={item} className="md:col-span-1">
+              <motion.div variants={item} className="h-full">
                 <CreditCardExpensesCard companyId={companyId} filters={filters} />
               </motion.div>
-              <motion.div variants={item} className="md:col-span-1">
+
+              {/* Row 3 - Full width */}
+              <motion.div variants={item} className="md:col-span-2">
                 <FinancialGoalsCard
                   companyId={companyId}
                   onViewAll={() => setShowGoalsModal(true)}
