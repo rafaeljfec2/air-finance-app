@@ -3,9 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/services/apiClient';
+import { authUtils } from '@/utils/auth';
+import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Loader2, Mail, Send } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -18,29 +20,20 @@ import { useNavigate } from 'react-router-dom';
  */
 export function EmailPendingPage() {
   const navigate = useNavigate();
-  const { user, refetchUser, logout, isLoggingOut } = useAuth();
+  const queryClient = useQueryClient();
+  const { user, refetchUser } = useAuth();
   const [isResending, setIsResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState<string | null>(null);
   const [resendError, setResendError] = useState<string | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Redirect if email is verified
-  useEffect(() => {
-    if (user?.emailVerified === true) {
-      // If email is verified, check if needs onboarding
-      if (user.onboardingCompleted === true) {
-        navigate('/dashboard', { replace: true });
-      } else {
-        navigate('/onboarding', { replace: true });
-      }
+  if (user?.emailVerified === true) {
+    if (user.onboardingCompleted === true) {
+      navigate('/dashboard', { replace: true });
+    } else {
+      navigate('/onboarding', { replace: true });
     }
-  }, [user, navigate]);
-
-  // If no user, redirect to login
-  useEffect(() => {
-    if (!user) {
-      navigate('/login', { replace: true });
-    }
-  }, [user, navigate]);
+  }
 
   const handleResendEmail = async () => {
     if (!user?.email) return;
@@ -69,8 +62,19 @@ export function EmailPendingPage() {
     await refetchUser();
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await apiClient.post('/auth/logout');
+    } catch {
+      // Ignore logout errors - we'll clear local state anyway
+    }
+    authUtils.clearAuth();
+    queryClient.removeQueries({ queryKey: ['user'] });
+    queryClient.removeQueries({ queryKey: ['companies'] });
+    localStorage.removeItem('company-storage');
+    localStorage.removeItem('@air-finance:company');
+    navigate('/login', { replace: true });
   };
 
   if (!user) {
