@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
  */
 export function EmailPendingPage() {
   const navigate = useNavigate();
-  const { user, refetchUser } = useAuth();
+  const { user, refetchUser, logout, isLoggingOut } = useAuth();
   const [isResending, setIsResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState<string | null>(null);
   const [resendError, setResendError] = useState<string | null>(null);
@@ -70,7 +70,7 @@ export function EmailPendingPage() {
   };
 
   const handleLogout = () => {
-    navigate('/login', { replace: true });
+    logout();
   };
 
   if (!user) {
@@ -161,10 +161,18 @@ export function EmailPendingPage() {
 
               <Button
                 onClick={handleLogout}
+                disabled={isLoggingOut}
                 variant="ghost"
                 className="w-full text-text/60 dark:text-text-dark/60 hover:text-text dark:hover:text-text-dark"
               >
-                Fazer Logout
+                {isLoggingOut ? (
+                  <>
+                    <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                    Saindo...
+                  </>
+                ) : (
+                  'Fazer Logout'
+                )}
               </Button>
             </div>
           </div>
