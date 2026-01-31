@@ -110,6 +110,7 @@ export function DeleteAllUserDataModal({ open, onClose }: Readonly<DeleteAllUser
             variant="outline"
             onClick={handleClose}
             disabled={isDeletingAllDataByEmail}
+            className="border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             Cancelar
           </Button>
