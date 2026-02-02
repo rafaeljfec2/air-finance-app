@@ -154,9 +154,7 @@ export function CreditCardsSection({
         );
       case 'description':
         return (
-          <span className="text-text dark:text-text-dark truncate block max-w-[200px]">
-            {item.description}
-          </span>
+          <span className="text-text dark:text-text-dark break-words">{item.description}</span>
         );
       case 'category':
         return (
