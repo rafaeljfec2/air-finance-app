@@ -18,7 +18,7 @@ export function useBudgetPageController() {
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? null;
 
-  const { data, isLoading } = useBudget(companyId, filter);
+  const { data, isLoading, refetch } = useBudget(companyId, filter);
 
   const cashFlow = data?.cashFlow ?? null;
   const receivables = data?.receivables ?? [];
@@ -152,5 +152,6 @@ export function useBudgetPageController() {
     activeCardBillTotal,
     activeCardAvailable,
     activeCardRealBalance,
+    refetch,
   };
 }

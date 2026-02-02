@@ -1,9 +1,11 @@
 import { CashFlowCard, CreditCardsCard, PayablesCard, ReceivablesCard } from '@/components/budget';
 import { BudgetExpandedModal } from '@/components/budget/BudgetExpandedModal';
+import { BudgetSettingsModal } from '@/components/budget/BudgetSettingsModal';
 import { MonthNavigator } from '@/components/budget/MonthNavigator';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { motion } from 'framer-motion';
-import { Wallet } from 'lucide-react';
+import { Settings, Wallet } from 'lucide-react';
+import { useState } from 'react';
 
 import { useBudgetPageController } from '@/hooks/useBudgetPageController';
 
@@ -31,7 +33,10 @@ export function BudgetPage() {
     activeCardLimit,
     activeCardBillTotal,
     activeCardRealBalance,
+    refetch,
   } = useBudgetPageController();
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Define variants
   const container = {
@@ -59,13 +64,24 @@ export function BudgetPage() {
       >
         <motion.div variants={item} className="mb-4 relative z-10">
           <div className="absolute top-[-20px] left-[-20px] right-[-20px] bottom-[-20px] bg-gradient-to-r from-primary-500/5 to-transparent rounded-3xl -z-10 blur-xl dark:from-primary-500/10" />
-          <div className="flex items-center gap-3 mb-2">
-            <div className="inline-flex items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/50 p-2 shadow-sm ring-1 ring-primary-500/10">
-              <Wallet className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="inline-flex items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/50 p-2 shadow-sm ring-1 ring-primary-500/10">
+                <Wallet className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark tracking-tight">
+                Meu Orçamento
+              </h1>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-text dark:text-text-dark tracking-tight">
-              Meu Orçamento
-            </h1>
+            <button
+              type="button"
+              onClick={() => setIsSettingsOpen(true)}
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              title="Configurações do orçamento"
+            >
+              <Settings className="h-4 w-4" />
+              <span className="hidden sm:inline">Configurações</span>
+            </button>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 ml-11 max-w-2xl">
             Visão geral do seu orçamento. Essa tela utiliza o fluxo de caixa, recebíveis, pagáveis e
@@ -148,6 +164,12 @@ export function BudgetPage() {
         activeCardTab={activeCardTab}
         onActiveCardChange={setActiveCardTab}
         onClose={() => setExpandedCard(null)}
+      />
+
+      <BudgetSettingsModal
+        open={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onSave={() => refetch()}
       />
     </ViewDefault>
   );

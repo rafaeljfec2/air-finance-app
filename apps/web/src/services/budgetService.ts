@@ -60,6 +60,13 @@ const ReceivablesResponseSchema = z.array(ReceivableSchema);
 const PayablesResponseSchema = z.array(PayableSchema);
 const CreditCardsResponseSchema = z.array(CreditCardSchema);
 
+const BudgetSettingsSchema = z.object({
+  companyId: z.string(),
+  excludedCategoryIds: z.array(z.string()),
+});
+
+export type BudgetSettings = z.infer<typeof BudgetSettingsSchema>;
+
 export interface BudgetFilters {
   year: string;
   month: string; // '01' .. '12'
@@ -124,11 +131,39 @@ async function fetchCreditCards(companyId: string, filters: BudgetFilters): Prom
   }
 }
 
+async function fetchSettings(companyId: string): Promise<BudgetSettings> {
+  try {
+    const response = await apiClient.get(`/companies/${companyId}/budget/settings`);
+    return BudgetSettingsSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+}
+
+async function updateExcludedCategories(
+  companyId: string,
+  categoryIds: string[],
+): Promise<BudgetSettings> {
+  try {
+    const response = await apiClient.put(
+      `/companies/${companyId}/budget/settings/excluded-categories`,
+      {
+        categoryIds,
+      },
+    );
+    return BudgetSettingsSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+}
+
 export const budgetService = {
   getCashFlow: fetchCashFlow,
   getReceivables: fetchReceivables,
   getPayables: fetchPayables,
   getCreditCards: fetchCreditCards,
+  getSettings: fetchSettings,
+  updateExcludedCategories,
 
   getBudget: async (companyId: string, filters: BudgetFilters): Promise<BudgetResponse> => {
     const [cashFlow, receivables, payables, creditCards] = await Promise.all([
