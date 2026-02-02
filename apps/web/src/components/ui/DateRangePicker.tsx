@@ -88,12 +88,32 @@ const createAllPeriodRange = () => {
   };
 };
 
+const createTodayRange = () => {
+  const now = new Date();
+  return {
+    start: startOfDay(now),
+    end: endOfDay(now),
+  };
+};
+
+const createNextMonthRange = () => {
+  const now = new Date();
+  const nextMonth = subMonths(now, -1);
+  return {
+    start: startOfDay(startOfMonth(nextMonth)),
+    end: endOfDay(endOfMonth(nextMonth)),
+  };
+};
+
 const PRESET_OPTIONS: PresetOption[] = [
+  { id: 'today', label: 'Hoje', getRange: createTodayRange },
   { id: 'last7', label: 'Últimos 7 dias', getRange: () => createPresetRange(7) },
   { id: 'last30', label: 'Últimos 30 dias', getRange: () => createPresetRange(30) },
   { id: 'last90', label: 'Últimos 90 dias', getRange: () => createPresetRange(90) },
+  { id: 'nextMonth', label: 'Mês seguinte', getRange: createNextMonthRange },
   { id: 'thisMonth', label: 'Este mês', getRange: createCurrentMonthRange },
   { id: 'lastMonth', label: 'Mês passado', getRange: () => createMonthRange(1) },
+
   {
     id: 'last6Months',
     label: 'Últimos 6 meses',
@@ -156,8 +176,7 @@ function PresetButton({
   onClick,
   isFullWidth = false,
 }: Readonly<PresetButtonProps>) {
-  const baseClasses =
-    'px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border';
+  const baseClasses = 'px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border';
   const selectedClasses =
     'bg-primary-500 border-primary-500 text-white dark:bg-primary-400 dark:border-primary-400';
   const unselectedClasses =
@@ -244,12 +263,10 @@ const dayPickerClassNames = {
   day_selected: 'bg-primary-500 text-white dark:bg-primary-400',
   day_range_start: 'bg-primary-500 text-white rounded-l-md',
   day_range_end: 'bg-primary-500 text-white rounded-r-md',
-  day_range_middle:
-    'bg-primary-100 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100',
+  day_range_middle: 'bg-primary-100 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100',
   day_today: 'font-semibold',
   day_outside: 'text-muted-foreground dark:text-gray-500 opacity-50',
-  day_disabled:
-    'text-muted-foreground dark:text-gray-500 opacity-30 cursor-not-allowed',
+  day_disabled: 'text-muted-foreground dark:text-gray-500 opacity-30 cursor-not-allowed',
   day_hidden: 'invisible',
 };
 
@@ -449,99 +466,87 @@ export function DateRangePicker({
     }
   }, [open, initialStartDate, initialEndDate, parseDate]);
 
-  const handlePresetClick = useCallback(
-    (preset: PresetOption) => {
-      setSelectedPreset(preset.id);
-      const range = preset.getRange();
-      const normalizedRange = {
-        from: startOfDay(range.start),
-        to: startOfDay(range.end),
+  const handlePresetClick = useCallback((preset: PresetOption) => {
+    setSelectedPreset(preset.id);
+    const range = preset.getRange();
+    const normalizedRange = {
+      from: startOfDay(range.start),
+      to: startOfDay(range.end),
+    };
+    setDateRange(normalizedRange);
+
+    setCustomStartDate(formatDateToLocalISO(range.start));
+    setCustomEndDate(formatDateToLocalISO(range.end));
+
+    const months = calculateCalendarMonths(normalizedRange.from, normalizedRange.to);
+    setCurrentMonth(months.currentMonth);
+    setSecondMonth(months.secondMonth);
+  }, []);
+
+  const handleRangeSelect = useCallback((range: DateRange | undefined) => {
+    if (range) {
+      const normalizedRange: DateRange = {
+        from: range.from ? startOfDay(range.from) : undefined,
+        to: range.to ? startOfDay(range.to) : undefined,
       };
       setDateRange(normalizedRange);
 
-      setCustomStartDate(formatDateToLocalISO(range.start));
-      setCustomEndDate(formatDateToLocalISO(range.end));
+      setCustomStartDate(normalizedRange.from ? formatDateToLocalISO(normalizedRange.from) : '');
+      setCustomEndDate(normalizedRange.to ? formatDateToLocalISO(normalizedRange.to) : '');
 
       const months = calculateCalendarMonths(normalizedRange.from, normalizedRange.to);
       setCurrentMonth(months.currentMonth);
       setSecondMonth(months.secondMonth);
-    },
-    [],
-  );
 
-  const handleRangeSelect = useCallback(
-    (range: DateRange | undefined) => {
-      if (range) {
-        const normalizedRange: DateRange = {
-          from: range.from ? startOfDay(range.from) : undefined,
-          to: range.to ? startOfDay(range.to) : undefined,
-        };
-        setDateRange(normalizedRange);
-
-        setCustomStartDate(normalizedRange.from ? formatDateToLocalISO(normalizedRange.from) : '');
-        setCustomEndDate(normalizedRange.to ? formatDateToLocalISO(normalizedRange.to) : '');
-
-        const months = calculateCalendarMonths(normalizedRange.from, normalizedRange.to);
-        setCurrentMonth(months.currentMonth);
-        setSecondMonth(months.secondMonth);
-
-        if (normalizedRange.from && normalizedRange.to) {
-          setSelectedPreset(null);
-        }
-      } else {
-        setDateRange(undefined);
-        setCustomStartDate('');
-        setCustomEndDate('');
+      if (normalizedRange.from && normalizedRange.to) {
+        setSelectedPreset(null);
       }
-    },
-    [],
-  );
+    } else {
+      setDateRange(undefined);
+      setCustomStartDate('');
+      setCustomEndDate('');
+    }
+  }, []);
 
-  const handleCustomStartDateChange = useCallback(
-    (dateStr: string) => {
-      setCustomStartDate(dateStr);
-      if (dateStr) {
-        const start = parseLocalDate(dateStr);
-        if (start) {
-          setDateRange((prevRange) => {
-            const newRange = {
-              from: startOfDay(start),
-              to: prevRange?.to,
-            };
-            const months = calculateCalendarMonths(newRange.from, newRange.to);
-            setCurrentMonth(months.currentMonth);
-            setSecondMonth(months.secondMonth);
-            return newRange;
-          });
-          setSelectedPreset(null);
-        }
+  const handleCustomStartDateChange = useCallback((dateStr: string) => {
+    setCustomStartDate(dateStr);
+    if (dateStr) {
+      const start = parseLocalDate(dateStr);
+      if (start) {
+        setDateRange((prevRange) => {
+          const newRange = {
+            from: startOfDay(start),
+            to: prevRange?.to,
+          };
+          const months = calculateCalendarMonths(newRange.from, newRange.to);
+          setCurrentMonth(months.currentMonth);
+          setSecondMonth(months.secondMonth);
+          return newRange;
+        });
+        setSelectedPreset(null);
       }
-    },
-    [],
-  );
+    }
+  }, []);
 
-  const handleCustomEndDateChange = useCallback(
-    (dateStr: string) => {
-      setCustomEndDate(dateStr);
-      if (dateStr) {
-        const end = parseLocalDate(dateStr);
-        if (end) {
-          setDateRange((prevRange) => {
-            const newRange = {
-              from: prevRange?.from,
-              to: startOfDay(end),
-            };
-            const months = calculateCalendarMonths(newRange.from, newRange.to);
-            setCurrentMonth(months.currentMonth);
-            setSecondMonth(months.secondMonth);
-            return newRange;
-          });
-          setSelectedPreset(null);
-        }
+  const handleCustomEndDateChange = useCallback((dateStr: string) => {
+    setCustomEndDate(dateStr);
+    if (dateStr) {
+      const end = parseLocalDate(dateStr);
+      if (end) {
+        setDateRange((prevRange) => {
+          const newRange = {
+            from: prevRange?.from,
+            to: startOfDay(end),
+          };
+          const months = calculateCalendarMonths(newRange.from, newRange.to);
+          setCurrentMonth(months.currentMonth);
+          setSecondMonth(months.secondMonth);
+          return newRange;
+        });
+        setSelectedPreset(null);
       }
-    },
-    [],
-  );
+    }
+  }, []);
 
   const handleCustomApply = useCallback(() => {
     const start = customStartDate ? parseLocalDate(customStartDate) : undefined;
