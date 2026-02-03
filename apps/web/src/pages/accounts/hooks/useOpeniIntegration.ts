@@ -93,7 +93,7 @@ export function useOpeniIntegration({ companyId, accountId, onSuccess }: UseOpen
       return resyncItem(companyId, accountId, itemId);
     },
     onSuccess: () => {
-      toast.success('Ressincronização iniciada');
+      toast.success('Ressincronização iniciada, pode demorar alguns minutos para concluir');
       queryClient.invalidateQueries({ queryKey: ['openi-item-status', companyId, accountId] });
     },
     onError: (error: unknown) => {

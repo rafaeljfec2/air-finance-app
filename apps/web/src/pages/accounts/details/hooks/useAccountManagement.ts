@@ -28,7 +28,7 @@ export function useAccountManagement({
     mutationFn: ({ accountId, itemId }: { accountId: string; itemId: string }) =>
       resyncItem(companyId, accountId, itemId),
     onSuccess: () => {
-      toast.success('Ressincronização iniciada');
+      toast.success('Ressincronização iniciada, pode demorar alguns minutos para concluir');
       queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
     },
     onError: (error: unknown) => {
