@@ -31,6 +31,17 @@ export function LoginFooter() {
           Política de Privacidade
         </Link>
       </p>
+      <p className="text-xs text-text/60 dark:text-text-dark/60 pt-2">
+        Desenvolvido por{' '}
+        <a
+          href="https://www.connexto.com.br/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-brand-arrow hover:underline dark:text-brand-leaf"
+        >
+          Connexto Tecnologia Ltda
+        </a>
+      </p>
     </div>
   );
 }

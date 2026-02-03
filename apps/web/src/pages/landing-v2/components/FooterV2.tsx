@@ -150,9 +150,20 @@ export function FooterV2() {
         </div>
 
         {/* Copyright */}
-        <div className="pt-12 border-t border-gray-100 text-center">
+        <div className="pt-12 border-t border-gray-100 text-center space-y-2">
           <p className="text-gray-500 text-sm">
             © {new Date().getFullYear()} Airfinance. Todos os direitos reservados.
+          </p>
+          <p className="text-gray-500 text-sm">
+            Desenvolvido por{' '}
+            <a
+              href="https://www.connexto.com.br/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#10b981] hover:underline"
+            >
+              Connexto Tecnologia Ltda
+            </a>
           </p>
         </div>
       </div>

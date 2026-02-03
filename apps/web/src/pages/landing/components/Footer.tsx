@@ -155,8 +155,19 @@ export function Footer() {
           </ScrollReveal>
         </div>
         <ScrollReveal variant="fade" delay={0.5}>
-          <div className="mt-12 pt-8 border-t border-border text-center text-sm text-text/60">
+          <div className="mt-12 pt-8 border-t border-border text-center text-sm text-text/60 space-y-2">
             <p>© {new Date().getFullYear()} Airfinance. Todos os direitos reservados.</p>
+            <p>
+              Desenvolvido por{' '}
+              <a
+                href="https://www.connexto.com.br/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-arrow hover:underline dark:text-brand-leaf"
+              >
+                Connexto Tecnologia Ltda
+              </a>
+            </p>
           </div>
         </ScrollReveal>
       </div>
