@@ -9,12 +9,13 @@ import { formatDocument } from '@/utils/formatDocument';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState, useRef } from 'react';
 
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export function CompanySelectionModal() {
   const { user, isLoadingUser } = useAuth();
   const { activeCompany, changeActiveCompany, clearActiveCompany } = useActiveCompany();
   const location = useLocation();
+  const navigate = useNavigate();
   const hasBeenShownRef = useRef(false);
   const hasConfirmedSelectionRef = useRef(false);
 
@@ -41,6 +42,8 @@ export function CompanySelectionModal() {
   const isSubscriptionPage =
     location.pathname.startsWith('/pricing') ||
     location.pathname.startsWith('/settings/subscription');
+  const isCompaniesPage = location.pathname.startsWith('/companies');
+  const isOnboardingPage = location.pathname.startsWith('/onboarding');
 
   // Reset flags when user logs out
   useEffect(() => {
@@ -52,13 +55,13 @@ export function CompanySelectionModal() {
 
   const shouldShowModal =
     !isSubscriptionPage &&
+    !isCompaniesPage &&
+    !isOnboardingPage &&
     !!user &&
     !isLoadingUser &&
     !isLoading &&
     !hasValidActiveCompany &&
-    hasCompanies &&
-    !hasBeenShownRef.current &&
-    !hasConfirmedSelectionRef.current;
+    (hasCompanies ? !hasBeenShownRef.current && !hasConfirmedSelectionRef.current : true);
 
   // Set selected company ID when companies load or activeCompany changes
   useEffect(() => {
@@ -126,9 +129,13 @@ export function CompanySelectionModal() {
 
   const modalTitle = useMemo(() => {
     if (isLoading) return 'Carregando empresas';
-    if (!hasCompanies) return 'Nenhuma empresa encontrada';
+    if (!hasCompanies) return 'Nenhum perfil cadastrado';
     return 'Selecione uma empresa';
   }, [isLoading, hasCompanies]);
+
+  const handleCreateProfile = () => {
+    navigate('/companies');
+  };
 
   // Convert companies to ComboBox options
   const companyOptions: ComboBoxOption<string>[] = useMemo(
@@ -176,10 +183,12 @@ export function CompanySelectionModal() {
       className="max-w-lg p-4 sm:p-6 md:p-8"
     >
       <div className="space-y-4 sm:space-y-6">
-        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-          Escolha a empresa que deseja gerenciar. Essa definição pode ser alterada depois no seletor
-          do cabeçalho.
-        </p>
+        {hasCompanies && (
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+            Escolha a empresa que deseja gerenciar. Essa definição pode ser alterada depois no
+            seletor do cabeçalho.
+          </p>
+        )}
 
         {isLoading && (
           <div className="flex min-h-[140px] sm:min-h-[180px] flex-col items-center justify-center gap-3 rounded-lg bg-gray-100/50 dark:bg-gray-800/50 py-4 sm:py-6">
@@ -197,10 +206,18 @@ export function CompanySelectionModal() {
         )}
 
         {!isLoading && !isError && !hasCompanies && (
-          <div className="rounded-lg bg-gray-100/50 dark:bg-gray-800/50 px-3 sm:px-4 py-4 sm:py-5 text-center text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-            Nenhum perfil está vinculado à sua conta. Solicite o cadastro de um perfil para
-            continuar utilizando a plataforma.
-          </div>
+          <>
+            <div className="rounded-lg bg-gray-100/50 dark:bg-gray-800/50 px-3 sm:px-4 py-4 sm:py-5 text-center text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              Nenhum perfil está vinculado à sua conta. Solicite o cadastro de um perfil para
+              continuar utilizando a plataforma.
+            </div>
+            <Button
+              onClick={handleCreateProfile}
+              className="w-full h-11 sm:h-12 text-sm font-semibold bg-primary-500 hover:bg-primary-600 text-white transition-colors"
+            >
+              Criar perfil
+            </Button>
+          </>
         )}
 
         {!isLoading && !isError && hasCompanies && (

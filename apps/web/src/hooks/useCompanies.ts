@@ -1,4 +1,5 @@
 import { toast } from '@/components/ui/toast';
+import { useActiveCompany } from '@/hooks/useActiveCompany';
 import { companyService } from '@/services/companyService';
 import { useAuthStore } from '@/stores/auth';
 import { Company } from '@/types/company';
@@ -7,7 +8,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export function useCompanies() {
   const queryClient = useQueryClient();
-
+  const { changeActiveCompany } = useActiveCompany();
   const { user } = useAuthStore();
 
   const {
@@ -22,8 +23,11 @@ export function useCompanies() {
 
   const { mutate: createCompany, isPending: isCreating } = useMutation({
     mutationFn: companyService.create,
-    onSuccess: () => {
+    onSuccess: (createdCompany) => {
       queryClient.invalidateQueries({ queryKey: ['companies'] });
+      if (createdCompany?.id) {
+        changeActiveCompany(createdCompany);
+      }
       toast({
         title: 'Sucesso',
         description: 'Empresa cadastrada com sucesso!',
