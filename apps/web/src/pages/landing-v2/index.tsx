@@ -3,6 +3,7 @@ import { HeaderV2 } from './components/HeaderV2';
 import { HeroV2 } from './components/HeroV2';
 import { FeaturesV2 } from './components/FeaturesV2';
 import { PricingV2 } from './components/PricingV2';
+import { ContactV2 } from './components/ContactV2';
 import { CTAV2 } from './components/CTAV2';
 import { FooterV2 } from './components/FooterV2';
 import { SEOHead } from '../landing/components/SEOHead';
@@ -38,6 +39,7 @@ export function LandingPageV2() {
           <FeaturesV2 />
           <PricingV2 />
           <CTAV2 />
+          <ContactV2 />
         </main>
         <FooterV2 />
       </div>

@@ -32,7 +32,7 @@ const footerLinks = {
   empresa: [
     { name: 'Sobre nós', href: '#' },
     { name: 'Carreiras', href: '#' },
-    { name: 'Contato', href: '#' },
+    { name: 'Contato', href: '#contact' },
   ],
   legal: [
     { name: 'Privacidade', href: '/privacy' },

@@ -73,6 +73,14 @@ export function HeaderV2() {
           >
             Planos
           </a>
+          <a
+            href="#contact"
+            onClick={(e) => handleNavClick(e, '#contact')}
+            className="text-gray-700 hover:text-[#10b981] transition-colors font-medium text-sm lg:text-base"
+            aria-label="Ir para seção de Contato"
+          >
+            Contato
+          </a>
           <button
             onClick={() => navigate('/login')}
             className="px-4 lg:px-6 py-2 lg:py-2.5 rounded-xl font-semibold text-[#10b981] border-2 border-[#10b981] hover:bg-[#10b981] hover:text-white transition-all duration-300 hover:scale-105 active:scale-95 text-sm lg:text-base"
