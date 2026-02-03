@@ -6,8 +6,8 @@ import { User } from '@/types/user';
  * Rules:
  * 1. After account creation: User must confirm email via link
  * 2. While email not verified: Email pending screen always appears
- * 3. After email confirmation: On first login, show onboarding
- * 4. With onboarding completed: On login, always go to dashboard
+ * 3. Onboarding is optional (modal); no redirect to /onboarding
+ * 4. With onboarding completed and on /onboarding route -> redirect to /home
  */
 
 export interface UserRedirectInfo {
@@ -59,20 +59,8 @@ export function getUserRedirectInfo(
     return null;
   }
 
-  // Rule 3: Email verified but onboarding not completed -> Onboarding
   const onboardingNotCompleted = user.onboardingCompleted !== true;
   const needsOnboarding = isEmailVerified && onboardingNotCompleted;
-
-  if (needsOnboarding) {
-    if (!currentPath.startsWith('/onboarding')) {
-      return {
-        shouldRedirect: true,
-        redirectTo: '/onboarding',
-        reason: 'Onboarding not completed',
-      };
-    }
-    return null;
-  }
 
   // Rule 4: Onboarding completed but trying to access onboarding -> Dashboard
   if (!needsOnboarding && currentPath.startsWith('/onboarding')) {

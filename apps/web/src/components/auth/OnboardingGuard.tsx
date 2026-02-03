@@ -1,3 +1,4 @@
+import { OnboardingModalProvider } from '@/pages/onboarding/OnboardingModalProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { getUserRedirectInfo } from '@/utils/authRedirect';
 import { Loader2 } from 'lucide-react';
@@ -36,5 +37,5 @@ export function OnboardingGuard({ children }: OnboardingGuardProps) {
     return <Navigate to={redirectInfo.redirectTo} replace />;
   }
 
-  return <>{children}</>;
+  return <OnboardingModalProvider>{children}</OnboardingModalProvider>;
 }
