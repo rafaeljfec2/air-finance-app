@@ -52,7 +52,7 @@ export function Modal({
         ref={modalRef}
         open={open}
         className={cn(
-          'relative z-10 w-full max-w-lg mx-auto rounded-xl bg-white dark:bg-gray-900 shadow-xl p-4 sm:p-6 focus:outline-none border-0',
+          'relative z-10 w-full max-w-lg mx-auto rounded-xl bg-background dark:bg-background-dark border border-border dark:border-border-dark shadow-xl p-4 sm:p-6 focus:outline-none',
           // Mobile: max height considers safe areas, desktop: standard
           'max-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-2rem)] lg:max-h-[calc(100dvh-2rem)]',
           className?.includes('overflow-hidden') ? '' : 'overflow-y-auto',
@@ -64,7 +64,7 @@ export function Modal({
         {dismissible && (
           <button
             onClick={onClose}
-            className="absolute top-safe-3 right-safe-3 lg:top-3 lg:right-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-md"
+            className="absolute top-safe-3 right-safe-3 lg:top-3 lg:right-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-text-muted dark:text-text-muted-dark hover:text-text dark:hover:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-md"
             aria-label="Fechar"
           >
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -79,7 +79,7 @@ export function Modal({
           </button>
         )}
         {title && (
-          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-gray-100 pr-8">
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-text dark:text-text-dark pr-8">
             {title}
           </h2>
         )}

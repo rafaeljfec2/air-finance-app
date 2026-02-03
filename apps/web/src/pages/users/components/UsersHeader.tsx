@@ -1,16 +1,20 @@
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Users as UsersIcon } from 'lucide-react';
+import { Mail, Plus, Trash2, Users as UsersIcon } from 'lucide-react';
 
 interface UsersHeaderProps {
   onCreateClick: () => void;
   onDeleteAllDataClick: () => void;
+  onSendRemindersClick: () => void;
   canDeleteAllData: boolean;
+  canSendReminders: boolean;
 }
 
 export function UsersHeader({
   onCreateClick,
   onDeleteAllDataClick,
+  onSendRemindersClick,
   canDeleteAllData,
+  canSendReminders,
 }: Readonly<UsersHeaderProps>) {
   return (
     <>
@@ -22,9 +26,7 @@ export function UsersHeader({
           </div>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-text dark:text-text-dark">Usuários</h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Gerencie usuários do sistema
-            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Gerencie usuários do sistema</p>
           </div>
         </div>
 
@@ -36,6 +38,16 @@ export function UsersHeader({
             <Plus className="h-5 w-5" />
             Novo Usuário
           </Button>
+          {canSendReminders && (
+            <Button
+              variant="outline"
+              onClick={onSendRemindersClick}
+              className="w-full flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm"
+            >
+              <Mail className="h-4 w-4" />
+              Enviar lembretes
+            </Button>
+          )}
           {canDeleteAllData && (
             <Button
               variant="destructive"
@@ -56,9 +68,7 @@ export function UsersHeader({
             <UsersIcon className="h-8 w-8 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-text dark:text-text-dark mb-1">
-              Usuários
-            </h1>
+            <h1 className="text-3xl font-bold text-text dark:text-text-dark mb-1">Usuários</h1>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Gerencie usuários, permissões e acesso ao sistema
             </p>
@@ -66,6 +76,16 @@ export function UsersHeader({
         </div>
 
         <div className="flex items-center gap-3">
+          {canSendReminders && (
+            <Button
+              variant="outline"
+              onClick={onSendRemindersClick}
+              className="flex items-center gap-2 h-12 px-6 rounded-xl font-semibold"
+            >
+              <Mail className="h-5 w-5" />
+              Enviar lembretes
+            </Button>
+          )}
           {canDeleteAllData && (
             <Button
               variant="destructive"

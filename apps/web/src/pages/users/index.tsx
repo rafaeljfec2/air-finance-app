@@ -12,6 +12,7 @@ import { UsersErrorState } from './components/UsersErrorState';
 import { UsersList } from './components/UsersList';
 import { UserEmptyState } from './components/UserEmptyState';
 import { UserFilters } from './components/UserFilters';
+import { SendReminderEmailsModal } from './components/SendReminderEmailsModal';
 import { UserPermissionsModal } from './components/UserPermissionsModal';
 import { useCanDeleteUser } from './hooks/useCanDeleteUser';
 import { useUserDelete } from './hooks/useUserDelete';
@@ -48,6 +49,7 @@ export function UsersPage() {
   }, [filteredUsers, sortUsers]);
 
   const [showDeleteAllDataModal, setShowDeleteAllDataModal] = useState(false);
+  const [showSendReminderModal, setShowSendReminderModal] = useState(false);
   const [permissionsUser, setPermissionsUser] = useState<User | null>(null);
 
   const handleViewPermissions = (user: User) => {
@@ -75,7 +77,9 @@ export function UsersPage() {
           <UsersHeader
             onCreateClick={handleCreate}
             onDeleteAllDataClick={() => setShowDeleteAllDataModal(true)}
+            onSendRemindersClick={() => setShowSendReminderModal(true)}
             canDeleteAllData={currentUser?.role === 'god'}
+            canSendReminders={currentUser?.role === 'god'}
           />
 
           <UserFilters
@@ -130,6 +134,11 @@ export function UsersPage() {
       <DeleteAllUserDataModal
         open={showDeleteAllDataModal}
         onClose={() => setShowDeleteAllDataModal(false)}
+      />
+
+      <SendReminderEmailsModal
+        open={showSendReminderModal}
+        onClose={() => setShowSendReminderModal(false)}
       />
 
       {permissionsUser && (

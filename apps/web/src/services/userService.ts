@@ -212,3 +212,24 @@ export const deleteAllUserDataByEmail = async (email: string): Promise<void> => 
     throw parseApiError(error);
   }
 };
+
+export type ReminderEmailType = 'verification' | 'onboarding' | 'both';
+
+export interface SendReminderEmailsResult {
+  sentVerification: number;
+  sentOnboarding: number;
+}
+
+export const sendReminderEmails = async (
+  type: ReminderEmailType,
+): Promise<SendReminderEmailsResult> => {
+  try {
+    const response = await apiClient.post<SendReminderEmailsResult>('/user/reminder-emails', {
+      type,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao enviar e-mails de lembrete:', error);
+    throw parseApiError(error);
+  }
+};
