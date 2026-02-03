@@ -21,6 +21,7 @@ interface AccountBalanceCardProps {
   readonly onClick: () => void;
   readonly onEdit?: (account: Account) => void;
   readonly onToggleAutoSync?: (account: Account) => void;
+  readonly onResync?: (account: Account) => void;
   readonly onDelete?: (account: Account) => void;
 }
 
@@ -30,6 +31,7 @@ export function AccountBalanceCard({
   onClick,
   onEdit,
   onToggleAutoSync,
+  onResync,
   onDelete,
 }: Readonly<AccountBalanceCardProps>) {
   const [isBalanceHidden, setIsBalanceHidden] = useState(false);
@@ -50,20 +52,15 @@ export function AccountBalanceCard({
 
   const cardClassName = `
     relative flex-shrink-0 w-[280px] min-w-[280px] rounded-xl overflow-hidden
-    transition-all duration-200 text-left
+    transition-all duration-200 text-left cursor-pointer
+    border-0 p-0 font-inherit bg-transparent
     ${isSelected ? 'scale-[1.02] shadow-lg' : 'opacity-80 hover:opacity-100'}
   `;
 
   return (
-    <div
-      role="button"
-      tabIndex={0}
+    <button
+      type="button"
       onClick={onClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          onClick();
-        }
-      }}
       className={cardClassName}
       style={{ background: gradient }}
     >
@@ -109,6 +106,7 @@ export function AccountBalanceCard({
                 account={account}
                 onEdit={onEdit}
                 onToggleAutoSync={onToggleAutoSync}
+                onResync={onResync}
                 onDelete={onDelete}
               />
             )}
@@ -128,6 +126,6 @@ export function AccountBalanceCard({
           <p className="mt-3 text-[10px] text-white/60 font-medium truncate">{details}</p>
         )}
       </div>
-    </div>
+    </button>
   );
 }

@@ -4,6 +4,7 @@ import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
 import { useResponsiveBreakpoint } from '@/hooks/useResponsiveBreakpoint';
+import { useCompanyStore } from '@/stores/company';
 import { useAccountDetails } from './hooks/useAccountDetails';
 import { useStatementNavigation } from './hooks/useStatementNavigation';
 import { useAccountManagement } from './hooks/useAccountManagement';
@@ -41,6 +42,9 @@ export function AccountDetailsPage() {
 
   const hasAccounts = accounts && accounts.length > 0;
 
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id ?? '';
+
   const handleAccountSelect = useCallback(
     (newAccountId: string) => {
       if (newAccountId !== selectedAccountId) {
@@ -54,6 +58,7 @@ export function AccountDetailsPage() {
     accounts,
     selectedAccountId,
     onSelectAccount: setSelectedAccountId,
+    companyId,
   });
 
   useEffect(() => {
@@ -83,6 +88,7 @@ export function AccountDetailsPage() {
       onMenuClick={openSidebar}
       onEditAccount={handlers.onEditAccount}
       onToggleAutoSync={handlers.onConfigureSchedule}
+      onResyncAccount={handlers.onResyncAccount}
       onDeleteAccount={handlers.onDeleteAccount}
       onAddAccount={handlers.onAddAccount}
     />

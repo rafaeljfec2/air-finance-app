@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Loading } from '@/components/Loading';
 import { ViewDefault } from '@/layouts/ViewDefault';
+import { useCompanyStore } from '@/stores/company';
 import { useAccountDetails } from './hooks/useAccountDetails';
 import { useStatementNavigation } from './hooks/useStatementNavigation';
 import { useAccountManagement } from './hooks/useAccountManagement';
@@ -18,6 +19,8 @@ export function AccountDetailsPageDesktop() {
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebouncedValue(searchInput, 500);
   const searchTermToSend = debouncedSearch.length >= 3 ? debouncedSearch : undefined;
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id ?? '';
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useStatementNavigation();
 
@@ -48,6 +51,7 @@ export function AccountDetailsPageDesktop() {
     accounts,
     selectedAccountId,
     onSelectAccount: setSelectedAccountId,
+    companyId,
   });
 
   useEffect(() => {
@@ -97,6 +101,7 @@ export function AccountDetailsPageDesktop() {
             onAccountSelect={handleAccountSelect}
             onEditAccount={handlers.onEditAccount}
             onToggleAutoSync={handlers.onConfigureSchedule}
+            onResyncAccount={handlers.onResyncAccount}
             onDeleteAccount={handlers.onDeleteAccount}
             onAddAccount={handlers.onAddAccount}
           />
@@ -118,6 +123,7 @@ export function AccountDetailsPageDesktop() {
             onAccountSelect={handleAccountSelect}
             onEditAccount={handlers.onEditAccount}
             onToggleAutoSync={handlers.onConfigureSchedule}
+            onResyncAccount={handlers.onResyncAccount}
             onDeleteAccount={handlers.onDeleteAccount}
             onAddAccount={handlers.onAddAccount}
           />
@@ -142,6 +148,7 @@ export function AccountDetailsPageDesktop() {
           onAccountSelect={handleAccountSelect}
           onEditAccount={handlers.onEditAccount}
           onToggleAutoSync={handlers.onConfigureSchedule}
+          onResyncAccount={handlers.onResyncAccount}
           onDeleteAccount={handlers.onDeleteAccount}
           onAddAccount={handlers.onAddAccount}
         />

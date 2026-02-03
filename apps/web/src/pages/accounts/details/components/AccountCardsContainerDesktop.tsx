@@ -11,6 +11,7 @@ interface AccountCardsContainerDesktopProps {
   readonly onAccountSelect: (accountId: string) => void;
   readonly onEditAccount?: (account: Account) => void;
   readonly onToggleAutoSync?: (account: Account) => void;
+  readonly onResyncAccount?: (account: Account) => void;
   readonly onDeleteAccount?: (account: Account) => void;
   readonly onAddAccount?: () => void;
 }
@@ -27,6 +28,7 @@ export function AccountCardsContainerDesktop({
   onAccountSelect,
   onEditAccount,
   onToggleAutoSync,
+  onResyncAccount,
   onDeleteAccount,
   onAddAccount,
 }: Readonly<AccountCardsContainerDesktopProps>) {
@@ -78,6 +80,7 @@ export function AccountCardsContainerDesktop({
                   onClick={() => onAccountSelect(account.id)}
                   onEdit={onEditAccount}
                   onToggleAutoSync={onToggleAutoSync}
+                  onResync={onResyncAccount}
                   onDelete={onDeleteAccount}
                 />
               </div>

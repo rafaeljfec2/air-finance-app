@@ -1,5 +1,5 @@
 import type { MouseEvent } from 'react';
-import { MoreVertical, Pencil, RefreshCw, Trash2 } from 'lucide-react';
+import { MoreVertical, Pencil, RefreshCw, RotateCw, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +13,7 @@ interface AccountCardMenuProps {
   readonly account: Account;
   readonly onEdit: (account: Account) => void;
   readonly onToggleAutoSync: (account: Account) => void;
+  readonly onResync?: (account: Account) => void;
   readonly onDelete: (account: Account) => void;
 }
 
@@ -20,10 +21,11 @@ export function AccountCardMenu({
   account,
   onEdit,
   onToggleAutoSync,
+  onResync,
   onDelete,
 }: Readonly<AccountCardMenuProps>) {
   const hasIntegration = account.integration?.enabled ?? false;
-  const isAutoSyncEnabled = account.integration?.sync?.enabled ?? false;
+  const hasOpeniItem = Boolean(account.openiItemId);
 
   const handleEdit = () => {
     onEdit(account);
@@ -31,6 +33,10 @@ export function AccountCardMenu({
 
   const handleToggleAutoSync = () => {
     onToggleAutoSync(account);
+  };
+
+  const handleResync = () => {
+    onResync?.(account);
   };
 
   const handleDelete = () => {
@@ -61,8 +67,15 @@ export function AccountCardMenu({
 
         {hasIntegration && (
           <DropdownMenuItem onSelect={handleToggleAutoSync}>
-            <RefreshCw className={`h-4 w-4 ${isAutoSyncEnabled ? 'text-green-500' : ''}`} />
-            <span>{isAutoSyncEnabled ? 'Desativar sincronização' : 'Ativar sincronização'}</span>
+            <RefreshCw className="h-4 w-4" />
+            <span>Editar Sincronização</span>
+          </DropdownMenuItem>
+        )}
+
+        {hasOpeniItem && onResync && (
+          <DropdownMenuItem onSelect={handleResync}>
+            <RotateCw className="h-4 w-4" />
+            <span>Resincronizar a conta</span>
           </DropdownMenuItem>
         )}
 
