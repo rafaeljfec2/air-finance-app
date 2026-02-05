@@ -44,6 +44,8 @@ export function useAccountManagement({
   const [schedulingAccount, setSchedulingAccount] = useState<Account | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState<Account | null>(null);
+  const [showIntegrationModal, setShowIntegrationModal] = useState(false);
+  const [integrationAccount, setIntegrationAccount] = useState<Account | null>(null);
 
   const handleAddAccount = useCallback(() => {
     setEditingAccount(null);
@@ -82,6 +84,22 @@ export function useAccountManagement({
     setShowScheduleModal(false);
     setSchedulingAccount(null);
   }, []);
+
+  const handleConfigureIntegration = useCallback((account: Account) => {
+    setIntegrationAccount(account);
+    setShowIntegrationModal(true);
+  }, []);
+
+  const handleCloseIntegrationModal = useCallback(() => {
+    setShowIntegrationModal(false);
+    setIntegrationAccount(null);
+  }, []);
+
+  const handleIntegrationSuccess = useCallback(() => {
+    setShowIntegrationModal(false);
+    setIntegrationAccount(null);
+    queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+  }, [queryClient, companyId]);
 
   const handleDeleteAccount = useCallback((account: Account) => {
     setDeletingAccount(account);
@@ -134,6 +152,12 @@ export function useAccountManagement({
       account: schedulingAccount,
       onClose: handleCloseScheduleModal,
     },
+    integrationModal: {
+      isOpen: showIntegrationModal,
+      account: integrationAccount,
+      onClose: handleCloseIntegrationModal,
+      onSuccess: handleIntegrationSuccess,
+    },
     deleteModal: {
       isOpen: showConfirmDelete,
       account: deletingAccount,
@@ -145,6 +169,7 @@ export function useAccountManagement({
       onAddAccount: handleAddAccount,
       onEditAccount: handleEditAccount,
       onConfigureSchedule: handleConfigureSchedule,
+      onConfigureIntegration: handleConfigureIntegration,
       onResyncAccount: handleResyncAccount,
       onDeleteAccount: handleDeleteAccount,
     },

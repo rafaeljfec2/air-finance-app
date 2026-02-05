@@ -47,12 +47,13 @@ export function AccountDetailsPageDesktop() {
     [selectedAccountId],
   );
 
-  const { formModal, scheduleModal, deleteModal, handlers } = useAccountManagement({
-    accounts,
-    selectedAccountId,
-    onSelectAccount: setSelectedAccountId,
-    companyId,
-  });
+  const { formModal, integrationModal, scheduleModal, deleteModal, handlers } =
+    useAccountManagement({
+      accounts,
+      selectedAccountId,
+      onSelectAccount: setSelectedAccountId,
+      companyId,
+    });
 
   useEffect(() => {
     if (isLoading || !hasAccounts) return;
@@ -84,6 +85,8 @@ export function AccountDetailsPageDesktop() {
         <NoAccountsState onAddAccount={handlers.onAddAccount} />
         <AccountModals
           formModal={formModal}
+          onConfigureIntegration={handlers.onConfigureIntegration}
+          integrationModal={integrationModal}
           scheduleModal={scheduleModal}
           deleteModal={deleteModal}
         />
@@ -177,6 +180,8 @@ export function AccountDetailsPageDesktop() {
 
       <AccountModals
         formModal={formModal}
+        onConfigureIntegration={handlers.onConfigureIntegration}
+        integrationModal={integrationModal}
         scheduleModal={scheduleModal}
         deleteModal={deleteModal}
       />

@@ -54,12 +54,13 @@ export function AccountDetailsPage() {
     [selectedAccountId],
   );
 
-  const { formModal, scheduleModal, deleteModal, handlers } = useAccountManagement({
-    accounts,
-    selectedAccountId,
-    onSelectAccount: setSelectedAccountId,
-    companyId,
-  });
+  const { formModal, integrationModal, scheduleModal, deleteModal, handlers } =
+    useAccountManagement({
+      accounts,
+      selectedAccountId,
+      onSelectAccount: setSelectedAccountId,
+      companyId,
+    });
 
   useEffect(() => {
     if (isLoading || !hasAccounts) return;
@@ -101,6 +102,8 @@ export function AccountDetailsPage() {
       <TransactionTypeModal isOpen={isFabModalOpen} onClose={closeFabModal} />
       <AccountModals
         formModal={formModal}
+        onConfigureIntegration={handlers.onConfigureIntegration}
+        integrationModal={integrationModal}
         scheduleModal={scheduleModal}
         deleteModal={deleteModal}
       />
