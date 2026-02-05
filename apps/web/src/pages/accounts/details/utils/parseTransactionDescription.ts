@@ -112,22 +112,22 @@ function extractRecipient(description: string): string {
   const cpfMatch = /(•••\.\d{3}\.\d{3}-••|\d{3}\.\d{3}\.\d{3}-\d{2})/.exec(cleaned);
 
   let recipient = cleaned
-    .replaceAll(/\s*-\s*\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}.*$/i, '')
-    .replaceAll(/\s*-\s*•••\.\d{3}\.\d{3}-••.*$/i, '')
-    .replaceAll(/\s*-\s*[A-Z\s]+ \(\d{4}\).*$/i, '')
-    .replaceAll(/\s+Ag[êe]ncia:.*$/i, '')
-    .replaceAll(/\s+Conta:.*$/i, '')
+    .replaceAll(/\s*-\s*\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}.*$/gi, '')
+    .replaceAll(/\s*-\s*•••\.\d{3}\.\d{3}-••.*$/gi, '')
+    .replaceAll(/\s*-\s*[A-Z\s]+ \(\d{4}\).*$/gi, '')
+    .replaceAll(/\s+Ag[êe]ncia:.*$/gi, '')
+    .replaceAll(/\s+Conta:.*$/gi, '')
     .trim();
 
   if (cnpjMatch?.[1]) {
     const beforeCnpj = cleaned.split(cnpjMatch[1])[0];
-    const namePart = beforeCnpj.replaceAll(/\s*-\s*$/, '').trim();
+    const namePart = beforeCnpj.replaceAll(/\s*-\s*$/g, '').trim();
     if (namePart) {
       recipient = namePart;
     }
   } else if (cpfMatch?.[1]) {
     const beforeCpf = cleaned.split(cpfMatch[1])[0];
-    const namePart = beforeCpf.replaceAll(/\s*-\s*$/, '').trim();
+    const namePart = beforeCpf.replaceAll(/\s*-\s*$/g, '').trim();
     if (namePart) {
       recipient = namePart;
     }
@@ -153,12 +153,20 @@ function detectType(description: string, amount: number): { type: TransactionTyp
 }
 
 export function parseTransactionDescription(
-  description: string,
+  description: string | null | undefined,
   amount: number,
 ): ParsedTransaction {
-  const { type, label } = detectType(description, amount);
-  const recipient = extractRecipient(description);
-  const isCredit = amount > 0;
+  const safeDescription = typeof description === 'string' ? description : '';
+  const safeAmount = typeof amount === 'number' && !Number.isNaN(amount) ? amount : 0;
+  if (typeof description !== 'string') {
+    console.warn('[parseTransactionDescription] Invalid description', { description });
+  }
+  if (typeof amount !== 'number' || Number.isNaN(amount)) {
+    console.warn('[parseTransactionDescription] Invalid amount', { amount });
+  }
+  const { type, label } = detectType(safeDescription, safeAmount);
+  const recipient = extractRecipient(safeDescription);
+  const isCredit = safeAmount > 0;
 
   return {
     type,

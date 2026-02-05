@@ -16,12 +16,21 @@ const DateHeader = ({ date }: { readonly date: string }) => (
   </div>
 );
 
+const safeAmount = (value: unknown): number => {
+  if (typeof value === 'number' && !Number.isNaN(value)) return value;
+  return 0;
+};
+
 export function StatementTransactionItem({
   transaction,
   showDateHeader = false,
 }: StatementTransactionItemProps) {
-  const isCredit = transaction.amount > 0;
+  if (!transaction) return null;
+
+  const amount = safeAmount(transaction.amount);
+  const isCredit = amount > 0;
   const parsed = parseTransactionDescription(transaction.description, transaction.amount);
+  const dateStr = transaction.date ?? '';
 
   const amountColorClass = isCredit
     ? 'text-green-500 dark:text-green-400'
@@ -29,7 +38,7 @@ export function StatementTransactionItem({
 
   return (
     <>
-      {showDateHeader && <DateHeader date={transaction.date} />}
+      {showDateHeader && <DateHeader date={dateStr} />}
       <div className="px-4 py-3 border-b border-border/50 dark:border-border-dark/50 last:border-b-0 hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors">
         <div className="flex items-center gap-3">
           <TransactionIcon type={parsed.type} isCredit={isCredit} size="sm" />
@@ -44,10 +53,10 @@ export function StatementTransactionItem({
           <div className="text-right shrink-0">
             <p className={`text-sm font-semibold ${amountColorClass}`}>
               {isCredit ? '+' : '-'}
-              {formatCurrencyAbsolute(transaction.amount)}
+              {formatCurrencyAbsolute(amount)}
             </p>
             <p className="text-xs text-text-muted dark:text-text-muted-dark mt-0.5">
-              {formatDateShort(transaction.date)}
+              {formatDateShort(dateStr)}
             </p>
           </div>
         </div>

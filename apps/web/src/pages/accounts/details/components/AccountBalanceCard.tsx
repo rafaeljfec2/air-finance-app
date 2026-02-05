@@ -58,15 +58,19 @@ export function AccountBalanceCard({
   `;
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cardClassName}
-      style={{ background: gradient }}
-    >
-      <div className="absolute inset-0 bg-black/10 dark:bg-black/20" />
+    <div className={cardClassName} style={{ background: gradient }}>
+      <button
+        type="button"
+        className="absolute inset-0 z-0 w-full h-full cursor-pointer border-0 bg-transparent p-0"
+        onClick={onClick}
+        aria-label="Selecionar conta"
+      />
+      <div
+        className="absolute inset-0 z-0 bg-black/10 dark:bg-black/20 pointer-events-none"
+        aria-hidden
+      />
 
-      <div className="relative p-4">
+      <div className="relative z-10 p-4 pointer-events-none">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-sm overflow-hidden">
@@ -87,7 +91,7 @@ export function AccountBalanceCard({
             </div>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 pointer-events-auto">
             <button
               type="button"
               onClick={handleToggleBalance}
@@ -126,6 +130,6 @@ export function AccountBalanceCard({
           <p className="mt-3 text-[10px] text-white/60 font-medium truncate">{details}</p>
         )}
       </div>
-    </button>
+    </div>
   );
 }
