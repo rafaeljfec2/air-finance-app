@@ -23,7 +23,7 @@ export function MaintenanceProvider({ children }: MaintenanceProviderProps) {
 
     try {
       // Try to reach the API health endpoint
-      const response = await fetch(`${env.VITE_API_URL}/health`, {
+      const response = await fetch(`${env.VITE_API_URL}/v1/health`, {
         method: 'GET',
         cache: 'no-store',
       });
