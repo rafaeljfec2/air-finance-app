@@ -160,7 +160,7 @@ export function ImportOfxModal({
     <Modal
       open={open}
       onClose={handleModalClose}
-      title="Importar Extrato OFX"
+      title="Importar Extrato"
       className="max-w-2xl overflow-hidden"
     >
       <div className="space-y-4 p-4">
