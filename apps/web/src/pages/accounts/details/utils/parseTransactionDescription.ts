@@ -98,44 +98,39 @@ const TYPE_PATTERNS: ReadonlyArray<{
 
 function extractRecipient(description: string): string {
   const cleaned = description
-    .replace(/transfer[êe]ncia\s+(recebida|enviada)\s+(pelo\s+pix\s*-?\s*)?/gi, '')
-    .replace(/pix\s+(recebido|enviado)\s*-?\s*/gi, '')
-    .replace(/ted\s+(recebida|enviada)\s*-?\s*/gi, '')
-    .replace(/pagamento\s+de\s+fatura\s*-?\s*/gi, '')
-    .replace(/cr[ée]dito\s+em\s+conta\s*-?\s*/gi, '')
-    .replace(/valor\s+adicionado[^-]*-?\s*/gi, '')
-    .replace(/tarifa[^-]*-?\s*/gi, '')
-    .replace(/boleto[^-]*-?\s*/gi, '')
+    .replaceAll(/transfer[êe]ncia\s+(recebida|enviada)\s+(pelo\s+pix\s*-?\s*)?/gi, '')
+    .replaceAll(/pix\s+(recebido|enviado)\s*-?\s*/gi, '')
+    .replaceAll(/ted\s+(recebida|enviada)\s*-?\s*/gi, '')
+    .replaceAll(/pagamento\s+de\s+fatura\s*-?\s*/gi, '')
+    .replaceAll(/cr[ée]dito\s+em\s+conta\s*-?\s*/gi, '')
+    .replaceAll(/valor\s+adicionado[^-]*-?\s*/gi, '')
+    .replaceAll(/tarifa[^-]*-?\s*/gi, '')
+    .replaceAll(/boleto[^-]*-?\s*/gi, '')
     .trim();
 
-  const cnpjMatch = cleaned.match(/(\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})/);
-  const cpfMatch = cleaned.match(/(•••\.\d{3}\.\d{3}-••|\d{3}\.\d{3}\.\d{3}-\d{2})/);
+  const cnpjMatch = /(\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})/.exec(cleaned);
+  const cpfMatch = /(•••\.\d{3}\.\d{3}-••|\d{3}\.\d{3}\.\d{3}-\d{2})/.exec(cleaned);
 
   let recipient = cleaned
-    .replace(/\s*-\s*\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}.*$/i, '')
-    .replace(/\s*-\s*•••\.\d{3}\.\d{3}-••.*$/i, '')
-    .replace(/\s*-\s*[A-Z\s]+ \(\d{4}\).*$/i, '')
-    .replace(/\s+Ag[êe]ncia:.*$/i, '')
-    .replace(/\s+Conta:.*$/i, '')
+    .replaceAll(/\s*-\s*\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}.*$/i, '')
+    .replaceAll(/\s*-\s*•••\.\d{3}\.\d{3}-••.*$/i, '')
+    .replaceAll(/\s*-\s*[A-Z\s]+ \(\d{4}\).*$/i, '')
+    .replaceAll(/\s+Ag[êe]ncia:.*$/i, '')
+    .replaceAll(/\s+Conta:.*$/i, '')
     .trim();
 
-  if (cnpjMatch) {
+  if (cnpjMatch?.[1]) {
     const beforeCnpj = cleaned.split(cnpjMatch[1])[0];
-    const namePart = beforeCnpj.replace(/\s*-\s*$/, '').trim();
+    const namePart = beforeCnpj.replaceAll(/\s*-\s*$/, '').trim();
     if (namePart) {
       recipient = namePart;
     }
-  } else if (cpfMatch) {
+  } else if (cpfMatch?.[1]) {
     const beforeCpf = cleaned.split(cpfMatch[1])[0];
-    const namePart = beforeCpf.replace(/\s*-\s*$/, '').trim();
+    const namePart = beforeCpf.replaceAll(/\s*-\s*$/, '').trim();
     if (namePart) {
       recipient = namePart;
     }
-  }
-
-  const words = recipient.split(/\s+/);
-  if (words.length > 5) {
-    recipient = words.slice(0, 5).join(' ') + '...';
   }
 
   return recipient || 'Transação';

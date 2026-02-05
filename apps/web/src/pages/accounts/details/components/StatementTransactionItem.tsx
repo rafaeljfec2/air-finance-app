@@ -36,7 +36,7 @@ export function StatementTransactionItem({
 
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-text dark:text-text-dark">{parsed.label}</p>
-            <p className="text-xs text-text-muted dark:text-text-muted-dark truncate mt-0.5">
+            <p className="text-xs text-text-muted dark:text-text-muted-dark mt-0.5 break-words">
               {transaction.category ?? parsed.recipient}
             </p>
           </div>
