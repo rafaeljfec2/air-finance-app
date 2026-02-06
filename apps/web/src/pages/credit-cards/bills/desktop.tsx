@@ -151,6 +151,7 @@ export function CreditCardBillsPageDesktop() {
           limitAvailable={limitAvailable}
           limitTotal={limitTotal}
           billTotal={totalUsed}
+          billStatus={currentBill?.status}
         />
 
         <div className="px-4 pb-6 lg:px-6">

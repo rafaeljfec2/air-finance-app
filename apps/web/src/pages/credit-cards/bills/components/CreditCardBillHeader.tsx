@@ -298,6 +298,12 @@ export function CreditCardBillHeader({
                 <p className="text-2xl font-bold text-white tracking-tight">
                   {isValueHidden ? 'R$ ••••••' : formatCurrency(billTotal)}
                 </p>
+                {billStatus === 'OPEN' && (
+                  <p className="text-[10px] text-white/60 mt-1">
+                    Valor estimado. A fatura ainda não foi fechada pelo banco e pode variar no
+                    período.
+                  </p>
+                )}
                 {dueDate && (
                   <p className="text-xs text-white/70 mt-1">Vence em {formatDueDate(dueDate)}</p>
                 )}

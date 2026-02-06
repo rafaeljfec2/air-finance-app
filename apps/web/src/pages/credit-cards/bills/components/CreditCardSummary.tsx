@@ -5,13 +5,16 @@ interface CreditCardSummaryProps {
   readonly limitAvailable: number;
   readonly limitTotal: number;
   readonly billTotal: number;
+  readonly billStatus?: 'OPEN' | 'CLOSED' | 'PAID';
 }
 
 export function CreditCardSummary({
   limitAvailable,
   limitTotal,
   billTotal,
+  billStatus,
 }: Readonly<CreditCardSummaryProps>) {
+  const isEstimated = billStatus === 'OPEN';
   return (
     <div className="grid grid-cols-3 gap-2 px-4 pt-6 pb-2 lg:gap-2 lg:px-6 lg:pt-8 lg:pb-3">
       <div className="bg-card dark:bg-card-dark rounded-lg border border-border dark:border-border-dark p-2.5 lg:p-3">
@@ -54,6 +57,11 @@ export function CreditCardSummary({
         <p className="text-sm lg:text-base font-bold text-red-500 truncate">
           {formatCurrency(billTotal)}
         </p>
+        {isEstimated && (
+          <p className="text-[9px] text-text-muted dark:text-text-muted-dark mt-0.5">
+            Valor estimado
+          </p>
+        )}
       </div>
     </div>
   );

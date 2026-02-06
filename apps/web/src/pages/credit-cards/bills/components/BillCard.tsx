@@ -115,6 +115,11 @@ export function BillCard({
             <p className="text-xl font-bold text-text dark:text-text-dark">
               {formatCurrency(billTotal)}
             </p>
+            {status === 'OPEN' && (
+              <p className="text-[10px] text-text-muted dark:text-text-muted-dark mt-0.5">
+                Valor estimado. A fatura ainda não foi fechada pelo banco e pode variar no período.
+              </p>
+            )}
           </div>
         </div>
       </div>
