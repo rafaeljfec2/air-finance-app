@@ -76,15 +76,6 @@ interface StaggerContainerProps {
   readonly once?: boolean;
 }
 
-const staggerContainerVariants: Variants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
 export function StaggerContainer({
   children,
   className,
@@ -188,5 +179,3 @@ export function Collapse({ isOpen, children, className }: CollapseProps) {
     </AnimatePresence>
   );
 }
-
-export { staggerContainerVariants };
