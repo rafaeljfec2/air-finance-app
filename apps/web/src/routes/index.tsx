@@ -154,6 +154,12 @@ const LandingPageV2 = lazy(() =>
   })),
 );
 
+const LandingPageV3 = lazy(() =>
+  import('@/pages/landing-v3').then((m) => ({
+    default: m.LandingPageV3,
+  })),
+);
+
 const PierreFinanceConfigPage = lazy(() =>
   import('@/pages/pierre-finance-config').then((m) => ({
     default: m.PierreFinanceConfigPage,
@@ -234,6 +240,7 @@ export const router = createBrowserRouter([
   // ==================== PUBLIC ROUTES ====================
   createPublicRoute('/', LandingPageV2),
   createPublicRoute('/landing-v2', LandingPageV2),
+  createPublicRoute('/landing-v3', LandingPageV3),
   createPublicRoute('/pierre-finance-config', PierreFinanceConfigPage),
   {
     path: '/login',
