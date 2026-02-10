@@ -14,6 +14,7 @@ import {
   Link2,
   Plus,
   RefreshCcw,
+  Sparkles,
   Tag,
   User,
   Wallet,
@@ -32,6 +33,10 @@ export const navigation: NavigationSection[] = [
       },
       { name: 'Relatórios', href: '/reports', icon: ChartBar },
     ],
+  },
+  {
+    section: '🤖 Inteligência',
+    items: [{ name: 'Análise Inteligente', href: '/insights', icon: Sparkles }],
   },
   {
     section: '🎯 Planejamento',

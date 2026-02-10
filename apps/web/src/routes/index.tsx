@@ -55,6 +55,9 @@ const CreditCardBillsPage = lazy(() =>
     default: m.CreditCardBillsPage,
   })),
 );
+const InsightsPage = lazy(() =>
+  import('@/pages/insights').then((m) => ({ default: m.InsightsPage })),
+);
 const Dashboard = lazy(() =>
   import('@/pages/dashboard/Dashboard').then((m) => ({ default: m.Dashboard })),
 );
@@ -336,6 +339,7 @@ export const router = createBrowserRouter([
   createSimpleProtectedRoute('/transactions/new', NewTransaction),
   createSimpleProtectedRoute('/credit-cards', CreditCardsPage),
   createSimpleProtectedRoute('/credit-cards/bills', CreditCardBillsPage),
+  createSimpleProtectedRoute('/insights', InsightsPage),
   createSimpleProtectedRoute('/goals', GoalsPage),
   createSimpleProtectedRoute('/recurring-transactions', RecurringTransactionsPage),
   createSimpleProtectedRoute('/income-sources', IncomeSourcesPage),
