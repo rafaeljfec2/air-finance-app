@@ -2,6 +2,7 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
 import { InsightsPageHeader } from './components/InsightsPageHeader';
 import { CreditCardInsightsSection } from './components/CreditCardInsightsSection';
+import { AskAirFinanceFab } from './components/AskAirFinanceFab';
 
 export function InsightsPage() {
   const { activeCompany } = useCompanyStore();
@@ -9,10 +10,11 @@ export function InsightsPage() {
 
   return (
     <ViewDefault>
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-2xl mx-auto">
         <InsightsPageHeader />
         <CreditCardInsightsSection companyId={companyId} />
       </div>
+      <AskAirFinanceFab />
     </ViewDefault>
   );
 }

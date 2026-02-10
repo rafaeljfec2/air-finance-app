@@ -15,6 +15,27 @@ import type {
   WarningItem,
 } from '@/services/agentService';
 
+export type DecisionState = 'all-clear' | 'attention' | 'risk';
+
+export function deriveDecisionState(
+  insights: readonly { severity: 'info' | 'warning' | 'critical' }[],
+  warnings: readonly { severity: 'low' | 'medium' | 'high' }[],
+  confidenceLevel: 'HIGH' | 'MEDIUM' | 'LOW' | 'INSUFFICIENT_DATA',
+): DecisionState {
+  const hasCriticalInsight = insights.some((i) => i.severity === 'critical');
+  const hasHighWarning = warnings.some((w) => w.severity === 'high');
+
+  if (hasCriticalInsight || hasHighWarning) return 'risk';
+
+  const hasWarningInsight = insights.some((i) => i.severity === 'warning');
+  const hasMediumWarning = warnings.some((w) => w.severity === 'medium');
+  const isLowConfidence = confidenceLevel === 'LOW';
+
+  if (hasWarningInsight || hasMediumWarning || isLowConfidence) return 'attention';
+
+  return 'all-clear';
+}
+
 export const SEVERITY_STYLES = {
   info: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
   warning: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
@@ -116,14 +137,34 @@ export function ProjectionRow({ projection }: { readonly projection: ProjectionI
 
 export function InsightsLoadingSkeleton() {
   return (
-    <div className="animate-pulse space-y-3">
-      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
-      <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-full" />
-      <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-5/6" />
-      <div className="space-y-2 mt-4">
-        <div className="h-16 bg-slate-200 dark:bg-slate-700 rounded-lg" />
-        <div className="h-16 bg-slate-200 dark:bg-slate-700 rounded-lg" />
+    <div className="animate-pulse space-y-5">
+      <div className="rounded-2xl p-5 lg:p-7 bg-slate-100 dark:bg-slate-800/50 space-y-3">
+        <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded-full w-24" />
+        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-full" />
+        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-4/5" />
+        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-2/3 mt-1" />
       </div>
+
+      <div className="space-y-3">
+        {['skel-ev-a', 'skel-ev-b'].map((id) => (
+          <div
+            key={id}
+            className="rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-2"
+          >
+            <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-28" />
+            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full w-20" />
+            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-2 py-3">
+        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full w-32" />
+        <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full w-full" />
+        <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full w-4/5" />
+      </div>
+
+      <div className="h-px bg-slate-200 dark:bg-slate-700" />
     </div>
   );
 }
