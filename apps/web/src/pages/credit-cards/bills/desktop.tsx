@@ -9,6 +9,7 @@ import { useBillNavigation } from './hooks/useBillNavigation';
 import { useCreditCardManagement } from './hooks/useCreditCardManagement';
 import { useAllCardsBillTotals } from './hooks/useAllCardsBillTotals';
 import { CreditCardCardsContainer } from './components/CreditCardCardsContainer';
+import { CreditCardInsightsCard } from './components/CreditCardInsightsCard';
 import { CreditCardSummary } from './components/CreditCardSummary';
 import { BillCard } from './components/BillCard';
 import { BillEmptyState } from './components/BillEmptyState';
@@ -153,6 +154,10 @@ export function CreditCardBillsPageDesktop() {
           billTotal={totalUsed}
           billStatus={currentBill?.status}
         />
+
+        <div className="py-2">
+          <CreditCardInsightsCard companyId={companyId} cardId={selectedCardId} defaultExpanded />
+        </div>
 
         <div className="px-4 pb-6 lg:px-6">
           {currentBill ? (

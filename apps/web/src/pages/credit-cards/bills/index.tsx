@@ -10,6 +10,7 @@ import { useCreditCardBills } from './hooks/useCreditCardBills';
 import { useBillNavigation } from './hooks/useBillNavigation';
 import { useCreditCardManagement } from './hooks/useCreditCardManagement';
 import { CreditCardBillHeader } from './components/CreditCardBillHeader';
+import { CreditCardInsightsCard } from './components/CreditCardInsightsCard';
 import { BillSummary } from './components/BillSummary';
 import { BillTransactionList } from './components/BillTransactionList';
 import { BillEmptyState } from './components/BillEmptyState';
@@ -192,6 +193,8 @@ export function CreditCardBillsPage() {
             status={currentBill.status}
             total={currentBill.total}
           />
+
+          <CreditCardInsightsCard companyId={companyId} cardId={selectedCardId} />
 
           <div className="flex-1 px-4 pb-4">
             <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark overflow-hidden">
