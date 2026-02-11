@@ -1,7 +1,8 @@
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { usePreferencesStore } from '@/stores/preferences';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
 import { HomeHeader } from './components/HomeHeader';
 import { CashComposition } from './components/CashComposition';
@@ -25,10 +26,11 @@ export function HomePage() {
     expenses,
     incomePercentage,
     expensesPercentage,
-    expensesCoverageRatio,
     total,
     cashComposition,
     cashInsight,
+    cashStatusLine,
+    marginLabel,
     transactions,
     summaryQuery,
   } = useHomePageData();
@@ -61,12 +63,14 @@ export function HomePage() {
             balance={balance}
             accumulatedBalance={accumulatedBalance}
             cashInsight={cashInsight}
+            cashStatusLine={cashStatusLine}
             isPrivacyModeEnabled={isPrivacyModeEnabled}
             onTogglePrivacyMode={togglePrivacyMode}
           />
 
           <CashComposition
             composition={cashComposition}
+            cashInsight={cashInsight}
             isPrivacyModeEnabled={isPrivacyModeEnabled}
           />
 
@@ -76,12 +80,20 @@ export function HomePage() {
               expenses={expenses}
               incomePercentage={incomePercentage}
               expensesPercentage={expensesPercentage}
-              expensesCoverageRatio={expensesCoverageRatio}
+              marginLabel={marginLabel}
               total={total}
               isLoading={summaryQuery.isLoading}
               isPrivacyModeEnabled={isPrivacyModeEnabled}
             />
           </div>
+
+          <Link
+            to="/transactions"
+            className="flex items-center justify-center gap-1 text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors mt-3 pt-2"
+          >
+            Ver fluxo detalhado
+            <ArrowRight size={12} />
+          </Link>
         </header>
 
         {/* Quick Actions Grid */}

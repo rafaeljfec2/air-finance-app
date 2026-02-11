@@ -7,6 +7,7 @@ interface HomeHeaderProps {
   readonly balance: number;
   readonly accumulatedBalance: number | null;
   readonly cashInsight: CashInsight;
+  readonly cashStatusLine: string;
   readonly isPrivacyModeEnabled: boolean;
   readonly onTogglePrivacyMode: () => void;
 }
@@ -17,31 +18,37 @@ const INSIGHT_TONE_CLASSES: Record<CashInsight['tone'], string> = {
   neutral: 'text-gray-500 dark:text-gray-400',
 };
 
+function resolveBalanceColor(isPrivacy: boolean, balance: number): string {
+  if (isPrivacy) return 'text-gray-900 dark:text-white';
+  return balance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400';
+}
+
+function resolveAccumulatedColor(isPrivacy: boolean, accumulated: number | null): string {
+  if (isPrivacy) return 'text-gray-500 dark:text-gray-400';
+  const isPositive = accumulated !== null && accumulated >= 0;
+  return isPositive ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400';
+}
+
 export function HomeHeader({
   balance,
   accumulatedBalance,
   cashInsight,
+  cashStatusLine,
   isPrivacyModeEnabled,
   onTogglePrivacyMode,
 }: Readonly<HomeHeaderProps>) {
   const { user } = useAuth();
 
-  const balanceColorClass = isPrivacyModeEnabled
-    ? 'text-gray-900 dark:text-white'
-    : balance >= 0
-      ? 'text-blue-600 dark:text-blue-400'
-      : 'text-red-600 dark:text-red-400';
-
-  const accumulatedColorClass = isPrivacyModeEnabled
-    ? 'text-gray-500 dark:text-gray-400'
-    : accumulatedBalance !== null && accumulatedBalance >= 0
-      ? 'text-blue-600 dark:text-blue-400'
-      : 'text-red-600 dark:text-red-400';
+  const balanceColorClass = resolveBalanceColor(isPrivacyModeEnabled, balance);
+  const accumulatedColorClass = resolveAccumulatedColor(isPrivacyModeEnabled, accumulatedBalance);
 
   return (
     <div className="mb-4">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-gray-500 dark:text-gray-400 text-sm">Olá, {user?.name?.split(' ')[0]}</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">
+          {'Ol\u00E1, '}
+          {user?.name?.split(' ')[0]}
+        </p>
         <button
           onClick={onTogglePrivacyMode}
           className="text-gray-400 hover:text-primary-500 flex-shrink-0 transition-colors"
@@ -52,27 +59,31 @@ export function HomeHeader({
       </div>
 
       <div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Saldo do fluxo de caixa</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Caixa atual</p>
         <h1 className={`text-2xl font-bold ${balanceColorClass} mb-1.5`}>
-          {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(balance)}
+          {isPrivacyModeEnabled
+            ? 'R$ \u2022\u2022\u2022\u2022\u2022\u2022'
+            : formatCurrency(balance)}
         </h1>
 
         {!isPrivacyModeEnabled && (
           <p className={`text-xs ${INSIGHT_TONE_CLASSES[cashInsight.tone]} mb-3`}>
-            {cashInsight.label}
+            {cashStatusLine}
           </p>
         )}
 
         {accumulatedBalance !== null && (
           <div className="space-y-0.5">
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Acumulado no período:{' '}
+              {'Resultado l\u00EDquido: '}
               <span className={`font-medium ${accumulatedColorClass}`}>
-                {isPrivacyModeEnabled ? 'R$ ••••••' : formatCurrency(accumulatedBalance)}
+                {isPrivacyModeEnabled
+                  ? 'R$ \u2022\u2022\u2022\u2022\u2022\u2022'
+                  : formatCurrency(accumulatedBalance)}
               </span>
             </p>
             <p className="text-[10px] text-gray-400 dark:text-gray-500">
-              Entradas menos saídas dos últimos 30 dias
+              {'Entradas menos sa\u00EDdas \u00B7 \u00FAltimos 30 dias'}
             </p>
           </div>
         )}

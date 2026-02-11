@@ -60,22 +60,74 @@ function deriveCashInsight(composition: CashComposition, balance: number): CashI
   const totalRevenue = recurringRevenue + oneTimeRevenue;
 
   if (balance < 0) {
-    return { label: 'Despesas superaram receitas neste período', tone: 'warning' };
+    return {
+      label:
+        'Despesas superaram receitas neste período. Revise compromissos fixos para reequilibrar o fluxo.',
+      tone: 'warning',
+    };
   }
 
   if (totalRevenue === 0 && balance === 0) {
-    return { label: 'Resultado do período baseado no fluxo de caixa', tone: 'neutral' };
+    return {
+      label: 'Período sem movimentações significativas no fluxo de caixa.',
+      tone: 'neutral',
+    };
   }
 
   if (oneTimeRevenue > recurringRevenue && totalRevenue > 0) {
-    return { label: 'Saldo positivo, mas dependente de receitas pontuais', tone: 'warning' };
+    return {
+      label:
+        'Saldo positivo, porém dependente de entradas pontuais. Receitas recorrentes ainda não cobrem suas despesas fixas.',
+      tone: 'warning',
+    };
   }
 
   if (recurringRevenue >= fixedExpenses && recurringRevenue > 0) {
-    return { label: 'Receitas recorrentes cobrem suas despesas fixas', tone: 'positive' };
+    return {
+      label:
+        'Seu caixa é majoritariamente sustentado por receitas recorrentes, reduzindo risco financeiro no curto prazo.',
+      tone: 'positive',
+    };
   }
 
-  return { label: 'Resultado do período baseado no fluxo de caixa', tone: 'neutral' };
+  return {
+    label: 'Período sem movimentações significativas no fluxo de caixa.',
+    tone: 'neutral',
+  };
+}
+
+function deriveCashStatusLine(insight: CashInsight, balance: number): string {
+  if (balance < 0) {
+    return 'Caixa negativo \u00B7 despesas superaram receitas';
+  }
+
+  if (insight.tone === 'positive') {
+    return 'Caixa saudável \u00B7 sustentado por receitas recorrentes';
+  }
+
+  if (insight.tone === 'warning') {
+    return 'Caixa positivo \u00B7 dependente de receitas pontuais';
+  }
+
+  return 'Caixa do período';
+}
+
+function computeMarginLabel(income: number, expenses: number): string {
+  if (income === 0 && expenses === 0) {
+    return '';
+  }
+
+  if (income > expenses) {
+    const ratio = income > 0 ? Math.round(((income - expenses) / income) * 100) : 0;
+    return `Margem positiva de +${ratio}% no período`;
+  }
+
+  if (expenses > income) {
+    const ratio = income > 0 ? Math.round(((expenses - income) / income) * 100) : 100;
+    return `Margem negativa de -${ratio}% no período`;
+  }
+
+  return 'Receitas e despesas equilibradas no período';
 }
 
 export function useHomePageData() {
@@ -130,6 +182,13 @@ export function useHomePageData() {
     [cashComposition, balance],
   );
 
+  const cashStatusLine = useMemo(
+    () => deriveCashStatusLine(cashInsight, balance),
+    [cashInsight, balance],
+  );
+
+  const marginLabel = useMemo(() => computeMarginLabel(income, expenses), [income, expenses]);
+
   const accountMap = useMemo(() => {
     const map = new Map<string, string>();
     accounts?.forEach((account) => {
@@ -167,6 +226,8 @@ export function useHomePageData() {
     total,
     cashComposition,
     cashInsight,
+    cashStatusLine,
+    marginLabel,
     isLoading: summaryQuery.isLoading || balanceQuery.isLoading || transactionsQuery.isLoading,
     transactions: transactionsWithAccount,
     summaryQuery,

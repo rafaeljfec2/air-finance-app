@@ -7,27 +7,10 @@ interface MonthlySummaryBarProps {
   readonly expenses: number;
   readonly incomePercentage: number;
   readonly expensesPercentage: number;
-  readonly expensesCoverageRatio: number;
+  readonly marginLabel: string;
   readonly total: number;
   readonly isLoading: boolean;
   readonly isPrivacyModeEnabled: boolean;
-}
-
-function buildInsightText(income: number, expenses: number, expensesCoverageRatio: number): string {
-  if (income === 0 && expenses === 0) {
-    return '';
-  }
-
-  if (income > expenses) {
-    const surplusRatio = income > 0 ? Math.round(((income - expenses) / income) * 100) : 0;
-    return `Receitas superaram despesas em ${surplusRatio}%`;
-  }
-
-  if (expenses > income) {
-    return `Despesas consomem ${expensesCoverageRatio}% das receitas`;
-  }
-
-  return 'Receitas e despesas equilibradas no período';
 }
 
 export function MonthlySummaryBar({
@@ -35,14 +18,12 @@ export function MonthlySummaryBar({
   expenses,
   incomePercentage,
   expensesPercentage,
-  expensesCoverageRatio,
+  marginLabel,
   total,
   isLoading,
   isPrivacyModeEnabled,
 }: Readonly<MonthlySummaryBarProps>) {
   const currentMonthYear = format(new Date(), 'MMM/yyyy', { locale: ptBR });
-
-  const insightText = buildInsightText(income, expenses, expensesCoverageRatio);
 
   const renderProgressBar = () => {
     if (isLoading) {
@@ -75,7 +56,7 @@ export function MonthlySummaryBar({
 
   const formatValue = (value: number, prefix: string) => {
     if (isPrivacyModeEnabled) {
-      return 'R$ •••';
+      return 'R$ \u2022\u2022\u2022';
     }
     if (isLoading) {
       return 'Carregando...';
@@ -85,8 +66,8 @@ export function MonthlySummaryBar({
 
   return (
     <div className="bg-gray-100 dark:bg-gray-800 rounded-xl p-3">
-      {!isPrivacyModeEnabled && !isLoading && insightText && (
-        <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1.5">{insightText}</p>
+      {!isPrivacyModeEnabled && !isLoading && marginLabel && (
+        <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1.5">{marginLabel}</p>
       )}
       <div className="flex justify-between text-xs mb-1.5">
         <span className="text-gray-600 dark:text-gray-300">Receitas vs Despesas</span>
@@ -97,7 +78,10 @@ export function MonthlySummaryBar({
       </div>
       <div className="flex justify-between text-[10px] mt-1.5 text-gray-500">
         <span>Entradas: {formatValue(income, '+')}</span>
-        <span>Saídas: {formatValue(expenses, '-')}</span>
+        <span>
+          {'Sa\u00EDdas: '}
+          {formatValue(expenses, '-')}
+        </span>
       </div>
     </div>
   );

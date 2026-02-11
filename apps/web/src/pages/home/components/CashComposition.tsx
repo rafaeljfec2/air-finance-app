@@ -1,8 +1,9 @@
 import { formatCurrency } from '@/utils/formatters';
-import type { CashComposition as CashCompositionData } from '../hooks/useHomePageData';
+import type { CashComposition as CashCompositionData, CashInsight } from '../hooks/useHomePageData';
 
 interface CashCompositionProps {
   readonly composition: CashCompositionData;
+  readonly cashInsight: CashInsight;
   readonly isPrivacyModeEnabled: boolean;
 }
 
@@ -15,9 +16,9 @@ interface CompositionLineItem {
 function buildLineItems(composition: CashCompositionData): readonly CompositionLineItem[] {
   return [
     { label: 'Receitas recorrentes', value: composition.recurringRevenue, type: 'revenue' },
-    { label: 'Receitas pontuais', value: composition.oneTimeRevenue, type: 'revenue' },
     { label: 'Despesas fixas', value: composition.fixedExpenses, type: 'expense' },
-    { label: 'Despesas variáveis', value: composition.variableExpenses, type: 'expense' },
+    { label: 'Receitas pontuais', value: composition.oneTimeRevenue, type: 'revenue' },
+    { label: 'Despesas vari\u00E1veis', value: composition.variableExpenses, type: 'expense' },
   ];
 }
 
@@ -32,6 +33,7 @@ function hasNonZeroValue(composition: CashCompositionData): boolean {
 
 export function CashComposition({
   composition,
+  cashInsight,
   isPrivacyModeEnabled,
 }: Readonly<CashCompositionProps>) {
   if (isPrivacyModeEnabled || !hasNonZeroValue(composition)) {
@@ -43,7 +45,7 @@ export function CashComposition({
   return (
     <div className="border-t border-gray-100 dark:border-gray-700/50 pt-3 mt-3">
       <p className="text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">
-        Composição do saldo
+        {'Composi\u00E7\u00E3o do caixa'}
       </p>
       <div className="space-y-1.5">
         {items.map((item) => (
@@ -62,6 +64,9 @@ export function CashComposition({
           </div>
         ))}
       </div>
+      <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed mt-2.5">
+        {cashInsight.label}
+      </p>
     </div>
   );
 }
