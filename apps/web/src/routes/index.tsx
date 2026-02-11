@@ -241,7 +241,7 @@ function createPublicRoute(
 
 export const router = createBrowserRouter([
   // ==================== PUBLIC ROUTES ====================
-  createPublicRoute('/', LandingPageV2),
+  createPublicRoute('/', LandingPageV3),
   createPublicRoute('/landing-v2', LandingPageV2),
   createPublicRoute('/landing-v3', LandingPageV3),
   createPublicRoute('/pierre-finance-config', PierreFinanceConfigPage),
