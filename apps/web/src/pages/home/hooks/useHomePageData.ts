@@ -1,7 +1,4 @@
-import {
-  useDashboardBalanceHistory,
-  useDashboardSummary,
-} from '@/hooks/useDashboard';
+import { useDashboardBalanceHistory, useDashboardSummary } from '@/hooks/useDashboard';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCompanyStore } from '@/stores/company';
@@ -12,6 +9,73 @@ import { startOfMonth, endOfMonth, format } from 'date-fns';
 
 interface TransactionWithAccount extends Transaction {
   accountName?: string;
+}
+
+export interface CashComposition {
+  readonly recurringRevenue: number;
+  readonly oneTimeRevenue: number;
+  readonly fixedExpenses: number;
+  readonly variableExpenses: number;
+}
+
+export interface CashInsight {
+  readonly label: string;
+  readonly tone: 'positive' | 'warning' | 'neutral';
+}
+
+function isRecurringTransaction(tx: Transaction): boolean {
+  return tx.valueType === 'fixed' || tx.repeatMonthly;
+}
+
+function computeCashComposition(transactions: Transaction[]): CashComposition {
+  let recurringRevenue = 0;
+  let oneTimeRevenue = 0;
+  let fixedExpenses = 0;
+  let variableExpenses = 0;
+
+  for (const tx of transactions) {
+    const amount = Math.abs(tx.value);
+    const recurring = isRecurringTransaction(tx);
+
+    if (tx.launchType === 'revenue') {
+      if (recurring) {
+        recurringRevenue += amount;
+      } else {
+        oneTimeRevenue += amount;
+      }
+    } else if (tx.launchType === 'expense') {
+      if (recurring) {
+        fixedExpenses += amount;
+      } else {
+        variableExpenses += amount;
+      }
+    }
+  }
+
+  return { recurringRevenue, oneTimeRevenue, fixedExpenses, variableExpenses };
+}
+
+function deriveCashInsight(composition: CashComposition, balance: number): CashInsight {
+  const { recurringRevenue, oneTimeRevenue, fixedExpenses } = composition;
+  const totalRevenue = recurringRevenue + oneTimeRevenue;
+
+  if (balance < 0) {
+    return { label: 'Despesas superaram receitas neste período', tone: 'warning' };
+  }
+
+  if (totalRevenue === 0 && balance === 0) {
+    return { label: 'Resultado do período baseado no fluxo de caixa', tone: 'neutral' };
+  }
+
+  if (oneTimeRevenue > recurringRevenue && totalRevenue > 0) {
+    return { label: 'Saldo positivo, mas dependente de receitas pontuais', tone: 'warning' };
+  }
+
+  if (recurringRevenue >= fixedExpenses && recurringRevenue > 0) {
+    return { label: 'Receitas recorrentes cobrem suas despesas fixas', tone: 'positive' };
+  }
+
+  return { label: 'Resultado do período baseado no fluxo de caixa', tone: 'neutral' };
 }
 
 export function useHomePageData() {
@@ -27,7 +91,6 @@ export function useHomePageData() {
     [],
   );
 
-  // Calcular início e fim do mês atual
   const monthFilters = useMemo(() => {
     const now = new Date();
     const start = startOfMonth(now);
@@ -39,7 +102,6 @@ export function useHomePageData() {
   }, []);
 
   const balanceQuery = useDashboardBalanceHistory(companyId, filters);
-  // Buscar todas as transações do mês atual (sem filtro de conta)
   const transactionsQuery = useTransactions(companyId, monthFilters);
   const summaryQuery = useDashboardSummary(companyId, filters);
 
@@ -53,7 +115,21 @@ export function useHomePageData() {
   const incomePercentage = total > 0 ? (income / total) * 100 : 0;
   const expensesPercentage = total > 0 ? (expenses / total) * 100 : 0;
 
-  // Criar mapa de accountId -> accountName
+  const expensesCoverageRatio = useMemo(() => {
+    if (income === 0) return 0;
+    return Math.round((expenses / income) * 100);
+  }, [income, expenses]);
+
+  const cashComposition = useMemo<CashComposition>(
+    () => computeCashComposition(transactionsQuery.transactions ?? []),
+    [transactionsQuery.transactions],
+  );
+
+  const cashInsight = useMemo<CashInsight>(
+    () => deriveCashInsight(cashComposition, balance),
+    [cashComposition, balance],
+  );
+
   const accountMap = useMemo(() => {
     const map = new Map<string, string>();
     accounts?.forEach((account) => {
@@ -62,22 +138,22 @@ export function useHomePageData() {
     return map;
   }, [accounts]);
 
-  // Ordenar transações por data de lançamento DESC (mais recente primeiro) e adicionar nome da conta
   const transactionsWithAccount = useMemo(() => {
     const transactions = transactionsQuery.transactions ?? [];
     return transactions
-      .map((tx): TransactionWithAccount => ({
-        ...tx,
-        accountName: accountMap.get(tx.accountId) ?? 'Conta não encontrada',
-        accountId: tx.accountId, // Garantir que accountId está disponível
-      }))
+      .map(
+        (tx): TransactionWithAccount => ({
+          ...tx,
+          accountName: accountMap.get(tx.accountId) ?? 'Conta não encontrada',
+          accountId: tx.accountId,
+        }),
+      )
       .sort((a, b) => {
-        // Ordenar por paymentDate DESC (mais recente primeiro)
         const dateA = new Date(a.paymentDate).getTime();
         const dateB = new Date(b.paymentDate).getTime();
-        return dateB - dateA; // DESC: mais recente primeiro
+        return dateB - dateA;
       })
-      .slice(0, 5); // Limitar a 5 transações
+      .slice(0, 5);
   }, [transactionsQuery.transactions, accountMap]);
 
   return {
@@ -87,11 +163,11 @@ export function useHomePageData() {
     expenses,
     incomePercentage,
     expensesPercentage,
+    expensesCoverageRatio,
     total,
-    isLoading:
-      summaryQuery.isLoading ||
-      balanceQuery.isLoading ||
-      transactionsQuery.isLoading,
+    cashComposition,
+    cashInsight,
+    isLoading: summaryQuery.isLoading || balanceQuery.isLoading || transactionsQuery.isLoading,
     transactions: transactionsWithAccount,
     summaryQuery,
   };

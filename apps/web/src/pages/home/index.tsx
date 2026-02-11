@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
 import { HomeHeader } from './components/HomeHeader';
+import { CashComposition } from './components/CashComposition';
 import { MonthlySummaryBar } from './components/MonthlySummaryBar';
 import { QuickActionsGrid } from './components/QuickActionsGrid';
 import { RecentTransactionsList } from './components/RecentTransactionsList';
@@ -24,7 +25,10 @@ export function HomePage() {
     expenses,
     incomePercentage,
     expensesPercentage,
+    expensesCoverageRatio,
     total,
+    cashComposition,
+    cashInsight,
     transactions,
     summaryQuery,
   } = useHomePageData();
@@ -56,19 +60,28 @@ export function HomePage() {
           <HomeHeader
             balance={balance}
             accumulatedBalance={accumulatedBalance}
+            cashInsight={cashInsight}
             isPrivacyModeEnabled={isPrivacyModeEnabled}
             onTogglePrivacyMode={togglePrivacyMode}
           />
 
-          <MonthlySummaryBar
-            income={income}
-            expenses={expenses}
-            incomePercentage={incomePercentage}
-            expensesPercentage={expensesPercentage}
-            total={total}
-            isLoading={summaryQuery.isLoading}
+          <CashComposition
+            composition={cashComposition}
             isPrivacyModeEnabled={isPrivacyModeEnabled}
           />
+
+          <div className="mt-3">
+            <MonthlySummaryBar
+              income={income}
+              expenses={expenses}
+              incomePercentage={incomePercentage}
+              expensesPercentage={expensesPercentage}
+              expensesCoverageRatio={expensesCoverageRatio}
+              total={total}
+              isLoading={summaryQuery.isLoading}
+              isPrivacyModeEnabled={isPrivacyModeEnabled}
+            />
+          </div>
         </header>
 
         {/* Quick Actions Grid */}
