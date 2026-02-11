@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getAccountById, getAccounts, type Account } from '@/services/accountService';
 
 interface UseAccountQueriesParams {
@@ -7,6 +8,8 @@ interface UseAccountQueriesParams {
 }
 
 export function useAccountQueries({ companyId, accountId }: UseAccountQueriesParams) {
+  const queryClient = useQueryClient();
+
   const {
     data: account,
     isLoading: isLoadingAccount,
@@ -29,6 +32,22 @@ export function useAccountQueries({ companyId, accountId }: UseAccountQueriesPar
     staleTime: 5 * 60 * 1000,
     select: (data) => data.filter((acc) => acc.type !== 'credit_card'),
   });
+
+  useEffect(() => {
+    if (!account || !companyId) return;
+
+    queryClient.setQueryData<Account[]>(['accounts', companyId], (prev) => {
+      if (!prev) return prev;
+
+      const needsUpdate = prev.some(
+        (acc) => acc.id === account.id && acc.currentBalance !== account.currentBalance,
+      );
+
+      if (!needsUpdate) return prev;
+
+      return prev.map((acc) => (acc.id === account.id ? account : acc));
+    });
+  }, [account, companyId, queryClient]);
 
   return {
     account: account ?? null,
