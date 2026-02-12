@@ -1,12 +1,16 @@
 import { Check, X, Minus } from 'lucide-react';
-import { ScrollReveal, StaggerContainer, StaggerItem } from './animations';
+import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
+import { ScrollReveal } from './animations';
+
+type ComparisonStatus = 'yes' | 'no' | 'partial';
 
 interface ComparisonRow {
   readonly feature: string;
-  readonly airfinance: 'yes' | 'no' | 'partial';
-  readonly spreadsheet: 'yes' | 'no' | 'partial';
-  readonly bankApp: 'yes' | 'no' | 'partial';
-  readonly otherApps: 'yes' | 'no' | 'partial';
+  readonly airfinance: ComparisonStatus;
+  readonly spreadsheet: ComparisonStatus;
+  readonly bankApp: ComparisonStatus;
+  readonly otherApps: ComparisonStatus;
 }
 
 const COMPARISON_DATA: readonly ComparisonRow[] = [
@@ -53,7 +57,7 @@ const COMPARISON_DATA: readonly ComparisonRow[] = [
     otherApps: 'partial',
   },
   {
-    feature: 'Relatórios avançados',
+    feature: 'Relat\u00F3rios avan\u00E7ados',
     airfinance: 'yes',
     spreadsheet: 'partial',
     bankApp: 'partial',
@@ -63,7 +67,21 @@ const COMPARISON_DATA: readonly ComparisonRow[] = [
 
 const COLUMNS = ['Airfinance', 'Planilha', 'App do banco', 'Outros apps'] as const;
 
-function StatusIcon({ status }: { readonly status: 'yes' | 'no' | 'partial' }) {
+const rowVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.06,
+    },
+  },
+};
+
+function StatusIcon({ status }: { readonly status: ComparisonStatus }) {
   switch (status) {
     case 'yes':
       return (
@@ -87,6 +105,8 @@ function StatusIcon({ status }: { readonly status: 'yes' | 'no' | 'partial' }) {
 }
 
 export function ComparisonV3() {
+  const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
+
   return (
     <section className="v3-section v3-section-dark">
       <div className="v3-container">
@@ -94,12 +114,13 @@ export function ComparisonV3() {
           <div className="v3-badge v3-badge-dark mx-auto mb-4">Comparativo</div>
           <h2 className="v3-h2 mb-4">Por que o Airfinance?</h2>
           <p className="v3-body max-w-xl mx-auto">
-            Veja como nos comparamos com as alternativas que você provavelmente já tentou.
+            Veja como nos comparamos com as alternativas que voc&ecirc; provavelmente j&aacute;
+            tentou.
           </p>
         </ScrollReveal>
 
         <div className="max-w-4xl mx-auto overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full" ref={ref}>
             <thead>
               <tr>
                 <th className="text-left py-3 px-4 text-sm font-medium text-gray-400 w-[180px]" />
@@ -115,39 +136,42 @@ export function ComparisonV3() {
                 ))}
               </tr>
             </thead>
-            <StaggerContainer as-child staggerDelay={0.06}>
-              <tbody>
-                {COMPARISON_DATA.map((row) => (
-                  <StaggerItem key={row.feature} variant="fade">
-                    <tr className="border-t border-gray-800">
-                      <td className="py-3.5 px-4 text-sm font-medium text-gray-300">
-                        {row.feature}
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <div className="flex justify-center">
-                          <StatusIcon status={row.airfinance} />
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <div className="flex justify-center">
-                          <StatusIcon status={row.spreadsheet} />
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <div className="flex justify-center">
-                          <StatusIcon status={row.bankApp} />
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <div className="flex justify-center">
-                          <StatusIcon status={row.otherApps} />
-                        </div>
-                      </td>
-                    </tr>
-                  </StaggerItem>
-                ))}
-              </tbody>
-            </StaggerContainer>
+            <motion.tbody
+              initial="hidden"
+              animate={inView ? 'visible' : 'hidden'}
+              variants={staggerContainer}
+            >
+              {COMPARISON_DATA.map((row) => (
+                <motion.tr
+                  key={row.feature}
+                  variants={rowVariants}
+                  transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
+                  className="border-t border-gray-800"
+                >
+                  <td className="py-3.5 px-4 text-sm font-medium text-gray-300">{row.feature}</td>
+                  <td className="py-3.5 px-4">
+                    <div className="flex justify-center">
+                      <StatusIcon status={row.airfinance} />
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <div className="flex justify-center">
+                      <StatusIcon status={row.spreadsheet} />
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <div className="flex justify-center">
+                      <StatusIcon status={row.bankApp} />
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <div className="flex justify-center">
+                      <StatusIcon status={row.otherApps} />
+                    </div>
+                  </td>
+                </motion.tr>
+              ))}
+            </motion.tbody>
           </table>
         </div>
       </div>
