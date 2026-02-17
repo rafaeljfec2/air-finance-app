@@ -14,6 +14,7 @@ import {
   Link2,
   Plus,
   RefreshCcw,
+  Send,
   Sparkles,
   Tag,
   User,
@@ -52,6 +53,7 @@ export const navigation: NavigationSection[] = [
       { name: 'Nova Transação', href: '/transactions/new', icon: Plus },
       { name: 'Fluxo de Caixa', href: '/transactions', icon: ArrowRightLeft },
       { name: 'Importar Extrato', href: '/import-ofx', icon: Import },
+      { name: 'Pagamentos', href: '/payments', icon: Send },
     ],
   },
 

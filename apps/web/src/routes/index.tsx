@@ -83,6 +83,12 @@ const NewPasswordPage = lazy(() =>
   import('@/pages/new-password').then((m) => ({ default: m.NewPasswordPage })),
 );
 const Payables = lazy(() => import('@/pages/payables').then((m) => ({ default: m.Payables })));
+const PaymentsPage = lazy(() =>
+  import('@/pages/payments').then((m) => ({ default: m.PaymentsPage })),
+);
+const NewPaymentPage = lazy(() =>
+  import('@/pages/payments/new').then((m) => ({ default: m.NewPayment })),
+);
 const PlannerPage = lazy(() => import('@/pages/planner').then((m) => ({ default: m.PlannerPage })));
 const Profile = lazy(() => import('@/pages/profile').then((m) => ({ default: m.Profile })));
 const Receivables = lazy(() =>
@@ -346,6 +352,8 @@ export const router = createBrowserRouter([
   createSimpleProtectedRoute('/companies', CompaniesPage),
   createSimpleProtectedRoute('/users', UsersPage),
   createSimpleProtectedRoute('/payables', Payables),
+  createProtectedRoute('/payments', PaymentsPage, { requireOnboarding: true }),
+  createSimpleProtectedRoute('/payments/new', NewPaymentPage),
   createSimpleProtectedRoute('/receivables', Receivables),
   createSimpleProtectedRoute('/monthly-closing', MonthlyClosing),
   createSimpleProtectedRoute('/annual-result', AnnualResult),
