@@ -1,24 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { QrCode, Zap } from 'lucide-react';
 import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
+import { ComboBox } from '@/components/ui/ComboBox';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 
 interface DarfPaymentFormProps {
   readonly onSubmit: (data: Record<string, unknown>) => void;
   readonly onBack: () => void;
+  readonly initialData?: Record<string, unknown>;
+  readonly onSwitchToPix?: (pixPayload: string, amount: string) => void;
 }
 
-const REVENUE_CODES = [
+const REVENUE_CODE_OPTIONS = [
   { value: '0220', label: '0220 - IRPJ' },
-  { value: '2372', label: '2372 - CSLL' },
-  { value: '5952', label: '5952 - PIS' },
-  { value: '2172', label: '2172 - COFINS' },
-  { value: '1708', label: '1708 - IRRF' },
   { value: '0561', label: '0561 - IRRF Trabalho Assalariado' },
   { value: '0588', label: '0588 - IRRF Trabalho sem Vinculo' },
+  { value: '1099', label: '1099 - GPS - Contrib. Individual' },
+  { value: '1120', label: '1120 - GPS - Empresa' },
+  { value: '1138', label: '1138 - GPS - Com. Prod. Rural PJ' },
+  { value: '1162', label: '1162 - GPS - Contrib. Facultativo' },
+  { value: '1708', label: '1708 - IRRF' },
+  { value: '2100', label: '2100 - GPS - Empresa em Geral' },
+  { value: '2172', label: '2172 - COFINS' },
+  { value: '2372', label: '2372 - CSLL' },
   { value: '4600', label: '4600 - Simples Nacional' },
+  { value: '5952', label: '5952 - PIS' },
 ];
 
-export function DarfPaymentForm({ onSubmit, onBack }: DarfPaymentFormProps) {
+export function DarfPaymentForm({
+  onSubmit,
+  onBack,
+  initialData,
+  onSwitchToPix,
+}: DarfPaymentFormProps) {
   const [cnpjCpf, setCnpjCpf] = useState('');
   const [revenueCode, setRevenueCode] = useState('');
   const [dueDate, setDueDate] = useState('');
@@ -30,6 +45,40 @@ export function DarfPaymentForm({ onSubmit, onBack }: DarfPaymentFormProps) {
   const [companyPhone, setCompanyPhone] = useState('');
   const [fineAmount, setFineAmount] = useState('');
   const [interestAmount, setInterestAmount] = useState('');
+  const [pixPayload, setPixPayload] = useState('');
+
+  useEffect(() => {
+    if (!initialData) return;
+    const str = (key: string): string => {
+      const val = initialData[key];
+      return typeof val === 'string' || typeof val === 'number' ? String(val) : '';
+    };
+    const v = (key: string) => str(key) || undefined;
+    const toCurrency = (key: string): string => {
+      const raw = initialData[key];
+      const num = typeof raw === 'number' ? raw : Number.parseFloat(str(key));
+      return !Number.isNaN(num) && num > 0
+        ? formatCurrencyInput(String(Math.round(num * 100)))
+        : '';
+    };
+
+    if (v('cnpjCpf')) setCnpjCpf(str('cnpjCpf'));
+    if (v('revenueCode')) setRevenueCode(str('revenueCode'));
+    if (v('dueDate')) setDueDate(str('dueDate'));
+    if (v('description')) setDescription(str('description'));
+    if (v('companyName')) setCompanyName(str('companyName'));
+    if (v('assessmentPeriod')) setAssessmentPeriod(str('assessmentPeriod'));
+    if (v('principalAmount')) setPrincipalAmount(toCurrency('principalAmount'));
+    if (v('reference')) setReference(str('reference'));
+    if (v('companyPhone')) setCompanyPhone(str('companyPhone'));
+    if (v('fineAmount')) setFineAmount(toCurrency('fineAmount'));
+    if (v('interestAmount')) setInterestAmount(toCurrency('interestAmount'));
+    if (v('pixPayload')) setPixPayload(str('pixPayload'));
+  }, [initialData]);
+
+  const numericPrincipal = principalAmount ? parseCurrency(principalAmount) : 0;
+  const numericFine = fineAmount ? parseCurrency(fineAmount) : 0;
+  const numericInterest = interestAmount ? parseCurrency(interestAmount) : 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,13 +89,23 @@ export function DarfPaymentForm({ onSubmit, onBack }: DarfPaymentFormProps) {
       description,
       companyName,
       assessmentPeriod,
-      principalAmount: Number.parseFloat(principalAmount),
+      principalAmount: numericPrincipal,
       reference,
       companyPhone: companyPhone || undefined,
-      fineAmount: fineAmount ? Number.parseFloat(fineAmount) : undefined,
-      interestAmount: interestAmount ? Number.parseFloat(interestAmount) : undefined,
+      fineAmount: numericFine > 0 ? numericFine : undefined,
+      interestAmount: numericInterest > 0 ? numericInterest : undefined,
     });
   };
+
+  const revenueCodeOptions = useMemo(() => {
+    if (revenueCode && !REVENUE_CODE_OPTIONS.some((c) => c.value === revenueCode)) {
+      return [
+        { value: revenueCode, label: `${revenueCode} - Codigo personalizado` },
+        ...REVENUE_CODE_OPTIONS,
+      ];
+    }
+    return REVENUE_CODE_OPTIONS;
+  }, [revenueCode]);
 
   const isValid =
     cnpjCpf.trim() !== '' &&
@@ -55,7 +114,7 @@ export function DarfPaymentForm({ onSubmit, onBack }: DarfPaymentFormProps) {
     description.trim() !== '' &&
     companyName.trim() !== '' &&
     assessmentPeriod !== '' &&
-    Number.parseFloat(principalAmount) > 0 &&
+    numericPrincipal > 0 &&
     reference.trim() !== '';
 
   return (
@@ -67,6 +126,28 @@ export function DarfPaymentForm({ onSubmit, onBack }: DarfPaymentFormProps) {
         </p>
       </div>
 
+      {pixPayload && onSwitchToPix && (
+        <div className="flex items-start gap-3 p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+          <QrCode className="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">
+              Esta guia aceita pagamento via PIX
+            </p>
+            <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">
+              Pagamento instantaneo, sem custo e disponivel 24h
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onSwitchToPix(pixPayload, principalAmount)}
+            className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-md transition-colors"
+          >
+            <Zap className="w-3.5 h-3.5" />
+            Pagar via PIX
+          </button>
+        </div>
+      )}
+
       <div className="space-y-3">
         <FormField label="CPF/CNPJ do contribuinte">
           <Input
@@ -77,22 +158,16 @@ export function DarfPaymentForm({ onSubmit, onBack }: DarfPaymentFormProps) {
           />
         </FormField>
 
-        <FormField label="Codigo de receita">
-          <select
-            id="darf-revenue-code"
-            value={revenueCode}
-            onChange={(e) => setRevenueCode(e.target.value)}
-            className="flex min-h-[44px] w-full rounded-md border border-input dark:border-border-dark bg-background dark:bg-background-dark px-3 py-2.5 text-sm text-text dark:text-text-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            required
-          >
-            <option value="">Selecione o codigo</option>
-            {REVENUE_CODES.map((code) => (
-              <option key={code.value} value={code.value}>
-                {code.label}
-              </option>
-            ))}
-          </select>
-        </FormField>
+        <ComboBox
+          label="Codigo de receita"
+          options={revenueCodeOptions}
+          value={revenueCode || null}
+          onValueChange={(val) => setRevenueCode(val ?? '')}
+          placeholder="Selecione o codigo"
+          searchable
+          searchPlaceholder="Buscar codigo..."
+          showClearButton={false}
+        />
 
         <FormField label="Nome da empresa/contribuinte">
           <Input
@@ -125,12 +200,10 @@ export function DarfPaymentForm({ onSubmit, onBack }: DarfPaymentFormProps) {
         <div className="grid grid-cols-2 gap-3">
           <FormField label="Valor principal (R$)">
             <Input
-              type="number"
-              step="0.01"
-              min="0.01"
               value={principalAmount}
-              onChange={(e) => setPrincipalAmount(e.target.value)}
-              placeholder="0,00"
+              onChange={(e) => setPrincipalAmount(formatCurrencyInput(e.target.value))}
+              placeholder="R$ 0,00"
+              inputMode="numeric"
               required
             />
           </FormField>
@@ -170,22 +243,18 @@ export function DarfPaymentForm({ onSubmit, onBack }: DarfPaymentFormProps) {
         <div className="grid grid-cols-2 gap-3">
           <FormField label="Multa (R$)">
             <Input
-              type="number"
-              step="0.01"
-              min="0"
               value={fineAmount}
-              onChange={(e) => setFineAmount(e.target.value)}
-              placeholder="0,00"
+              onChange={(e) => setFineAmount(formatCurrencyInput(e.target.value))}
+              placeholder="R$ 0,00"
+              inputMode="numeric"
             />
           </FormField>
           <FormField label="Juros (R$)">
             <Input
-              type="number"
-              step="0.01"
-              min="0"
               value={interestAmount}
-              onChange={(e) => setInterestAmount(e.target.value)}
-              placeholder="0,00"
+              onChange={(e) => setInterestAmount(formatCurrencyInput(e.target.value))}
+              placeholder="R$ 0,00"
+              inputMode="numeric"
             />
           </FormField>
         </div>

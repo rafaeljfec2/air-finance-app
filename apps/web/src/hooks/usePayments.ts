@@ -10,6 +10,7 @@ import {
   cancelPayment,
   listPixCharges,
   cancelPixCharge,
+  parsePaymentDocument,
   type PixPaymentRequest,
   type TedPaymentRequest,
   type BoletoPaymentRequest,
@@ -18,6 +19,7 @@ import {
   type Payment,
   type PixCharge,
   type PaymentFilters,
+  type ParsedDocumentResponse,
 } from '@/services/paymentService';
 
 const PAYMENTS_KEY = 'payments';
@@ -135,5 +137,11 @@ export function useCancelPixCharge(accountId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [PIX_CHARGES_KEY, accountId] });
     },
+  });
+}
+
+export function useParsePaymentDocument(accountId: string) {
+  return useMutation<ParsedDocumentResponse, Error, File>({
+    mutationFn: (file: File) => parsePaymentDocument(accountId, file),
   });
 }

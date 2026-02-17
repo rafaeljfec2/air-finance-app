@@ -4,21 +4,32 @@ import { formatCurrency } from '@/utils/formatters';
 import { memo } from 'react';
 import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { TransactionActions } from './TransactionActions';
+import { PaymentStatusBadge } from '@/components/transactions/PaymentStatusBadge';
 import type { TransactionGridTransaction } from './TransactionGrid.types';
 import { formatTransactionDate } from './TransactionGrid.utils';
 
 interface TableRowProps {
-  transaction: TransactionGridTransaction;
-  showActions: boolean;
-  onActionClick?: (transaction: TransactionGridTransaction) => void;
-  onEdit?: (transaction: TransactionGridTransaction) => void;
-  onDelete?: (transaction: TransactionGridTransaction) => void;
-  onViewHistory?: (transaction: TransactionGridTransaction) => void;
-  spacious?: boolean;
+  readonly transaction: TransactionGridTransaction;
+  readonly showActions: boolean;
+  readonly onActionClick?: (transaction: TransactionGridTransaction) => void;
+  readonly onEdit?: (transaction: TransactionGridTransaction) => void;
+  readonly onDelete?: (transaction: TransactionGridTransaction) => void;
+  readonly onViewHistory?: (transaction: TransactionGridTransaction) => void;
+  readonly onRetryPayment?: (transaction: TransactionGridTransaction) => void;
+  readonly spacious?: boolean;
 }
 
 export const TableRow = memo(
-  ({ transaction, showActions, onActionClick, onEdit, onDelete, onViewHistory, spacious = false }: TableRowProps) => {
+  ({
+    transaction,
+    showActions,
+    onActionClick,
+    onEdit,
+    onDelete,
+    onViewHistory,
+    onRetryPayment,
+    spacious = false,
+  }: TableRowProps) => {
     const isPreviousBalance = transaction.id === 'previous-balance';
 
     // Extrair lógica dos ternários aninhados para variáveis separadas
@@ -35,7 +46,8 @@ export const TableRow = memo(
     };
 
     const getRowClassName = () => {
-      const baseClasses = 'transition-colors border-b border-border/50 dark:border-border-dark/50 last:border-0';
+      const baseClasses =
+        'transition-colors border-b border-border/50 dark:border-border-dark/50 last:border-0';
       if (isPreviousBalance) {
         return cn(baseClasses, 'bg-gray-50/80 dark:bg-gray-900/40 italic font-medium');
       }
@@ -64,25 +76,34 @@ export const TableRow = memo(
 
     // Estilos espaçosos quando spacious=true (aumenta altura das linhas)
     // Quando spacious=false, forçar linhas compactas com padding mínimo
-    const cellPadding = spacious 
-      ? { paddingTop: '8px', paddingBottom: '8px', lineHeight: '1.5' } 
+    const cellPadding = spacious
+      ? { paddingTop: '8px', paddingBottom: '8px', lineHeight: '1.5' }
       : { paddingTop: '2px', paddingBottom: '2px', lineHeight: '1.0' };
-    const rowStyle = spacious 
-      ? { height: 'auto', lineHeight: '1.5' } 
+    const rowStyle = spacious
+      ? { height: 'auto', lineHeight: '1.5' }
       : { height: 'auto', lineHeight: '1.0', minHeight: 'auto' };
     // Quando spacious=false, usar classes compactas e garantir que não haja padding extra
     const cellPaddingClass = spacious ? 'py-2 px-2' : 'py-0.5 px-2';
     const numericCellPaddingClass = spacious ? 'py-2 pl-0 pr-4' : 'py-0.5 pl-0 pr-4';
 
     return (
-      <tr
-        className={getRowClassName()}
-        style={rowStyle}
-      >
-        <td className={cn(cellPaddingClass, "text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap align-middle")} style={cellPadding}>
+      <tr className={getRowClassName()} style={rowStyle}>
+        <td
+          className={cn(
+            cellPaddingClass,
+            'text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap align-middle',
+          )}
+          style={cellPadding}
+        >
           {formatTransactionDate(transaction.paymentDate || transaction.createdAt, 'dd/MM/yyyy')}
         </td>
-        <td className={cn(cellPaddingClass, "text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis align-middle")} style={cellPadding}>
+        <td
+          className={cn(
+            cellPaddingClass,
+            'text-xs text-text dark:text-text-dark whitespace-nowrap overflow-hidden text-ellipsis align-middle',
+          )}
+          style={cellPadding}
+        >
           <div className="flex items-center gap-1.5">
             {getCategoryIcon()}
             <Tooltip content={transaction.categoryId || 'Sem categoria'}>
@@ -92,24 +113,59 @@ export const TableRow = memo(
             </Tooltip>
           </div>
         </td>
-        <td className={cn(cellPaddingClass, "text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis align-middle")} style={cellPadding}>
-          <Tooltip content={transaction.description || 'Sem descrição'}>
-            <span className="block overflow-hidden text-ellipsis">
-              {transaction.description || 'Sem descrição'}
-            </span>
-          </Tooltip>
+        <td
+          className={cn(
+            cellPaddingClass,
+            'text-xs font-medium text-text dark:text-text-dark overflow-hidden text-ellipsis align-middle',
+          )}
+          style={cellPadding}
+        >
+          <div className="flex items-center gap-1.5">
+            <Tooltip content={transaction.description || 'Sem descrição'}>
+              <span className="block overflow-hidden text-ellipsis">
+                {transaction.description || 'Sem descrição'}
+              </span>
+            </Tooltip>
+            <PaymentStatusBadge
+              status={transaction.paymentStatus}
+              onRetry={onRetryPayment ? () => onRetryPayment(transaction) : undefined}
+            />
+          </div>
         </td>
-        <td className={cn(cellPaddingClass, "text-xs text-text dark:text-text-dark align-middle overflow-hidden")} style={{...cellPadding, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+        <td
+          className={cn(
+            cellPaddingClass,
+            'text-xs text-text dark:text-text-dark align-middle overflow-hidden',
+          )}
+          style={{
+            ...cellPadding,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
           <Tooltip content={transaction.accountId || 'Sem conta'}>
             <span className="block overflow-hidden text-ellipsis whitespace-nowrap">
               {transaction.accountId || 'Sem conta'}
             </span>
           </Tooltip>
         </td>
-        <td className={cn(numericCellPaddingClass, "text-xs font-medium text-right text-emerald-400 whitespace-nowrap align-middle")} style={cellPadding}>
+        <td
+          className={cn(
+            numericCellPaddingClass,
+            'text-xs font-medium text-right text-emerald-400 whitespace-nowrap align-middle',
+          )}
+          style={cellPadding}
+        >
           {getCreditValue()}
         </td>
-        <td className={cn(numericCellPaddingClass, "text-xs font-medium text-right text-red-400 whitespace-nowrap align-middle")} style={cellPadding}>
+        <td
+          className={cn(
+            numericCellPaddingClass,
+            'text-xs font-medium text-right text-red-400 whitespace-nowrap align-middle',
+          )}
+          style={cellPadding}
+        >
           {getDebitValue()}
         </td>
         <td
@@ -123,7 +179,7 @@ export const TableRow = memo(
           {getBalanceDisplay()}
         </td>
         {showActions && !isPreviousBalance && (
-          <td className={cn(cellPaddingClass, "align-middle")} style={cellPadding}>
+          <td className={cn(cellPaddingClass, 'align-middle')} style={cellPadding}>
             <TransactionActions
               transaction={transaction}
               onEdit={onEdit}
@@ -134,7 +190,9 @@ export const TableRow = memo(
             />
           </td>
         )}
-        {showActions && isPreviousBalance && <td className={cn(cellPaddingClass, "align-middle")} style={cellPadding} />}
+        {showActions && isPreviousBalance && (
+          <td className={cn(cellPaddingClass, 'align-middle')} style={cellPadding} />
+        )}
       </tr>
     );
   },

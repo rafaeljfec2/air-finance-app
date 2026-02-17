@@ -26,6 +26,7 @@ interface TransactionTableProps {
   onEdit?: (transaction: TransactionGridTransaction) => void;
   onDelete?: (transaction: TransactionGridTransaction) => void;
   onViewHistory?: (transaction: TransactionGridTransaction) => void;
+  onRetryPayment?: (transaction: TransactionGridTransaction) => void;
 }
 
 export function TransactionTable({
@@ -44,6 +45,7 @@ export function TransactionTable({
   onEdit,
   onDelete,
   onViewHistory,
+  onRetryPayment,
 }: Readonly<TransactionTableProps>) {
   const headerProps = {
     sortConfig,
@@ -63,7 +65,9 @@ export function TransactionTable({
   return (
     <div className="hidden md:block">
       <div className="w-full min-h-[240px]">
-        <table className={cn('w-full table-fixed text-xs', spacious && 'transaction-grid-spacious')}>
+        <table
+          className={cn('w-full table-fixed text-xs', spacious && 'transaction-grid-spacious')}
+        >
           <colgroup>
             <col className="w-[6%] sm:w-[8%]" />
             <col className="w-[12%] sm:w-[15%]" />
@@ -124,6 +128,7 @@ export function TransactionTable({
                   onEdit={onEdit}
                   onDelete={onDelete}
                   onViewHistory={onViewHistory}
+                  onRetryPayment={onRetryPayment}
                   spacious={spacious}
                 />
               ))

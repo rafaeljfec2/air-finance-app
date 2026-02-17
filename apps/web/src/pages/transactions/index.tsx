@@ -12,7 +12,7 @@ import { TransactionHeader } from '@/pages/transactions/components/TransactionHe
 import { TransactionSummary } from '@/pages/transactions/components/TransactionSummary';
 import { useCompanyStore } from '@/stores/company';
 import { formatDateToLocalISO } from '@/utils/date';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTransactionLogic } from './hooks/useTransactionLogic';
 
@@ -94,6 +94,15 @@ export function Transactions() {
     setShowHistoryModal(true);
   };
 
+  const handleRetryPayment = useCallback(
+    (transaction: TransactionGridTransaction) => {
+      if (!transaction.bankingPaymentId) return;
+      const accountId = transaction.rawAccountId ?? transaction.accountId;
+      navigate(`/payments/new?retry=${transaction.bankingPaymentId}&accountId=${accountId}`);
+    },
+    [navigate],
+  );
+
   const confirmDelete = async () => {
     if (!transactionToDelete) return;
     try {
@@ -165,6 +174,7 @@ export function Transactions() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onViewHistory={handleViewHistory}
+            onRetryPayment={handleRetryPayment}
             resetPageKey={`${selectedAccountId}-${startDate}-${endDate}-${searchTerm}-${selectedType}`}
           />
         </div>

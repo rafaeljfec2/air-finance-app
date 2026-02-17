@@ -1,14 +1,22 @@
 import { apiClient } from './apiClient';
 
 export interface Notification {
-  _id: string; // Backend uses _id
-  userId: string;
-  type: 'INFO' | 'WARNING' | 'SUCCESS' | 'ERROR' | 'SYSTEM' | 'BUDGET' | 'BILL' | 'SECURITY';
-  title: string;
-  message: string;
-  read: boolean;
-  data?: Record<string, unknown>;
-  createdAt: string;
+  readonly id: string;
+  readonly userId: string;
+  readonly type:
+    | 'INFO'
+    | 'WARNING'
+    | 'SUCCESS'
+    | 'ERROR'
+    | 'SYSTEM'
+    | 'BUDGET'
+    | 'BILL'
+    | 'SECURITY';
+  readonly title: string;
+  readonly message: string;
+  readonly read: boolean;
+  readonly data?: Record<string, unknown>;
+  readonly createdAt: string;
 }
 
 export const notificationService = {
@@ -27,8 +35,8 @@ export const notificationService = {
       const response = await apiClient.get<number>(`/notifications/unread-count?userId=${userId}`);
       return response.data;
     } catch (error) {
-       console.error('Error fetching unread count:', error);
-       return 0;
+      console.error('Error fetching unread count:', error);
+      return 0;
     }
   },
 

@@ -17,6 +17,8 @@ export type TransactionGridTransaction = {
   updatedAt: string;
   balance?: number;
   rawAccountId?: string;
+  bankingPaymentId?: string;
+  paymentStatus?: 'PROCESSANDO' | 'CONCLUIDO' | 'FALHOU' | 'CANCELADO';
 };
 
 export type SortField =
@@ -42,9 +44,10 @@ export interface TransactionGridProps {
   onEdit?: (transaction: TransactionGridTransaction) => void;
   onDelete?: (transaction: TransactionGridTransaction) => void;
   onViewHistory?: (transaction: TransactionGridTransaction) => void;
+  onRetryPayment?: (transaction: TransactionGridTransaction) => void;
   className?: string;
-  resetPageKey?: string | number; // Key that changes when page should be reset (e.g., account filter change)
-  spacious?: boolean; // Se true, aumenta o padding vertical das linhas
+  resetPageKey?: string | number;
+  spacious?: boolean;
 }
 
 export interface TransactionActionsProps {

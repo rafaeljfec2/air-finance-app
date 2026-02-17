@@ -54,6 +54,13 @@ export function usePaymentForm() {
     setStep('form');
   }, []);
 
+  const fillFromDocument = useCallback((type: PaymentType, fields: Record<string, unknown>) => {
+    setSelectedType(type);
+    setFormData(fields);
+    setResult(null);
+    setStep('form');
+  }, []);
+
   const goToConfirm = useCallback((data: Record<string, unknown>) => {
     setFormData(data);
     setStep('confirm');
@@ -146,6 +153,7 @@ export function usePaymentForm() {
     result,
     isSubmitting,
     selectType,
+    fillFromDocument,
     goToConfirm,
     goBack,
     submit,

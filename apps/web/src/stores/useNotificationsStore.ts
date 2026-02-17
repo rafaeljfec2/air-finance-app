@@ -1,7 +1,15 @@
 import { notificationService } from '@/services/notificationService';
 import { create } from 'zustand';
 
-export type NotificationType = 'INFO' | 'WARNING' | 'SUCCESS' | 'ERROR' | 'SYSTEM' | 'BUDGET' | 'BILL' | 'SECURITY';
+export type NotificationType =
+  | 'INFO'
+  | 'WARNING'
+  | 'SUCCESS'
+  | 'ERROR'
+  | 'SYSTEM'
+  | 'BUDGET'
+  | 'BILL'
+  | 'SECURITY';
 
 export interface Notification {
   id: string;
@@ -17,11 +25,11 @@ interface NotificationsState {
   notifications: Notification[];
   unreadCount: number;
   isLoading: boolean;
-  
+
   fetchNotifications: (userId: string) => Promise<void>;
   markAsRead: (id: string, userId: string) => Promise<void>;
   markAllAsRead: (userId: string) => Promise<void>;
-  addNotification: (notification: Notification) => void; 
+  addNotification: (notification: Notification) => void;
 }
 
 export const useNotificationsStore = create<NotificationsState>((set) => ({
@@ -34,17 +42,17 @@ export const useNotificationsStore = create<NotificationsState>((set) => ({
     try {
       const [data, count] = await Promise.all([
         notificationService.getAll(userId),
-        notificationService.getUnreadCount(userId)
+        notificationService.getUnreadCount(userId),
       ]);
-      
-      const mappedNotifications = data.map(n => ({
-        id: n._id,
+
+      const mappedNotifications = data.map((n) => ({
+        id: n.id,
         type: n.type,
         title: n.title,
         message: n.message,
         read: n.read,
         createdAt: n.createdAt,
-        data: n.data
+        data: n.data,
       }));
 
       set({ notifications: mappedNotifications, unreadCount: count });
@@ -59,7 +67,7 @@ export const useNotificationsStore = create<NotificationsState>((set) => ({
     // Optimistic update
     set((state) => {
       const updatedNotifications = state.notifications.map((n) =>
-        n.id === id ? { ...n, read: true } : n
+        n.id === id ? { ...n, read: true } : n,
       );
       return {
         notifications: updatedNotifications,
@@ -97,5 +105,5 @@ export const useNotificationsStore = create<NotificationsState>((set) => ({
       notifications: [notification, ...state.notifications],
       unreadCount: state.unreadCount + 1,
     }));
-  }
+  },
 }));

@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { apiClient } from './apiClient';
 import {
-    ExtractHeaderSchema,
-    ExtractTransactionSchema,
-    type ExtractResponse,
+  ExtractHeaderSchema,
+  ExtractTransactionSchema,
+  type ExtractResponse,
 } from './types/extract.types';
 import { normalizeExtract } from './utils/extractNormalizer';
 
@@ -28,6 +28,8 @@ export const TransactionSchema = z.object({
   suggestedCategoryId: z.string().optional(),
   classificationStatus: z.enum(['pending', 'accepted', 'edited', 'rejected']).optional(),
   classificationConfidence: z.number().optional(),
+  bankingPaymentId: z.string().optional(),
+  paymentStatus: z.enum(['PROCESSANDO', 'CONCLUIDO', 'FALHOU', 'CANCELADO']).optional(),
 });
 
 export const CreateTransactionSchema = TransactionSchema.omit({ id: true });

@@ -218,3 +218,24 @@ export async function cancelPixCharge(accountId: string, txid: string): Promise<
   );
   return response.data.data;
 }
+
+export interface ParsedDocumentResponse {
+  readonly detectedType: PaymentType;
+  readonly confidence: number;
+  readonly fields: Record<string, unknown>;
+}
+
+export async function parsePaymentDocument(
+  accountId: string,
+  file: File,
+): Promise<ParsedDocumentResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await apiClient.post<ApiSingleResponse<ParsedDocumentResponse>>(
+    `${BASE_PATH}/${accountId}/payments/parse-document`,
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  );
+  return response.data.data;
+}

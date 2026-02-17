@@ -16,6 +16,7 @@ export function TransactionGrid({
   onEdit,
   onDelete,
   onViewHistory,
+  onRetryPayment,
   className,
   resetPageKey,
   spacious = false,
@@ -86,6 +87,7 @@ export function TransactionGrid({
               onEdit={onEdit}
               onDelete={onDelete}
               onViewHistory={onViewHistory}
+              onRetryPayment={onRetryPayment}
             />
 
             <TransactionMobileList
@@ -95,6 +97,7 @@ export function TransactionGrid({
               onEdit={onEdit}
               onDelete={onDelete}
               onViewHistory={onViewHistory}
+              onRetryPayment={onRetryPayment}
             />
           </>
         )}

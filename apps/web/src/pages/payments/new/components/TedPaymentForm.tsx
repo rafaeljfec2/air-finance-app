@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
+import { ComboBox } from '@/components/ui/ComboBox';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 
 interface TedPaymentFormProps {
   readonly onSubmit: (data: Record<string, unknown>) => void;
   readonly onBack: () => void;
+  readonly initialData?: Record<string, unknown>;
 }
 
-export function TedPaymentForm({ onSubmit, onBack }: TedPaymentFormProps) {
+const ACCOUNT_TYPE_OPTIONS = [
+  { value: 'CORRENTE', label: 'Corrente' },
+  { value: 'POUPANCA', label: 'Poupanca' },
+];
+
+export function TedPaymentForm({ onSubmit, onBack, initialData }: TedPaymentFormProps) {
   const [amount, setAmount] = useState('');
   const [beneficiaryName, setBeneficiaryName] = useState('');
   const [beneficiaryDocument, setBeneficiaryDocument] = useState('');
@@ -17,10 +25,34 @@ export function TedPaymentForm({ onSubmit, onBack }: TedPaymentFormProps) {
   const [accountType, setAccountType] = useState('CORRENTE');
   const [description, setDescription] = useState('');
 
+  useEffect(() => {
+    if (!initialData) return;
+    const str = (key: string): string => {
+      const val = initialData[key];
+      return typeof val === 'string' || typeof val === 'number' ? String(val) : '';
+    };
+    const v = (key: string) => str(key) || undefined;
+    if (v('amount')) {
+      const raw = initialData.amount;
+      const num = typeof raw === 'number' ? raw : Number.parseFloat(str('amount'));
+      if (!Number.isNaN(num) && num > 0)
+        setAmount(formatCurrencyInput(String(Math.round(num * 100))));
+    }
+    if (v('beneficiaryName')) setBeneficiaryName(str('beneficiaryName'));
+    if (v('beneficiaryDocument')) setBeneficiaryDocument(str('beneficiaryDocument'));
+    if (v('bankCode')) setBankCode(str('bankCode'));
+    if (v('agency')) setAgency(str('agency'));
+    if (v('account')) setAccount(str('account'));
+    if (v('accountType')) setAccountType(str('accountType'));
+    if (v('description')) setDescription(str('description'));
+  }, [initialData]);
+
+  const numericAmount = amount ? parseCurrency(amount) : 0;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
-      amount: Number.parseFloat(amount),
+      amount: numericAmount,
       beneficiaryName,
       beneficiaryDocument,
       bankCode,
@@ -32,7 +64,7 @@ export function TedPaymentForm({ onSubmit, onBack }: TedPaymentFormProps) {
   };
 
   const isValid =
-    Number.parseFloat(amount) > 0 &&
+    numericAmount > 0 &&
     beneficiaryName.trim() !== '' &&
     beneficiaryDocument.trim() !== '' &&
     bankCode.trim() !== '' &&
@@ -51,12 +83,10 @@ export function TedPaymentForm({ onSubmit, onBack }: TedPaymentFormProps) {
       <div className="space-y-3">
         <FormField label="Valor (R$)">
           <Input
-            type="number"
-            step="0.01"
-            min="0.01"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="0,00"
+            onChange={(e) => setAmount(formatCurrencyInput(e.target.value))}
+            placeholder="R$ 0,00"
+            inputMode="numeric"
             required
           />
         </FormField>
@@ -113,17 +143,14 @@ export function TedPaymentForm({ onSubmit, onBack }: TedPaymentFormProps) {
               required
             />
           </FormField>
-          <FormField label="Tipo de conta">
-            <select
-              id="ted-account-type"
-              value={accountType}
-              onChange={(e) => setAccountType(e.target.value)}
-              className="flex min-h-[44px] w-full rounded-md border border-input dark:border-border-dark bg-background dark:bg-background-dark px-3 py-2.5 text-sm text-text dark:text-text-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              <option value="CORRENTE">Corrente</option>
-              <option value="POUPANCA">Poupanca</option>
-            </select>
-          </FormField>
+          <ComboBox
+            label="Tipo de conta"
+            options={ACCOUNT_TYPE_OPTIONS}
+            value={accountType}
+            onValueChange={(val) => setAccountType(val ?? 'CORRENTE')}
+            placeholder="Selecione"
+            showClearButton={false}
+          />
         </div>
 
         <FormField label="Descricao (opcional)">

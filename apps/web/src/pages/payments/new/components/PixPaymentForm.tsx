@@ -1,29 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
+import { ComboBox } from '@/components/ui/ComboBox';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 
 interface PixPaymentFormProps {
   readonly onSubmit: (data: Record<string, unknown>) => void;
   readonly onBack: () => void;
+  readonly initialData?: Record<string, unknown>;
 }
 
-export function PixPaymentForm({ onSubmit, onBack }: PixPaymentFormProps) {
+const PIX_KEY_TYPE_OPTIONS = [
+  { value: 'EMAIL', label: 'E-mail' },
+  { value: 'CPF', label: 'CPF' },
+  { value: 'CNPJ', label: 'CNPJ' },
+  { value: 'PHONE', label: 'Telefone' },
+  { value: 'RANDOM', label: 'Chave aleatoria' },
+  { value: 'PAYLOAD', label: 'QR Code / Copia e Cola' },
+];
+
+export function PixPaymentForm({ onSubmit, onBack, initialData }: PixPaymentFormProps) {
   const [pixKey, setPixKey] = useState('');
   const [pixKeyType, setPixKeyType] = useState('EMAIL');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
+
+  useEffect(() => {
+    if (!initialData) return;
+    const str = (key: string): string => {
+      const val = initialData[key];
+      return typeof val === 'string' || typeof val === 'number' ? String(val) : '';
+    };
+    const v = (key: string) => str(key) || undefined;
+    if (v('pixKey')) setPixKey(str('pixKey'));
+    if (v('pixKeyType')) setPixKeyType(str('pixKeyType'));
+    if (v('amount')) {
+      const raw = initialData.amount;
+      const num = typeof raw === 'number' ? raw : Number.parseFloat(str('amount'));
+      if (!Number.isNaN(num) && num > 0)
+        setAmount(formatCurrencyInput(String(Math.round(num * 100))));
+    }
+    if (v('description')) setDescription(str('description'));
+  }, [initialData]);
+
+  const numericAmount = amount ? parseCurrency(amount) : 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
       pixKey,
       pixKeyType,
-      amount: Number.parseFloat(amount),
+      amount: numericAmount,
       description: description || undefined,
     });
   };
 
-  const isValid = pixKey.trim() !== '' && Number.parseFloat(amount) > 0;
+  const isValid = pixKey.trim() !== '' && numericAmount > 0;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -35,38 +67,30 @@ export function PixPaymentForm({ onSubmit, onBack }: PixPaymentFormProps) {
       </div>
 
       <div className="space-y-3">
-        <FormField label="Tipo da chave">
-          <select
-            id="pix-key-type"
-            value={pixKeyType}
-            onChange={(e) => setPixKeyType(e.target.value)}
-            className="flex min-h-[44px] w-full rounded-md border border-input dark:border-border-dark bg-background dark:bg-background-dark px-3 py-2.5 text-sm text-text dark:text-text-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          >
-            <option value="EMAIL">E-mail</option>
-            <option value="CPF">CPF</option>
-            <option value="CNPJ">CNPJ</option>
-            <option value="PHONE">Telefone</option>
-            <option value="RANDOM">Chave aleatoria</option>
-          </select>
-        </FormField>
+        <ComboBox
+          label="Tipo da chave"
+          options={PIX_KEY_TYPE_OPTIONS}
+          value={pixKeyType}
+          onValueChange={(val) => setPixKeyType(val ?? 'EMAIL')}
+          placeholder="Selecione o tipo"
+          showClearButton={false}
+        />
 
-        <FormField label="Chave PIX">
+        <FormField label={pixKeyType === 'PAYLOAD' ? 'Payload PIX (copia e cola)' : 'Chave PIX'}>
           <Input
             value={pixKey}
             onChange={(e) => setPixKey(e.target.value)}
-            placeholder="Digite a chave PIX"
+            placeholder={pixKeyType === 'PAYLOAD' ? 'Payload do QR Code' : 'Digite a chave PIX'}
             required
           />
         </FormField>
 
         <FormField label="Valor (R$)">
           <Input
-            type="number"
-            step="0.01"
-            min="0.01"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="0,00"
+            onChange={(e) => setAmount(formatCurrencyInput(e.target.value))}
+            placeholder="R$ 0,00"
+            inputMode="numeric"
             required
           />
         </FormField>

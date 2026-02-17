@@ -3,12 +3,13 @@ import { EmptyState } from './EmptyState';
 import { MobileCard } from './TransactionMobileCard';
 
 interface TransactionMobileListProps {
-  paginatedItems: TransactionGridTransaction[];
-  showActions: boolean;
-  onActionClick: (transaction: TransactionGridTransaction) => void;
-  onEdit?: (transaction: TransactionGridTransaction) => void;
-  onDelete?: (transaction: TransactionGridTransaction) => void;
-  onViewHistory?: (transaction: TransactionGridTransaction) => void;
+  readonly paginatedItems: TransactionGridTransaction[];
+  readonly showActions: boolean;
+  readonly onActionClick: (transaction: TransactionGridTransaction) => void;
+  readonly onEdit?: (transaction: TransactionGridTransaction) => void;
+  readonly onDelete?: (transaction: TransactionGridTransaction) => void;
+  readonly onViewHistory?: (transaction: TransactionGridTransaction) => void;
+  readonly onRetryPayment?: (transaction: TransactionGridTransaction) => void;
 }
 
 export function TransactionMobileList({
@@ -18,6 +19,7 @@ export function TransactionMobileList({
   onEdit,
   onDelete,
   onViewHistory,
+  onRetryPayment,
 }: Readonly<TransactionMobileListProps>) {
   const hasItems = paginatedItems.length > 0;
 
@@ -33,6 +35,7 @@ export function TransactionMobileList({
             onEdit={onEdit}
             onDelete={onDelete}
             onViewHistory={onViewHistory}
+            onRetryPayment={onRetryPayment}
           />
         ))
       ) : (
