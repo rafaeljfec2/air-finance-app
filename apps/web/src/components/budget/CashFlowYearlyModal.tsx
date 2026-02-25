@@ -41,23 +41,13 @@ interface YearlyRow {
 }
 
 function buildYearlyRows(data: CashFlow[]): YearlyRow[] {
-  const rows: YearlyRow[] = [];
-  const startingBalance = data[0]?.initialBalance ?? 0;
-  let accumulated = startingBalance;
-
-  for (const row of data) {
-    const balance = row.totalIncome - row.totalExpense;
-    accumulated += balance;
-    rows.push({
-      month: row.month,
-      totalIncome: row.totalIncome,
-      totalExpense: row.totalExpense,
-      balance,
-      accumulated,
-    });
-  }
-
-  return rows;
+  return data.map((row) => ({
+    month: row.month,
+    totalIncome: row.totalIncome,
+    totalExpense: row.totalExpense,
+    balance: row.totalIncome - row.totalExpense,
+    accumulated: row.finalBalance,
+  }));
 }
 
 function computeTotals(rows: YearlyRow[]) {

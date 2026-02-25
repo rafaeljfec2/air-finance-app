@@ -57,6 +57,24 @@ export function getUseInitialBalanceInCashFlow(account: Account): boolean {
   return account.useInitialBalanceInCashFlow ?? true;
 }
 
+// === CONTEXT-SPECIFIC BALANCE ===
+
+export function getExtractBalance(account: Account): {
+  readonly initial: number;
+  readonly date: string | null;
+  readonly enabled: boolean;
+} {
+  return account.extractBalance;
+}
+
+export function getCashFlowBalance(account: Account): {
+  readonly initial: number;
+  readonly date: string | null;
+  readonly enabled: boolean;
+} {
+  return account.cashFlowBalance;
+}
+
 // === CREDIT CARD ===
 
 export function getCreditLimit(account: Account): number | undefined {

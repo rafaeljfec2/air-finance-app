@@ -2,8 +2,15 @@ import { parseApiError } from '@/utils/apiErrorHandler';
 import { z } from 'zod';
 import { apiClient } from './apiClient';
 
-// Schema para subdocumento balance (nova estrutura)
+const ContextBalanceSchema = z.object({
+  initial: z.number().default(0),
+  date: z.string().nullable().optional(),
+  enabled: z.boolean().default(true),
+});
+
 const BalanceSubdocSchema = z.object({
+  extract: ContextBalanceSchema.optional(),
+  cashFlow: ContextBalanceSchema.optional(),
   initial: z.number().default(0),
   date: z.string().nullable().optional(),
   useInExtract: z.boolean().default(true),
@@ -106,38 +113,61 @@ const AccountBaseSchema = z.object({
   openiAuthExpiresAt: z.string().nullable().optional(),
 });
 
-// Schema com transform para normalizar dados (extrai subdocuments para campos flat)
+function resolveContextBalance(
+  ctx: { initial?: number; date?: string | null; enabled?: boolean } | undefined,
+  fallbackInitial: number,
+  fallbackDate: string | null,
+  fallbackEnabled: boolean,
+) {
+  if (ctx) {
+    return {
+      initial: ctx.initial ?? fallbackInitial,
+      date: ctx.date ?? fallbackDate,
+      enabled: ctx.enabled ?? fallbackEnabled,
+    };
+  }
+  return { initial: fallbackInitial, date: fallbackDate, enabled: fallbackEnabled };
+}
+
 export const AccountSchema = AccountBaseSchema.transform((data) => {
-  // Prioriza subdocumento balance sobre campos legados (que podem ter default 0)
   const balanceInitial = data.balance?.initial ?? data.initialBalance ?? 0;
   const balanceCurrent = data.balance?.current ?? null;
+  const balanceDate = data.balance?.date ?? data.initialBalanceDate ?? null;
+  const useInExtract = data.balance?.useInExtract ?? data.useInitialBalanceInExtract ?? true;
+  const useInCashFlow = data.balance?.useInCashFlow ?? data.useInitialBalanceInCashFlow ?? true;
+
+  const extractBalance = resolveContextBalance(
+    data.balance?.extract,
+    balanceInitial,
+    balanceDate,
+    useInExtract,
+  );
+  const cashFlowBalance = resolveContextBalance(
+    data.balance?.cashFlow,
+    balanceInitial,
+    balanceDate,
+    useInCashFlow,
+  );
 
   return {
     ...data,
-    // Garantir valores padrão para campos obrigatórios em componentes
     color: data.color ?? '#8A05BE',
     icon: data.icon ?? 'Banknote',
-    // Campo currentBalance: usa saldo atual se disponível, senão saldo inicial
     currentBalance: balanceCurrent ?? balanceInitial,
-    // Saldo atual do banco (atualizado a cada sync)
     bankCurrentBalance: balanceCurrent,
     bankCurrentBalanceDate: data.balance?.currentDate ?? null,
-    // Extrair campos de bankDetails para root (compatibilidade)
     institution: data.institution ?? data.bankDetails?.institution ?? '',
     bankCode: data.bankCode ?? data.bankDetails?.bankCode ?? undefined,
     agency: data.agency ?? data.bankDetails?.agency ?? undefined,
     accountNumber: data.accountNumber ?? data.bankDetails?.accountNumber ?? undefined,
     pixKey: data.pixKey ?? data.bankDetails?.pixKey ?? undefined,
-    // Extrair campos de balance para root (prioriza subdocumento)
     initialBalance: balanceInitial,
-    initialBalanceDate: data.balance?.date ?? data.initialBalanceDate ?? null,
-    useInitialBalanceInExtract:
-      data.balance?.useInExtract ?? data.useInitialBalanceInExtract ?? true,
-    useInitialBalanceInCashFlow:
-      data.balance?.useInCashFlow ?? data.useInitialBalanceInCashFlow ?? true,
-    // Extrair campos de creditCard para root (compatibilidade)
+    initialBalanceDate: balanceDate,
+    useInitialBalanceInExtract: useInExtract,
+    useInitialBalanceInCashFlow: useInCashFlow,
+    extractBalance,
+    cashFlowBalance,
     creditLimit: data.creditLimit ?? data.creditCard?.limit ?? undefined,
-    // Extrair campos de integration para root (compatibilidade)
     hasBankingIntegration: data.hasBankingIntegration ?? data.integration?.enabled ?? false,
     bankingTenantId: data.bankingTenantId ?? data.integration?.tenantId ?? undefined,
     openiItemId: data.openiItemId ?? data.integration?.openFinance?.itemId ?? undefined,
@@ -150,12 +180,20 @@ export const AccountSchema = AccountBaseSchema.transform((data) => {
   };
 });
 
-// CreateAccountSchema usa o schema base (sem transform) para poder usar .omit()
+const ContextBalanceInputSchema = z.object({
+  initial: z.number().default(0),
+  date: z.string().nullable().optional(),
+  enabled: z.boolean().default(true),
+});
+
 export const CreateAccountSchema = AccountBaseSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
   balance: true,
+}).extend({
+  extractBalanceInput: ContextBalanceInputSchema.optional(),
+  cashFlowBalanceInput: ContextBalanceInputSchema.optional(),
 });
 
 export type Account = z.infer<typeof AccountSchema>;
@@ -205,13 +243,50 @@ export const getAccountById = async (companyId: string, id: string): Promise<Acc
   }
 };
 
+function buildBalancePayload(data: CreateAccount) {
+  const balance: Record<string, unknown> = {
+    initial: data.initialBalance ?? 0,
+    date: data.initialBalanceDate ?? new Date().toISOString(),
+    useInExtract: data.useInitialBalanceInExtract ?? true,
+    useInCashFlow: data.useInitialBalanceInCashFlow ?? true,
+  };
+
+  if (data.extractBalanceInput) {
+    balance.extract = {
+      initial: data.extractBalanceInput.initial,
+      date: data.extractBalanceInput.date ?? data.initialBalanceDate ?? new Date().toISOString(),
+      enabled: data.extractBalanceInput.enabled,
+    };
+  }
+  if (data.cashFlowBalanceInput) {
+    balance.cashFlow = {
+      initial: data.cashFlowBalanceInput.initial,
+      date: data.cashFlowBalanceInput.date ?? data.initialBalanceDate ?? new Date().toISOString(),
+      enabled: data.cashFlowBalanceInput.enabled,
+    };
+  }
+
+  return {
+    name: data.name,
+    type: data.type,
+    color: data.color,
+    icon: data.icon,
+    companyId: data.companyId,
+    institution: data.institution,
+    bankCode: data.bankCode,
+    agency: data.agency,
+    accountNumber: data.accountNumber,
+    creditLimit: data.creditLimit,
+    creditCard: data.creditCard,
+    balance,
+  };
+}
+
 export const createAccount = async (companyId: string, data: CreateAccount): Promise<Account> => {
   try {
     const validatedData = CreateAccountSchema.parse(data);
-    const response = await apiClient.post<Account>(
-      `/companies/${companyId}/accounts`,
-      validatedData,
-    );
+    const payload = buildBalancePayload(validatedData);
+    const response = await apiClient.post<Account>(`/companies/${companyId}/accounts`, payload);
     return AccountSchema.parse(response.data);
   } catch (error) {
     throw parseApiError(error);
@@ -225,9 +300,10 @@ export const updateAccount = async (
 ): Promise<Account> => {
   try {
     const validatedData = CreateAccountSchema.partial().parse(data);
+    const payload = buildBalancePayload(validatedData as CreateAccount);
     const response = await apiClient.patch<Account>(
       `/companies/${companyId}/accounts/${id}`,
-      validatedData,
+      payload,
     );
     return AccountSchema.parse(response.data);
   } catch (error) {

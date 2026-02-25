@@ -16,6 +16,8 @@ interface UseAccountFormModalProps {
 export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFormModalProps) {
   const { activeCompany } = useCompanyStore();
 
+  const todayISO = formatDateToLocalISO(new Date());
+
   const initialFormState: CreateAccount = useMemo(
     () => ({
       name: '',
@@ -26,19 +28,23 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
       accountNumber: '',
       color: '#8A05BE',
       icon: 'Banknote',
-      companyId: activeCompany?.id || '',
+      companyId: activeCompany?.id ?? '',
       initialBalance: 0,
-      initialBalanceDate: formatDateToLocalISO(new Date()),
+      initialBalanceDate: todayISO,
       useInitialBalanceInExtract: true,
       useInitialBalanceInCashFlow: true,
       hasBankingIntegration: false,
+      extractBalanceInput: { initial: 0, date: todayISO, enabled: true },
+      cashFlowBalanceInput: { initial: 0, date: todayISO, enabled: true },
     }),
-    [activeCompany],
+    [activeCompany, todayISO],
   );
 
   const [form, setForm] = useState<CreateAccount>(initialFormState);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [initialBalanceInput, setInitialBalanceInput] = useState('');
+  const [extractBalanceInput, setExtractBalanceInput] = useState('');
+  const [cashFlowBalanceInput, setCashFlowBalanceInput] = useState('');
   const [limitInput, setLimitInput] = useState('');
 
   const formatBalanceValue = useCallback((balance: number, withSign: boolean): string => {
@@ -50,12 +56,19 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
     (accountData: Account) => {
       const balance = accountData.initialBalance ?? 0;
       setInitialBalanceInput(formatBalanceValue(balance, true));
+      setExtractBalanceInput(formatBalanceValue(accountData.extractBalance.initial, true));
+      setCashFlowBalanceInput(formatBalanceValue(accountData.cashFlowBalance.initial, true));
       setLimitInput('');
     },
     [formatBalanceValue],
   );
 
   const mapAccountToForm = useCallback((accountData: Account): CreateAccount => {
+    const extractDate =
+      accountData.extractBalance.date?.slice(0, 10) ?? formatDateToLocalISO(new Date());
+    const cashFlowDate =
+      accountData.cashFlowBalance.date?.slice(0, 10) ?? formatDateToLocalISO(new Date());
+
     return {
       name: accountData.name,
       type: accountData.type,
@@ -75,15 +88,27 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
       hasBankingIntegration: accountData.hasBankingIntegration,
       bankingTenantId: accountData.bankingTenantId,
       pixKey: accountData.pixKey,
+      extractBalanceInput: {
+        initial: accountData.extractBalance.initial,
+        date: extractDate,
+        enabled: accountData.extractBalance.enabled,
+      },
+      cashFlowBalanceInput: {
+        initial: accountData.cashFlowBalance.initial,
+        date: cashFlowDate,
+        enabled: accountData.cashFlowBalance.enabled,
+      },
     };
   }, []);
 
   const resetFormState = useCallback(() => {
     setForm({
       ...initialFormState,
-      companyId: activeCompany?.id || '',
+      companyId: activeCompany?.id ?? '',
     });
     setInitialBalanceInput('');
+    setExtractBalanceInput('');
+    setCashFlowBalanceInput('');
     setLimitInput('');
     setErrors({});
   }, [initialFormState, activeCompany]);
@@ -156,6 +181,45 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
     [],
   );
 
+  type BalanceContext = 'extract' | 'cashFlow';
+
+  const handleContextBalanceChange = useCallback((context: BalanceContext, rawValue: string) => {
+    const formatted = formatCurrencyInput(rawValue, true);
+    const numericValue = parseCurrency(formatted);
+    if (numericValue > 999999999999) return;
+
+    if (context === 'extract') {
+      setExtractBalanceInput(formatted);
+      setForm((prev) => ({
+        ...prev,
+        extractBalanceInput: { ...prev.extractBalanceInput!, initial: numericValue },
+      }));
+    } else {
+      setCashFlowBalanceInput(formatted);
+      setForm((prev) => ({
+        ...prev,
+        cashFlowBalanceInput: { ...prev.cashFlowBalanceInput!, initial: numericValue },
+      }));
+    }
+  }, []);
+
+  const handleContextDateChange = useCallback((context: BalanceContext, date: Date | undefined) => {
+    const dateString = date ? formatDateToLocalISO(date) : '';
+    const key = context === 'extract' ? 'extractBalanceInput' : 'cashFlowBalanceInput';
+    setForm((prev) => ({
+      ...prev,
+      [key]: { ...prev[key]!, date: dateString },
+    }));
+  }, []);
+
+  const handleContextEnabledChange = useCallback((context: BalanceContext, checked: boolean) => {
+    const key = context === 'extract' ? 'extractBalanceInput' : 'cashFlowBalanceInput';
+    setForm((prev) => ({
+      ...prev,
+      [key]: { ...prev[key]!, enabled: checked },
+    }));
+  }, []);
+
   const validateBankingFields = useCallback(
     (errors: Record<string, string>) => {
       if (!(form.agency ?? '').trim()) {
@@ -217,6 +281,8 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
     form,
     errors,
     initialBalanceInput,
+    extractBalanceInput,
+    cashFlowBalanceInput,
     limitInput,
     handleChange,
     handleLimitInputChange,
@@ -226,6 +292,9 @@ export function useAccountFormModal({ account, onSubmit, onClose }: UseAccountFo
     handleTypeChange,
     handleSwitchChange,
     handleBankChange,
+    handleContextBalanceChange,
+    handleContextDateChange,
+    handleContextEnabledChange,
     handleSubmit,
     handleClose,
   };

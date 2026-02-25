@@ -69,16 +69,18 @@ export function AccountFormModal({
   const {
     form,
     errors,
-    initialBalanceInput,
+    extractBalanceInput,
+    cashFlowBalanceInput,
     limitInput,
     handleChange,
     handleLimitInputChange,
-    handleInitialBalanceChange,
     handleCreditLimitChange,
     handleDateChange,
     handleTypeChange,
-    handleSwitchChange,
     handleBankChange,
+    handleContextBalanceChange,
+    handleContextDateChange,
+    handleContextEnabledChange,
     handleSubmit,
     handleClose,
   } = useAccountFormModal({ account, onSubmit, onClose });
@@ -161,13 +163,15 @@ export function AccountFormModal({
               errors={errors}
               isCreditCard={false}
               account={account}
-              initialBalanceInput={initialBalanceInput}
+              extractBalanceInput={extractBalanceInput}
+              cashFlowBalanceInput={cashFlowBalanceInput}
               limitInput={limitInput}
-              onInitialBalanceChange={handleInitialBalanceChange}
               onLimitInputChange={handleLimitInputChange}
               onCreditLimitChange={handleCreditLimitChange}
               onDateChange={handleDateChange}
-              onSwitchChange={handleSwitchChange}
+              onContextBalanceChange={handleContextBalanceChange}
+              onContextDateChange={handleContextDateChange}
+              onContextEnabledChange={handleContextEnabledChange}
             />
 
             {/* Banking Integration Section */}

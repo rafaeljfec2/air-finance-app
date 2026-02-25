@@ -41,19 +41,28 @@ function mapCompanyPayload(company: CompanyFormData): Record<string, unknown> {
 }
 
 function mapAccountPayload(account: AccountFormData, companyId: string): Record<string, unknown> {
-  const payload: Record<string, unknown> = {
+  const initial = account.initialBalance ?? 0;
+  const date = account.initialBalanceDate ?? new Date().toISOString();
+  const contextBalance = { initial, date, enabled: true };
+
+  return {
     companyId,
     name: account.name,
     type: account.type,
     institution: account.institution,
-    initialBalance: account.initialBalance ?? 0,
-    initialBalanceDate: new Date().toISOString(),
     color: account.color ?? '#8A05BE',
     icon: account.icon ?? 'Banknote',
+    agency: account.agency?.trim() ?? '',
+    accountNumber: account.accountNumber?.trim() ?? '',
+    balance: {
+      initial,
+      date,
+      useInExtract: true,
+      useInCashFlow: true,
+      extract: contextBalance,
+      cashFlow: contextBalance,
+    },
   };
-  payload.agency = account.agency?.trim() ? account.agency.trim() : '';
-  payload.accountNumber = account.accountNumber?.trim() ? account.accountNumber.trim() : '';
-  return payload;
 }
 
 export function OnboardingFlow({
