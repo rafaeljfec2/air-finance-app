@@ -35,13 +35,13 @@ export const TableRow = memo(
     // Extrair lógica dos ternários aninhados para variáveis separadas
     const getCreditValue = () => {
       if (isPreviousBalance) return '-';
-      if (transaction.launchType === 'revenue') return formatCurrency(transaction.value);
+      if (transaction.launchType === 'revenue') return formatCurrency(Math.abs(transaction.value));
       return '-';
     };
 
     const getDebitValue = () => {
       if (isPreviousBalance) return '-';
-      if (transaction.launchType === 'expense') return formatCurrency(transaction.value);
+      if (transaction.launchType === 'expense') return formatCurrency(Math.abs(transaction.value));
       return '-';
     };
 
@@ -64,10 +64,7 @@ export const TableRow = memo(
 
     const getBalanceDisplay = () => {
       const balance = transaction.balance ?? 0;
-      if (balance >= 0) {
-        return `+${formatCurrency(Math.abs(balance))}`;
-      }
-      return formatCurrency(balance);
+      return formatCurrency(Math.abs(balance));
     };
 
     const getBalanceColor = () => {

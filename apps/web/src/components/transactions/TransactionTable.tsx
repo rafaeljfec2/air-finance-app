@@ -1,4 +1,6 @@
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/utils/formatters';
+import { useMemo } from 'react';
 import type {
   FilterValue,
   SortDirection,
@@ -11,7 +13,8 @@ import { SortableHeader } from './SortableHeader';
 import { TableRow } from './TransactionTableRow';
 
 interface TransactionTableProps {
-  transactions: TransactionGridTransaction[];
+  allTransactions: TransactionGridTransaction[];
+  filteredTransactions: TransactionGridTransaction[];
   paginatedItems: TransactionGridTransaction[];
   showActions: boolean;
   spacious: boolean;
@@ -30,7 +33,8 @@ interface TransactionTableProps {
 }
 
 export function TransactionTable({
-  transactions,
+  allTransactions,
+  filteredTransactions,
   paginatedItems,
   showActions,
   spacious,
@@ -56,11 +60,22 @@ export function TransactionTable({
     onFilter,
     onCloseFilter,
     getFieldValues,
-    transactions,
+    transactions: allTransactions,
     spacious,
   };
 
   const hasItems = paginatedItems.length > 0;
+
+  const { totalCredits, totalDebits } = useMemo(() => {
+    let credits = 0;
+    let debits = 0;
+    for (const t of filteredTransactions) {
+      if (t.id === 'previous-balance') continue;
+      if (t.launchType === 'revenue') credits += t.value;
+      else if (t.launchType === 'expense') debits += t.value;
+    }
+    return { totalCredits: credits, totalDebits: debits };
+  }, [filteredTransactions]);
 
   return (
     <div className="hidden md:block">
@@ -136,6 +151,26 @@ export function TransactionTable({
               <EmptyState colSpan={showActions ? 8 : 7} />
             )}
           </tbody>
+          {hasItems && (
+            <tfoot>
+              <tr className="bg-muted/40 dark:bg-muted-dark/40 border-t-2 border-border dark:border-border-dark">
+                <td
+                  colSpan={4}
+                  className="px-2 py-2 text-xs font-semibold text-foreground dark:text-foreground-dark text-right"
+                >
+                  Total
+                </td>
+                <td className="px-2 py-2 text-right text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  {formatCurrency(Math.abs(totalCredits))}
+                </td>
+                <td className="px-2 py-2 text-right text-xs font-semibold text-red-600 dark:text-red-400">
+                  {formatCurrency(Math.abs(totalDebits))}
+                </td>
+                <td className="px-2 py-2" />
+                {showActions && <td className="px-2 py-2" />}
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
     </div>

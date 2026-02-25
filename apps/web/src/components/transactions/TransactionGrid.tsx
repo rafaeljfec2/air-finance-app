@@ -27,6 +27,7 @@ export function TransactionGrid({
     filters,
     currentPage,
     itemsPerPageSelected,
+    filteredTransactions,
     paginatedItems,
     totalPages,
     startIndex,
@@ -72,7 +73,8 @@ export function TransactionGrid({
             />
 
             <TransactionTable
-              transactions={transactions}
+              allTransactions={transactions}
+              filteredTransactions={filteredTransactions}
               paginatedItems={paginatedItems}
               showActions={showActions}
               spacious={spacious}
@@ -91,6 +93,7 @@ export function TransactionGrid({
             />
 
             <TransactionMobileList
+              transactions={filteredTransactions}
               paginatedItems={paginatedItems}
               showActions={showActions}
               onActionClick={handleActionClick}

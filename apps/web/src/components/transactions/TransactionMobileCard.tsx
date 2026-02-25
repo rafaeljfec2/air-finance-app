@@ -100,11 +100,11 @@ export const MobileCard = memo(
                     {/* Valor da Transação */}
                     {transaction.launchType === 'revenue' ? (
                       <span className="text-base font-bold text-emerald-600 dark:text-emerald-400">
-                        +{formatCurrency(transaction.value)}
+                        {formatCurrency(Math.abs(transaction.value))}
                       </span>
                     ) : (
                       <span className="text-base font-bold text-red-600 dark:text-red-400">
-                        -{formatCurrency(transaction.value)}
+                        {formatCurrency(Math.abs(transaction.value))}
                       </span>
                     )}
                   </>
@@ -129,7 +129,7 @@ export const MobileCard = memo(
                         : 'text-red-600 dark:text-red-400',
                     )}
                   >
-                    {formatCurrency(transaction.balance)}
+                    {formatCurrency(Math.abs(transaction.balance))}
                   </span>
                 </div>
               )}

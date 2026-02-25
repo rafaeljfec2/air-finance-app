@@ -1,4 +1,6 @@
 import type React from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ArrowUpDown, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FilterMenu } from './FilterMenu';
@@ -40,6 +42,32 @@ export function SortableHeader({
   transactions,
   spacious = false,
 }: Readonly<SortableHeaderProps>) {
+  const thRef = useRef<HTMLTableCellElement>(null);
+  const [portalPosition, setPortalPosition] = useState<{ top: number; left: number } | null>(null);
+  const isOpen = activeFilter === field;
+
+  const computePosition = useCallback(() => {
+    if (!thRef.current) return;
+    const rect = thRef.current.getBoundingClientRect();
+    setPortalPosition({ top: rect.bottom, left: rect.left });
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setPortalPosition(null);
+      return;
+    }
+    computePosition();
+
+    const handleScrollOrResize = () => computePosition();
+    window.addEventListener('scroll', handleScrollOrResize, true);
+    window.addEventListener('resize', handleScrollOrResize);
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize, true);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [isOpen, computePosition]);
+
   const getAriaSort = () => {
     if (sortConfig.field !== field) return 'none';
     return sortConfig.direction === 'asc' ? 'ascending' : 'descending';
@@ -52,8 +80,11 @@ export function SortableHeader({
 
   return (
     <th
+      ref={thRef}
       className={cn(
-        'text-left', headerPaddingClass, 'text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none relative align-middle',
+        'text-left',
+        headerPaddingClass,
+        'text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none relative align-middle',
         className,
       )}
       style={headerStyle}
@@ -94,17 +125,19 @@ export function SortableHeader({
           />
         </button>
       </div>
-      {activeFilter === field && (
-        <div className="absolute left-0 right-0 top-full">
+      {activeFilter === field &&
+        portalPosition &&
+        createPortal(
           <FilterMenu
             field={field}
             items={getFieldValues(transactions, field)}
             selectedValues={filters.find((f) => f.field === field)?.values ?? new Set()}
             onFilter={onFilter}
             onClose={onCloseFilter}
-          />
-        </div>
-      )}
+            position={portalPosition}
+          />,
+          document.body,
+        )}
     </th>
   );
 }

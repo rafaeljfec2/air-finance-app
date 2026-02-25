@@ -41,10 +41,7 @@ export function useTransactionGridState({
     resetPage,
   } = usePagination(10);
 
-  const transactionsWithBalance = useMemo(
-    () => calculateBalance(transactions),
-    [transactions],
-  );
+  const transactionsWithBalance = useMemo(() => calculateBalance(transactions), [transactions]);
 
   const sortedAndFilteredTransactions = useMemo(() => {
     const filtered = getFilteredTransactions(transactionsWithBalance);
@@ -123,6 +120,7 @@ export function useTransactionGridState({
     filters,
     currentPage,
     itemsPerPageSelected,
+    filteredTransactions: sortedAndFilteredTransactions,
     paginatedItems,
     totalPages,
     startIndex,
