@@ -84,7 +84,7 @@ export function SortableHeader({
       className={cn(
         'text-left',
         headerPaddingClass,
-        'text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none relative align-middle',
+        'text-xs font-medium text-muted-foreground dark:text-muted-foreground-dark cursor-pointer hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors group select-none relative align-middle',
         className,
       )}
       style={headerStyle}
@@ -115,12 +115,14 @@ export function SortableHeader({
             e.stopPropagation();
             onFilterClick(field);
           }}
-          className="ml-2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+          className="ml-2 p-1 hover:bg-background dark:hover:bg-background-dark rounded-md transition-colors"
         >
           <Filter
             className={cn(
               'h-3 w-3',
-              filters.some((f) => f.field === field) ? 'text-primary-500' : 'text-gray-400',
+              filters.some((f) => f.field === field)
+                ? 'text-primary-500'
+                : 'text-muted-foreground dark:text-muted-foreground-dark',
             )}
           />
         </button>
