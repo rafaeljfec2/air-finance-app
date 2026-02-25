@@ -3,16 +3,22 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import type { CashFlow } from '@/types/budget';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Activity, Maximize2 } from 'lucide-react';
+import { Activity, CalendarDays, Maximize2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface CashFlowCardProps {
   cashFlow: CashFlow | null;
   isLoading: boolean;
   onExpand: () => void;
+  onOpenYearly?: () => void;
 }
 
-export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlowCardProps>) {
+export function CashFlowCard({
+  cashFlow,
+  isLoading,
+  onExpand,
+  onOpenYearly,
+}: Readonly<CashFlowCardProps>) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
@@ -24,6 +30,19 @@ export function CashFlowCard({ cashFlow, isLoading, onExpand }: Readonly<CashFlo
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       >
+        {onOpenYearly && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-xs text-gray-500 hover:text-primary-600 dark:text-gray-300"
+            onClick={onOpenYearly}
+          >
+            <CalendarDays className="w-3 h-3 mr-1" />
+            <span className="hidden sm:inline">Visao Anual</span>
+            <span className="sm:hidden">Anual</span>
+          </Button>
+        )}
         <Button
           type="button"
           variant="ghost"

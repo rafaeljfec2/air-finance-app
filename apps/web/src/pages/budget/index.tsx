@@ -1,6 +1,7 @@
 import { CashFlowCard, CreditCardsCard, PayablesCard, ReceivablesCard } from '@/components/budget';
 import { BudgetExpandedModal } from '@/components/budget/BudgetExpandedModal';
 import { BudgetSettingsModal } from '@/components/budget/BudgetSettingsModal';
+import { CashFlowYearlyModal } from '@/components/budget/CashFlowYearlyModal';
 import { MonthNavigator } from '@/components/budget/MonthNavigator';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { motion } from 'framer-motion';
@@ -37,6 +38,7 @@ export function BudgetPage() {
   } = useBudgetPageController();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isYearlyOpen, setIsYearlyOpen] = useState(false);
 
   // Define variants
   const container = {
@@ -104,6 +106,7 @@ export function BudgetPage() {
             cashFlow={cashFlow}
             isLoading={isLoading}
             onExpand={() => setExpandedCard('cashFlow')}
+            onOpenYearly={() => setIsYearlyOpen(true)}
           />
         </motion.div>
 
@@ -170,6 +173,12 @@ export function BudgetPage() {
         open={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         onSave={() => refetch()}
+      />
+
+      <CashFlowYearlyModal
+        open={isYearlyOpen}
+        onClose={() => setIsYearlyOpen(false)}
+        year={filter.year}
       />
     </ViewDefault>
   );

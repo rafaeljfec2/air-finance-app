@@ -157,8 +157,20 @@ async function updateExcludedCategories(
   }
 }
 
+async function fetchYearlyCashFlow(companyId: string, year: string): Promise<CashFlow[]> {
+  try {
+    const response = await apiClient.get(`/companies/${companyId}/budget/cash-flow/yearly`, {
+      params: { year },
+    });
+    return z.array(CashFlowSchema).parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+}
+
 export const budgetService = {
   getCashFlow: fetchCashFlow,
+  getYearlyCashFlow: fetchYearlyCashFlow,
   getReceivables: fetchReceivables,
   getPayables: fetchPayables,
   getCreditCards: fetchCreditCards,
