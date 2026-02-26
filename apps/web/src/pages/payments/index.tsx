@@ -295,14 +295,14 @@ export function PaymentsPage() {
         />
 
         <ConfirmModal
-          isOpen={!!cancelTarget}
-          onClose={() => setCancelTarget(null)}
+          open={!!cancelTarget}
+          onCancel={() => setCancelTarget(null)}
           onConfirm={handleCancel}
           title="Cancelar pagamento"
           description={`Deseja cancelar o pagamento de ${cancelTarget ? formatCurrency(cancelTarget.amount) : ''}?`}
-          confirmText="Cancelar pagamento"
-          cancelText="Voltar"
-          variant="danger"
+          confirmLabel="Cancelar pagamento"
+          cancelLabel="Voltar"
+          danger
           isLoading={cancelMutation.isPending}
         />
       </div>
