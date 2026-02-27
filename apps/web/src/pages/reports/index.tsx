@@ -87,14 +87,14 @@ export function Reports() {
     const raw = historyQuery.data ?? [];
     return raw.map((point) => ({
       date: point.date,
-      balance: point.balance,
+      balance: point.income - point.expenses,
       revenue: point.income,
       expenses: point.expenses,
     }));
   }, [historyQuery.data]);
 
   const expensesTotalMemo = useMemo(() => summary.expenses, [summary.expenses]);
-  
+
   const reportStructure = useMemo(() => {
     const expensesWithPct = expenses.map((e) => ({
       name: e.name,
@@ -220,9 +220,13 @@ export function Reports() {
           <div>
             <div className="flex items-center gap-2">
               <BarChart3 className="h-8 w-8 text-primary-400" />
-              <h1 className="text-2xl font-bold text-text dark:text-text-dark">Painel Financeiro</h1>
+              <h1 className="text-2xl font-bold text-text dark:text-text-dark">
+                Painel Financeiro
+              </h1>
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Visão estratégica para tomada de decisão</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Visão estratégica para tomada de decisão
+            </p>
           </div>
         </div>
 
