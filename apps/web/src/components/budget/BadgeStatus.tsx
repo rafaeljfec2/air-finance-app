@@ -1,8 +1,10 @@
-import React from 'react';
+import type React from 'react';
 
 interface BadgeStatusProps {
-  status?: 'success' | 'warning' | 'danger' | 'default';
-  children: React.ReactNode;
+  readonly status?: 'success' | 'warning' | 'danger' | 'default';
+  readonly children: React.ReactNode;
+  readonly onClick?: () => void;
+  readonly disabled?: boolean;
 }
 
 const statusMap = {
@@ -12,6 +14,28 @@ const statusMap = {
   default: 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
 };
 
-export const BadgeStatus: React.FC<BadgeStatusProps> = ({ status = 'default', children }) => (
-  <span className={`px-2 py-0.5 rounded text-xs font-medium ${statusMap[status]}`}>{children}</span>
-);
+export const BadgeStatus: React.FC<BadgeStatusProps> = ({
+  status = 'default',
+  children,
+  onClick,
+  disabled,
+}) => {
+  const baseClasses = `px-2 py-0.5 rounded text-xs font-medium ${statusMap[status]}`;
+  const interactiveClasses = onClick ? 'cursor-pointer hover:opacity-80 transition-opacity' : '';
+  const disabledClasses = disabled ? 'opacity-50 cursor-wait' : '';
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        className={`${baseClasses} ${interactiveClasses} ${disabledClasses}`}
+        onClick={onClick}
+        disabled={disabled}
+      >
+        {children}
+      </button>
+    );
+  }
+
+  return <span className={baseClasses}>{children}</span>;
+};
