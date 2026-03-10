@@ -1,12 +1,12 @@
-import { Menu } from '@headlessui/react';
-import { LucideIcon } from 'lucide-react';
+import { MenuItem } from '@headlessui/react';
+import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface UserMenuItemProps {
-  icon: LucideIcon;
-  label: string;
-  onClick: () => void;
-  variant?: 'default' | 'emerald';
+  readonly icon: LucideIcon;
+  readonly label: string;
+  readonly onClick: () => void;
+  readonly variant?: 'default' | 'emerald';
 }
 
 export function UserMenuItem({
@@ -16,12 +16,12 @@ export function UserMenuItem({
   variant = 'default',
 }: Readonly<UserMenuItemProps>) {
   return (
-    <Menu.Item>
-      {({ active }) => (
+    <MenuItem>
+      {({ focus }) => (
         <button
           onClick={onClick}
           className={cn(
-            active ? 'bg-background dark:bg-background-dark' : '',
+            focus ? 'bg-background dark:bg-background-dark' : '',
             'flex w-full items-center px-4 py-2 text-sm',
             variant === 'emerald'
               ? 'text-emerald-600 dark:text-emerald-400'
@@ -32,6 +32,6 @@ export function UserMenuItem({
           {label}
         </button>
       )}
-    </Menu.Item>
+    </MenuItem>
   );
 }
