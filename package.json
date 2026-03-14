@@ -39,7 +39,9 @@
     "flatted": "3.4.1",
     "lodash": "4.17.23",
     "ajv": "6.14.0",
-    "inflight@npm:^1.0.4": "patch:inflight@npm%3A1.0.6#~/.yarn/patches/inflight-npm-1.0.6-ccedb4b908.patch"
+    "@react-native/codegen": "0.84.1",
+    "chromium-edge-launcher": "0.3.0",
+    "test-exclude": "7.0.2"
   },
   "packageManager": "yarn@4.0.0",
   "engines": {
