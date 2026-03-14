@@ -32,6 +32,15 @@
       "turbo run build"
     ]
   },
+  "resolutions": {
+    "undici": "6.24.1",
+    "tar": "7.5.11",
+    "axios": "1.13.6",
+    "flatted": "3.4.1",
+    "lodash": "4.17.23",
+    "ajv": "6.14.0",
+    "inflight@npm:^1.0.4": "patch:inflight@npm%3A1.0.6#~/.yarn/patches/inflight-npm-1.0.6-ccedb4b908.patch"
+  },
   "packageManager": "yarn@4.0.0",
   "engines": {
     "node": ">=24.x"
