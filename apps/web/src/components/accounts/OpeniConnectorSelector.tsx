@@ -1,7 +1,17 @@
-import { Input } from '@/components/ui/input';
 import { Loader2, Search, Building2 } from 'lucide-react';
-import { type OpeniConnector } from '@/services/openiService';
 import { useState, useMemo } from 'react';
+
+import { Input } from '@/components/ui/input';
+import { type OpeniConnector } from '@/services/openiService';
+
+function isSafeImageUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+  } catch {
+    return false;
+  }
+}
 
 interface OpeniConnectorSelectorProps {
   readonly connectors: readonly OpeniConnector[];
@@ -81,7 +91,7 @@ export function OpeniConnectorSelector({
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  {connector.imageUrl ? (
+                  {connector.imageUrl && isSafeImageUrl(connector.imageUrl) ? (
                     <img
                       src={connector.imageUrl}
                       alt={connector.name}
