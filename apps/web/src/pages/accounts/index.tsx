@@ -1,13 +1,16 @@
+import { useMemo, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
+
 import { Loading } from '@/components/Loading';
 import { useAccounts } from '@/hooks/useAccounts';
 import { usePlanLimits } from '@/hooks/usePlanLimits';
 import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { useCompanyStore } from '@/stores/company';
 import { companyService } from '@/services/companyService';
 import { useAuthStore } from '@/stores/auth';
-import { useMemo, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useCompanyStore } from '@/stores/company';
+import { UserRole } from '@/types/user';
+
 import { AccountsEmptyState } from './components/AccountsEmptyState';
 import { AccountsErrorState } from './components/AccountsErrorState';
 import { AccountsFilters } from './components/AccountsFilters';
@@ -17,7 +20,6 @@ import { AccountsPageModals } from './components/AccountsPageModals';
 import { useAccountFilters } from './hooks/useAccountFilters';
 import { useAccountSorting } from './hooks/useAccountSorting';
 import { useAccountsPageModals } from './hooks/useAccountsPageModals';
-import { UserRole } from '@/types/user';
 
 export function AccountsPage() {
   return <Navigate to="/accounts/details" replace />;
@@ -105,7 +107,7 @@ export function AccountsManagementPage() {
             onCreate={handlers.onCreate}
             canCreate={canCreateAccount}
             onConnectPierre={isGod && isPierreAvailable ? handlers.onConnectPierre : undefined}
-            onConnectOpenFinance={isGod ? handlers.onConnectOpenFinance : undefined}
+            onConnectOpenFinance={handlers.onConnectOpenFinance}
           />
 
           <AccountsFilters

@@ -1,5 +1,3 @@
-import { NavigationSection } from '@/types/navigation';
-import { UserRole } from '@/types/user';
 import {
   ArrowRightLeft,
   Banknote,
@@ -20,6 +18,9 @@ import {
   User,
   Wallet,
 } from 'lucide-react';
+
+import { NavigationSection } from '@/types/navigation';
+import { UserRole } from '@/types/user';
 
 export const navigation: NavigationSection[] = [
   {
@@ -62,7 +63,7 @@ export const navigation: NavigationSection[] = [
     items: [
       { name: 'Perfis', href: '/companies', icon: Building2 },
       { name: 'Contas Bancárias', href: '/accounts/details', icon: Banknote },
-      { name: 'Open Finance', href: '/openfinance', icon: Link2, roles: [UserRole.GOD] },
+      { name: 'Open Finance', href: '/openfinance', icon: Link2 },
       { name: 'Cartões de Crédito', href: '/credit-cards/bills', icon: CreditCard },
       { name: 'Categorias', href: '/categories', icon: Tag },
       { name: 'Recorrências', href: '/recurring-transactions', icon: RefreshCcw },

@@ -1,8 +1,8 @@
 import { AccountFormModal } from '@/components/accounts/AccountFormModal';
 import { BankingIntegrationModal } from '@/components/accounts/BankingIntegrationModal';
-import { StatementScheduleConfig } from '@/components/accounts/StatementScheduleConfig';
-import { PierreConnectModal } from '@/components/accounts/PierreConnectModal';
 import { OpenFinanceConnectModal } from '@/components/accounts/OpenFinanceConnectModal';
+import { PierreConnectModal } from '@/components/accounts/PierreConnectModal';
+import { StatementScheduleConfig } from '@/components/accounts/StatementScheduleConfig';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import type { Account, CreateAccount } from '@/services/accountService';
 
@@ -122,7 +122,7 @@ export function AccountsPageModals({
         />
       )}
 
-      {isGod && activeCompany && openFinanceModal.isOpen && (
+      {activeCompany && openFinanceModal.isOpen && (
         <OpenFinanceConnectModal
           key={`openi-modal-${activeCompany.id}-${openFinanceModal.companyData?.openiTenantId ?? 'no-tenant'}`}
           open={openFinanceModal.isOpen}
