@@ -117,9 +117,7 @@ export async function updateStatementSchedule(
 /**
  * Get statement sync schedule for an account
  */
-export async function getStatementSchedule(
-  accountId: string,
-): Promise<StatementScheduleResponse> {
+export async function getStatementSchedule(accountId: string): Promise<StatementScheduleResponse> {
   const response = await apiClient.get<StatementScheduleResponse>(
     `/banking/accounts/${accountId}/statement/schedule`,
   );
@@ -168,8 +166,7 @@ export function fileToText(file: File): Promise<string> {
  */
 export function validateCertificate(content: string): boolean {
   return (
-    content.includes('-----BEGIN CERTIFICATE-----') &&
-    content.includes('-----END CERTIFICATE-----')
+    content.includes('-----BEGIN CERTIFICATE-----') && content.includes('-----END CERTIFICATE-----')
   );
 }
 
@@ -308,6 +305,130 @@ export async function importPierreAccounts(
   const response = await apiClient.post<ImportPierreAccountsResponse>(
     `/banking/pierre/import-accounts?companyId=${companyId}`,
     { accountIds },
+  );
+  return response.data;
+}
+
+export interface PierreCreditCardBillsResponse {
+  readonly success: boolean;
+  readonly data: Record<string, unknown>;
+}
+
+export async function getPierreCreditCardBills(
+  companyId: string,
+  filters?: { readonly accountId?: string; readonly onlyPastDue?: boolean },
+): Promise<PierreCreditCardBillsResponse> {
+  const params = new URLSearchParams({ companyId });
+  if (filters?.accountId) params.set('accountId', filters.accountId);
+  if (filters?.onlyPastDue === true) params.set('onlyPastDue', 'true');
+  const response = await apiClient.get<PierreCreditCardBillsResponse>(
+    `/banking/pierre/credit-card-bills?${params.toString()}`,
+  );
+  return response.data;
+}
+
+export interface PierreInstallmentsResponse {
+  readonly success: boolean;
+  readonly data: Record<string, unknown>;
+}
+
+export async function getPierreInstallments(
+  companyId: string,
+  filters?: { readonly transactionId?: string; readonly accountId?: string },
+): Promise<PierreInstallmentsResponse> {
+  const params = new URLSearchParams({ companyId });
+  if (filters?.transactionId) params.set('transactionId', filters.transactionId);
+  if (filters?.accountId) params.set('accountId', filters.accountId);
+  const response = await apiClient.get<PierreInstallmentsResponse>(
+    `/banking/pierre/installments?${params.toString()}`,
+  );
+  return response.data;
+}
+
+export interface PierreSyncResponse {
+  readonly success: boolean;
+  readonly data: Record<string, unknown>;
+}
+
+export async function syncPierreTenant(companyId: string): Promise<PierreSyncResponse> {
+  const response = await apiClient.post<PierreSyncResponse>(
+    `/banking/pierre/sync?companyId=${companyId}`,
+    {},
+  );
+  return response.data;
+}
+
+export interface PierreBalanceResponse {
+  readonly success: boolean;
+  readonly data: Record<string, unknown>;
+}
+
+export async function getPierreStatementBalance(
+  companyId: string,
+  accountId?: string,
+): Promise<PierreBalanceResponse> {
+  const params = new URLSearchParams({ companyId });
+  if (accountId) params.set('accountId', accountId);
+  const response = await apiClient.get<PierreBalanceResponse>(
+    `/banking/pierre/balance?${params.toString()}`,
+  );
+  return response.data;
+}
+
+export interface ConnextoTenantDetail {
+  readonly id: string;
+  readonly name: string;
+  readonly document: string;
+  readonly email: string;
+  readonly isActive: boolean;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
+export interface ConnextoTenantDetailResponse {
+  readonly success: boolean;
+  readonly data: ConnextoTenantDetail;
+}
+
+export async function getConnextoTenant(tenantUuid: string): Promise<ConnextoTenantDetailResponse> {
+  const response = await apiClient.get<ConnextoTenantDetailResponse>(
+    `/banking/connexto/tenants/${tenantUuid}`,
+  );
+  return response.data;
+}
+
+export interface ConnextoTenantCredentialPayload {
+  readonly bankCode: string;
+  readonly clientId?: string;
+  readonly clientSecret?: string;
+  readonly certificate?: string;
+  readonly privateKey?: string;
+  readonly accountNumber?: string;
+}
+
+export interface ConnextoTenantCredential {
+  readonly id: string;
+  readonly tenantId: string;
+  readonly bankCode: string;
+  readonly clientId: string;
+  readonly accountNumber: string;
+  readonly isActive: boolean;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
+export interface ConnextoTenantCredentialResponse {
+  readonly success: boolean;
+  readonly data: ConnextoTenantCredential;
+}
+
+export async function addConnextoTenantCredential(
+  tenantUuid: string,
+  body: ConnextoTenantCredentialPayload,
+): Promise<ConnextoTenantCredentialResponse> {
+  const response = await apiClient.post<ConnextoTenantCredentialResponse>(
+    `/banking/connexto/tenants/${tenantUuid}/credentials`,
+    body,
   );
   return response.data;
 }

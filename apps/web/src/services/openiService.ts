@@ -1,5 +1,7 @@
-import { parseApiError } from '@/utils/apiErrorHandler';
 import { z } from 'zod';
+
+import { parseApiError } from '@/utils/apiErrorHandler';
+
 import { apiClient } from './apiClient';
 
 const OpeniConnectorRuleSchema = z.object({
@@ -253,6 +255,251 @@ export const importAccounts = async (
       },
     );
     return ImportOpeniAccountsResponseSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+const OpeniCreditCardPaginationSchema = z.object({
+  page: z.number(),
+  pageSize: z.number().optional(),
+  totalItems: z.number().optional(),
+  totalPages: z.number().optional(),
+});
+
+const OpeniCreditCardListItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  digits: z.string(),
+  brand: z.string(),
+  level: z.string(),
+  status: z.string(),
+  currency: z.string(),
+  holderType: z.string().nullable(),
+  limitTotal: z.number(),
+  limitUsed: z.number(),
+  limitAvailable: z.number(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+const OpeniCreditCardListPayloadSchema = z.object({
+  pagination: OpeniCreditCardPaginationSchema,
+  creditCards: z.array(OpeniCreditCardListItemSchema),
+});
+
+export type OpeniCreditCardListItem = z.infer<typeof OpeniCreditCardListItemSchema>;
+export type OpeniCreditCardListPayload = z.infer<typeof OpeniCreditCardListPayloadSchema>;
+
+const OpeniCreditCardLimitItemSchema = z.object({
+  id: z.string(),
+  identificationNumber: z.string(),
+  consolidationType: z.string(),
+  limitType: z.string(),
+  isFlexible: z.boolean(),
+  limitTotal: z.number(),
+  limitUsed: z.number(),
+  limitAvailable: z.number(),
+  currency: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+const OpeniCreditCardBillItemSchema = z.object({
+  id: z.string(),
+  amount: z.number(),
+  currency: z.string(),
+  minimumPayment: z.number(),
+  allowsInstallments: z.boolean(),
+  dueDate: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+const OpeniCreditCardDetailsPayloadSchema = OpeniCreditCardListItemSchema.extend({
+  limits: z.array(OpeniCreditCardLimitItemSchema),
+  bills: z.array(OpeniCreditCardBillItemSchema),
+});
+
+export type OpeniCreditCardDetailsPayload = z.infer<typeof OpeniCreditCardDetailsPayloadSchema>;
+
+const OpeniCreditCardTransactionSchema = z.object({
+  id: z.string(),
+  accountId: z.string(),
+  billId: z.string().nullable(),
+  description: z.string(),
+  descriptionRaw: z.string(),
+  status: z.string(),
+  type: z.string(),
+  operationType: z.string().nullable(),
+  amount: z.number(),
+  amountInAccountCurrency: z.number().nullable(),
+  currency: z.string(),
+  cardNumber: z.string().nullable(),
+  installmentNumber: z.number().nullable(),
+  installmentTotal: z.number().nullable(),
+  transactionAt: z.string(),
+  updatedAt: z.string(),
+  createdAt: z.string(),
+});
+
+const OpeniCreditCardTransactionsPayloadSchema = z.object({
+  transactions: z.array(OpeniCreditCardTransactionSchema),
+  total: z.number(),
+  periodStart: z.string().nullable(),
+  periodEnd: z.string().nullable(),
+  currentBill: z.object({ amount: z.number(), currency: z.string() }),
+  summary: z.object({
+    totalAmount: z.number(),
+    totalDebit: z.number(),
+    totalCredit: z.number(),
+    currency: z.string(),
+  }),
+});
+
+export type OpeniCreditCardTransactionsPayload = z.infer<
+  typeof OpeniCreditCardTransactionsPayloadSchema
+>;
+
+const OpeniPlatformWebhookRecordSchema = z.object({
+  id: z.string(),
+  url: z.string(),
+  secret: z.string().optional(),
+  message: z.string().optional(),
+});
+
+export type OpeniPlatformWebhookRecord = z.infer<typeof OpeniPlatformWebhookRecordSchema>;
+
+export const listCreditCards = async (
+  companyId: string,
+  itemId: string,
+  accountId: string,
+  page?: number,
+): Promise<OpeniCreditCardListPayload> => {
+  try {
+    const params: Record<string, string | number> = { accountId };
+    if (page !== undefined) params.page = page;
+    const response = await apiClient.get<{ success: boolean; data: OpeniCreditCardListPayload }>(
+      `/companies/${companyId}/banking/openi/items/${itemId}/credit-cards`,
+      { params },
+    );
+    return OpeniCreditCardListPayloadSchema.parse(response.data.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+export const getCreditCard = async (
+  companyId: string,
+  itemId: string,
+  cardId: string,
+  accountId: string,
+): Promise<OpeniCreditCardDetailsPayload> => {
+  try {
+    const response = await apiClient.get<{ success: boolean; data: OpeniCreditCardDetailsPayload }>(
+      `/companies/${companyId}/banking/openi/items/${itemId}/credit-cards/${cardId}`,
+      { params: { accountId } },
+    );
+    return OpeniCreditCardDetailsPayloadSchema.parse(response.data.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+export const getCreditCardTransactions = async (
+  companyId: string,
+  itemId: string,
+  cardId: string,
+  accountId: string,
+  filters?: { readonly startDate?: string; readonly endDate?: string },
+): Promise<OpeniCreditCardTransactionsPayload> => {
+  try {
+    const params: Record<string, string> = { accountId };
+    if (filters?.startDate) params.startDate = filters.startDate;
+    if (filters?.endDate) params.endDate = filters.endDate;
+    const response = await apiClient.get<{
+      success: boolean;
+      data: OpeniCreditCardTransactionsPayload;
+    }>(
+      `/companies/${companyId}/banking/openi/items/${itemId}/credit-cards/${cardId}/transactions`,
+      { params },
+    );
+    return OpeniCreditCardTransactionsPayloadSchema.parse(response.data.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+const OpeniPlatformWebhooksListSchema = z.object({
+  success: z.boolean(),
+  data: z.object({
+    data: z.array(OpeniPlatformWebhookRecordSchema),
+  }),
+});
+
+export const createPlatformWebhook = async (
+  companyId: string,
+  body: { readonly url: string; readonly secret?: string },
+): Promise<OpeniPlatformWebhookRecord> => {
+  try {
+    const response = await apiClient.post<{ success: boolean; data: OpeniPlatformWebhookRecord }>(
+      `/companies/${companyId}/banking/openi/webhooks`,
+      body,
+    );
+    return OpeniPlatformWebhookRecordSchema.parse(response.data.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+export const listPlatformWebhooks = async (
+  companyId: string,
+): Promise<readonly OpeniPlatformWebhookRecord[]> => {
+  try {
+    const response = await apiClient.get<unknown>(`/companies/${companyId}/banking/openi/webhooks`);
+    const parsed = OpeniPlatformWebhooksListSchema.parse(response.data);
+    return parsed.data.data;
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+export const getPlatformWebhook = async (
+  companyId: string,
+  webhookId: string,
+): Promise<OpeniPlatformWebhookRecord> => {
+  try {
+    const response = await apiClient.get<{ success: boolean; data: OpeniPlatformWebhookRecord }>(
+      `/companies/${companyId}/banking/openi/webhooks/${webhookId}`,
+    );
+    return OpeniPlatformWebhookRecordSchema.parse(response.data.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+export const updatePlatformWebhook = async (
+  companyId: string,
+  webhookId: string,
+  body: { readonly url: string; readonly secret?: string },
+): Promise<OpeniPlatformWebhookRecord> => {
+  try {
+    const response = await apiClient.put<{ success: boolean; data: OpeniPlatformWebhookRecord }>(
+      `/companies/${companyId}/banking/openi/webhooks/${webhookId}`,
+      body,
+    );
+    return OpeniPlatformWebhookRecordSchema.parse(response.data.data);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
+export const deletePlatformWebhook = async (
+  companyId: string,
+  webhookId: string,
+): Promise<void> => {
+  try {
+    await apiClient.delete(`/companies/${companyId}/banking/openi/webhooks/${webhookId}`);
   } catch (error) {
     throw parseApiError(error);
   }

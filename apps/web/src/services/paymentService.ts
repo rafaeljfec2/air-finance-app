@@ -212,6 +212,117 @@ export async function listPixCharges(accountId: string): Promise<PixCharge[]> {
   return response.data.data;
 }
 
+export interface RemotePixChargeListItem {
+  readonly txid: string;
+  readonly status: string;
+  readonly amount: number;
+  readonly createdAt?: string;
+  readonly expiresAt?: string;
+}
+
+export interface RemotePixChargeListPayload {
+  readonly charges: readonly RemotePixChargeListItem[];
+  readonly total: number;
+  readonly page: number;
+}
+
+export interface RemoteBillingListItem {
+  readonly id: string;
+  readonly status: string;
+  readonly amount: number;
+  readonly dueDate?: string;
+  readonly createdAt?: string;
+}
+
+export interface RemoteBillingListPayload {
+  readonly billings: readonly RemoteBillingListItem[];
+  readonly total: number;
+  readonly page: number;
+}
+
+export interface RemoteListFilters {
+  readonly startDate?: string;
+  readonly endDate?: string;
+  readonly status?: string;
+}
+
+export async function listRemotePixCharges(
+  accountId: string,
+  filters?: RemoteListFilters,
+): Promise<RemotePixChargeListPayload> {
+  const params = new URLSearchParams();
+  if (filters?.startDate) params.set('startDate', filters.startDate);
+  if (filters?.endDate) params.set('endDate', filters.endDate);
+  if (filters?.status) params.set('status', filters.status);
+  const qs = params.toString();
+  const suffix = qs ? `?${qs}` : '';
+  const response = await apiClient.get<ApiSingleResponse<RemotePixChargeListPayload>>(
+    `${BASE_PATH}/${accountId}/pix/charges/remote${suffix}`,
+  );
+  return response.data.data;
+}
+
+export async function listRemoteBillings(
+  accountId: string,
+  filters?: RemoteListFilters,
+): Promise<RemoteBillingListPayload> {
+  const params = new URLSearchParams();
+  if (filters?.startDate) params.set('startDate', filters.startDate);
+  if (filters?.endDate) params.set('endDate', filters.endDate);
+  if (filters?.status) params.set('status', filters.status);
+  const qs = params.toString();
+  const suffix = qs ? `?${qs}` : '';
+  const response = await apiClient.get<ApiSingleResponse<RemoteBillingListPayload>>(
+    `${BASE_PATH}/${accountId}/billing/remote${suffix}`,
+  );
+  return response.data.data;
+}
+
+export async function cancelRemoteBilling(accountId: string, billingId: string): Promise<void> {
+  await apiClient.delete(`${BASE_PATH}/${accountId}/billing/remote/${billingId}`);
+}
+
+export interface ConnextoTenantWebhookConfig {
+  readonly url: string;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
+export async function getConnextoTenantWebhook(
+  accountId: string,
+): Promise<ConnextoTenantWebhookConfig> {
+  const response = await apiClient.get<ApiSingleResponse<ConnextoTenantWebhookConfig>>(
+    `${BASE_PATH}/${accountId}/connexto/webhook`,
+  );
+  return response.data.data;
+}
+
+export async function createConnextoTenantWebhook(
+  accountId: string,
+  body: { readonly url: string; readonly secret?: string },
+): Promise<ConnextoTenantWebhookConfig> {
+  const response = await apiClient.post<ApiSingleResponse<ConnextoTenantWebhookConfig>>(
+    `${BASE_PATH}/${accountId}/connexto/webhook`,
+    body,
+  );
+  return response.data.data;
+}
+
+export async function updateConnextoTenantWebhook(
+  accountId: string,
+  body: { readonly url?: string; readonly secret?: string },
+): Promise<ConnextoTenantWebhookConfig> {
+  const response = await apiClient.put<ApiSingleResponse<ConnextoTenantWebhookConfig>>(
+    `${BASE_PATH}/${accountId}/connexto/webhook`,
+    body,
+  );
+  return response.data.data;
+}
+
+export async function deleteConnextoTenantWebhook(accountId: string): Promise<void> {
+  await apiClient.delete(`${BASE_PATH}/${accountId}/connexto/webhook`);
+}
+
 export async function cancelPixCharge(accountId: string, txid: string): Promise<PixCharge> {
   const response = await apiClient.delete<ApiSingleResponse<PixCharge>>(
     `${BASE_PATH}/${accountId}/pix/charge/${txid}`,
