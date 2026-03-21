@@ -198,68 +198,91 @@ function CreateTokenModal({
   };
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title="Criar API Token"
-      className="bg-card dark:bg-card-dark"
-    >
-      <div className="space-y-4">
-        <div>
-          <label
-            htmlFor="token-name"
-            className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
-          >
-            Nome do token
-          </label>
-          <Input
-            id="token-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Ex: CI/CD Pipeline, Integração Zapier..."
-            className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
-            maxLength={100}
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="token-expiration"
-            className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
-          >
-            Expiração
-          </label>
-          <Select value={expiration} onValueChange={(v) => setExpiration(v as ExpirationOption)}>
-            <SelectTrigger className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-              {EXPIRATION_OPTIONS.find((o) => o.value === expiration)?.label}
-            </SelectTrigger>
-            <SelectContent className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark">
-              {EXPIRATION_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value ?? 'never'}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="opacity-50 pointer-events-none">
-          <p className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
-            Escopos <span className="ml-2 text-xs text-gray-400">(em breve)</span>
-          </p>
-          <div className="p-3 rounded-md border border-border dark:border-border-dark bg-gray-50 dark:bg-gray-900 text-xs text-gray-400">
-            Acesso total (herda permissões do usuário)
+    <Modal open={open} onClose={onClose} className="max-w-md bg-card dark:bg-card-dark p-0">
+      <div className="flex flex-col min-h-0">
+        <div className="flex items-center gap-3 px-6 pt-4 pb-3 border-b border-border dark:border-border-dark flex-shrink-0">
+          <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+            <Key className="h-5 w-5 text-primary-500 dark:text-primary-400" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-text dark:text-text-dark">Criar API Token</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Gere um token para integrações externas e automações.
+            </p>
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 pt-2">
-          <Button variant="ghost" onClick={onClose} disabled={isCreating}>
-            Cancelar
-          </Button>
-          <Button onClick={handleSubmit} disabled={!name.trim() || isCreating} className="gap-2">
-            {isCreating ? <Spinner size="sm" /> : <Key className="h-4 w-4" />}
-            Gerar Token
-          </Button>
+        <div className="px-6 py-5 space-y-5">
+          <div>
+            <label
+              htmlFor="token-name"
+              className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
+            >
+              Nome do token
+            </label>
+            <Input
+              id="token-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ex: CI/CD Pipeline, Integração Zapier..."
+              className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark focus:border-primary-500"
+              maxLength={100}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="token-expiration"
+              className="block text-sm font-medium text-text dark:text-text-dark mb-1.5"
+            >
+              Expiração
+            </label>
+            <Select value={expiration} onValueChange={(v) => setExpiration(v as ExpirationOption)}>
+              <SelectTrigger className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
+                {EXPIRATION_OPTIONS.find((o) => o.value === expiration)?.label}
+              </SelectTrigger>
+              <SelectContent className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
+                {EXPIRATION_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value ?? 'never'}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="opacity-50 pointer-events-none">
+            <p className="block text-sm font-medium text-text dark:text-text-dark mb-1.5">
+              Escopos <span className="ml-2 text-xs text-gray-400">(em breve)</span>
+            </p>
+            <div className="p-3 rounded-lg border border-border dark:border-border-dark bg-gray-50 dark:bg-gray-800/50 text-xs text-gray-400">
+              <div className="flex items-center gap-2">
+                <Shield className="h-3.5 w-3.5" />
+                Acesso total (herda permissões do usuário)
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3 pt-1">
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={!name.trim() || isCreating}
+              className="w-full py-3 px-4 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isCreating ? <Spinner size="sm" /> : <Key className="h-4 w-4" />}
+              {isCreating ? 'Gerando...' : 'Gerar Token'}
+            </button>
+
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isCreating}
+              className="w-full py-2.5 px-4 rounded-xl border border-border dark:border-border-dark text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 text-sm font-medium transition-colors disabled:opacity-60"
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
       </div>
     </Modal>
@@ -294,41 +317,63 @@ function TokenCreatedModal({
     <Modal
       open={true}
       onClose={onClose}
-      title="Token criado com sucesso"
       dismissible={false}
-      className="bg-card dark:bg-card-dark"
+      className="max-w-md bg-card dark:bg-card-dark p-0"
     >
-      <div className="space-y-4">
-        <div className="flex items-start gap-3 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-950/50 border border-yellow-200 dark:border-yellow-800">
-          <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-yellow-800 dark:text-yellow-200">
-            Copie o token agora. Por segurança, ele não será exibido novamente.
-          </p>
+      <div className="flex flex-col min-h-0">
+        <div className="flex items-center gap-3 px-6 pt-4 pb-3 border-b border-border dark:border-border-dark flex-shrink-0">
+          <div className="p-2 rounded-lg bg-emerald-500/10 dark:bg-emerald-400/10">
+            <Check className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-text dark:text-text-dark">
+              Token criado com sucesso
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Copie e armazene o token em local seguro.
+            </p>
+          </div>
         </div>
 
-        <div className="relative">
-          <Input
-            readOnly
-            value={token}
-            className="pr-12 font-mono text-xs bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark"
-            onClick={(e) => (e.target as HTMLInputElement).select()}
-          />
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            aria-label="Copiar token"
-          >
-            {copied ? (
-              <Check className="h-4 w-4 text-green-500" />
-            ) : (
-              <Copy className="h-4 w-4 text-gray-500" />
-            )}
-          </button>
-        </div>
+        <div className="px-6 py-5 space-y-5">
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-yellow-50/80 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800/30">
+            <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              Copie o token agora. Por segurança, ele não será exibido novamente.
+            </p>
+          </div>
 
-        <div className="flex justify-end pt-2">
-          <Button onClick={onClose}>Já copiei o token</Button>
+          <div className="relative">
+            <Input
+              readOnly
+              value={token}
+              className="pr-12 font-mono text-xs bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark"
+              onClick={(e) => (e.target as HTMLInputElement).select()}
+            />
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Copiar token"
+            >
+              {copied ? (
+                <Check className="h-4 w-4 text-emerald-500" />
+              ) : (
+                <Copy className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+              )}
+            </button>
+          </div>
+
+          <div className="space-y-3 pt-1">
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full py-3 px-4 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2"
+            >
+              <Check className="h-4 w-4" />
+              Já copiei o token
+            </button>
+          </div>
         </div>
       </div>
     </Modal>
