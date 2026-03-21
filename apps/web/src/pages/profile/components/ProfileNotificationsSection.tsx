@@ -1,8 +1,9 @@
+import { Save } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Switch } from '@/components/ui/switch';
-import { Save } from 'lucide-react';
 
 interface NotificationsData {
   email: boolean;

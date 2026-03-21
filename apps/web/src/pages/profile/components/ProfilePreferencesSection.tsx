@@ -1,8 +1,9 @@
+import { Calendar, DollarSign, Globe, Palette, Save } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import { Calendar, DollarSign, Globe, Palette, Save } from 'lucide-react';
 
 interface PreferencesData {
   currency: string;

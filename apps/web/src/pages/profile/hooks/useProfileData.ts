@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
+
 import { toast } from '@/components/ui/toast';
 import { getCurrentUser } from '@/services/authService';
 import { useAuthStore } from '@/stores/auth';
+
 import {
   ProfileFormData,
   PreferencesData,

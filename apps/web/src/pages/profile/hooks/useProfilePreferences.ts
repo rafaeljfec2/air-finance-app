@@ -1,9 +1,11 @@
 import React, { useState, useCallback } from 'react';
+
 import { toast } from '@/components/ui/toast';
 import { updateUser } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
 import { useTheme } from '@/stores/useTheme';
 import { mapUserServiceToUserType } from '@/utils/userMapper';
+
 import type { PreferencesData } from './types';
 
 interface UseProfilePreferencesParams {

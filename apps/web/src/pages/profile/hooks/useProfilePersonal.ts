@@ -1,8 +1,10 @@
 import React, { useState, useCallback } from 'react';
+
 import { toast } from '@/components/ui/toast';
 import { updateUser, type CreateUser } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
 import { mapUserServiceToUserType } from '@/utils/userMapper';
+
 import type { ProfileFormData } from './types';
 
 interface UseProfilePersonalParams {

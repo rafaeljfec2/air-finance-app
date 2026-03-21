@@ -79,11 +79,11 @@ function TokenCard({
   const status = getTokenStatus(token);
 
   return (
-    <div className="p-4 rounded-lg border border-border dark:border-border-dark bg-background dark:bg-background-dark">
+    <div className="p-4 rounded-xl border border-gray-100 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-800/50">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex-shrink-0 p-2 rounded-lg bg-primary-50 dark:bg-primary-950">
-            <Key className="h-4 w-4 text-primary-500" />
+          <div className="flex-shrink-0 p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+            <Key className="h-4 w-4 text-primary-500 dark:text-primary-400" />
           </div>
           <div className="min-w-0">
             <p className="font-medium text-text dark:text-text-dark truncate">{token.name}</p>
@@ -154,8 +154,8 @@ function TokenCard({
 function EmptyState({ onCreate }: Readonly<{ onCreate: () => void }>) {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-      <div className="p-4 rounded-full bg-primary-50 dark:bg-primary-950 mb-4">
-        <Key className="h-8 w-8 text-primary-400" />
+      <div className="p-4 rounded-full bg-primary-100 dark:bg-primary-900/30 mb-4">
+        <Key className="h-8 w-8 text-primary-500 dark:text-primary-400" />
       </div>
       <h3 className="text-lg font-semibold text-text dark:text-text-dark mb-2">Nenhum API Token</h3>
       <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mb-6">
@@ -198,7 +198,12 @@ function CreateTokenModal({
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Criar API Token">
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Criar API Token"
+      className="bg-card dark:bg-card-dark"
+    >
       <div className="space-y-4">
         <div>
           <label
@@ -286,7 +291,13 @@ function TokenCreatedModal({
   };
 
   return (
-    <Modal open={true} onClose={onClose} title="Token criado com sucesso" dismissible={false}>
+    <Modal
+      open={true}
+      onClose={onClose}
+      title="Token criado com sucesso"
+      dismissible={false}
+      className="bg-card dark:bg-card-dark"
+    >
       <div className="space-y-4">
         <div className="flex items-start gap-3 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-950/50 border border-yellow-200 dark:border-yellow-800">
           <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
@@ -299,7 +310,7 @@ function TokenCreatedModal({
           <Input
             readOnly
             value={token}
-            className="pr-12 font-mono text-xs bg-gray-50 dark:bg-gray-900 border-border dark:border-border-dark text-text dark:text-text-dark"
+            className="pr-12 font-mono text-xs bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark"
             onClick={(e) => (e.target as HTMLInputElement).select()}
           />
           <button

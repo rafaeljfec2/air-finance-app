@@ -1,10 +1,11 @@
+import { Camera, Mail, MapPin, Phone, Save, User, X } from 'lucide-react';
 import React from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Mail, MapPin, Phone, Save, User, X } from 'lucide-react';
 
 interface ProfilePersonalSectionProps {
   readonly formData: {
