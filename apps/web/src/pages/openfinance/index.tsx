@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link2 } from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { OpenBankingPaywallModal } from '@/components/accounts/OpenBankingPaywallModal';
@@ -68,7 +68,8 @@ export function OpenFinancePage() {
   const [selectedConnector, setSelectedConnector] = useState<OpeniConnector | null>(null);
   const [createdItemId, setCreatedItemId] = useState<string | null>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
-  const [importedItemIds, setImportedItemIds] = useState<Set<string>>(new Set());
+  const importedItemIdsRef = useRef<Set<string>>(new Set());
+  const isAutoImportingRef = useRef(false);
   const [showPaywall, setShowPaywall] = useState(false);
 
   const hasOpeniTenant = Boolean(openiTenantId?.trim());
@@ -85,8 +86,7 @@ export function OpenFinancePage() {
     queryKey: ['openi-items', companyId],
     queryFn: () => getItems(companyId),
     enabled: !!companyId && hasOpeniTenant,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 30_000,
     retry: false,
   });
 
@@ -156,25 +156,40 @@ export function OpenFinancePage() {
     onSuccess: undefined, // No redirect
   });
 
-  // Auto-import accounts for items with SYNCED status
   useEffect(() => {
     if (!existingItems || existingItems.length === 0) return;
+    if (isAutoImportingRef.current) return;
 
     const syncedItems = existingItems.filter(
-      (item) => item.status.toUpperCase() === 'SYNCED' && !importedItemIds.has(item.itemId),
+      (item) =>
+        item.status.toUpperCase() === 'SYNCED' && !importedItemIdsRef.current.has(item.itemId),
     );
 
-    if (syncedItems.length > 0) {
-      console.log('[OpenFinancePage] Found SYNCED items, importing accounts:', syncedItems);
+    if (syncedItems.length === 0) return;
 
+    isAutoImportingRef.current = true;
+
+    const processSequentially = async () => {
       for (const item of syncedItems) {
-        setImportedItemIds((prev) => new Set(prev).add(item.itemId));
-        importAccountsSilent(item.itemId, item.status).catch((error) => {
+        if (importedItemIdsRef.current.has(item.itemId)) continue;
+        importedItemIdsRef.current.add(item.itemId);
+
+        try {
+          await importAccountsSilent(item.itemId, item.status);
+        } catch (error) {
           console.error('[OpenFinancePage] Error importing accounts for item:', item.itemId, error);
-        });
+        }
+
+        if (syncedItems.indexOf(item) < syncedItems.length - 1) {
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+        }
       }
-    }
-  }, [existingItems, importedItemIds, importAccountsSilent]);
+
+      isAutoImportingRef.current = false;
+    };
+
+    processSequentially();
+  }, [existingItems, importAccountsSilent]);
 
   const sseStep: ModalStep = step === 'loading' ? 'cpf-input' : step;
 

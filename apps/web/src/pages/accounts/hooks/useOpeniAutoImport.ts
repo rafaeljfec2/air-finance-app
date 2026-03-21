@@ -1,13 +1,20 @@
-import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
+
 import { toast } from '@/components/ui/toast';
 import { getAccounts, importAccounts, type OpeniItem } from '@/services/openiService';
 
 interface UseOpeniAutoImportParams {
-  open: boolean;
-  existingItems: OpeniItem[] | undefined;
-  isLoadingExistingItems: boolean;
-  companyId: string;
+  readonly open: boolean;
+  readonly existingItems: OpeniItem[] | undefined;
+  readonly isLoadingExistingItems: boolean;
+  readonly companyId: string;
+}
+
+const DELAY_BETWEEN_IMPORTS_MS = 3000;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export const useOpeniAutoImport = ({
@@ -17,61 +24,64 @@ export const useOpeniAutoImport = ({
   companyId,
 }: UseOpeniAutoImportParams) => {
   const queryClient = useQueryClient();
-  const [importedItems, setImportedItems] = useState<Set<string>>(new Set());
+  const importedItemsRef = useRef<Set<string>>(new Set());
+  const isProcessingRef = useRef(false);
 
   useEffect(() => {
     if (!open) {
-      setImportedItems(new Set());
+      importedItemsRef.current = new Set();
+      isProcessingRef.current = false;
       return;
     }
 
-    if (open && existingItems && existingItems.length > 0 && !isLoadingExistingItems) {
-      const connectedItems = existingItems.filter(
-        (item) =>
-          (item.status === 'CONNECTED' || item.status === 'SYNCING' || item.status === 'SYNCED') &&
-          !importedItems.has(item.itemId),
-      );
+    if (!existingItems || existingItems.length === 0 || isLoadingExistingItems) return;
+    if (isProcessingRef.current) return;
 
-      if (connectedItems.length > 0) {
-        console.log(
-          '[OpenFinanceModal] Found connected items, importing accounts automatically:',
-          connectedItems.map((i) => ({ itemId: i.itemId, status: i.status })),
-        );
+    const connectedItems = existingItems.filter(
+      (item) =>
+        (item.status === 'CONNECTED' || item.status === 'SYNCING' || item.status === 'SYNCED') &&
+        !importedItemsRef.current.has(item.itemId),
+    );
 
-        connectedItems.forEach(async (item) => {
-          try {
-            const availableAccounts = await getAccounts(companyId, item.itemId);
+    if (connectedItems.length === 0) return;
 
-            if (availableAccounts && availableAccounts.length > 0) {
-              const accountIds = availableAccounts.map((acc) => acc.id);
-              console.log(
-                `[OpenFinanceModal] Auto-importing ${accountIds.length} accounts for item ${item.itemId}`,
-              );
+    isProcessingRef.current = true;
 
-              const importResult = await importAccounts(companyId, item.itemId, accountIds);
+    const processItems = async () => {
+      for (const item of connectedItems) {
+        if (importedItemsRef.current.has(item.itemId)) continue;
+        importedItemsRef.current.add(item.itemId);
 
-              console.log('[OpenFinanceModal] Auto-import completed:', importResult);
+        try {
+          const availableAccounts = await getAccounts(companyId, item.itemId);
 
-              setImportedItems((prev) => new Set(prev).add(item.itemId));
-              queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
-
-              toast.success(`${importResult.data.imported} conta(s) importada(s) automaticamente!`);
-            } else {
-              console.log(`[OpenFinanceModal] No accounts found for item ${item.itemId}`);
-            }
-          } catch (error) {
-            console.error(
-              `[OpenFinanceModal] Error auto-importing accounts for item ${item.itemId}:`,
-              error,
-            );
+          if (availableAccounts && availableAccounts.length > 0) {
+            const accountIds = availableAccounts.map((acc) => acc.id);
+            const importResult = await importAccounts(companyId, item.itemId, accountIds);
+            toast.success(`${importResult.data.imported} conta(s) importada(s) automaticamente!`);
           }
-        });
+        } catch (error) {
+          console.error(
+            `[OpenFinanceModal] Error auto-importing accounts for item ${item.itemId}:`,
+            error,
+          );
+        }
+
+        if (connectedItems.indexOf(item) < connectedItems.length - 1) {
+          await delay(DELAY_BETWEEN_IMPORTS_MS);
+        }
       }
-    }
-  }, [open, existingItems, isLoadingExistingItems, companyId, queryClient, importedItems]);
+
+      queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+      isProcessingRef.current = false;
+    };
+
+    processItems();
+  }, [open, existingItems, isLoadingExistingItems, companyId, queryClient]);
 
   const resetImportedItems = () => {
-    setImportedItems(new Set());
+    importedItemsRef.current = new Set();
+    isProcessingRef.current = false;
   };
 
   return {

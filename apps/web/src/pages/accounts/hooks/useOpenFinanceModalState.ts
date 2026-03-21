@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+
 import type { OpeniConnector, OpeniItem } from '@/services/openiService';
+
 import type { ModalStep } from './handlers/openiStatusHandlers';
 
 interface UseOpenFinanceModalStateParams {
@@ -22,7 +23,6 @@ export const useOpenFinanceModalState = ({
   isLoadingExistingItems,
   isFetchingExistingItems,
 }: UseOpenFinanceModalStateParams) => {
-  const queryClient = useQueryClient();
   const [step, setStep] = useState<ModalStep>('cpf-input');
   const [cpfCnpj, setCpfCnpj] = useState(companyDocument ?? '');
   const [selectedConnector, setSelectedConnector] = useState<OpeniConnector | null>(null);
@@ -35,12 +35,11 @@ export const useOpenFinanceModalState = ({
     if (open && companyId && openiTenantId) {
       setHasJustOpened(true);
       setIsInitializing(true);
-      queryClient.invalidateQueries({ queryKey: ['openi-items', companyId] });
     } else if (!open) {
       setHasJustOpened(false);
       setIsInitializing(false);
     }
-  }, [open, companyId, openiTenantId, queryClient]);
+  }, [open, companyId, openiTenantId]);
 
   const shouldShowLoading = useMemo(() => {
     if (!open) return false;
@@ -48,7 +47,14 @@ export const useOpenFinanceModalState = ({
     if (!hasOpeniTenant) return false;
     const isQueryLoading = isLoadingExistingItems || isFetchingExistingItems;
     return isQueryLoading || (hasJustOpened && existingItems === undefined);
-  }, [open, openiTenantId, isLoadingExistingItems, isFetchingExistingItems, hasJustOpened, existingItems]);
+  }, [
+    open,
+    openiTenantId,
+    isLoadingExistingItems,
+    isFetchingExistingItems,
+    hasJustOpened,
+    existingItems,
+  ]);
 
   const determineStep = useMemo(() => {
     if (!open) return 'cpf-input';
@@ -63,11 +69,11 @@ export const useOpenFinanceModalState = ({
     if (open) {
       setIsInitializing(shouldShowLoading);
       setStep(determineStep);
-      
+
       if (!shouldShowLoading) {
         setHasJustOpened(false);
       }
-      
+
       if (companyDocument) {
         setCpfCnpj(companyDocument);
       }

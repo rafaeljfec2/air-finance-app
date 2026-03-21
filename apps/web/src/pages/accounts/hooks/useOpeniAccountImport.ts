@@ -1,5 +1,6 @@
-import { useCallback, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useRef, useEffect } from 'react';
+
 import { toast } from '@/components/ui/toast';
 import { getAccounts, importAccounts } from '@/services/openiService';
 
@@ -67,23 +68,16 @@ export const useOpeniAccountImport = ({ companyId, onSuccess }: UseOpeniAccountI
 
   const importAccountsWithRetry = useCallback(
     async (itemId: string, status: string): Promise<void> => {
-      const maxRetries = 5;
-      const retryDelays = [2000, 3000, 5000, 8000, 10000];
+      const maxRetries = 3;
+      const retryDelays = [6000, 10000, 15000];
 
       for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
-          console.log(
-            `[OpenFinanceModal] Fetching available accounts for itemId: ${itemId} (attempt ${attempt + 1}/${maxRetries})`,
-          );
           const availableAccounts = await getAccounts(companyId, itemId);
 
           if (availableAccounts && availableAccounts.length > 0) {
             const accountIds = availableAccounts.map((acc) => acc.id);
-            console.log('[OpenFinanceModal] Importing accounts:', accountIds);
-
             const importResult = await importAccounts(companyId, itemId, accountIds);
-            console.log('[OpenFinanceModal] Accounts imported successfully:', importResult);
-
             handleSuccessfulImport(importResult, status);
             return;
           }

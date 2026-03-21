@@ -1,19 +1,21 @@
-import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
+
 import { toast } from '@/components/ui/toast';
+import { useAccounts } from '@/hooks/useAccounts';
 import {
   getConnectors,
   getItems,
   type OpeniConnector,
   type OpeniItem,
 } from '@/services/openiService';
+
+import { processConflictError } from './handlers/openiStatusHandlers';
 import { useOpenFinanceModalState } from './useOpenFinanceModalState';
 import { useOpenFinanceMutations } from './useOpenFinanceMutations';
 import { useOpeniAccountImport } from './useOpeniAccountImport';
-import { useOpeniSseHandler } from './useOpeniSseHandler';
 import { useOpeniAutoImport } from './useOpeniAutoImport';
-import { processConflictError } from './handlers/openiStatusHandlers';
-import { useAccounts } from '@/hooks/useAccounts';
+import { useOpeniSseHandler } from './useOpeniSseHandler';
 
 interface UseOpenFinanceModalProps {
   companyId: string;
@@ -41,10 +43,8 @@ export function useOpenFinanceModal({
     queryKey: ['openi-items', companyId],
     queryFn: () => getItems(companyId),
     enabled: !!companyId && !!open && !!openiTenantId,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 30_000,
     retry: false,
-    refetchOnMount: 'always',
     refetchOnWindowFocus: false,
   });
 
