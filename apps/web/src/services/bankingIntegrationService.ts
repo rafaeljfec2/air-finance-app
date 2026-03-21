@@ -150,15 +150,7 @@ export async function syncStatementNow(accountId: string): Promise<{ success: bo
  * Read file content as text
  */
 export function fileToText(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsText(file);
-    reader.onload = () => {
-      const content = reader.result as string;
-      resolve(content);
-    };
-    reader.onerror = (error) => reject(error);
-  });
+  return file.text();
 }
 
 /**
@@ -192,7 +184,7 @@ export function validatePixKey(key: string): { valid: boolean; type?: string } {
   }
 
   // Telefone (11 dígitos)
-  const phoneClean = key.replace(/\D/g, '');
+  const phoneClean = key.replaceAll(/\D/g, '');
   if (phoneClean.length === 10 || phoneClean.length === 11) {
     return { valid: true, type: 'PHONE' };
   }

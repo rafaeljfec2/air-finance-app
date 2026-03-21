@@ -1,8 +1,11 @@
 import { useState, useCallback } from 'react';
+
+import { toast } from '@/components/ui/toast';
 import { useAccounts } from '@/hooks/useAccounts';
-import { useCompanyStore } from '@/stores/company';
-import { companyService } from '@/services/companyService';
 import type { Account, CreateAccount } from '@/services/accountService';
+import { companyService } from '@/services/companyService';
+import { openBankingService, type OpenBankingEntitlement } from '@/services/subscriptionService';
+import { useCompanyStore } from '@/stores/company';
 
 interface OpenFinanceCompanyData {
   readonly openiTenantId?: string;
@@ -26,6 +29,8 @@ export function useAccountsPageModals() {
   const [showOpenFinanceModal, setShowOpenFinanceModal] = useState(false);
   const [openFinanceCompanyData, setOpenFinanceCompanyData] =
     useState<OpenFinanceCompanyData | null>(null);
+  const [showPaywallModal, setShowPaywallModal] = useState(false);
+  const [paywallEntitlement, setPaywallEntitlement] = useState<OpenBankingEntitlement | null>(null);
 
   const handleCreate = useCallback(() => {
     setEditingAccount(null);
@@ -104,32 +109,45 @@ export function useAccountsPageModals() {
   }, []);
 
   const handleConnectOpenFinance = useCallback(async () => {
-    if (activeCompany?.id) {
-      try {
-        const company = await companyService.getById(activeCompany.id);
-        setActiveCompany(company);
-        setOpenFinanceCompanyData({
-          openiTenantId: company.openiTenantId,
-          companyDocument: company.cnpj,
-        });
-        setShowOpenFinanceModal(true);
-      } catch (err) {
-        console.error('Failed to refresh company data:', err);
-        setOpenFinanceCompanyData({
-          openiTenantId: activeCompany.openiTenantId,
-          companyDocument: activeCompany.cnpj,
-        });
-        setShowOpenFinanceModal(true);
-      }
-    } else {
+    if (!activeCompany?.id) {
       setOpenFinanceCompanyData(null);
       setShowOpenFinanceModal(true);
+      return;
+    }
+
+    try {
+      const [company, entitlement] = await Promise.all([
+        companyService.getById(activeCompany.id),
+        openBankingService.getEntitlement(activeCompany.id),
+      ]);
+
+      setActiveCompany(company);
+
+      if (entitlement.entitledSlots === 0 || !entitlement.canConnect) {
+        setPaywallEntitlement(entitlement);
+        setShowPaywallModal(true);
+        return;
+      }
+
+      setOpenFinanceCompanyData({
+        openiTenantId: company.openiTenantId,
+        companyDocument: company.cnpj,
+      });
+      setShowOpenFinanceModal(true);
+    } catch (err) {
+      console.error('Failed to check Open Banking entitlement:', err);
+      toast.error('Não foi possível verificar o acesso ao Open Banking. Tente novamente.');
     }
   }, [activeCompany, setActiveCompany]);
 
   const handleCloseOpenFinanceModal = useCallback(() => {
     setShowOpenFinanceModal(false);
     setOpenFinanceCompanyData(null);
+  }, []);
+
+  const handleClosePaywallModal = useCallback(() => {
+    setShowPaywallModal(false);
+    setPaywallEntitlement(null);
   }, []);
 
   const handleIntegrationSuccess = useCallback(async () => {
@@ -180,6 +198,11 @@ export function useAccountsPageModals() {
       companyData: openFinanceCompanyData,
       onClose: handleCloseOpenFinanceModal,
       onSuccess: handleIntegrationSuccess,
+    },
+    paywallModal: {
+      isOpen: showPaywallModal,
+      entitlement: paywallEntitlement,
+      onClose: handleClosePaywallModal,
     },
     handlers: {
       onCreate: handleCreate,

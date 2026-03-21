@@ -1,4 +1,5 @@
 import { Plan } from '@/types/subscription';
+
 import { apiClient } from './apiClient';
 
 export interface CheckoutResponse {
@@ -87,3 +88,26 @@ export interface UpdatePlanData {
   };
   highlight?: boolean;
 }
+
+export interface OpenBankingEntitlement {
+  readonly entitledSlots: number;
+  readonly usedSlots: number;
+  readonly canConnect: boolean;
+}
+
+export const openBankingService = {
+  async getEntitlement(companyId: string): Promise<OpenBankingEntitlement> {
+    const { data } = await apiClient.get<OpenBankingEntitlement>(
+      `/subscription/open-banking/entitlement/${companyId}`,
+    );
+    return data;
+  },
+
+  async createCheckoutSession(companyId: string, quantity: number): Promise<CheckoutResponse> {
+    const { data } = await apiClient.post<CheckoutResponse>('/subscription/checkout/open-banking', {
+      companyId,
+      quantity,
+    });
+    return data;
+  },
+};

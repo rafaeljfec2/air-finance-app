@@ -1,7 +1,9 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 
 import { Loading } from '@/components/Loading';
+import { toast } from '@/components/ui/toast';
 import { useAccounts } from '@/hooks/useAccounts';
 import { usePlanLimits } from '@/hooks/usePlanLimits';
 import { useViewMode } from '@/hooks/useViewMode';
@@ -31,6 +33,20 @@ export function AccountsManagementPage() {
   const { canCreateAccount } = usePlanLimits();
   const user = useAuthStore((state) => state.user);
   const isGod = user?.role === UserRole.GOD;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (searchParams.get('open_banking_success') === 'true') {
+      toast.success('Open Banking ativado com sucesso! Agora você pode conectar suas contas.');
+      queryClient.invalidateQueries({ queryKey: ['open-banking-entitlement'] });
+      setSearchParams({}, { replace: true });
+    }
+    if (searchParams.get('open_banking_canceled') === 'true') {
+      toast.info('Pagamento cancelado. Você pode tentar novamente a qualquer momento.');
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams, queryClient]);
 
   useEffect(() => {
     if (activeCompany?.id && !activeCompany.documentType) {
@@ -59,6 +75,7 @@ export function AccountsManagementPage() {
     scheduleModal,
     pierreModal,
     openFinanceModal,
+    paywallModal,
     handlers,
   } = useAccountsPageModals();
 
@@ -145,6 +162,7 @@ export function AccountsManagementPage() {
         scheduleModal={scheduleModal}
         pierreModal={pierreModal}
         openFinanceModal={openFinanceModal}
+        paywallModal={paywallModal}
         onConfigureIntegration={handlers.onConfigureIntegration}
         isGod={isGod}
         isPierreAvailable={isPierreAvailable}

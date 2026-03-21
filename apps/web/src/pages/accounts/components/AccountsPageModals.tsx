@@ -1,10 +1,12 @@
 import { AccountFormModal } from '@/components/accounts/AccountFormModal';
 import { BankingIntegrationModal } from '@/components/accounts/BankingIntegrationModal';
+import { OpenBankingPaywallModal } from '@/components/accounts/OpenBankingPaywallModal';
 import { OpenFinanceConnectModal } from '@/components/accounts/OpenFinanceConnectModal';
 import { PierreConnectModal } from '@/components/accounts/PierreConnectModal';
 import { StatementScheduleConfig } from '@/components/accounts/StatementScheduleConfig';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import type { Account, CreateAccount } from '@/services/accountService';
+import type { OpenBankingEntitlement } from '@/services/subscriptionService';
 
 interface FormModalState {
   readonly isOpen: boolean;
@@ -50,6 +52,12 @@ interface OpenFinanceModalState {
   readonly onSuccess: () => void;
 }
 
+interface PaywallModalState {
+  readonly isOpen: boolean;
+  readonly entitlement: OpenBankingEntitlement | null;
+  readonly onClose: () => void;
+}
+
 interface CompanyInfo {
   readonly id: string;
   readonly documentType?: string;
@@ -65,6 +73,7 @@ interface AccountsPageModalsProps {
   readonly scheduleModal: ScheduleModalState;
   readonly pierreModal: PierreModalState;
   readonly openFinanceModal: OpenFinanceModalState;
+  readonly paywallModal: PaywallModalState;
   readonly onConfigureIntegration: (account: Account) => void;
   readonly isGod: boolean;
   readonly isPierreAvailable: boolean;
@@ -78,6 +87,7 @@ export function AccountsPageModals({
   scheduleModal,
   pierreModal,
   openFinanceModal,
+  paywallModal,
   onConfigureIntegration,
   isGod,
   isPierreAvailable,
@@ -131,6 +141,16 @@ export function AccountsPageModals({
           openiTenantId={openFinanceModal.companyData?.openiTenantId ?? activeCompany.openiTenantId}
           companyDocument={openFinanceModal.companyData?.companyDocument ?? activeCompany.cnpj}
           onSuccess={openFinanceModal.onSuccess}
+        />
+      )}
+
+      {activeCompany && paywallModal.isOpen && (
+        <OpenBankingPaywallModal
+          open={paywallModal.isOpen}
+          onClose={paywallModal.onClose}
+          companyId={activeCompany.id}
+          currentSlots={paywallModal.entitlement?.entitledSlots ?? 0}
+          usedSlots={paywallModal.entitlement?.usedSlots ?? 0}
         />
       )}
 

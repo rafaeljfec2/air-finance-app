@@ -1,26 +1,30 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Link2 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { OpenBankingPaywallModal } from '@/components/accounts/OpenBankingPaywallModal';
+import { LoadingState } from '@/components/accounts/OpenFinanceConnectModal.LoadingState';
+import { OAuthWaitingStep } from '@/components/accounts/OpenFinanceConnectModal.OAuthWaitingStep';
 import { toast } from '@/components/ui/toast';
-import { Link2 } from 'lucide-react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { useCompanyStore } from '@/stores/company';
 import { useAccounts } from '@/hooks/useAccounts';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import {
+  processConflictError,
+  type ModalStep,
+} from '@/pages/accounts/hooks/handlers/openiStatusHandlers';
+import { useOpenFinanceMutations } from '@/pages/accounts/hooks/useOpenFinanceMutations';
+import { useOpeniAccountImport } from '@/pages/accounts/hooks/useOpeniAccountImport';
+import { useOpeniSseHandler } from '@/pages/accounts/hooks/useOpeniSseHandler';
 import {
   getConnectors,
   getItems,
   type OpeniConnector,
   type OpeniItem,
 } from '@/services/openiService';
-import { useOpenFinanceMutations } from '@/pages/accounts/hooks/useOpenFinanceMutations';
-import { useOpeniAccountImport } from '@/pages/accounts/hooks/useOpeniAccountImport';
-import { useOpeniSseHandler } from '@/pages/accounts/hooks/useOpeniSseHandler';
-import {
-  processConflictError,
-  type ModalStep,
-} from '@/pages/accounts/hooks/handlers/openiStatusHandlers';
-import { LoadingState } from '@/components/accounts/OpenFinanceConnectModal.LoadingState';
-import { OAuthWaitingStep } from '@/components/accounts/OpenFinanceConnectModal.OAuthWaitingStep';
+import { openBankingService } from '@/services/subscriptionService';
+import { useCompanyStore } from '@/stores/company';
+
 import { PageExistingConnections, PageCpfInput, PageConnectorSelection } from './components';
 
 type PageStep =
@@ -65,9 +69,17 @@ export function OpenFinancePage() {
   const [createdItemId, setCreatedItemId] = useState<string | null>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
   const [importedItemIds, setImportedItemIds] = useState<Set<string>>(new Set());
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const hasOpeniTenant = Boolean(openiTenantId?.trim());
   const isCompanyLoaded = Boolean(activeCompany);
+
+  const { data: entitlement, isLoading: isLoadingEntitlement } = useQuery({
+    queryKey: ['open-banking-entitlement', companyId],
+    queryFn: () => openBankingService.getEntitlement(companyId),
+    enabled: !!companyId,
+    staleTime: 30_000,
+  });
 
   const { data: existingItems, isLoading: isLoadingExistingItems } = useQuery<OpeniItem[]>({
     queryKey: ['openi-items', companyId],
@@ -79,13 +91,22 @@ export function OpenFinancePage() {
   });
 
   useEffect(() => {
-    // Wait for company to load
     if (!isCompanyLoaded) {
       setStep('loading');
       return;
     }
 
-    // If no OpenI tenant, go directly to CPF input
+    if (isLoadingEntitlement) {
+      setStep('loading');
+      return;
+    }
+
+    if (entitlement?.entitledSlots === 0) {
+      setShowPaywall(true);
+      setStep('loading');
+      return;
+    }
+
     if (!hasOpeniTenant) {
       if (!hasInitialized) {
         setStep('cpf-input');
@@ -94,18 +115,24 @@ export function OpenFinancePage() {
       return;
     }
 
-    // Wait for items to load
     if (isLoadingExistingItems) {
       setStep('loading');
       return;
     }
 
-    // Only set initial step once when data arrives
     if (!hasInitialized && existingItems !== undefined) {
       setStep(existingItems.length > 0 ? 'existing-connections' : 'cpf-input');
       setHasInitialized(true);
     }
-  }, [isCompanyLoaded, hasOpeniTenant, isLoadingExistingItems, existingItems, hasInitialized]);
+  }, [
+    isCompanyLoaded,
+    hasOpeniTenant,
+    isLoadingExistingItems,
+    existingItems,
+    hasInitialized,
+    isLoadingEntitlement,
+    entitlement,
+  ]);
 
   useEffect(() => {
     if (companyDocument) {
@@ -265,6 +292,19 @@ export function OpenFinancePage() {
 
   return (
     <ViewDefault>
+      {companyId && showPaywall && (
+        <OpenBankingPaywallModal
+          open={showPaywall}
+          onClose={() => {
+            setShowPaywall(false);
+            navigate('/accounts');
+          }}
+          companyId={companyId}
+          currentSlots={entitlement?.entitledSlots ?? 0}
+          usedSlots={entitlement?.usedSlots ?? 0}
+        />
+      )}
+
       <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
         <div className="container mx-auto px-4 py-4 lg:py-6 max-w-2xl">
           <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark overflow-hidden">
