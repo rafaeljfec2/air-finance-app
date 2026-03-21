@@ -17,6 +17,7 @@ import {
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { OpenBankingPaywallModal } from '@/components/accounts/OpenBankingPaywallModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -324,6 +325,7 @@ function OpenFinanceCard({
   companyId: string | undefined;
 }>) {
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showPaywallModal, setShowPaywallModal] = useState(false);
 
   if (isLoading) {
     return (
@@ -457,11 +459,8 @@ function OpenFinanceCard({
               </div>
 
               <Button
-                onClick={() => {
-                  if (companyId) {
-                    globalThis.location.href = `/accounts?open_banking=true`;
-                  }
-                }}
+                onClick={() => setShowPaywallModal(true)}
+                disabled={!companyId}
                 className="w-full sm:w-auto gap-2 bg-purple-600 hover:bg-purple-700 text-white"
               >
                 <Link2 className="h-4 w-4" />
@@ -479,6 +478,16 @@ function OpenFinanceCard({
         isCancelling={false}
         planName="Open Finance"
       />
+
+      {companyId && (
+        <OpenBankingPaywallModal
+          open={showPaywallModal}
+          onClose={() => setShowPaywallModal(false)}
+          companyId={companyId}
+          currentSlots={totalSlots}
+          usedSlots={usedSlots}
+        />
+      )}
     </>
   );
 }
