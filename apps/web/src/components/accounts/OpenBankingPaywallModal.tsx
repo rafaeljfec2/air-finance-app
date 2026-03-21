@@ -1,12 +1,13 @@
+import { useQuery } from '@tanstack/react-query';
 import { Link2, Minus, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 import { Modal } from '@/components/ui/Modal';
-import { openBankingService } from '@/services/subscriptionService';
+import { openBankingService, subscriptionService } from '@/services/subscriptionService';
 
-const SLOT_PRICE_BRL = 6.99;
 const MIN_SLOTS = 1;
 const MAX_SLOTS = 20;
+const FALLBACK_PRICE = 7.99;
 
 interface OpenBankingPaywallModalProps {
   readonly open: boolean;
@@ -27,6 +28,14 @@ export function OpenBankingPaywallModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { data: plans } = useQuery({
+    queryKey: ['subscription-plans'],
+    queryFn: () => subscriptionService.getPlans(),
+    staleTime: 300_000,
+  });
+
+  const slotPrice = plans?.find((p) => p.name === 'open_banking')?.priceMonthly ?? FALLBACK_PRICE;
+
   useEffect(() => {
     if (open) {
       setQuantity(Math.max(MIN_SLOTS, usedSlots + 1 - currentSlots));
@@ -35,7 +44,8 @@ export function OpenBankingPaywallModal({
     }
   }, [open, usedSlots, currentSlots]);
 
-  const totalPrice = (quantity * SLOT_PRICE_BRL).toFixed(2).replace('.', ',');
+  const totalPrice = (quantity * slotPrice).toFixed(2).replace('.', ',');
+  const unitPrice = slotPrice.toFixed(2).replace('.', ',');
 
   const handleIncrement = () => {
     setQuantity((prev) => Math.min(prev + 1, MAX_SLOTS));
@@ -116,7 +126,7 @@ export function OpenBankingPaywallModal({
             <div className="border-t border-purple-100 dark:border-purple-800/30 pt-3">
               <div className="flex items-baseline justify-between">
                 <span className="text-sm text-muted-foreground dark:text-gray-400">
-                  {quantity} {slotLabel} × R$ 6,99/mês
+                  {quantity} {slotLabel} × R$ {unitPrice}/mês
                 </span>
                 <span className="text-xl font-bold text-text dark:text-text-dark">
                   R$ {totalPrice}

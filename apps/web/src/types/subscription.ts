@@ -1,4 +1,4 @@
-export type PlanName = 'free' | 'pro' | 'business';
+export type PlanName = 'free' | 'pro' | 'business' | 'open_banking';
 
 export interface PlanLimits {
   maxAccounts: number; // -1 for unlimited
