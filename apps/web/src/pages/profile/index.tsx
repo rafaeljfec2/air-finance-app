@@ -1,14 +1,17 @@
+import { Bell, Bot, CreditCard, Key, Palette, User } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
+
 import { Spinner } from '@/components/ui/spinner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useAuthStore } from '@/stores/auth';
-import { Bell, Bot, CreditCard, Palette, User } from 'lucide-react';
+
 import {
   ProfilePersonalSection,
   ProfilePreferencesSection,
   ProfileNotificationsSection,
   ProfileIntegrationsSection,
+  ProfileApiTokensSection,
   ProfileSubscriptionSection,
 } from './components';
 import {
@@ -100,7 +103,7 @@ export function Profile() {
           </div>
 
           <Tabs defaultValue={defaultTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-5 mb-6">
+            <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 mb-6">
               <TabsTrigger value="personal" className="gap-2">
                 <User className="h-4 w-4" />
                 <span className="hidden sm:inline">Pessoal</span>
@@ -116,6 +119,10 @@ export function Profile() {
               <TabsTrigger value="integrations" className="gap-2">
                 <Bot className="h-4 w-4" />
                 <span className="hidden sm:inline">Integrações</span>
+              </TabsTrigger>
+              <TabsTrigger value="api-tokens" className="gap-2">
+                <Key className="h-4 w-4" />
+                <span className="hidden sm:inline">API Tokens</span>
               </TabsTrigger>
               <TabsTrigger value="subscription" className="gap-2">
                 <CreditCard className="h-4 w-4" />
@@ -163,6 +170,10 @@ export function Profile() {
                 onChange={integrationsSection.handleChange}
                 onSave={integrationsSection.handleSave}
               />
+            </TabsContent>
+
+            <TabsContent value="api-tokens">
+              <ProfileApiTokensSection />
             </TabsContent>
 
             <TabsContent value="subscription">

@@ -34,6 +34,7 @@ export const VALID_TABS = [
   'preferences',
   'notifications',
   'integrations',
+  'api-tokens',
   'subscription',
 ] as const;
 

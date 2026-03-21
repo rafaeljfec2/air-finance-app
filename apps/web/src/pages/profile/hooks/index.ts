@@ -4,3 +4,4 @@ export { useProfilePersonal } from './useProfilePersonal';
 export { useProfilePreferences } from './useProfilePreferences';
 export { useProfileNotifications } from './useProfileNotifications';
 export { useProfileIntegrations } from './useProfileIntegrations';
+export { useProfileApiTokens } from './useProfileApiTokens';
