@@ -12,7 +12,11 @@ interface OpenFinanceCompanyData {
   readonly companyDocument?: string;
 }
 
-export function useAccountsPageModals() {
+interface UseAccountsPageModalsOptions {
+  readonly isGod?: boolean;
+}
+
+export function useAccountsPageModals({ isGod = false }: UseAccountsPageModalsOptions = {}) {
   const { activeCompany, setActiveCompany } = useCompanyStore();
   const { createAccount, updateAccount, deleteAccount, isCreating, isUpdating, isDeleting } =
     useAccounts();
@@ -123,7 +127,9 @@ export function useAccountsPageModals() {
 
       setActiveCompany(company);
 
-      if (entitlement.entitledSlots === 0 || !entitlement.canConnect) {
+      const godBypass = isGod || entitlement.isGodBypass;
+
+      if (!godBypass && (entitlement.entitledSlots === 0 || !entitlement.canConnect)) {
         setPaywallEntitlement(entitlement);
         setShowPaywallModal(true);
         return;
@@ -138,7 +144,7 @@ export function useAccountsPageModals() {
       console.error('Failed to check Open Banking entitlement:', err);
       toast.error('Não foi possível verificar o acesso ao Open Banking. Tente novamente.');
     }
-  }, [activeCompany, setActiveCompany]);
+  }, [activeCompany, setActiveCompany, isGod]);
 
   const handleCloseOpenFinanceModal = useCallback(() => {
     setShowOpenFinanceModal(false);

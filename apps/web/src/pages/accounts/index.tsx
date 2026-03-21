@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useEffect } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 
@@ -9,6 +9,7 @@ import { usePlanLimits } from '@/hooks/usePlanLimits';
 import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { companyService } from '@/services/companyService';
+import { openBankingService } from '@/services/subscriptionService';
 import { useAuthStore } from '@/stores/auth';
 import { useCompanyStore } from '@/stores/company';
 import { UserRole } from '@/types/user';
@@ -35,6 +36,13 @@ export function AccountsManagementPage() {
   const isGod = user?.role === UserRole.GOD;
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
+
+  const { data: entitlement } = useQuery({
+    queryKey: ['open-banking-entitlement', activeCompany?.id],
+    queryFn: () => openBankingService.getEntitlement(activeCompany!.id),
+    enabled: !!activeCompany?.id,
+    staleTime: 60_000,
+  });
 
   useEffect(() => {
     if (searchParams.get('open_banking_success') === 'true') {
@@ -77,7 +85,7 @@ export function AccountsManagementPage() {
     openFinanceModal,
     paywallModal,
     handlers,
-  } = useAccountsPageModals();
+  } = useAccountsPageModals({ isGod });
 
   const filteredAndSortedAccounts = useMemo(() => {
     if (!accounts) return [];
@@ -125,6 +133,8 @@ export function AccountsManagementPage() {
             canCreate={canCreateAccount}
             onConnectPierre={isGod && isPierreAvailable ? handlers.onConnectPierre : undefined}
             onConnectOpenFinance={handlers.onConnectOpenFinance}
+            entitlement={entitlement}
+            isGod={isGod}
           />
 
           <AccountsFilters

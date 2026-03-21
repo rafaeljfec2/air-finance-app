@@ -1,11 +1,32 @@
-import { Button } from '@/components/ui/button';
 import { Banknote, Plus, Link2 } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
+import type { OpenBankingEntitlement } from '@/services/subscriptionService';
+
 interface AccountsHeaderProps {
-  onCreate: () => void;
-  canCreate: boolean;
-  onConnectPierre?: () => void;
-  onConnectOpenFinance?: () => void;
+  readonly onCreate: () => void;
+  readonly canCreate: boolean;
+  readonly onConnectPierre?: () => void;
+  readonly onConnectOpenFinance?: () => void;
+  readonly entitlement?: OpenBankingEntitlement | null;
+  readonly isGod?: boolean;
+}
+
+function SlotBadge({ entitlement }: Readonly<{ entitlement: OpenBankingEntitlement }>) {
+  const available = entitlement.entitledSlots - entitlement.usedSlots;
+  const isFull = available <= 0;
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+        isFull
+          ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+          : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+      }`}
+    >
+      {entitlement.usedSlots}/{entitlement.entitledSlots} Open Finance
+    </span>
+  );
 }
 
 export function AccountsHeader({
@@ -13,7 +34,10 @@ export function AccountsHeader({
   canCreate,
   onConnectPierre,
   onConnectOpenFinance,
+  entitlement,
+  isGod = false,
 }: Readonly<AccountsHeaderProps>) {
+  const showBadge = entitlement && (entitlement.entitledSlots > 0 || isGod);
   return (
     <>
       {/* Mobile Header */}
@@ -42,14 +66,17 @@ export function AccountsHeader({
             </Button>
           )}
           {onConnectOpenFinance && (
-            <Button
-              onClick={onConnectOpenFinance}
-              variant="outline"
-              className="w-full border-purple-500 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/10 flex items-center justify-center gap-2 h-11 rounded-xl font-medium"
-            >
-              <Link2 className="h-5 w-5" />
-              Open Finance
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={onConnectOpenFinance}
+                variant="outline"
+                className="flex-1 border-purple-500 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/10 flex items-center justify-center gap-2 h-11 rounded-xl font-medium"
+              >
+                <Link2 className="h-5 w-5" />
+                Open Finance
+              </Button>
+              {showBadge && <SlotBadge entitlement={entitlement} />}
+            </div>
           )}
           {canCreate && (
             <Button
@@ -91,14 +118,17 @@ export function AccountsHeader({
             </Button>
           )}
           {onConnectOpenFinance && (
-            <Button
-              onClick={onConnectOpenFinance}
-              variant="outline"
-              className="border-purple-500 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/10 flex items-center gap-2 h-12 px-6 rounded-xl font-semibold"
-            >
-              <Link2 className="h-5 w-5" />
-              Open Finance
-            </Button>
+            <>
+              <Button
+                onClick={onConnectOpenFinance}
+                variant="outline"
+                className="border-purple-500 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/10 flex items-center gap-2 h-12 px-6 rounded-xl font-semibold"
+              >
+                <Link2 className="h-5 w-5" />
+                Open Finance
+              </Button>
+              {showBadge && <SlotBadge entitlement={entitlement} />}
+            </>
           )}
           {canCreate && (
             <Button

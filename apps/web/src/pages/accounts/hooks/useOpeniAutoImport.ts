@@ -61,6 +61,15 @@ export const useOpeniAutoImport = ({
             toast.success(`${importResult.data.imported} conta(s) importada(s) automaticamente!`);
           }
         } catch (error) {
+          const status = (error as { response?: { status?: number } })?.response?.status;
+
+          if (status === 403) {
+            toast.warning(
+              'Limite de contas Open Finance atingido. Adquira mais slots para continuar.',
+            );
+            break;
+          }
+
           console.error(
             `[OpenFinanceModal] Error auto-importing accounts for item ${item.itemId}:`,
             error,

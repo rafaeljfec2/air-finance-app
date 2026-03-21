@@ -32,19 +32,33 @@ export const useOpeniAccountImport = ({ companyId, onSuccess }: UseOpeniAccountI
   );
 
   const handleImportError = useCallback(
-    (error: unknown, attempt: number, maxRetries: number, retryDelays: number[]): Promise<void> => {
+    (
+      error: unknown,
+      attempt: number,
+      maxRetries: number,
+      retryDelays: number[],
+    ): Promise<boolean> => {
       console.error(`[OpenFinanceModal] Error importing accounts (attempt ${attempt + 1}):`, error);
+
+      const status = (error as { response?: { status?: number } })?.response?.status;
+
+      if (status === 403) {
+        toast.warning('Limite de contas Open Finance atingido. Adquira mais slots para continuar.');
+        queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+        onSuccessRef.current?.();
+        return Promise.resolve(true);
+      }
 
       if (attempt === maxRetries - 1) {
         const errorMessage = error instanceof Error ? error.message : 'Erro ao importar contas';
         toast.error(`Erro ao importar contas: ${errorMessage}`);
         queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
         onSuccessRef.current?.();
-        return Promise.resolve();
+        return Promise.resolve(true);
       }
 
       const delay = retryDelays[attempt] ?? 10000;
-      return new Promise((resolve) => setTimeout(resolve, delay));
+      return new Promise((resolve) => setTimeout(() => resolve(false), delay));
     },
     [companyId, queryClient],
   );
@@ -84,7 +98,8 @@ export const useOpeniAccountImport = ({ companyId, onSuccess }: UseOpeniAccountI
 
           await handleNoAccountsFound(attempt, maxRetries, retryDelays);
         } catch (error) {
-          await handleImportError(error, attempt, maxRetries, retryDelays);
+          const shouldStop = await handleImportError(error, attempt, maxRetries, retryDelays);
+          if (shouldStop) return;
         }
       }
     },

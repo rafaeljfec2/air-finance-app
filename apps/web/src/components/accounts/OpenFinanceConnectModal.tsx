@@ -1,12 +1,44 @@
+import { useQuery } from '@tanstack/react-query';
+
 import { Modal } from '@/components/ui/Modal';
 import { useOpenFinanceModal } from '@/pages/accounts/hooks/useOpenFinanceModal';
+import { openBankingService } from '@/services/subscriptionService';
+
+import { ConnectorSelectionStep } from './OpenFinanceConnectModal.ConnectorSelectionStep';
+import { MODAL_MAX_WIDTH, MODAL_MAX_HEIGHT } from './OpenFinanceConnectModal.constants';
+import { CpfInputStep } from './OpenFinanceConnectModal.CpfInputStep';
+import { ExistingConnectionsStep } from './OpenFinanceConnectModal.ExistingConnectionsStep';
 import { ModalHeader } from './OpenFinanceConnectModal.Header';
 import { LoadingState } from './OpenFinanceConnectModal.LoadingState';
-import { CpfInputStep } from './OpenFinanceConnectModal.CpfInputStep';
-import { ConnectorSelectionStep } from './OpenFinanceConnectModal.ConnectorSelectionStep';
-import { ExistingConnectionsStep } from './OpenFinanceConnectModal.ExistingConnectionsStep';
 import { OAuthWaitingStep } from './OpenFinanceConnectModal.OAuthWaitingStep';
-import { MODAL_MAX_WIDTH, MODAL_MAX_HEIGHT } from './OpenFinanceConnectModal.constants';
+
+function SlotInfoBanner({
+  entitlement,
+}: Readonly<{
+  entitlement: { entitledSlots: number; usedSlots: number; isGodBypass: boolean };
+}>) {
+  if (entitlement.isGodBypass) return null;
+
+  const available = entitlement.entitledSlots - entitlement.usedSlots;
+  const hasSlots = available > 0;
+
+  return (
+    <div
+      className={`mx-6 mt-3 px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-between ${
+        hasSlots
+          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400'
+          : 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
+      }`}
+    >
+      <span>
+        {available > 0
+          ? `${available} de ${entitlement.entitledSlots} conta(s) disponível(is)`
+          : `Nenhuma conta disponível (${entitlement.usedSlots}/${entitlement.entitledSlots} usadas)`}
+      </span>
+      {!hasSlots && <span className="text-xs underline cursor-pointer">Comprar mais</span>}
+    </div>
+  );
+}
 
 interface OpenFinanceConnectModalProps {
   readonly open: boolean;
@@ -61,7 +93,19 @@ export function OpenFinanceConnectModal({
     open,
   });
 
-  const isLoading = isLoadingConnectors || isCreatingAccount || isCreatingItem || isInitializing || isLoadingExistingItems;
+  const { data: entitlement } = useQuery({
+    queryKey: ['open-banking-entitlement', companyId],
+    queryFn: () => openBankingService.getEntitlement(companyId),
+    enabled: open && !!companyId,
+    staleTime: 30_000,
+  });
+
+  const isLoading =
+    isLoadingConnectors ||
+    isCreatingAccount ||
+    isCreatingItem ||
+    isInitializing ||
+    isLoadingExistingItems;
   const canClose = !isLoading && step !== 'oauth-waiting';
 
   const handleModalClose = () => {
@@ -83,6 +127,8 @@ export function OpenFinanceConnectModal({
     >
       <div className="flex flex-col min-h-0">
         <ModalHeader />
+
+        {entitlement && <SlotInfoBanner entitlement={entitlement} />}
 
         <div className="px-6 py-4 min-h-0 flex-1 overflow-y-auto">
           {isInitializing || isLoadingExistingItems ? (

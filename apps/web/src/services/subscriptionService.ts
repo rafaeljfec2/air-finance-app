@@ -93,6 +93,7 @@ export interface OpenBankingEntitlement {
   readonly entitledSlots: number;
   readonly usedSlots: number;
   readonly canConnect: boolean;
+  readonly isGodBypass: boolean;
 }
 
 export const openBankingService = {
