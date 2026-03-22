@@ -11,18 +11,12 @@ import { FALLBACK_OB_PRICE } from './constants';
 import { OpenFinanceCard } from './OpenFinanceCard';
 import { PlanCard } from './PlanCard';
 
-interface ProfileSubscriptionSectionProps {
-  readonly userId?: string;
-  readonly userPlan?: string;
-}
-
-export function ProfileSubscriptionSection({ userId, userPlan }: ProfileSubscriptionSectionProps) {
+export function ProfileSubscriptionSection() {
   const { activeCompany } = useCompanyStore();
 
   const { data: subscription, isLoading: isLoadingSub } = useQuery({
-    queryKey: ['subscription', userId],
-    queryFn: () => subscriptionService.getMySubscription(userId ?? ''),
-    enabled: !!userId,
+    queryKey: ['subscription-me'],
+    queryFn: () => subscriptionService.getMySubscription(),
   });
 
   const { data: plans } = useQuery({
@@ -37,7 +31,7 @@ export function ProfileSubscriptionSection({ userId, userPlan }: ProfileSubscrip
     enabled: !!activeCompany?.id,
   });
 
-  const currentPlanId = subscription?.plan ?? userPlan ?? 'free';
+  const currentPlanId = subscription?.plan ?? 'free';
   const currentPlan = PLANS.find((p) => p.id === currentPlanId) ?? PLANS[0];
   const obSlotPrice =
     plans?.find((p) => p.name === 'open_banking')?.priceMonthly ?? FALLBACK_OB_PRICE;

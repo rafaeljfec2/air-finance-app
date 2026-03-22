@@ -177,7 +177,7 @@ export function Profile() {
             </TabsContent>
 
             <TabsContent value="subscription">
-              <ProfileSubscriptionSection userId={user?.id} userPlan={user?.plan} />
+              <ProfileSubscriptionSection />
             </TabsContent>
           </Tabs>
         </div>

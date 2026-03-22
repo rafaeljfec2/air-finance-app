@@ -1,12 +1,13 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ArrowUpRight, Calendar, CheckCircle2, CreditCard } from 'lucide-react';
+import { ArrowUpRight, Calendar, CheckCircle2, Clock, CreditCard } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import type { SubscriptionDetails } from '@/services/subscriptionService';
 import { subscriptionService } from '@/services/subscriptionService';
 import type { Plan } from '@/types/subscription';
 
@@ -17,9 +18,65 @@ import { PlanBadge } from './PlanBadge';
 interface PlanCardProps {
   readonly currentPlan: Plan;
   readonly currentPlanId: string;
-  readonly subscription:
-    | { plan: string; status: string; nextBillingDate?: string; amount?: number }
-    | undefined;
+  readonly subscription: SubscriptionDetails | undefined;
+}
+
+function getPlanDescription(isCancelScheduled: boolean, currentPlanId: string): string {
+  if (isCancelScheduled) return 'Sua assinatura será cancelada ao final do período atual';
+  if (currentPlanId === 'free') return 'Plano gratuito com recursos essenciais';
+  return 'Sua assinatura está ativa e será renovada automaticamente';
+}
+
+function getBillingLabel(isCancelScheduled: boolean, currentPlanId: string): string {
+  if (isCancelScheduled) return 'Acesso até';
+  if (currentPlanId === 'free') return 'Renovação';
+  return 'Próxima cobrança';
+}
+
+function getStatusBadge(subscription: SubscriptionDetails | undefined) {
+  if (!subscription) return null;
+
+  if (subscription.cancelAtPeriodEnd && subscription.nextBillingDate) {
+    const cancelDate = format(new Date(subscription.nextBillingDate), 'dd/MM', { locale: ptBR });
+    return (
+      <Badge
+        variant="secondary"
+        className="text-[10px] px-2 py-0.5 gap-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800"
+      >
+        <Clock className="h-3 w-3" />
+        Cancela em {cancelDate}
+      </Badge>
+    );
+  }
+
+  if (subscription.status === 'active' || subscription.status === 'trialing') {
+    return (
+      <Badge variant="success" className="text-[10px] px-2 py-0.5">
+        Ativo
+      </Badge>
+    );
+  }
+
+  if (subscription.status === 'past_due') {
+    return (
+      <Badge
+        variant="secondary"
+        className="text-[10px] px-2 py-0.5 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800"
+      >
+        Pagamento pendente
+      </Badge>
+    );
+  }
+
+  if (subscription.status === 'canceled') {
+    return (
+      <Badge variant="destructive" className="text-[10px] px-2 py-0.5">
+        Cancelado
+      </Badge>
+    );
+  }
+
+  return null;
 }
 
 export function PlanCard({ currentPlan, currentPlanId, subscription }: PlanCardProps) {
@@ -32,10 +89,15 @@ export function PlanCard({ currentPlan, currentPlanId, subscription }: PlanCardP
     ? format(new Date(subscription.nextBillingDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
     : null;
 
+  const isCancelScheduled = subscription?.cancelAtPeriodEnd === true;
+  const canCancel =
+    currentPlanId !== 'free' && !isCancelScheduled && subscription?.status !== 'canceled';
+
   const handleCancelSubscription = async () => {
+    if (!subscription?.providerSubscriptionId) return;
     setIsCancelling(true);
     try {
-      await subscriptionService.cancelSubscription(currentPlanId);
+      await subscriptionService.cancelSubscription(subscription.providerSubscriptionId);
       setShowCancelModal(false);
       globalThis.location.reload();
     } catch {
@@ -55,16 +117,10 @@ export function PlanCard({ currentPlan, currentPlanId, subscription }: PlanCardP
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <PlanBadge planId={currentPlanId} planName={currentPlan.name} />
-                {subscription?.status === 'active' && (
-                  <Badge variant="success" className="text-[10px] px-2 py-0.5">
-                    Ativo
-                  </Badge>
-                )}
+                {getStatusBadge(subscription)}
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {currentPlanId === 'free'
-                  ? 'Plano gratuito com recursos essenciais'
-                  : `Sua assinatura está ativa e será renovada automaticamente`}
+                {getPlanDescription(isCancelScheduled, currentPlanId)}
               </p>
             </div>
 
@@ -97,7 +153,7 @@ export function PlanCard({ currentPlan, currentPlanId, subscription }: PlanCardP
               </div>
               <div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {currentPlanId === 'free' ? 'Renovação' : 'Próxima cobrança'}
+                  {getBillingLabel(isCancelScheduled, currentPlanId)}
                 </p>
                 <p className="text-sm font-semibold text-text dark:text-text-dark">
                   {currentPlanId === 'free' ? 'Sem cobrança' : (nextBillingDate ?? 'N/A')}
@@ -138,7 +194,7 @@ export function PlanCard({ currentPlan, currentPlanId, subscription }: PlanCardP
                 'Alterar Plano'
               )}
             </Button>
-            {currentPlanId !== 'free' && (
+            {canCancel && (
               <Button
                 variant="ghost"
                 onClick={() => setShowCancelModal(true)}

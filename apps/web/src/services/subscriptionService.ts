@@ -2,19 +2,24 @@ import { Plan } from '@/types/subscription';
 
 import { apiClient } from './apiClient';
 
+export type PlanSlug = 'free' | 'pro' | 'business';
+export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'trialing' | 'incomplete';
+
 export interface CheckoutResponse {
   url: string;
 }
 
 export interface SubscriptionDetails {
-  plan: string;
-  status: string;
-  nextBillingDate?: string;
-  amount?: number;
+  readonly plan: PlanSlug;
+  readonly status: SubscriptionStatus;
+  readonly nextBillingDate: string | null;
+  readonly amount: number;
+  readonly cancelAtPeriodEnd: boolean;
+  readonly providerSubscriptionId: string | null;
 }
 
 export interface PlanPermissions {
-  plan: 'free' | 'pro' | 'business';
+  plan: PlanSlug;
   canCreateMultipleCompanies: boolean;
   canUseAI: boolean;
   canUseBankIntegration: boolean;
@@ -33,8 +38,8 @@ export const subscriptionService = {
     return data;
   },
 
-  async getMySubscription(userId: string): Promise<SubscriptionDetails> {
-    const { data } = await apiClient.get<SubscriptionDetails>(`/subscription/me/${userId}`);
+  async getMySubscription(): Promise<SubscriptionDetails> {
+    const { data } = await apiClient.get<SubscriptionDetails>('/subscription/me');
     return data;
   },
 
@@ -59,15 +64,19 @@ export const subscriptionService = {
     await apiClient.post('/subscription/cancel', { subscriptionId });
   },
 
+  async changePlan(newPlanId: string): Promise<{ status: string }> {
+    const { data } = await apiClient.post<{ status: string }>('/subscription/change-plan', {
+      newPlanId,
+    });
+    return data;
+  },
+
   async getMyPermissions(): Promise<PlanPermissions> {
     const { data } = await apiClient.get<PlanPermissions>('/subscription/permissions');
     return data;
   },
 
-  async updatePlan(
-    planName: 'free' | 'pro' | 'business',
-    updateData: UpdatePlanData,
-  ): Promise<Plan> {
+  async updatePlan(planName: PlanSlug, updateData: UpdatePlanData): Promise<Plan> {
     const { data } = await apiClient.put<Plan>(`/subscription/plans/${planName}`, updateData);
     return data;
   },
