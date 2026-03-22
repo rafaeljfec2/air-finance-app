@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link2 } from 'lucide-react';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +17,7 @@ import { useOpenFinanceMutations } from '@/pages/accounts/hooks/useOpenFinanceMu
 import { useOpeniAccountImport } from '@/pages/accounts/hooks/useOpeniAccountImport';
 import { useOpeniSseHandler } from '@/pages/accounts/hooks/useOpeniSseHandler';
 import {
+  disconnectItem,
   getConnectors,
   getItems,
   type OpeniConnector,
@@ -289,6 +290,31 @@ export function OpenFinancePage() {
     window.open(authUrl, '_blank');
   }, []);
 
+  const disconnectMutation = useMutation({
+    mutationFn: (itemId: string) => disconnectItem(companyId, itemId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['openi-items'] });
+      queryClient.invalidateQueries({ queryKey: ['open-banking-entitlement'] });
+      toast.success('Conexão removida com sucesso. Slot liberado.');
+    },
+    onError: () => {
+      toast.error('Erro ao desconectar. Tente novamente.');
+    },
+  });
+
+  const handleDisconnect = useCallback(
+    (itemId: string) => {
+      if (
+        globalThis.confirm(
+          'Tem certeza que deseja desconectar esta conta? As transações já importadas serão mantidas.',
+        )
+      ) {
+        disconnectMutation.mutate(itemId);
+      }
+    },
+    [disconnectMutation],
+  );
+
   const handleAddAnotherConnection = useCallback(() => {
     setStep('cpf-input');
   }, []);
@@ -337,6 +363,8 @@ export function OpenFinancePage() {
                 <PageExistingConnections
                   items={existingItems ?? []}
                   onAddAnother={handleAddAnotherConnection}
+                  onDisconnect={handleDisconnect}
+                  isDisconnecting={disconnectMutation.isPending}
                 />
               )}
 

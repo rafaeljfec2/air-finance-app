@@ -1,13 +1,16 @@
+import { Link2, Building2, RefreshCw, Trash2 } from 'lucide-react';
+
+import { translateOpeniStatus } from '@/components/accounts/utils/openiStatusTranslations';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Link2, Building2, RefreshCw } from 'lucide-react';
 import { type OpeniItem } from '@/services/openiService';
 import { formatDateTime } from '@/utils/formatters';
-import { translateOpeniStatus } from '@/components/accounts/utils/openiStatusTranslations';
 
 interface PageExistingConnectionsProps {
   readonly items: ReadonlyArray<OpeniItem>;
   readonly onAddAnother: () => void;
+  readonly onDisconnect: (itemId: string) => void;
+  readonly isDisconnecting: boolean;
 }
 
 function StatusBadge({ status }: { readonly status: string }) {
@@ -23,7 +26,13 @@ function StatusBadge({ status }: { readonly status: string }) {
   );
 }
 
-function ConnectionCard({ item }: { readonly item: OpeniItem }) {
+interface ConnectionCardProps {
+  readonly item: OpeniItem;
+  readonly onDisconnect: (itemId: string) => void;
+  readonly isDisconnecting: boolean;
+}
+
+function ConnectionCard({ item, onDisconnect, isDisconnecting }: ConnectionCardProps) {
   return (
     <Card className="border border-border dark:border-border-dark hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-md transition-all duration-200">
       <CardContent className="p-4">
@@ -73,6 +82,15 @@ function ConnectionCard({ item }: { readonly item: OpeniItem }) {
               </div>
               <StatusBadge status={item.status} />
             </div>
+            <button
+              type="button"
+              onClick={() => onDisconnect(item.itemId)}
+              disabled={isDisconnecting}
+              className="mt-2 text-xs text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 flex items-center gap-1 transition-colors disabled:opacity-50"
+            >
+              <Trash2 className="h-3 w-3" />
+              Desconectar
+            </button>
           </div>
         </div>
       </CardContent>
@@ -101,7 +119,12 @@ function EmptyState({ onAddAnother }: { readonly onAddAnother: () => void }) {
   );
 }
 
-export function PageExistingConnections({ items, onAddAnother }: PageExistingConnectionsProps) {
+export function PageExistingConnections({
+  items,
+  onAddAnother,
+  onDisconnect,
+  isDisconnecting,
+}: PageExistingConnectionsProps) {
   if (items.length === 0) {
     return <EmptyState onAddAnother={onAddAnother} />;
   }
@@ -128,7 +151,12 @@ export function PageExistingConnections({ items, onAddAnother }: PageExistingCon
 
       <div className="space-y-3">
         {items.map((item) => (
-          <ConnectionCard key={item.itemId} item={item} />
+          <ConnectionCard
+            key={item.itemId}
+            item={item}
+            onDisconnect={onDisconnect}
+            isDisconnecting={isDisconnecting}
+          />
         ))}
       </div>
 

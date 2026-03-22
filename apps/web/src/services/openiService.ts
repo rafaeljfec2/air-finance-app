@@ -494,6 +494,20 @@ export const updatePlatformWebhook = async (
   }
 };
 
+export const disconnectItem = async (
+  companyId: string,
+  itemId: string,
+): Promise<{ disconnectedAccounts: number }> => {
+  try {
+    const response = await apiClient.delete<{ disconnectedAccounts: number }>(
+      `/companies/${companyId}/banking/openi/items/${itemId}/disconnect`,
+    );
+    return response.data;
+  } catch (error) {
+    throw parseApiError(error);
+  }
+};
+
 export const deletePlatformWebhook = async (
   companyId: string,
   webhookId: string,
