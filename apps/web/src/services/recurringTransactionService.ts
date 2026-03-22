@@ -1,5 +1,7 @@
-import { parseApiError } from '@/utils/apiErrorHandler';
 import { z } from 'zod';
+
+import { parseApiError } from '@/utils/apiErrorHandler';
+
 import { apiClient } from './apiClient';
 
 // Validation schemas
@@ -66,12 +68,21 @@ export const createRecurringTransaction = async (
   data: CreateRecurringTransaction,
 ): Promise<RecurringTransaction> => {
   try {
+    const payload = {
+      description: data.description,
+      value: data.value,
+      type: data.type,
+      category: data.category,
+      accountId: data.accountId,
+      startDate: data.startDate,
+      frequency: data.frequency,
+      repeatUntil: data.repeatUntil,
+      createdAutomatically: data.createdAutomatically,
+      companyId,
+    };
     const response = await apiClient.post<RecurringTransaction>(
       `/companies/${companyId}/recurring-transactions`,
-      {
-        ...data,
-        companyId,
-      },
+      payload,
     );
     return RecurringTransactionSchema.parse(response.data);
   } catch (error) {

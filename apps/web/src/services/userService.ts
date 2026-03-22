@@ -1,5 +1,12 @@
-import { parseApiError } from '@/utils/apiErrorHandler';
 import { z } from 'zod';
+
+import {
+  isPaginatedEnvelope,
+  type PaginatedResponse,
+  type PaginationParams,
+} from '@/types/pagination';
+import { parseApiError } from '@/utils/apiErrorHandler';
+
 import { apiClient } from './apiClient';
 import { companyService } from './companyService';
 
@@ -58,16 +65,59 @@ export type User = z.infer<typeof UserSchema>;
 export type CreateUser = z.infer<typeof CreateUserSchema>;
 export type { UserRole, UserStatus } from '@/types/user';
 
-// Service functions
-export const getUsers = async (): Promise<User[]> => {
+export async function getUsers(): Promise<User[]>;
+// eslint-disable-next-line no-redeclare
+export async function getUsers(pagination: PaginationParams): Promise<PaginatedResponse<User>>;
+// eslint-disable-next-line no-redeclare
+export async function getUsers(
+  pagination?: PaginationParams,
+): Promise<User[] | PaginatedResponse<User>> {
   try {
-    const response = await apiClient.get<User[]>('/user');
-    return UserSchema.array().parse(response.data);
+    if (pagination === undefined) {
+      const response = await apiClient.get<User[]>('/user');
+      return UserSchema.array().parse(response.data);
+    }
+
+    const params: Record<string, number> = {};
+    if (pagination.page !== undefined) {
+      params.page = pagination.page;
+    }
+    if (pagination.limit !== undefined) {
+      params.limit = pagination.limit;
+    }
+
+    const response = await apiClient.get<unknown>('/user', { params });
+    const body = response.data;
+
+    if (isPaginatedEnvelope(body)) {
+      return {
+        data: UserSchema.array().parse(body.data),
+        total: body.total,
+        page: body.page,
+        limit: body.limit,
+        totalPages: body.totalPages,
+      };
+    }
+
+    const users = UserSchema.array().parse(body);
+    const page = pagination.page ?? 1;
+    const limit = pagination.limit ?? Math.max(1, users.length);
+    const total = users.length;
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const startIndex = (page - 1) * limit;
+
+    return {
+      data: users.slice(startIndex, startIndex + limit),
+      total,
+      page,
+      limit,
+      totalPages,
+    };
   } catch (error) {
     console.error('Erro ao buscar usuários:', error);
     throw new Error('Falha ao buscar usuários');
   }
-};
+}
 
 export const getUserById = async (id: string): Promise<User> => {
   try {

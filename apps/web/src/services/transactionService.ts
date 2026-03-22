@@ -1,4 +1,11 @@
 import { z } from 'zod';
+
+import {
+  isPaginatedEnvelope,
+  type PaginatedResponse,
+  type PaginationParams,
+} from '@/types/pagination';
+
 import { apiClient } from './apiClient';
 import {
   ExtractHeaderSchema,
@@ -136,7 +143,21 @@ export const getPreviousBalance = async (
 };
 
 export const createTransaction = async (data: CreateTransactionPayload) => {
-  const response = await apiClient.post(`/companies/${data.companyId}/transactions`, data);
+  const payload = {
+    description: data.description,
+    launchType: data.launchType,
+    valueType: data.valueType,
+    accountId: data.accountId,
+    categoryId: data.categoryId,
+    value: data.value,
+    paymentDate: data.paymentDate,
+    issueDate: data.issueDate,
+    quantityInstallments: data.quantityInstallments,
+    repeatMonthly: data.repeatMonthly,
+    observation: data.observation,
+    reconciled: data.reconciled,
+  };
+  const response = await apiClient.post(`/companies/${data.companyId}/transactions`, payload);
   return response.data;
 };
 
@@ -243,23 +264,7 @@ const isSingleExtractObject = (data: unknown): boolean => {
   );
 };
 
-export const getExtracts = async (
-  companyId: string,
-  startDate: string,
-  endDate: string,
-  accountId?: string,
-): Promise<ExtractResponse[]> => {
-  const params: Record<string, string> = { startDate, endDate };
-  if (accountId) {
-    params.accountId = accountId;
-  }
-
-  const response = await apiClient.get(`/companies/${companyId}/transactions/extracts`, {
-    params,
-  });
-
-  const data = response.data;
-
+function normalizeExtractsFromResponse(data: unknown, accountId?: string): ExtractResponse[] {
   if (isSingleExtractObject(data)) {
     return [normalizeExtract(data)];
   }
@@ -269,7 +274,6 @@ export const getExtracts = async (
       return [];
     }
 
-    // Check if it's an array of transactions (without header)
     if (isTransactionsArray(data)) {
       const normalized = normalizeExtract(data);
       if (accountId) {
@@ -278,13 +282,83 @@ export const getExtracts = async (
       return [normalized];
     }
 
-    // Normalize each extract in the array
     return data.map((item) => normalizeExtract(item));
   }
 
-  // Fallback: try to normalize as single extract
   return [normalizeExtract(data)];
-};
+}
+
+export async function getExtracts(
+  companyId: string,
+  startDate: string,
+  endDate: string,
+  accountId?: string,
+): Promise<ExtractResponse[]>;
+// eslint-disable-next-line no-redeclare
+export async function getExtracts(
+  companyId: string,
+  startDate: string,
+  endDate: string,
+  accountId: string | undefined,
+  pagination: PaginationParams,
+): Promise<PaginatedResponse<ExtractResponse>>;
+// eslint-disable-next-line no-redeclare
+export async function getExtracts(
+  companyId: string,
+  startDate: string,
+  endDate: string,
+  accountId?: string,
+  pagination?: PaginationParams,
+): Promise<ExtractResponse[] | PaginatedResponse<ExtractResponse>> {
+  const params: Record<string, string | number> = { startDate, endDate };
+  if (accountId) {
+    params.accountId = accountId;
+  }
+  if (pagination !== undefined) {
+    if (pagination.page !== undefined) {
+      params.page = pagination.page;
+    }
+    if (pagination.limit !== undefined) {
+      params.limit = pagination.limit;
+    }
+  }
+
+  const response = await apiClient.get(`/companies/${companyId}/transactions/extracts`, {
+    params,
+  });
+
+  const data = response.data as unknown;
+
+  if (pagination === undefined) {
+    return normalizeExtractsFromResponse(data, accountId);
+  }
+
+  if (isPaginatedEnvelope(data)) {
+    return {
+      data: data.data.map((item) => normalizeExtract(item)),
+      total: data.total,
+      page: data.page,
+      limit: data.limit,
+      totalPages: data.totalPages,
+    };
+  }
+
+  const fullList = normalizeExtractsFromResponse(data, accountId);
+  const page = pagination.page ?? 1;
+  const limit = pagination.limit ?? Math.max(1, fullList.length);
+  const total = fullList.length;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const startIndex = (page - 1) * limit;
+  const slice = fullList.slice(startIndex, startIndex + limit);
+
+  return {
+    data: slice,
+    total,
+    page,
+    limit,
+    totalPages,
+  };
+}
 
 export const getExtractsPaginated = async (
   companyId: string,

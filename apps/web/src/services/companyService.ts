@@ -1,6 +1,13 @@
-import { Company } from '@/types/company';
-import { parseApiError } from '@/utils/apiErrorHandler';
 import { z } from 'zod';
+
+import { Company } from '@/types/company';
+import {
+  isPaginatedEnvelope,
+  type PaginatedResponse,
+  type PaginationParams,
+} from '@/types/pagination';
+import { parseApiError } from '@/utils/apiErrorHandler';
+
 import { apiClient } from './apiClient';
 
 const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
@@ -71,6 +78,10 @@ function normalizeFoundationDate(value: unknown): string {
 /**
  * Transforms company data by normalizing date fields before validation
  */
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 function transformCompanyData(company: Record<string, unknown>): Record<string, unknown> {
   return {
     ...company,
@@ -101,6 +112,108 @@ export const CompanySchema = z.object({
   updatedAt: z.string().datetime(),
 });
 
+function toPaginatedCompanies(
+  payload: unknown,
+  pagination: PaginationParams,
+): PaginatedResponse<Company> {
+  if (isPaginatedEnvelope(payload)) {
+    const transformedData = payload.data.filter(isPlainObject).map(transformCompanyData);
+    const companies = CompanySchema.array().parse(transformedData);
+    return {
+      data: companies,
+      total: payload.total,
+      page: payload.page,
+      limit: payload.limit,
+      totalPages: payload.totalPages,
+    };
+  }
+
+  const data = Array.isArray(payload) ? payload : [];
+  const transformedData = data.filter(isPlainObject).map(transformCompanyData);
+  const companies = CompanySchema.array().parse(transformedData);
+  const page = pagination.page ?? 1;
+  const limit = pagination.limit ?? Math.max(1, companies.length);
+  const total = companies.length;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const startIndex = (page - 1) * limit;
+  const slice = companies.slice(startIndex, startIndex + limit);
+
+  return {
+    data: slice,
+    total,
+    page,
+    limit,
+    totalPages,
+  };
+}
+
+async function getAllCompanies(): Promise<Company[]>;
+// eslint-disable-next-line no-redeclare
+async function getAllCompanies(pagination: PaginationParams): Promise<PaginatedResponse<Company>>;
+// eslint-disable-next-line no-redeclare
+async function getAllCompanies(
+  pagination?: PaginationParams,
+): Promise<Company[] | PaginatedResponse<Company>> {
+  try {
+    if (pagination === undefined) {
+      const response = await apiClient.get<unknown>('/companies');
+      const data = response.data as Array<Record<string, unknown>>;
+      const transformedData = data.map(transformCompanyData);
+      return CompanySchema.array().parse(transformedData);
+    }
+
+    const params: Record<string, number> = {};
+    if (pagination.page !== undefined) {
+      params.page = pagination.page;
+    }
+    if (pagination.limit !== undefined) {
+      params.limit = pagination.limit;
+    }
+
+    const response = await apiClient.get<unknown>('/companies', { params });
+    return toPaginatedCompanies(response.data, pagination);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+}
+
+async function getUserCompaniesImpl(): Promise<Company[]>;
+// eslint-disable-next-line no-redeclare
+async function getUserCompaniesImpl(
+  pagination: PaginationParams,
+): Promise<PaginatedResponse<Company>>;
+// eslint-disable-next-line no-redeclare
+async function getUserCompaniesImpl(
+  pagination?: PaginationParams,
+): Promise<Company[] | PaginatedResponse<Company>> {
+  try {
+    if (pagination === undefined) {
+      const response = await apiClient.get<unknown>('/user/me/companies');
+      const data = response.data;
+
+      if (!Array.isArray(data)) {
+        return [];
+      }
+
+      const transformedData = data.filter(isPlainObject).map(transformCompanyData);
+      return CompanySchema.array().parse(transformedData);
+    }
+
+    const params: Record<string, number> = {};
+    if (pagination.page !== undefined) {
+      params.page = pagination.page;
+    }
+    if (pagination.limit !== undefined) {
+      params.limit = pagination.limit;
+    }
+
+    const response = await apiClient.get<unknown>('/user/me/companies', { params });
+    return toPaginatedCompanies(response.data, pagination);
+  } catch (error) {
+    throw parseApiError(error);
+  }
+}
+
 export const CreateCompanySchema = CompanySchema.omit({
   id: true,
   createdAt: true,
@@ -119,43 +232,27 @@ function prepareCompanyPayload(
   data: CreateCompany | Partial<CreateCompany>,
 ): Record<string, unknown> {
   return {
-    ...data,
+    name: data.name,
+    cnpj: data.cnpj,
+    documentType: data.documentType,
+    type: data.type,
     foundationDate: data.foundationDate ? new Date(data.foundationDate).toISOString() : '',
+    email: data.email,
+    phone: data.phone,
+    address: data.address,
+    notes: data.notes,
   };
 }
 
 export const companyService = {
-  /**
-   * Fetches all companies
-   */
-  getAll: async (): Promise<Company[]> => {
-    try {
-      const response = await apiClient.get<unknown>('/companies');
-      const data = response.data as Array<Record<string, unknown>>;
-      const transformedData = data.map(transformCompanyData);
-      return CompanySchema.array().parse(transformedData) as Company[];
-    } catch (error) {
-      throw parseApiError(error);
-    }
+  getAll: getAllCompanies as {
+    (): Promise<Company[]>;
+    (pagination: PaginationParams): Promise<PaginatedResponse<Company>>;
   },
 
-  /**
-   * Fetches companies associated with the current user
-   */
-  getUserCompanies: async (): Promise<Company[]> => {
-    try {
-      const response = await apiClient.get<unknown>('/user/me/companies');
-      const data = response.data as Array<Record<string, unknown>>;
-
-      if (!Array.isArray(data)) {
-        return [];
-      }
-
-      const transformedData = data.map(transformCompanyData);
-      return CompanySchema.array().parse(transformedData) as Company[];
-    } catch (error) {
-      throw parseApiError(error);
-    }
+  getUserCompanies: getUserCompaniesImpl as {
+    (): Promise<Company[]>;
+    (pagination: PaginationParams): Promise<PaginatedResponse<Company>>;
   },
 
   /**
