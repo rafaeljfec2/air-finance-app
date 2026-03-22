@@ -1,6 +1,8 @@
 import { NotificationsMenu } from '@/components/notifications/NotificationsMenu';
 import { SupportModal } from '@/components/support/SupportModal';
+
 import { CompanySelector } from '../CompanySelector';
+
 import { HeaderMobileButtons } from './components/HeaderMobileButtons';
 import { HeaderQuickActions } from './components/HeaderQuickActions';
 import { HeaderThemeToggle } from './components/HeaderThemeToggle';
@@ -26,7 +28,7 @@ export function Header({ onOpenSidebar }: Readonly<HeaderProps>) {
   } = useHeaderActions();
 
   return (
-    <header className="bg-card dark:bg-card-dark border-b border-border dark:border-border-dark shadow-sm z-20 relative">
+    <header className="bg-card dark:bg-card-dark border-b border-border dark:border-border-dark shadow-sm z-30 relative">
       <div className="h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Left side: Mobile buttons (with back button) + Company Selector (web only) */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
