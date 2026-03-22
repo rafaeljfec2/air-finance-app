@@ -21,20 +21,54 @@ import { useAccountDetails } from './hooks/useAccountDetails';
 import { useAccountManagement } from './hooks/useAccountManagement';
 import { useStatementNavigation } from './hooks/useStatementNavigation';
 
-function SlotBadge({ entitlement }: Readonly<{ entitlement: OpenBankingEntitlement }>) {
+function SlotBanner({ entitlement }: Readonly<{ entitlement: OpenBankingEntitlement }>) {
   const available = entitlement.entitledSlots - entitlement.usedSlots;
   const isFull = available <= 0;
+  const isOver = entitlement.usedSlots > entitlement.entitledSlots;
+  const pct =
+    entitlement.entitledSlots > 0
+      ? Math.min((entitlement.usedSlots / entitlement.entitledSlots) * 100, 100)
+      : 0;
 
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-        isFull
-          ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-          : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+    <div
+      className={`flex items-center gap-4 px-4 py-3 rounded-xl border text-sm ${
+        isOver
+          ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800/50'
+          : isFull
+            ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800/50'
+            : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800/50'
       }`}
     >
-      {entitlement.usedSlots}/{entitlement.entitledSlots} Open Finance
-    </span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1.5">
+          <span
+            className={`font-semibold ${
+              isOver
+                ? 'text-red-700 dark:text-red-400'
+                : isFull
+                  ? 'text-amber-700 dark:text-amber-400'
+                  : 'text-emerald-700 dark:text-emerald-400'
+            }`}
+          >
+            Open Finance — {entitlement.usedSlots}/{entitlement.entitledSlots} contas
+          </span>
+          {isOver && (
+            <span className="text-xs font-medium text-red-600 dark:text-red-400">
+              Limite excedido
+            </span>
+          )}
+        </div>
+        <div className="h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all ${
+              isOver ? 'bg-red-500' : isFull ? 'bg-amber-500' : 'bg-emerald-500'
+            }`}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -192,8 +226,8 @@ export function AccountDetailsPageDesktop() {
         />
 
         {showBadge && (
-          <div className="px-4 pt-2 lg:px-6">
-            <SlotBadge entitlement={entitlement} />
+          <div className="px-4 pt-3 pb-1 lg:px-6">
+            <SlotBanner entitlement={entitlement} />
           </div>
         )}
 
