@@ -18,13 +18,21 @@ export const useOpeniAccountImport = ({ companyId, onSuccess }: UseOpeniAccountI
   }, [onSuccess]);
 
   const handleSuccessfulImport = useCallback(
-    (importResult: { data: { imported: number } }, status: string): void => {
-      const successMessage =
-        status === 'syncing'
-          ? `Conexão estabelecida! ${importResult.data.imported} conta(s) importada(s) com sucesso!`
-          : `${importResult.data.imported} conta(s) importada(s) com sucesso!`;
+    (
+      importResult: { data: { imported: number; created?: number; updated?: number } },
+      status: string,
+    ): void => {
+      const created = importResult.data.created ?? importResult.data.imported;
 
-      toast.success(successMessage);
+      if (created > 0) {
+        const successMessage =
+          status === 'syncing'
+            ? `Conexão estabelecida! ${created} nova(s) conta(s) importada(s) com sucesso!`
+            : `${created} nova(s) conta(s) importada(s) com sucesso!`;
+
+        toast.success(successMessage);
+      }
+
       queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
       onSuccessRef.current?.();
     },

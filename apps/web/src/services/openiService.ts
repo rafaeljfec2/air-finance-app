@@ -217,6 +217,8 @@ const ImportOpeniAccountsResponseSchema = z.object({
   success: z.boolean(),
   data: z.object({
     imported: z.number(),
+    created: z.number().default(0),
+    updated: z.number().default(0),
     accounts: z.array(
       z.object({
         id: z.string(),

@@ -12,9 +12,41 @@ interface UseOpeniAutoImportParams {
 }
 
 const DELAY_BETWEEN_IMPORTS_MS = 3000;
+const CONNECTED_STATUSES = new Set(['CONNECTED', 'SYNCING', 'SYNCED']);
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function importSingleItem(
+  companyId: string,
+  itemId: string,
+): Promise<'ok' | 'limit' | 'error'> {
+  try {
+    const availableAccounts = await getAccounts(companyId, itemId);
+
+    if (availableAccounts && availableAccounts.length > 0) {
+      const accountIds = availableAccounts.map((acc) => acc.id);
+      const importResult = await importAccounts(companyId, itemId, accountIds);
+      const created = importResult.data.created ?? importResult.data.imported;
+
+      if (created > 0) {
+        toast.success(`${created} nova(s) conta(s) importada(s) automaticamente!`);
+      }
+    }
+
+    return 'ok';
+  } catch (error) {
+    const status = (error as { response?: { status?: number } })?.response?.status;
+
+    if (status === 403) {
+      toast.warning('Limite de contas Open Finance atingido. Adquira mais slots para continuar.');
+      return 'limit';
+    }
+
+    console.error(`[OpenFinanceModal] Error auto-importing accounts for item ${itemId}:`, error);
+    return 'error';
+  }
 }
 
 export const useOpeniAutoImport = ({
@@ -38,9 +70,7 @@ export const useOpeniAutoImport = ({
     if (isProcessingRef.current) return;
 
     const connectedItems = existingItems.filter(
-      (item) =>
-        (item.status === 'CONNECTED' || item.status === 'SYNCING' || item.status === 'SYNCED') &&
-        !importedItemsRef.current.has(item.itemId),
+      (item) => CONNECTED_STATUSES.has(item.status) && !importedItemsRef.current.has(item.itemId),
     );
 
     if (connectedItems.length === 0) return;
@@ -52,29 +82,8 @@ export const useOpeniAutoImport = ({
         if (importedItemsRef.current.has(item.itemId)) continue;
         importedItemsRef.current.add(item.itemId);
 
-        try {
-          const availableAccounts = await getAccounts(companyId, item.itemId);
-
-          if (availableAccounts && availableAccounts.length > 0) {
-            const accountIds = availableAccounts.map((acc) => acc.id);
-            const importResult = await importAccounts(companyId, item.itemId, accountIds);
-            toast.success(`${importResult.data.imported} conta(s) importada(s) automaticamente!`);
-          }
-        } catch (error) {
-          const status = (error as { response?: { status?: number } })?.response?.status;
-
-          if (status === 403) {
-            toast.warning(
-              'Limite de contas Open Finance atingido. Adquira mais slots para continuar.',
-            );
-            break;
-          }
-
-          console.error(
-            `[OpenFinanceModal] Error auto-importing accounts for item ${item.itemId}:`,
-            error,
-          );
-        }
+        const result = await importSingleItem(companyId, item.itemId);
+        if (result === 'limit') break;
 
         if (connectedItems.indexOf(item) < connectedItems.length - 1) {
           await delay(DELAY_BETWEEN_IMPORTS_MS);
