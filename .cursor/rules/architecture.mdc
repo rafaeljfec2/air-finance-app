@@ -1,0 +1,47 @@
+---
+description: Monorepo layout, routing, services, and state stores
+globs: ["apps/**/*.tsx", "apps/**/*.ts", "packages/**/*.ts"]
+alwaysApply: false
+---
+
+# Architecture (air-finance-app)
+
+## Monorepo
+
+- `apps/web`: main Vite SPA; primary source for `pages/`, `components/`, `hooks/`, `services/`, `stores/`, `routes/`
+- `apps/mobile-webview`: WebView shell and native-adjacent config
+- `packages/shared`: cross-app types, utilities, and shared constants
+
+## Routing
+
+- Route definitions and lazy page imports live under `apps/web/src/routes/` (and related route config)
+- Many top-level flows under `apps/web/src/pages/` mirroring product areas (dashboard, transactions, accounts, open finance, admin, SEO, etc.)
+
+## API layer
+
+- Central Axios instance: `apps/web/src/services/apiClient.ts` (or current equivalent path)
+- Feature services under `apps/web/src/services/` encapsulate HTTP and DTO mapping
+
+## State
+
+- Zustand stores include auth, company, preferences, sidebar, statement, transaction, maintenance, theme, notifications (names may vary slightly; search `stores/`)
+
+## Layouts
+
+- `LayoutDefault`, `LayoutAuth`, `ViewDefault` under `layouts/` provide consistent chrome and page structure
+
+## SEO
+
+- `react-helmet-async` for metadata; dedicated SEO-oriented pages under `pages/seo/` where applicable
+
+## New feature flow
+
+1. Add or extend a route in `routes/`
+2. Add page under `pages/<feature>/` (split `desktop.tsx` / `mobile.tsx` when the project pattern exists)
+3. Add service methods in `services/`
+4. Add TanStack Query hooks and/or Zustand actions in `hooks/` and `stores/`
+5. Compose UI with existing design primitives under `components/`
+
+## Scale
+
+- The codebase is large (hundreds of components and hooks). Prefer extending existing modules over duplicating patterns.

@@ -1,0 +1,38 @@
+---
+description: Product domain for Air Finance web and WebView clients
+globs: ["apps/**/*.tsx", "apps/**/*.ts"]
+alwaysApply: false
+---
+
+# Business domain (Air Finance frontend)
+
+## Product
+
+- SaaS financial management for individuals and companies: web app plus mobile experience via WebView
+
+## Core areas
+
+- **Dashboard**: KPIs, charts, shortcuts
+- **Transactions**: listing, filters, creation, categories, installments
+- **Accounts** and **credit cards**: balances, details, transfers context
+- **Budget** and **goals**: planning widgets and flows
+- **Open Finance**: bank connection, consent, account linking (see Open Finance pages and services)
+- **Reports** and **insights**: exports and AI-assisted summaries where enabled
+- **Recurring transactions** and **import** (e.g. OFX): automation and file flows
+
+## Multi-company
+
+- Active company is selected in the client; `CompanyProvider` (or equivalent context) supplies company id to hooks and services
+- Role and plan may gate UI; align with backend plan permissions
+
+## Onboarding
+
+- New users follow an onboarding path before full app access; do not skip required steps in production flows
+
+## Subscription
+
+- Plans and checkout integrate with Stripe on the backend; frontend shows paywalls and upgrade paths consistent with entitlements
+
+## UX principles
+
+- Mobile-first layouts, accessible controls, loading and empty states consistent with the design system (`docs/DESIGN_SYSTEM.md`)

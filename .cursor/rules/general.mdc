@@ -1,0 +1,64 @@
+---
+description: Stack, mobile-first UI, TypeScript, and engineering conventions for air-finance-app
+globs: ["apps/**/*.tsx", "apps/**/*.ts", "packages/**/*.tsx", "packages/**/*.ts"]
+alwaysApply: true
+---
+
+# General rules (Air Finance monorepo)
+
+## Stack
+
+- React 18, Vite 5, TypeScript, Tailwind CSS 3
+- Yarn 4 workspaces + Turborepo
+- Apps: `apps/web`, `apps/mobile-webview`; shared code: `packages/shared`
+- Default branch: `main`
+- Deploy: Vercel (see `docs/VERCEL_DEPLOY.md`)
+
+## UI libraries
+
+- Radix UI, Headless UI, lucide-react, sonner, recharts, framer-motion
+- Prefer `class-variance-authority` (CVA) for component variants where used in the project
+
+## State and data
+
+- Server state: TanStack Query v5
+- Client UI state: Zustand v5
+- Forms: react-hook-form + zod
+
+## Mobile-first
+
+- Design and implement for small viewports first; enhance for tablet and desktop
+- Touch targets, spacing, and navigation must work on mobile and WebView (`apps/mobile-webview`)
+
+## TypeScript
+
+- Do not use `any`
+- Prefer `??` over `||` for nullish coalescing
+- Mark component `props` as `readonly` (SonarQube typescript:S6759)
+
+## Async
+
+- Use `Promise.all` for independent async work; `Promise.allSettled` when partial failure is acceptable; `Promise.race` only when the first result wins
+
+## Language
+
+- Code, identifiers, and test descriptions in English
+- User-facing copy follows product locale conventions
+
+## Quality
+
+- Avoid unnecessary comments
+- Reuse existing patterns before adding new abstractions
+- No simulated/mock data in dev or production paths (tests only)
+
+## Migrated guidelines (from legacy `apps/web/.cursorrules`, adapted for web)
+
+- Apply sensible component boundaries: keep visual components thin; move data and orchestration to hooks or route loaders
+- Prefer custom hooks for reusable async and domain logic
+- Use clear file names: PascalCase for components, `useX` for hooks, camelCase for utilities and services
+- Treat errors explicitly; surface user-visible feedback via toasts or inline states as the project already does
+- For list-heavy UIs, use virtualization patterns when lists are large (web equivalents of performant lists)
+- New primary screens should use the existing layout shell (`ViewDefault` / `LayoutDefault` / `LayoutAuth` as appropriate to the route)
+- Do not change visual or behavioral UX without explicit product justification
+- Validate forms with zod schemas shared with types where possible
+- Commit messages: conventional, in English (e.g. `feat(scope): summary`)
