@@ -101,7 +101,7 @@ export function OpenFinancePage() {
       return;
     }
 
-    if (entitlement?.entitledSlots === 0) {
+    if (entitlement && entitlement.entitledSlots === 0 && !entitlement.isGodBypass) {
       setShowPaywall(true);
       setStep('loading');
       return;

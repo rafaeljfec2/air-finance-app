@@ -120,4 +120,19 @@ export const openBankingService = {
     });
     return data;
   },
+
+  async cancelSubscription(companyId: string): Promise<{ status: string }> {
+    const { data } = await apiClient.post<{ status: string }>('/subscription/open-banking/cancel', {
+      companyId,
+    });
+    return data;
+  },
+
+  async updateSlots(companyId: string, quantity: number): Promise<{ status: string }> {
+    const { data } = await apiClient.post<{ status: string }>(
+      '/subscription/open-banking/update-slots',
+      { companyId, quantity },
+    );
+    return data;
+  },
 };

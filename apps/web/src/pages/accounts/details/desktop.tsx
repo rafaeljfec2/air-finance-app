@@ -1,18 +1,42 @@
+import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect, useCallback } from 'react';
+
 import { Loading } from '@/components/Loading';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { ViewDefault } from '@/layouts/ViewDefault';
+import type { OpenBankingEntitlement } from '@/services/subscriptionService';
+import { openBankingService } from '@/services/subscriptionService';
+import { useAuthStore } from '@/stores/auth';
 import { useCompanyStore } from '@/stores/company';
-import { useAccountDetails } from './hooks/useAccountDetails';
-import { useStatementNavigation } from './hooks/useStatementNavigation';
-import { useAccountManagement } from './hooks/useAccountManagement';
+import { UserRole } from '@/types/user';
+
 import { AccountCardsContainerDesktop } from './components/AccountCardsContainerDesktop';
-import { AccountSummary } from './components/AccountSummary';
-import { StatementCard } from './components/StatementCard';
 import { AccountErrorState } from './components/AccountErrorState';
 import { AccountModals } from './components/AccountModals';
+import { AccountSummary } from './components/AccountSummary';
 import { NoAccountsState } from './components/NoAccountsState';
+import { StatementCard } from './components/StatementCard';
 import { createInitialSummary } from './hooks/types';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useAccountDetails } from './hooks/useAccountDetails';
+import { useAccountManagement } from './hooks/useAccountManagement';
+import { useStatementNavigation } from './hooks/useStatementNavigation';
+
+function SlotBadge({ entitlement }: Readonly<{ entitlement: OpenBankingEntitlement }>) {
+  const available = entitlement.entitledSlots - entitlement.usedSlots;
+  const isFull = available <= 0;
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+        isFull
+          ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+          : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+      }`}
+    >
+      {entitlement.usedSlots}/{entitlement.entitledSlots} Open Finance
+    </span>
+  );
+}
 
 export function AccountDetailsPageDesktop() {
   const [selectedAccountId, setSelectedAccountId] = useState('');
@@ -21,6 +45,17 @@ export function AccountDetailsPageDesktop() {
   const searchTermToSend = debouncedSearch.length >= 3 ? debouncedSearch : undefined;
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
+  const user = useAuthStore((state) => state.user);
+  const isGod = user?.role === UserRole.GOD;
+
+  const { data: entitlement } = useQuery({
+    queryKey: ['open-banking-entitlement', companyId],
+    queryFn: () => openBankingService.getEntitlement(companyId),
+    enabled: !!companyId,
+    staleTime: 30_000,
+  });
+
+  const showBadge = entitlement && (entitlement.entitledSlots > 0 || isGod);
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useStatementNavigation();
 
@@ -155,6 +190,12 @@ export function AccountDetailsPageDesktop() {
           onDeleteAccount={handlers.onDeleteAccount}
           onAddAccount={handlers.onAddAccount}
         />
+
+        {showBadge && (
+          <div className="px-4 pt-2 lg:px-6">
+            <SlotBadge entitlement={entitlement} />
+          </div>
+        )}
 
         <AccountSummary summary={summary} />
 

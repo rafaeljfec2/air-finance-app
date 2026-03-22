@@ -17,8 +17,6 @@ function SlotInfoBanner({
 }: Readonly<{
   entitlement: { entitledSlots: number; usedSlots: number; isGodBypass: boolean };
 }>) {
-  if (entitlement.isGodBypass) return null;
-
   const available = entitlement.entitledSlots - entitlement.usedSlots;
   const hasSlots = available > 0;
 

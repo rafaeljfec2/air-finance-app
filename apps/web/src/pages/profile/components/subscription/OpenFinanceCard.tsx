@@ -1,3 +1,4 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link2, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 
@@ -6,7 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
+import { toast } from '@/components/ui/toast';
 import type { OpenBankingEntitlement } from '@/services/subscriptionService';
+import { openBankingService } from '@/services/subscriptionService';
 
 import { CancelSubscriptionModal } from './CancelSubscriptionModal';
 import { UsageBar } from './UsageBar';
@@ -26,6 +29,19 @@ export function OpenFinanceCard({
 }: OpenFinanceCardProps) {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPaywallModal, setShowPaywallModal] = useState(false);
+  const queryClient = useQueryClient();
+
+  const cancelMutation = useMutation({
+    mutationFn: () => openBankingService.cancelSubscription(companyId!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['open-banking-entitlement'] });
+      setShowCancelModal(false);
+      toast.success('Open Finance será cancelado ao final do período de cobrança atual.');
+    },
+    onError: () => {
+      toast.error('Erro ao cancelar. Tente novamente.');
+    },
+  });
 
   if (isLoading) {
     return (
@@ -174,8 +190,8 @@ export function OpenFinanceCard({
       <CancelSubscriptionModal
         open={showCancelModal}
         onClose={() => setShowCancelModal(false)}
-        onConfirm={() => setShowCancelModal(false)}
-        isCancelling={false}
+        onConfirm={() => cancelMutation.mutate()}
+        isCancelling={cancelMutation.isPending}
         planName="Open Finance"
       />
 
