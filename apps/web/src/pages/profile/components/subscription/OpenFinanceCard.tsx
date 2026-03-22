@@ -123,9 +123,7 @@ export function OpenFinanceCard({
               <div className="flex flex-col gap-3 sm:flex-row pt-4 border-t border-gray-100 dark:border-gray-700/50">
                 <Button
                   onClick={() => {
-                    if (companyId) {
-                      globalThis.location.href = `/accounts?open_banking=true`;
-                    }
+                    globalThis.location.href = '/openfinance';
                   }}
                   variant="outline"
                   className="gap-2 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/10"
