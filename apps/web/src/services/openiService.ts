@@ -219,6 +219,7 @@ const ImportOpeniAccountsResponseSchema = z.object({
     imported: z.number(),
     created: z.number().default(0),
     updated: z.number().default(0),
+    creditCardsImported: z.number().default(0),
     accounts: z.array(
       z.object({
         id: z.string(),

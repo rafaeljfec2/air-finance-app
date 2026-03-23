@@ -19,21 +19,35 @@ export const useOpeniAccountImport = ({ companyId, onSuccess }: UseOpeniAccountI
 
   const handleSuccessfulImport = useCallback(
     (
-      importResult: { data: { imported: number; created?: number; updated?: number } },
+      importResult: {
+        data: {
+          imported: number;
+          created?: number;
+          updated?: number;
+          creditCardsImported?: number;
+        };
+      },
       status: string,
     ): void => {
       const created = importResult.data.created ?? importResult.data.imported;
+      const creditCards = importResult.data.creditCardsImported ?? 0;
 
-      if (created > 0) {
+      if (created > 0 || creditCards > 0) {
+        const parts: string[] = [];
+        if (created > 0) parts.push(`${created} conta(s)`);
+        if (creditCards > 0) parts.push(`${creditCards} cartão(ões)`);
+        const items = parts.join(' e ');
+
         const successMessage =
           status === 'syncing'
-            ? `Conexão estabelecida! ${created} nova(s) conta(s) importada(s) com sucesso!`
-            : `${created} nova(s) conta(s) importada(s) com sucesso!`;
+            ? `Conexão estabelecida! ${items} importada(s) com sucesso!`
+            : `${items} importada(s) com sucesso!`;
 
         toast.success(successMessage);
       }
 
       queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+      queryClient.invalidateQueries({ queryKey: ['credit-cards'] });
       onSuccessRef.current?.();
     },
     [companyId, queryClient],

@@ -29,9 +29,13 @@ async function importSingleItem(
       const accountIds = availableAccounts.map((acc) => acc.id);
       const importResult = await importAccounts(companyId, itemId, accountIds);
       const created = importResult.data.created ?? importResult.data.imported;
+      const creditCards = importResult.data.creditCardsImported ?? 0;
 
-      if (created > 0) {
-        toast.success(`${created} nova(s) conta(s) importada(s) automaticamente!`);
+      if (created > 0 || creditCards > 0) {
+        const parts: string[] = [];
+        if (created > 0) parts.push(`${created} conta(s)`);
+        if (creditCards > 0) parts.push(`${creditCards} cartão(ões)`);
+        toast.success(`${parts.join(' e ')} importada(s) automaticamente!`);
       }
     }
 
@@ -91,6 +95,7 @@ export const useOpeniAutoImport = ({
       }
 
       queryClient.invalidateQueries({ queryKey: ['accounts', companyId] });
+      queryClient.invalidateQueries({ queryKey: ['credit-cards'] });
       isProcessingRef.current = false;
     };
 
