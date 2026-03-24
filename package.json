@@ -14,6 +14,8 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
+    "format": "prettier --write \"apps\" \"packages\" \"package.json\"",
+    "format:check": "prettier --check \"apps\" \"packages\" \"package.json\"",
     "typecheck": "turbo run type-check",
     "clean": "turbo run clean && rm -rf node_modules apps/*/node_modules packages/*/node_modules",
     "prepare": "husky"
@@ -23,14 +25,6 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
     "turbo": "^2.8.10"
-  },
-  "lint-staged": {
-    "apps/web/**/*.{ts,tsx}": [
-      "prettier --write",
-      "turbo run lint",
-      "turbo run type-check",
-      "turbo run build"
-    ]
   },
   "resolutions": {
     "undici": "6.24.1",

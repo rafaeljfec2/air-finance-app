@@ -1,6 +1,8 @@
+import { Inbox, RefreshCw } from 'lucide-react';
+
+
 import { Transaction } from '@/types/transaction';
 import { formatCurrency, formatDateTime } from '@/utils/formatters';
-import { Inbox, RefreshCw } from 'lucide-react';
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -10,12 +12,12 @@ interface TransactionListProps {
   isLoading?: boolean;
 }
 
-export function TransactionList({ 
-  transactions, 
-  onEdit, 
-  onRemove, 
+export function TransactionList({
+  transactions,
+  onEdit,
+  onRemove,
   onRefresh,
-  isLoading = false 
+  isLoading = false,
 }: Readonly<TransactionListProps>) {
   if (transactions.length === 0) {
     return (
@@ -81,8 +83,8 @@ export function TransactionList({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-              {transactions.map(transaction => (
-                <tr 
+              {transactions.map((transaction) => (
+                <tr
                   key={transaction.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                 >

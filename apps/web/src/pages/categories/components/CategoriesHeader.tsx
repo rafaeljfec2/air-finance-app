@@ -1,5 +1,7 @@
-import { Button } from '@/components/ui/button';
 import { Plus, Tag } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+
 
 interface CategoriesHeaderProps {
   onCreate: () => void;
@@ -16,9 +18,7 @@ export function CategoriesHeader({ onCreate }: Readonly<CategoriesHeaderProps>) 
           </div>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-text dark:text-text-dark">Categorias</h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Gerencie receitas e despesas
-            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Gerencie receitas e despesas</p>
           </div>
         </div>
 
@@ -38,9 +38,7 @@ export function CategoriesHeader({ onCreate }: Readonly<CategoriesHeaderProps>) 
             <Tag className="h-8 w-8 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-text dark:text-text-dark mb-1">
-              Categorias
-            </h1>
+            <h1 className="text-3xl font-bold text-text dark:text-text-dark mb-1">Categorias</h1>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Organize suas receitas e despesas por categoria
             </p>

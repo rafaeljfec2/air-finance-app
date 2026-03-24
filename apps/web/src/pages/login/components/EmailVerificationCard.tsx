@@ -1,6 +1,8 @@
+import { Loader2, Mail, Send } from 'lucide-react';
+
+
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Loader2, Mail, Send } from 'lucide-react';
 
 interface EmailVerificationCardProps {
   email: string;
@@ -24,9 +26,7 @@ export function EmailVerificationCard({
       <div className="rounded-full bg-yellow-100 dark:bg-yellow-900/20 w-16 h-16 mx-auto flex items-center justify-center mb-4">
         <Mail className="h-8 w-8 text-yellow-600 dark:text-yellow-500" />
       </div>
-      <h2 className="text-xl font-semibold text-text dark:text-text-dark">
-        Verifique seu E-mail
-      </h2>
+      <h2 className="text-xl font-semibold text-text dark:text-text-dark">Verifique seu E-mail</h2>
       <p className="text-sm text-text/80 dark:text-text-dark/80">
         Sua conta ainda não foi ativada. Enviamos um link de confirmação para{' '}
         <strong>{email}</strong>. Caso você não receba o e-mail, clique no botão abaixo para

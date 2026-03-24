@@ -73,4 +73,3 @@ export function parseOfxContent(content: string): {
 
   return { header, transactions };
 }
-

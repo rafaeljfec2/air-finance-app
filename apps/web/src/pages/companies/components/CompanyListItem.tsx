@@ -1,6 +1,8 @@
-import { Company } from '@/types/company';
 import { MoreVertical, Edit, Trash2 } from 'lucide-react';
+
+
 import { Button } from '@/components/ui/button';
+import { Company } from '@/types/company';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const typeOptions = [
@@ -35,7 +37,7 @@ export function CompanyListItem({
   // Pegar iniciais do nome
   const initials = company.name
     .split(' ')
-    .map(word => word[0])
+    .map((word) => word[0])
     .slice(0, 2)
     .join('')
     .toUpperCase();
@@ -44,9 +46,7 @@ export function CompanyListItem({
     <div className="flex items-center gap-2.5 p-2 bg-card dark:bg-card-dark hover:bg-background/50 dark:hover:bg-background-dark/50 transition-colors rounded-lg border border-border/50 dark:border-border-dark/50">
       {/* Avatar com iniciais */}
       <div className="w-9 h-9 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center shrink-0">
-        <span className="text-sm font-bold text-primary-700 dark:text-primary-300">
-          {initials}
-        </span>
+        <span className="text-sm font-bold text-primary-700 dark:text-primary-300">{initials}</span>
       </div>
 
       {/* Conteúdo */}
@@ -54,9 +54,7 @@ export function CompanyListItem({
         <h3 className="font-semibold text-[13px] text-text dark:text-text-dark truncate leading-tight">
           {company.name}
         </h3>
-        <p className="text-[11px] text-gray-500 dark:text-gray-400">
-          {getTypeLabel(company.type)}
-        </p>
+        <p className="text-[11px] text-gray-500 dark:text-gray-400">{getTypeLabel(company.type)}</p>
       </div>
 
       {/* Menu */}

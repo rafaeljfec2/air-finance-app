@@ -5,10 +5,7 @@ interface HeaderThemeToggleProps {
   onToggle: () => void;
 }
 
-export function HeaderThemeToggle({
-  isDarkMode,
-  onToggle,
-}: Readonly<HeaderThemeToggleProps>) {
+export function HeaderThemeToggle({ isDarkMode, onToggle }: Readonly<HeaderThemeToggleProps>) {
   return (
     <button
       onClick={onToggle}

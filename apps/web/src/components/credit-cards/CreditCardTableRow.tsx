@@ -1,7 +1,9 @@
+import { Edit, Trash2 } from 'lucide-react';
+
+
 import { Button } from '@/components/ui/button';
 import { CreditCard } from '@/services/creditCardService';
 import { formatCurrency } from '@/utils/formatters';
-import { Edit, Trash2 } from 'lucide-react';
 
 interface CreditCardTableRowProps {
   creditCard: CreditCard;
@@ -28,8 +30,7 @@ export function CreditCardTableRow({
   isUpdating,
   isDeleting,
 }: Readonly<CreditCardTableRowProps>) {
-  const bankLabel =
-    bankTypes.find((t) => t.value === creditCard.icon)?.label || 'Cartão';
+  const bankLabel = bankTypes.find((t) => t.value === creditCard.icon)?.label || 'Cartão';
 
   return (
     <tr className="border-b border-border dark:border-border-dark hover:bg-card dark:hover:bg-card-dark transition-colors">

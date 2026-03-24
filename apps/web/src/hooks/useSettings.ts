@@ -52,6 +52,6 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: '@air-finance:settings',
-    }
-  )
-); 
+    },
+  ),
+);

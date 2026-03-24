@@ -1,7 +1,9 @@
+import { useCallback } from 'react';
+
+
 import { useAuthStore } from '@/stores/auth';
 import { useCompanyStore } from '@/stores/company';
 import { Company } from '@/types';
-import { useCallback } from 'react';
 
 export const useActiveCompany = () => {
   const { activeCompany, setActiveCompany, clearActiveCompany } = useCompanyStore();
@@ -18,7 +20,7 @@ export const useActiveCompany = () => {
       // This validation is now handled by backend guards to prevent data leaks
       // userIds are no longer stored in localStorage for security reasons
       // The backend validates user access to company through CompanyPermissionGuard
-      
+
       setActiveCompany(company);
     },
     [user, setActiveCompany, clearActiveCompany],

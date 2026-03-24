@@ -1,6 +1,8 @@
+import { Plus, User as UserIcon } from 'lucide-react';
+
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Plus, User as UserIcon } from 'lucide-react';
 
 interface UserEmptyStateProps {
   hasFilters: boolean;
@@ -32,4 +34,3 @@ export function UserEmptyState({ hasFilters, onCreateClick }: Readonly<UserEmpty
     </Card>
   );
 }
-

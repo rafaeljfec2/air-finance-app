@@ -1,12 +1,14 @@
-import { Modal } from '@/components/ui/Modal';
+import { Link2, X, AlertCircle } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Account } from '@/services/accountService';
-import { Link2, X, AlertCircle } from 'lucide-react';
-import { useBankingIntegration } from '@/pages/accounts/hooks/useBankingIntegration';
-import { CertificateUpload } from './CertificateUpload';
+import { Modal } from '@/components/ui/Modal';
 import { cn } from '@/lib/utils';
+import { useBankingIntegration } from '@/pages/accounts/hooks/useBankingIntegration';
+import { Account } from '@/services/accountService';
+
+import { CertificateUpload } from './CertificateUpload';
 
 interface BankingIntegrationModalProps {
   open: boolean;
@@ -78,7 +80,8 @@ export function BankingIntegrationModal({
               <div className="flex-1 text-xs text-blue-800 dark:text-blue-300">
                 <p className="font-medium mb-0.5">Informações sobre a integração</p>
                 <p className="text-blue-700 dark:text-blue-400">
-                  Você precisará dos certificados digitais (.crt e .key) e credenciais OAuth2 do Banco Inter. Acesse o{' '}
+                  Você precisará dos certificados digitais (.crt e .key) e credenciais OAuth2 do
+                  Banco Inter. Acesse o{' '}
                   <a
                     href="https://developers.inter.co"
                     target="_blank"
@@ -86,7 +89,8 @@ export function BankingIntegrationModal({
                     className="underline hover:text-blue-900 dark:hover:text-blue-200"
                   >
                     Portal de Desenvolvedores
-                  </a>.
+                  </a>
+                  .
                 </p>
               </div>
             </div>
@@ -94,7 +98,9 @@ export function BankingIntegrationModal({
             {/* Banco and Account Number - Same Line */}
             <div className="grid grid-cols-2 gap-2.5">
               <div className="space-y-1">
-                <Label htmlFor="bankCode" className="text-xs">Banco *</Label>
+                <Label htmlFor="bankCode" className="text-xs">
+                  Banco *
+                </Label>
                 <select
                   id="bankCode"
                   value={formData.bankCode}
@@ -117,7 +123,9 @@ export function BankingIntegrationModal({
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="accountNumber" className="text-xs">Número da Conta *</Label>
+                <Label htmlFor="accountNumber" className="text-xs">
+                  Número da Conta *
+                </Label>
                 <Input
                   id="accountNumber"
                   type="text"
@@ -125,7 +133,10 @@ export function BankingIntegrationModal({
                   value={formData.accountNumber}
                   onChange={(e) => handleChange('accountNumber', e.target.value)}
                   disabled={isLoading}
-                  className={cn('text-sm h-[38px]', errors.accountNumber && 'border-red-500 focus:ring-red-500')}
+                  className={cn(
+                    'text-sm h-[38px]',
+                    errors.accountNumber && 'border-red-500 focus:ring-red-500',
+                  )}
                 />
                 {errors.accountNumber && (
                   <p className="text-xs text-red-600 dark:text-red-400">{errors.accountNumber}</p>
@@ -135,7 +146,9 @@ export function BankingIntegrationModal({
 
             {/* Pix Key */}
             <div className="space-y-1">
-              <Label htmlFor="pixKey" className="text-xs">Chave Pix *</Label>
+              <Label htmlFor="pixKey" className="text-xs">
+                Chave Pix *
+              </Label>
               <Input
                 id="pixKey"
                 type="text"
@@ -143,7 +156,10 @@ export function BankingIntegrationModal({
                 value={formData.pixKey}
                 onChange={(e) => handleChange('pixKey', e.target.value)}
                 disabled={isLoading}
-                className={cn('text-sm h-[38px]', errors.pixKey && 'border-red-500 focus:ring-red-500')}
+                className={cn(
+                  'text-sm h-[38px]',
+                  errors.pixKey && 'border-red-500 focus:ring-red-500',
+                )}
               />
               {errors.pixKey && (
                 <p className="text-xs text-red-600 dark:text-red-400">{errors.pixKey}</p>
@@ -153,7 +169,9 @@ export function BankingIntegrationModal({
             {/* Client ID and Client Secret - Same Line */}
             <div className="grid grid-cols-2 gap-2.5">
               <div className="space-y-1">
-                <Label htmlFor="clientId" className="text-xs">Client ID OAuth2 *</Label>
+                <Label htmlFor="clientId" className="text-xs">
+                  Client ID OAuth2 *
+                </Label>
                 <Input
                   id="clientId"
                   type="text"
@@ -161,7 +179,10 @@ export function BankingIntegrationModal({
                   value={formData.clientId}
                   onChange={(e) => handleChange('clientId', e.target.value)}
                   disabled={isLoading}
-                  className={cn('text-sm h-[38px]', errors.clientId && 'border-red-500 focus:ring-red-500')}
+                  className={cn(
+                    'text-sm h-[38px]',
+                    errors.clientId && 'border-red-500 focus:ring-red-500',
+                  )}
                 />
                 {errors.clientId && (
                   <p className="text-xs text-red-600 dark:text-red-400">{errors.clientId}</p>
@@ -169,7 +190,9 @@ export function BankingIntegrationModal({
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="clientSecret" className="text-xs">Client Secret OAuth2 *</Label>
+                <Label htmlFor="clientSecret" className="text-xs">
+                  Client Secret OAuth2 *
+                </Label>
                 <Input
                   id="clientSecret"
                   type="password"
@@ -177,7 +200,10 @@ export function BankingIntegrationModal({
                   value={formData.clientSecret}
                   onChange={(e) => handleChange('clientSecret', e.target.value)}
                   disabled={isLoading}
-                  className={cn('text-sm h-[38px]', errors.clientSecret && 'border-red-500 focus:ring-red-500')}
+                  className={cn(
+                    'text-sm h-[38px]',
+                    errors.clientSecret && 'border-red-500 focus:ring-red-500',
+                  )}
                   autoComplete="off"
                 />
                 {errors.clientSecret && (
@@ -214,7 +240,8 @@ export function BankingIntegrationModal({
               <div className="flex-1 text-xs text-yellow-800 dark:text-yellow-300">
                 <p className="font-medium mb-0.5">Segurança</p>
                 <p className="text-yellow-700 dark:text-yellow-400">
-                  Os certificados e credenciais são transmitidos via HTTPS e armazenados criptografados. Nunca compartilhe com terceiros.
+                  Os certificados e credenciais são transmitidos via HTTPS e armazenados
+                  criptografados. Nunca compartilhe com terceiros.
                 </p>
               </div>
             </div>
@@ -242,9 +269,25 @@ export function BankingIntegrationModal({
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
-                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Configurando...
               </span>

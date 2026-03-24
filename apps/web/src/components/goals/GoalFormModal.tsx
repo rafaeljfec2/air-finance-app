@@ -1,19 +1,20 @@
+import { Calendar, DollarSign, FileText, Tag, Target, Wallet, X } from 'lucide-react';
+import type { ChangeEvent, FormEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
+import { Button } from '@/components/ui/button';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { FormField } from '@/components/ui/FormField';
-import { Modal } from '@/components/ui/Modal';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/Modal';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCategories } from '@/hooks/useCategories';
 import { cn } from '@/lib/utils';
 import { CreateGoal, Goal } from '@/services/goalService';
 import { useCompanyStore } from '@/stores/company';
-import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { formatDateToLocalISO } from '@/utils/date';
-import { Calendar, DollarSign, FileText, Tag, Target, Wallet, X } from 'lucide-react';
-import type { ChangeEvent, FormEvent } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 
 interface GoalFormModalProps {
   open: boolean;
@@ -251,7 +252,9 @@ export function GoalFormModal({
                   <ComboBox
                     options={accountOptions}
                     value={form.accountId || null}
-                    onValueChange={(value) => setForm((prev) => ({ ...prev, accountId: value ?? '' }))}
+                    onValueChange={(value) =>
+                      setForm((prev) => ({ ...prev, accountId: value ?? '' }))
+                    }
                     placeholder="Selecione..."
                     error={errors.accountId}
                     searchable

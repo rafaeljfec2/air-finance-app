@@ -25,4 +25,3 @@ export const defaultSEOMetadata: SEOMetadata = {
   ogImage: '/og-image.jpg',
   canonicalUrl: 'https://airfinance.app/',
 };
-

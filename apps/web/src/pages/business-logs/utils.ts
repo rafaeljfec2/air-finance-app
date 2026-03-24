@@ -1,4 +1,6 @@
 import { BusinessLog } from '@/services/businessLogService';
+
+
 import { entityTypeLabels, operationLabels } from './constants';
 
 /**
@@ -30,4 +32,3 @@ export function filterLogsBySearchTerm(logs: BusinessLog[], searchTerm: string):
       operationLabels[log.operation]?.toLowerCase().includes(term),
   );
 }
-

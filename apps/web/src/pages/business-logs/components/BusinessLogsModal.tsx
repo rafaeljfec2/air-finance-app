@@ -1,4 +1,6 @@
 import { Modal } from '@/components/ui/Modal';
+
+
 import { BusinessLogsPageContent } from './BusinessLogsPageContent';
 
 interface BusinessLogsModalProps {
@@ -8,12 +10,7 @@ interface BusinessLogsModalProps {
   readonly entityType?: string;
 }
 
-export function BusinessLogsModal({
-  open,
-  onClose,
-  entityId,
-  entityType,
-}: BusinessLogsModalProps) {
+export function BusinessLogsModal({ open, onClose, entityId, entityType }: BusinessLogsModalProps) {
   return (
     <Modal
       open={open}
@@ -27,4 +24,3 @@ export function BusinessLogsModal({
     </Modal>
   );
 }
-

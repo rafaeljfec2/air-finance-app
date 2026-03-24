@@ -1,15 +1,19 @@
 import { AccountTableRow } from '@/components/accounts/AccountTableRow';
 import { Card } from '@/components/ui/card';
 import { RecordsGrid } from '@/components/ui/RecordsGrid';
-import { SortableColumn , SortConfig } from '@/components/ui/SortableColumn';
+import { SortableColumn, SortConfig } from '@/components/ui/SortableColumn';
 import { Account } from '@/services/accountService';
+
+
 import { AccountCard } from './AccountCard';
 import { AccountListItem } from './AccountListItem';
 
 interface AccountsListProps {
   accounts: Account[];
   viewMode: 'grid' | 'list';
-  sortConfig: SortConfig<'name' | 'type' | 'institution' | 'agency' | 'accountNumber' | 'balance'> | null;
+  sortConfig: SortConfig<
+    'name' | 'type' | 'institution' | 'agency' | 'accountNumber' | 'balance'
+  > | null;
   onSort: (field: 'name' | 'type' | 'institution' | 'agency' | 'accountNumber' | 'balance') => void;
   onEdit: (account: Account) => void;
   onDelete: (id: string) => void;

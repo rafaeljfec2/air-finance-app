@@ -4,6 +4,8 @@
  */
 
 import { StateStorage } from 'zustand/middleware';
+
+
 import { encryptObject, decryptObject } from './encryption';
 import { clearExpiredItems, getStorageSize } from './storage';
 
@@ -39,12 +41,7 @@ export const createSecureStorage = (
   _name: string,
   options: SecureStorageOptions = {},
 ): StateStorage => {
-  const {
-    encrypt = false,
-    ttl,
-    storage = localStorage,
-    monitor = true,
-  } = options;
+  const { encrypt = false, ttl, storage = localStorage, monitor = true } = options;
 
   // Clean expired items on initialization
   if (ttl) {
@@ -86,7 +83,7 @@ export const createSecureStorage = (
         try {
           // Check if it's our secure storage format (with expiration)
           const parsed = JSON.parse(rawItem);
-          
+
           // If it has expiresAt, it's our secure format
           if (parsed.expiresAt !== undefined) {
             // Check expiration
@@ -94,10 +91,10 @@ export const createSecureStorage = (
               storage.removeItem(key);
               return null;
             }
-            
+
             // Extract Zustand data from our wrapper
             const zustandData = parsed.data;
-            
+
             // If encrypted, decrypt the state
             if (encrypt && zustandData?.state && typeof zustandData.state === 'string') {
               try {
@@ -108,10 +105,10 @@ export const createSecureStorage = (
                 return JSON.stringify(zustandData);
               }
             }
-            
+
             return JSON.stringify(zustandData);
           }
-          
+
           // It's Zustand's direct format (backward compatibility)
           // Check expiration if TTL is set (we can't really expire it, but we can migrate on next write)
           return rawItem;
@@ -240,4 +237,3 @@ export const getStorageInfo = (storage: Storage = localStorage) => {
     isNearLimit: usagePercent > 80,
   };
 };
-

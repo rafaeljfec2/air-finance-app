@@ -25,7 +25,7 @@ export const PLANS: Plan[] = [
   {
     id: 'pro',
     name: 'Pro',
-    price: 29.90,
+    price: 29.9,
     displayPrice: 'R$ 29,90',
     features: [
       'Tudo do plano Free',
@@ -48,7 +48,7 @@ export const PLANS: Plan[] = [
   {
     id: 'business',
     name: 'Business',
-    price: 79.90,
+    price: 79.9,
     displayPrice: 'R$ 79,90',
     features: [
       'Tudo do plano Pro',

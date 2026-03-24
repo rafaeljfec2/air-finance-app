@@ -1,13 +1,23 @@
 import React from 'react';
+
+
 import { Label } from '@/components/ui/label';
-import { CategoryCard } from './CategoryCard';
+
 import { type CategoryFormData } from '../schemas';
+import { CategoryCard } from './CategoryCard';
+
+
+
 
 interface CategoriesListProps {
   categories: CategoryFormData[];
   onRemove: (index: number) => void;
   iconOptions: ReadonlyArray<{ value: string; icon: React.ComponentType<{ className?: string }> }>;
-  categoryTypes: ReadonlyArray<{ value: string; label: string; icon: React.ComponentType<{ className?: string }> }>;
+  categoryTypes: ReadonlyArray<{
+    value: string;
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+  }>;
 }
 
 export function CategoriesList({

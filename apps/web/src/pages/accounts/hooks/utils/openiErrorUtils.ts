@@ -45,7 +45,10 @@ export const getErrorData = (error: unknown): ErrorResponse => {
   return err.response?.data ?? err;
 };
 
-export const extractItemIdFromError = (errorData: ErrorResponse, errorMessage: string): string | undefined => {
+export const extractItemIdFromError = (
+  errorData: ErrorResponse,
+  errorMessage: string,
+): string | undefined => {
   if (errorData.details && Array.isArray(errorData.details) && errorData.details.length > 0) {
     const firstDetail = errorData.details[0];
     if (firstDetail && typeof firstDetail === 'object' && 'id' in firstDetail) {
@@ -53,7 +56,11 @@ export const extractItemIdFromError = (errorData: ErrorResponse, errorMessage: s
     }
   }
 
-  if (typeof errorData.message === 'object' && errorData.message !== null && 'itemId' in errorData.message) {
+  if (
+    typeof errorData.message === 'object' &&
+    errorData.message !== null &&
+    'itemId' in errorData.message
+  ) {
     return errorData.message.itemId;
   }
 

@@ -1,35 +1,37 @@
-import { Button } from '@/components/ui/button';
-import {
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { ComboBox } from '@/components/ui/ComboBox';
-import { useBanks } from '@/hooks/useBanks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import {
-    Banknote,
-    Building2,
-    ChevronLeft,
-    ChevronRight,
-    Landmark,
-    Loader2,
-    Wallet,
+  Banknote,
+  Building2,
+  ChevronLeft,
+  ChevronRight,
+  Landmark,
+  Loader2,
+  Wallet,
 } from 'lucide-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+
+import { Button } from '@/components/ui/button';
+import {
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { ComboBox } from '@/components/ui/ComboBox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useBanks } from '@/hooks/useBanks';
+
 import { type AccountFormData, AccountSchema } from '../schemas';
 
 const accountTypes = [
@@ -48,7 +50,7 @@ interface AccountStepProps {
 
 export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<AccountStepProps>) {
   const { bankOptions, isLoading: isLoadingBanks } = useBanks();
-  
+
   const accountForm = useForm<AccountFormData>({
     resolver: zodResolver(AccountSchema),
     defaultValues: initialData || {
@@ -71,7 +73,7 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
 
   const handleBankChange = (bankCode: string | null) => {
     if (bankCode) {
-      const selectedBank = bankOptions.find(b => b.value === bankCode);
+      const selectedBank = bankOptions.find((b) => b.value === bankCode);
       if (selectedBank) {
         // Extract bank name from label (format: "001 - Banco do Brasil")
         const bankName = selectedBank.label.split(' - ')[1] || selectedBank.label;
@@ -161,7 +163,7 @@ export function AccountStep({ onNext, onBack, loading, initialData }: Readonly<A
                 options={bankOptions}
                 value={accountForm.watch('bankCode') ?? null}
                 onValueChange={handleBankChange}
-                placeholder={isLoadingBanks ? "Carregando bancos..." : "Selecione o banco"}
+                placeholder={isLoadingBanks ? 'Carregando bancos...' : 'Selecione o banco'}
                 disabled={isLoadingBanks}
                 searchable
                 searchPlaceholder="Buscar banco..."

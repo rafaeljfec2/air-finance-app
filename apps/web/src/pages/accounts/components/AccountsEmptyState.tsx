@@ -1,16 +1,15 @@
+import { Banknote, Plus } from 'lucide-react';
+
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Banknote, Plus } from 'lucide-react';
 
 interface AccountsEmptyStateProps {
   hasFilters: boolean;
   onCreate: () => void;
 }
 
-export function AccountsEmptyState({
-  hasFilters,
-  onCreate,
-}: Readonly<AccountsEmptyStateProps>) {
+export function AccountsEmptyState({ hasFilters, onCreate }: Readonly<AccountsEmptyStateProps>) {
   const emptyTitle = hasFilters ? 'Nenhuma conta encontrada' : 'Nenhuma conta cadastrada';
   const emptyDescription = hasFilters
     ? 'Tente ajustar os filtros de busca'

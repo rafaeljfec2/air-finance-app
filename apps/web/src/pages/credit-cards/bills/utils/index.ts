@@ -7,8 +7,4 @@ export {
   calculateUsagePercentage,
 } from './formatters';
 
-export {
-  type BillStatus,
-  getStatusConfig,
-  getStatusBadgeClasses,
-} from './billStatus';
+export { type BillStatus, getStatusConfig, getStatusBadgeClasses } from './billStatus';

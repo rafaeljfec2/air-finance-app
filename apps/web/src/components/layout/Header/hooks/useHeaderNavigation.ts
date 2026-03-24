@@ -1,5 +1,5 @@
-import { useLocation, useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export function useHeaderNavigation() {
   const navigate = useNavigate();
@@ -7,9 +7,7 @@ export function useHeaderNavigation() {
 
   const shouldShowBackButton = useCallback(() => {
     return (
-      location.pathname !== '/home' &&
-      location.pathname !== '/' &&
-      location.pathname !== '/login'
+      location.pathname !== '/home' && location.pathname !== '/' && location.pathname !== '/login'
     );
   }, [location.pathname]);
 

@@ -1,28 +1,21 @@
+import { Edit, History, MoreVertical, Trash2 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Edit, History, MoreVertical, Trash2 } from 'lucide-react';
-import type { TransactionActionsProps } from './TransactionGrid.types';
 
-interface TransactionActionsPropsReadonly extends Readonly<TransactionActionsProps> {}
+import type { TransactionActionsProps } from './TransactionGrid.types';
 
 export function TransactionActions({
   transaction,
   onEdit,
   onDelete,
   onViewHistory,
-  // variant = 'table',
-}: TransactionActionsPropsReadonly) {
-  
-  // Mobile/Card view might prefer visible buttons or same menu. 
-  // For consistency and space, using menu for both but allowing customization if needed.
-  // Actually, for mobile list items, simple buttons might be easier to tap? 
-  // Let's stick to menu for table as requested, and maybe keep it consistent.
-  
+}: Readonly<TransactionActionsProps>) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className="h-7 w-7 p-0 data-[state=open]:bg-muted"
           onClick={(e) => e.stopPropagation()} // Prevent row click
         >
@@ -73,4 +66,3 @@ export function TransactionActions({
     </Popover>
   );
 }
-

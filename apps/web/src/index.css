@@ -218,23 +218,13 @@
   }
 
   .animate-shimmer {
-    background: linear-gradient(
-      90deg,
-      #E8EFEC 25%,
-      #f0f5f2 50%,
-      #E8EFEC 75%
-    );
+    background: linear-gradient(90deg, #e8efec 25%, #f0f5f2 50%, #e8efec 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
   }
 
   .dark .animate-shimmer {
-    background: linear-gradient(
-      90deg,
-      #374151 25%,
-      #4b5563 50%,
-      #374151 75%
-    );
+    background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
   }
@@ -504,7 +494,6 @@
   min-width: 32px !important;
 }
 
-
 .flatpickr-month > * {
   flex-shrink: 0 !important;
 }
@@ -711,7 +700,6 @@
   min-width: 130px !important;
 }
 
-
 .flatpickr-month .flatpickr-prev-month,
 .flatpickr-month .flatpickr-current-month,
 .flatpickr-month .flatpickr-next-month {
@@ -734,8 +722,6 @@
 .dark .flatpickr-monthDropdown-years {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ccc' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
 }
-
-
 
 /* Show year text by default */
 .flatpickr-current-month .cur-year {

@@ -1,4 +1,8 @@
+import { Plus } from 'lucide-react';
+
+
 import React from 'react';
+
 import { Button } from '@/components/ui/button';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { IconPicker } from '@/components/ui/icon-picker';
@@ -11,14 +15,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus } from 'lucide-react';
+
 import { type CategoryFormData } from '../schemas';
 
 interface CategoryFormProps {
   formData: CategoryFormData;
   errors: Record<string, string>;
   iconOptions: ReadonlyArray<{ value: string; icon: React.ComponentType<{ className?: string }> }>;
-  categoryTypes: ReadonlyArray<{ value: string; label: string; icon: React.ComponentType<{ className?: string }> }>;
+  categoryTypes: ReadonlyArray<{
+    value: string;
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+  }>;
   onNameChange: (name: string) => void;
   onTypeChange: (type: 'income' | 'expense') => void;
   onColorChange: (color: string) => void;
@@ -55,7 +63,10 @@ export function CategoryForm({
 
       <div className="space-y-2">
         <Label className="text-text dark:text-text-dark">Tipo</Label>
-        <Select value={formData.type} onValueChange={(value) => onTypeChange(value as 'income' | 'expense')}>
+        <Select
+          value={formData.type}
+          onValueChange={(value) => onTypeChange(value as 'income' | 'expense')}
+        >
           <SelectTrigger className="bg-card dark:bg-card-dark border-border dark:border-border-dark text-text dark:text-text-dark">
             <SelectValue />
           </SelectTrigger>

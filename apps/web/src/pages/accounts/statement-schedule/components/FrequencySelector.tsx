@@ -5,10 +5,7 @@ interface FrequencySelectorProps {
   onSelect: (type: FrequencyType) => void;
 }
 
-export function FrequencySelector({
-  selectedType,
-  onSelect,
-}: Readonly<FrequencySelectorProps>) {
+export function FrequencySelector({ selectedType, onSelect }: Readonly<FrequencySelectorProps>) {
   return (
     <div className="space-y-2">
       <h2 className="text-sm font-medium text-text dark:text-text-dark">Frequência</h2>
@@ -40,9 +37,7 @@ export function FrequencySelector({
                     : 'border-gray-300 dark:border-gray-600'
                 }`}
               >
-                {selectedType === option.type && (
-                  <div className="w-2 h-2 rounded-full bg-white" />
-                )}
+                {selectedType === option.type && <div className="w-2 h-2 rounded-full bg-white" />}
               </div>
             </div>
           </button>

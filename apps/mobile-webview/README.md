@@ -29,7 +29,7 @@ App mobile do Air Finance usando Expo e React Native WebView.
 Atualize a URL em `src/constants/webview.ts`:
 
 ```typescript
-export const WEBSITE_URL = 'https://app.airfinance.com.br';
+export const WEBSITE_URL = "https://app.airfinance.com.br";
 ```
 
 ## Estrutura

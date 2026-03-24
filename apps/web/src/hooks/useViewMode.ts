@@ -3,6 +3,8 @@
  */
 
 import { useState, useEffect } from 'react';
+
+
 import { getViewMode, setViewMode, type ViewPreferences } from '@/utils/viewPreferences';
 
 type ViewMode = 'grid' | 'list';
@@ -29,4 +31,3 @@ export const useViewMode = (page: keyof ViewPreferences): [ViewMode, (mode: View
 
   return [mode, setMode];
 };
-

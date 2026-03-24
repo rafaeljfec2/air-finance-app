@@ -1,5 +1,3 @@
-import { Category } from '@/services/categoryService';
-import { cn } from '@/lib/utils';
 import {
   Gift,
   Landmark,
@@ -12,8 +10,11 @@ import {
   Edit,
   Trash2,
 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { Category } from '@/services/categoryService';
 
 const iconOptions = [
   { value: 'TagIcon', icon: Tag },
@@ -38,8 +39,10 @@ function getTypeLabel(type: CategoryType): string {
 
 function getTypeBadgeColor(type: CategoryType): string {
   const colors: Record<CategoryType, string> = {
-    income: 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700',
-    expense: 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700',
+    income:
+      'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700',
+    expense:
+      'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700',
   };
   return colors[type] ?? colors.expense;
 }

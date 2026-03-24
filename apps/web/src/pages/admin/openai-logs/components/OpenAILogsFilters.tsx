@@ -1,7 +1,9 @@
+import { Search } from 'lucide-react';
+
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
 
 interface OpenAILogsFiltersProps {
   searchTerm: string;
@@ -36,9 +38,7 @@ export function OpenAILogsFilters({
               onClick={() => onStatusFilterChange('all')}
               size="sm"
               className={
-                statusFilter === 'all'
-                  ? 'bg-primary-500 hover:bg-primary-600 text-white'
-                  : ''
+                statusFilter === 'all' ? 'bg-primary-500 hover:bg-primary-600 text-white' : ''
               }
             >
               Todos
@@ -48,9 +48,7 @@ export function OpenAILogsFilters({
               onClick={() => onStatusFilterChange('success')}
               size="sm"
               className={
-                statusFilter === 'success'
-                  ? 'bg-green-600 hover:bg-green-700 text-white'
-                  : ''
+                statusFilter === 'success' ? 'bg-green-600 hover:bg-green-700 text-white' : ''
               }
             >
               Sucesso
@@ -59,11 +57,7 @@ export function OpenAILogsFilters({
               variant={statusFilter === 'error' ? 'default' : 'outline'}
               onClick={() => onStatusFilterChange('error')}
               size="sm"
-              className={
-                statusFilter === 'error'
-                  ? 'bg-red-600 hover:bg-red-700 text-white'
-                  : ''
-              }
+              className={statusFilter === 'error' ? 'bg-red-600 hover:bg-red-700 text-white' : ''}
             >
               Erro
             </Button>

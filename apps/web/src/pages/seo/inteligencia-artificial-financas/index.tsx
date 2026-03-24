@@ -1,8 +1,9 @@
-import { SEOHead } from '@/components/seo/SEOHead';
-import { InternalLink } from '@/components/seo/InternalLink';
 import { ChevronRight, Home } from 'lucide-react';
-import { Header } from '@/pages/landing/components/Header';
+
+import { InternalLink } from '@/components/seo/InternalLink';
+import { SEOHead } from '@/components/seo/SEOHead';
 import { Footer } from '@/pages/landing/components/Footer';
+import { Header } from '@/pages/landing/components/Header';
 
 export function InteligenciaArtificialFinancasPage() {
   const faqItems = [
@@ -91,8 +92,8 @@ export function InteligenciaArtificialFinancasPage() {
                 </h3>
                 <p>
                   Sistemas com IA aprendem que compras em determinado estabelecimento são
-                  &apos;alimentação&apos; ou &apos;transporte&apos;. Com histórico suficiente, categorizam
-                  automaticamente novas transações, reduzindo trabalho manual.
+                  &apos;alimentação&apos; ou &apos;transporte&apos;. Com histórico suficiente,
+                  categorizam automaticamente novas transações, reduzindo trabalho manual.
                 </p>
 
                 <h3>Identificação de Padrões</h3>
@@ -125,9 +126,9 @@ export function InteligenciaArtificialFinancasPage() {
 
                 <h3>Falta de Contexto</h3>
                 <p>
-                  IA vê apenas dados, não contexto. Uma compra em farmácia pode ser &apos;saúde&apos; ou
-                  &apos;presente&apos;, e sem contexto adicional, a IA pode errar. Correções manuais ajudam o
-                  sistema a aprender.
+                  IA vê apenas dados, não contexto. Uma compra em farmácia pode ser
+                  &apos;saúde&apos; ou &apos;presente&apos;, e sem contexto adicional, a IA pode
+                  errar. Correções manuais ajudam o sistema a aprender.
                 </p>
 
                 <h3>Dados Insuficientes</h3>
@@ -245,8 +246,8 @@ export function InteligenciaArtificialFinancasPage() {
 
                 <h3>Regras Adaptativas</h3>
                 <p>
-                  Ao invés de regras fixas (&apos;se valor &gt; X, então Y&apos;), IA aprende regras dinâmicas
-                  que se adaptam a mudanças de comportamento.
+                  Ao invés de regras fixas (&apos;se valor &gt; X, então Y&apos;), IA aprende regras
+                  dinâmicas que se adaptam a mudanças de comportamento.
                 </p>
               </section>
 

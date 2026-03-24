@@ -1,7 +1,9 @@
-import { ComboBoxOption } from '@/components/ui/ComboBox';
-import { getBanks, type Bank } from '@/services/bankService';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useEffect } from 'react';
+
+import { ComboBoxOption } from '@/components/ui/ComboBox';
+import { getBanks, type Bank } from '@/services/bankService';
+
 
 export function useBanks() {
   const {
@@ -26,10 +28,10 @@ export function useBanks() {
     bankName?: string;
   })[] = useMemo(() => {
     if (!banks || banks.length === 0) return [];
-    
+
     // Filtrar apenas bancos ativos
     const activeBanks = banks.filter((bank) => bank.active !== false);
-    
+
     return activeBanks.map((bank) => ({
       value: bank.code,
       label: `${bank.code} - ${bank.shortName || bank.name}`, // Fallback para name se shortName não existir
@@ -40,19 +42,19 @@ export function useBanks() {
   }, [banks]);
 
   const getBankByCode = (code: string): Bank | undefined => {
-    return banks?.find(bank => bank.code === code);
+    return banks?.find((bank) => bank.code === code);
   };
 
   const hasBankingIntegration = (code: string | null | undefined): boolean => {
     if (!code) return false;
     const bank = getBankByCode(code);
     if (!bank) return false;
-    
+
     // Verifica o campo integration
     if (bank.integration?.active && bank.integration?.type && bank.integration.type !== 'none') {
       return true;
     }
-    
+
     return false;
   };
 

@@ -6,58 +6,58 @@ const categories: Category[] = [
     name: 'Salary',
     type: 'INCOME',
     color: '#10B981',
-    icon: '💼'
+    icon: '💼',
   },
   {
     id: '2',
     name: 'Freelance',
     type: 'INCOME',
     color: '#3B82F6',
-    icon: '💻'
+    icon: '💻',
   },
   {
     id: '3',
     name: 'Investments',
     type: 'INCOME',
     color: '#8B5CF6',
-    icon: '📈'
+    icon: '📈',
   },
   {
     id: '4',
     name: 'Housing',
     type: 'EXPENSE',
     color: '#EF4444',
-    icon: '🏠'
+    icon: '🏠',
   },
   {
     id: '5',
     name: 'Food',
     type: 'EXPENSE',
     color: '#F59E0B',
-    icon: '🍽️'
+    icon: '🍽️',
   },
   {
     id: '6',
     name: 'Transport',
     type: 'EXPENSE',
     color: '#6366F1',
-    icon: '🚗'
+    icon: '🚗',
   },
   {
     id: '7',
     name: 'Leisure',
     type: 'EXPENSE',
     color: '#EC4899',
-    icon: '🎮'
-  }
+    icon: '🎮',
+  },
 ];
 
 export function getCategoriesByType(type: 'INCOME' | 'EXPENSE'): Category[] {
-  return categories.filter(category => category.type === type);
+  return categories.filter((category) => category.type === type);
 }
 
 export function getCategoryById(id: string): Category | undefined {
-  return categories.find(category => category.id === id);
+  return categories.find((category) => category.id === id);
 }
 
 export function getCategoryColor(id: string): string {
@@ -66,4 +66,4 @@ export function getCategoryColor(id: string): string {
 
 export function getCategoryIcon(id: string): string {
   return getCategoryById(id)?.icon || '💰';
-} 
+}

@@ -1,8 +1,9 @@
-import { useCompanyStore } from '@/stores/company';
-import { useHomePageDataFromExtracts } from '@/pages/home/hooks/useHomePageDataFromExtracts';
 import { useQuery } from '@tanstack/react-query';
+
+import { useHomePageDataFromExtracts } from '@/pages/home/hooks/useHomePageDataFromExtracts';
 import { getAccountsSummaryFromExtracts } from '@/services/accountService';
 import { getCreditCardsSummary } from '@/services/creditCardService';
+import { useCompanyStore } from '@/stores/company';
 
 export function useHomeV2DataFromExtracts() {
   const { activeCompany } = useCompanyStore();
@@ -44,8 +45,6 @@ export function useHomeV2DataFromExtracts() {
     creditCards,
     creditCardAggregated,
     isLoading:
-      summaryQuery.isLoading ||
-      accountsSummaryQuery.isLoading ||
-      creditCardsSummaryQuery.isLoading,
+      summaryQuery.isLoading || accountsSummaryQuery.isLoading || creditCardsSummaryQuery.isLoading,
   };
 }

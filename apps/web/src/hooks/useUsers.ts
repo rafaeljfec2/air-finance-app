@@ -1,13 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+
 import {
-    createUser,
-    deleteAllUserData,
-    deleteAllUserDataByEmail,
-    deleteUser,
-    getUsers,
-    updateUser,
-    type CreateUser,
-    type User,
+  createUser,
+  deleteAllUserData,
+  deleteAllUserDataByEmail,
+  deleteUser,
+  getUsers,
+  updateUser,
+  type CreateUser,
+  type User,
 } from '../services/userService';
 
 export const useUsers = () => {

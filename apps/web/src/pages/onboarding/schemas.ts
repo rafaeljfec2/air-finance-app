@@ -7,15 +7,17 @@ export const CompanySchema = z.object({
 
 export const AccountSchema = z.object({
   name: z.string().min(3, 'Nome da conta deve ter pelo menos 3 caracteres'),
-  type: z
-    .enum(['checking', 'savings', 'investment', 'digital_wallet'])
-    .default('checking'),
+  type: z.enum(['checking', 'savings', 'investment', 'digital_wallet']).default('checking'),
   initialBalance: z.coerce.number().default(0),
   institution: z.string().min(2, 'Informe a instituição'),
   bankCode: z.string().optional(),
   agency: z.string().optional(),
   accountNumber: z.string().optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida').optional().default('#8A05BE'),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida')
+    .optional()
+    .default('#8A05BE'),
   icon: z.string().min(1, 'Ícone é obrigatório').optional().default('Banknote'),
   initialBalanceDate: z.string().optional(),
 });
@@ -23,9 +25,19 @@ export const AccountSchema = z.object({
 export const CreditCardSchema = z.object({
   name: z.string().min(3, 'Nome do cartão deve ter pelo menos 3 caracteres'),
   limit: z.coerce.number().min(0.01, 'Limite deve ser maior que zero'),
-  closingDay: z.coerce.number().min(1, 'Dia de fechamento inválido').max(31, 'Dia de fechamento inválido'),
-  dueDay: z.coerce.number().min(1, 'Dia de vencimento inválido').max(31, 'Dia de vencimento inválido'),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida').optional().default('#8A05BE'),
+  closingDay: z.coerce
+    .number()
+    .min(1, 'Dia de fechamento inválido')
+    .max(31, 'Dia de fechamento inválido'),
+  dueDay: z.coerce
+    .number()
+    .min(1, 'Dia de vencimento inválido')
+    .max(31, 'Dia de vencimento inválido'),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida')
+    .optional()
+    .default('#8A05BE'),
   icon: z.string().min(1, 'Ícone é obrigatório').optional().default('CreditCard'),
   bankCode: z.string().optional(),
 });

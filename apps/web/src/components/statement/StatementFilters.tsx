@@ -1,6 +1,8 @@
-import { Category } from '@/types/transaction';
 import { Filter, Search } from 'lucide-react';
 import { useState } from 'react';
+
+import { Category } from '@/types/transaction';
+
 
 interface StatementFiltersProps {
   categories: Category[];
@@ -9,11 +11,11 @@ interface StatementFiltersProps {
   selectedCategory?: string | null;
 }
 
-export function StatementFilters({ 
-  categories, 
-  onSearch, 
+export function StatementFilters({
+  categories,
+  onSearch,
   onFilterCategory,
-  selectedCategory: externalSelectedCategory = null 
+  selectedCategory: externalSelectedCategory = null,
 }: StatementFiltersProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -91,4 +93,4 @@ export function StatementFilters({
       </div>
     </div>
   );
-} 
+}

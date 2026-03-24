@@ -55,4 +55,3 @@ export const getProductStructuredData = () => ({
   description:
     'Plataforma completa de gestão financeira pessoal com dashboard inteligente, relatórios automáticos e análise de gastos.',
 });
-

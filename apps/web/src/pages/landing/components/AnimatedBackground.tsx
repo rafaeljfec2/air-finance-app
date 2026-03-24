@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react';
+
+
 import { useMousePosition } from '../hooks/useMousePosition';
 import '../landing.css';
 
@@ -6,9 +8,9 @@ export function AnimatedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
   const { x, y } = useMousePosition();
-  const particlesRef = useRef<Array<{ x: number; y: number; vx: number; vy: number; size: number }>>(
-    [],
-  );
+  const particlesRef = useRef<
+    Array<{ x: number; y: number; vx: number; vy: number; size: number }>
+  >([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -80,4 +82,3 @@ export function AnimatedBackground() {
 
   return <canvas ref={canvasRef} className="animated-background" aria-hidden="true" />;
 }
-

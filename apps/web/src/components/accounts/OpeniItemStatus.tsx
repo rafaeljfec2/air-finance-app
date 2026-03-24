@@ -1,6 +1,10 @@
-import { Button } from '@/components/ui/button';
 import { RefreshCw, ExternalLink, AlertTriangle } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+
+
 import { type OpeniItemResponse } from '@/services/openiService';
+
 import { translateOpeniStatus } from './utils/openiStatusTranslations';
 
 interface OpeniItemStatusProps {
@@ -44,7 +48,7 @@ export function OpeniItemStatus({
   const statusConfig = translateOpeniStatus(item.status);
   const StatusIcon = statusConfig.icon;
   const description = getStatusDescription(item.status);
-  
+
   const colorMap: Record<string, string> = {
     CONNECTED: 'text-green-600 dark:text-green-400',
     SYNCING: 'text-blue-600 dark:text-blue-400',
@@ -90,12 +94,12 @@ export function OpeniItemStatus({
     <div className="space-y-4">
       <div className={`p-4 rounded-lg border-2 ${bgColor} ${borderColor}`}>
         <div className="flex items-start gap-3">
-          <StatusIcon className={`h-5 w-5 ${color} flex-shrink-0 mt-0.5 ${upperStatus === 'SYNCING' ? 'animate-spin' : ''}`} />
+          <StatusIcon
+            className={`h-5 w-5 ${color} flex-shrink-0 mt-0.5 ${upperStatus === 'SYNCING' ? 'animate-spin' : ''}`}
+          />
           <div className="flex-1">
             <h3 className={`text-sm font-medium ${color}`}>{statusConfig.label}</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-              {description}
-            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{description}</p>
           </div>
         </div>
       </div>

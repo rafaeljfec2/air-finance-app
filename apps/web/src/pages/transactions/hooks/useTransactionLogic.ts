@@ -1,3 +1,6 @@
+import { useCallback, useMemo } from 'react';
+
+
 import { TransactionGridTransaction } from '@/components/transactions/TransactionGrid.types';
 import {
   calculateBalance,
@@ -6,7 +9,6 @@ import {
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCategories } from '@/hooks/useCategories';
 import { usePreviousBalance, useTransactions } from '@/hooks/useTransactions';
-import { useCallback, useMemo } from 'react';
 
 interface UseTransactionLogicProps {
   companyId: string;
@@ -123,17 +125,20 @@ export function useTransactionLogic({
     return true;
   };
 
-  const shouldIncludeTransaction = useCallback((transaction: TransactionGridTransaction): boolean => {
-    if (transaction.id === 'previous-balance') {
-      return true;
-    }
+  const shouldIncludeTransaction = useCallback(
+    (transaction: TransactionGridTransaction): boolean => {
+      if (transaction.id === 'previous-balance') {
+        return true;
+      }
 
-    const matchesSearch = matchesSearchTerm(transaction.description, searchTerm);
-    const matchesType = matchesTransactionType(selectedType, transaction.launchType);
-    const matchesPeriod = matchesDatePeriod(transaction.paymentDate, startDate, endDate);
+      const matchesSearch = matchesSearchTerm(transaction.description, searchTerm);
+      const matchesType = matchesTransactionType(selectedType, transaction.launchType);
+      const matchesPeriod = matchesDatePeriod(transaction.paymentDate, startDate, endDate);
 
-    return matchesSearch && matchesType && matchesPeriod;
-  }, [searchTerm, selectedType, startDate, endDate]);
+      return matchesSearch && matchesType && matchesPeriod;
+    },
+    [searchTerm, selectedType, startDate, endDate],
+  );
 
   const transactionsWithPreviousBalance = useMemo(() => {
     let transactionsList = [...transactionsWithLabels];

@@ -83,7 +83,7 @@ export function CategoryDetails({ report }: Readonly<CategoryDetailsProps>) {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-800">
-              {expenses.categories.map(category => (
+              {expenses.categories.map((category) => (
                 <tr key={category.name}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">

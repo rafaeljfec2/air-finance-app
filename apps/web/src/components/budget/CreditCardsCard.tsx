@@ -1,11 +1,13 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import { CreditCard, Maximize2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+
+
 import { CardContainer, CardHeader, CardTotal } from '@/components/budget';
 import { CreditCardBrandIcon } from '@/components/budget/CreditCardBrandIcon';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import type { CreditCardBill, CreditCard as CreditCardType } from '@/types/budget';
-import { AnimatePresence, motion } from 'framer-motion';
-import { CreditCard, Maximize2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
 
 interface CreditCardsCardProps {
   cards: CreditCardType[];
@@ -92,7 +94,7 @@ export function CreditCardsCard({
   const totalBillValue = activeBill?.total ?? 0;
 
   return (
-    <CardContainer color="violet" className={isCollapsed ? "min-h-0" : "min-h-[250px]"}>
+    <CardContainer color="violet" className={isCollapsed ? 'min-h-0' : 'min-h-[250px]'}>
       <CardHeader
         icon={<CreditCard className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
         title="Cartões de Crédito"
@@ -116,115 +118,127 @@ export function CreditCardsCard({
         {!isCollapsed && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
+            animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
             <div className="mt-2 flex flex-col justify-between min-h-[180px]">
-        {isLoading ? (
-          <div className="mt-6 flex justify-center">
-            <Spinner size="md" className="text-violet-500" />
-          </div>
-        ) : (
-          <>
-            <div className="flex gap-2 mb-2 mt-1 overflow-x-auto pb-1 justify-center">
-              {cards.map((card) => {
-                const isActive = activeCardId === card.id;
-                let activeClass = '';
-                if (isActive) {
-                 if (card.brand === 'nubank') {
-                    activeClass = 'bg-[#8A05BE] text-white border-[#8A05BE] shadow-md ring-1 ring-[#8A05BE]/20';
-                  } else if (card.brand === 'itau') {
-                    activeClass = 'bg-[#FF6900] text-white border-[#FF6900] shadow-md ring-1 ring-[#FF6900]/20';
-                  } else {
-                    activeClass = 'bg-primary-600 text-white dark:bg-primary-500 shadow-md ring-1 ring-primary-500/20';
-                  }
-                } else {
-                  activeClass =
-                    'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-transparent hover:bg-gray-200 dark:hover:bg-gray-700';
-                }
-                return (
-                  <button
-                    key={card.id}
-                    type="button"
-                    onClick={() => onChangeActiveCard(card.id)}
-                    className={`px-3 py-1.5 rounded-full font-medium transition-all text-xs flex items-center gap-1.5 ${activeClass}`}
-                  >
-                    <CreditCardBrandIcon brand={card.brand} />
-                    {card.name}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Exibição do Saldo da Conta */}
-            {typeof activeCardBalance === 'number' && (
-                <div className="flex justify-center items-center gap-2 text-xs mb-2">
-                    <span className="text-gray-500 dark:text-gray-400">Saldo da Conta:</span>
-                    <span className={`font-semibold ${activeCardBalance < 0 ? 'text-red-500' : 'text-emerald-500'}`}>
-                        R$ {activeCardBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </span>
+              {isLoading ? (
+                <div className="mt-6 flex justify-center">
+                  <Spinner size="md" className="text-violet-500" />
                 </div>
-            )}
-            
-            <div className="overflow-x-auto -mx-2">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="border-b border-border dark:border-border-dark">
-                    <th className="px-3 py-2 text-left font-medium text-gray-500 dark:text-gray-400 w-[60%]">DESCRIÇÃO</th>
-                    <th className="px-3 py-2 text-right font-medium text-gray-500 dark:text-gray-400 w-[40%]">VALOR</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/30 dark:divide-border-dark/30">
-                  {Array.from({ length: itemsPerPage }).map((_, idx) => {
-                    const t = paginatedTransactions[idx];
-                    const key = t ? t.id : `transaction-placeholder-${idx}`;
-                    return t ? (
-                      <tr key={key} className="group hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-                        <td className="px-3 py-1 text-text dark:text-text-dark font-medium truncate max-w-[160px]">
-                          {t.description}
-                        </td>
-                        <td className="px-3 py-1 text-right font-semibold text-text dark:text-text-dark whitespace-nowrap">
-                          R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </td>
-                      </tr>
-                    ) : (
-                      <tr key={key}>
-                        <td className="px-3 py-1" colSpan={2}>
-                          &nbsp;
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            {totalPages > 1 && (
-              <div className="flex justify-between items-center mt-3 pt-2 border-t border-border/50 dark:border-border-dark/50">
-                <button
-                  type="button"
-                  className="p-1 px-3 rounded-md text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 transition-colors"
-                  onClick={handlePrev}
-                  disabled={safePage === 1}
-                >
-                  Anterior
-                </button>
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
-                  {safePage} / {totalPages}
-                </span>
-                <button
-                  type="button"
-                  className="p-1 px-3 rounded-md text-xs font-medium text-text dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 transition-colors"
-                  onClick={handleNext}
-                  disabled={safePage === totalPages}
-                >
-                  Próxima
-                </button>
-              </div>
-            )}
-          </>
-        )}
+              ) : (
+                <>
+                  <div className="flex gap-2 mb-2 mt-1 overflow-x-auto pb-1 justify-center">
+                    {cards.map((card) => {
+                      const isActive = activeCardId === card.id;
+                      let activeClass = '';
+                      if (isActive) {
+                        if (card.brand === 'nubank') {
+                          activeClass =
+                            'bg-[#8A05BE] text-white border-[#8A05BE] shadow-md ring-1 ring-[#8A05BE]/20';
+                        } else if (card.brand === 'itau') {
+                          activeClass =
+                            'bg-[#FF6900] text-white border-[#FF6900] shadow-md ring-1 ring-[#FF6900]/20';
+                        } else {
+                          activeClass =
+                            'bg-primary-600 text-white dark:bg-primary-500 shadow-md ring-1 ring-primary-500/20';
+                        }
+                      } else {
+                        activeClass =
+                          'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-transparent hover:bg-gray-200 dark:hover:bg-gray-700';
+                      }
+                      return (
+                        <button
+                          key={card.id}
+                          type="button"
+                          onClick={() => onChangeActiveCard(card.id)}
+                          className={`px-3 py-1.5 rounded-full font-medium transition-all text-xs flex items-center gap-1.5 ${activeClass}`}
+                        >
+                          <CreditCardBrandIcon brand={card.brand} />
+                          {card.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Exibição do Saldo da Conta */}
+                  {typeof activeCardBalance === 'number' && (
+                    <div className="flex justify-center items-center gap-2 text-xs mb-2">
+                      <span className="text-gray-500 dark:text-gray-400">Saldo da Conta:</span>
+                      <span
+                        className={`font-semibold ${activeCardBalance < 0 ? 'text-red-500' : 'text-emerald-500'}`}
+                      >
+                        R$ {activeCardBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="overflow-x-auto -mx-2">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-border dark:border-border-dark">
+                          <th className="px-3 py-2 text-left font-medium text-gray-500 dark:text-gray-400 w-[60%]">
+                            DESCRIÇÃO
+                          </th>
+                          <th className="px-3 py-2 text-right font-medium text-gray-500 dark:text-gray-400 w-[40%]">
+                            VALOR
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/30 dark:divide-border-dark/30">
+                        {Array.from({ length: itemsPerPage }).map((_, idx) => {
+                          const t = paginatedTransactions[idx];
+                          const key = t ? t.id : `transaction-placeholder-${idx}`;
+                          return t ? (
+                            <tr
+                              key={key}
+                              className="group hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors"
+                            >
+                              <td className="px-3 py-1 text-text dark:text-text-dark font-medium truncate max-w-[160px]">
+                                {t.description}
+                              </td>
+                              <td className="px-3 py-1 text-right font-semibold text-text dark:text-text-dark whitespace-nowrap">
+                                R$ {t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              </td>
+                            </tr>
+                          ) : (
+                            <tr key={key}>
+                              <td className="px-3 py-1" colSpan={2}>
+                                &nbsp;
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  {totalPages > 1 && (
+                    <div className="flex justify-between items-center mt-3 pt-2 border-t border-border/50 dark:border-border-dark/50">
+                      <button
+                        type="button"
+                        className="p-1 px-3 rounded-md text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 transition-colors"
+                        onClick={handlePrev}
+                        disabled={safePage === 1}
+                      >
+                        Anterior
+                      </button>
+                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
+                        {safePage} / {totalPages}
+                      </span>
+                      <button
+                        type="button"
+                        className="p-1 px-3 rounded-md text-xs font-medium text-text dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 transition-colors"
+                        onClick={handleNext}
+                        disabled={safePage === totalPages}
+                      >
+                        Próxima
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </motion.div>
         )}

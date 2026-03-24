@@ -1,0 +1,8 @@
+**/node_modules
+**/dist
+**/build
+**/coverage
+**/.turbo
+**/android
+**/ios
+yarn.lock

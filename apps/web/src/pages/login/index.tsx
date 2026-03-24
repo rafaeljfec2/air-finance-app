@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+
 import { useAuth } from '@/hooks/useAuth';
-import { useLoginForm } from './hooks/useLoginForm';
-import { useEmailVerification } from './hooks/useEmailVerification';
-import { LoginLayout } from './components/LoginLayout';
+
 import { EmailVerificationCard } from './components/EmailVerificationCard';
-import { GoogleLoginButton } from './components/GoogleLoginButton';
 import { FormSeparator } from './components/FormSeparator';
-import { LoginForm } from './components/LoginForm';
+import { GoogleLoginButton } from './components/GoogleLoginButton';
 import { LoginFooter } from './components/LoginFooter';
+import { LoginForm } from './components/LoginForm';
+import { LoginLayout } from './components/LoginLayout';
+import { useEmailVerification } from './hooks/useEmailVerification';
+import { useLoginForm } from './hooks/useLoginForm';
 
 export function Login() {
   const navigate = useNavigate();
@@ -18,22 +20,10 @@ export function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
 
-  const {
-    formData,
-    error,
-    isLoggingIn,
-    handleChange,
-    handleSubmit,
-    setError,
-  } = useLoginForm();
+  const { formData, error, isLoggingIn, handleChange, handleSubmit, setError } = useLoginForm();
 
-  const {
-    isResending,
-    resendSuccess,
-    resendError,
-    handleResendEmail,
-    clearMessages,
-  } = useEmailVerification();
+  const { isResending, resendSuccess, resendError, handleResendEmail, clearMessages } =
+    useEmailVerification();
 
   // Verifica erro na URL (vindo do callback OAuth)
   useEffect(() => {

@@ -28,7 +28,7 @@ export function InteractiveCard({
 
     requestAnimationFrame(() => {
       if (!cardRef.current) return;
-      
+
       const rect = cardRef.current.getBoundingClientRect();
       const width = rect.width;
       const height = rect.height;

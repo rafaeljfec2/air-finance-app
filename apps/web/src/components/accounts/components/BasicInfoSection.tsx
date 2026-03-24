@@ -1,12 +1,13 @@
+import { Building2, CreditCard } from 'lucide-react';
+import React from 'react';
+
+import { BankIcon } from '@/components/bank/BankIcon';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
 import { useBanks } from '@/hooks/useBanks';
 import { cn } from '@/lib/utils';
 import type { CreateAccount } from '@/services/accountService';
-import { Building2, CreditCard } from 'lucide-react';
-import React from 'react';
-import { BankIcon } from '@/components/bank/BankIcon';
 
 type AccountType = 'checking' | 'savings' | 'digital_wallet' | 'investment';
 
@@ -33,7 +34,7 @@ export function BasicInfoSection({
 
   const handleBankChange = (bankCode: string | null) => {
     if (bankCode) {
-      const selectedBank = bankOptions.find(b => b.value === bankCode);
+      const selectedBank = bankOptions.find((b) => b.value === bankCode);
       if (selectedBank) {
         // Extract bank name from label (format: "001 - Banco do Brasil")
         const bankName = selectedBank.label.split(' - ')[1] || selectedBank.label;
@@ -103,7 +104,7 @@ export function BasicInfoSection({
             options={bankOptions}
             value={form.bankCode ?? null}
             onValueChange={handleBankChange}
-            placeholder={isLoadingBanks ? "Carregando bancos..." : "Selecione o banco"}
+            placeholder={isLoadingBanks ? 'Carregando bancos...' : 'Selecione o banco'}
             disabled={isLoadingBanks}
             searchable
             searchPlaceholder="Buscar banco..."

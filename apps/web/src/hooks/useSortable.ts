@@ -1,4 +1,6 @@
 import { useState, useCallback } from 'react';
+
+
 import { SortConfig, SortDirection } from '@/components/ui/SortableColumn';
 
 interface UseSortableOptions<T extends string = string> {
@@ -6,34 +8,29 @@ interface UseSortableOptions<T extends string = string> {
   initialDirection?: SortDirection;
 }
 
-export function useSortable<T extends string = string>(
-  options: UseSortableOptions<T> = {},
-) {
+export function useSortable<T extends string = string>(options: UseSortableOptions<T> = {}) {
   const { initialField, initialDirection = null } = options;
 
   const [sortConfig, setSortConfig] = useState<SortConfig<T> | null>(
     initialField ? { field: initialField, direction: initialDirection } : null,
   );
 
-  const handleSort = useCallback(
-    (field: T) => {
-      setSortConfig((current) => {
-        if (current?.field === field) {
-          // Toggle direction: asc -> desc -> null
-          if (current.direction === 'asc') {
-            return { field, direction: 'desc' };
-          }
-          if (current.direction === 'desc') {
-            return null; // Remove sort
-          }
-          return { field, direction: 'asc' };
+  const handleSort = useCallback((field: T) => {
+    setSortConfig((current) => {
+      if (current?.field === field) {
+        // Toggle direction: asc -> desc -> null
+        if (current.direction === 'asc') {
+          return { field, direction: 'desc' };
         }
-        // New field, start with asc
+        if (current.direction === 'desc') {
+          return null; // Remove sort
+        }
         return { field, direction: 'asc' };
-      });
-    },
-    [],
-  );
+      }
+      // New field, start with asc
+      return { field, direction: 'asc' };
+    });
+  }, []);
 
   const sortData = useCallback(
     <TData extends Record<string, unknown>>(
@@ -61,9 +58,7 @@ export function useSortable<T extends string = string>(
         }
 
         if (typeof aValue === 'number' && typeof bValue === 'number') {
-          return sortConfig.direction === 'asc'
-            ? aValue - bValue
-            : bValue - aValue;
+          return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
         }
 
         if (aValue instanceof Date && bValue instanceof Date) {

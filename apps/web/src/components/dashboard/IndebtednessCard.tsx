@@ -1,19 +1,21 @@
+import {
+  AlertTriangle,
+  CreditCard,
+  DollarSign,
+  HelpCircle,
+  Lightbulb,
+  TrendingDown,
+  TrendingUp,
+} from 'lucide-react';
+import React, { useMemo } from 'react';
+
 import { Card } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Tooltip } from '@/components/ui/tooltip';
 import { useIndebtedness } from '@/hooks/useIndebtedness';
 import type { IndebtednessMetrics } from '@/types/indebtedness';
 import { formatCurrency } from '@/utils/formatters';
-import {
-    AlertTriangle,
-    CreditCard,
-    DollarSign,
-    HelpCircle,
-    Lightbulb,
-    TrendingDown,
-    TrendingUp,
-} from 'lucide-react';
-import React, { useMemo } from 'react';
+
 
 interface IndebtednessCardProps {
   companyId: string;
@@ -555,34 +557,32 @@ export function IndebtednessCard({ companyId }: Readonly<IndebtednessCardProps>)
     <Card className="bg-white dark:bg-card-dark border-none shadow-md overflow-hidden">
       <div className="p-4 space-y-3">
         <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <div className="p-1.5 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
-                 <AlertTriangle className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-              </div>
-              Análise de Saúde Financeira
-            </h3>
+          <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <div className="p-1.5 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
+              <AlertTriangle className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            Análise de Saúde Financeira
+          </h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="bg-gray-50 dark:bg-background-dark rounded-xl p-3 border border-gray-100 dark:border-border-dark">
-             <CreditUtilizationSection data={data.creditUtilization} />
+            <CreditUtilizationSection data={data.creditUtilization} />
           </div>
           <div className="bg-gray-50 dark:bg-background-dark rounded-xl p-3 border border-gray-100 dark:border-border-dark">
-             <LiquiditySection data={data.liquidity} />
+            <LiquiditySection data={data.liquidity} />
           </div>
         </div>
 
         <div className="bg-white dark:bg-background-dark rounded-xl border border-gray-100 dark:border-border-dark p-1">
-             <DebtSummarySection totalDebt={data.totalDebt} debtToRevenue={data.debtToRevenue} />
+          <DebtSummarySection totalDebt={data.totalDebt} debtToRevenue={data.debtToRevenue} />
         </div>
 
         <div className="bg-gray-50 dark:bg-background-dark rounded-xl p-3 border border-gray-100 dark:border-border-dark">
-             <AccountBalancesSection balances={data.accountBalances} />
+          <AccountBalancesSection balances={data.accountBalances} />
         </div>
 
-        {suggestions.length > 0 && (
-             <SuggestionsSection suggestions={suggestions} />
-        )}
+        {suggestions.length > 0 && <SuggestionsSection suggestions={suggestions} />}
       </div>
     </Card>
   );

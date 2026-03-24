@@ -46,7 +46,7 @@ export function usePullToRefresh({ onRefresh, threshold = 100 }: UsePullToRefres
         }
       }
     },
-    [onRefresh, threshold]
+    [onRefresh, threshold],
   );
 
   const handleTouchEnd = useCallback(() => {
@@ -81,4 +81,4 @@ export function usePullToRefresh({ onRefresh, threshold = 100 }: UsePullToRefres
       },
     },
   };
-} 
+}

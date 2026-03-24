@@ -1,23 +1,35 @@
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { TrendingUp, Target, Calendar, Clock, MoreVertical, Edit, Trash2 } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Progress } from '@/components/ui/progress';
 import { useCategories } from '@/hooks/useCategories';
 import { useGoals } from '@/hooks/useGoals';
 import { cn } from '@/lib/utils';
 import { Goal } from '@/services/goalService';
 import { formatCurrency } from '@/utils/formatters';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { TrendingUp, Target, Calendar, Clock, MoreVertical, Edit, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const statusOptions = [
-  { value: 'active', label: 'Ativa', color: 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700' },
+  {
+    value: 'active',
+    label: 'Ativa',
+    color:
+      'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700',
+  },
   {
     value: 'completed',
     label: 'Concluída',
-    color: 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700',
+    color:
+      'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700',
   },
-  { value: 'cancelled', label: 'Cancelada', color: 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700' },
+  {
+    value: 'cancelled',
+    label: 'Cancelada',
+    color:
+      'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700',
+  },
 ] as const;
 
 type GoalStatus = (typeof statusOptions)[number]['value'];

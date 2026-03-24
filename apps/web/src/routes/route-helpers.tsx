@@ -1,15 +1,19 @@
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { SuspenseLoader } from '@/components/SuspenseLoader';
+
 import { OnboardingGuard } from '@/components/auth/OnboardingGuard';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { RequireGod } from '@/components/auth/RequireGod';
 import { Suspense, ReactNode, ComponentType, LazyExoticComponent } from 'react';
 import { RouteObject } from 'react-router-dom';
 
+
 interface RouteConfig {
   path: string;
-  component: LazyExoticComponent<ComponentType<Record<string, unknown>>> | ComponentType<Record<string, unknown>>;
+  component:
+    | LazyExoticComponent<ComponentType<Record<string, unknown>>>
+    | ComponentType<Record<string, unknown>>;
   requireAuth?: boolean;
   requireOnboarding?: boolean;
   requireGod?: boolean;
@@ -67,7 +71,9 @@ function createProtectedRoute(config: RouteConfig): RouteObject {
  */
 function createPublicRoute(
   path: string,
-  component: LazyExoticComponent<ComponentType<Record<string, unknown>>> | ComponentType<Record<string, unknown>>,
+  component:
+    | LazyExoticComponent<ComponentType<Record<string, unknown>>>
+    | ComponentType<Record<string, unknown>>,
   suspense: boolean = true,
 ): RouteObject {
   const Component = component;

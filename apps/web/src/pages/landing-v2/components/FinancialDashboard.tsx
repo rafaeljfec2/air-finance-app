@@ -7,7 +7,9 @@ export function FinancialDashboard() {
         <div className="bg-gradient-to-br from-[#f0fdf4] via-white to-white p-8 border-b border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Saldo Total</span>
+              <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                Saldo Total
+              </span>
               <div className="flex items-baseline gap-2 mt-2">
                 <span className="text-5xl font-bold text-gray-900">R$ 12.450</span>
                 <span className="text-2xl font-semibold text-gray-500">,00</span>
@@ -18,7 +20,7 @@ export function FinancialDashboard() {
             </div>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-2 divide-x divide-gray-100">
           <div className="p-8 bg-gradient-to-br from-green-50 to-green-100/50">
             <div className="flex items-center justify-between mb-3">
@@ -38,7 +40,7 @@ export function FinancialDashboard() {
               <span className="text-2xl font-semibold text-green-600">,00</span>
             </div>
           </div>
-          
+
           <div className="p-8 bg-gradient-to-br from-red-50 to-red-100/50">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -55,7 +57,7 @@ export function FinancialDashboard() {
           </div>
         </div>
       </div>
-      
+
       <div className="absolute -top-3 -right-3 w-full h-full bg-gradient-to-br from-[#10b981]/10 to-transparent rounded-3xl -z-10 blur-2xl" />
       <div className="absolute -top-6 -right-6 w-full h-full bg-gradient-to-br from-gray-100/80 to-gray-50/80 rounded-3xl -z-20" />
     </div>

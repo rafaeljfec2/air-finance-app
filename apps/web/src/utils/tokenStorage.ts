@@ -1,7 +1,7 @@
 /**
  * Token storage abstraction
  * This allows easy migration from localStorage to HttpOnly cookies in the future
- * 
+ *
  * TODO: When backend supports HttpOnly cookies, remove localStorage usage
  * and rely on cookies automatically sent by browser
  */
@@ -16,7 +16,7 @@ export const getToken = (): string | null => {
     // TODO: When migrating to HttpOnly cookies, remove this
     // Cookies will be automatically sent with requests via credentials: 'include'
     return localStorage.getItem('auth-storage')
-      ? JSON.parse(localStorage.getItem('auth-storage') ?? '{}')?.state?.token ?? null
+      ? (JSON.parse(localStorage.getItem('auth-storage') ?? '{}')?.state?.token ?? null)
       : null;
   } catch (error) {
     console.error('Error reading token:', error);
@@ -86,4 +86,3 @@ export const getTokenStorageMode = (): TokenStorageMode => {
   // TODO: Change to 'cookie' when backend supports HttpOnly cookies
   return 'localStorage';
 };
-

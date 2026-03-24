@@ -1,9 +1,13 @@
-import { Button } from '@/components/ui/button';
 import { CheckCircle2, Sparkles, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+import { Button } from '@/components/ui/button';
+
 import { env } from '@/utils/env';
+
 import { ScrollReveal } from './ScrollReveal';
 import { InteractiveCard } from './InteractiveCard';
+
 
 const plans = [
   {
@@ -67,12 +71,15 @@ export function PricingSection() {
       <div className="max-w-7xl mx-auto">
         {showPricingCards && (
           <ScrollReveal variant="fade" className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-brand-arrow" id="pricing-heading">
+            <h2
+              className="text-4xl md:text-5xl font-bold mb-6 text-brand-arrow"
+              id="pricing-heading"
+            >
               Planos para todos os perfis
             </h2>
             <p className="text-xl text-text/80 max-w-3xl mx-auto">
-              Escolha o plano ideal para suas necessidades e comece a transformar sua vida financeira
-              hoje
+              Escolha o plano ideal para suas necessidades e comece a transformar sua vida
+              financeira hoje
             </p>
           </ScrollReveal>
         )}
@@ -82,20 +89,21 @@ export function PricingSection() {
           <div className={`mx-auto ${isProduction ? 'max-w-4xl' : 'max-w-3xl'}`}>
             <div
               className={`relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#10b981] via-[#059669] to-[#047857] shadow-2xl border-2 border-[#10b981]/30 ${
-                isProduction
-                  ? 'px-8 py-8 md:px-12 md:py-10'
-                  : 'px-6 py-4'
+                isProduction ? 'px-8 py-8 md:px-12 md:py-10' : 'px-6 py-4'
               }`}
             >
               {/* Animated background gradient */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
-              
+
               {/* Sparkle decoration */}
               <div className="absolute top-4 right-4 opacity-20">
                 <Sparkles className="w-6 h-6 text-white animate-pulse" />
               </div>
               <div className="absolute bottom-4 left-4 opacity-20">
-                <Gift className="w-5 h-5 text-white animate-pulse" style={{ animationDelay: '1s' }} />
+                <Gift
+                  className="w-5 h-5 text-white animate-pulse"
+                  style={{ animationDelay: '1s' }}
+                />
               </div>
 
               <div className="relative flex flex-col md:flex-row items-center gap-6">
@@ -106,7 +114,9 @@ export function PricingSection() {
                       isProduction ? 'w-16 h-16' : 'w-12 h-12'
                     }`}
                   >
-                    <span className={`text-white font-bold ${isProduction ? 'text-2xl' : 'text-lg'}`}>
+                    <span
+                      className={`text-white font-bold ${isProduction ? 'text-2xl' : 'text-lg'}`}
+                    >
                       β
                     </span>
                   </div>
@@ -133,8 +143,8 @@ export function PricingSection() {
                       isProduction ? 'text-base md:text-lg' : 'text-sm'
                     }`}
                   >
-                    Use qualquer plano gratuitamente durante a fase beta. Se fizer sentido para você,
-                    pode contribuir e nos ajudar a melhorar o Airfinance.
+                    Use qualquer plano gratuitamente durante a fase beta. Se fizer sentido para
+                    você, pode contribuir e nos ajudar a melhorar o Airfinance.
                   </p>
                 </div>
 

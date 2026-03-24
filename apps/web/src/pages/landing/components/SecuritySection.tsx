@@ -1,6 +1,8 @@
 import { Shield, Lock, Cloud, Bell, FileText, Users } from 'lucide-react';
-import { ScrollReveal } from './ScrollReveal';
+
 import { InteractiveCard } from './InteractiveCard';
+import { ScrollReveal } from './ScrollReveal';
+
 
 const securityFeatures = [
   {
@@ -18,8 +20,7 @@ const securityFeatures = [
   {
     icon: Bell,
     title: 'Monitoramento 24/7',
-    description:
-      'Sistema de monitoramento contínuo para garantir a segurança dos seus dados.',
+    description: 'Sistema de monitoramento contínuo para garantir a segurança dos seus dados.',
   },
   {
     icon: FileText,
@@ -40,13 +41,20 @@ const securityFeatures = [
 
 export function SecuritySection() {
   return (
-    <section id="security" className="py-32 px-6 bg-gradient-to-br from-background to-white relative z-10" aria-labelledby="security-heading">
+    <section
+      id="security"
+      className="py-32 px-6 bg-gradient-to-br from-background to-white relative z-10"
+      aria-labelledby="security-heading"
+    >
       <div className="max-w-7xl mx-auto">
         <ScrollReveal variant="fade" className="text-center mb-20">
           <div className="inline-flex p-4 rounded-xl bg-brand-arrow/10 mb-6" aria-hidden="true">
             <Shield className="w-10 h-10 text-brand-arrow" />
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-brand-arrow" id="security-heading">
+          <h2
+            className="text-4xl md:text-5xl font-bold mb-6 text-brand-arrow"
+            id="security-heading"
+          >
             Segurança em primeiro lugar
           </h2>
           <p className="text-xl text-text/80 max-w-3xl mx-auto">
@@ -65,9 +73,7 @@ export function SecuritySection() {
                     <div className="p-3 rounded-lg bg-brand-arrow/10 w-fit mb-4">
                       <Icon className="w-6 h-6 text-brand-arrow" />
                     </div>
-                    <h3 className="font-semibold mb-2 text-lg text-brand-arrow">
-                      {feature.title}
-                    </h3>
+                    <h3 className="font-semibold mb-2 text-lg text-brand-arrow">{feature.title}</h3>
                     <p className="text-text/80 text-sm">{feature.description}</p>
                   </div>
                 </InteractiveCard>
@@ -79,4 +85,3 @@ export function SecuritySection() {
     </section>
   );
 }
-

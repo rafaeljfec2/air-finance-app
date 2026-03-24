@@ -71,10 +71,7 @@ export function parseCronToSelection(cron: string | null): CronSelection {
   return { type: 'daily', time: '8' };
 }
 
-export function getCronExpression(
-  frequencyType: FrequencyType,
-  selectedTime: string,
-): string {
+export function getCronExpression(frequencyType: FrequencyType, selectedTime: string): string {
   const option = scheduleOptions.find((opt) => opt.type === frequencyType);
   if (!option) return '0 8 * * *';
 
@@ -85,9 +82,7 @@ export function getCronExpression(
   return option.cronExpression;
 }
 
-export function getScheduleDescription(
-  cronExpression: string | null | undefined,
-): string {
+export function getScheduleDescription(cronExpression: string | null | undefined): string {
   if (!cronExpression) return '';
 
   const selection = parseCronToSelection(cronExpression);

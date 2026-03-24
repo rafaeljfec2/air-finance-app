@@ -1,5 +1,7 @@
-import { PierreAccount } from '@/services/bankingIntegrationService';
 import { CreditCard, Landmark, Check } from 'lucide-react';
+
+import { PierreAccount } from '@/services/bankingIntegrationService';
+
 import { formatCurrency } from '@/utils/formatters';
 
 interface PierreAccountListProps {
@@ -82,10 +84,11 @@ export function PierreAccountList({
       </div>
 
       {/* Account List */}
-      <div className="space-y-1.5 max-h-[280px] overflow-y-auto pr-1"
-        style={{ 
+      <div
+        className="space-y-1.5 max-h-[280px] overflow-y-auto pr-1"
+        style={{
           scrollbarWidth: 'thin',
-          scrollbarColor: 'rgb(156 163 175) transparent'
+          scrollbarColor: 'rgb(156 163 175) transparent',
         }}
       >
         {accounts.map((account) => {
@@ -134,11 +137,13 @@ export function PierreAccountList({
                           Valor utilizado
                         </p>
                       )}
-                      <p className={`text-sm font-semibold ${
-                        account.type === 'CREDIT' || Number.parseFloat(account.balance) < 0
-                          ? 'text-red-600 dark:text-red-400'
-                          : 'text-green-600 dark:text-green-400'
-                      }`}>
+                      <p
+                        className={`text-sm font-semibold ${
+                          account.type === 'CREDIT' || Number.parseFloat(account.balance) < 0
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-green-600 dark:text-green-400'
+                        }`}
+                      >
                         {formatBalance(account.balance, account)}
                       </p>
                     </div>

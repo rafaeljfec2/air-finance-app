@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { announcementsService, type Announcement } from '@/services/announcementsService';
 import { formatDate } from '@/utils/formatters';
+
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { CheckCircle2, Sparkles, AlertCircle, Megaphone } from 'lucide-react';
+
 
 export function AnnouncementsList() {
   const { data: readAnnouncements = [], isLoading } = useQuery<Announcement[]>({
@@ -64,9 +66,7 @@ export function AnnouncementsList() {
   if (readAnnouncements.length === 0) {
     return (
       <Card className="p-8 text-center bg-card dark:bg-card-dark border-border dark:border-border-dark">
-        <p className="text-gray-500 dark:text-gray-400">
-          Você ainda não leu nenhum aviso.
-        </p>
+        <p className="text-gray-500 dark:text-gray-400">Você ainda não leu nenhum aviso.</p>
       </Card>
     );
   }

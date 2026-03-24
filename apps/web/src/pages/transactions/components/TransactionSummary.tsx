@@ -1,7 +1,9 @@
-import { Card } from '@/components/ui/card';
-import { formatCurrency } from '@/utils/formatters';
 import { ArrowDownCircle, ArrowUpCircle, Wallet } from 'lucide-react';
 import { useMemo } from 'react';
+
+import { Card } from '@/components/ui/card';
+import { formatCurrency } from '@/utils/formatters';
+
 
 interface TransactionSummaryProps {
   totalCredits: number;
@@ -36,9 +38,7 @@ const SummaryCard = ({ type, label, value, isPositive }: Readonly<SummaryCardPro
       case 'balance':
         return {
           Icon: Wallet,
-          bgColor: isPositive
-            ? 'bg-blue-100 dark:bg-blue-900/20'
-            : 'bg-red-100 dark:bg-red-900/20',
+          bgColor: isPositive ? 'bg-blue-100 dark:bg-blue-900/20' : 'bg-red-100 dark:bg-red-900/20',
           textColor: isPositive
             ? 'text-blue-600 dark:text-blue-400'
             : 'text-red-600 dark:text-red-400',
@@ -128,9 +128,7 @@ const SummaryItem = ({ type, label, value, isPositive }: Readonly<SummaryItemPro
   );
 };
 
-const Divider = () => (
-  <div className="h-10 w-px bg-border dark:bg-border-dark" />
-);
+const Divider = () => <div className="h-10 w-px bg-border dark:bg-border-dark" />;
 
 export function TransactionSummary({
   totalCredits,
@@ -142,18 +140,8 @@ export function TransactionSummary({
   return (
     <>
       <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4 mb-2 animate-in slide-in-from-top-2 duration-200">
-        <SummaryCard
-          type="credits"
-          label="Receitas"
-          value={totalCredits}
-          isPositive={true}
-        />
-        <SummaryCard
-          type="debits"
-          label="Despesas"
-          value={totalDebits}
-          isPositive={false}
-        />
+        <SummaryCard type="credits" label="Receitas" value={totalCredits} isPositive={true} />
+        <SummaryCard type="debits" label="Despesas" value={totalDebits} isPositive={false} />
         <SummaryCard
           type="balance"
           label="Saldo do Período"
@@ -165,19 +153,9 @@ export function TransactionSummary({
       <div className="md:hidden mb-3">
         <Card className="p-3 bg-card dark:bg-card-dark border-border dark:border-border-dark">
           <div className="flex items-center justify-between gap-3">
-            <SummaryItem
-              type="credits"
-              label="Receitas"
-              value={totalCredits}
-              isPositive={true}
-            />
+            <SummaryItem type="credits" label="Receitas" value={totalCredits} isPositive={true} />
             <Divider />
-            <SummaryItem
-              type="debits"
-              label="Despesas"
-              value={totalDebits}
-              isPositive={false}
-            />
+            <SummaryItem type="debits" label="Despesas" value={totalDebits} isPositive={false} />
             <Divider />
             <SummaryItem
               type="balance"

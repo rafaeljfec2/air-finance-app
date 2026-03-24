@@ -1,8 +1,13 @@
 import type { ExtractResponse } from '@/services/types/extract.types';
 
-export const isValidExtractData = (extractsData: {
-  data?: ExtractResponse[];
-} | null | undefined): boolean => {
+export const isValidExtractData = (
+  extractsData:
+    | {
+        data?: ExtractResponse[];
+      }
+    | null
+    | undefined,
+): boolean => {
   return (
     extractsData?.data !== undefined &&
     Array.isArray(extractsData.data) &&

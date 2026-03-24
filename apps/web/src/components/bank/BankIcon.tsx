@@ -1,8 +1,9 @@
+import * as Icons from 'lucide-react';
 import { useState } from 'react';
 import type React from 'react';
-import * as Icons from 'lucide-react';
-import { getBankInfo } from '@/utils/bankIcons';
+
 import { cn } from '@/lib/utils';
+import { getBankInfo } from '@/utils/bankIcons';
 
 export interface BankIconProps {
   bankCode?: string;
@@ -38,9 +39,9 @@ const IMG_FULL_CONTAINER_CLASSES = {
 
 /**
  * BankIcon Component
- * 
+ *
  * Displays bank logo (SVG/PNG) if available, otherwise falls back to lucide-react icon
- * 
+ *
  * @param bankCode - Bank code (e.g., '001', '237')
  * @param institution - Institution name (e.g., 'Banco do Brasil')
  * @param iconName - Optional custom icon name for non-bank accounts
@@ -65,8 +66,9 @@ export function BankIcon({
   // Try to render logo if available and no error occurred (priority over iconName)
   // Check if logoPath is a string (URL) - Vite processes SVGs as URLs when used in img src
   if (bankInfo.hasLogo && bankInfo.logoPath && !logoError) {
-    const logoUrl = typeof bankInfo.logoPath === 'string' ? bankInfo.logoPath : String(bankInfo.logoPath);
-    
+    const logoUrl =
+      typeof bankInfo.logoPath === 'string' ? bankInfo.logoPath : String(bankInfo.logoPath);
+
     return (
       <img
         src={logoUrl}
@@ -93,7 +95,8 @@ export function BankIcon({
 
   // Fallback to bank-specific lucide-react icon
   const FallbackIcon =
-    (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[bankInfo.iconName] ||
-    Icons.Banknote;
+    (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[
+      bankInfo.iconName
+    ] || Icons.Banknote;
   return <FallbackIcon className={cn(SIZE_CLASSES[size], className)} />;
 }

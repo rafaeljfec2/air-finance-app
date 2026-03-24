@@ -1,8 +1,10 @@
+import { Grid3x3, List, Search, TrendingDown, TrendingUp } from 'lucide-react';
+
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { Grid3x3, List, Search, TrendingDown, TrendingUp } from 'lucide-react';
 
 const categoryTypes = [
   { value: 'income', label: 'Receita', icon: TrendingUp },
@@ -52,9 +54,7 @@ export function CategoriesFilters({
         <Select value={filterType} onValueChange={onFilterTypeChange}>
           <SelectTrigger className="w-[180px] h-11 rounded-xl bg-card dark:bg-card-dark border-border/50 dark:border-border-dark/50 text-text dark:text-text-dark focus:border-primary-500">
             <span className="text-sm">
-              {filterType === 'all'
-                ? 'Todos os tipos'
-                : getTypeLabel(filterType as CategoryType)}
+              {filterType === 'all' ? 'Todos os tipos' : getTypeLabel(filterType as CategoryType)}
             </span>
           </SelectTrigger>
           <SelectContent className="bg-card dark:bg-card-dark border border-border dark:border-border-dark text-text dark:text-text-dark">

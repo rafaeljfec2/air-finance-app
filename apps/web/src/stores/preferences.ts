@@ -18,8 +18,7 @@ export const usePreferencesStore = create<PreferencesState>()(
         set((state) => ({ isPrivacyModeEnabled: !state.isPrivacyModeEnabled })),
       setPrivacyMode: (enabled: boolean) => set({ isPrivacyModeEnabled: enabled }),
       isHeaderVisible: true, // Default to visible
-      toggleHeaderVisibility: () =>
-        set((state) => ({ isHeaderVisible: !state.isHeaderVisible })),
+      toggleHeaderVisibility: () => set((state) => ({ isHeaderVisible: !state.isHeaderVisible })),
       setHeaderVisibility: (visible: boolean) => set({ isHeaderVisible: visible }),
     }),
     {

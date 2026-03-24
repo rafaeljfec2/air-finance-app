@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
+
+
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { cn } from '@/lib/utils';
 import { Account } from '@/services/accountService';
 import type { Category } from '@/types/transaction';
-import { useMemo } from 'react';
 
 interface AccountCategoryTypeFieldsProps {
   accounts: Account[];
@@ -54,7 +56,9 @@ export function AccountCategoryTypeFields({
 
   return (
     <div className="p-3 bg-background dark:bg-background-dark">
-      <div className={`grid grid-cols-1 sm:grid-cols-2 ${isCreditCard ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4`}>
+      <div
+        className={`grid grid-cols-1 sm:grid-cols-2 ${isCreditCard ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4`}
+      >
         {/* Conta */}
         <div>
           <label
@@ -114,7 +118,10 @@ export function AccountCategoryTypeFields({
             >
               Tipo
             </label>
-            <div id="transactionKind" className="flex bg-muted dark:bg-muted/20 p-1 rounded-xl border border-border/50">
+            <div
+              id="transactionKind"
+              className="flex bg-muted dark:bg-muted/20 p-1 rounded-xl border border-border/50"
+            >
               <button
                 type="button"
                 className={cn(

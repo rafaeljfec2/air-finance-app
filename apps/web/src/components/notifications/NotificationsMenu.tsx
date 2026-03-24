@@ -1,13 +1,16 @@
-import React, { Fragment, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { useNotificationsStore } from '@/stores/useNotificationsStore';
 import { Menu, Transition } from '@headlessui/react';
 import { Bell, CheckCheck } from 'lucide-react';
+import React, { Fragment, useEffect } from 'react';
+
+import { useAuth } from '@/hooks/useAuth';
+import { useNotificationsStore } from '@/stores/useNotificationsStore';
+
 import { NotificationItem } from './NotificationItem';
 
 export function NotificationsMenu() {
   const { user } = useAuth();
-  const { notifications, unreadCount, markAsRead, markAllAsRead, fetchNotifications } = useNotificationsStore();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, fetchNotifications } =
+    useNotificationsStore();
 
   useEffect(() => {
     if (user?.id) {
@@ -54,46 +57,48 @@ export function NotificationsMenu() {
           >
             <Menu.Items className="absolute right-0 right-safe lg:right-0 mt-2 w-80 sm:w-96 origin-top-right rounded-lg bg-card dark:bg-card-dark shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden z-50 max-w-[calc(100vw-var(--safe-area-inset-left)-var(--safe-area-inset-right)-1rem)]">
               <div className="flex items-center justify-between px-4 py-3 border-b border-border dark:border-border-dark bg-gray-50/50 dark:bg-gray-800/50">
-                <h3 className="font-semibold text-sm text-text dark:text-text-dark">Notificações</h3>
+                <h3 className="font-semibold text-sm text-text dark:text-text-dark">
+                  Notificações
+                </h3>
                 {unreadCount > 0 && (
-                   <button 
-                     onClick={handleMarkAllRead}
-                     className="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 flex items-center gap-1 font-medium transition-colors"
-                   >
-                     <CheckCheck className="h-3 w-3" />
-                     Marcar todas como lidas
-                   </button>
+                  <button
+                    onClick={handleMarkAllRead}
+                    className="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 flex items-center gap-1 font-medium transition-colors"
+                  >
+                    <CheckCheck className="h-3 w-3" />
+                    Marcar todas como lidas
+                  </button>
                 )}
               </div>
 
               <div className="max-h-[400px] overflow-y-auto">
                 {notifications.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                        <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                        <p className="text-sm">Nenhuma notificação por enquanto.</p>
-                    </div>
+                  <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                    <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Nenhuma notificação por enquanto.</p>
+                  </div>
                 ) : (
-                    <div className="divide-y divide-border/50 dark:divide-border-dark/50">
-                        {notifications.map((notification) => (
-                          <Menu.Item key={notification.id}>
-                            {({ active }) => (
-                                <div className={active ? 'bg-muted/50' : ''}>
-                                    <NotificationItem 
-                                        notification={notification} 
-                                        onClick={() => handleNotificationClick(notification.id)}
-                                    />
-                                </div>
-                            )}
-                          </Menu.Item>
-                        ))}
-                    </div>
+                  <div className="divide-y divide-border/50 dark:divide-border-dark/50">
+                    {notifications.map((notification) => (
+                      <Menu.Item key={notification.id}>
+                        {({ active }) => (
+                          <div className={active ? 'bg-muted/50' : ''}>
+                            <NotificationItem
+                              notification={notification}
+                              onClick={() => handleNotificationClick(notification.id)}
+                            />
+                          </div>
+                        )}
+                      </Menu.Item>
+                    ))}
+                  </div>
                 )}
               </div>
-              
+
               <div className="p-2 border-t border-border dark:border-border-dark bg-gray-50/50 dark:bg-gray-800/50 text-center">
-                  <button className="text-xs text-gray-500 hover:text-primary-500 transition-colors w-full min-h-[44px] py-2.5">
-                      Ver histórico completo
-                  </button>
+                <button className="text-xs text-gray-500 hover:text-primary-500 transition-colors w-full min-h-[44px] py-2.5">
+                  Ver histórico completo
+                </button>
               </div>
             </Menu.Items>
           </Transition>

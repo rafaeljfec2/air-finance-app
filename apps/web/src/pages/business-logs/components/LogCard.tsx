@@ -1,10 +1,16 @@
+import { ChevronDown, ChevronUp, FileText, User } from 'lucide-react';
+
+
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { BusinessLog } from '@/services/businessLogService';
-import { ChevronDown, ChevronUp, FileText, User } from 'lucide-react';
+
+
 import { entityTypeLabels, operationColors, operationLabels } from '../constants';
 import { formatDateTime } from '../utils';
+
 import { LogDetails } from './LogDetails';
 
 interface LogCardProps {
@@ -52,7 +58,11 @@ export function LogCard({ log, isExpanded, onToggleExpand }: LogCardProps) {
             onClick={onToggleExpand}
             className="text-gray-500 dark:text-gray-400 flex-shrink-0"
           >
-            {isExpanded ? <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5" /> : <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5" />}
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5" />
+            ) : (
+              <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5" />
+            )}
           </Button>
         </div>
 
@@ -61,4 +71,3 @@ export function LogCard({ log, isExpanded, onToggleExpand }: LogCardProps) {
     </Card>
   );
 }
-

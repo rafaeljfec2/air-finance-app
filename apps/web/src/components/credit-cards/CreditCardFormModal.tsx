@@ -1,30 +1,24 @@
-import { FormField } from '@/components/ui/FormField';
-import { Modal } from '@/components/ui/Modal';
+import { Building2, Calendar, CreditCard, DollarSign, Hash, X } from 'lucide-react';
+import type { ChangeEvent, FormEvent } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+
+import { BankIcon } from '@/components/bank/BankIcon';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { DatePicker } from '@/components/ui/DatePicker';
+import { FormField } from '@/components/ui/FormField';
+import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/Modal';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { useBanks } from '@/hooks/useBanks';
 import { cn } from '@/lib/utils';
-import { BankIcon } from '@/components/bank/BankIcon';
 import {
   CreateCreditCardPayload,
   CreditCard as CreditCardType,
 } from '@/services/creditCardService';
 import { useCompanyStore } from '@/stores/company';
-import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { formatDateToLocalISO, formatDateForInput } from '@/utils/date';
-import {
-  Building2,
-  Calendar,
-  CreditCard,
-  DollarSign,
-  Hash,
-  X,
-} from 'lucide-react';
-import type { ChangeEvent, FormEvent } from 'react';
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 
 const DUE_DATES = Array.from({ length: 31 }, (_, i) => ({
   value: i + 1,
@@ -37,7 +31,8 @@ const DEFAULT_CLOSING_DAY = 10;
 const DEFAULT_DUE_DAY = 10;
 const MAX_ACCOUNT_NUMBER_LENGTH = 10;
 
-const MODAL_CLASSES = 'max-w-2xl bg-card dark:bg-card-dark p-0 flex flex-col overflow-hidden max-h-[85vh]';
+const MODAL_CLASSES =
+  'max-w-2xl bg-card dark:bg-card-dark p-0 flex flex-col overflow-hidden max-h-[85vh]';
 
 interface CreditCardFormModalProps {
   open: boolean;
@@ -109,9 +104,7 @@ export function CreditCardFormModal({
         companyId: creditCard.companyId,
       });
       setLimitInput(
-        creditCard.limit
-          ? formatCurrencyInput(creditCard.limit.toFixed(2).replace('.', ''))
-          : '',
+        creditCard.limit ? formatCurrencyInput(creditCard.limit.toFixed(2).replace('.', '')) : '',
       );
       setInitialBalanceInput(
         creditCard.initialBalance
@@ -233,13 +226,7 @@ export function CreditCardFormModal({
   const bankComboBoxKey = `bank-${creditCard?.id || 'new'}-${form.bankCode || 'none'}`;
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      title=""
-      dismissible={false}
-      className={MODAL_CLASSES}
-    >
+    <Modal open={open} onClose={handleClose} title="" dismissible={false} className={MODAL_CLASSES}>
       <div className="flex flex-col h-full min-h-0">
         {/* Header Customizado */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-border dark:border-border-dark flex-shrink-0">
@@ -248,12 +235,8 @@ export function CreditCardFormModal({
               <CreditCard className="h-5 w-5 text-primary-500 dark:text-primary-400" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-text dark:text-text-dark">
-                {modalTitle}
-              </h2>
-              <p className="text-sm text-muted-foreground dark:text-gray-400">
-                {modalDescription}
-              </p>
+              <h2 className="text-xl font-semibold text-text dark:text-text-dark">{modalTitle}</h2>
+              <p className="text-sm text-muted-foreground dark:text-gray-400">{modalDescription}</p>
             </div>
           </div>
           <button
@@ -314,7 +297,9 @@ export function CreditCardFormModal({
                           <div className="flex items-center gap-2 flex-1 min-w-0">
                             <Building2 className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                             <span className="truncate text-gray-900 dark:text-gray-100">
-                              {isLoadingBanks ? 'Carregando bancos...' : 'Selecione o banco (opcional)'}
+                              {isLoadingBanks
+                                ? 'Carregando bancos...'
+                                : 'Selecione o banco (opcional)'}
                             </span>
                           </div>
                         );
@@ -331,7 +316,9 @@ export function CreditCardFormModal({
                             size="sm"
                             className="flex-shrink-0"
                           />
-                          <span className="truncate text-gray-900 dark:text-gray-100">{option.label}</span>
+                          <span className="truncate text-gray-900 dark:text-gray-100">
+                            {option.label}
+                          </span>
                         </div>
                       );
                     }}

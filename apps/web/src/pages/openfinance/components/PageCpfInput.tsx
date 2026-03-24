@@ -1,8 +1,10 @@
+import { Search, ArrowLeft } from 'lucide-react';
+
 import { type ChangeEvent } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Search, ArrowLeft } from 'lucide-react';
 
 interface PageCpfInputProps {
   readonly cpfCnpj: string;
@@ -15,14 +17,14 @@ interface PageCpfInputProps {
 
 function formatCpfCnpj(value: string): string {
   const cleaned = value.replaceAll(/\D/g, '');
-  
+
   if (cleaned.length <= 11) {
     return cleaned
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
   }
-  
+
   return cleaned
     .replace(/(\d{2})(\d)/, '$1.$2')
     .replace(/(\d{3})(\d)/, '$1.$2')

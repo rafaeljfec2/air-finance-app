@@ -1,7 +1,9 @@
-import { Button } from '@/components/ui/button';
-import { ArrowRight, TrendingUp, Users, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ArrowRight, TrendingUp, Users, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
+import { Button } from '@/components/ui/button';
+
 import { ScrollReveal } from './ScrollReveal';
 
 const stats = [
@@ -65,4 +67,3 @@ export function CTASection() {
     </section>
   );
 }
-

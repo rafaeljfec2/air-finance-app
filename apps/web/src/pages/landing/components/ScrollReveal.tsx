@@ -1,5 +1,7 @@
 import { motion, type Variants } from 'framer-motion';
 import { ReactNode } from 'react';
+
+
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 interface ScrollRevealProps {
@@ -61,4 +63,3 @@ export function ScrollReveal({
     </motion.div>
   );
 }
-

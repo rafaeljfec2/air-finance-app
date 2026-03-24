@@ -42,7 +42,7 @@ export class StorageManager {
     try {
       await this.adapter.clear();
     } catch (error) {
-      console.error("Error clearing storage:", error);
+      console.error('Error clearing storage:', error);
       throw error;
     }
   }

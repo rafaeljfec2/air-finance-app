@@ -1,22 +1,24 @@
-import { Card } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { formatCurrency } from '@/utils/formatters';
 import { BarChart3, PieChart as PieChartIcon, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import {
-    Bar,
-    BarChart,
-    CartesianGrid,
-    Cell,
-    Line,
-    LineChart,
-    Pie,
-    PieChart,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
+
+import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/utils/formatters';
+
 
 interface ChartData {
   name: string;
@@ -70,10 +72,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
         <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{label}</p>
         {payload.map((entry, index) => (
           <div key={index} className="flex items-center gap-2">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: entry.color }}
-            />
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
             <p className="text-sm text-gray-600 dark:text-gray-300">
               {entry.name}: {formatCurrency(entry.value)}
             </p>
@@ -128,7 +127,9 @@ export function CategoryCharts({ report }: CategoryChartsProps) {
           </ResponsiveContainer>
         );
       case 'line': {
-        const historicalData = title.includes('Income') ? report.historicalIncome : report.historicalExpenses;
+        const historicalData = title.includes('Income')
+          ? report.historicalIncome
+          : report.historicalExpenses;
         return (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={historicalData}>
@@ -163,7 +164,7 @@ export function CategoryCharts({ report }: CategoryChartsProps) {
             'inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium',
             chartType === 'pie'
               ? 'bg-primary-100 text-primary-600 dark:bg-primary-900 dark:text-primary-300'
-              : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+              : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white',
           )}
         >
           <PieChartIcon className="h-5 w-5 mr-1" />
@@ -175,7 +176,7 @@ export function CategoryCharts({ report }: CategoryChartsProps) {
             'inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium',
             chartType === 'bar'
               ? 'bg-primary-100 text-primary-600 dark:bg-primary-900 dark:text-primary-300'
-              : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+              : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white',
           )}
         >
           <BarChart3 className="h-5 w-5 mr-1" />
@@ -187,7 +188,7 @@ export function CategoryCharts({ report }: CategoryChartsProps) {
             'inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium',
             chartType === 'line'
               ? 'bg-primary-100 text-primary-600 dark:bg-primary-900 dark:text-primary-300'
-              : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+              : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white',
           )}
         >
           <TrendingUp className="h-5 w-5 mr-1" />

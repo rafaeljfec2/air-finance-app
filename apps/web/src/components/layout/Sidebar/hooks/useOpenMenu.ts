@@ -1,14 +1,13 @@
-import { NavigationSection } from '@/types/navigation';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+
+import { NavigationSection } from '@/types/navigation';
+
 
 /**
  * Finds the parent menu of the active route
  */
-function findActiveMenuParent(
-  navigation: NavigationSection[],
-  currentPath: string,
-): string | null {
+function findActiveMenuParent(navigation: NavigationSection[], currentPath: string): string | null {
   for (const group of navigation) {
     for (const item of group.items) {
       if ('children' in item && item.children) {

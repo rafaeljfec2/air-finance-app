@@ -9,10 +9,10 @@ interface ThemeState {
 
 export const useTheme = create<ThemeState>()(
   persist(
-    set => ({
+    (set) => ({
       isDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
       toggleTheme: () =>
-        set(state => {
+        set((state) => {
           const newIsDarkMode = !state.isDarkMode;
           // Atualiza a classe no documento
           document.documentElement.classList.toggle('dark', newIsDarkMode);
@@ -26,12 +26,12 @@ export const useTheme = create<ThemeState>()(
     }),
     {
       name: 'theme-storage',
-      onRehydrateStorage: () => state => {
+      onRehydrateStorage: () => (state) => {
         // Aplica o tema ao recarregar a página
         if (state) {
           document.documentElement.classList.toggle('dark', state.isDarkMode);
         }
       },
-    }
-  )
+    },
+  ),
 );

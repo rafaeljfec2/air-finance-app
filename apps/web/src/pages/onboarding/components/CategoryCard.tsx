@@ -1,6 +1,10 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Tags, Trash2, TrendingDown } from 'lucide-react';
+
+
+import React from 'react';
+
+import { Button } from '@/components/ui/button';
+
 import { type CategoryFormData } from '../schemas';
 
 interface CategoryCardProps {
@@ -8,7 +12,11 @@ interface CategoryCardProps {
   index: number;
   onRemove: (index: number) => void;
   iconOptions: ReadonlyArray<{ value: string; icon: React.ComponentType<{ className?: string }> }>;
-  categoryTypes: ReadonlyArray<{ value: string; label: string; icon: React.ComponentType<{ className?: string }> }>;
+  categoryTypes: ReadonlyArray<{
+    value: string;
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+  }>;
 }
 
 export function CategoryCard({

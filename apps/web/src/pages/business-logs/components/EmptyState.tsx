@@ -1,5 +1,7 @@
-import { Card } from '@/components/ui/card';
 import { History } from 'lucide-react';
+
+import { Card } from '@/components/ui/card';
+
 
 export function EmptyState() {
   return (
@@ -16,4 +18,3 @@ export function EmptyState() {
     </Card>
   );
 }
-

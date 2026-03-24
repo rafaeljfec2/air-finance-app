@@ -1,17 +1,19 @@
+import {
+  Edit,
+  Gift,
+  Landmark,
+  ShoppingCart,
+  Tag,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+  Wallet,
+} from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Category } from '@/services/categoryService';
-import {
-    Edit,
-    Gift,
-    Landmark,
-    ShoppingCart,
-    Tag,
-    Trash2,
-    TrendingDown,
-    TrendingUp,
-    Wallet,
-} from 'lucide-react';
+
 
 interface CategoryTableRowProps {
   category: Category;

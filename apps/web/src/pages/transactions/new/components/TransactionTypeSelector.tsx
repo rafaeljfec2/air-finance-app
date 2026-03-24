@@ -1,6 +1,8 @@
+import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
+
+
 import { cn } from '@/lib/utils';
 import type { TransactionType } from '@/types/transaction';
-import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 
 interface TransactionTypeSelectorProps {
   transactionType: TransactionType;
@@ -24,7 +26,14 @@ export function TransactionTypeSelector({
               : 'text-muted-foreground hover:text-foreground hover:bg-background/50',
           )}
         >
-          <ArrowDownCircle className={cn("h-4 w-4", transactionType === 'EXPENSE' ? "text-red-600 dark:text-red-400" : "text-muted-foreground")} />
+          <ArrowDownCircle
+            className={cn(
+              'h-4 w-4',
+              transactionType === 'EXPENSE'
+                ? 'text-red-600 dark:text-red-400'
+                : 'text-muted-foreground',
+            )}
+          />
           <span>Despesa</span>
         </button>
         <button
@@ -37,11 +46,17 @@ export function TransactionTypeSelector({
               : 'text-muted-foreground hover:text-foreground hover:bg-background/50',
           )}
         >
-          <ArrowUpCircle className={cn("h-4 w-4", transactionType === 'INCOME' ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")} />
+          <ArrowUpCircle
+            className={cn(
+              'h-4 w-4',
+              transactionType === 'INCOME'
+                ? 'text-emerald-600 dark:text-emerald-400'
+                : 'text-muted-foreground',
+            )}
+          />
           <span>Receita</span>
         </button>
       </div>
     </div>
   );
 }
-

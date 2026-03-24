@@ -1,16 +1,11 @@
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, Sparkles, AlertCircle, Megaphone, ArrowRight, X } from 'lucide-react';
+import { type LucideIcon } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { type Announcement } from '@/services/announcementsService';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  CheckCircle2,
-  Sparkles,
-  AlertCircle,
-  Megaphone,
-  ArrowRight,
-  X,
-} from 'lucide-react';
-import { type LucideIcon } from 'lucide-react';
+
 
 interface FeatureAnnouncementModalProps {
   readonly announcement: Announcement;
@@ -34,20 +29,24 @@ const PRIORITY_STYLES: Record<AnnouncementPriority, PriorityStyle> = {
   urgent: {
     gradient: 'from-red-500 via-orange-500 to-yellow-500',
     border: 'border-red-400',
-    badge: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-300 dark:border-red-800',
+    badge:
+      'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-300 dark:border-red-800',
     button: 'bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700',
   },
   important: {
     gradient: 'from-blue-500 via-purple-500 to-pink-500',
     border: 'border-blue-400',
-    badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-300 dark:border-blue-800',
+    badge:
+      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-300 dark:border-blue-800',
     button: 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700',
   },
   normal: {
     gradient: 'from-green-500 via-emerald-500 to-teal-500',
     border: 'border-green-400',
-    badge: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-300 dark:border-green-800',
-    button: 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700',
+    badge:
+      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-300 dark:border-green-800',
+    button:
+      'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700',
   },
 };
 
@@ -134,7 +133,12 @@ function ModalHeader({ announcement, styles, onClose }: Readonly<ModalHeaderProp
   const TypeIcon = getTypeIcon(announcement.type);
 
   return (
-    <div className={cn('relative h-16 sm:h-24 lg:h-24 bg-gradient-to-r flex-shrink-0', styles.gradient)}>
+    <div
+      className={cn(
+        'relative h-16 sm:h-24 lg:h-24 bg-gradient-to-r flex-shrink-0',
+        styles.gradient,
+      )}
+    >
       {announcement.imageUrl && (
         <div className="absolute inset-0">
           <img
@@ -235,7 +239,10 @@ function ModalActions({ announcement, styles, onConfirm, isLoading }: Readonly<M
         <Button
           onClick={onConfirm}
           disabled={isLoading}
-          className={cn('flex-1 text-white shadow-lg min-h-[44px] sm:min-h-[44px] text-xs sm:text-sm font-semibold', styles.button)}
+          className={cn(
+            'flex-1 text-white shadow-lg min-h-[44px] sm:min-h-[44px] text-xs sm:text-sm font-semibold',
+            styles.button,
+          )}
         >
           {isLoading ? (
             <>
@@ -287,7 +294,12 @@ export function FeatureAnnouncementModal({
         >
           <ModalHeader announcement={announcement} styles={styles} onClose={onClose} />
           <ModalContent announcement={announcement} />
-          <ModalActions announcement={announcement} styles={styles} onConfirm={onConfirm} isLoading={isLoading} />
+          <ModalActions
+            announcement={announcement}
+            styles={styles}
+            onConfirm={onConfirm}
+            isLoading={isLoading}
+          />
         </motion.div>
       </div>
     </AnimatePresence>

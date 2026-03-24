@@ -1,19 +1,13 @@
-import { Modal } from '@/components/ui/Modal';
+import { Link2, X, AlertCircle, ExternalLink, Loader2, Download, CheckCircle2 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Link2,
-  X,
-  AlertCircle,
-  ExternalLink,
-  Loader2,
-  Download,
-  CheckCircle2,
-} from 'lucide-react';
-import { PierreAccountList } from './PierreAccountList';
+import { Modal } from '@/components/ui/Modal';
 import { usePierreIntegration } from '@/pages/accounts/hooks/usePierreIntegration';
 import type { PierreAccount } from '@/services/bankingIntegrationService';
+
+import { PierreAccountList } from './PierreAccountList';
 
 const PIERRE_API_KEY_URL = 'https://www.pierre.finance/api-key';
 const MODAL_MAX_HEIGHT = 'max-h-[85vh]';

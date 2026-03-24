@@ -1,6 +1,8 @@
-import { cn } from '@/lib/utils';
 import { Upload, X, FileCheck, AlertCircle } from 'lucide-react';
 import { useRef, useState, DragEvent, ChangeEvent, MouseEvent } from 'react';
+
+import { cn } from '@/lib/utils';
+
 
 interface CertificateUploadProps {
   label: string;
@@ -58,8 +60,8 @@ export function CertificateUpload({
 
     // Check file extension
     const extension = selectedFile.name.split('.').pop()?.toLowerCase();
-    const acceptedExtensions = accept.split(',').map(ext => ext.trim().replace('.', ''));
-    
+    const acceptedExtensions = accept.split(',').map((ext) => ext.trim().replace('.', ''));
+
     if (extension && acceptedExtensions.includes(extension)) {
       onUpload(selectedFile);
     }
@@ -99,7 +101,9 @@ export function CertificateUpload({
           error && 'border-red-500 dark:border-red-400',
           disabled && 'opacity-50 cursor-not-allowed',
           !file && !error && 'border-gray-300 dark:border-gray-600',
-          file && !error && 'border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/10',
+          file &&
+            !error &&
+            'border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/10',
         )}
       >
         <input

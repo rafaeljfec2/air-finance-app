@@ -1,5 +1,12 @@
 import { CalendarDays, ShoppingBag } from 'lucide-react';
-import { formatCurrency, calculateUsagePercentage, type BillStatus, getStatusConfig } from '../utils';
+
+
+import {
+  formatCurrency,
+  calculateUsagePercentage,
+  type BillStatus,
+  getStatusConfig,
+} from '../utils';
 
 interface LimitUsageCardProps {
   readonly limitTotal: number;
@@ -27,7 +34,9 @@ export function LimitUsageCard({
       <div className="p-5 border-b border-border dark:border-border-dark">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-text dark:text-text-dark">Resumo do Cartão</h3>
-          <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusConfig.bg} ${statusConfig.color}`}>
+          <span
+            className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusConfig.bg} ${statusConfig.color}`}
+          >
             {statusConfig.label}
           </span>
         </div>
@@ -36,7 +45,9 @@ export function LimitUsageCard({
           <div>
             <div className="flex items-center justify-between text-xs mb-1.5">
               <span className="text-text-muted dark:text-text-muted-dark">Uso do limite</span>
-              <span className="font-medium text-text dark:text-text-dark">{usagePercentage.toFixed(0)}%</span>
+              <span className="font-medium text-text dark:text-text-dark">
+                {usagePercentage.toFixed(0)}%
+              </span>
             </div>
             <div className="h-2.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
               <div
@@ -48,12 +59,20 @@ export function LimitUsageCard({
 
           <div className="grid grid-cols-2 gap-3 pt-2">
             <div className="bg-background dark:bg-background-dark rounded-lg p-3">
-              <p className="text-[10px] text-text-muted dark:text-text-muted-dark uppercase tracking-wide">Disponível</p>
-              <p className="text-lg font-bold text-primary-600 dark:text-primary-400">{formatCurrency(limitAvailable)}</p>
+              <p className="text-[10px] text-text-muted dark:text-text-muted-dark uppercase tracking-wide">
+                Disponível
+              </p>
+              <p className="text-lg font-bold text-primary-600 dark:text-primary-400">
+                {formatCurrency(limitAvailable)}
+              </p>
             </div>
             <div className="bg-background dark:bg-background-dark rounded-lg p-3">
-              <p className="text-[10px] text-text-muted dark:text-text-muted-dark uppercase tracking-wide">Limite</p>
-              <p className="text-lg font-bold text-text dark:text-text-dark">{formatCurrency(limitTotal)}</p>
+              <p className="text-[10px] text-text-muted dark:text-text-muted-dark uppercase tracking-wide">
+                Limite
+              </p>
+              <p className="text-lg font-bold text-text dark:text-text-dark">
+                {formatCurrency(limitTotal)}
+              </p>
             </div>
           </div>
         </div>
@@ -66,7 +85,9 @@ export function LimitUsageCard({
               <CalendarDays className="h-4 w-4 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
-              <p className="text-[10px] text-text-muted dark:text-text-muted-dark uppercase">Vencimento</p>
+              <p className="text-[10px] text-text-muted dark:text-text-muted-dark uppercase">
+                Vencimento
+              </p>
               <p className="text-sm font-semibold text-text dark:text-text-dark">Dia {dueDay}</p>
             </div>
           </div>
@@ -76,8 +97,12 @@ export function LimitUsageCard({
               <ShoppingBag className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <p className="text-[10px] text-text-muted dark:text-text-muted-dark uppercase">Melhor dia</p>
-              <p className="text-sm font-semibold text-text dark:text-text-dark">Dia {bestPurchaseDay}</p>
+              <p className="text-[10px] text-text-muted dark:text-text-muted-dark uppercase">
+                Melhor dia
+              </p>
+              <p className="text-sm font-semibold text-text dark:text-text-dark">
+                Dia {bestPurchaseDay}
+              </p>
             </div>
           </div>
         </div>

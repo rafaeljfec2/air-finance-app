@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import type { IndebtednessMetrics } from '@/types/indebtedness';
+
 import { getIndebtednessMetrics } from '@/services/indebtednessService';
+import type { IndebtednessMetrics } from '@/types/indebtedness';
+
 
 export const useIndebtedness = (companyId: string) => {
   return useQuery<IndebtednessMetrics>({
@@ -10,4 +12,3 @@ export const useIndebtedness = (companyId: string) => {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
-

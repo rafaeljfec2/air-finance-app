@@ -4,28 +4,32 @@ const features = [
   {
     icon: BarChart3,
     title: 'Análise Inteligente',
-    description: 'Visualize seus gastos e receitas com gráficos interativos e insights personalizados que te ajudam a tomar decisões melhores.',
+    description:
+      'Visualize seus gastos e receitas com gráficos interativos e insights personalizados que te ajudam a tomar decisões melhores.',
     stat: '95%',
     statLabel: 'de precisão',
   },
   {
     icon: Zap,
     title: 'Gestão Simplificada',
-    description: 'Controle suas finanças de forma intuitiva e eficiente, com categorização automática e orçamento personalizado.',
+    description:
+      'Controle suas finanças de forma intuitiva e eficiente, com categorização automática e orçamento personalizado.',
     stat: '3x',
     statLabel: 'mais rápido',
   },
   {
     icon: Shield,
     title: 'Segurança Total',
-    description: 'Seus dados protegidos com criptografia de ponta a ponta e sincronização em tempo real em todas as plataformas.',
+    description:
+      'Seus dados protegidos com criptografia de ponta a ponta e sincronização em tempo real em todas as plataformas.',
     stat: '100%',
     statLabel: 'seguro',
   },
   {
     icon: Smartphone,
     title: 'Multiplataforma',
-    description: 'Acesse suas finanças de qualquer lugar, a qualquer momento, em todos os dispositivos com sincronização instantânea.',
+    description:
+      'Acesse suas finanças de qualquer lugar, a qualquer momento, em todos os dispositivos com sincronização instantânea.',
     stat: '24/7',
     statLabel: 'disponível',
   },
@@ -35,7 +39,7 @@ export function FeaturesV2() {
   return (
     <section id="features" className="v2-section bg-gray-50 relative">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-100 to-transparent" />
-      
+
       <div className="v2-container relative z-10">
         <div className="v2-text-center v2-mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#d1fae5] text-[#059669] text-sm font-semibold mb-6">
@@ -44,7 +48,8 @@ export function FeaturesV2() {
           </div>
           <h2 className="v2-h2 v2-mb-6">Tudo que você precisa em um só lugar</h2>
           <p className="v2-body max-w-2xl mx-auto text-gray-600">
-            Descubra como o Airfinance pode revolucionar sua gestão financeira com ferramentas inteligentes e intuitivas
+            Descubra como o Airfinance pode revolucionar sua gestão financeira com ferramentas
+            inteligentes e intuitivas
           </p>
         </div>
 

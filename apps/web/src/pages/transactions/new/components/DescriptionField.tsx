@@ -1,6 +1,8 @@
+import React, { useRef } from 'react';
+
+
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import React, { useRef } from 'react';
 
 interface DescriptionFieldProps {
   value: string;
@@ -37,7 +39,7 @@ export function DescriptionField({
         aria-required="true"
         aria-invalid={error ? 'true' : 'false'}
         aria-describedby={error ? 'description-error' : undefined}
-          className={cn(
+        className={cn(
           'bg-background dark:bg-background-dark text-foreground border-2 placeholder:text-muted-foreground transition-all min-h-[44px] rounded-lg text-base font-medium',
           error
             ? 'border-red-500 focus-visible:ring-red-500'

@@ -1,3 +1,8 @@
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { Edit, Trash2, TrendingUp } from 'lucide-react';
+
+
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useCategories } from '@/hooks/useCategories';
@@ -5,9 +10,6 @@ import { useGoals } from '@/hooks/useGoals';
 import { cn } from '@/lib/utils';
 import { Goal } from '@/services/goalService';
 import { formatCurrency } from '@/utils/formatters';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { Edit, Trash2, TrendingUp } from 'lucide-react';
 
 const statusOptions = [
   { value: 'active', label: 'Ativa', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
@@ -91,25 +93,25 @@ export function GoalTableRow({
       </td>
       <td className="p-4">
         <div className="text-sm">
-           <span className="text-gray-500 dark:text-gray-400 text-xs">Atual/Meta: </span>
-           <div className="text-text dark:text-text-dark font-medium">
-             {formatCurrency(goal.currentAmount)} / {formatCurrency(goal.targetAmount)}
-           </div>
+          <span className="text-gray-500 dark:text-gray-400 text-xs">Atual/Meta: </span>
+          <div className="text-text dark:text-text-dark font-medium">
+            {formatCurrency(goal.currentAmount)} / {formatCurrency(goal.targetAmount)}
+          </div>
         </div>
       </td>
       <td className="p-4">
         <div className="text-sm text-text dark:text-text-dark">
-          {format(new Date(goal.deadline), "dd/MM/yyyy", {
+          {format(new Date(goal.deadline), 'dd/MM/yyyy', {
             locale: ptBR,
           })}
           {daysUntilDeadline > 0 && (
-             <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-               Restam {daysUntilDeadline} dias
-             </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Restam {daysUntilDeadline} dias
+            </div>
           )}
         </div>
       </td>
-       <td className="p-4">
+      <td className="p-4">
         <div className="flex justify-end gap-2">
           <Button
             size="sm"

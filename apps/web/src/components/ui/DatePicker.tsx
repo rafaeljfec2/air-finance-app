@@ -1,10 +1,12 @@
-import { cn } from '@/lib/utils';
-import { parseLocalDate } from '@/utils/date';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import type { Instance } from 'flatpickr/dist/types/instance';
 import { Calendar, X } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
+
+import { cn } from '@/lib/utils';
+import { parseLocalDate } from '@/utils/date';
+
 import { Input } from './input';
 
 // Portuguese locale configuration
@@ -104,19 +106,19 @@ flatpickr.localize(ptLocale);
 export interface DatePickerProps {
   /**
    * Selected date value (ISO string or Date object)
-   * 
+   *
    * The DatePicker handles ALL timezone conversions internally.
    * You can pass:
    * - ISO string (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss.sssZ) - will be parsed in local timezone
    * - Date object - will be normalized to start of day in local timezone
-   * 
+   *
    * No manual timezone handling is needed - the component does it all automatically.
    */
   value?: string | Date | null;
 
   /**
    * Callback when date changes
-   * 
+   *
    * Returns a Date object normalized to start of day in local timezone.
    * If you need a string for API calls, use formatDateToLocalISO(date) from @/utils/date
    */
@@ -182,7 +184,7 @@ export interface DatePickerProps {
  * Converts a value (string or Date) to a Date object
  * Always creates dates in local timezone to avoid timezone issues
  * This is the central place for all date parsing - ensures consistency across the application
- * 
+ *
  * Handles:
  * - ISO strings (YYYY-MM-DD) - parses in local timezone
  * - Date objects - normalizes to start of day in local timezone
@@ -198,7 +200,7 @@ function convertValueToDate(value: string | Date | null | undefined): Date | nul
     // Remove time part if present (handle ISO strings with time like "2025-12-01T00:00:00.000Z")
     // This is critical - we only care about the date part, not the time or timezone
     const datePart = value.split('T')[0].split(' ')[0].trim();
-    
+
     // Try to parse ISO string first (YYYY-MM-DD format)
     const isoDateRegex = /^(\d{4})-(\d{2})-(\d{2})/;
     const isoDateMatch = isoDateRegex.exec(datePart);
@@ -412,22 +414,22 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
               yearText.style.opacity = '1';
             }
           }
-          
+
           // Mark weekend days (Saturday and Sunday)
           const markWeekends = () => {
             const days = calendar?.querySelectorAll('.flatpickr-day');
             const currentMonth = instance.currentMonth;
             const currentYear = instance.currentYear;
-            
+
             days?.forEach((day) => {
               const dayElement = day as HTMLElement;
-              
+
               // Skip disabled days
               if (dayElement.classList.contains('flatpickr-disabled')) {
                 dayElement.classList.remove('weekend');
                 return;
               }
-              
+
               // Skip days from previous or next month - only mark days from current month
               if (
                 dayElement.classList.contains('prevMonthDay') ||
@@ -436,23 +438,23 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
                 dayElement.classList.remove('weekend');
                 return;
               }
-              
+
               // Get day number from text content
               const dayNum = dayElement.textContent?.trim();
               if (!dayNum) {
                 dayElement.classList.remove('weekend');
                 return;
               }
-              
+
               const dayValue = Number.parseInt(dayNum, 10);
               if (Number.isNaN(dayValue) || dayValue < 1 || dayValue > 31) {
                 dayElement.classList.remove('weekend');
                 return;
               }
-              
+
               // Create date object for this day in the current month/year
               const dateObj = new Date(currentYear, currentMonth, dayValue);
-              
+
               // Verify this date is actually in the current month (handles edge cases like day 31 in months with 30 days)
               if (
                 dateObj.getMonth() === currentMonth &&
@@ -471,10 +473,10 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
               }
             });
           };
-          
+
           // Mark weekends on ready
           setTimeout(markWeekends, 100);
-          
+
           // Also mark weekends when month changes (observe calendar changes)
           const daysContainer = calendar?.querySelector('.flatpickr-days');
           if (daysContainer) {
@@ -490,22 +492,22 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
           if (calendar) {
             calendar.style.setProperty('z-index', '999999', 'important');
           }
-          
+
           // Mark weekend days when calendar opens (reuse same logic)
           setTimeout(() => {
             const days = calendar?.querySelectorAll('.flatpickr-day');
             const currentMonth = instance.currentMonth;
             const currentYear = instance.currentYear;
-            
+
             days?.forEach((day) => {
               const dayElement = day as HTMLElement;
-              
+
               // Skip disabled days
               if (dayElement.classList.contains('flatpickr-disabled')) {
                 dayElement.classList.remove('weekend');
                 return;
               }
-              
+
               // Skip days from previous or next month - only mark days from current month
               if (
                 dayElement.classList.contains('prevMonthDay') ||
@@ -514,23 +516,23 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
                 dayElement.classList.remove('weekend');
                 return;
               }
-              
+
               // Get day number from text content
               const dayNum = dayElement.textContent?.trim();
               if (!dayNum) {
                 dayElement.classList.remove('weekend');
                 return;
               }
-              
+
               const dayValue = Number.parseInt(dayNum, 10);
               if (Number.isNaN(dayValue) || dayValue < 1 || dayValue > 31) {
                 dayElement.classList.remove('weekend');
                 return;
               }
-              
+
               // Create date object for this day in the current month/year
               const dateObj = new Date(currentYear, currentMonth, dayValue);
-              
+
               // Verify this date is actually in the current month (handles edge cases like day 31 in months with 30 days)
               if (
                 dateObj.getMonth() === currentMonth &&
@@ -663,7 +665,11 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
 
     return (
       <div className="w-full">
-        {label && <label className="text-xs text-muted-foreground dark:text-gray-400 mb-1 block">{label}</label>}
+        {label && (
+          <label className="text-xs text-muted-foreground dark:text-gray-400 mb-1 block">
+            {label}
+          </label>
+        )}
         <div className="relative">
           {showIcon && (
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400 pointer-events-none z-10" />

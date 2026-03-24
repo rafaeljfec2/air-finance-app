@@ -18,4 +18,3 @@ export function ErrorState({ error, onRetry }: ErrorStateProps) {
     </Card>
   );
 }
-

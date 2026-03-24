@@ -1,11 +1,12 @@
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebar';
-import { useFilteredNavigation } from './hooks/useFilteredNavigation';
-import { useOpenMenu } from './hooks/useOpenMenu';
-import { SidebarOverlay } from './components/SidebarOverlay';
-import { SidebarHeader } from './components/SidebarHeader';
+
 import { NavigationSection } from './components/NavigationSection';
 import { SidebarFooter } from './components/SidebarFooter';
+import { SidebarHeader } from './components/SidebarHeader';
+import { SidebarOverlay } from './components/SidebarOverlay';
+import { useFilteredNavigation } from './hooks/useFilteredNavigation';
+import { useOpenMenu } from './hooks/useOpenMenu';
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -38,23 +39,23 @@ export function Sidebar({
         aria-label="Menu lateral"
       >
         <div className="flex flex-col h-full overflow-hidden">
-        <SidebarHeader onClose={onClose} isHeaderVisible={isHeaderVisible} />
-        <nav className="flex-1 min-h-0 space-y-1 px-2 py-4 overflow-y-auto pb-24 lg:pb-4">
-          {filteredNavigation.map((group, idx) => (
-            <NavigationSection
-              key={group.section}
-              section={group}
-              index={idx}
-              isCollapsed={isCollapsed}
-              openMenu={openMenu}
-              onMenuToggle={toggleMenu}
-            />
-          ))}
-        </nav>
-        <div className="flex-shrink-0 lg:pb-0 pb-20">
-          <SidebarFooter />
+          <SidebarHeader onClose={onClose} isHeaderVisible={isHeaderVisible} />
+          <nav className="flex-1 min-h-0 space-y-1 px-2 py-4 overflow-y-auto pb-24 lg:pb-4">
+            {filteredNavigation.map((group, idx) => (
+              <NavigationSection
+                key={group.section}
+                section={group}
+                index={idx}
+                isCollapsed={isCollapsed}
+                openMenu={openMenu}
+                onMenuToggle={toggleMenu}
+              />
+            ))}
+          </nav>
+          <div className="flex-shrink-0 lg:pb-0 pb-20">
+            <SidebarFooter />
+          </div>
         </div>
-      </div>
       </div>
     </>
   );

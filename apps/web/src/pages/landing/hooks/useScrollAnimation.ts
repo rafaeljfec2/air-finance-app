@@ -19,4 +19,3 @@ export function useScrollAnimation({
 
   return { ref, inView };
 }
-

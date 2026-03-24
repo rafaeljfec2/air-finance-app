@@ -1,10 +1,19 @@
 import { useCallback } from 'react';
+
+
 import { useSortable } from '@/hooks/useSortable';
 import { User } from '@/services/userService';
 
 export function useUserSorting() {
   const { sortConfig, handleSort, sortData } = useSortable<
-    'name' | 'email' | 'role' | 'status' | 'plan' | 'createdAt' | 'emailVerified' | 'onboardingCompleted'
+    | 'name'
+    | 'email'
+    | 'role'
+    | 'status'
+    | 'plan'
+    | 'createdAt'
+    | 'emailVerified'
+    | 'onboardingCompleted'
   >({
     initialField: 'createdAt',
     initialDirection: 'desc',
@@ -39,7 +48,11 @@ export function useUserSorting() {
           case 'emailVerified':
             return user.emailVerified === true ? 1 : user.emailVerified === false ? 0 : -1;
           case 'onboardingCompleted':
-            return user.onboardingCompleted === true ? 1 : user.onboardingCompleted === false ? 0 : -1;
+            return user.onboardingCompleted === true
+              ? 1
+              : user.onboardingCompleted === false
+                ? 0
+                : -1;
           default:
             return (user as unknown as Record<string, unknown>)[field];
         }

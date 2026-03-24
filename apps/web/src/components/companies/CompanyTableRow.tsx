@@ -1,9 +1,11 @@
+import { Edit, Trash2 } from 'lucide-react';
+
+
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Company } from '@/types/company';
 import { formatDate } from '@/utils/date';
 import { formatDocument } from '@/utils/formatDocument';
-import { Edit, Trash2 } from 'lucide-react';
 
 interface CompanyTableRowProps {
   company: Company;
@@ -79,19 +81,23 @@ export function CompanyTableRow({
       <td className="p-4">
         <div className="space-y-1">
           {company.email && (
-            <div className="text-sm text-text dark:text-text-dark truncate max-w-[200px]" title={company.email}>
+            <div
+              className="text-sm text-text dark:text-text-dark truncate max-w-[200px]"
+              title={company.email}
+            >
               {company.email}
             </div>
           )}
           {company.phone && (
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {company.phone}
-            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">{company.phone}</div>
           )}
         </div>
       </td>
       <td className="p-4">
-        <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[200px]" title={company.address}>
+        <div
+          className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[200px]"
+          title={company.address}
+        >
           {company.address || '-'}
         </div>
       </td>

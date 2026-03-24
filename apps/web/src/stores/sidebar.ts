@@ -8,12 +8,12 @@ interface SidebarState {
 
 export const useSidebarStore = create<SidebarState>()(
   persist(
-    set => ({
+    (set) => ({
       isCollapsed: false,
-      toggleCollapse: () => set(state => ({ isCollapsed: !state.isCollapsed })),
+      toggleCollapse: () => set((state) => ({ isCollapsed: !state.isCollapsed })),
     }),
     {
       name: 'sidebar-storage',
-    }
-  )
+    },
+  ),
 );

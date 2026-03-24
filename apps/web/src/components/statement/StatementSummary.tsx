@@ -1,5 +1,7 @@
-import { formatCurrency } from '@/utils/formatters';
 import { Banknote, TrendingDown, TrendingUp } from 'lucide-react';
+
+import { formatCurrency } from '@/utils/formatters';
+
 
 interface StatementSummaryProps {
   balance: number;
@@ -10,27 +12,31 @@ interface StatementSummaryProps {
   previousExpenses?: number;
 }
 
-export function StatementSummary({ 
-  balance, 
-  income, 
+export function StatementSummary({
+  balance,
+  income,
   expenses,
   previousBalance = 0,
   previousIncome = 0,
-  previousExpenses = 0
+  previousExpenses = 0,
 }: StatementSummaryProps) {
-  const balanceVariation = previousBalance ? ((balance - previousBalance) / previousBalance) * 100 : 0;
+  const balanceVariation = previousBalance
+    ? ((balance - previousBalance) / previousBalance) * 100
+    : 0;
   const incomeVariation = previousIncome ? ((income - previousIncome) / previousIncome) * 100 : 0;
-  const expensesVariation = previousExpenses ? ((expenses - previousExpenses) / previousExpenses) * 100 : 0;
+  const expensesVariation = previousExpenses
+    ? ((expenses - previousExpenses) / previousExpenses) * 100
+    : 0;
 
   const renderVariation = (variation: number) => {
     if (variation === 0) return null;
-    
+
     return (
-      <span className={`inline-flex items-center text-sm ${
-        variation > 0 
-          ? 'text-green-600 dark:text-green-400' 
-          : 'text-red-600 dark:text-red-400'
-      }`}>
+      <span
+        className={`inline-flex items-center text-sm ${
+          variation > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+        }`}
+      >
         {variation > 0 ? (
           <TrendingUp className="h-4 w-4 mr-1" />
         ) : (
@@ -49,9 +55,11 @@ export function StatementSummary({
         </div>
         <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Saldo Disponível</h3>
         <div className="mt-2">
-          <p className={`text-3xl font-bold ${
-            balance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-          }`}>
+          <p
+            className={`text-3xl font-bold ${
+              balance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+            }`}
+          >
             {formatCurrency(balance)}
           </p>
           {renderVariation(balanceVariation)}

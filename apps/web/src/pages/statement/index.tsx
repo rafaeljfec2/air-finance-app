@@ -1,7 +1,11 @@
+import { AlertTriangle, ChevronDown, FileText, TrendingDown, TrendingUp } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+
 import { StatementFilters } from '@/components/statement/StatementFilters';
 import {
-    TransactionGrid,
-    type TransactionGridTransaction,
+  TransactionGrid,
+  type TransactionGridTransaction,
 } from '@/components/transactions/TransactionGrid';
 import { Card } from '@/components/ui/card';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -9,14 +13,6 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
 import { useStatementStore } from '@/stores/statement';
 import { formatCurrency } from '@/utils/formatters';
-import {
-    AlertTriangle,
-    ChevronDown,
-    FileText,
-    TrendingDown,
-    TrendingUp,
-} from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export function Statement() {
   const [searchTerm, setSearchTerm] = useState('');

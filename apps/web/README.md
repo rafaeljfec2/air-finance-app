@@ -116,6 +116,7 @@ import { StorageManager } from '@air-finance/shared/utils';
 Deploy automatizado na Vercel para branch `main`.
 
 **Configuração**:
+
 - Root Directory: `.` (raiz do monorepo)
 - Build Command: `turbo run build --filter=@air-finance/web`
 - Output: `apps/web/dist`

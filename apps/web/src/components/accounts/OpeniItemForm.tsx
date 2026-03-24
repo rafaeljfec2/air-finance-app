@@ -1,7 +1,8 @@
+import { AlertCircle, Loader2 } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { AlertCircle, Loader2 } from 'lucide-react';
 import { type OpeniConnector } from '@/services/openiService';
 
 interface OpeniItemFormProps {
@@ -132,9 +133,7 @@ export function OpeniItemForm({
 
         {optionalFields.length > 0 && (
           <div className="space-y-4">
-            <h3 className="text-sm font-medium text-text dark:text-text-dark">
-              Campos opcionais
-            </h3>
+            <h3 className="text-sm font-medium text-text dark:text-text-dark">Campos opcionais</h3>
             {optionalFields.map(renderField)}
           </div>
         )}

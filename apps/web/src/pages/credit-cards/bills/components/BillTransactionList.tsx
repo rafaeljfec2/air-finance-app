@@ -1,4 +1,6 @@
 import { useEffect, useRef, useMemo } from 'react';
+
+
 import { BillTransactionItem } from './BillTransactionItem';
 
 interface BillTransactionListProps {
@@ -99,9 +101,7 @@ export function BillTransactionList({
   if (transactions.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center px-4 py-12 text-center">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Nenhuma transação encontrada
-        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Nenhuma transação encontrada</p>
       </div>
     );
   }

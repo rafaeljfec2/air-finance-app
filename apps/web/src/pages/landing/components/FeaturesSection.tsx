@@ -1,15 +1,18 @@
 import { CheckCircle2 } from 'lucide-react';
-import { ScrollReveal } from './ScrollReveal';
-import { InteractiveCard } from './InteractiveCard';
+
 import dashboardImage from '@/assets/images/landing/dashboard.svg';
 import mobileImage from '@/assets/images/landing/mobile.svg';
 import securityImage from '@/assets/images/landing/security.svg';
+
+import { InteractiveCard } from './InteractiveCard';
+import { ScrollReveal } from './ScrollReveal';
 
 const features = [
   {
     id: 1,
     title: 'Análise Inteligente',
-    description: 'Visualize seus gastos e receitas com gráficos interativos e insights personalizados.',
+    description:
+      'Visualize seus gastos e receitas com gráficos interativos e insights personalizados.',
     image: dashboardImage,
     imageAlt: 'Dashboard inteligente com gráficos e análises financeiras',
     items: ['Dashboard personalizado', 'Relatórios automáticos', 'Previsões financeiras'],
@@ -34,7 +37,11 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="py-32 px-6 bg-white relative z-10" aria-labelledby="features-heading">
+    <section
+      id="features"
+      className="py-32 px-6 bg-white relative z-10"
+      aria-labelledby="features-heading"
+    >
       <div className="max-w-7xl mx-auto">
         <ScrollReveal variant="fade" className="text-center mb-20">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-brand-arrow">
@@ -47,12 +54,7 @@ export function FeaturesSection() {
 
         <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
           {features.map((feature, index) => (
-            <ScrollReveal
-              key={feature.id}
-              variant="slideUp"
-              delay={index * 0.2}
-              className="h-full"
-            >
+            <ScrollReveal key={feature.id} variant="slideUp" delay={index * 0.2} className="h-full">
               <InteractiveCard className="h-full">
                 <div className="bg-background p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-full flex flex-col">
                   <div className="mb-6">
@@ -86,4 +88,3 @@ export function FeaturesSection() {
     </section>
   );
 }
-

@@ -1,7 +1,11 @@
-import { parseApiError } from '@/utils/apiErrorHandler';
 import { z } from 'zod';
-import { apiClient } from './apiClient';
+
 import type { IndebtednessMetrics } from '@/types/indebtedness';
+import { parseApiError } from '@/utils/apiErrorHandler';
+
+import { apiClient } from './apiClient';
+
+
 
 const CreditUtilizationStatusSchema = z.enum(['low', 'moderate', 'high', 'critical']);
 const LiquidityStatusSchema = z.enum(['positive', 'negative', 'critical']);
@@ -41,9 +45,7 @@ const IndebtednessMetricsSchema = z.object({
   accountBalances: AccountBalancesSchema,
 });
 
-export const getIndebtednessMetrics = async (
-  companyId: string,
-): Promise<IndebtednessMetrics> => {
+export const getIndebtednessMetrics = async (companyId: string): Promise<IndebtednessMetrics> => {
   try {
     const response = await apiClient.get<IndebtednessMetrics>(
       `/companies/${companyId}/indebtedness`,
@@ -53,4 +55,3 @@ export const getIndebtednessMetrics = async (
     throw parseApiError(error);
   }
 };
-

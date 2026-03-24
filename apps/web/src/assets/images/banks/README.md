@@ -28,6 +28,7 @@ Os seguintes logos estão disponíveis neste diretório (baixados do repositóri
 ## Fonte dos Logos
 
 Os logos foram baixados do repositório GitHub:
+
 - **Repositório:** [Tgentil/Bancos-em-SVG](https://github.com/Tgentil/Bancos-em-SVG)
 - **Formato:** SVG vetorial
 - **Tamanho:** 2500x2500px
@@ -52,6 +53,7 @@ Os logos foram baixados do repositório GitHub:
 ## Fallback
 
 O sistema usa ícones do lucide-react como fallback quando:
+
 - O logo PNG não está disponível
 - O logo falha ao carregar
 - O banco não está na lista de logos disponíveis
@@ -69,6 +71,7 @@ Para adicionar logos de novos bancos:
 ## Testando
 
 Após adicionar os logos, teste em diferentes cenários:
+
 - Modo claro e escuro
 - Diferentes tamanhos de tela
 - Com e sem logos disponíveis

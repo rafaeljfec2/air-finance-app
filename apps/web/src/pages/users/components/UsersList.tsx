@@ -2,9 +2,7 @@ import { Card } from '@/components/ui/card';
 import { RecordsGrid } from '@/components/ui/RecordsGrid';
 import { SortableColumn, SortConfig } from '@/components/ui/SortableColumn';
 import { User } from '@/services/userService';
-import { UserCard } from './UserCard';
-import { UserListItem } from './UserListItem';
-import { UserTableRow } from './UserTableRow';
+
 import {
   getEmailVerifiedBadgeColor,
   getOnboardingCompletedBadgeColor,
@@ -12,13 +10,38 @@ import {
   getStatusBadgeColor,
 } from '../utils/userHelpers';
 
+import { UserCard } from './UserCard';
+import { UserListItem } from './UserListItem';
+import { UserTableRow } from './UserTableRow';
+
+
+
 interface UsersListProps {
   users: User[];
   viewMode: 'grid' | 'list';
   isUpdating: boolean;
   isDeleting: boolean;
-  sortConfig: SortConfig<'name' | 'email' | 'role' | 'status' | 'plan' | 'createdAt' | 'emailVerified' | 'onboardingCompleted'> | null;
-  onSort: (field: 'name' | 'email' | 'role' | 'status' | 'plan' | 'createdAt' | 'emailVerified' | 'onboardingCompleted') => void;
+  sortConfig: SortConfig<
+    | 'name'
+    | 'email'
+    | 'role'
+    | 'status'
+    | 'plan'
+    | 'createdAt'
+    | 'emailVerified'
+    | 'onboardingCompleted'
+  > | null;
+  onSort: (
+    field:
+      | 'name'
+      | 'email'
+      | 'role'
+      | 'status'
+      | 'plan'
+      | 'createdAt'
+      | 'emailVerified'
+      | 'onboardingCompleted',
+  ) => void;
   onEdit: (user: User) => void;
   onDelete: (id: string) => void;
   onViewPermissions: (user: User) => void;
@@ -87,7 +110,11 @@ export function UsersList({
                 <SortableColumn field="emailVerified" currentSort={sortConfig} onSort={onSort}>
                   Email Verificado
                 </SortableColumn>
-                <SortableColumn field="onboardingCompleted" currentSort={sortConfig} onSort={onSort}>
+                <SortableColumn
+                  field="onboardingCompleted"
+                  currentSort={sortConfig}
+                  onSort={onSort}
+                >
                   Onboarding
                 </SortableColumn>
                 <th className="text-right py-2 px-3 text-xs font-semibold text-text dark:text-text-dark">

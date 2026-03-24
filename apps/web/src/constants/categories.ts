@@ -20,5 +20,5 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const getCategoriesByType = (type: TransactionType): Category[] => {
-  return CATEGORIES.filter(category => category.types.includes(type));
+  return CATEGORIES.filter((category) => category.types.includes(type));
 };

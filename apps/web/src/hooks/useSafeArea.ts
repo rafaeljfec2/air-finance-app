@@ -33,9 +33,7 @@ export function useSafeArea(): SafeAreaInsets {
     // Get safe area insets from CSS variables
     const getSafeAreaInset = (property: string): number => {
       if (typeof globalThis.window === 'undefined') return 0;
-      const value = getComputedStyle(document.documentElement)
-        .getPropertyValue(property)
-        .trim();
+      const value = getComputedStyle(document.documentElement).getPropertyValue(property).trim();
       // Parse value (e.g., "44px" -> 44)
       const regex = /(\d+(?:\.\d+)?)px/;
       const match = RegExp.prototype.exec.call(regex, value);

@@ -1,6 +1,8 @@
 import { Star } from 'lucide-react';
-import { ScrollReveal } from './ScrollReveal';
+
 import { InteractiveCard } from './InteractiveCard';
+import { ScrollReveal } from './ScrollReveal';
+
 
 const testimonials = [
   {
@@ -56,7 +58,9 @@ export function TestimonialsSection() {
                       />
                     ))}
                   </div>
-                  <p className="text-text/80 mb-6 flex-grow italic">&quot;{testimonial.text}&quot;</p>
+                  <p className="text-text/80 mb-6 flex-grow italic">
+                    &quot;{testimonial.text}&quot;
+                  </p>
                   <div className="flex items-center gap-4 mt-auto">
                     <div className="w-12 h-12 rounded-full bg-brand-arrow/10 flex items-center justify-center text-2xl">
                       {testimonial.avatar}
@@ -75,4 +79,3 @@ export function TestimonialsSection() {
     </section>
   );
 }
-

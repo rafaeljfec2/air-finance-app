@@ -1,5 +1,7 @@
-import { BusinessLog, BusinessLogFilters, getBusinessLogs } from '@/services/businessLogService';
 import { useCallback, useEffect, useState } from 'react';
+
+import { BusinessLog, BusinessLogFilters, getBusinessLogs } from '@/services/businessLogService';
+
 
 interface UseBusinessLogsParams {
   companyId: string | undefined;
@@ -60,7 +62,15 @@ export function useBusinessLogs({
     } finally {
       setIsLoading(false);
     }
-  }, [companyId, filters.entityType, filters.operation, filters.entityId, filters.startDate, filters.endDate, filters.currentPage]);
+  }, [
+    companyId,
+    filters.entityType,
+    filters.operation,
+    filters.entityId,
+    filters.startDate,
+    filters.endDate,
+    filters.currentPage,
+  ]);
 
   useEffect(() => {
     loadLogs();
@@ -68,4 +78,3 @@ export function useBusinessLogs({
 
   return { logs, meta, isLoading, error, loadLogs };
 }
-

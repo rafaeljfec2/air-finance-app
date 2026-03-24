@@ -1,4 +1,7 @@
+import { Loader2, Send } from 'lucide-react';
+
 import React, { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { ComboBox } from '@/components/ui/ComboBox';
 import { Input } from '@/components/ui/input';
@@ -7,7 +10,6 @@ import { Modal } from '@/components/ui/Modal';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
 import { supportService } from '@/services/supportService';
-import { Loader2, Send } from 'lucide-react';
 
 interface SupportModalProps {
   readonly isOpen: boolean;
@@ -50,14 +52,14 @@ export function SupportModal({ isOpen, onClose }: SupportModalProps) {
       }, 2000);
     } catch (error: unknown) {
       console.error('Failed to create ticket:', error);
-      
+
       let errorMessage = 'Erro ao enviar solicitação. Tente novamente.';
-      
+
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as { response?: { status?: number; data?: { message?: string } } };
         const status = axiosError.response?.status;
         const message = axiosError.response?.data?.message;
-        
+
         if (status === 400) {
           errorMessage = message ?? 'Dados inválidos. Verifique os campos preenchidos.';
         } else if (status === 401) {
@@ -72,7 +74,7 @@ export function SupportModal({ isOpen, onClose }: SupportModalProps) {
           errorMessage = message;
         }
       }
-      
+
       toast({
         type: 'error',
         description: errorMessage,

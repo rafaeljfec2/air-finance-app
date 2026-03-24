@@ -61,7 +61,8 @@ export function StepIndicator({ currentStep, steps }: Readonly<StepIndicatorProp
             stepIconClassName +=
               'bg-brand-leaf text-brand-arrow border-brand-leaf ring-2 sm:ring-4 ring-brand-leaf/20';
           } else {
-            stepIconClassName += 'bg-card dark:bg-card-dark border-border dark:border-border-dark text-gray-400 dark:text-gray-500';
+            stepIconClassName +=
+              'bg-card dark:bg-card-dark border-border dark:border-border-dark text-gray-400 dark:text-gray-500';
           }
 
           return (

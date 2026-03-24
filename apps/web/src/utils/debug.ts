@@ -54,11 +54,7 @@ function getTimestamp(): string {
 /**
  * Format log message with context
  */
-function formatMessage(
-  level: LogLevel,
-  message: string,
-  context?: string,
-): string {
+function formatMessage(level: LogLevel, message: string, context?: string): string {
   const parts: string[] = [];
 
   // Level emoji

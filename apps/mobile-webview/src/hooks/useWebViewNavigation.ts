@@ -1,45 +1,52 @@
-import { useState, useEffect, RefObject } from 'react'
-import { BackHandler } from 'react-native'
-import type { WebView, WebViewNavigation } from 'react-native-webview'
-import { ALLOWED_DOMAINS } from '../constants/webview'
+import { useState, useEffect, RefObject } from "react";
+import { BackHandler } from "react-native";
+import type { WebView, WebViewNavigation } from "react-native-webview";
+import { ALLOWED_DOMAINS } from "../constants/webview";
 
 export function useWebViewNavigation(webViewRef: RefObject<WebView | null>) {
-  const [canGoBack, setCanGoBack] = useState(false)
+  const [canGoBack, setCanGoBack] = useState(false);
 
   useEffect(() => {
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (canGoBack && webViewRef.current) {
-        webViewRef.current.goBack()
-        return true
-      }
-      return false
-    })
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        if (canGoBack && webViewRef.current) {
+          webViewRef.current.goBack();
+          return true;
+        }
+        return false;
+      },
+    );
 
-    return () => backHandler.remove()
-  }, [canGoBack, webViewRef])
+    return () => backHandler.remove();
+  }, [canGoBack, webViewRef]);
 
   const handleNavigationStateChange = (navState: WebViewNavigation) => {
-    setCanGoBack(navState.canGoBack)
+    setCanGoBack(navState.canGoBack);
 
-    const url = navState.url
-    const isAllowedDomain = ALLOWED_DOMAINS.some(domain => url.includes(domain))
+    const url = navState.url;
+    const isAllowedDomain = ALLOWED_DOMAINS.some((domain) =>
+      url.includes(domain),
+    );
 
     if (!isAllowedDomain && !navState.loading) {
-      webViewRef.current?.stopLoading()
+      webViewRef.current?.stopLoading();
       if (navState.canGoBack) {
-        webViewRef.current?.goBack()
+        webViewRef.current?.goBack();
       }
     }
-  }
+  };
 
   const shouldStartLoadWithRequest = (request: { url: string }) => {
-    const isAllowed = ALLOWED_DOMAINS.some(domain => request.url.includes(domain))
-    return isAllowed
-  }
+    const isAllowed = ALLOWED_DOMAINS.some((domain) =>
+      request.url.includes(domain),
+    );
+    return isAllowed;
+  };
 
   return {
     canGoBack,
     handleNavigationStateChange,
     shouldStartLoadWithRequest,
-  }
+  };
 }

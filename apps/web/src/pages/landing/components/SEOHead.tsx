@@ -1,4 +1,6 @@
 import { Helmet } from 'react-helmet-async';
+
+
 import { defaultSEOMetadata } from '../utils/seoMetadata';
 import {
   getOrganizationStructuredData,
@@ -40,16 +42,9 @@ export function SEOHead() {
       <meta name="revisit-after" content="7 days" />
 
       {/* Structured Data - JSON-LD */}
-      <script type="application/ld+json">
-        {JSON.stringify(getOrganizationStructuredData())}
-      </script>
-      <script type="application/ld+json">
-        {JSON.stringify(getWebSiteStructuredData())}
-      </script>
-      <script type="application/ld+json">
-        {JSON.stringify(getProductStructuredData())}
-      </script>
+      <script type="application/ld+json">{JSON.stringify(getOrganizationStructuredData())}</script>
+      <script type="application/ld+json">{JSON.stringify(getWebSiteStructuredData())}</script>
+      <script type="application/ld+json">{JSON.stringify(getProductStructuredData())}</script>
     </Helmet>
   );
 }
-

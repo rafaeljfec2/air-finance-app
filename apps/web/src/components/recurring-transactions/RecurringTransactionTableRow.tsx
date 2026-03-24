@@ -1,3 +1,6 @@
+import { ArrowDownCircle, ArrowUpCircle, Edit, Trash2 } from 'lucide-react';
+
+
 import { Button } from '@/components/ui/button';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCategories } from '@/hooks/useCategories';
@@ -5,12 +8,6 @@ import { cn } from '@/lib/utils';
 import { RecurringTransaction } from '@/services/recurringTransactionService';
 import { useCompanyStore } from '@/stores/company';
 import { formatCurrency } from '@/utils/formatters';
-import {
-    ArrowDownCircle,
-    ArrowUpCircle,
-    Edit,
-    Trash2,
-} from 'lucide-react';
 
 interface RecurringTransactionTableRowProps {
   recurringTransaction: RecurringTransaction;
@@ -95,18 +92,14 @@ export function RecurringTransactionTableRow({
       </td>
       <td className="p-4">
         <div className="text-sm text-gray-500 dark:text-gray-400">
-           {formatDate(recurringTransaction.startDate)}
+          {formatDate(recurringTransaction.startDate)}
         </div>
       </td>
       <td className="p-4">
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          {categoryName}
-        </div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">{categoryName}</div>
       </td>
-       <td className="p-4">
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          {accountName}
-        </div>
+      <td className="p-4">
+        <div className="text-sm text-gray-500 dark:text-gray-400">{accountName}</div>
       </td>
       <td className="p-4">
         <div className="flex justify-end gap-2">
@@ -115,7 +108,7 @@ export function RecurringTransactionTableRow({
             variant="outline"
             onClick={() => onEdit(recurringTransaction)}
             disabled={isUpdating}
-             className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
+            className="bg-background dark:bg-background-dark border-border dark:border-border-dark text-text dark:text-text-dark hover:bg-card dark:hover:bg-card-dark"
           >
             <Edit className="h-4 w-4 mr-2" />
             Editar

@@ -2,15 +2,21 @@ import { RecurringTransactionCard } from '@/components/recurring-transactions/Re
 import { RecurringTransactionTableRow } from '@/components/recurring-transactions/RecurringTransactionTableRow';
 import { Card } from '@/components/ui/card';
 import { RecordsGrid } from '@/components/ui/RecordsGrid';
-import { SortableColumn , SortConfig } from '@/components/ui/SortableColumn';
+import { SortableColumn, SortConfig } from '@/components/ui/SortableColumn';
 import { RecurringTransaction } from '@/services/recurringTransactionService';
+
+
 import { RecurringTransactionListItem } from './RecurringTransactionListItem';
 
 interface RecurringTransactionsListProps {
   transactions: RecurringTransaction[];
   viewMode: 'grid' | 'list';
-  sortConfig: SortConfig<'description' | 'value' | 'frequency' | 'startDate' | 'category' | 'account'> | null;
-  onSort: (field: 'description' | 'value' | 'frequency' | 'startDate' | 'category' | 'account') => void;
+  sortConfig: SortConfig<
+    'description' | 'value' | 'frequency' | 'startDate' | 'category' | 'account'
+  > | null;
+  onSort: (
+    field: 'description' | 'value' | 'frequency' | 'startDate' | 'category' | 'account',
+  ) => void;
   onEdit: (transaction: RecurringTransaction) => void;
   onDelete: (id: string) => void;
   isUpdating: boolean;

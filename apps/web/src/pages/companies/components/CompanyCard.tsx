@@ -1,9 +1,21 @@
+import {
+  Building2,
+  FileText,
+  Calendar,
+  Phone,
+  Mail,
+  MapPin,
+  MoreVertical,
+  Edit,
+  Trash2,
+} from 'lucide-react';
+
+
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Company } from '@/types/company';
 import { formatDate } from '@/utils/date';
 import { formatDocument } from '@/utils/formatDocument';
-import { Building2, FileText, Calendar, Phone, Mail, MapPin, MoreVertical, Edit, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const typeOptions = [
@@ -22,11 +34,16 @@ function getTypeLabel(type: CompanyType): string {
 
 function getTypeBadgeColor(type: CompanyType): string {
   const colors: Record<CompanyType, string> = {
-    matriz: 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700',
-    filial: 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700',
-    holding: 'bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700',
-    prestadora: 'bg-orange-100 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-700',
-    outra: 'bg-gray-100 dark:bg-gray-900/20 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700',
+    matriz:
+      'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700',
+    filial:
+      'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700',
+    holding:
+      'bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700',
+    prestadora:
+      'bg-orange-100 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-700',
+    outra:
+      'bg-gray-100 dark:bg-gray-900/20 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700',
   };
   return colors[type] ?? colors.outra;
 }
@@ -94,9 +111,7 @@ export function CompanyCard({
               {company.phone && (
                 <div className="flex items-center gap-1.5 min-w-0">
                   <Phone className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                  <span className="text-gray-600 dark:text-gray-300 truncate">
-                    {company.phone}
-                  </span>
+                  <span className="text-gray-600 dark:text-gray-300 truncate">{company.phone}</span>
                 </div>
               )}
 
@@ -104,9 +119,7 @@ export function CompanyCard({
               {company.email && (
                 <div className="flex items-center gap-1.5 min-w-0">
                   <Mail className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                  <span className="text-gray-600 dark:text-gray-300 truncate">
-                    {company.email}
-                  </span>
+                  <span className="text-gray-600 dark:text-gray-300 truncate">{company.email}</span>
                 </div>
               )}
 

@@ -1,11 +1,13 @@
+import { Calendar, Download, Filter, Search } from 'lucide-react';
+import React, { useCallback, useMemo, useState } from 'react';
+
+import { ComboBox } from '@/components/ui/ComboBox';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DateRangePicker } from '@/components/ui/DateRangePicker';
 import { Input } from '@/components/ui/input';
-import { ComboBox } from '@/components/ui/ComboBox';
 import { formatDateToLocalISO, parseLocalDate } from '@/utils/date';
-import { Calendar, Download, Filter, Search } from 'lucide-react';
-import React, { useCallback, useMemo, useState } from 'react';
 
 interface Account {
   id: string;
@@ -87,12 +89,9 @@ export function TransactionFilters({
     return 'Selecionar período';
   }, [startDate, endDate]);
 
-  const getTransactionTypeLabel = useCallback(
-    (type: string): string => {
-      return TRANSACTION_TYPE_LABELS[type] ?? TRANSACTION_TYPE_LABELS.all;
-    },
-    [],
-  );
+  const getTransactionTypeLabel = useCallback((type: string): string => {
+    return TRANSACTION_TYPE_LABELS[type] ?? TRANSACTION_TYPE_LABELS.all;
+  }, []);
 
   const getAccountDisplayName = useCallback(
     (accountId: string | undefined): string => {
@@ -114,7 +113,7 @@ export function TransactionFilters({
 
   const handleAccountChange = useCallback(
     (value: string | null) => {
-      setSelectedAccountId(value === 'all' || !value ? undefined : value ?? undefined);
+      setSelectedAccountId(value === 'all' || !value ? undefined : (value ?? undefined));
     },
     [setSelectedAccountId],
   );
@@ -126,13 +125,10 @@ export function TransactionFilters({
     [setSelectedType],
   );
 
-  const handleToggleDateRangePicker = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-      setIsDateRangePickerOpen((prev) => !prev);
-    },
-    [],
-  );
+  const handleToggleDateRangePicker = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setIsDateRangePickerOpen((prev) => !prev);
+  }, []);
 
   const renderActiveFiltersSummary = () => {
     if (showFilters) return null;

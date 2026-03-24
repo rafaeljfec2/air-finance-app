@@ -1,4 +1,12 @@
-import { CheckCircle2, Loader2, AlertCircle, Clock, XCircle, RefreshCw, WifiOff } from 'lucide-react';
+import {
+  CheckCircle2,
+  Loader2,
+  AlertCircle,
+  Clock,
+  XCircle,
+  RefreshCw,
+  WifiOff,
+} from 'lucide-react';
 
 export interface StatusBadgeConfig {
   label: string;

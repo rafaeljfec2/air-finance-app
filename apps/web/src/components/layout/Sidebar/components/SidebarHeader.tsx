@@ -1,7 +1,9 @@
+import { X } from 'lucide-react';
+
+
 import { CompanySelector } from '@/components/layout/CompanySelector';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebar';
-import { X } from 'lucide-react';
 
 interface SidebarHeaderProps {
   readonly onClose?: () => void;
@@ -26,12 +28,7 @@ export function SidebarHeader({ onClose, isHeaderVisible }: Readonly<SidebarHead
       )}
     >
       {showCompanySelector && (
-        <div
-          className={cn(
-            'w-full',
-            isHeaderVisible && 'lg:hidden',
-          )}
-        >
+        <div className={cn('w-full', isHeaderVisible && 'lg:hidden')}>
           <CompanySelector size="large" />
         </div>
       )}
