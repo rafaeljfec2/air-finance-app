@@ -1,4 +1,6 @@
-import { Loading } from '@/components/Loading';
+import { useMemo, useState } from 'react';
+
+import { TableSkeleton } from '@/components/skeletons';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { DeleteAllUserDataModal } from '@/components/users/DeleteAllUserDataModal';
 import { UserFormModal } from '@/components/users/UserFormModal';
@@ -6,14 +8,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { User } from '@/services/userService';
-import { useMemo, useState } from 'react';
-import { UsersHeader } from './components/UsersHeader';
-import { UsersErrorState } from './components/UsersErrorState';
-import { UsersList } from './components/UsersList';
+
+import { SendReminderEmailsModal } from './components/SendReminderEmailsModal';
 import { UserEmptyState } from './components/UserEmptyState';
 import { UserFilters } from './components/UserFilters';
-import { SendReminderEmailsModal } from './components/SendReminderEmailsModal';
 import { UserPermissionsModal } from './components/UserPermissionsModal';
+import { UsersErrorState } from './components/UsersErrorState';
+import { UsersHeader } from './components/UsersHeader';
+import { UsersList } from './components/UsersList';
 import { useCanDeleteUser } from './hooks/useCanDeleteUser';
 import { useUserDelete } from './hooks/useUserDelete';
 import { useUserFilters } from './hooks/useUserFilters';
@@ -60,7 +62,7 @@ export function UsersPage() {
     return (
       <ViewDefault>
         <div className="container mx-auto px-4 sm:px-6 py-10">
-          <Loading size="large">Carregando usuários, por favor aguarde...</Loading>
+          <TableSkeleton title="Usuários" />
         </div>
       </ViewDefault>
     );

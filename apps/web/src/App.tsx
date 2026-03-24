@@ -1,13 +1,15 @@
-import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { HelmetProvider } from 'react-helmet-async';
-import { router } from './routes';
-import { ThemeProvider } from './components/ThemeProvider';
-import { MaintenanceProvider } from './components/maintenance/MaintenanceProvider';
-import { Toaster } from 'sonner';
-import { CompanyProvider } from '@/contexts/companyContext';
 import { useEffect, lazy, Suspense } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
+import { RouterProvider } from 'react-router-dom';
+import { Toaster } from 'sonner';
+
+import { CompanyProvider } from '@/contexts/companyContext';
 import { initStorageCleanup } from '@/utils/storageCleanup';
+
+import { MaintenanceProvider } from './components/maintenance/MaintenanceProvider';
+import { ThemeProvider } from './components/ThemeProvider';
+import { router } from './routes';
 
 const ReactQueryDevtools = lazy(() =>
   import('@tanstack/react-query-devtools').then((d) => ({
@@ -51,7 +53,7 @@ export function App() {
         <CompanyProvider>
           <ThemeProvider>
             <MaintenanceProvider>
-              <RouterProvider router={router} />
+              <RouterProvider router={router} future={{ v7_startTransition: true }} />
             </MaintenanceProvider>
             <Toaster
               position="top-right"

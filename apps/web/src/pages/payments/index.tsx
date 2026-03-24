@@ -1,10 +1,3 @@
-import React, { useState, useMemo } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { useAccounts } from '@/hooks/useAccounts';
-import { usePayments, useCancelPayment } from '@/hooks/usePayments';
-import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { toast } from '@/components/ui/toast';
-import { formatCurrency } from '@/utils/format';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
@@ -17,8 +10,17 @@ import {
   XCircle,
   ArrowLeft,
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { TableSkeleton } from '@/components/skeletons';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { toast } from '@/components/ui/toast';
+import { useAccounts } from '@/hooks/useAccounts';
+import { usePayments, useCancelPayment } from '@/hooks/usePayments';
+import { ViewDefault } from '@/layouts/ViewDefault';
 import type { Payment, PaymentType, PaymentStatus } from '@/services/paymentService';
+import { formatCurrency } from '@/utils/format';
 
 type PaymentTypeConfig = {
   readonly label: string;
@@ -103,11 +105,7 @@ function PaymentStatusBadge({ status }: { readonly status: PaymentStatus }) {
 }
 
 function LoadingState() {
-  return (
-    <div className="flex items-center justify-center py-20">
-      <Loader2 className="animate-spin text-gray-400" size={32} />
-    </div>
-  );
+  return <TableSkeleton rows={5} />;
 }
 
 function EmptyState({

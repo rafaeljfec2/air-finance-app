@@ -1,7 +1,7 @@
 import { Key, Plus, Shield } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import { useProfileApiTokens } from '../../hooks/useProfileApiTokens';
 
@@ -34,8 +34,11 @@ export function ProfileApiTokensSection() {
   if (isLoading) {
     return (
       <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark p-6">
-        <div className="flex items-center justify-center py-12">
-          <Spinner className="text-primary-500" />
+        <div className="space-y-4 py-2">
+          <Skeleton className="h-5 w-1/4" />
+          <Skeleton className="h-10 w-full rounded-md" />
+          <Skeleton className="h-10 w-full rounded-md" />
+          <Skeleton className="h-10 w-3/4 rounded-md" />
         </div>
       </Card>
     );

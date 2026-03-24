@@ -1,4 +1,7 @@
-import { Loading } from '@/components/Loading';
+import { Heart, User, Users } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { TableSkeleton } from '@/components/skeletons';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ColorPicker } from '@/components/ui/color-picker';
@@ -10,8 +13,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 import { useDependents } from '@/hooks/useDependents';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
-import { Heart, User, Users } from 'lucide-react';
-import React, { useState } from 'react';
 
 const relationTypes = [
   { value: 'filho', label: 'Filho(a)', icon: User, iconName: 'User' },
@@ -138,7 +139,7 @@ export function DependentsPage() {
     return (
       <ViewDefault>
         <div className="container mx-auto px-2 sm:px-6 py-10">
-          <Loading size="large">Carregando dependentes, por favor aguarde...</Loading>
+          <TableSkeleton title="Dependentes" />
         </div>
       </ViewDefault>
     );

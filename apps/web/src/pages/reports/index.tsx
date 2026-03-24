@@ -1,8 +1,10 @@
+import { BarChart3 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+
 import { MonthNavigator } from '@/components/budget/MonthNavigator';
-import { Loading } from '@/components/Loading';
 import { FinancialDashboard } from '@/components/reports/FinancialDashboard';
 import { Insight } from '@/components/reports/InsightsCard';
-import { TransactionSummary } from '@/pages/transactions/components/TransactionSummary';
+import { DashboardSkeleton } from '@/components/skeletons';
 import {
   useDashboardSummary,
   useDashboardBalanceHistory,
@@ -10,12 +12,11 @@ import {
   useDashboardGoalsSummary,
 } from '@/hooks/useDashboard';
 import { ViewDefault } from '@/layouts/ViewDefault';
+import { TransactionSummary } from '@/pages/transactions/components/TransactionSummary';
 import { useCompanyStore } from '@/stores/company';
 import type { DashboardFilters } from '@/types/dashboard';
-import { formatCurrency } from '@/utils/formatters';
 import { parseApiError, getUserFriendlyMessage } from '@/utils/apiErrorHandler';
-import { BarChart3 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { formatCurrency } from '@/utils/formatters';
 
 export function Reports() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -196,7 +197,9 @@ export function Reports() {
   if (loading) {
     return (
       <ViewDefault>
-        <Loading size="large" className="min-h-[400px]" />
+        <div className="container mx-auto px-4 sm:px-6 py-10">
+          <DashboardSkeleton />
+        </div>
       </ViewDefault>
     );
   }

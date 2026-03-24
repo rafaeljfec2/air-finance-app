@@ -1,17 +1,20 @@
+import { Banknote } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
+
 import { AccountFormModal } from '@/components/accounts/AccountFormModal';
-import { Loading } from '@/components/Loading';
+import { DetailSkeleton } from '@/components/skeletons';
 import { useAccounts } from '@/hooks/useAccounts';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { CreateAccount } from '@/services/accountService';
-import { useAccountDetails } from '../details/hooks/useAccountDetails';
-import { useStatementNavigation } from '../details/hooks/useStatementNavigation';
+
+import { AccountErrorState } from '../details/components/AccountErrorState';
 import { AccountSummary } from '../details/components/AccountSummary';
 import { StatementCard } from '../details/components/StatementCard';
-import { AccountErrorState } from '../details/components/AccountErrorState';
 import { createInitialSummary } from '../details/hooks/types';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useAccountDetails } from '../details/hooks/useAccountDetails';
+import { useStatementNavigation } from '../details/hooks/useStatementNavigation';
+
 import { AccountCardsHeader } from './AccountCardsHeader';
-import { Banknote } from 'lucide-react';
 
 export function AccountsStatementsSection() {
   const { accounts, isLoading: isLoadingAccounts, createAccount, isCreating } = useAccounts();
@@ -58,8 +61,8 @@ export function AccountsStatementsSection() {
 
   if (isLoadingAccounts) {
     return (
-      <div className="flex items-center justify-center min-h-[40vh]">
-        <Loading size="large">Carregando contas...</Loading>
+      <div className="px-4 py-6">
+        <DetailSkeleton title="Contas" />
       </div>
     );
   }
@@ -104,8 +107,8 @@ export function AccountsStatementsSection() {
           onAccountSelect={setSelectedAccountId}
           onAddAccount={handleAddAccount}
         />
-        <div className="flex items-center justify-center min-h-[40vh]">
-          <Loading size="large">Carregando extrato...</Loading>
+        <div className="px-4 py-6">
+          <DetailSkeleton title="Extrato" />
         </div>
 
         <AccountFormModal

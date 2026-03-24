@@ -1,15 +1,17 @@
 import { useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { Loading } from '@/components/Loading';
+
+import { TableSkeleton } from '@/components/skeletons';
 import { useAccounts } from '@/hooks/useAccounts';
-import { useStatementSchedule } from './hooks/useStatementSchedule';
-import { StatementScheduleHeader } from './components/StatementScheduleHeader';
-import { StatementScheduleStatus } from './components/StatementScheduleStatus';
+import { ViewDefault } from '@/layouts/ViewDefault';
+
+import { ActionButtons } from './components/ActionButtons';
 import { EnableToggle } from './components/EnableToggle';
 import { FrequencySelector } from './components/FrequencySelector';
+import { StatementScheduleHeader } from './components/StatementScheduleHeader';
+import { StatementScheduleStatus } from './components/StatementScheduleStatus';
 import { TimeSelector } from './components/TimeSelector';
-import { ActionButtons } from './components/ActionButtons';
+import { useStatementSchedule } from './hooks/useStatementSchedule';
 
 export function StatementSchedulePage() {
   const navigate = useNavigate();
@@ -59,9 +61,7 @@ export function StatementSchedulePage() {
         <StatementScheduleHeader account={account} onBack={handleBack} />
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loading size="large">Carregando...</Loading>
-          </div>
+          <TableSkeleton rows={4} />
         ) : (
           <div className="space-y-4">
             <StatementScheduleStatus schedule={schedule} />

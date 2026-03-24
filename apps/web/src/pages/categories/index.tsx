@@ -1,12 +1,14 @@
+import { useMemo, useState } from 'react';
+
 import { CategoryFormModal } from '@/components/categories/CategoryFormModal';
-import { Loading } from '@/components/Loading';
+import { TableSkeleton } from '@/components/skeletons';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useCategories } from '@/hooks/useCategories';
 import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { Category, CreateCategory } from '@/services/categoryService';
 import { useCompanyStore } from '@/stores/company';
-import { useMemo, useState } from 'react';
+
 import { CategoriesEmptyState } from './components/CategoriesEmptyState';
 import { CategoriesErrorState } from './components/CategoriesErrorState';
 import { CategoriesFilters } from './components/CategoriesFilters';
@@ -95,7 +97,7 @@ export function CategoriesPage() {
     return (
       <ViewDefault>
         <div className="container mx-auto px-4 sm:px-6 py-10">
-          <Loading size="large">Carregando categorias, por favor aguarde...</Loading>
+          <TableSkeleton title="Categorias" />
         </div>
       </ViewDefault>
     );

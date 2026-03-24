@@ -1,13 +1,15 @@
-import { Loading } from '@/components/Loading';
+import { ChevronLeft } from 'lucide-react';
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { FormSkeleton } from '@/components/skeletons';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
 import { useCompanyStore } from '@/stores/company';
 import { formatDateToLocalISO } from '@/utils/date';
-import { ChevronLeft } from 'lucide-react';
-import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { AccountCategoryTypeFields } from './components/AccountCategoryTypeFields';
 import { DescriptionField } from './components/DescriptionField';
 import { NoteField } from './components/NoteField';
@@ -52,7 +54,7 @@ export function NewTransaction() {
 
   // Exibir loading enquanto carrega contas ou categorias
   if (loading) {
-    return <Loading size="large">Carregando dados...</Loading>;
+    return <FormSkeleton title="Nova Transação" />;
   }
   if (loadError) {
     return <div className="text-red-500 text-center py-8">{loadError}</div>;
@@ -72,9 +74,7 @@ export function NewTransaction() {
               <ChevronLeft className="h-5 w-5 text-muted-foreground" />
             </button>
             <div>
-              <h1 className="text-lg font-bold text-foreground leading-tight">
-                Nova Transação
-              </h1>
+              <h1 className="text-lg font-bold text-foreground leading-tight">Nova Transação</h1>
             </div>
           </div>
 
@@ -153,14 +153,16 @@ export function NewTransaction() {
                 <Button
                   type="submit"
                   className={cn(
-                    "flex-[2] h-10 text-white font-medium shadow-sm transition-all",
+                    'flex-[2] h-10 text-white font-medium shadow-sm transition-all',
                     transactionType === 'EXPENSE'
-                      ? "bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-500"
-                      : "bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500"
+                      ? 'bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-500'
+                      : 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500',
                   )}
                   disabled={isCreating}
                 >
-                  {isCreating ? 'Salvando...' : `Salvar ${transactionType === 'EXPENSE' ? 'Despesa' : 'Receita'}`}
+                  {isCreating
+                    ? 'Salvando...'
+                    : `Salvar ${transactionType === 'EXPENSE' ? 'Despesa' : 'Receita'}`}
                 </Button>
               </div>
             </form>

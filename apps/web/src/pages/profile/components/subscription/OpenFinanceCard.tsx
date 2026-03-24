@@ -6,7 +6,7 @@ import { OpenBankingPaywallModal } from '@/components/accounts/OpenBankingPaywal
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
 import type { OpenBankingEntitlement } from '@/services/subscriptionService';
 import { openBankingService } from '@/services/subscriptionService';
@@ -46,8 +46,10 @@ export function OpenFinanceCard({
   if (isLoading) {
     return (
       <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark p-6">
-        <div className="flex justify-center py-6">
-          <Spinner className="text-primary-500" />
+        <div className="space-y-4 py-2">
+          <Skeleton className="h-5 w-1/3" />
+          <Skeleton className="h-10 w-full rounded-md" />
+          <Skeleton className="h-10 w-full rounded-md" />
         </div>
       </Card>
     );

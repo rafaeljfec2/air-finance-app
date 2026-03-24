@@ -1,22 +1,25 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Loading } from '@/components/Loading';
+
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
+import { Loading } from '@/components/Loading';
+import { DetailSkeleton } from '@/components/skeletons';
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
-import { useResponsiveBreakpoint } from '@/hooks/useResponsiveBreakpoint';
 import { useCreditCards } from '@/hooks/useCreditCards';
+import { useResponsiveBreakpoint } from '@/hooks/useResponsiveBreakpoint';
 import { useCompanyStore } from '@/stores/company';
-import { useCreditCardBills } from './hooks/useCreditCardBills';
-import { useBillNavigation } from './hooks/useBillNavigation';
-import { useCreditCardManagement } from './hooks/useCreditCardManagement';
-import { CreditCardBillHeader } from './components/CreditCardBillHeader';
-import { BillSummary } from './components/BillSummary';
-import { BillTransactionList } from './components/BillTransactionList';
+
 import { BillEmptyState } from './components/BillEmptyState';
 import { BillErrorState } from './components/BillErrorState';
+import { BillSummary } from './components/BillSummary';
+import { BillTransactionList } from './components/BillTransactionList';
+import { CreditCardBillHeader } from './components/CreditCardBillHeader';
 import { CreditCardModals } from './components/CreditCardModals';
 import { NoCreditCardsState } from './components/NoCreditCardsState';
 import { CreditCardBillsPageDesktop } from './desktop';
+import { useBillNavigation } from './hooks/useBillNavigation';
+import { useCreditCardBills } from './hooks/useCreditCardBills';
+import { useCreditCardManagement } from './hooks/useCreditCardManagement';
 
 export function CreditCardBillsPage() {
   const { isDesktop } = useResponsiveBreakpoint();
@@ -110,8 +113,8 @@ export function CreditCardBillsPage() {
   if (isLoadingCards) {
     return (
       <>
-        <div className="flex items-center justify-center h-screen bg-background dark:bg-background-dark pb-20">
-          <Loading size="large">Carregando cartões, por favor aguarde...</Loading>
+        <div className="flex flex-col h-screen bg-background dark:bg-background-dark pb-20 px-4 py-6">
+          <DetailSkeleton title="Cartões" />
         </div>
         {renderMobileNavigation()}
       </>
@@ -132,8 +135,10 @@ export function CreditCardBillsPage() {
   if (isLoading) {
     return (
       <>
-        <div className="flex items-center justify-center h-screen bg-background dark:bg-background-dark pb-20 lg:pb-0">
-          <Loading size="large">Carregando fatura, por favor aguarde...</Loading>
+        <div className="flex flex-col h-screen bg-background dark:bg-background-dark pb-20 lg:pb-0">
+          <div className="flex-1 px-4 py-6">
+            <DetailSkeleton title="Fatura" />
+          </div>
         </div>
         {renderMobileNavigation()}
       </>

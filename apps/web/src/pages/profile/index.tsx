@@ -1,7 +1,7 @@
 import { Bell, Bot, CreditCard, Key, Palette, User } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
-import { Spinner } from '@/components/ui/spinner';
+import { FormSkeleton } from '@/components/skeletons';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useAuthStore } from '@/stores/auth';
@@ -81,8 +81,8 @@ export function Profile() {
   if (isLoading) {
     return (
       <ViewDefault>
-        <div className="flex-1 flex items-center justify-center">
-          <Spinner className="text-primary-500" />
+        <div className="container mx-auto px-4 sm:px-6 py-10">
+          <FormSkeleton title="Perfil" fields={6} />
         </div>
       </ViewDefault>
     );

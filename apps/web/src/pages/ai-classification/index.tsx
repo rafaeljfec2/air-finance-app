@@ -1,11 +1,13 @@
+import { BadgeCheck, Check, Edit2, Sparkles, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+import { TableSkeleton } from '@/components/skeletons';
 import { Button } from '@/components/ui/button';
 import { useCompanyStore } from '@/contexts/companyContext';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
 import { Category, getCategories } from '@/services/categoryService';
 import { getTransactions, Transaction, updateTransaction } from '@/services/transactionService';
-import { BadgeCheck, Check, Edit2, Sparkles, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
 export function AiClassificationPage() {
   const { companyId } = useCompanyStore();
@@ -94,8 +96,8 @@ export function AiClassificationPage() {
   if (loading) {
     return (
       <ViewDefault>
-        <div className="flex items-center justify-center h-full">
-          <p>Carregando...</p>
+        <div className="container mx-auto px-4 sm:px-6 py-10">
+          <TableSkeleton title="Classificação IA" />
         </div>
       </ViewDefault>
     );
@@ -116,10 +118,12 @@ export function AiClassificationPage() {
                 feita pela IA. Sua escolha ajuda a IA a ficar cada vez mais precisa!
               </p>
             </div>
-            
+
             {transactions.length === 0 ? (
               <div className="text-center p-8 bg-white dark:bg-gray-900 rounded-xl shadow border border-border dark:border-border-dark">
-                <p className="text-lg text-gray-500">Nenhuma transação pendente de classificação.</p>
+                <p className="text-lg text-gray-500">
+                  Nenhuma transação pendente de classificação.
+                </p>
               </div>
             ) : (
               <div className="space-y-6">
@@ -147,7 +151,7 @@ export function AiClassificationPage() {
                           <BadgeCheck className="w-4 h-4" /> Sugestão IA
                         </span>
                         <span className="text-xs text-gray-400">
-                           ({Math.round((tx.classificationConfidence || 0) * 100)}%)
+                          ({Math.round((tx.classificationConfidence || 0) * 100)}%)
                         </span>
                       </div>
                       <span
@@ -164,15 +168,18 @@ export function AiClassificationPage() {
                       <span
                         className={cn(
                           'px-2 py-0.5 rounded-full text-xs font-medium',
-                          getCategoryColor(tx.suggestedCategoryId)
+                          getCategoryColor(tx.suggestedCategoryId),
                         )}
                         style={
-                           tx.suggestedCategoryId 
-                             ? { 
-                                 backgroundColor: categories.find(c => c.id === tx.suggestedCategoryId)?.color + '20', // 20% opacity
-                                 color: categories.find(c => c.id === tx.suggestedCategoryId)?.color 
-                               }
-                             : {}
+                          tx.suggestedCategoryId
+                            ? {
+                                backgroundColor:
+                                  categories.find((c) => c.id === tx.suggestedCategoryId)?.color +
+                                  '20', // 20% opacity
+                                color: categories.find((c) => c.id === tx.suggestedCategoryId)
+                                  ?.color,
+                              }
+                            : {}
                         }
                       >
                         {getCategoryName(tx.suggestedCategoryId)}

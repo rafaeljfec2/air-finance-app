@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useEffect } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 
-import { Loading } from '@/components/Loading';
+import { TableSkeleton } from '@/components/skeletons';
 import { toast } from '@/components/ui/toast';
 import { useAccounts } from '@/hooks/useAccounts';
 import { usePlanLimits } from '@/hooks/usePlanLimits';
@@ -99,7 +99,7 @@ export function AccountsManagementPage() {
     return (
       <ViewDefault>
         <div className="container mx-auto px-4 sm:px-6 py-10">
-          <Loading size="large">Carregando contas bancárias, por favor aguarde...</Loading>
+          <TableSkeleton title="Contas" />
         </div>
       </ViewDefault>
     );

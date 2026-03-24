@@ -8,6 +8,8 @@ import {
   ShieldAlert,
   TrendingUp,
 } from 'lucide-react';
+
+import { Skeleton, SkeletonText } from '@/components/ui/skeleton';
 import type {
   CreditCardInsight,
   InsightItem,
@@ -137,34 +139,34 @@ export function ProjectionRow({ projection }: { readonly projection: ProjectionI
 
 export function InsightsLoadingSkeleton() {
   return (
-    <div className="animate-pulse space-y-5">
+    <div aria-hidden="true" className="space-y-5">
       <div className="rounded-2xl p-5 lg:p-7 bg-slate-100 dark:bg-slate-800/50 space-y-3">
-        <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded-full w-24" />
-        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-full" />
-        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-4/5" />
-        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-2/3 mt-1" />
+        <Skeleton className="h-5 w-24 rounded-full" />
+        <SkeletonText className="w-full" />
+        <SkeletonText className="w-4/5" />
+        <Skeleton className="h-4 w-2/3 rounded mt-1" />
       </div>
 
       <div className="space-y-3">
         {['skel-ev-a', 'skel-ev-b'].map((id) => (
           <div
             key={id}
-            className="rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-2"
+            className="rounded-xl border border-border dark:border-border-dark p-4 space-y-2"
           >
-            <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-28" />
-            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full w-20" />
-            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
+            <Skeleton className="h-5 w-28 rounded" />
+            <SkeletonText className="w-20" />
+            <SkeletonText className="w-3/4" />
           </div>
         ))}
       </div>
 
       <div className="space-y-2 py-3">
-        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full w-32" />
-        <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full w-full" />
-        <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full w-4/5" />
+        <Skeleton className="h-3 w-32 rounded-full" />
+        <Skeleton className="h-1.5 w-full rounded-full" />
+        <Skeleton className="h-1.5 w-4/5 rounded-full" />
       </div>
 
-      <div className="h-px bg-slate-200 dark:bg-slate-700" />
+      <Skeleton className="h-px w-full" />
     </div>
   );
 }

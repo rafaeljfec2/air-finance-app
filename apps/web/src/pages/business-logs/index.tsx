@@ -1,9 +1,11 @@
-import { Loading } from '@/components/Loading';
+import { History } from 'lucide-react';
+import { useMemo, useState } from 'react';
+
+import { TableSkeleton } from '@/components/skeletons';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
 import { formatDateToLocalISO } from '@/utils/date';
-import { History } from 'lucide-react';
-import { useMemo, useState } from 'react';
+
 import { EmptyState } from './components/EmptyState';
 import { ErrorState } from './components/ErrorState';
 import { FilterCard } from './components/FilterCard';
@@ -62,7 +64,7 @@ export function BusinessLogsPage() {
 
   const renderLogsContent = () => {
     if (isLoading) {
-      return <Loading />;
+      return <TableSkeleton rows={5} />;
     }
 
     if (error) {

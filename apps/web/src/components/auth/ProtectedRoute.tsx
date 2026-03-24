@@ -1,15 +1,15 @@
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { Loading } from '@/components/Loading';
-import { AnnouncementsProvider } from '@/components/announcements/AnnouncementsProvider';
 import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+
+import { Loading } from '@/components/Loading';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
+  readonly children: React.ReactNode;
+  readonly requireAuth?: boolean;
 }
 
-export function ProtectedRoute({ children, requireAuth = true }: Readonly<ProtectedRouteProps>) {
+export function ProtectedRoute({ children, requireAuth = true }: ProtectedRouteProps) {
   const { user, isLoadingUser } = useAuth();
   const location = useLocation();
 
@@ -25,10 +25,5 @@ export function ProtectedRoute({ children, requireAuth = true }: Readonly<Protec
     return <Navigate to="/home" replace />;
   }
 
-  return (
-    <>
-      <AnnouncementsProvider />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

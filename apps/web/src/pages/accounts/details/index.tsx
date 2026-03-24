@@ -1,23 +1,26 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Loading } from '@/components/Loading';
+
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
+import { Loading } from '@/components/Loading';
+import { DetailSkeleton } from '@/components/skeletons';
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
 import { useResponsiveBreakpoint } from '@/hooks/useResponsiveBreakpoint';
 import { useCompanyStore } from '@/stores/company';
-import { useAccountDetails } from './hooks/useAccountDetails';
-import { useStatementNavigation } from './hooks/useStatementNavigation';
-import { useAccountManagement } from './hooks/useAccountManagement';
+
 import { AccountCardsContainer } from './components/AccountCardsContainer';
-import { AccountStatementHeader } from './components/AccountStatementHeader';
-import { AccountSummary } from './components/AccountSummary';
-import { StatementTransactionList } from './components/StatementTransactionList';
 import { AccountEmptyState } from './components/AccountEmptyState';
 import { AccountErrorState } from './components/AccountErrorState';
 import { AccountModals } from './components/AccountModals';
+import { AccountStatementHeader } from './components/AccountStatementHeader';
+import { AccountSummary } from './components/AccountSummary';
 import { NoAccountsState } from './components/NoAccountsState';
+import { StatementTransactionList } from './components/StatementTransactionList';
 import { AccountDetailsPageDesktop } from './desktop';
 import { createInitialSummary } from './hooks/types';
+import { useAccountDetails } from './hooks/useAccountDetails';
+import { useAccountManagement } from './hooks/useAccountManagement';
+import { useStatementNavigation } from './hooks/useStatementNavigation';
 
 export function AccountDetailsPage() {
   const { isDesktop } = useResponsiveBreakpoint();
@@ -113,8 +116,8 @@ export function AccountDetailsPage() {
   if (isLoading && !hasAccounts) {
     return (
       <>
-        <div className="flex items-center justify-center h-screen bg-background dark:bg-background-dark pb-20">
-          <Loading size="large">Carregando contas, por favor aguarde...</Loading>
+        <div className="flex flex-col h-screen bg-background dark:bg-background-dark pb-20 px-4 py-6">
+          <DetailSkeleton title="Contas" />
         </div>
         {renderMobileNavigation()}
       </>
@@ -137,8 +140,8 @@ export function AccountDetailsPage() {
       <>
         <div className="flex flex-col h-screen bg-background dark:bg-background-dark pb-20 lg:pb-0">
           {renderAccountCards()}
-          <div className="flex-1 flex items-center justify-center">
-            <Loading size="large">Carregando extrato, por favor aguarde...</Loading>
+          <div className="flex-1 px-4 py-6">
+            <DetailSkeleton title="Extrato" />
           </div>
         </div>
         {renderMobileNavigation()}

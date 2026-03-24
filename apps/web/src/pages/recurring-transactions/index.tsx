@@ -1,5 +1,7 @@
-import { Loading } from '@/components/Loading';
+import { useMemo, useState } from 'react';
+
 import { RecurringTransactionFormModal } from '@/components/recurring-transactions/RecurringTransactionFormModal';
+import { TableSkeleton } from '@/components/skeletons';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useRecurringTransactions } from '@/hooks/useRecurringTransactions';
 import { useViewMode } from '@/hooks/useViewMode';
@@ -9,7 +11,7 @@ import {
   RecurringTransaction,
 } from '@/services/recurringTransactionService';
 import { useCompanyStore } from '@/stores/company';
-import { useMemo, useState } from 'react';
+
 import { RecurringTransactionsEmptyState } from './components/RecurringTransactionsEmptyState';
 import { RecurringTransactionsErrorState } from './components/RecurringTransactionsErrorState';
 import { RecurringTransactionsFilters } from './components/RecurringTransactionsFilters';
@@ -102,7 +104,7 @@ export function RecurringTransactionsPage() {
     return (
       <ViewDefault>
         <div className="container mx-auto px-4 sm:px-6 py-10">
-          <Loading size="large">Carregando transações recorrentes, por favor aguarde...</Loading>
+          <TableSkeleton title="Transações Recorrentes" />
         </div>
       </ViewDefault>
     );

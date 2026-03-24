@@ -1,3 +1,6 @@
+import React, { useEffect, useState } from 'react';
+
+import { TableSkeleton } from '@/components/skeletons';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -12,7 +15,6 @@ import { useCompanyStore } from '@/stores/company';
 import { IncomeSource } from '@/types/incomeSource';
 import { formatDate, formatDateToLocalISO } from '@/utils/date';
 import { formatCurrency, formatCurrencyInput, parseCurrency } from '@/utils/formatters';
-import React, { useEffect, useState } from 'react';
 
 export function IncomeSourcesPage() {
   const { activeCompany } = useCompanyStore();
@@ -154,7 +156,7 @@ export function IncomeSourcesPage() {
 
   const renderIncomeSources = () => {
     if (loading) {
-      return <div className="text-center py-4">Carregando...</div>;
+      return <TableSkeleton rows={4} />;
     }
 
     if (incomeSources.length === 0) {

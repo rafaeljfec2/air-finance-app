@@ -1,14 +1,7 @@
-import { Loader2 } from 'lucide-react';
-
-/**
- * SuspenseLoader Component
- *
- * Loading component used as fallback for React Suspense boundaries
- */
 export function SuspenseLoader() {
   return (
-    <div className="flex h-screen items-center justify-center">
-      <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+    <div className="absolute inset-x-0 top-0 z-50 h-0.5 overflow-hidden">
+      <div className="h-full w-full animate-route-progress bg-primary-500/80" />
     </div>
   );
 }

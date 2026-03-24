@@ -1,12 +1,14 @@
+import { useMemo, useState } from 'react';
+
 import { GoalFormModal } from '@/components/goals/GoalFormModal';
-import { Loading } from '@/components/Loading';
+import { TableSkeleton } from '@/components/skeletons';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useGoals } from '@/hooks/useGoals';
 import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { CreateGoal, Goal } from '@/services/goalService';
 import { useCompanyStore } from '@/stores/company';
-import { useMemo, useState } from 'react';
+
 import { GoalsEmptyState } from './components/GoalsEmptyState';
 import { GoalsErrorState } from './components/GoalsErrorState';
 import { GoalsFilters } from './components/GoalsFilters';
@@ -96,7 +98,7 @@ export function GoalsPage() {
     return (
       <ViewDefault>
         <div className="container mx-auto px-4 sm:px-6 py-10">
-          <Loading size="large">Carregando metas, por favor aguarde...</Loading>
+          <TableSkeleton title="Metas" />
         </div>
       </ViewDefault>
     );

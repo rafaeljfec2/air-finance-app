@@ -1,18 +1,18 @@
-import { ErrorBoundary } from '@/components/error/ErrorBoundary';
+import React, { lazy, Suspense } from 'react';
+import { createBrowserRouter, Navigate, type RouteObject } from 'react-router-dom';
+
+import { OnboardingGuard } from '@/components/auth/OnboardingGuard';
+import { RequireGod } from '@/components/auth/RequireGod';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { SuspenseLoader } from '@/components/SuspenseLoader';
-import { OnboardingGuard } from '@/components/auth/OnboardingGuard';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { RequireGod } from '@/components/auth/RequireGod';
+import { ProtectedLayout } from '@/layouts/ProtectedLayout';
+import { AuthCallbackPage } from '@/pages/auth-callback';
 import { ConfirmError, ConfirmProcessing, ConfirmSuccess } from '@/pages/confirm-email';
 import { EmailPendingPage } from '@/pages/email-pending';
+import { PrivacyPolicy } from '@/pages/legal/PrivacyPolicy';
+import { TermsOfService } from '@/pages/legal/TermsOfService';
 import { Login } from '@/pages/login';
 import { SignUpPage } from '@/pages/signup';
-import { AuthCallbackPage } from '@/pages/auth-callback';
-import { TermsOfService } from '@/pages/legal/TermsOfService';
-import { PrivacyPolicy } from '@/pages/legal/PrivacyPolicy';
-import React, { Suspense, lazy } from 'react';
-import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom';
 
 // Lazy Components
 const AccountsPage = lazy(() =>
@@ -95,7 +95,9 @@ const Receivables = lazy(() =>
   import('@/pages/receivables').then((m) => ({ default: m.Receivables })),
 );
 const RecurringTransactionsPage = lazy(() =>
-  import('@/pages/recurring-transactions').then((m) => ({ default: m.RecurringTransactionsPage })),
+  import('@/pages/recurring-transactions').then((m) => ({
+    default: m.RecurringTransactionsPage,
+  })),
 );
 const Reports = lazy(() => import('@/pages/reports').then((m) => ({ default: m.Reports })));
 const Settings = lazy(() => import('@/pages/settings').then((m) => ({ default: m.Settings })));
@@ -175,60 +177,6 @@ const PierreFinanceConfigPage = lazy(() =>
   })),
 );
 
-/**
- * Helper function to create protected routes with common wrappers
- */
-function createProtectedRoute(
-  path: string,
-  Component: React.ComponentType<Record<string, unknown>>,
-  options: {
-    requireOnboarding?: boolean;
-    requireGod?: boolean;
-    errorCode?: number;
-  } = {},
-): RouteObject {
-  const { requireOnboarding = false, requireGod = false, errorCode } = options;
-
-  let element: React.ReactNode = (
-    <Suspense fallback={<SuspenseLoader />}>
-      <Component />
-    </Suspense>
-  );
-
-  if (requireGod) {
-    element = <RequireGod>{element}</RequireGod>;
-  }
-
-  if (requireOnboarding) {
-    element = <OnboardingGuard>{element}</OnboardingGuard>;
-  }
-
-  element = (
-    <ErrorBoundary>
-      <ProtectedRoute>{element}</ProtectedRoute>
-    </ErrorBoundary>
-  );
-
-  return {
-    path,
-    element,
-    errorElement: errorCode ? <ErrorPage code={errorCode} /> : <ErrorPage />,
-  };
-}
-
-/**
- * Helper function to create simple protected routes without onboarding
- */
-function createSimpleProtectedRoute(
-  path: string,
-  Component: React.ComponentType<Record<string, unknown>>,
-): RouteObject {
-  return createProtectedRoute(path, Component);
-}
-
-/**
- * Helper function to create public routes
- */
 function createPublicRoute(
   path: string,
   Component: React.ComponentType<Record<string, unknown>>,
@@ -245,188 +193,162 @@ function createPublicRoute(
   return { path, element };
 }
 
-export const router = createBrowserRouter([
-  // ==================== PUBLIC ROUTES ====================
-  createPublicRoute('/', LandingPageV3),
-  createPublicRoute('/landing-v2', LandingPageV2),
-  createPublicRoute('/landing-v3', LandingPageV3),
-  createPublicRoute('/pierre-finance-config', PierreFinanceConfigPage),
-  {
-    path: '/login',
-    element: <Login />,
-  },
-  {
-    path: '/register',
-    element: <SignUpPage />,
-  },
-  {
-    path: '/signup',
-    element: <SignUpPage />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/confirm',
-    element: <ConfirmProcessing />,
-  },
-  {
-    path: '/confirm/success',
-    element: <ConfirmSuccess />,
-  },
-  {
-    path: '/confirm/error',
-    element: <ConfirmError />,
-  },
-  createPublicRoute('/forgot-password', ForgotPasswordPage),
-  createPublicRoute('/new-password', NewPasswordPage),
-  {
-    path: '/reset-password/:token',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <ForgotPasswordPage />
-      </Suspense>
+function onboardingRoute(path: string, element: React.ReactNode): RouteObject {
+  return {
+    path,
+    element: <OnboardingGuard>{element}</OnboardingGuard>,
+    errorElement: <ErrorPage code={500} />,
+  };
+}
+
+function simpleRoute(path: string, element: React.ReactNode): RouteObject {
+  return { path, element };
+}
+
+function godRoute(path: string, element: React.ReactNode): RouteObject {
+  return {
+    path,
+    element: <RequireGod>{element}</RequireGod>,
+  };
+}
+
+export const router = createBrowserRouter(
+  [
+    // ==================== PUBLIC ROUTES ====================
+    createPublicRoute('/', LandingPageV3),
+    createPublicRoute('/landing-v2', LandingPageV2),
+    createPublicRoute('/landing-v3', LandingPageV3),
+    createPublicRoute('/pierre-finance-config', PierreFinanceConfigPage),
+    { path: '/login', element: <Login /> },
+    { path: '/register', element: <SignUpPage /> },
+    { path: '/signup', element: <SignUpPage />, errorElement: <ErrorPage /> },
+    { path: '/confirm', element: <ConfirmProcessing /> },
+    { path: '/confirm/success', element: <ConfirmSuccess /> },
+    { path: '/confirm/error', element: <ConfirmError /> },
+    createPublicRoute('/forgot-password', ForgotPasswordPage),
+    createPublicRoute('/new-password', NewPasswordPage),
+    {
+      path: '/reset-password/:token',
+      element: (
+        <Suspense fallback={<SuspenseLoader />}>
+          <ForgotPasswordPage />
+        </Suspense>
+      ),
+    },
+    { path: '/auth/callback', element: <AuthCallbackPage /> },
+    createPublicRoute('/pricing', PricingPage),
+    createPublicRoute('/terms', TermsOfService, false),
+    createPublicRoute('/privacy', PrivacyPolicy, false),
+
+    // ==================== SEO PAGES ====================
+    createPublicRoute('/gestao-financeira-cpf', GestaoFinanceiraCPFPage),
+    createPublicRoute(
+      '/gestao-financeira-cpf/controle-financeiro-pessoal',
+      ControleFinanceiroPessoalPage,
     ),
-  },
-  {
-    path: '/auth/callback',
-    element: <AuthCallbackPage />,
-  },
-  createPublicRoute('/pricing', PricingPage),
-  createPublicRoute('/terms', TermsOfService, false),
-  createPublicRoute('/privacy', PrivacyPolicy, false),
-
-  // ==================== SEO PAGES ====================
-  createPublicRoute('/gestao-financeira-cpf', GestaoFinanceiraCPFPage),
-  createPublicRoute(
-    '/gestao-financeira-cpf/controle-financeiro-pessoal',
-    ControleFinanceiroPessoalPage,
-  ),
-  createPublicRoute(
-    '/gestao-financeira-cpf/organizacao-financeira-pessoal',
-    OrganizacaoFinanceiraPessoalPage,
-  ),
-  createPublicRoute(
-    '/gestao-financeira-cpf/categorizacao-automatica-gastos',
-    CategorizacaoAutomaticaGastosPage,
-  ),
-  createPublicRoute(
-    '/gestao-financeira-cpf/gestao-financeira-com-inteligencia-artificial',
-    GestaoFinanceiraComIAPage,
-  ),
-  createPublicRoute(
-    '/gestao-financeira-cpf/score-credito-e-financas-pessoais',
-    ScoreCreditoFinancasPessoaisPage,
-  ),
-
-  // ==================== PROTECTED ROUTES WITH ONBOARDING ====================
-  createProtectedRoute('/onboarding', OnboardingPage, { errorCode: 500 }),
-  createProtectedRoute('/home', HomePage, { requireOnboarding: true, errorCode: 500 }),
-  createProtectedRoute('/home-v2', HomePageV2, { requireOnboarding: true, errorCode: 500 }),
-  createProtectedRoute('/dashboard', Dashboard, { requireOnboarding: true, errorCode: 500 }),
-  createProtectedRoute('/financial-health', FinancialHealthPage, {
-    requireOnboarding: true,
-    errorCode: 500,
-  }),
-  createProtectedRoute('/transactions', Transactions, { requireOnboarding: true }),
-  createProtectedRoute('/reports', Reports, { requireOnboarding: true }),
-
-  // ==================== PROTECTED ROUTES (SIMPLE) ====================
-  createSimpleProtectedRoute('/email-pending', EmailPendingPage),
-  createSimpleProtectedRoute('/dependents', DependentsPage),
-  createSimpleProtectedRoute('/categories', CategoriesPage),
-  createSimpleProtectedRoute('/accounts', AccountsPage),
-  createSimpleProtectedRoute('/accounts/:accountId/statement-schedule', StatementSchedulePage),
-  createSimpleProtectedRoute('/accounts/details', AccountDetailsPage),
-  createSimpleProtectedRoute('/openfinance', OpenFinancePage),
-  createSimpleProtectedRoute('/business-logs', BusinessLogsPage),
-  createSimpleProtectedRoute('/profile', Profile),
-  createSimpleProtectedRoute('/import-ofx', ImportOfxPage),
-  createSimpleProtectedRoute('/budget', BudgetPage),
-  createSimpleProtectedRoute('/statement', Statement),
-  createSimpleProtectedRoute('/transactions/new', NewTransaction),
-  createSimpleProtectedRoute('/credit-cards', CreditCardsPage),
-  createSimpleProtectedRoute('/credit-cards/bills', CreditCardBillsPage),
-  createSimpleProtectedRoute('/insights', InsightsPage),
-  createSimpleProtectedRoute('/goals', GoalsPage),
-  createSimpleProtectedRoute('/recurring-transactions', RecurringTransactionsPage),
-  createSimpleProtectedRoute('/income-sources', IncomeSourcesPage),
-  createSimpleProtectedRoute('/companies', CompaniesPage),
-  createSimpleProtectedRoute('/users', UsersPage),
-  createSimpleProtectedRoute('/payables', Payables),
-  createProtectedRoute('/payments', PaymentsPage, { requireOnboarding: true }),
-  createSimpleProtectedRoute('/payments/new', NewPaymentPage),
-  createSimpleProtectedRoute('/receivables', Receivables),
-  createSimpleProtectedRoute('/monthly-closing', MonthlyClosing),
-  createSimpleProtectedRoute('/annual-result', AnnualResult),
-  createSimpleProtectedRoute('/planner', PlannerPage),
-  {
-    path: '/settings/preferences',
-    element: <Navigate to="/profile?tab=preferences" replace />,
-  },
-  {
-    path: '/settings/notifications',
-    element: <Navigate to="/profile?tab=notifications" replace />,
-  },
-  {
-    path: '/settings/integrations',
-    element: <Navigate to="/profile?tab=integrations" replace />,
-  },
-  createSimpleProtectedRoute('/ai/classification', AiClassificationPage),
-
-  // ==================== ADMIN ROUTES (REQUIRE GOD) ====================
-  createProtectedRoute('/admin/openai-logs', OpenAILogsPage, { requireGod: true }),
-  createProtectedRoute('/admin/plans', PlansAdminPage, { requireGod: true }),
-
-  // ==================== SETTINGS ROUTES (SPECIAL HANDLING) ====================
-  {
-    path: '/settings',
-    element: (
-      <Suspense fallback={<SuspenseLoader />}>
-        <Settings />
-      </Suspense>
+    createPublicRoute(
+      '/gestao-financeira-cpf/organizacao-financeira-pessoal',
+      OrganizacaoFinanceiraPessoalPage,
     ),
-  },
-  {
-    path: '/settings/subscription',
-    element: <Navigate to="/profile?tab=subscription" replace />,
-  },
-  {
-    path: '/settings/categories',
-    element: <div>Categorias</div>,
-  },
-  {
-    path: '/settings/accounts',
-    element: <div>Contas bancárias</div>,
-  },
-  {
-    path: '/settings/cards',
-    element: <div>Cartões</div>,
-  },
-  {
-    path: '/settings/goals',
-    element: <div>Metas</div>,
-  },
-  {
-    path: '/settings/reminders',
-    element: <div>Lembretes</div>,
-  },
-  {
-    path: '/settings/export',
-    element: <div>Exportar dados</div>,
-  },
+    createPublicRoute(
+      '/gestao-financeira-cpf/categorizacao-automatica-gastos',
+      CategorizacaoAutomaticaGastosPage,
+    ),
+    createPublicRoute(
+      '/gestao-financeira-cpf/gestao-financeira-com-inteligencia-artificial',
+      GestaoFinanceiraComIAPage,
+    ),
+    createPublicRoute(
+      '/gestao-financeira-cpf/score-credito-e-financas-pessoais',
+      ScoreCreditoFinancasPessoaisPage,
+    ),
 
-  // ==================== PLACEHOLDER ROUTES ====================
-  {
-    path: '/privacy-policy',
-    element: <div>Política de privacidade</div>,
-  },
-  {
-    path: '/support',
-    element: <div>Ajuda e suporte</div>,
-  },
+    // ==================== PROTECTED ROUTES (shared layout) ====================
+    {
+      element: <ProtectedLayout />,
+      errorElement: <ErrorPage />,
+      children: [
+        // --- Routes with onboarding guard ---
+        onboardingRoute('/onboarding', <OnboardingPage />),
+        onboardingRoute('/home', <HomePage />),
+        onboardingRoute('/home-v2', <HomePageV2 />),
+        onboardingRoute('/dashboard', <Dashboard />),
+        onboardingRoute('/financial-health', <FinancialHealthPage />),
+        onboardingRoute('/transactions', <Transactions />),
+        onboardingRoute('/reports', <Reports />),
+        onboardingRoute('/payments', <PaymentsPage />),
 
-  // ==================== 404 ROUTE ====================
+        // --- Simple protected routes ---
+        simpleRoute('/email-pending', <EmailPendingPage />),
+        simpleRoute('/dependents', <DependentsPage />),
+        simpleRoute('/categories', <CategoriesPage />),
+        simpleRoute('/accounts', <AccountsPage />),
+        simpleRoute('/accounts/:accountId/statement-schedule', <StatementSchedulePage />),
+        simpleRoute('/accounts/details', <AccountDetailsPage />),
+        simpleRoute('/openfinance', <OpenFinancePage />),
+        simpleRoute('/business-logs', <BusinessLogsPage />),
+        simpleRoute('/profile', <Profile />),
+        simpleRoute('/import-ofx', <ImportOfxPage />),
+        simpleRoute('/budget', <BudgetPage />),
+        simpleRoute('/statement', <Statement />),
+        simpleRoute('/transactions/new', <NewTransaction />),
+        simpleRoute('/credit-cards', <CreditCardsPage />),
+        simpleRoute('/credit-cards/bills', <CreditCardBillsPage />),
+        simpleRoute('/insights', <InsightsPage />),
+        simpleRoute('/goals', <GoalsPage />),
+        simpleRoute('/recurring-transactions', <RecurringTransactionsPage />),
+        simpleRoute('/income-sources', <IncomeSourcesPage />),
+        simpleRoute('/companies', <CompaniesPage />),
+        simpleRoute('/users', <UsersPage />),
+        simpleRoute('/payables', <Payables />),
+        simpleRoute('/payments/new', <NewPaymentPage />),
+        simpleRoute('/receivables', <Receivables />),
+        simpleRoute('/monthly-closing', <MonthlyClosing />),
+        simpleRoute('/annual-result', <AnnualResult />),
+        simpleRoute('/planner', <PlannerPage />),
+        simpleRoute('/ai/classification', <AiClassificationPage />),
+        simpleRoute('/settings', <Settings />),
+
+        // --- Settings redirects ---
+        {
+          path: '/settings/preferences',
+          element: <Navigate to="/profile?tab=preferences" replace />,
+        },
+        {
+          path: '/settings/notifications',
+          element: <Navigate to="/profile?tab=notifications" replace />,
+        },
+        {
+          path: '/settings/integrations',
+          element: <Navigate to="/profile?tab=integrations" replace />,
+        },
+        {
+          path: '/settings/subscription',
+          element: <Navigate to="/profile?tab=subscription" replace />,
+        },
+        { path: '/settings/categories', element: <div>Categorias</div> },
+        { path: '/settings/accounts', element: <div>Contas bancárias</div> },
+        { path: '/settings/cards', element: <div>Cartões</div> },
+        { path: '/settings/goals', element: <div>Metas</div> },
+        { path: '/settings/reminders', element: <div>Lembretes</div> },
+        { path: '/settings/export', element: <div>Exportar dados</div> },
+
+        // --- God routes ---
+        godRoute('/admin/openai-logs', <OpenAILogsPage />),
+        godRoute('/admin/plans', <PlansAdminPage />),
+      ],
+    },
+
+    // ==================== PLACEHOLDER ROUTES ====================
+    { path: '/privacy-policy', element: <div>Política de privacidade</div> },
+    { path: '/support', element: <div>Ajuda e suporte</div> },
+
+    // ==================== 404 ROUTE ====================
+    { path: '*', element: <ErrorPage code={404} /> },
+  ],
   {
-    path: '*',
-    element: <ErrorPage code={404} />,
+    future: {
+      v7_relativeSplatPath: true,
+    },
   },
-]);
+);

@@ -1,6 +1,8 @@
-import { formatCurrency } from '@/utils/formatters';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+
+import { Skeleton, SkeletonText } from '@/components/ui/skeleton';
+import { formatCurrency } from '@/utils/formatters';
 
 interface MonthlySummaryBarProps {
   readonly income: number;
@@ -25,13 +27,25 @@ export function MonthlySummaryBar({
 }: Readonly<MonthlySummaryBarProps>) {
   const currentMonthYear = format(new Date(), 'MMM/yyyy', { locale: ptBR });
 
-  const renderProgressBar = () => {
-    if (isLoading) {
-      return <div className="h-full bg-gray-300 dark:bg-gray-600 animate-pulse w-full"></div>;
-    }
+  if (isLoading) {
+    return (
+      <div aria-hidden="true" className="bg-gray-100 dark:bg-gray-800 rounded-xl p-3 space-y-2">
+        <div className="flex justify-between">
+          <SkeletonText className="w-28 h-2.5" />
+          <SkeletonText className="w-16 h-2.5" />
+        </div>
+        <Skeleton className="h-1.5 w-full rounded-full" />
+        <div className="flex justify-between">
+          <SkeletonText className="w-24 h-2" />
+          <SkeletonText className="w-24 h-2" />
+        </div>
+      </div>
+    );
+  }
 
+  const renderProgressBar = () => {
     if (total === 0) {
-      return <div className="h-full bg-gray-300 dark:bg-gray-600 w-full"></div>;
+      return <div className="h-full bg-gray-300 dark:bg-gray-600 w-full" />;
     }
 
     return (
@@ -41,14 +55,14 @@ export function MonthlySummaryBar({
             className="h-full bg-emerald-500"
             style={{ width: `${incomePercentage}%` }}
             aria-label={`Receitas: ${incomePercentage.toFixed(1)}%`}
-          ></div>
+          />
         )}
         {expenses > 0 && (
           <div
             className="h-full bg-red-500"
             style={{ width: `${expensesPercentage}%` }}
             aria-label={`Despesas: ${expensesPercentage.toFixed(1)}%`}
-          ></div>
+          />
         )}
       </>
     );
@@ -58,15 +72,12 @@ export function MonthlySummaryBar({
     if (isPrivacyModeEnabled) {
       return 'R$ \u2022\u2022\u2022';
     }
-    if (isLoading) {
-      return 'Carregando...';
-    }
     return `${prefix}${formatCurrency(value)}`;
   };
 
   return (
     <div className="bg-gray-100 dark:bg-gray-800 rounded-xl p-3">
-      {!isPrivacyModeEnabled && !isLoading && marginLabel && (
+      {!isPrivacyModeEnabled && marginLabel && (
         <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1.5">{marginLabel}</p>
       )}
       <div className="flex justify-between text-xs mb-1.5">

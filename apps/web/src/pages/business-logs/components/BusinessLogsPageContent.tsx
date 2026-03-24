@@ -1,32 +1,30 @@
-import { Loading } from '@/components/Loading';
-import { useCompanyStore } from '@/stores/company';
-import { formatDateToLocalISO } from '@/utils/date';
 import { History } from 'lucide-react';
 import { useMemo, useState } from 'react';
+
+import { TableSkeleton } from '@/components/skeletons';
+import { useCompanyStore } from '@/stores/company';
+import { formatDateToLocalISO } from '@/utils/date';
+
+import { useBusinessLogs } from '../hooks/useBusinessLogs';
+import { filterLogsBySearchTerm } from '../utils';
+
 import { EmptyState } from './EmptyState';
 import { ErrorState } from './ErrorState';
 import { FilterCard } from './FilterCard';
 import { LogCard } from './LogCard';
 import { Pagination } from './Pagination';
-import { useBusinessLogs } from '../hooks/useBusinessLogs';
-import { filterLogsBySearchTerm } from '../utils';
 
 interface BusinessLogsPageContentProps {
   readonly entityId?: string;
   readonly entityType?: string;
 }
 
-export function BusinessLogsPageContent({
-  entityId,
-  entityType,
-}: BusinessLogsPageContentProps) {
+export function BusinessLogsPageContent({ entityId, entityType }: BusinessLogsPageContentProps) {
   const { activeCompany } = useCompanyStore();
 
   // Filters state
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterEntityType, setFilterEntityType] = useState<string>(
-    entityType || 'all',
-  );
+  const [filterEntityType, setFilterEntityType] = useState<string>(entityType || 'all');
   const [filterOperation, setFilterOperation] = useState<string>('all');
   const [startDate, setStartDate] = useState<string>(
     formatDateToLocalISO(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
@@ -74,7 +72,7 @@ export function BusinessLogsPageContent({
 
   const renderLogsContent = () => {
     if (isLoading) {
-      return <Loading />;
+      return <TableSkeleton rows={5} />;
     }
 
     if (error) {
@@ -160,4 +158,3 @@ export function BusinessLogsPageContent({
     </div>
   );
 }
-

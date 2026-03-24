@@ -1,20 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Loading } from '@/components/Loading';
-import { ViewDefault } from '@/layouts/ViewDefault';
+
+import { DetailSkeleton } from '@/components/skeletons';
 import { useCreditCards } from '@/hooks/useCreditCards';
-import { useCompanyStore } from '@/stores/company';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { useCreditCardBills } from './hooks/useCreditCardBills';
-import { useBillNavigation } from './hooks/useBillNavigation';
-import { useCreditCardManagement } from './hooks/useCreditCardManagement';
-import { useAllCardsBillTotals } from './hooks/useAllCardsBillTotals';
-import { CreditCardCardsContainer } from './components/CreditCardCardsContainer';
-import { CreditCardSummary } from './components/CreditCardSummary';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { useCompanyStore } from '@/stores/company';
+
 import { BillCard } from './components/BillCard';
 import { BillEmptyState } from './components/BillEmptyState';
 import { BillErrorState } from './components/BillErrorState';
+import { CreditCardCardsContainer } from './components/CreditCardCardsContainer';
 import { CreditCardModals } from './components/CreditCardModals';
+import { CreditCardSummary } from './components/CreditCardSummary';
 import { NoCreditCardsState } from './components/NoCreditCardsState';
+import { useAllCardsBillTotals } from './hooks/useAllCardsBillTotals';
+import { useBillNavigation } from './hooks/useBillNavigation';
+import { useCreditCardBills } from './hooks/useCreditCardBills';
+import { useCreditCardManagement } from './hooks/useCreditCardManagement';
 
 export function CreditCardBillsPageDesktop() {
   const { activeCompany } = useCompanyStore();
@@ -92,8 +94,8 @@ export function CreditCardBillsPageDesktop() {
   if (isLoadingCards) {
     return (
       <ViewDefault>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loading size="large">Carregando cartões, por favor aguarde...</Loading>
+        <div className="px-4 py-10">
+          <DetailSkeleton title="Cartões" />
         </div>
       </ViewDefault>
     );
@@ -113,8 +115,8 @@ export function CreditCardBillsPageDesktop() {
       <ViewDefault>
         <div className="-m-4 sm:-m-6 lg:-m-6">
           {renderCardsContainer()}
-          <div className="flex items-center justify-center min-h-[40vh]">
-            <Loading size="large">Carregando fatura, por favor aguarde...</Loading>
+          <div className="px-4 py-6 sm:px-6 lg:px-6">
+            <DetailSkeleton title="Fatura" />
           </div>
         </div>
       </ViewDefault>

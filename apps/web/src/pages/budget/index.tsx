@@ -1,14 +1,15 @@
+import { motion } from 'framer-motion';
+import { Settings, Wallet } from 'lucide-react';
+import { useState } from 'react';
+
 import { CashFlowCard, CreditCardsCard, PayablesCard, ReceivablesCard } from '@/components/budget';
 import { BudgetExpandedModal } from '@/components/budget/BudgetExpandedModal';
 import { BudgetSettingsModal } from '@/components/budget/BudgetSettingsModal';
 import { CashFlowYearlyModal } from '@/components/budget/CashFlowYearlyModal';
 import { MonthNavigator } from '@/components/budget/MonthNavigator';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { motion } from 'framer-motion';
-import { Settings, Wallet } from 'lucide-react';
-import { useState } from 'react';
-
+import { BudgetSkeleton } from '@/components/skeletons';
 import { useBudgetPageController } from '@/hooks/useBudgetPageController';
+import { ViewDefault } from '@/layouts/ViewDefault';
 
 export function BudgetPage() {
   const {
@@ -40,7 +41,16 @@ export function BudgetPage() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isYearlyOpen, setIsYearlyOpen] = useState(false);
 
-  // Define variants
+  if (isLoading) {
+    return (
+      <ViewDefault>
+        <div className="container mx-auto px-2 sm:px-6 pt-0 pb-6">
+          <BudgetSkeleton />
+        </div>
+      </ViewDefault>
+    );
+  }
+
   const container = {
     hidden: { opacity: 0 },
     show: {

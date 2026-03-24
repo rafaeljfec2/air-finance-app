@@ -1,15 +1,16 @@
-import { Loading } from '@/components/Loading';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Settings, Edit } from 'lucide-react';
+import { useState, useMemo } from 'react';
+
+import { PlanFormModal } from '@/components/admin/PlanFormModal';
+import { TableSkeleton } from '@/components/skeletons';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { PlanFormModal } from '@/components/admin/PlanFormModal';
+import { toast } from '@/components/ui/toast';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { subscriptionService, type UpdatePlanData } from '@/services/subscriptionService';
 import { Plan } from '@/types/subscription';
 import { parseApiError, getUserFriendlyMessage, logApiError } from '@/utils/apiErrorHandler';
-import { toast } from '@/components/ui/toast';
-import { Settings, Edit } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState, useMemo } from 'react';
 
 export function PlansAdminPage() {
   const queryClient = useQueryClient();
@@ -73,8 +74,8 @@ export function PlansAdminPage() {
   if (isLoading) {
     return (
       <ViewDefault>
-        <div className="flex items-center justify-center h-full min-h-[400px]">
-          <Loading size="large" />
+        <div className="container mx-auto px-4 sm:px-6 py-10">
+          <TableSkeleton title="Planos" />
         </div>
       </ViewDefault>
     );

@@ -1,5 +1,7 @@
+import { useMemo, useState } from 'react';
+
 import { CompanyFormModal } from '@/components/companies/CompanyFormModal';
-import { Loading } from '@/components/Loading';
+import { TableSkeleton } from '@/components/skeletons';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useCompanies } from '@/hooks/useCompanies';
 import { usePlanLimits } from '@/hooks/usePlanLimits';
@@ -7,7 +9,7 @@ import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { CreateCompany } from '@/services/companyService';
 import { Company } from '@/types/company';
-import { useMemo, useState } from 'react';
+
 import { CompaniesEmptyState } from './components/CompaniesEmptyState';
 import { CompaniesErrorState } from './components/CompaniesErrorState';
 import { CompaniesFilters } from './components/CompaniesFilters';
@@ -95,7 +97,7 @@ export function CompaniesPage() {
     return (
       <ViewDefault>
         <div className="container mx-auto px-4 sm:px-6 py-10">
-          <Loading size="large">Carregando empresas, por favor aguarde...</Loading>
+          <TableSkeleton title="Empresas" />
         </div>
       </ViewDefault>
     );

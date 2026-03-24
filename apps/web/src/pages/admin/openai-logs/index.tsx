@@ -1,7 +1,9 @@
-import { Spinner } from '@/components/ui/spinner';
+import { useEffect, useMemo, useState } from 'react';
+
+import { TableSkeleton } from '@/components/skeletons';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { OpenAILog, openaiService } from '@/services/openaiService';
-import { useEffect, useMemo, useState } from 'react';
+
 import { OpenAILogDetailsModal } from './components/OpenAILogDetailsModal';
 import { OpenAILogsEmptyState } from './components/OpenAILogsEmptyState';
 import { OpenAILogsErrorState } from './components/OpenAILogsErrorState';
@@ -17,14 +19,8 @@ export function OpenAILogsPage() {
   const [error, setError] = useState<Error | null>(null);
   const [selectedLog, setSelectedLog] = useState<OpenAILog | null>(null);
 
-  const {
-    searchTerm,
-    setSearchTerm,
-    statusFilter,
-    setStatusFilter,
-    filterLogs,
-    hasActiveFilters,
-  } = useOpenAILogFilters();
+  const { searchTerm, setSearchTerm, statusFilter, setStatusFilter, filterLogs, hasActiveFilters } =
+    useOpenAILogFilters();
 
   const { sortConfig, handleSort, sortLogs } = useOpenAILogSorting();
 
@@ -69,9 +65,7 @@ export function OpenAILogsPage() {
           />
 
           {isLoading ? (
-            <div className="flex justify-center py-12">
-              <Spinner className="text-primary-500" />
-            </div>
+            <TableSkeleton rows={5} />
           ) : filteredAndSortedLogs.length === 0 ? (
             <OpenAILogsEmptyState hasFilters={hasActiveFilters} />
           ) : (

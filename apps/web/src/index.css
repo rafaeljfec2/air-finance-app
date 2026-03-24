@@ -207,6 +207,58 @@
   }
 }
 
+@layer components {
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      #E8EFEC 25%,
+      #f0f5f2 50%,
+      #E8EFEC 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  .dark .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      #374151 25%,
+      #4b5563 50%,
+      #374151 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  @keyframes route-progress {
+    0% {
+      transform: translateX(-100%);
+    }
+    40% {
+      transform: translateX(-30%);
+    }
+    65% {
+      transform: translateX(-5%);
+    }
+    100% {
+      transform: translateX(0%);
+    }
+  }
+
+  .animate-route-progress {
+    animation: route-progress 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+}
+
 @layer utilities {
   /* Safe Area Padding Utilities */
   .pt-safe {

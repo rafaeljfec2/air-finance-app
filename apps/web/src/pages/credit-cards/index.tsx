@@ -1,5 +1,8 @@
+import { useMemo, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+
 import { CreditCardFormModal } from '@/components/credit-cards/CreditCardFormModal';
-import { Loading } from '@/components/Loading';
+import { TableSkeleton } from '@/components/skeletons';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useCreditCards } from '@/hooks/useCreditCards';
 import { usePlanLimits } from '@/hooks/usePlanLimits';
@@ -7,8 +10,7 @@ import { useViewMode } from '@/hooks/useViewMode';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { CreateCreditCardPayload, CreditCard } from '@/services/creditCardService';
 import { useCompanyStore } from '@/stores/company';
-import { useMemo, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+
 import { CreditCardsEmptyState } from './components/CreditCardsEmptyState';
 import { CreditCardsErrorState } from './components/CreditCardsErrorState';
 import { CreditCardsFilters } from './components/CreditCardsFilters';
@@ -95,7 +97,7 @@ export function CreditCardsManagementPage() {
     return (
       <ViewDefault>
         <div className="container mx-auto px-4 sm:px-6 py-10">
-          <Loading size="large">Carregando cartões de crédito, por favor aguarde...</Loading>
+          <TableSkeleton title="Cartões de Crédito" />
         </div>
       </ViewDefault>
     );

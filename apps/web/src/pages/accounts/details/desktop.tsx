@@ -1,14 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { Loading } from '@/components/Loading';
+import { DetailSkeleton } from '@/components/skeletons';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import type { OpenBankingEntitlement } from '@/services/subscriptionService';
-import { openBankingService } from '@/services/subscriptionService';
-import { useAuthStore } from '@/stores/auth';
 import { useCompanyStore } from '@/stores/company';
-import { UserRole } from '@/types/user';
 
 import { AccountCardsContainerDesktop } from './components/AccountCardsContainerDesktop';
 import { AccountErrorState } from './components/AccountErrorState';
@@ -21,57 +16,6 @@ import { useAccountDetails } from './hooks/useAccountDetails';
 import { useAccountManagement } from './hooks/useAccountManagement';
 import { useStatementNavigation } from './hooks/useStatementNavigation';
 
-function SlotBanner({ entitlement }: Readonly<{ entitlement: OpenBankingEntitlement }>) {
-  const available = entitlement.entitledSlots - entitlement.usedSlots;
-  const isFull = available <= 0;
-  const isOver = entitlement.usedSlots > entitlement.entitledSlots;
-  const pct =
-    entitlement.entitledSlots > 0
-      ? Math.min((entitlement.usedSlots / entitlement.entitledSlots) * 100, 100)
-      : 0;
-
-  return (
-    <div
-      className={`flex items-center gap-4 px-4 py-3 rounded-xl border text-sm ${
-        isOver
-          ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800/50'
-          : isFull
-            ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800/50'
-            : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800/50'
-      }`}
-    >
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between mb-1.5">
-          <span
-            className={`font-semibold ${
-              isOver
-                ? 'text-red-700 dark:text-red-400'
-                : isFull
-                  ? 'text-amber-700 dark:text-amber-400'
-                  : 'text-emerald-700 dark:text-emerald-400'
-            }`}
-          >
-            Open Finance — {entitlement.usedSlots}/{entitlement.entitledSlots} contas
-          </span>
-          {isOver && (
-            <span className="text-xs font-medium text-red-600 dark:text-red-400">
-              Limite excedido
-            </span>
-          )}
-        </div>
-        <div className="h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all ${
-              isOver ? 'bg-red-500' : isFull ? 'bg-amber-500' : 'bg-emerald-500'
-            }`}
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function AccountDetailsPageDesktop() {
   const [selectedAccountId, setSelectedAccountId] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -79,17 +23,7 @@ export function AccountDetailsPageDesktop() {
   const searchTermToSend = debouncedSearch.length >= 3 ? debouncedSearch : undefined;
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
-  const user = useAuthStore((state) => state.user);
-  const isGod = user?.role === UserRole.GOD;
 
-  const { data: entitlement } = useQuery({
-    queryKey: ['open-banking-entitlement', companyId],
-    queryFn: () => openBankingService.getEntitlement(companyId),
-    enabled: !!companyId,
-    staleTime: 30_000,
-  });
-
-  const showBadge = entitlement && (entitlement.entitledSlots > 0 || isGod);
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useStatementNavigation();
 
@@ -141,8 +75,8 @@ export function AccountDetailsPageDesktop() {
   if (isLoading && !hasAccounts) {
     return (
       <ViewDefault>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loading size="large">Carregando contas, por favor aguarde...</Loading>
+        <div className="px-4 py-10">
+          <DetailSkeleton title="Contas" />
         </div>
       </ViewDefault>
     );
@@ -178,7 +112,7 @@ export function AccountDetailsPageDesktop() {
             onAddAccount={handlers.onAddAccount}
           />
           <div className="flex items-center justify-center min-h-[40vh]">
-            <Loading size="large">Carregando extrato, por favor aguarde...</Loading>
+            <DetailSkeleton title="Extrato" />
           </div>
         </div>
       </ViewDefault>
@@ -224,12 +158,6 @@ export function AccountDetailsPageDesktop() {
           onDeleteAccount={handlers.onDeleteAccount}
           onAddAccount={handlers.onAddAccount}
         />
-
-        {showBadge && (
-          <div className="px-4 pt-3 pb-1 lg:px-6">
-            <SlotBanner entitlement={entitlement} />
-          </div>
-        )}
 
         <AccountSummary summary={summary} />
 
