@@ -1,7 +1,8 @@
-import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { DashboardPreview } from './DashboardPreview';
+import { useNavigate } from 'react-router-dom';
+
 import { HeroAnimation } from './animations';
+import { DashboardPreview } from './DashboardPreview';
 
 export function HeroV3() {
   const navigate = useNavigate();

@@ -1,7 +1,8 @@
+import { Edit, Trash2 } from 'lucide-react';
 import { ReactNode } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Edit, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RecordCardProps {

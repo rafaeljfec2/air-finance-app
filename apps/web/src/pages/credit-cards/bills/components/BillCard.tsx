@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight, Receipt, Search, X } from 'lucide-react';
-import { BillTransactionList } from './BillTransactionList';
+import React from 'react';
+
 import {
   formatCurrency,
   formatMonthYear,
@@ -7,7 +8,8 @@ import {
   type BillStatus,
   getStatusBadgeClasses,
 } from '../utils';
-import React from 'react';
+
+import { BillTransactionList } from './BillTransactionList';
 
 const STATUS_LABELS: Record<BillStatus, string> = {
   PAID: 'Paga',

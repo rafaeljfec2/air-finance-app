@@ -1,5 +1,6 @@
-import { useNavigate } from 'react-router-dom';
 import { UserPlus, Link2, LayoutDashboard, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 import { ScrollReveal, StaggerContainer, StaggerItem } from './animations';
 
 const STEPS = [

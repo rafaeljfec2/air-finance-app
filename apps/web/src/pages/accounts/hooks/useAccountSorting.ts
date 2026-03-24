@@ -1,6 +1,6 @@
 import { useSortable } from '@/hooks/useSortable';
-import { Account } from '@/services/accountService';
 import { getInstitution, getAgency, getAccountNumber } from '@/services/accountHelpers';
+import { Account } from '@/services/accountService';
 
 export function useAccountSorting() {
   const { sortConfig, handleSort, sortData } = useSortable<

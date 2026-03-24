@@ -1,9 +1,10 @@
-import { RecurringTransaction } from '@/services/recurringTransactionService';
-import { formatCurrency } from '@/utils/formatters';
 import { MoreVertical, Edit, Trash2, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { RecurringTransaction } from '@/services/recurringTransactionService';
+import { formatCurrency } from '@/utils/formatters';
 
 interface RecurringTransactionListItemProps {
   recurringTransaction: RecurringTransaction;

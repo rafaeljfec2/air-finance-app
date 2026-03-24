@@ -1,6 +1,7 @@
+import { Plus, Tag } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Plus, Tag } from 'lucide-react';
 
 interface CategoriesEmptyStateProps {
   hasFilters: boolean;

@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
 import { formatCurrency } from '@/components/insights/InsightRenderers';
 import type { InsightItem } from '@/services/agentService';
 

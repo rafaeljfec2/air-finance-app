@@ -1,9 +1,10 @@
 import { Check, ExternalLink, Key, Link2, Settings, Eye } from 'lucide-react';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { HeaderV2 } from '@/pages/landing-v2/components/HeaderV2';
-import { FooterV2 } from '@/pages/landing-v2/components/FooterV2';
+
 import { SEOHead } from '@/pages/landing/components/SEOHead';
+import { FooterV2 } from '@/pages/landing-v2/components/FooterV2';
+import { HeaderV2 } from '@/pages/landing-v2/components/HeaderV2';
 import '@/pages/landing-v2/landing-v2.css';
 
 export function PierreFinanceConfigPage() {

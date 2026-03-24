@@ -1,10 +1,11 @@
-import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+
 import { BankIcon } from '@/components/bank/BankIcon';
-import { hasBankLogo } from '@/utils/bankIcons';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { Account } from '@/services/accountService';
 import { getBankCode, getInstitution } from '@/services/accountHelpers';
+import type { Account } from '@/services/accountService';
+import { hasBankLogo } from '@/utils/bankIcons';
 
 interface StatementScheduleHeaderProps {
   account: Account | undefined;

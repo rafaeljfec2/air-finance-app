@@ -1,8 +1,9 @@
-import { Company } from '@/types/company';
-import { sanitizeCompany } from '@/utils/sanitize';
 import React, { createContext, useMemo } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
+import { Company } from '@/types/company';
+import { sanitizeCompany } from '@/utils/sanitize';
 
 interface CompanyState {
   companyId: string;

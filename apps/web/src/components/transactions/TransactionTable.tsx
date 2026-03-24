@@ -1,6 +1,10 @@
+import { useMemo } from 'react';
+
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatters';
-import { useMemo } from 'react';
+
+import { EmptyState } from './EmptyState';
+import { SortableHeader } from './SortableHeader';
 import type {
   FilterValue,
   SortDirection,
@@ -8,8 +12,6 @@ import type {
   TransactionGridTransaction,
 } from './TransactionGrid.types';
 import { getFieldValues } from './TransactionGrid.utils';
-import { EmptyState } from './EmptyState';
-import { SortableHeader } from './SortableHeader';
 import { TableRow } from './TransactionTableRow';
 
 interface TransactionTableProps {

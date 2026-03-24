@@ -1,7 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getStatement, type StatementResponse } from '@/services/bankingStatementService';
 import { endOfMonth, format, parseISO } from 'date-fns';
+import { useState, useEffect, useCallback, useRef } from 'react';
+
+import { getStatement, type StatementResponse } from '@/services/bankingStatementService';
+
 import {
   createInitialPaginationState,
   createInitialSummary,

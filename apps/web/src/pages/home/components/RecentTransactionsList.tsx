@@ -1,9 +1,10 @@
-import { formatCurrency } from '@/utils/formatters';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ArrowRightLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
 import type { Transaction } from '@/services/transactionService';
+import { formatCurrency } from '@/utils/formatters';
 
 interface TransactionWithAccount extends Transaction {
   accountName?: string;

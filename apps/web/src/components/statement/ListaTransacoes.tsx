@@ -1,5 +1,7 @@
-import { Transaction } from '@/types/transaction';
 import { useState } from 'react';
+
+import { Transaction } from '@/types/transaction';
+
 import { TransactionCard } from './TransactionCard';
 
 interface ListaTransacoesProps {

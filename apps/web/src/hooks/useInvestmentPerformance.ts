@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { getInvestmentPerformance } from '../services/investmentService';
 
 interface InvestmentPerformance {

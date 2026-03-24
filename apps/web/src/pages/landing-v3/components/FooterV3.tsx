@@ -1,6 +1,7 @@
-import { Logo } from '@/components/Logo';
-import { Link } from 'react-router-dom';
 import { Shield } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+import { Logo } from '@/components/Logo';
 
 const FOOTER_LINKS = {
   produto: [

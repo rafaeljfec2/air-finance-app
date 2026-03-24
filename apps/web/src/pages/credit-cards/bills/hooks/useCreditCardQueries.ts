@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { getCreditCardById, CreditCard } from '@/services/creditCardService';
+
 import { getAccounts, type Account } from '@/services/accountService';
+import { getCreditCardById, CreditCard } from '@/services/creditCardService';
 
 interface UseCreditCardQueriesParams {
   companyId: string;

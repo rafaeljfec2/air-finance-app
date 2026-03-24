@@ -1,10 +1,11 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import { Activity, CalendarDays, Maximize2 } from 'lucide-react';
+import { useState } from 'react';
+
 import { CardContainer, CardEmpty, CardHeader, CardStat } from '@/components/budget';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import type { CashFlow } from '@/types/budget';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Activity, CalendarDays, Maximize2 } from 'lucide-react';
-import { useState } from 'react';
 
 interface CashFlowCardProps {
   cashFlow: CashFlow | null;

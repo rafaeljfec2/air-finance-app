@@ -1,16 +1,18 @@
-import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
-import { FormField } from '@/components/ui/FormField';
-import { Modal } from '@/components/ui/Modal';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useCompanies } from '@/hooks/useCompanies';
-import { CreateUser, User } from '@/services/userService';
-import { companyService } from '@/services/companyService';
-import { useCompanyStore } from '@/stores/company';
 import { Loader2 } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { CompanyRole, UserCompanyRolesSection } from './UserCompanyRolesSection';
+
+import { Button } from '@/components/ui/button';
+import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
+import { FormField } from '@/components/ui/FormField';
+import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/Modal';
+import { useCompanies } from '@/hooks/useCompanies';
+import { companyService } from '@/services/companyService';
+import { CreateUser, User } from '@/services/userService';
+import { useCompanyStore } from '@/stores/company';
 import type { Company } from '@/types/company';
+
+import { CompanyRole, UserCompanyRolesSection } from './UserCompanyRolesSection';
 
 interface UserFormModalProps {
   open: boolean;

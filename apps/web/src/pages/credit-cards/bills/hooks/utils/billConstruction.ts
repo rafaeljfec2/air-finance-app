@@ -1,6 +1,8 @@
 import { useMemo, useRef } from 'react';
-import type { CreditCard, CreditCardBillResponse } from '@/services/creditCardService';
+
 import type { Account } from '@/services/accountService';
+import type { CreditCard, CreditCardBillResponse } from '@/services/creditCardService';
+
 import type { BillTransaction } from './transactionProcessing';
 
 export interface CurrentBill {

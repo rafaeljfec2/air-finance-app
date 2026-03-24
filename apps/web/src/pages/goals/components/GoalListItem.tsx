@@ -1,10 +1,11 @@
-import { Goal } from '@/services/goalService';
-import { formatCurrency } from '@/utils/formatters';
 import { Target, MoreVertical, Edit, Trash2 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useGoals } from '@/hooks/useGoals';
 import { useCategories } from '@/hooks/useCategories';
+import { useGoals } from '@/hooks/useGoals';
+import { Goal } from '@/services/goalService';
+import { formatCurrency } from '@/utils/formatters';
 
 interface GoalListItemProps {
   goal: Goal;

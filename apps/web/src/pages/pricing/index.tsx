@@ -1,11 +1,12 @@
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+
 import { PlanCard } from '@/components/subscription/PlanCard';
 import { PLANS } from '@/constants/plans';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { subscriptionService } from '@/services/subscriptionService';
 import { useAuthStore } from '@/stores/auth';
 import { User } from '@/types/user';
-import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 
 export function PricingPage() {
   const { user } = useAuthStore();

@@ -1,9 +1,12 @@
-import { useMemo } from 'react';
-import { ChevronLeft, ChevronRight, ArrowLeft, MoreVertical, Plus, Menu } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { ChevronLeft, ChevronRight, ArrowLeft, MoreVertical, Plus, Menu } from 'lucide-react';
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import type { Account } from '@/services/accountService';
+
 import { useHorizontalScroll } from '../hooks/useHorizontalScroll';
+
 import { AccountBalanceCard } from './AccountBalanceCard';
 import { AddAccountCard } from './AddAccountCard';
 

@@ -1,12 +1,3 @@
-import { RecordCard } from '@/components/ui/RecordCard';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { useAccounts } from '@/hooks/useAccounts';
-import { useCategories } from '@/hooks/useCategories';
-import { cn } from '@/lib/utils';
-import { RecurringTransaction } from '@/services/recurringTransactionService';
-import { useCompanyStore } from '@/stores/company';
-import { formatCurrency } from '@/utils/formatters';
 import {
   ArrowDownCircle,
   ArrowUpCircle,
@@ -17,6 +8,16 @@ import {
   Tag,
   Trash2,
 } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { RecordCard } from '@/components/ui/RecordCard';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useCategories } from '@/hooks/useCategories';
+import { cn } from '@/lib/utils';
+import { RecurringTransaction } from '@/services/recurringTransactionService';
+import { useCompanyStore } from '@/stores/company';
+import { formatCurrency } from '@/utils/formatters';
 
 interface RecurringTransactionCardProps {
   recurringTransaction: RecurringTransaction;

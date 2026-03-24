@@ -1,6 +1,7 @@
-import { useSidebarStore } from '@/stores/sidebar';
-import { cn } from '@/lib/utils';
 import { ExternalLink } from 'lucide-react';
+
+import { cn } from '@/lib/utils';
+import { useSidebarStore } from '@/stores/sidebar';
 
 export function SidebarFooter() {
   const { isCollapsed } = useSidebarStore();

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { QrCode, Zap } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';

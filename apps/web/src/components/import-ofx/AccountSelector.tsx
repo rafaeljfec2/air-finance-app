@@ -1,7 +1,8 @@
-import { ComboBox, type ComboBoxOption } from '@/components/ui/ComboBox';
-import type { Account } from '@/services/accountService';
-import { getAccountNumber } from '@/services/accountHelpers';
 import { useMemo } from 'react';
+
+import { ComboBox, type ComboBoxOption } from '@/components/ui/ComboBox';
+import { getAccountNumber } from '@/services/accountHelpers';
+import type { Account } from '@/services/accountService';
 
 interface AccountSelectorProps {
   accounts: Account[];

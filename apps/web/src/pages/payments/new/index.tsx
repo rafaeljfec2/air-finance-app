@@ -1,19 +1,21 @@
-import { useCallback, useMemo, useEffect } from 'react';
-import { ViewDefault } from '@/layouts/ViewDefault';
 import { ArrowLeft } from 'lucide-react';
-import { ComboBox } from '@/components/ui/ComboBox';
+import { useCallback, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { usePaymentForm } from './hooks/usePaymentForm';
+
+import { ComboBox } from '@/components/ui/ComboBox';
 import { useParsePaymentDocument, usePaymentById } from '@/hooks/usePayments';
-import { PaymentTypeSelector } from './components/PaymentTypeSelector';
-import { DocumentUpload } from './components/DocumentUpload';
-import { PixPaymentForm } from './components/PixPaymentForm';
-import { TedPaymentForm } from './components/TedPaymentForm';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import type { PaymentType, Payment } from '@/services/paymentService';
+
 import { BoletoPaymentForm } from './components/BoletoPaymentForm';
 import { DarfPaymentForm } from './components/DarfPaymentForm';
+import { DocumentUpload } from './components/DocumentUpload';
 import { PaymentConfirmation } from './components/PaymentConfirmation';
 import { PaymentResult } from './components/PaymentResult';
-import type { PaymentType, Payment } from '@/services/paymentService';
+import { PaymentTypeSelector } from './components/PaymentTypeSelector';
+import { PixPaymentForm } from './components/PixPaymentForm';
+import { TedPaymentForm } from './components/TedPaymentForm';
+import { usePaymentForm } from './hooks/usePaymentForm';
 
 interface RenderFormOptions {
   readonly type: string;

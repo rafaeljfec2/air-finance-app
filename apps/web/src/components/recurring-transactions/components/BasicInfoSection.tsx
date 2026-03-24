@@ -1,4 +1,6 @@
+import { DollarSign, FileText, Tag, Wallet } from 'lucide-react';
 import React, { useMemo } from 'react';
+
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
@@ -6,7 +8,7 @@ import { cn } from '@/lib/utils';
 import type { Account } from '@/services/accountService';
 import type { Category } from '@/services/categoryService';
 import type { CreateRecurringTransaction } from '@/services/recurringTransactionService';
-import { DollarSign, FileText, Tag, Wallet } from 'lucide-react';
+
 import { TYPE_OPTIONS } from '../constants';
 
 interface BasicInfoSectionProps {

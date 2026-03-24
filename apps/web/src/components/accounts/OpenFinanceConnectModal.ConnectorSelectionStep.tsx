@@ -1,5 +1,6 @@
-import { OpeniConnectorSelector } from './OpeniConnectorSelector';
 import type { OpeniConnector } from '@/services/openiService';
+
+import { OpeniConnectorSelector } from './OpeniConnectorSelector';
 
 interface ConnectorSelectionStepProps {
   readonly connectors: readonly OpeniConnector[];

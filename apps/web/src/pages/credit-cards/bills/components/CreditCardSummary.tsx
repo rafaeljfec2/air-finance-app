@@ -1,4 +1,5 @@
 import { Wallet, CreditCard, TrendingUp } from 'lucide-react';
+
 import { formatCurrency } from '../utils';
 
 interface CreditCardSummaryProps {

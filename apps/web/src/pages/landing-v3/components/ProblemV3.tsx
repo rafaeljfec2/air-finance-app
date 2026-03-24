@@ -1,4 +1,5 @@
 import { CreditCard, ClipboardList, HelpCircle } from 'lucide-react';
+
 import { ScrollReveal, StaggerContainer, StaggerItem } from './animations';
 
 const PROBLEMS = [

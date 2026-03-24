@@ -1,5 +1,6 @@
 import { Check, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
 import { ScrollReveal, StaggerContainer, StaggerItem } from './animations';
 
 interface Plan {

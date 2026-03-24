@@ -1,8 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+
 import { useAuth } from '@/hooks/useAuth';
 import { needsOnboarding } from '@/utils/authRedirect';
+
 import { OnboardingModal } from './OnboardingModal';
 
 const SESSION_STORAGE_KEY = 'onboarding_modal_dismissed';

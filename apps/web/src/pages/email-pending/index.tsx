@@ -1,14 +1,15 @@
+import { useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import { Loader2, Mail, Send } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/services/apiClient';
 import { authUtils } from '@/utils/auth';
-import { useQueryClient } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
-import { Loader2, Mail, Send } from 'lucide-react';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 /**
  * Email Pending Page

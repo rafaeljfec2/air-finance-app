@@ -1,6 +1,7 @@
-import { formatCurrency } from '@/utils/formatters';
 import { Eye, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+import { formatCurrency } from '@/utils/formatters';
 
 interface BalanceSectionProps {
   balance: number;

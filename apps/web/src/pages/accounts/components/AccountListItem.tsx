@@ -1,17 +1,18 @@
-import { Account } from '@/services/accountService';
+import { MoreVertical, Edit, Trash2, Link2, Clock } from 'lucide-react';
+
+import { BankIcon } from '@/components/bank/BankIcon';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useBanks } from '@/hooks/useBanks';
+import { cn } from '@/lib/utils';
 import {
   getInstitution,
   getBankCode,
   hasBankingIntegration as hasIntegration,
 } from '@/services/accountHelpers';
-import { formatCurrency } from '@/utils/formatters';
-import { MoreVertical, Edit, Trash2, Link2, Clock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useBanks } from '@/hooks/useBanks';
-import { BankIcon } from '@/components/bank/BankIcon';
+import { Account } from '@/services/accountService';
 import { hasBankLogo } from '@/utils/bankIcons';
-import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/utils/formatters';
 
 interface AccountListItemProps {
   account: Account;

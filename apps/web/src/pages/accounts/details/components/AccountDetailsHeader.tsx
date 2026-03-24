@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import {
   ArrowLeft,
   MoreVertical,
@@ -13,10 +14,10 @@ import {
   EyeOff,
   Check,
 } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import type { Account } from '@/services/accountService';
 
 interface AccountDetailsHeaderProps {

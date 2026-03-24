@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePagination } from './usePagination';
-import { useTransactionFilters } from './useTransactionFilters';
-import { useTransactionSorting } from './useTransactionSorting';
+
 import type {
   FilterValue,
   SortDirection,
@@ -10,6 +8,10 @@ import type {
   TransactionGridTransaction,
 } from '../TransactionGrid.types';
 import { calculateBalance } from '../TransactionGrid.utils';
+
+import { usePagination } from './usePagination';
+import { useTransactionFilters } from './useTransactionFilters';
+import { useTransactionSorting } from './useTransactionSorting';
 
 interface UseTransactionGridStateProps {
   transactions: TransactionGridTransaction[];

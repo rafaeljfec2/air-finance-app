@@ -1,6 +1,8 @@
-import { env } from '@/utils/env';
-import { useMaintenanceStore } from '@/stores/maintenance';
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+
+import { useMaintenanceStore } from '@/stores/maintenance';
+import { env } from '@/utils/env';
+
 import { authUtils } from '../utils/auth';
 
 /**

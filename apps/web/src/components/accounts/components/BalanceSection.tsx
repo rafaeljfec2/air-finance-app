@@ -1,11 +1,12 @@
+import { DollarSign, FileText, TrendingUp } from 'lucide-react';
+
 import { DatePicker } from '@/components/ui/DatePicker';
 import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
-import type { Account, CreateAccount } from '@/services/accountService';
 import { getCreditLimit } from '@/services/accountHelpers';
-import { DollarSign, FileText, TrendingUp } from 'lucide-react';
+import type { Account, CreateAccount } from '@/services/accountService';
 import { formatCurrencyInput } from '@/utils/formatters';
 
 type BalanceContext = 'extract' | 'cashFlow';

@@ -1,9 +1,10 @@
-import { Card } from '@/components/ui/card';
-import { Transaction } from '@/types/transaction';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 import React from 'react';
+
+import { Card } from '@/components/ui/card';
+import { Transaction } from '@/types/transaction';
 
 interface TransactionCardProps {
   transaction: Transaction;

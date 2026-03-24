@@ -1,7 +1,10 @@
-import { useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useMemo } from 'react';
+
 import type { Account } from '@/services/accountService';
+
 import { useHorizontalScroll } from '../hooks/useHorizontalScroll';
+
 import { AccountBalanceCard } from './AccountBalanceCard';
 import { AddAccountCard } from './AddAccountCard';
 

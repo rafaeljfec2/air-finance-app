@@ -1,5 +1,6 @@
-import { ExtractResponse, getExtracts } from '@/services/transactionService';
 import { useQuery } from '@tanstack/react-query';
+
+import { ExtractResponse, getExtracts } from '@/services/transactionService';
 
 export const useExtracts = (
   companyId: string,

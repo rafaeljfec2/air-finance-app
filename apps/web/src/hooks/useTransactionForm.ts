@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { useCompanyStore } from '@/stores/company';
 import { useTransactionStore } from '@/stores/transaction';
 import { Transaction, TransactionType } from '@/types/transaction';
-import { formatCurrency } from '@/utils/formatters';
-import { useCompanyStore } from '@/stores/company';
 import { formatDateToLocalISO } from '@/utils/date';
+import { formatCurrency } from '@/utils/formatters';
 
 export const INITIAL_FORM_STATE = {
   description: '',

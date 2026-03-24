@@ -1,8 +1,9 @@
-import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
-import { Button } from '@/components/ui/button';
-import { useCompanies } from '@/hooks/useCompanies';
 import { Building2, Trash2 } from 'lucide-react';
 import { useMemo } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
+import { useCompanies } from '@/hooks/useCompanies';
 
 export interface CompanyRole {
   companyId: string;

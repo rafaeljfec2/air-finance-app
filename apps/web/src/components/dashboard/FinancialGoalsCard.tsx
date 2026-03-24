@@ -1,9 +1,10 @@
+import { Building2, CreditCard } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { useDashboardGoalsSummary } from '@/hooks/useDashboard';
 import type { DashboardGoalSummary } from '@/types/dashboard';
-import { Building2, CreditCard } from 'lucide-react';
 
 interface FinancialGoalsCardProps {
   companyId: string;

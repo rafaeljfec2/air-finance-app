@@ -1,6 +1,7 @@
+import axios from 'axios';
+
 import { useAuthStore } from '@/stores/auth';
 import { env } from '@/utils/env';
-import axios from 'axios';
 
 const baseURL = env.VITE_API_URL.endsWith('/v1')
   ? env.VITE_API_URL

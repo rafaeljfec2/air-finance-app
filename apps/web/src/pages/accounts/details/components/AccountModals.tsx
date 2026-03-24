@@ -1,8 +1,9 @@
 import { AccountFormModal } from '@/components/accounts/AccountFormModal';
 import { BankingIntegrationModal } from '@/components/accounts/BankingIntegrationModal';
 import { StatementScheduleConfig } from '@/components/accounts/StatementScheduleConfig';
-import { DeleteAccountModal } from './DeleteAccountModal';
 import type { Account, CreateAccount } from '@/services/accountService';
+
+import { DeleteAccountModal } from './DeleteAccountModal';
 
 interface AccountModalsProps {
   readonly formModal: {

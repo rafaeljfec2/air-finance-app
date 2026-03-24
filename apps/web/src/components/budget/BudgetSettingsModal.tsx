@@ -1,7 +1,9 @@
-import { Modal } from '@/components/ui/Modal';
-import { useBudgetSettings } from '@/hooks/useBudgetSettings';
 import { Loader2, Search, Settings } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+
+import { Modal } from '@/components/ui/Modal';
+import { useBudgetSettings } from '@/hooks/useBudgetSettings';
+
 import { BudgetSettingsCategoryList } from './BudgetSettingsCategoryList';
 
 interface BudgetSettingsModalProps {

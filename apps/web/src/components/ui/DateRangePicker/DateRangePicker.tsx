@@ -1,10 +1,12 @@
+import { Check } from 'lucide-react';
 import React, { useCallback, useEffect, useRef } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Check } from 'lucide-react';
+
+import { PresetButton, CalendarView, CustomDateInputs } from './components';
 import { PRESET_OPTIONS } from './datePresets';
 import { useDateRangePicker } from './useDateRangePicker';
-import { PresetButton, CalendarView, CustomDateInputs } from './components';
 
 interface DateRangePickerProps {
   readonly open: boolean;

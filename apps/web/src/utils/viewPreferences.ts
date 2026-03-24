@@ -3,8 +3,8 @@
  * Manages view mode preferences with expiration
  */
 
-import { setStorageItem, getStorageItem } from './storage';
 import { STORAGE_CONFIG } from './secureStorage';
+import { setStorageItem, getStorageItem } from './storage';
 
 const VIEW_PREFERENCES_KEY = 'view-preferences';
 

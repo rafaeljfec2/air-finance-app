@@ -1,9 +1,11 @@
+import { Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+
 import type { LoginFormData } from '../hooks/useLoginForm';
 
 interface LoginFormProps {

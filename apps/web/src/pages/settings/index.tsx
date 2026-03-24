@@ -1,5 +1,3 @@
-import { useSettings } from '@/hooks/useSettings';
-import { ViewDefault } from '@/layouts/ViewDefault';
 import {
   ChevronRight,
   CreditCard,
@@ -9,6 +7,9 @@ import {
   Tag,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
+import { useSettings } from '@/hooks/useSettings';
+import { ViewDefault } from '@/layouts/ViewDefault';
 
 export function Settings() {
   const navigate = useNavigate();

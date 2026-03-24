@@ -1,9 +1,10 @@
-import { User } from '@/services/userService';
-import { UserRole, UserStatus } from '@/types/user';
 import { MoreVertical, Edit, Trash2, CheckCircle2, XCircle, Shield } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { User } from '@/services/userService';
+import { UserRole, UserStatus } from '@/types/user';
 
 interface UserListItemProps {
   user: User;

@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import type {
   BalanceHistoryPoint,
   DashboardComparison,
@@ -8,7 +10,7 @@ import type {
   ExpenseByCategory,
 } from '@/types/dashboard';
 import { parseApiError } from '@/utils/apiErrorHandler';
-import { z } from 'zod';
+
 import { apiClient } from './apiClient';
 import { TransactionSchema, type Transaction } from './transactionService';
 

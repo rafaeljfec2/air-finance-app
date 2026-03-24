@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Logo } from '@/components/Logo';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+import { Logo } from '@/components/Logo';
 
 const NAV_ITEMS = [
   { label: 'Recursos', hash: '#features' },

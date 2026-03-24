@@ -1,3 +1,6 @@
+import { motion } from 'framer-motion';
+import { CheckCircle2, ChevronRight, Sparkles, Target, TrendingUp } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import {
   CardContent,
@@ -6,8 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { motion } from 'framer-motion';
-import { CheckCircle2, ChevronRight, Sparkles, Target, TrendingUp } from 'lucide-react';
 
 interface WelcomeStepProps {
   readonly onNext: () => void;

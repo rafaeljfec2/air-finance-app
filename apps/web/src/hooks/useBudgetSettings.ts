@@ -1,7 +1,8 @@
-import { getCategories, type Category } from '@/services/categoryService';
-import { budgetService, type BudgetSettings } from '@/services/budgetService';
-import { useCompanyStore } from '@/stores/company';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { budgetService, type BudgetSettings } from '@/services/budgetService';
+import { getCategories, type Category } from '@/services/categoryService';
+import { useCompanyStore } from '@/stores/company';
 
 function sortedIdsEqual(a: string[], b: string[]): boolean {
   if (a.length !== b.length) return false;

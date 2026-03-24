@@ -1,4 +1,5 @@
 import { MessageSquare } from 'lucide-react';
+
 import { ScrollReveal, StaggerContainer, StaggerItem } from './animations';
 
 interface Testimonial {

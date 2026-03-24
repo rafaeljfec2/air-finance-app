@@ -1,3 +1,5 @@
+import { useQuery } from '@tanstack/react-query';
+
 import { dashboardService } from '@/services/dashboardService';
 import type { Transaction } from '@/services/transactionService';
 import type {
@@ -8,7 +10,6 @@ import type {
   DashboardSummary,
   ExpenseByCategory,
 } from '@/types/dashboard';
-import { useQuery } from '@tanstack/react-query';
 
 export const useDashboardSummary = (companyId: string, filters: DashboardFilters) =>
   useQuery<DashboardSummary>({

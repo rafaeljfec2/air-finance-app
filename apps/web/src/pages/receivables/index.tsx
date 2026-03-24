@@ -1,5 +1,6 @@
-import { ViewDefault } from '@/layouts/ViewDefault';
 import { ArrowUp } from 'lucide-react';
+
+import { ViewDefault } from '@/layouts/ViewDefault';
 
 export function Receivables() {
   return (

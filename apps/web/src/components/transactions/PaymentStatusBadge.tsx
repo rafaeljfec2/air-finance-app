@@ -1,5 +1,6 @@
-import { cn } from '@/lib/utils';
 import { Clock, CheckCircle2, XCircle, Ban, RotateCcw } from 'lucide-react';
+
+import { cn } from '@/lib/utils';
 
 interface PaymentStatusBadgeProps {
   readonly status?: 'PROCESSANDO' | 'CONCLUIDO' | 'FALHOU' | 'CANCELADO';

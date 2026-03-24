@@ -1,6 +1,8 @@
 import { z } from 'zod';
-import { apiClient } from './apiClient';
+
 import { parseApiError } from '@/utils/apiErrorHandler';
+
+import { apiClient } from './apiClient';
 
 const InsightItemSchema = z.object({
   type: z.string(),

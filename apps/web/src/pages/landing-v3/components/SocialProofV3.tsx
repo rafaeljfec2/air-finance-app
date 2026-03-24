@@ -1,4 +1,5 @@
 import { Shield } from 'lucide-react';
+
 import { ScrollReveal } from './animations';
 
 const BANKS = [

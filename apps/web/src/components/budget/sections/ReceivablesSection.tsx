@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { BadgeStatus } from '@/components/budget';
 import {
   EmptyState,
@@ -12,7 +14,6 @@ import type { Receivable } from '@/types/budget';
 import { formatDate } from '@/utils/date';
 import { formatCurrency } from '@/utils/formatters';
 import { isFinishingInstallment } from '@/utils/installment.utils';
-import { useMemo } from 'react';
 
 interface ReceivablesSectionProps {
   readonly receivables: Receivable[];

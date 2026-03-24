@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { processExtractTransactions, type BillTransaction } from './utils/transactionProcessing';
+
 import type { CreditCardBillResponse } from '@/services/creditCardService';
+
+import { processExtractTransactions, type BillTransaction } from './utils/transactionProcessing';
 
 interface UseBillTransactionsParams {
   readonly billData: CreditCardBillResponse | undefined;

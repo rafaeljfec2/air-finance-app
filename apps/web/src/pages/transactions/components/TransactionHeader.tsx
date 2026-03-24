@@ -1,5 +1,6 @@
-import { Button } from '@/components/ui/button';
 import { Filter, Plus, Receipt } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 
 interface TransactionHeaderProps {
   showFilters: boolean;

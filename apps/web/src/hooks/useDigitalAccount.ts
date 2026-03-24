@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { getDigitalAccountById, DigitalAccount } from '../services/digitalAccountService';
 
 export const useDigitalAccount = (id: string) => {

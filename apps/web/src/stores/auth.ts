@@ -1,7 +1,8 @@
-import { AuthState } from '@/types';
-import { User } from '@/types/user';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
+import { AuthState } from '@/types';
+import { User } from '@/types/user';
 import { sanitizeUser } from '@/utils/sanitize';
 
 interface AuthStore extends AuthState {

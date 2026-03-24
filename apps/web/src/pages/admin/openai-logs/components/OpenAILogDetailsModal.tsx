@@ -1,7 +1,8 @@
+import { Bot, X } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { OpenAILog } from '@/services/openaiService';
-import { Bot, X } from 'lucide-react';
 
 interface OpenAILogDetailsModalProps {
   log: OpenAILog | null;

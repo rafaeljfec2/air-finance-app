@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+
 import { Company } from '@/types/company';
 
 function removeNonDigits(value: string): string {

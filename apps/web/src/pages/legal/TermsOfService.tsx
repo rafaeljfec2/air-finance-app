@@ -1,6 +1,6 @@
-import { Header } from '@/pages/landing/components/Header';
-import { Footer } from '@/pages/landing/components/Footer';
 import { usePageScroll } from '@/hooks/usePageScroll';
+import { Footer } from '@/pages/landing/components/Footer';
+import { Header } from '@/pages/landing/components/Header';
 
 export function TermsOfService() {
   usePageScroll();

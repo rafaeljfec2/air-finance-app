@@ -1,7 +1,8 @@
-import { useState } from 'react';
 import { Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
-import { useCreditCardInsights } from '@/hooks/useCreditCardInsights';
+import { useState } from 'react';
+
 import { resolveInsightsContent } from '@/components/insights/InsightRenderers';
+import { useCreditCardInsights } from '@/hooks/useCreditCardInsights';
 
 interface CreditCardInsightsCardProps {
   readonly companyId: string;

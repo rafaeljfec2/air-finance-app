@@ -1,3 +1,6 @@
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+
 import { Loading } from '@/components/Loading';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { useActiveCompany } from '@/hooks/useActiveCompany';
@@ -5,8 +8,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { companyService } from '@/services/companyService';
 import { Company } from '@/types/company';
 import { maskDocument } from '@/utils/formatDocument';
-import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
 
 interface CompanySelectorProps {
   size?: 'default' | 'compact' | 'large';

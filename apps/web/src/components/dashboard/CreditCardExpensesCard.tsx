@@ -1,9 +1,3 @@
-import { Card } from '@/components/ui/card';
-import { useAccounts } from '@/hooks/useAccounts';
-import { useTransactions } from '@/hooks/useTransactions';
-import type { DashboardFilters } from '@/types/dashboard';
-import { formatDateToLocalISO } from '@/utils/date';
-import { formatCurrency } from '@/utils/formatters';
 import {
   endOfDay,
   endOfMonth,
@@ -16,6 +10,13 @@ import {
 } from 'date-fns';
 import { CreditCard } from 'lucide-react';
 import { useMemo } from 'react';
+
+import { Card } from '@/components/ui/card';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useTransactions } from '@/hooks/useTransactions';
+import type { DashboardFilters } from '@/types/dashboard';
+import { formatDateToLocalISO } from '@/utils/date';
+import { formatCurrency } from '@/utils/formatters';
 
 interface CreditCardExpensesCardProps {
   companyId: string;

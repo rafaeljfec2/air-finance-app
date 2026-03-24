@@ -1,6 +1,7 @@
-import { Logo } from '@/components/Logo';
-import { useNavigate, useLocation } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+import { Logo } from '@/components/Logo';
 
 export function HeaderV2() {
   const navigate = useNavigate();

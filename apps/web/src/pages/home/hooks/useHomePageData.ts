@@ -1,11 +1,12 @@
+import { startOfMonth, endOfMonth, format } from 'date-fns';
+import { useMemo } from 'react';
+
+import { useAccounts } from '@/hooks/useAccounts';
 import { useDashboardBalanceHistory, useDashboardSummary } from '@/hooks/useDashboard';
 import { useTransactions } from '@/hooks/useTransactions';
-import { useAccounts } from '@/hooks/useAccounts';
-import { useCompanyStore } from '@/stores/company';
-import { useMemo } from 'react';
-import type { DashboardFilters } from '@/types/dashboard';
 import type { Transaction } from '@/services/transactionService';
-import { startOfMonth, endOfMonth, format } from 'date-fns';
+import { useCompanyStore } from '@/stores/company';
+import type { DashboardFilters } from '@/types/dashboard';
 
 interface TransactionWithAccount extends Transaction {
   accountName?: string;

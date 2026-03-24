@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+
 import { useAnnouncements } from '@/hooks/useAnnouncements';
-import { FeatureAnnouncementModal } from './FeatureAnnouncementModal';
 import { useAuth } from '@/hooks/useAuth';
+
+import { FeatureAnnouncementModal } from './FeatureAnnouncementModal';
 
 export function AnnouncementsProvider() {
   const { user } = useAuth();

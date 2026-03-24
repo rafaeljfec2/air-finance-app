@@ -1,11 +1,12 @@
+import { AlertTriangle, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Modal } from '@/components/ui/Modal';
 import { toast } from '@/components/ui/toast';
 import { useUsers } from '@/hooks/useUsers';
-import { AlertTriangle, Loader2 } from 'lucide-react';
-import React, { useState } from 'react';
 
 interface DeleteAllUserDataModalProps {
   open: boolean;

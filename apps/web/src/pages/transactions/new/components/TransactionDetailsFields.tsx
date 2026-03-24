@@ -1,10 +1,11 @@
+import React, { useEffect, useMemo, useRef } from 'react';
+
 import { ComboBox } from '@/components/ui/ComboBox';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Account } from '@/services/accountService';
 import { formatCurrency } from '@/utils/formatters';
-import React, { useEffect, useMemo, useRef } from 'react';
 
 type RecurrenceFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
 type TransactionKind = 'FIXED' | 'VARIABLE';

@@ -1,6 +1,7 @@
+import { AxiosError } from 'axios';
+
 import { Button } from '@/components/ui/button';
 import { ViewDefault } from '@/layouts/ViewDefault';
-import { AxiosError } from 'axios';
 
 interface RecurringTransactionsErrorStateProps {
   error: Error;

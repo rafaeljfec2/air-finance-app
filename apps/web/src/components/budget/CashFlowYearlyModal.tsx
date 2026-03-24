@@ -1,10 +1,10 @@
 import { Modal } from '@/components/ui/Modal';
 import { Spinner } from '@/components/ui/spinner';
 import { useYearlyCashFlow } from '@/hooks/useYearlyCashFlow';
+import { cn } from '@/lib/utils';
 import { useCompanyStore } from '@/stores/company';
 import type { CashFlow } from '@/types/budget';
 import { formatCurrency } from '@/utils/format';
-import { cn } from '@/lib/utils';
 
 interface CashFlowYearlyModalProps {
   readonly open: boolean;

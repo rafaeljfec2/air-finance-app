@@ -1,7 +1,8 @@
-import { Logo } from '@/components/Logo';
-import { ViewDefault } from '@/layouts/ViewDefault';
 import { AlertTriangle, Home, RefreshCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
+import { Logo } from '@/components/Logo';
+import { ViewDefault } from '@/layouts/ViewDefault';
 
 interface ErrorPageProps {
   error?: Error | null;

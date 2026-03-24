@@ -1,5 +1,6 @@
-import { ViewDefault } from '@/layouts/ViewDefault';
 import { Calendar } from 'lucide-react';
+
+import { ViewDefault } from '@/layouts/ViewDefault';
 
 export function MonthlyClosing() {
   return (

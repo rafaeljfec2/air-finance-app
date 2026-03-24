@@ -1,7 +1,9 @@
+import { useState } from 'react';
+
 import { useAuth } from '@/hooks/useAuth';
 import { usePreferencesStore } from '@/stores/preferences';
 import { useTheme } from '@/stores/useTheme';
-import { useState } from 'react';
+
 import { useHeaderNavigation } from './useHeaderNavigation';
 
 export function useHeaderActions() {

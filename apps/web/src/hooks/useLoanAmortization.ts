@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { getLoanAmortization } from '../services/loanService';
 
 interface LoanAmortization {

@@ -1,3 +1,6 @@
+import { motion } from 'framer-motion';
+import { Check, ChevronLeft, Loader2, PartyPopper } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import {
   CardContent,
@@ -6,8 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { motion } from 'framer-motion';
-import { Check, ChevronLeft, Loader2, PartyPopper } from 'lucide-react';
 
 interface FinishStepProps {
   onComplete: () => void;

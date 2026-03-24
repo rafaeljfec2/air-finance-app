@@ -1,6 +1,9 @@
 import { useState, useCallback, type FormEvent } from 'react';
-import { Account } from '@/services/accountService';
+
+import { toast } from '@/components/ui/toast';
+import { useCompanies } from '@/hooks/useCompanies';
 import { getBankCode, getAccountNumber, getPixKey } from '@/services/accountHelpers';
+import { Account } from '@/services/accountService';
 import {
   setupBankingIntegration,
   fileToText,
@@ -9,8 +12,6 @@ import {
   validatePixKey,
   type BankCredentials,
 } from '@/services/bankingIntegrationService';
-import { toast } from '@/components/ui/toast';
-import { useCompanies } from '@/hooks/useCompanies';
 
 interface UseBankingIntegrationProps {
   account: Account;

@@ -7,6 +7,7 @@ import {
   Minus,
   ArrowLeftRight,
 } from 'lucide-react';
+
 import type { TransactionType } from '../utils/parseTransactionDescription';
 
 interface TransactionIconProps {

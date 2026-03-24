@@ -1,6 +1,8 @@
+import { z } from 'zod';
+
 import type { CashFlow, CreditCard, Payable, Receivable } from '@/types/budget';
 import { parseApiError } from '@/utils/apiErrorHandler';
-import { z } from 'zod';
+
 import { apiClient } from './apiClient';
 
 const CashFlowSchema = z.object({

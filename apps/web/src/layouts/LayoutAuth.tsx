@@ -1,5 +1,6 @@
-import { useAuthStore } from '@/stores/auth';
 import { Navigate, Outlet } from 'react-router-dom';
+
+import { useAuthStore } from '@/stores/auth';
 
 export function LayoutAuth() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);

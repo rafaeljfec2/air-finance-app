@@ -1,6 +1,7 @@
-import { Logo } from '@/components/Logo';
 import { MessageSquare, Headphones } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+import { Logo } from '@/components/Logo';
 
 const footerLinks = {
   produto: [

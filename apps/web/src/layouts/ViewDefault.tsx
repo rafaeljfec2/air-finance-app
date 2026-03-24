@@ -1,13 +1,14 @@
+import { Eye } from 'lucide-react';
+import { ReactNode, useCallback, useState } from 'react';
+
 import { Header } from '@/components/layout/Header';
-import { Sidebar } from '@/components/layout/Sidebar';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
+import { Sidebar } from '@/components/layout/Sidebar';
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
 import { CompanySelectionModal } from '@/features/company/components/CompanySelectionModal';
 import { cn } from '@/lib/utils';
 import { usePreferencesStore } from '@/stores/preferences';
 import { useSidebarStore } from '@/stores/sidebar';
-import { Eye } from 'lucide-react';
-import { ReactNode, useCallback, useState } from 'react';
 
 interface ViewDefaultProps {
   children: ReactNode;

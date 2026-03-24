@@ -1,11 +1,13 @@
+import { Loader2 } from 'lucide-react';
+
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Loader2 } from 'lucide-react';
+
+import { useTransactionGridState } from './hooks/useTransactionGridState';
 import { PaginationControls } from './PaginationControls';
 import type { TransactionGridProps } from './TransactionGrid.types';
-import { TransactionTable } from './TransactionTable';
 import { TransactionMobileList } from './TransactionMobileList';
-import { useTransactionGridState } from './hooks/useTransactionGridState';
+import { TransactionTable } from './TransactionTable';
 import './TransactionGrid.css';
 
 export function TransactionGrid({

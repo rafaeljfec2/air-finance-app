@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
+
 import { useMaintenanceStore } from '@/stores/maintenance';
-import { MaintenanceScreen } from './MaintenanceScreen';
 import { env } from '@/utils/env';
+
+import { MaintenanceScreen } from './MaintenanceScreen';
 
 interface MaintenanceProviderProps {
   readonly children: React.ReactNode;

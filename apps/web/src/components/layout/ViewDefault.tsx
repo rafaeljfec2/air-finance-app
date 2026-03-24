@@ -1,9 +1,10 @@
+import { Eye } from 'lucide-react';
 import React, { useState } from 'react';
+
 import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { cn } from '@/lib/utils';
 import { usePreferencesStore } from '@/stores/preferences';
-import { Eye } from 'lucide-react';
 
 interface ViewDefaultProps {
   children: React.ReactNode;

@@ -1,3 +1,10 @@
+import { useQueryClient } from '@tanstack/react-query';
+import { format, subMonths, startOfMonth, isSameMonth } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { motion } from 'framer-motion';
+import { Banknote, BarChart3, Calendar, List } from 'lucide-react';
+import { useMemo, useState } from 'react';
+
 import { AccountBalancesCard } from '@/components/dashboard/AccountBalancesCard';
 import { CreditCardExpensesCard } from '@/components/dashboard/CreditCardExpensesCard';
 import { ExpensesDistributionCard } from '@/components/dashboard/ExpensesDistributionCard';
@@ -8,7 +15,6 @@ import { SummaryCardsRow } from '@/components/dashboard/SummaryCardsRow';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/Modal';
 import { PullToRefresh } from '@/components/ui/pullToRefresh';
-
 import {
   useDashboardBalanceHistory,
   useDashboardExpensesByCategory,
@@ -19,12 +25,6 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
 import type { DashboardFilters, DashboardTimeRange } from '@/types/dashboard';
 import { formatCurrency } from '@/utils/formatters';
-import { useQueryClient } from '@tanstack/react-query';
-import { format, subMonths, startOfMonth, isSameMonth } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { motion } from 'framer-motion';
-import { Banknote, BarChart3, Calendar, List } from 'lucide-react';
-import { useMemo, useState } from 'react';
 
 export function Dashboard() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());

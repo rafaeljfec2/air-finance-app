@@ -1,5 +1,6 @@
-import React from 'react';
 import { QrCode, Landmark, Barcode, FileText } from 'lucide-react';
+import React from 'react';
+
 import type { PaymentType } from '@/services/paymentService';
 
 interface PaymentTypeSelectorProps {

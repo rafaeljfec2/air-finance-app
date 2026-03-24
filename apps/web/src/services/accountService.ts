@@ -1,5 +1,7 @@
-import { parseApiError } from '@/utils/apiErrorHandler';
 import { z } from 'zod';
+
+import { parseApiError } from '@/utils/apiErrorHandler';
+
 import { apiClient } from './apiClient';
 
 const ContextBalanceSchema = z.object({

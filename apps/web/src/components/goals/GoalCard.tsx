@@ -1,3 +1,7 @@
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { Edit, Trash2, TrendingUp } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -7,9 +11,6 @@ import { useGoals } from '@/hooks/useGoals';
 import { cn } from '@/lib/utils';
 import { Goal } from '@/services/goalService';
 import { formatCurrency } from '@/utils/formatters';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { Edit, Trash2, TrendingUp } from 'lucide-react';
 
 const statusOptions = [
   { value: 'active', label: 'Ativa', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },

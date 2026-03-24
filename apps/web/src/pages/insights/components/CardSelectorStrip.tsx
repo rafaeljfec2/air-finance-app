@@ -1,6 +1,7 @@
 import { CreditCard as CreditCardIcon } from 'lucide-react';
-import type { CreditCard } from '@/services/creditCardService';
+
 import type { DecisionState } from '@/components/insights/InsightRenderers';
+import type { CreditCard } from '@/services/creditCardService';
 
 interface CardSelectorStripProps {
   readonly cards: readonly CreditCard[];

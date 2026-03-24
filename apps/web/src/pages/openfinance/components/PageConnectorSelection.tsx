@@ -1,6 +1,7 @@
-import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+
 import { OpeniConnectorSelector } from '@/components/accounts/OpeniConnectorSelector';
+import { Button } from '@/components/ui/button';
 import type { OpeniConnector } from '@/services/openiService';
 
 interface PageConnectorSelectionProps {

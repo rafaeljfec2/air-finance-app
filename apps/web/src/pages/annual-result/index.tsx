@@ -1,5 +1,6 @@
-import { ViewDefault } from '@/layouts/ViewDefault';
 import { BarChart3 } from 'lucide-react';
+
+import { ViewDefault } from '@/layouts/ViewDefault';
 
 export function AnnualResult() {
   return (

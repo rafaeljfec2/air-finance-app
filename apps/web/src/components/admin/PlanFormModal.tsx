@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Modal } from '@/components/ui/Modal';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { FormField } from '@/components/ui/FormField';
-import { Switch } from '@/components/ui/switch';
-import { Plan } from '@/types/subscription';
-import { UpdatePlanData } from '@/services/subscriptionService';
 import { Loader2, X, CreditCard, DollarSign, Settings, Sparkles, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { FormField } from '@/components/ui/FormField';
+import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/Modal';
+import { Switch } from '@/components/ui/switch';
+import { UpdatePlanData } from '@/services/subscriptionService';
+import { Plan } from '@/types/subscription';
 
 interface PlanFormModalProps {
   open: boolean;

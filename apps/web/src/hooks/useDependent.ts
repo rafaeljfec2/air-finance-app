@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { getDependentById, type Dependent } from '../services/dependentService';
 
 export const useDependent = (id: string) => {

@@ -1,8 +1,9 @@
+import { Banknote, Grid3x3, Landmark, List, Search, Wallet } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { Banknote, Grid3x3, Landmark, List, Search, Wallet } from 'lucide-react';
 
 const accountTypes = [
   { value: 'checking', label: 'Conta Corrente', icon: Banknote },

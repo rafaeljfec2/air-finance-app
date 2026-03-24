@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
+
 import { useDashboardExtractsSummary } from '@/hooks/useDashboard';
 import { useCompanyStore } from '@/stores/company';
-import { useMemo } from 'react';
 import type { DashboardFilters } from '@/types/dashboard';
 
 export function useHomePageDataFromExtracts() {

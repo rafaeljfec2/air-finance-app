@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Account } from '@/services/accountService';
+
 import { getInstitution, getAgency, getAccountNumber } from '@/services/accountHelpers';
+import { Account } from '@/services/accountService';
 
 export function useAccountFilters() {
   const [searchTerm, setSearchTerm] = useState('');

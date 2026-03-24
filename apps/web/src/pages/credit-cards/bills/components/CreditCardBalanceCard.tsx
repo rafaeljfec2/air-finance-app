@@ -1,7 +1,9 @@
+import { Eye, EyeOff, CreditCard } from 'lucide-react';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
-import { Eye, EyeOff, CreditCard } from 'lucide-react';
+
 import type { CreditCard as CreditCardType } from '@/services/creditCardService';
+
 import { CreditCardCardMenu } from './CreditCardCardMenu';
 
 interface CreditCardBalanceCardProps {

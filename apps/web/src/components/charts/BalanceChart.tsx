@@ -1,4 +1,3 @@
-import { formatCurrency } from '@/utils/formatters';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
@@ -11,6 +10,8 @@ import {
   YAxis,
   TooltipProps,
 } from 'recharts';
+
+import { formatCurrency } from '@/utils/formatters';
 
 interface BalanceChartProps {
   data: Array<{

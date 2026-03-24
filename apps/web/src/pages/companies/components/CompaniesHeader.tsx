@@ -1,5 +1,6 @@
-import { Button } from '@/components/ui/button';
 import { Building2, Plus } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 
 interface CompaniesHeaderProps {
   onCreate: () => void;

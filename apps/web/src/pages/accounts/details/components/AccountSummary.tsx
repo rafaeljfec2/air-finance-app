@@ -1,4 +1,5 @@
 import { TrendingUp, TrendingDown, Equal } from 'lucide-react';
+
 import type { StatementSummary } from '../hooks/types';
 import { formatCurrency } from '../utils';
 

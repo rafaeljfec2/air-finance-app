@@ -1,8 +1,10 @@
-import heroImage from '@/assets/images/landing/hero.svg';
-import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
+import heroImage from '@/assets/images/landing/hero.svg';
+import { Button } from '@/components/ui/button';
+
 import { useParallax } from '../hooks/useParallax';
 
 export function HeroSection() {

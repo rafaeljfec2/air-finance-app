@@ -1,5 +1,5 @@
-import React from 'react';
 import { ArrowLeft, Menu as MenuIcon } from 'lucide-react';
+import React from 'react';
 
 interface HeaderMobileButtonsProps {
   onOpenSidebar?: () => void;

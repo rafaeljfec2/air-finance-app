@@ -1,7 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { NewTransaction } from '../transactions/new';
+
 import { useTransactionStore } from '@/stores/transaction';
+
+import { NewTransaction } from '../transactions/new';
 
 // Mock the transaction store
 jest.mock('@/stores/transaction', () => ({

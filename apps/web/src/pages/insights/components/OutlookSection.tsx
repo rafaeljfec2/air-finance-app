@@ -1,5 +1,6 @@
-import { useState } from 'react';
 import { TrendingUp, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+
 import { formatCurrency, type DecisionState } from '@/components/insights/InsightRenderers';
 import type { ProjectionItem } from '@/services/agentService';
 

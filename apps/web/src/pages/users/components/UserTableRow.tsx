@@ -1,9 +1,10 @@
+import { CheckCircle2, Edit, Mail, Shield, Trash2, XCircle } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { formatDateTime } from '@/utils/formatters';
 import { User } from '@/services/userService';
 import { UserRole, UserStatus } from '@/types/user';
-import { CheckCircle2, Edit, Mail, Shield, Trash2, XCircle } from 'lucide-react';
+import { formatDateTime } from '@/utils/formatters';
 
 export interface UserTableRowProps {
   user: User;

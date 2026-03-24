@@ -1,4 +1,5 @@
 import { Link2, Brain, LayoutDashboard } from 'lucide-react';
+
 import { ScrollReveal, StaggerContainer, StaggerItem } from './animations';
 
 const SOLUTIONS = [

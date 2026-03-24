@@ -1,5 +1,6 @@
-import { Button } from '@/components/ui/button';
 import { Mail, Plus, Trash2, Users as UsersIcon } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 
 interface UsersHeaderProps {
   onCreateClick: () => void;

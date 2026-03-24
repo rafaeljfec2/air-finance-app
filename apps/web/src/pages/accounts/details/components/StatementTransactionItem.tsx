@@ -1,7 +1,9 @@
-import { formatCurrencyAbsolute, formatDateShort, formatDateHeader } from '../utils';
 import type { StatementTransaction } from '@/services/bankingStatementService';
-import { TransactionIcon } from './TransactionIcon';
+
+import { formatCurrencyAbsolute, formatDateShort, formatDateHeader } from '../utils';
 import { parseTransactionDescription } from '../utils/parseTransactionDescription';
+
+import { TransactionIcon } from './TransactionIcon';
 
 interface StatementTransactionItemProps {
   readonly transaction: StatementTransaction;

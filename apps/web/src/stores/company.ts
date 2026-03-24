@@ -1,7 +1,8 @@
-import { Company } from '@/types';
-import { sanitizeCompany } from '@/utils/sanitize';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
+import { Company } from '@/types';
+import { sanitizeCompany } from '@/utils/sanitize';
 
 interface CompanyStore {
   activeCompany: Company | null;
@@ -16,8 +17,7 @@ const initialState: Pick<CompanyStore, 'activeCompany'> = {
 function sanitizeCompanyForStorage(company: Company | null): Partial<Company> | null {
   if (!company) return null;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { userIds, ...safeCompany } = company;
+  const { userIds: _userIds, ...safeCompany } = company;
   return safeCompany;
 }
 

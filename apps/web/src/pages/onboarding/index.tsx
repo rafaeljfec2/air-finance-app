@@ -1,8 +1,10 @@
-import { useActiveCompany } from '@/hooks/useActiveCompany';
-import { useAuth } from '@/hooks/useAuth';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { useActiveCompany } from '@/hooks/useActiveCompany';
+import { useAuth } from '@/hooks/useAuth';
+
 import { OnboardingFlow } from './OnboardingFlow';
 
 export default function OnboardingPage() {

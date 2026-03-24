@@ -1,9 +1,10 @@
+import { Hash } from 'lucide-react';
+import type { ChangeEvent } from 'react';
+
 import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import type { CreateAccount } from '@/services/accountService';
-import { Hash } from 'lucide-react';
-import type { ChangeEvent } from 'react';
 
 interface BankingFieldsSectionProps {
   form: CreateAccount;

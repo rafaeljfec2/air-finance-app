@@ -1,14 +1,3 @@
-import { cn } from '@/lib/utils';
-import { Account } from '@/services/accountService';
-import {
-  getInstitution,
-  getBankCode,
-  getAgency,
-  getAccountNumber,
-  getAccountTypeLabel,
-  hasBankingIntegration as hasIntegration,
-} from '@/services/accountHelpers';
-import { formatCurrency } from '@/utils/formatters';
 import {
   Banknote,
   Landmark,
@@ -21,11 +10,23 @@ import {
   Link2,
   Clock,
 } from 'lucide-react';
+
+import { BankIcon } from '@/components/bank/BankIcon';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useBanks } from '@/hooks/useBanks';
-import { BankIcon } from '@/components/bank/BankIcon';
+import { cn } from '@/lib/utils';
+import {
+  getInstitution,
+  getBankCode,
+  getAgency,
+  getAccountNumber,
+  getAccountTypeLabel,
+  hasBankingIntegration as hasIntegration,
+} from '@/services/accountHelpers';
+import { Account } from '@/services/accountService';
 import { hasBankLogo } from '@/utils/bankIcons';
+import { formatCurrency } from '@/utils/formatters';
 
 const accountTypes = [
   { value: 'checking', label: 'Conta Corrente', icon: Banknote },

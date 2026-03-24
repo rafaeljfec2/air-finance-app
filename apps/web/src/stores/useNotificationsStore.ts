@@ -1,5 +1,6 @@
-import { notificationService } from '@/services/notificationService';
 import { create } from 'zustand';
+
+import { notificationService } from '@/services/notificationService';
 
 export type NotificationType =
   | 'INFO'

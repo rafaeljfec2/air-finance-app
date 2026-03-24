@@ -1,9 +1,10 @@
+import { Eye, Terminal } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { SortableColumn, SortConfig } from '@/components/ui/SortableColumn';
 import { OpenAILog } from '@/services/openaiService';
-import { Eye, Terminal } from 'lucide-react';
 
 interface OpenAILogsTableProps {
   logs: OpenAILog[];

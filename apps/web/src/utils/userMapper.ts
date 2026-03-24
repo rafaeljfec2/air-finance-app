@@ -1,3 +1,4 @@
+import { User as ApiUser } from '@/services/userService';
 import {
   User as UserType,
   UserRole,
@@ -9,7 +10,6 @@ import {
   UserDateFormat,
   OpenaiModel,
 } from '@/types/user';
-import { User as ApiUser } from '@/services/userService';
 
 export function mapUserServiceToUserType(apiUser: ApiUser): UserType {
   return {

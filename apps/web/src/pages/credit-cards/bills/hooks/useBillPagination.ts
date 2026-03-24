@@ -1,6 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect, useCallback, useRef } from 'react';
+
 import { getCreditCardBill, type CreditCardBillResponse } from '@/services/creditCardService';
+
 import { createInitialPaginationState, type PaginationState } from './utils/stateManagement';
 
 interface UseBillPaginationParams {

@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+
 import { registerGlobalErrorListeners } from '@/components/error/ErrorBoundary';
+
 import { App } from './App';
 import './index.css';
 

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { User } from '@/services/userService';
+
 import { useViewMode } from '@/hooks/useViewMode';
+import { User } from '@/services/userService';
 
 /**
  * Hook to manage user filtering and search

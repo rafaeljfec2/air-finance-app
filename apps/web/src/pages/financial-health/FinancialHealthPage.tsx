@@ -1,11 +1,12 @@
-import { IndebtednessCard } from '@/components/dashboard/IndebtednessCard';
-import { PullToRefresh } from '@/components/ui/pullToRefresh';
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { useCompanyStore } from '@/stores/company';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Banknote } from 'lucide-react';
 import { useState } from 'react';
+
+import { IndebtednessCard } from '@/components/dashboard/IndebtednessCard';
+import { PullToRefresh } from '@/components/ui/pullToRefresh';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { useCompanyStore } from '@/stores/company';
 
 export function FinancialHealthPage() {
   const { activeCompany } = useCompanyStore();

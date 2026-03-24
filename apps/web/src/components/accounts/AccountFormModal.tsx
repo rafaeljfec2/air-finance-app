@@ -1,16 +1,18 @@
-import { ComboBoxOption } from '@/components/ui/ComboBox';
-import { Modal } from '@/components/ui/Modal';
-import { Button } from '@/components/ui/button';
-import type { Account, CreateAccount } from '@/services/accountService';
-import { getBankCode, hasBankingIntegration as hasIntegration } from '@/services/accountHelpers';
 import { CreditCard, X, Link2 } from 'lucide-react';
 import { useMemo } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { ComboBoxOption } from '@/components/ui/ComboBox';
+import { Modal } from '@/components/ui/Modal';
+import { useBanks } from '@/hooks/useBanks';
+import { getBankCode, hasBankingIntegration as hasIntegration } from '@/services/accountHelpers';
+import type { Account, CreateAccount } from '@/services/accountService';
+
+import { BalanceSection } from './components/BalanceSection';
 import { BankingFieldsSection } from './components/BankingFieldsSection';
 import { BasicInfoSection } from './components/BasicInfoSection';
-import { BalanceSection } from './components/BalanceSection';
 import { accountTypes, type AccountType } from './constants';
 import { useAccountFormModal } from './hooks/useAccountFormModal';
-import { useBanks } from '@/hooks/useBanks';
 
 function getModalTitle(account: Account | null | undefined): string {
   if (account) return 'Editar Conta';

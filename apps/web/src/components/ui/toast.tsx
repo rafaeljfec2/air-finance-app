@@ -1,5 +1,6 @@
-import { toast as sonnerToast } from 'sonner';
 import { CheckCircle2, XCircle, AlertCircle, Info, Loader2 } from 'lucide-react';
+import { toast as sonnerToast } from 'sonner';
+
 import { cn } from '@/lib/utils';
 
 const toastStyles = {

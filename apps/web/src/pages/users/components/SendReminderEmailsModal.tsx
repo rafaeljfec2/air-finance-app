@@ -1,3 +1,6 @@
+import { Loader2, Mail } from 'lucide-react';
+import { useCallback, useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/Modal';
 import { toast } from '@/components/ui/toast';
@@ -6,8 +9,6 @@ import {
   type ReminderEmailType,
   type SendReminderEmailsResult,
 } from '@/services/userService';
-import { Loader2, Mail } from 'lucide-react';
-import { useCallback, useState } from 'react';
 
 interface SendReminderEmailsModalProps {
   open: boolean;

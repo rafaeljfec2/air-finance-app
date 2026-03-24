@@ -1,3 +1,9 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { motion } from 'framer-motion';
+import { AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+
 import { Button } from '@/components/ui/button';
 import {
   CardContent,
@@ -11,11 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatDateToLocalISO } from '@/utils/date';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { motion } from 'framer-motion';
-import { AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+
 import { type GoalFormData, GoalSchema } from '../schemas';
 
 interface GoalsStepProps {

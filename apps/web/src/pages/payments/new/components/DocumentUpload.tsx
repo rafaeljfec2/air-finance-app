@@ -1,7 +1,8 @@
-import React, { useRef, useState, useCallback } from 'react';
-import { cn } from '@/lib/utils';
 import { Upload, FileText, X, Loader2, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import React, { useRef, useState, useCallback } from 'react';
+
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error';
 

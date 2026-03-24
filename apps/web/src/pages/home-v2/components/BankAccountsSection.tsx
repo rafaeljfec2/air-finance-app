@@ -1,10 +1,11 @@
-import { formatCurrency } from '@/utils/formatters';
 import { Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { AccountSummaryItem } from '@/services/accountService';
+
 import { BankIcon } from '@/components/bank/BankIcon';
-import { hasBankLogo } from '@/utils/bankIcons';
 import { cn } from '@/lib/utils';
+import type { AccountSummaryItem } from '@/services/accountService';
+import { hasBankLogo } from '@/utils/bankIcons';
+import { formatCurrency } from '@/utils/formatters';
 
 interface BankAccountsSectionProps {
   accounts: AccountSummaryItem[];

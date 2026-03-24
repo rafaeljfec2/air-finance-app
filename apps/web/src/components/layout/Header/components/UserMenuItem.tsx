@@ -1,5 +1,6 @@
 import { MenuItem } from '@headlessui/react';
 import type { LucideIcon } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 
 interface UserMenuItemProps {

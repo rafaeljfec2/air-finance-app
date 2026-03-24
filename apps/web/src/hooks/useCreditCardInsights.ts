@@ -1,11 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { toast } from '@/components/ui/toast';
-import { parseApiError, getUserFriendlyMessage, logApiError } from '@/utils/apiErrorHandler';
 import {
   getCreditCardInsights,
   generateCreditCardInsights,
   type CreditCardInsight,
 } from '@/services/agentService';
+import { parseApiError, getUserFriendlyMessage, logApiError } from '@/utils/apiErrorHandler';
 
 const INSIGHTS_STALE_TIME = 5 * 60 * 1000;
 

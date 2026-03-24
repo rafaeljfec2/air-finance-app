@@ -1,10 +1,12 @@
+import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
+import { memo } from 'react';
+
+import { PaymentStatusBadge } from '@/components/transactions/PaymentStatusBadge';
 import { Tooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatters';
-import { memo } from 'react';
-import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
+
 import { TransactionActions } from './TransactionActions';
-import { PaymentStatusBadge } from '@/components/transactions/PaymentStatusBadge';
 import type { TransactionGridTransaction } from './TransactionGrid.types';
 import { formatTransactionDate } from './TransactionGrid.utils';
 

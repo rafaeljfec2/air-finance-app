@@ -1,4 +1,5 @@
 import { Banknote, Wallet, Landmark, type LucideIcon } from 'lucide-react';
+
 import type { Account } from '@/services/accountService';
 
 export const DEFAULT_ACCOUNT_COLOR = '#8A05BE';

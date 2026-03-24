@@ -1,15 +1,17 @@
+import { Upload } from 'lucide-react';
+import { useState } from 'react';
+
 import { Loading } from '@/components/Loading';
-import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/button';
+import { Modal } from '@/components/ui/Modal';
 import { Switch } from '@/components/ui/switch';
 import type { Account } from '@/services/accountService';
 import type { ImportOfxResponse, InstallmentTransaction } from '@/services/transactionService';
-import { Upload } from 'lucide-react';
-import { useState } from 'react';
+
 import { AccountSelector } from './AccountSelector';
 import { FileUploadArea } from './FileUploadArea';
-import { InstallmentsModal } from './InstallmentsModal';
 import { useFileUpload } from './hooks/useFileUpload';
+import { InstallmentsModal } from './InstallmentsModal';
 
 interface ImportOfxModalProps {
   open: boolean;

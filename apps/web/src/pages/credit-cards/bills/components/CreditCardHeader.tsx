@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   ArrowLeft,
   Eye,
@@ -11,14 +10,17 @@ import {
   Trash2,
   Plus,
 } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useState } from 'react';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import type { CreditCard as CreditCardType } from '@/services/creditCardService';
+
 import { formatCurrency, calculateUsagePercentage } from '../utils';
 
 interface CreditCardHeaderProps {

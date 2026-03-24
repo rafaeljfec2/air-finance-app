@@ -1,6 +1,7 @@
-import { ComboBox, type ComboBoxOption } from '@/components/ui/ComboBox';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import React, { useMemo } from 'react';
+
+import { ComboBox, type ComboBoxOption } from '@/components/ui/ComboBox';
 
 const months = [
   'Janeiro',

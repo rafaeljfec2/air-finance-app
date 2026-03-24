@@ -1,6 +1,7 @@
+import { CreditCard as CreditCardIcon, Plus } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { CreditCard as CreditCardIcon, Plus } from 'lucide-react';
 
 interface CreditCardsEmptyStateProps {
   hasFilters: boolean;

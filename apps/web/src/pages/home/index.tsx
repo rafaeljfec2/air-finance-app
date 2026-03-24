@@ -1,17 +1,19 @@
-import { ViewDefault } from '@/layouts/ViewDefault';
-import { usePreferencesStore } from '@/stores/preferences';
+import { ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+
 import { TransactionTypeModal } from '@/components/transactions/TransactionTypeModal';
-import { HomeHeader } from './components/HomeHeader';
+import { useAccounts } from '@/hooks/useAccounts';
+import { ViewDefault } from '@/layouts/ViewDefault';
+import { usePreferencesStore } from '@/stores/preferences';
+
 import { CashComposition } from './components/CashComposition';
+import { HomeHeader } from './components/HomeHeader';
 import { MonthlySummaryBar } from './components/MonthlySummaryBar';
 import { QuickActionsGrid } from './components/QuickActionsGrid';
 import { RecentTransactionsList } from './components/RecentTransactionsList';
 import { createQuickActions } from './constants/quickActions';
 import { useHomePageData } from './hooks/useHomePageData';
-import { useAccounts } from '@/hooks/useAccounts';
 
 export function HomePage() {
   const { isPrivacyModeEnabled, togglePrivacyMode } = usePreferencesStore();

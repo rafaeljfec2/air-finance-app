@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { toast } from '@/components/ui/toast';
+import { useAccounts } from '@/hooks/useAccounts';
 import { createAccount, type CreateAccount } from '@/services/accountService';
 import { createItem } from '@/services/openiService';
-import { useAccounts } from '@/hooks/useAccounts';
+
 import { processConflictError } from './handlers/openiStatusHandlers';
 import type { ModalStep } from './handlers/openiStatusHandlers';
 

@@ -1,7 +1,9 @@
-import { Logo } from '@/components/Logo';
 import { MessageSquare, Headphones } from 'lucide-react';
-import { ScrollReveal } from './ScrollReveal';
 import { Link } from 'react-router-dom';
+
+import { Logo } from '@/components/Logo';
+
+import { ScrollReveal } from './ScrollReveal';
 
 const footerLinks = {
   produto: [

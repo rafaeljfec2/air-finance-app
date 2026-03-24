@@ -1,6 +1,8 @@
 import { useEffect, useRef, useMemo } from 'react';
-import { StatementTransactionItem } from './StatementTransactionItem';
+
 import type { StatementTransaction } from '@/services/bankingStatementService';
+
+import { StatementTransactionItem } from './StatementTransactionItem';
 
 interface StatementTransactionListProps {
   readonly transactions: ReadonlyArray<StatementTransaction>;

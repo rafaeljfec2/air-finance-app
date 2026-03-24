@@ -1,7 +1,9 @@
 import { Menu, MenuButton, MenuItems } from '@headlessui/react';
 import { CircleUser, Eye, EyeOff, LifeBuoy, LogOut, Settings } from 'lucide-react';
 import { useState } from 'react';
+
 import { useAuthStore } from '@/stores/auth';
+
 import { UserMenuItem } from './UserMenuItem';
 
 interface UserMenuProps {

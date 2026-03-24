@@ -1,7 +1,9 @@
-import { formatCurrency } from '@/utils/formatters';
 import { useMemo } from 'react';
-import type { TransactionGridTransaction } from './TransactionGrid.types';
+
+import { formatCurrency } from '@/utils/formatters';
+
 import { EmptyState } from './EmptyState';
+import type { TransactionGridTransaction } from './TransactionGrid.types';
 import { MobileCard } from './TransactionMobileCard';
 
 interface TransactionMobileListProps {

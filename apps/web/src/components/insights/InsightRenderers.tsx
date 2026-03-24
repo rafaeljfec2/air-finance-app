@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- module exports helpers and components together */
 import {
   AlertTriangle,
   BarChart3,

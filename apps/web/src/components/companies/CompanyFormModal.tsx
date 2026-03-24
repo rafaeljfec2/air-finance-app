@@ -1,17 +1,18 @@
+import { Building2, FileText, Mail, MapPin, Phone, X } from 'lucide-react';
+import type { ChangeEvent, FormEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
+import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { FormField } from '@/components/ui/FormField';
-import { Modal } from '@/components/ui/Modal';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/Modal';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { CreateCompany } from '@/services/companyService';
 import { Company } from '@/types/company';
 import { formatDateToLocalISO } from '@/utils/date';
 import { formatDocument, unformatDocument } from '@/utils/formatDocument';
-import { Building2, FileText, Mail, MapPin, Phone, X } from 'lucide-react';
-import type { ChangeEvent, FormEvent } from 'react';
-import { useEffect, useMemo, useState } from 'react';
 
 const typeOptions = [
   { value: 'matriz', label: 'Matriz' },

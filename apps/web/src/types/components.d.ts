@@ -1,6 +1,6 @@
 declare module '@/components/ui/tabs' {
-  import * as React from 'react';
   import * as TabsPrimitive from '@radix-ui/react-tabs';
+  import * as React from 'react';
 
   interface TabsProps extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root> {
     className?: string;

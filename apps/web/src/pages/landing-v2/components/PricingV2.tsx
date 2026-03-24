@@ -1,5 +1,6 @@
 import { Check, ExternalLink, Sparkles, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
 import { env } from '@/utils/env';
 
 const plans = [

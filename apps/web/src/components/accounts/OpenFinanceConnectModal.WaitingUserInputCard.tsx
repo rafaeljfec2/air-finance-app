@@ -1,6 +1,7 @@
+import { AlertCircle, ExternalLink } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle, ExternalLink } from 'lucide-react';
 
 interface WaitingUserInputCardProps {
   readonly authUrl?: string;

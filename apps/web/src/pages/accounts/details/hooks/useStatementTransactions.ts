@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+
 import type { StatementTransaction } from '@/services/bankingStatementService';
+
 import type { UseStatementTransactionsParams } from './types';
 
 export function useStatementTransactions({

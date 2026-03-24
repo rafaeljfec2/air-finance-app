@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import {
   ArrowLeft,
   MoreVertical,
@@ -14,16 +15,16 @@ import {
   Trash2,
   Plus,
 } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import type { CreditCard as CreditCardType } from '@/services/creditCardService';
 
 interface CreditCardBillHeaderProps {

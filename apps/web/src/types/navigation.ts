@@ -1,4 +1,5 @@
 import { ForwardRefExoticComponent, SVGProps } from 'react';
+
 import { UserRole } from './user';
 
 export type NavigationIcon = ForwardRefExoticComponent<

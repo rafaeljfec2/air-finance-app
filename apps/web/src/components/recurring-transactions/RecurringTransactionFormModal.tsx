@@ -1,3 +1,5 @@
+import type { FormEvent } from 'react';
+
 import { Modal } from '@/components/ui/Modal';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCategories } from '@/hooks/useCategories';
@@ -6,7 +8,7 @@ import type {
   RecurringTransaction,
 } from '@/services/recurringTransactionService';
 import { useCompanyStore } from '@/stores/company';
-import type { FormEvent } from 'react';
+
 import { BasicInfoSection } from './components/BasicInfoSection';
 import { ModalFooter } from './components/ModalFooter';
 import { ModalHeader } from './components/ModalHeader';

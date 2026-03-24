@@ -1,8 +1,10 @@
-import { FormField } from '@/components/ui/FormField';
+import { Palette } from 'lucide-react';
+
 import { ColorPicker } from '@/components/ui/color-picker';
+import { FormField } from '@/components/ui/FormField';
 import { IconPicker } from '@/components/ui/icon-picker';
 import type { CreateAccount } from '@/services/accountService';
-import { Palette } from 'lucide-react';
+
 import { accountTypes } from '../constants';
 
 interface CustomizationSectionProps {

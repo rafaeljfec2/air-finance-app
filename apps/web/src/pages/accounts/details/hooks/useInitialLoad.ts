@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+
 import type { StatementResponse } from '@/services/bankingStatementService';
 
 interface UseInitialLoadParams {

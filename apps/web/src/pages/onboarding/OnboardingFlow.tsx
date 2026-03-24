@@ -1,8 +1,10 @@
-import { Card } from '@/components/ui/card';
-import { apiClient as api } from '@/services/apiClient';
 import { AnimatePresence } from 'framer-motion';
 import { Banknote, Building2, CheckCircle2, CreditCard, Sparkles, Tags } from 'lucide-react';
 import { useState } from 'react';
+
+import { Card } from '@/components/ui/card';
+import { apiClient as api } from '@/services/apiClient';
+
 import { AccountStep } from './components/AccountStep';
 import { CategoriesStep } from './components/CategoriesStep';
 import { CompanyStep } from './components/CompanyStep';

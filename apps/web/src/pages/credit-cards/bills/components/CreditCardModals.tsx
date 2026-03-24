@@ -1,6 +1,7 @@
 import { CreditCardFormModal } from '@/components/credit-cards/CreditCardFormModal';
-import { DeleteCreditCardModal } from './DeleteCreditCardModal';
 import type { CreditCard, CreateCreditCardPayload } from '@/services/creditCardService';
+
+import { DeleteCreditCardModal } from './DeleteCreditCardModal';
 
 interface CreditCardModalsProps {
   readonly formModal: {

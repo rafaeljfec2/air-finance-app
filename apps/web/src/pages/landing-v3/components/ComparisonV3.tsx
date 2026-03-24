@@ -1,6 +1,7 @@
-import { Check, X, Minus } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Check, X, Minus } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
+
 import { ScrollReveal } from './animations';
 
 type ComparisonStatus = 'yes' | 'no' | 'partial';

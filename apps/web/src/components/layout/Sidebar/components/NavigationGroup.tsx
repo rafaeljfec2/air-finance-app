@@ -1,9 +1,11 @@
-import { NavigationGroupItem, NavigationItem } from '@/types/navigation';
-import { cn } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { NavigationSubmenu } from './NavigationSubmenu';
+
+import { cn } from '@/lib/utils';
+import { NavigationGroupItem, NavigationItem } from '@/types/navigation';
+
 import { NavigationItem as NavigationItemComponent } from './NavigationItem';
+import { NavigationSubmenu } from './NavigationSubmenu';
 
 interface NavigationGroupProps {
   item: NavigationItem;

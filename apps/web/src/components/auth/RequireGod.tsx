@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
+
 import { Spinner } from '@/components/ui/spinner';
 import { getCurrentUser } from '@/services/authService';
 import { useAuthStore } from '@/stores/auth';
-import { Navigate, Outlet } from 'react-router-dom';
 
 export function RequireGod({ children }: { children?: React.ReactNode }) {
   const { user, isAuthenticated } = useAuthStore();

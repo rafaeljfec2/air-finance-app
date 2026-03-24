@@ -1,4 +1,5 @@
 import { Modal } from '@/components/ui/Modal';
+
 import { OnboardingFlow } from './OnboardingFlow';
 
 export interface OnboardingModalProps {

@@ -1,10 +1,11 @@
-import { useMemo } from 'react';
 import { CheckCircle2, Clock, Loader2 } from 'lucide-react';
+import { useMemo } from 'react';
+
+import { ConnectionStatusIndicator } from './OpenFinanceConnectModal.ConnectionStatusIndicator';
+import type { ConnectionStatusIndicatorProps } from './OpenFinanceConnectModal.ConnectionStatusIndicator';
 import { LoadingState } from './OpenFinanceConnectModal.LoadingState';
 import { StatusCard } from './OpenFinanceConnectModal.StatusCard';
 import { WaitingUserInputCard } from './OpenFinanceConnectModal.WaitingUserInputCard';
-import { ConnectionStatusIndicator } from './OpenFinanceConnectModal.ConnectionStatusIndicator';
-import type { ConnectionStatusIndicatorProps } from './OpenFinanceConnectModal.ConnectionStatusIndicator';
 
 interface OAuthWaitingStepProps {
   readonly itemStatus: {

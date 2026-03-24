@@ -1,9 +1,10 @@
+import { useMemo } from 'react';
+
 import { Card } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { useDashboardComparison } from '@/hooks/useDashboard';
 import type { DashboardComparison, DashboardFilters } from '@/types/dashboard';
 import { formatCurrency } from '@/utils/formatters';
-import { useMemo } from 'react';
 
 interface MonthlyComparisonCardProps {
   companyId: string;

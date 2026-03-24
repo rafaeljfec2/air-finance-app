@@ -1,13 +1,14 @@
-import { formatCurrency } from '@/utils/formatters';
+import { useQuery } from '@tanstack/react-query';
+import { Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+import { BankIcon } from '@/components/bank/BankIcon';
 import { Card } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
-import { useQuery } from '@tanstack/react-query';
-import { getAccountsSummaryFromExtracts } from '@/services/accountService';
-import { BankIcon } from '@/components/bank/BankIcon';
-import { hasBankLogo } from '@/utils/bankIcons';
 import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { getAccountsSummaryFromExtracts } from '@/services/accountService';
+import { hasBankLogo } from '@/utils/bankIcons';
+import { formatCurrency } from '@/utils/formatters';
 
 interface AccountBalancesCardProps {
   companyId: string;

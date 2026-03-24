@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { budgetService } from '@/services/budgetService';
 import type { CashFlow } from '@/types/budget';
 

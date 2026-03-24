@@ -1,10 +1,12 @@
+import { Repeat } from 'lucide-react';
+
 import { DatePicker } from '@/components/ui/DatePicker';
 import { FormField } from '@/components/ui/FormField';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
-import { parseLocalDate } from '@/utils/date';
 import { cn } from '@/lib/utils';
 import type { CreateRecurringTransaction } from '@/services/recurringTransactionService';
-import { Repeat } from 'lucide-react';
+import { parseLocalDate } from '@/utils/date';
+
 import { FREQUENCY_OPTIONS } from '../constants';
 
 interface RecurrenceSectionProps {

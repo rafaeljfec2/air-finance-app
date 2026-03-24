@@ -1,4 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { toast } from '@/components/ui/toast';
+import { parseApiError, getUserFriendlyMessage, logApiError } from '@/utils/apiErrorHandler';
+
 import {
   getCategories,
   getCategoryById,
@@ -8,8 +12,6 @@ import {
   type Category,
   type CreateCategory,
 } from '../services/categoryService';
-import { toast } from '@/components/ui/toast';
-import { parseApiError, getUserFriendlyMessage, logApiError } from '@/utils/apiErrorHandler';
 
 export const useCategories = (companyId: string) => {
   const queryClient = useQueryClient();

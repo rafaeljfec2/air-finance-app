@@ -1,6 +1,6 @@
 import { motion, type Variants, AnimatePresence } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
 import { type ReactNode } from 'react';
+import { useInView } from 'react-intersection-observer';
 
 interface ScrollRevealProps {
   readonly children: ReactNode;

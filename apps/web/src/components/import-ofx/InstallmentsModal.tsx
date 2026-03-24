@@ -1,10 +1,11 @@
-import { Loading } from '@/components/Loading';
-import { Modal } from '@/components/ui/Modal';
-import { Button } from '@/components/ui/button';
-import type { InstallmentTransaction } from '@/services/transactionService';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AlertCircle } from 'lucide-react';
+
+import { Loading } from '@/components/Loading';
+import { Button } from '@/components/ui/button';
+import { Modal } from '@/components/ui/Modal';
+import type { InstallmentTransaction } from '@/services/transactionService';
 
 interface InstallmentsModalProps {
   open: boolean;
@@ -20,7 +21,7 @@ export function InstallmentsModal({
   open,
   onClose,
   installments,
-  accountId: _accountId, // eslint-disable-line @typescript-eslint/no-unused-vars
+  accountId: _accountId,
   periodEnd,
   onConfirm,
   isCreating = false,

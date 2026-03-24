@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ShoppingCart, CreditCard, Utensils, Car, Plane, Tv, Gift } from 'lucide-react';
+
 import { formatCurrencyAbsolute, parseLocalDate } from '../utils';
 
 interface Transaction {

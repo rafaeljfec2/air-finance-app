@@ -1,5 +1,6 @@
-import type { MouseEvent } from 'react';
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import type { MouseEvent } from 'react';
+
 import {
   DropdownMenu,
   DropdownMenuContent,

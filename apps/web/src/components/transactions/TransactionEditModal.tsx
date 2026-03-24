@@ -1,16 +1,18 @@
+import React, { useEffect, useMemo, useState } from 'react';
+
+import { Button } from '@/components/ui/button';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { DatePicker } from '@/components/ui/DatePicker';
-import { Modal } from '@/components/ui/Modal';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/Modal';
 import { Textarea } from '@/components/ui/textarea';
 import { useTransactions } from '@/hooks/useTransactions';
-import type { Account } from '@/services/accountService';
 import { getInstitution } from '@/services/accountHelpers';
+import type { Account } from '@/services/accountService';
 import type { Category } from '@/services/categoryService';
 import { useCompanyStore } from '@/stores/company';
 import { formatDateToLocalISO } from '@/utils/date';
-import React, { useEffect, useMemo, useState } from 'react';
+
 import type { TransactionGridTransaction } from './TransactionGrid.types';
 
 interface TransactionEditModalProps {

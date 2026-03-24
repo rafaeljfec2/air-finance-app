@@ -1,5 +1,6 @@
 import { Modal } from '@/components/ui/Modal';
 import type { CashFlow, CreditCard, CreditCardBill, Payable, Receivable } from '@/types/budget';
+
 import { CashFlowSection } from './sections/CashFlowSection';
 import { CreditCardsSection } from './sections/CreditCardsSection';
 import { PayablesSection } from './sections/PayablesSection';

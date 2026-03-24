@@ -1,9 +1,12 @@
-import { useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useMemo } from 'react';
+
 import type { CreditCard } from '@/services/creditCardService';
+
 import { useHorizontalScroll } from '../hooks/useHorizontalScroll';
-import { CreditCardBalanceCard } from './CreditCardBalanceCard';
+
 import { AddCreditCardCard } from './AddCreditCardCard';
+import { CreditCardBalanceCard } from './CreditCardBalanceCard';
 
 interface CreditCardCardsContainerProps {
   readonly creditCards: ReadonlyArray<CreditCard>;

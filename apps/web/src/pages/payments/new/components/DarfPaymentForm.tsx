@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import { QrCode, Zap } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+
+import { ComboBox } from '@/components/ui/ComboBox';
 import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/input';
-import { ComboBox } from '@/components/ui/ComboBox';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 
 interface DarfPaymentFormProps {

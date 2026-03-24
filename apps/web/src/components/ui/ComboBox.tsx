@@ -1,7 +1,9 @@
-import { cn } from '@/lib/utils';
 import { X } from 'lucide-react';
 import * as React from 'react';
 import { useEffect } from 'react';
+
+import { cn } from '@/lib/utils';
+
 import { Select, SelectContent, SelectItem, SelectTrigger } from './select';
 
 export interface ComboBoxOption<T = string> {

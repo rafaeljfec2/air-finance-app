@@ -1,6 +1,9 @@
+import { Banknote, Edit, Landmark, Trash2, Wallet, Link2, Clock } from 'lucide-react';
+
+import { BankIcon } from '@/components/bank/BankIcon';
 import { Button } from '@/components/ui/button';
+import { useBanks } from '@/hooks/useBanks';
 import { cn } from '@/lib/utils';
-import { Account } from '@/services/accountService';
 import {
   getInstitution,
   getBankCode,
@@ -9,11 +12,9 @@ import {
   getAccountTypeLabel,
   hasBankingIntegration as hasIntegration,
 } from '@/services/accountHelpers';
-import { formatCurrency } from '@/utils/formatters';
-import { Banknote, Edit, Landmark, Trash2, Wallet, Link2, Clock } from 'lucide-react';
-import { useBanks } from '@/hooks/useBanks';
-import { BankIcon } from '@/components/bank/BankIcon';
+import { Account } from '@/services/accountService';
 import { hasBankLogo } from '@/utils/bankIcons';
+import { formatCurrency } from '@/utils/formatters';
 
 interface AccountTableRowProps {
   account: Account;

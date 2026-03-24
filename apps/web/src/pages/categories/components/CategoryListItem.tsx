@@ -1,4 +1,3 @@
-import { Category } from '@/services/categoryService';
 import {
   Gift,
   Landmark,
@@ -11,8 +10,10 @@ import {
   Edit,
   Trash2,
 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Category } from '@/services/categoryService';
 
 const iconOptions = [
   { value: 'TagIcon', icon: Tag },

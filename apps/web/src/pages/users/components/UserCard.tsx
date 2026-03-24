@@ -1,6 +1,3 @@
-import { cn } from '@/lib/utils';
-import { User } from '@/services/userService';
-import { UserRole, UserStatus } from '@/types/user';
 import {
   CheckCircle2,
   Mail,
@@ -11,8 +8,12 @@ import {
   Trash2,
   Shield,
 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { User } from '@/services/userService';
+import { UserRole, UserStatus } from '@/types/user';
 
 interface UserCardProps {
   user: User;

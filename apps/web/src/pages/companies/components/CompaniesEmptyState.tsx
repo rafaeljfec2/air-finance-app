@@ -1,6 +1,7 @@
+import { Building2, Plus } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Building2, Plus } from 'lucide-react';
 
 interface CompaniesEmptyStateProps {
   hasFilters: boolean;

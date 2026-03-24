@@ -1,12 +1,14 @@
 import { useMemo } from 'react';
-import { useCompanyStore } from '@/stores/company';
+
 import { useCategories } from '@/hooks/useCategories';
-import { useCreditCardQueries } from './useCreditCardQueries';
-import { useBillTransactions } from './useBillTransactions';
-import { useBillPagination } from './useBillPagination';
-import { useCurrentBill } from './utils/billConstruction';
-import { useInitialLoad } from './useInitialLoad';
+import { useCompanyStore } from '@/stores/company';
+
 import type { UseCreditCardBillsReturn } from './types';
+import { useBillPagination } from './useBillPagination';
+import { useBillTransactions } from './useBillTransactions';
+import { useCreditCardQueries } from './useCreditCardQueries';
+import { useInitialLoad } from './useInitialLoad';
+import { useCurrentBill } from './utils/billConstruction';
 
 export function useCreditCardBills(
   cardId: string,

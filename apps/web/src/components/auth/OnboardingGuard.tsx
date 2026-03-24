@@ -1,9 +1,10 @@
-import { OnboardingModalProvider } from '@/pages/onboarding/OnboardingModalProvider';
-import { useAuth } from '@/hooks/useAuth';
-import { getUserRedirectInfo } from '@/utils/authRedirect';
 import { Loader2 } from 'lucide-react';
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+
+import { useAuth } from '@/hooks/useAuth';
+import { OnboardingModalProvider } from '@/pages/onboarding/OnboardingModalProvider';
+import { getUserRedirectInfo } from '@/utils/authRedirect';
 
 interface OnboardingGuardProps {
   readonly children: React.ReactNode;

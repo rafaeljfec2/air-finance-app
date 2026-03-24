@@ -1,5 +1,6 @@
-import { Button } from '@/components/ui/button';
 import { CreditCard, Plus, Sparkles, TrendingUp, Shield } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 
 interface NoCreditCardsStateProps {
   readonly onAddCard: () => void;

@@ -1,3 +1,5 @@
+import { useCallback, useMemo } from 'react';
+
 import { BadgeStatus, CardStat } from '@/components/budget';
 import { CreditCardBrandIcon } from '@/components/budget/CreditCardBrandIcon';
 import {
@@ -12,7 +14,6 @@ import type { CreditCard, CreditCardBill } from '@/types/budget';
 import { formatDate } from '@/utils/date';
 import { formatCurrency } from '@/utils/formatters';
 import { extractInstallment, isFinishingInstallment } from '@/utils/installment.utils';
-import { useCallback, useMemo } from 'react';
 
 interface CreditCardsSectionProps {
   readonly cards: CreditCard[];

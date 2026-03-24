@@ -1,4 +1,5 @@
 import { Landmark, Brain, Target, BarChart3, FileSpreadsheet, Building2 } from 'lucide-react';
+
 import { ScrollReveal, StaggerContainer, StaggerItem } from './animations';
 
 const FEATURES = [

@@ -1,3 +1,5 @@
+import { usePageScroll } from '@/hooks/usePageScroll';
+
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { CTASection } from './components/CTASection';
 import { FeaturesSection } from './components/FeaturesSection';
@@ -8,7 +10,6 @@ import { PricingSection } from './components/PricingSection';
 import { SecuritySection } from './components/SecuritySection';
 import { SEOHead } from './components/SEOHead';
 import { TestimonialsSection } from './components/TestimonialsSection';
-import { usePageScroll } from '@/hooks/usePageScroll';
 import './landing.css';
 
 export function LandingPage() {

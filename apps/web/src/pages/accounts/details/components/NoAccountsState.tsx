@@ -1,5 +1,6 @@
-import { Button } from '@/components/ui/button';
 import { Landmark, Plus, Sparkles, ArrowUpDown, PieChart } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 
 interface NoAccountsStateProps {
   readonly onAddAccount: () => void;

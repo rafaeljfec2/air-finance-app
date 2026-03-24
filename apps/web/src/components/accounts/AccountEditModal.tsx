@@ -1,8 +1,11 @@
+import { Building2 } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
-import { Modal } from '@/components/ui/Modal';
+
+import { BankIcon } from '@/components/bank/BankIcon';
 import { Button } from '@/components/ui/button';
+import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/Modal';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBanks } from '@/hooks/useBanks';
 import {
@@ -11,8 +14,6 @@ import {
   getAgency,
   getAccountNumber,
 } from '@/services/accountHelpers';
-import { Building2 } from 'lucide-react';
-import { BankIcon } from '@/components/bank/BankIcon';
 
 interface AccountEditModalProps {
   open: boolean;

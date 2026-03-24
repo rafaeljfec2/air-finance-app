@@ -1,13 +1,15 @@
+import { PanelLeftClose, PanelLeft } from 'lucide-react';
+
+import { cn } from '@/lib/utils';
+import { useSidebarStore } from '@/stores/sidebar';
 import {
   NavigationSection as NavigationSectionType,
   NavigationItem as NavigationItemType,
   NavigationGroupItem,
 } from '@/types/navigation';
+
 import { NavigationGroup } from './NavigationGroup';
 import { NavigationItem } from './NavigationItem';
-import { cn } from '@/lib/utils';
-import { useSidebarStore } from '@/stores/sidebar';
-import { PanelLeftClose, PanelLeft } from 'lucide-react';
 
 interface NavigationSectionProps {
   readonly section: NavigationSectionType;

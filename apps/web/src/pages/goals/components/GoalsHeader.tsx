@@ -1,5 +1,6 @@
-import { Button } from '@/components/ui/button';
 import { Target, Plus } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 
 interface GoalsHeaderProps {
   onCreate: () => void;

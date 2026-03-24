@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   ArrowLeft,
   Eye,
@@ -9,6 +8,8 @@ import {
   Landmark,
   Check,
 } from 'lucide-react';
+import { useState } from 'react';
+
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import type { Account } from '@/services/accountService';
 

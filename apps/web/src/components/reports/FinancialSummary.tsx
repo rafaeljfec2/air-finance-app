@@ -1,6 +1,7 @@
+import { ArrowDown, ArrowUp } from 'lucide-react';
+
 import { MonthlyReport } from '@/types/report';
 import { formatCurrency } from '@/utils/formatters';
-import { ArrowDown, ArrowUp } from 'lucide-react';
 
 interface FinancialSummaryProps {
   report: MonthlyReport;

@@ -1,4 +1,5 @@
 import { Sparkles } from 'lucide-react';
+
 import { toast } from '@/components/ui/toast';
 
 export function AskAirFinanceFab() {

@@ -1,5 +1,6 @@
-import { ViewDefault } from '@/layouts/ViewDefault';
 import { ArrowDown } from 'lucide-react';
+
+import { ViewDefault } from '@/layouts/ViewDefault';
 
 export function Payables() {
   return (

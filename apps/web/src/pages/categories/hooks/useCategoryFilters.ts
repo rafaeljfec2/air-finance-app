@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+
 import { Category } from '@/services/categoryService';
 
 export function useCategoryFilters() {

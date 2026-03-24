@@ -1,4 +1,5 @@
 import { RefreshCw } from 'lucide-react';
+
 import { CONFIDENCE_STYLES, formatRelativeTime } from '@/components/insights/InsightRenderers';
 import type { CreditCardInsight } from '@/services/agentService';
 

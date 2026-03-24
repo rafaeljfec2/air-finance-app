@@ -6,14 +6,14 @@
 // Imports estáticos dos logos SVG como URLs (processados pelo Vite)
 // Usando ?url para garantir que o Vite retorne uma URL string ao invés de componente React
 import bancoDoBrasilLogo from '@/assets/images/banks/001-banco-do-brasil.svg?url';
-import bradescoLogo from '@/assets/images/banks/237-bradesco.svg?url';
-import itauLogo from '@/assets/images/banks/341-itau.svg?url';
 import santanderLogo from '@/assets/images/banks/033-santander.svg?url';
-import caixaLogo from '@/assets/images/banks/104-caixa.svg?url';
-import nubankLogo from '@/assets/images/banks/260-nubank.svg?url';
 import interLogo from '@/assets/images/banks/077-inter.svg?url';
-import originalLogo from '@/assets/images/banks/212-original.svg?url';
+import caixaLogo from '@/assets/images/banks/104-caixa.svg?url';
 import btgLogo from '@/assets/images/banks/208-btg.svg?url';
+import originalLogo from '@/assets/images/banks/212-original.svg?url';
+import bradescoLogo from '@/assets/images/banks/237-bradesco.svg?url';
+import nubankLogo from '@/assets/images/banks/260-nubank.svg?url';
+import itauLogo from '@/assets/images/banks/341-itau.svg?url';
 
 // Mapeamento bankCode -> URL do logo (importado estaticamente pelo Vite)
 const BANK_LOGOS: Record<string, string> = {

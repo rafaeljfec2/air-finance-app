@@ -1,5 +1,6 @@
-import { subscriptionService, type PlanPermissions } from '@/services/subscriptionService';
 import { useQuery } from '@tanstack/react-query';
+
+import { subscriptionService, type PlanPermissions } from '@/services/subscriptionService';
 
 /**
  * Hook to get user plan permissions from backend

@@ -1,14 +1,15 @@
+import { motion } from 'framer-motion';
+import { CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
-import { parseApiError, getUserFriendlyMessage } from '@/utils/apiErrorHandler';
 import { loginWithGoogle } from '@/services/authService';
-import { motion } from 'framer-motion';
-import { CheckCircle2, Eye, EyeOff } from 'lucide-react';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { parseApiError, getUserFriendlyMessage } from '@/utils/apiErrorHandler';
 
 function calculatePasswordStrength(password: string): number {
   let score = 0;

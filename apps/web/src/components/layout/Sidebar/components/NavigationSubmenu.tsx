@@ -1,6 +1,7 @@
-import { NavigationLinkItem } from '@/types/navigation';
-import { cn } from '@/lib/utils';
 import { Link, useLocation } from 'react-router-dom';
+
+import { cn } from '@/lib/utils';
+import { NavigationLinkItem } from '@/types/navigation';
 
 interface NavigationSubmenuProps {
   items: NavigationLinkItem[];

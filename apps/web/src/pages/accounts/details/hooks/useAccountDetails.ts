@@ -1,12 +1,14 @@
-import { useMemo } from 'react';
-import { useCompanyStore } from '@/stores/company';
-import { useCategories } from '@/hooks/useCategories';
 import { endOfMonth, format, parseISO } from 'date-fns';
+import { useMemo } from 'react';
+
+import { useCategories } from '@/hooks/useCategories';
+import { useCompanyStore } from '@/stores/company';
+
+import type { UseAccountDetailsReturn, CurrentStatement } from './types';
 import { useAccountQueries } from './useAccountQueries';
+import { useInitialLoad } from './useInitialLoad';
 import { useStatementPagination } from './useStatementPagination';
 import { useStatementTransactions } from './useStatementTransactions';
-import { useInitialLoad } from './useInitialLoad';
-import type { UseAccountDetailsReturn, CurrentStatement } from './types';
 
 export function useAccountDetails(
   accountId: string,

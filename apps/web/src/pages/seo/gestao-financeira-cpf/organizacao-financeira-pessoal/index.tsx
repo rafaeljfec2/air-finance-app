@@ -1,9 +1,10 @@
-import { SEOHead } from '@/components/seo/SEOHead';
-import { InternalLink } from '@/components/seo/InternalLink';
 import { ChevronRight, Home } from 'lucide-react';
-import { Header } from '@/pages/landing/components/Header';
-import { Footer } from '@/pages/landing/components/Footer';
+
+import { InternalLink } from '@/components/seo/InternalLink';
+import { SEOHead } from '@/components/seo/SEOHead';
 import { usePageScroll } from '@/hooks/usePageScroll';
+import { Footer } from '@/pages/landing/components/Footer';
+import { Header } from '@/pages/landing/components/Header';
 
 export function OrganizacaoFinanceiraPessoalPage() {
   usePageScroll();

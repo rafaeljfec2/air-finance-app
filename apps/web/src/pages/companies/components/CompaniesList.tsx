@@ -1,10 +1,11 @@
 import { CompanyTableRow } from '@/components/companies/CompanyTableRow';
-import { CompanyCard } from './CompanyCard';
-import { CompanyListItem } from './CompanyListItem';
 import { Card } from '@/components/ui/card';
 import { RecordsGrid } from '@/components/ui/RecordsGrid';
 import { SortableColumn, SortConfig } from '@/components/ui/SortableColumn';
 import { Company } from '@/types/company';
+
+import { CompanyCard } from './CompanyCard';
+import { CompanyListItem } from './CompanyListItem';
 
 interface CompaniesListProps {
   companies: Company[];

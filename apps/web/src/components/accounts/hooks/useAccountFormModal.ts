@@ -1,9 +1,10 @@
+import type { ChangeEvent, FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import { Account, CreateAccount } from '@/services/accountService';
 import { useCompanyStore } from '@/stores/company';
 import { formatDateToLocalISO } from '@/utils/date';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
-import type { ChangeEvent, FormEvent } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
 
 type AccountType = 'checking' | 'savings' | 'digital_wallet' | 'investment';
 

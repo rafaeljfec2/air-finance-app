@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Logo } from '@/components/Logo';
 import { motion } from 'framer-motion';
 import { Mail, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { Logo } from '@/components/Logo';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 
 export function ForgotPasswordPage() {
@@ -31,7 +32,7 @@ export function ForgotPasswordPage() {
     try {
       await requestPasswordRecovery({ email });
       setSuccess(true);
-    } catch (err) {
+    } catch {
       setError('Erro ao enviar instruções. Tente novamente.');
     } finally {
       setSubmitting(false);

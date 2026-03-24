@@ -1,4 +1,5 @@
 import { formatCurrency } from '@/utils/formatters';
+
 import type { CashComposition as CashCompositionData, CashInsight } from '../hooks/useHomePageData';
 
 interface CashCompositionProps {

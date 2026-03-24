@@ -1,8 +1,9 @@
-import { Transaction as TransactionType } from '@/types/transaction';
-import { formatCurrency } from '@/utils/formatters';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ArrowDown, ArrowUp } from 'lucide-react';
+
+import { Transaction as TransactionType } from '@/types/transaction';
+import { formatCurrency } from '@/utils/formatters';
 
 interface TransactionListProps {
   transactions: TransactionType[];

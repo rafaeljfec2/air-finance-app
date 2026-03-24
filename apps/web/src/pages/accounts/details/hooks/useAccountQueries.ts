@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+
 import { getAccountById, getAccounts, type Account } from '@/services/accountService';
 
 interface UseAccountQueriesParams {

@@ -1,16 +1,3 @@
-import { Button } from '@/components/ui/button';
-import {
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { ComboBox, type ComboBoxOption } from '@/components/ui/ComboBox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useBanks } from '@/hooks/useBanks';
-import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import {
@@ -24,6 +11,21 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+
+import { Button } from '@/components/ui/button';
+import {
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { ComboBox, type ComboBoxOption } from '@/components/ui/ComboBox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useBanks } from '@/hooks/useBanks';
+import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
+
 import { type CreditCardFormData, CreditCardSchema } from '../schemas';
 
 const dueDates: ComboBoxOption<number>[] = Array.from({ length: 31 }, (_, i) => ({

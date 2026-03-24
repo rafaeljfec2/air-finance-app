@@ -1,3 +1,7 @@
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo, useState, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import { Loading } from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
@@ -6,10 +10,6 @@ import { useActiveCompany } from '@/hooks/useActiveCompany';
 import { useAuth } from '@/hooks/useAuth';
 import { companyService } from '@/services/companyService';
 import { formatDocument } from '@/utils/formatDocument';
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo, useState, useRef } from 'react';
-
-import { useLocation, useNavigate } from 'react-router-dom';
 
 export function CompanySelectionModal() {
   const { user, isLoadingUser } = useAuth();

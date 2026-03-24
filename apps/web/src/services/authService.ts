@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { apiClient } from './apiClient';
-import { env } from '@/utils/env';
+
 import {
   User as UserType,
   UserRole,
@@ -12,6 +11,9 @@ import {
   UserDateFormat,
   OpenaiModel,
 } from '@/types/user';
+import { env } from '@/utils/env';
+
+import { apiClient } from './apiClient';
 
 // Validation schemas
 export const UserSchema = z.object({

@@ -1,11 +1,14 @@
-import React from 'react';
-import { ChevronLeft, ChevronRight, Receipt, Search, X } from 'lucide-react';
-import { StatementTransactionList } from './StatementTransactionList';
-import { AccountEmptyState } from './AccountEmptyState';
-import type { StatementTransaction } from '@/services/bankingStatementService';
-import type { StatementSummary } from '../hooks/types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { ChevronLeft, ChevronRight, Receipt, Search, X } from 'lucide-react';
+import React from 'react';
+
+import type { StatementTransaction } from '@/services/bankingStatementService';
+
+import type { StatementSummary } from '../hooks/types';
+
+import { AccountEmptyState } from './AccountEmptyState';
+import { StatementTransactionList } from './StatementTransactionList';
 
 interface StatementCardProps {
   readonly month: string;

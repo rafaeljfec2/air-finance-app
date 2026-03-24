@@ -1,11 +1,3 @@
-import { Button } from '@/components/ui/button';
-import {
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import {
   ChevronLeft,
@@ -19,9 +11,20 @@ import {
   Wallet,
 } from 'lucide-react';
 import { useState } from 'react';
+
+import { Button } from '@/components/ui/button';
+import {
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+
+import { type CategoryFormData } from '../schemas';
+
 import { CategoriesList } from './CategoriesList';
 import { CategoryForm } from './CategoryForm';
-import { type CategoryFormData } from '../schemas';
 
 interface CategoriesStepProps {
   onNext: (data: CategoryFormData[]) => void;

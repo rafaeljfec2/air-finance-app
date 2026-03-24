@@ -1,9 +1,12 @@
-import { useAuthStore } from '@/stores/auth';
-import { useCompanyStore } from '@/stores/company';
-import { useCompanyStore as useCompanyContext } from '@/contexts/companyContext';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { useCompanyStore as useCompanyContext } from '@/contexts/companyContext';
+import { useAuthStore } from '@/stores/auth';
+import { useCompanyStore } from '@/stores/company';
+import { User } from '@/types/user';
+
 import {
   LoginData,
   getCurrentUser,
@@ -13,7 +16,6 @@ import {
   requestPasswordRecovery,
   resetPassword,
 } from '../services/authService';
-import { User } from '@/types/user';
 import { authUtils } from '../utils/auth';
 
 export interface LoginOptions {

@@ -1,8 +1,10 @@
+import { Eye, EyeOff } from 'lucide-react';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
-import type { Account } from '@/services/accountService';
+
 import { BankIcon } from '@/components/bank/BankIcon';
+import type { Account } from '@/services/accountService';
+
 import {
   formatCurrency,
   formatHiddenCurrency,
@@ -13,6 +15,7 @@ import {
   getAccountBankCode,
   getAccountInstitution,
 } from '../utils';
+
 import { AccountCardMenu } from './AccountCardMenu';
 
 interface AccountBalanceCardProps {

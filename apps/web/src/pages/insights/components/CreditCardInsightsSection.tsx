@@ -1,19 +1,21 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronDown, CreditCard as CreditCardIcon } from 'lucide-react';
-import { useCreditCards } from '@/hooks/useCreditCards';
-import { useCreditCardInsights } from '@/hooks/useCreditCardInsights';
+import { useState, useEffect, useRef, useCallback } from 'react';
+
 import {
   InsightsLoadingSkeleton,
   NoApiKeyState,
   InsightsErrorState,
   deriveDecisionState,
 } from '@/components/insights/InsightRenderers';
+import { useCreditCardInsights } from '@/hooks/useCreditCardInsights';
+import { useCreditCards } from '@/hooks/useCreditCards';
 import type { InsightItem } from '@/services/agentService';
+
 import { CardSelectorStrip } from './CardSelectorStrip';
 import { DecisionVerdictCard } from './DecisionVerdictCard';
 import { EvidenceCard } from './EvidenceCard';
-import { OutlookSection } from './OutlookSection';
 import { InsightsFooter } from './InsightsFooter';
+import { OutlookSection } from './OutlookSection';
 
 interface CreditCardInsightsSectionProps {
   readonly companyId: string;

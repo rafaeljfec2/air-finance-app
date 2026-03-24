@@ -1,6 +1,8 @@
 import { useState, useMemo, useEffect, useRef, memo } from 'react';
-import type { SortField } from './TransactionGrid.types';
+
 import { parseCurrency } from '@/utils/formatters';
+
+import type { SortField } from './TransactionGrid.types';
 
 interface FilterMenuProps {
   readonly field: SortField;

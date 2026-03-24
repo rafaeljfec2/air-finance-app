@@ -1,5 +1,6 @@
-import type { CreditCard } from '@/services/creditCardService';
 import type { Account } from '@/services/accountService';
+import type { CreditCard } from '@/services/creditCardService';
+
 import type { CurrentBill } from './utils/billConstruction';
 import type { PaginationState } from './utils/stateManagement';
 

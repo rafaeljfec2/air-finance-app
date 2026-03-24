@@ -1,8 +1,9 @@
+import { motion } from 'framer-motion';
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
-import { useNavigate, useLocation } from 'react-router-dom';
-import React from 'react';
 
 export function Header() {
   const navigate = useNavigate();

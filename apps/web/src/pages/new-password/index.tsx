@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Logo } from '@/components/Logo';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Lock } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
+import { Logo } from '@/components/Logo';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useAuth } from '@/hooks/useAuth';
+import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/toast';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
 export function NewPasswordPage() {

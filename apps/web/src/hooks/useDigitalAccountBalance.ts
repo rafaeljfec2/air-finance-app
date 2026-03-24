@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { getDigitalAccountBalance } from '../services/digitalAccountService';
 
 export const useDigitalAccountBalance = (id: string) => {

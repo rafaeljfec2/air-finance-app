@@ -1,5 +1,6 @@
-import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 import { FinancialDashboard } from './FinancialDashboard';
 
 export function HeroV2() {

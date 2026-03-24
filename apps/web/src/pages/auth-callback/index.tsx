@@ -1,11 +1,12 @@
+import { CheckCircle2, AlertCircle, LogIn, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuthStore } from '@/stores/auth';
-import { getCurrentUser } from '@/services/authService';
-import { authUtils } from '@/utils/auth';
+
 import { SuspenseLoader } from '@/components/SuspenseLoader';
-import { CheckCircle2, AlertCircle, LogIn, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { getCurrentUser } from '@/services/authService';
+import { useAuthStore } from '@/stores/auth';
+import { authUtils } from '@/utils/auth';
 
 export function AuthCallbackPage() {
   const [searchParams] = useSearchParams();

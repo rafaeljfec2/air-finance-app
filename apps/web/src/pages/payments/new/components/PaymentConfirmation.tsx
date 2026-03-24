@@ -1,7 +1,8 @@
+import { Loader2 } from 'lucide-react';
+
+import type { PaymentType } from '@/services/paymentService';
 import { formatCurrency } from '@/utils/format';
 import { formatDocument } from '@/utils/formatDocument';
-import { Loader2 } from 'lucide-react';
-import type { PaymentType } from '@/services/paymentService';
 
 interface PaymentConfirmationProps {
   readonly type: PaymentType;

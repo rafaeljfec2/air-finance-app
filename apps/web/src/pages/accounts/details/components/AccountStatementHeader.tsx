@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+
 import type { StatementSummary } from '../hooks/types';
 import { formatCurrency, formatMonthTitle } from '../utils';
 

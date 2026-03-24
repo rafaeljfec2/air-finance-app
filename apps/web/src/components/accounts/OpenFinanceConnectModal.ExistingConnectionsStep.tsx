@@ -1,11 +1,13 @@
+import { Link2, Building2 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Link2, Building2 } from 'lucide-react';
 import { type OpeniItem } from '@/services/openiService';
 import { formatDateTime } from '@/utils/formatters';
+
+import { BUTTON_FULL_WIDTH, BUTTON_HEIGHT } from './OpenFinanceConnectModal.constants';
 import { LoadingState } from './OpenFinanceConnectModal.LoadingState';
 import { StatusCard } from './OpenFinanceConnectModal.StatusCard';
-import { BUTTON_FULL_WIDTH, BUTTON_HEIGHT } from './OpenFinanceConnectModal.constants';
 import { translateOpeniStatus } from './utils/openiStatusTranslations';
 
 interface ExistingConnectionsStepProps {

@@ -1,10 +1,11 @@
+import { motion } from 'framer-motion';
+import { ChevronLeft } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { motion } from 'framer-motion';
-import { ChevronLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import type { ReactNode } from 'react';
 
 interface LoginLayoutProps {
   cardContent: ReactNode;

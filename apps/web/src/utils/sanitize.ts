@@ -3,8 +3,8 @@
  * Removes sensitive fields before storing in localStorage
  */
 
-import { User } from '@/types/user';
 import { Company } from '@/types/company';
+import { User } from '@/types/user';
 
 /**
  * Sanitize user data - remove sensitive fields

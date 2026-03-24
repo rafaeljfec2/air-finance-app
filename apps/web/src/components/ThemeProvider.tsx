@@ -1,4 +1,5 @@
 import { ReactNode, useEffect } from 'react';
+
 import { useTheme } from '@/stores/useTheme';
 
 interface ThemeProviderProps {

@@ -1,12 +1,3 @@
-import { FormField } from '@/components/ui/FormField';
-import { Modal } from '@/components/ui/Modal';
-import { Button } from '@/components/ui/button';
-import { ColorPicker } from '@/components/ui/color-picker';
-import { IconPicker } from '@/components/ui/icon-picker';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
-import { Category, CreateCategory } from '@/services/categoryService';
 import {
   Gift,
   Landmark,
@@ -20,6 +11,16 @@ import {
 } from 'lucide-react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { ColorPicker } from '@/components/ui/color-picker';
+import { FormField } from '@/components/ui/FormField';
+import { IconPicker } from '@/components/ui/icon-picker';
+import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/Modal';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import { Category, CreateCategory } from '@/services/categoryService';
 
 const iconOptions = [
   { value: 'Tag', icon: Tag },

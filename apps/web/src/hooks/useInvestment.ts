@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { getInvestmentById, Investment } from '../services/investmentService';
 
 export const useInvestment = (id: string) => {
