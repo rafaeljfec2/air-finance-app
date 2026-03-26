@@ -20,6 +20,7 @@ import { CreditCardBillsPageDesktop } from './desktop';
 import { useBillNavigation } from './hooks/useBillNavigation';
 import { useCreditCardBills } from './hooks/useCreditCardBills';
 import { useCreditCardManagement } from './hooks/useCreditCardManagement';
+import { useLinkedAccounts } from './hooks/useLinkedAccounts';
 
 export function CreditCardBillsPage() {
   const { isDesktop } = useResponsiveBreakpoint();
@@ -33,6 +34,11 @@ export function CreditCardBillsPage() {
   const { creditCards, isLoading: isLoadingCards } = useCreditCards(companyId);
   const { currentMonth, goToPreviousMonth, goToNextMonth, canGoPrevious, canGoNext } =
     useBillNavigation();
+
+  const { linkedAccountIds } = useLinkedAccounts({
+    companyId,
+    creditCards: creditCards ?? [],
+  });
 
   const hasCards = creditCards && creditCards.length > 0;
 
@@ -97,6 +103,7 @@ export function CreditCardBillsPage() {
       onEditCard={handlers.onEditCard}
       onDeleteCard={handlers.onDeleteCard}
       onAddCard={handlers.onAddCard}
+      linkedAccountId={selectedCardId ? linkedAccountIds[selectedCardId] : undefined}
       {...billProps}
     />
   );

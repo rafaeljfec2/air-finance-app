@@ -1,5 +1,6 @@
-import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { Clock, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import type { MouseEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import {
   DropdownMenu,
@@ -14,15 +15,29 @@ interface CreditCardCardMenuProps {
   readonly card: CreditCard;
   readonly onEdit: (card: CreditCard) => void;
   readonly onDelete: (card: CreditCard) => void;
+  readonly linkedAccountId?: string;
 }
 
-export function CreditCardCardMenu({ card, onEdit, onDelete }: Readonly<CreditCardCardMenuProps>) {
+export function CreditCardCardMenu({
+  card,
+  onEdit,
+  onDelete,
+  linkedAccountId,
+}: Readonly<CreditCardCardMenuProps>) {
+  const navigate = useNavigate();
+
   const handleEdit = () => {
     onEdit(card);
   };
 
   const handleDelete = () => {
     onDelete(card);
+  };
+
+  const handleConfigureSync = () => {
+    if (linkedAccountId) {
+      navigate(`/accounts/${linkedAccountId}/statement-schedule`);
+    }
   };
 
   const handleTriggerClick = (e: MouseEvent) => {
@@ -42,6 +57,16 @@ export function CreditCardCardMenu({ card, onEdit, onDelete }: Readonly<CreditCa
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={8}>
+        {linkedAccountId && (
+          <>
+            <DropdownMenuItem onSelect={handleConfigureSync}>
+              <Clock className="h-4 w-4" />
+              <span>Sincronização Automática</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+
         <DropdownMenuItem onSelect={handleEdit}>
           <Pencil className="h-4 w-4" />
           <span>Editar</span>

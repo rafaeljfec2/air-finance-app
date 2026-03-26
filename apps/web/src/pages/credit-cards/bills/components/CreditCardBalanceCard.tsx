@@ -13,6 +13,7 @@ interface CreditCardBalanceCardProps {
   readonly limitUsed?: number;
   readonly onEdit?: (card: CreditCardType) => void;
   readonly onDelete?: (card: CreditCardType) => void;
+  readonly linkedAccountId?: string;
 }
 
 const formatCurrency = (value: number): string => {
@@ -47,6 +48,7 @@ export function CreditCardBalanceCard({
   limitUsed = 0,
   onEdit,
   onDelete,
+  linkedAccountId,
 }: Readonly<CreditCardBalanceCardProps>) {
   const [isBalanceHidden, setIsBalanceHidden] = useState(false);
 
@@ -68,15 +70,9 @@ export function CreditCardBalanceCard({
   `;
 
   return (
-    <div
-      role="button"
-      tabIndex={0}
+    <button
+      type="button"
       onClick={onClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          onClick();
-        }
-      }}
       className={cardClassName}
       style={{ background: gradient }}
     >
@@ -109,7 +105,12 @@ export function CreditCardBalanceCard({
             </button>
 
             {hasMenuActions && (
-              <CreditCardCardMenu card={card} onEdit={onEdit} onDelete={onDelete} />
+              <CreditCardCardMenu
+                card={card}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                linkedAccountId={linkedAccountId}
+              />
             )}
           </div>
         </div>
@@ -136,6 +137,6 @@ export function CreditCardBalanceCard({
         </div>
         <p className="text-[10px] text-white/60 mt-1">{usagePercentage.toFixed(1)}% utilizado</p>
       </div>
-    </div>
+    </button>
   );
 }

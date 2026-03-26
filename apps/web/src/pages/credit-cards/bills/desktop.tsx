@@ -17,6 +17,7 @@ import { useAllCardsBillTotals } from './hooks/useAllCardsBillTotals';
 import { useBillNavigation } from './hooks/useBillNavigation';
 import { useCreditCardBills } from './hooks/useCreditCardBills';
 import { useCreditCardManagement } from './hooks/useCreditCardManagement';
+import { useLinkedAccounts } from './hooks/useLinkedAccounts';
 
 export function CreditCardBillsPageDesktop() {
   const { activeCompany } = useCompanyStore();
@@ -34,6 +35,11 @@ export function CreditCardBillsPageDesktop() {
     companyId,
     creditCards: creditCards ?? [],
     month: currentMonth,
+  });
+
+  const { linkedAccountIds } = useLinkedAccounts({
+    companyId,
+    creditCards: creditCards ?? [],
   });
 
   const hasCards = creditCards && creditCards.length > 0;
@@ -88,6 +94,7 @@ export function CreditCardBillsPageDesktop() {
       onDeleteCard={handlers.onDeleteCard}
       onAddCard={handlers.onAddCard}
       cardLimitsUsed={cardLimitsUsed}
+      linkedAccountIds={linkedAccountIds}
     />
   );
 

@@ -16,6 +16,7 @@ interface CreditCardCardsContainerProps {
   readonly onDeleteCard?: (card: CreditCard) => void;
   readonly onAddCard?: () => void;
   readonly cardLimitsUsed?: Record<string, number>;
+  readonly linkedAccountIds?: Record<string, string>;
 }
 
 const SCROLL_CONFIG = {
@@ -32,6 +33,7 @@ export function CreditCardCardsContainer({
   onDeleteCard,
   onAddCard,
   cardLimitsUsed = {},
+  linkedAccountIds = {},
 }: Readonly<CreditCardCardsContainerProps>) {
   const selectedIndex = useMemo(
     () => creditCards.findIndex((card) => card.id === selectedCardId),
@@ -82,6 +84,7 @@ export function CreditCardCardsContainer({
                   limitUsed={cardLimitsUsed[card.id] ?? 0}
                   onEdit={onEditCard}
                   onDelete={onDeleteCard}
+                  linkedAccountId={linkedAccountIds[card.id]}
                 />
               </div>
             ))}

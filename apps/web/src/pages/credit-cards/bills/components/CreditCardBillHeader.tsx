@@ -13,6 +13,7 @@ import {
   CreditCard,
   Edit,
   Trash2,
+  Clock,
   Plus,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -43,6 +44,7 @@ interface CreditCardBillHeaderProps {
   readonly onEditCard?: (card: CreditCardType) => void;
   readonly onDeleteCard?: (card: CreditCardType) => void;
   readonly onAddCard?: () => void;
+  readonly linkedAccountId?: string;
 }
 
 const formatCurrency = (value: number): string => {
@@ -94,6 +96,7 @@ export function CreditCardBillHeader({
   onEditCard,
   onDeleteCard,
   onAddCard,
+  linkedAccountId,
 }: Readonly<CreditCardBillHeaderProps>) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -133,6 +136,14 @@ export function CreditCardBillHeader({
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
+            {linkedAccountId && (
+              <DropdownMenuItem
+                onClick={() => navigate(`/accounts/${linkedAccountId}/statement-schedule`)}
+              >
+                <Clock className="h-4 w-4 mr-2" />
+                Sincronização Automática
+              </DropdownMenuItem>
+            )}
             {onAddCard && (
               <DropdownMenuItem onClick={onAddCard}>
                 <Plus className="h-4 w-4 mr-2" />
