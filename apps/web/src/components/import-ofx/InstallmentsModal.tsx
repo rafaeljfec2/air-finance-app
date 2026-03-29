@@ -2,9 +2,9 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AlertCircle } from 'lucide-react';
 
-import { Loading } from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/spinner';
 import type { InstallmentTransaction } from '@/services/transactionService';
 
 interface InstallmentsModalProps {
@@ -187,7 +187,7 @@ export function InstallmentsModal({
           >
             {isCreating ? (
               <>
-                <Loading size="small" />
+                <Spinner size="sm" />
                 Criando parcelas...
               </>
             ) : (
