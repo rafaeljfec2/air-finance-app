@@ -1,6 +1,5 @@
 import { useEffect, useRef, useMemo } from 'react';
 
-
 import { BillTransactionItem } from './BillTransactionItem';
 
 interface BillTransactionListProps {

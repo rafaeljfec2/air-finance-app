@@ -10,13 +10,12 @@ import {
   Trash2,
 } from 'lucide-react';
 
-
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { Company } from '@/types/company';
 import { formatDate } from '@/utils/date';
 import { formatDocument } from '@/utils/formatDocument';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const typeOptions = [
   { value: 'matriz', label: 'Matriz' },

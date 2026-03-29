@@ -3,7 +3,6 @@ import { Star } from 'lucide-react';
 import { InteractiveCard } from './InteractiveCard';
 import { ScrollReveal } from './ScrollReveal';
 
-
 const testimonials = [
   {
     id: 1,

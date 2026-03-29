@@ -5,7 +5,6 @@ import { RecordsGrid } from '@/components/ui/RecordsGrid';
 import { SortableColumn, SortConfig } from '@/components/ui/SortableColumn';
 import { RecurringTransaction } from '@/services/recurringTransactionService';
 
-
 import { RecurringTransactionListItem } from './RecurringTransactionListItem';
 
 interface RecurringTransactionsListProps {

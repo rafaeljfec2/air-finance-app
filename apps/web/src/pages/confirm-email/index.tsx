@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { env } from '@/utils/env';
 
-
 export function ConfirmProcessing() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');

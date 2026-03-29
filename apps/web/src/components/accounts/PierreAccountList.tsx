@@ -1,7 +1,6 @@
 import { CreditCard, Landmark, Check } from 'lucide-react';
 
 import { PierreAccount } from '@/services/bankingIntegrationService';
-
 import { formatCurrency } from '@/utils/formatters';
 
 interface PierreAccountListProps {

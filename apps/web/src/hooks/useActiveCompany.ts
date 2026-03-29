@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 
-
 import { useAuthStore } from '@/stores/auth';
 import { useCompanyStore } from '@/stores/company';
 import { Company } from '@/types';

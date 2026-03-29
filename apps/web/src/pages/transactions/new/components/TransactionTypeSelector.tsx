@@ -1,6 +1,5 @@
 import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 
-
 import { cn } from '@/lib/utils';
 import type { TransactionType } from '@/types/transaction';
 

@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 
-
 import { useSortable } from '@/hooks/useSortable';
 import { User } from '@/services/userService';
 

@@ -1,13 +1,10 @@
 import React from 'react';
 
-
 import { Label } from '@/components/ui/label';
 
 import { type CategoryFormData } from '../schemas';
+
 import { CategoryCard } from './CategoryCard';
-
-
-
 
 interface CategoriesListProps {
   categories: CategoryFormData[];

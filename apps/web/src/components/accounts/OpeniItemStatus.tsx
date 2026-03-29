@@ -1,8 +1,6 @@
 import { RefreshCw, ExternalLink, AlertTriangle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-
-
 import { type OpeniItemResponse } from '@/services/openiService';
 
 import { translateOpeniStatus } from './utils/openiStatusTranslations';

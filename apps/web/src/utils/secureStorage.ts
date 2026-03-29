@@ -5,7 +5,6 @@
 
 import { StateStorage } from 'zustand/middleware';
 
-
 import { encryptObject, decryptObject } from './encryption';
 import { clearExpiredItems, getStorageSize } from './storage';
 

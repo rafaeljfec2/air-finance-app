@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { formatCurrency } from '@/utils/formatters';
 
-
 interface TransactionSummaryProps {
   totalCredits: number;
   totalDebits: number;

@@ -1,13 +1,12 @@
-import { ErrorBoundary } from '@/components/error/ErrorBoundary';
-import { ErrorPage } from '@/components/error/ErrorPage';
-import { SuspenseLoader } from '@/components/SuspenseLoader';
+import { Suspense, ReactNode, ComponentType, LazyExoticComponent } from 'react';
+import { RouteObject } from 'react-router-dom';
 
 import { OnboardingGuard } from '@/components/auth/OnboardingGuard';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { RequireGod } from '@/components/auth/RequireGod';
-import { Suspense, ReactNode, ComponentType, LazyExoticComponent } from 'react';
-import { RouteObject } from 'react-router-dom';
-
+import { ErrorBoundary } from '@/components/error/ErrorBoundary';
+import { ErrorPage } from '@/components/error/ErrorPage';
+import { SuspenseLoader } from '@/components/SuspenseLoader';
 
 interface RouteConfig {
   path: string;

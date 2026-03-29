@@ -1,6 +1,5 @@
 import { ArrowDownCircle, ArrowUpCircle, Edit, Trash2 } from 'lucide-react';
 
-
 import { Button } from '@/components/ui/button';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCategories } from '@/hooks/useCategories';

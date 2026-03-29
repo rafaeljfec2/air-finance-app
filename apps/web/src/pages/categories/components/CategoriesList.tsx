@@ -4,7 +4,6 @@ import { RecordsGrid } from '@/components/ui/RecordsGrid';
 import { SortableColumn, SortConfig } from '@/components/ui/SortableColumn';
 import { Category } from '@/services/categoryService';
 
-
 import { CategoryCard } from './CategoryCard';
 import { CategoryListItem } from './CategoryListItem';
 

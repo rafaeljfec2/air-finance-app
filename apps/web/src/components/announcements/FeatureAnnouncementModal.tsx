@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { type Announcement } from '@/services/announcementsService';
 
-
 interface FeatureAnnouncementModalProps {
   readonly announcement: Announcement;
   readonly isOpen: boolean;

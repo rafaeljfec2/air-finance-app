@@ -5,8 +5,6 @@ import { parseApiError } from '@/utils/apiErrorHandler';
 
 import { apiClient } from './apiClient';
 
-
-
 const CreditUtilizationStatusSchema = z.enum(['low', 'moderate', 'high', 'critical']);
 const LiquidityStatusSchema = z.enum(['positive', 'negative', 'critical']);
 

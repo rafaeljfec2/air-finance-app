@@ -2,7 +2,6 @@ import type { QuickAction } from '../constants/quickActions';
 
 import { QuickActionCard } from './QuickActionCard';
 
-
 interface QuickActionsGridProps {
   actions: QuickAction[];
 }

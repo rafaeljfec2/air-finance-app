@@ -1,6 +1,5 @@
 import { TrendingDown, TrendingUp } from 'lucide-react';
 
-
 import { MonthlyReport } from '@/types/report';
 import { formatCurrency, formatPercentual } from '@/utils/formatters';
 

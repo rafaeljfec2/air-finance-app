@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { BusinessLog, BusinessLogFilters, getBusinessLogs } from '@/services/businessLogService';
 
-
 interface UseBusinessLogsParams {
   companyId: string | undefined;
   filters: {

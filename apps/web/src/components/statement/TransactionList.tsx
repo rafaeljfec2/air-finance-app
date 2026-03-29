@@ -1,6 +1,5 @@
 import { Inbox, RefreshCw } from 'lucide-react';
 
-
 import { Transaction } from '@/types/transaction';
 import { formatCurrency, formatDateTime } from '@/utils/formatters';
 

@@ -3,7 +3,6 @@ import { Shield, Lock, Cloud, Bell, FileText, Users } from 'lucide-react';
 import { InteractiveCard } from './InteractiveCard';
 import { ScrollReveal } from './ScrollReveal';
 
-
 const securityFeatures = [
   {
     icon: Lock,

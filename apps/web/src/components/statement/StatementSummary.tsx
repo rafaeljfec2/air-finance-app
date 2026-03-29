@@ -2,7 +2,6 @@ import { Banknote, TrendingDown, TrendingUp } from 'lucide-react';
 
 import { formatCurrency } from '@/utils/formatters';
 
-
 interface StatementSummaryProps {
   balance: number;
   income: number;

@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 
-
 import { SortConfig, SortDirection } from '@/components/ui/SortableColumn';
 
 interface UseSortableOptions<T extends string = string> {

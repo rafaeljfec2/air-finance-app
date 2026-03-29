@@ -1,6 +1,5 @@
 import type { StatementSchedule } from '@/services/bankingIntegrationService';
 
-
 import { getScheduleDescription } from '../utils/scheduleUtils';
 
 interface StatementScheduleStatusProps {

@@ -19,7 +19,6 @@ import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatters';
 
-
 interface ChartData {
   name: string;
   value: number;

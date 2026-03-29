@@ -1,6 +1,5 @@
 import { Modal } from '@/components/ui/Modal';
 
-
 import { BusinessLogsPageContent } from './BusinessLogsPageContent';
 
 interface BusinessLogsModalProps {

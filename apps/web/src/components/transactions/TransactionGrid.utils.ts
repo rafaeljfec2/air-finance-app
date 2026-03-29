@@ -3,8 +3,6 @@ import { ptBR } from 'date-fns/locale';
 
 import { formatCurrency } from '@/utils/formatters';
 
-
-
 import type { SortField, TransactionGridTransaction } from './TransactionGrid.types';
 
 /**

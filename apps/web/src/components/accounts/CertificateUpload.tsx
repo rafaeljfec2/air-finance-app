@@ -3,7 +3,6 @@ import { useRef, useState, DragEvent, ChangeEvent, MouseEvent } from 'react';
 
 import { cn } from '@/lib/utils';
 
-
 interface CertificateUploadProps {
   label: string;
   file: File | null;

@@ -1,6 +1,5 @@
 import { X } from 'lucide-react';
 
-
 import { CompanySelector } from '@/components/layout/CompanySelector';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebar';

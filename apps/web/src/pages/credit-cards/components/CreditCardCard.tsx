@@ -9,11 +9,10 @@ import {
   Trash2,
 } from 'lucide-react';
 
-
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CreditCard } from '@/services/creditCardService';
 import { formatCurrency } from '@/utils/formatters';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const bankTypes = [
   { value: 'nubank', label: 'Nubank', icon: CreditCardIcon },

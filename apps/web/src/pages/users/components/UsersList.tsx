@@ -14,8 +14,6 @@ import { UserCard } from './UserCard';
 import { UserListItem } from './UserListItem';
 import { UserTableRow } from './UserTableRow';
 
-
-
 interface UsersListProps {
   users: User[];
   viewMode: 'grid' | 'list';

@@ -1,7 +1,6 @@
 import { AlertTriangle, ChevronDown, FileText, TrendingDown, TrendingUp } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-
 import { StatementFilters } from '@/components/statement/StatementFilters';
 import {
   TransactionGrid,

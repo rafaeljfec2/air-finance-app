@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react';
 
-
 import { TransactionGridTransaction } from '@/components/transactions/TransactionGrid.types';
 import {
   calculateBalance,

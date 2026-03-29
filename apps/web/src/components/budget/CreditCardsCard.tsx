@@ -2,7 +2,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { CreditCard, Maximize2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-
 import { CardContainer, CardHeader, CardTotal } from '@/components/budget';
 import { CreditCardBrandIcon } from '@/components/budget/CreditCardBrandIcon';
 import { Button } from '@/components/ui/button';

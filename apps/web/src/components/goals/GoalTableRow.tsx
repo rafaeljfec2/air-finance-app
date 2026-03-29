@@ -2,7 +2,6 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Edit, Trash2, TrendingUp } from 'lucide-react';
 
-
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useCategories } from '@/hooks/useCategories';

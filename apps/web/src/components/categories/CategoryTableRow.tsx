@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Category } from '@/services/categoryService';
 
-
 interface CategoryTableRowProps {
   category: Category;
   onEdit: (category: Category) => void;

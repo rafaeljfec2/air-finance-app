@@ -1,12 +1,9 @@
 import { ChevronDown, ChevronUp, FileText, User } from 'lucide-react';
 
-
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { BusinessLog } from '@/services/businessLogService';
-
 
 import { entityTypeLabels, operationColors, operationLabels } from '../constants';
 import { formatDateTime } from '../utils';

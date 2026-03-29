@@ -2,7 +2,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Maximize2, TrendingDown } from 'lucide-react';
 import { useState } from 'react';
 
-
 import { BadgeStatus, CardContainer, CardHeader, CardTotal } from '@/components/budget';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';

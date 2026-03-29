@@ -1,9 +1,8 @@
 import { MoreVertical, Edit, Trash2 } from 'lucide-react';
 
-
 import { Button } from '@/components/ui/button';
-import { Company } from '@/types/company';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Company } from '@/types/company';
 
 const typeOptions = [
   { value: 'matriz', label: 'Matriz' },

@@ -1,11 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { announcementsService, type Announcement } from '@/services/announcementsService';
-import { formatDate } from '@/utils/formatters';
+import { CheckCircle2, Sparkles, AlertCircle, Megaphone } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { CheckCircle2, Sparkles, AlertCircle, Megaphone } from 'lucide-react';
-
+import { announcementsService, type Announcement } from '@/services/announcementsService';
+import { formatDate } from '@/utils/formatters';
 
 export function AnnouncementsList() {
   const { data: readAnnouncements = [], isLoading } = useQuery<Announcement[]>({

@@ -1,6 +1,5 @@
 import { CalendarDays, ShoppingBag } from 'lucide-react';
 
-
 import {
   formatCurrency,
   calculateUsagePercentage,

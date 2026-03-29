@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async';
 
-
 import { defaultSEOMetadata } from '../utils/seoMetadata';
 import {
   getOrganizationStructuredData,

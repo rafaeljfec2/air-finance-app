@@ -2,12 +2,10 @@ import { CheckCircle2, Sparkles, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
-
 import { env } from '@/utils/env';
 
-import { ScrollReveal } from './ScrollReveal';
 import { InteractiveCard } from './InteractiveCard';
-
+import { ScrollReveal } from './ScrollReveal';
 
 const plans = [
   {

@@ -16,7 +16,6 @@ import { useIndebtedness } from '@/hooks/useIndebtedness';
 import type { IndebtednessMetrics } from '@/types/indebtedness';
 import { formatCurrency } from '@/utils/formatters';
 
-
 interface IndebtednessCardProps {
   companyId: string;
 }

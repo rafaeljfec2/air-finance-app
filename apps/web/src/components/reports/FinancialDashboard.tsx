@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardGoalSummary } from '@/types/dashboard';
 import { MonthlyReport } from '@/types/report';
 
-
 import { CashFlowChart } from './CashFlowChart';
 import { ExpenseParetoChart } from './ExpenseParetoChart';
 import { GoalsCard } from './GoalsCard';

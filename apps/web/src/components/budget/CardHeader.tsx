@@ -3,7 +3,6 @@ import React from 'react';
 
 import { Tooltip } from '@/components/ui/tooltip';
 
-
 interface CardHeaderProps {
   icon: React.ReactNode;
   title: string;

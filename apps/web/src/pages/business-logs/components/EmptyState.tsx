@@ -2,7 +2,6 @@ import { History } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
 
-
 export function EmptyState() {
   return (
     <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark">

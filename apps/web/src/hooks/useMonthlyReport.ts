@@ -1,10 +1,9 @@
 import { useMemo, useState } from 'react';
 
-
 import { useStatementStore } from '@/stores/statement';
 import { Transaction, Category } from '@/types';
-import { getCategoriesByType } from '@/utils/categories';
 import { MonthlyReport } from '@/types/report';
+import { getCategoriesByType } from '@/utils/categories';
 
 const COLORS = [
   '#10B981', // Emerald

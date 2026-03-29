@@ -1,5 +1,4 @@
 import { Search, ArrowLeft } from 'lucide-react';
-
 import { type ChangeEvent } from 'react';
 
 import { Button } from '@/components/ui/button';

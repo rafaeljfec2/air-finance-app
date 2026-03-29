@@ -2,7 +2,6 @@ import { Bot } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
 
-
 interface OpenAILogsEmptyStateProps {
   hasFilters: boolean;
 }

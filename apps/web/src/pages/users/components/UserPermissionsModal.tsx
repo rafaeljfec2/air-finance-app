@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { ROLE_PERMISSIONS } from '@/constants/permissions';
 
-
 interface UserPermissionsModalProps {
   open: boolean;
   onClose: () => void;

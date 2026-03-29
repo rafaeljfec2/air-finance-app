@@ -4,7 +4,6 @@ import { RecordsGrid } from '@/components/ui/RecordsGrid';
 import { SortableColumn, SortConfig } from '@/components/ui/SortableColumn';
 import { CreditCard } from '@/services/creditCardService';
 
-
 import { CreditCardCard } from './CreditCardCard';
 import { CreditCardListItem } from './CreditCardListItem';
 

@@ -1,6 +1,5 @@
 import { BusinessLog } from '@/services/businessLogService';
 
-
 import { entityTypeLabels, operationLabels } from './constants';
 
 /**

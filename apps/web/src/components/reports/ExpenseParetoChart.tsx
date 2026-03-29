@@ -13,7 +13,6 @@ import {
 import { useTheme } from '@/stores/useTheme';
 import { formatCurrency } from '@/utils/formatters';
 
-
 interface ExpenseItem {
   category: string;
   amount: number;

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 
-
 import { useMousePosition } from '../hooks/useMousePosition';
 import '../landing.css';
 

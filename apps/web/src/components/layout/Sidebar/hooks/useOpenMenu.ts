@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 
 import { NavigationSection } from '@/types/navigation';
 
-
 /**
  * Finds the parent menu of the active route
  */

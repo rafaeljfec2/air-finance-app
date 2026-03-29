@@ -3,8 +3,6 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-
-
 import { badgeVariants } from './badgeVariants';
 
 interface BadgeProps

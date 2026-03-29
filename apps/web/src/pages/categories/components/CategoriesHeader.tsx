@@ -2,7 +2,6 @@ import { Plus, Tag } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
-
 interface CategoriesHeaderProps {
   onCreate: () => void;
 }

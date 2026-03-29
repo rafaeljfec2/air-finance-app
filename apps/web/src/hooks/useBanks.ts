@@ -4,7 +4,6 @@ import { useMemo, useEffect } from 'react';
 import { ComboBoxOption } from '@/components/ui/ComboBox';
 import { getBanks, type Bank } from '@/services/bankService';
 
-
 export function useBanks() {
   const {
     data: banks,

@@ -2,7 +2,6 @@ import { motion, useSpring, useTransform } from 'framer-motion';
 import { TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { useEffect } from 'react';
 
-
 import { Card } from '@/components/ui/card';
 import { useDashboardSummary } from '@/hooks/useDashboard';
 import type { DashboardFilters } from '@/types/dashboard';

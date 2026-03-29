@@ -3,7 +3,6 @@ import { useState } from 'react';
 
 import { Category } from '@/types/transaction';
 
-
 interface StatementFiltersProps {
   categories: Category[];
   onSearch: (term: string) => void;
