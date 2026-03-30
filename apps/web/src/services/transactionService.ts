@@ -144,6 +144,7 @@ export const getPreviousBalance = async (
 
 export const createTransaction = async (data: CreateTransactionPayload) => {
   const payload = {
+    companyId: data.companyId,
     description: data.description,
     launchType: data.launchType,
     valueType: data.valueType,
