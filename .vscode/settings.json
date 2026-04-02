@@ -1,6 +1,8 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsserver.maxTsServerMemory": 4096,
+  "editor.largeFileOptimizations": true,
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "cSpell.enabled": false,
@@ -13,12 +15,34 @@
     "**/dist": true,
     "**/build": true
   },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/.next/**": true,
+    "**/.expo/**": true,
+    "**/.turbo/**": true,
+    "**/.yarn/**": true,
+    "**/coverage/**": true,
+    "**/storybook-static/**": true,
+    "**/.vite/**": true,
+    "**/playwright-report/**": true
+  },
   "search.exclude": {
     "**/node_modules": true,
     "**/dist": true,
     "**/build": true,
     "**/.turbo": true,
-    "**/yarn.lock": true
+    "**/yarn.lock": true,
+    "**/.next": true,
+    "**/.expo": true,
+    "**/.yarn": true,
+    "**/coverage": true,
+    "**/storybook-static": true,
+    "**/.vite": true,
+    "**/playwright-report": true
   },
   "eslint.workingDirectories": [
     "./apps/web",

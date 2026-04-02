@@ -1,0 +1,13 @@
+node_modules
+dist
+build
+.next
+.turbo
+.vite
+.expo
+coverage
+storybook-static
+playwright-report
+.yarn/cache
+.yarn/install-state.gz
+*.log
