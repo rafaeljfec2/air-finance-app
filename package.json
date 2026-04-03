@@ -1,6 +1,6 @@
 {
   "name": "air-finance-monorepo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "license": "UNLICENSED",
   "workspaces": [
@@ -31,7 +31,8 @@
     "tar": "7.5.11",
     "axios": "1.13.6",
     "flatted": "3.4.2",
-    "lodash": "4.17.23",
+    "lodash": "4.18.1",
+    "@xmldom/xmldom": "0.8.12",
     "ajv": "6.14.0",
     "@react-native/codegen": "0.84.1",
     "chromium-edge-launcher": "0.3.0",

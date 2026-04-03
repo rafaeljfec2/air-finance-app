@@ -36,13 +36,6 @@ interface PayableRowProps {
   readonly onToggleStatus: (id: string, status: Payable['status']) => void;
 }
 
-const CREDIT_CARD_KEYWORDS = ['nubank', 'itau', 'visa', 'mastercard', 'elo', 'amex', 'hipercard'];
-
-function isCreditCardPayable(description: string): boolean {
-  const lowerDesc = description.toLowerCase();
-  return CREDIT_CARD_KEYWORDS.some((keyword) => lowerDesc.includes(keyword));
-}
-
 function sortByDueDate(a: Payable, b: Payable): number {
   return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
 }
@@ -157,7 +150,7 @@ export function PayablesSection({ payables, isLoading }: PayablesSectionProps) {
     const recurring: Payable[] = [];
 
     payables.forEach((p) => {
-      if (isCreditCardPayable(p.description)) {
+      if (p.type === 'credit_card') {
         creditCards.push(p);
       } else {
         recurring.push(p);

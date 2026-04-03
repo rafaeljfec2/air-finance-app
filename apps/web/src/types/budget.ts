@@ -21,6 +21,7 @@ export interface Payable {
   value: number;
   dueDate: string;
   status: 'PENDING' | 'PAID';
+  type: 'recurring' | 'credit_card';
 }
 
 export interface CreditCardBill {

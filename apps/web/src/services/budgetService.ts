@@ -28,6 +28,7 @@ const PayableSchema = z.object({
   value: z.number(),
   dueDate: z.string(),
   status: z.enum(['PENDING', 'PAID']),
+  type: z.enum(['recurring', 'credit_card']),
 });
 
 const CreditCardTransactionSchema = z.object({
