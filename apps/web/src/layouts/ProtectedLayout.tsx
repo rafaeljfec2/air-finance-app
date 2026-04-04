@@ -17,15 +17,17 @@ function RouteTransitionIndicator() {
 }
 
 export function ProtectedLayout() {
+  const location = useLocation();
+
   return (
-    <ErrorBoundary>
-      <ProtectedRoute>
-        <AnnouncementsProvider />
-        <RouteTransitionIndicator />
+    <ProtectedRoute>
+      <AnnouncementsProvider />
+      <RouteTransitionIndicator />
+      <ErrorBoundary key={location.pathname}>
         <Suspense fallback={<SuspenseLoader />}>
           <Outlet />
         </Suspense>
-      </ProtectedRoute>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </ProtectedRoute>
   );
 }
