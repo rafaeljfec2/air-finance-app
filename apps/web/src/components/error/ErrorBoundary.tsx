@@ -4,13 +4,11 @@ import { ErrorPage } from './ErrorPage';
 
 interface Props {
   readonly children: ReactNode;
-  readonly resetKey?: string;
 }
 
 interface State {
   hasError: boolean;
   error: Error | null;
-  prevResetKey?: string;
 }
 
 function logErrorPayload(error: Error, errorInfo: ErrorInfo): void {
@@ -53,14 +51,7 @@ export class ErrorBoundary extends Component<Props, State> {
     error: null,
   };
 
-  public static getDerivedStateFromProps(props: Props, state: State): Partial<State> | null {
-    if (props.resetKey !== undefined && props.resetKey !== state.prevResetKey) {
-      return { hasError: false, error: null, prevResetKey: props.resetKey };
-    }
-    return null;
-  }
-
-  public static getDerivedStateFromError(error: Error): Partial<State> {
+  public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 

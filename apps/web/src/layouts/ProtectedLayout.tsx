@@ -17,10 +17,8 @@ function RouteTransitionIndicator() {
 }
 
 export function ProtectedLayout() {
-  const location = useLocation();
-
   return (
-    <ErrorBoundary resetKey={location.pathname}>
+    <ErrorBoundary>
       <ProtectedRoute>
         <AnnouncementsProvider />
         <RouteTransitionIndicator />
