@@ -212,6 +212,51 @@ function godRoute(path: string, element: React.ReactNode): RouteObject {
   };
 }
 
+const PROTECTED_ROUTE_IMPORTS: Array<() => Promise<unknown>> = [
+  () => import('@/pages/dashboard/Dashboard'),
+  () => import('@/pages/home'),
+  () => import('@/pages/home-v2'),
+  () => import('@/pages/financial-health/FinancialHealthPage'),
+  () => import('@/pages/transactions'),
+  () => import('@/pages/reports'),
+  () => import('@/pages/payments'),
+  () => import('@/pages/categories'),
+  () => import('@/pages/accounts'),
+  () => import('@/pages/accounts/details'),
+  () => import('@/pages/openfinance'),
+  () => import('@/pages/profile'),
+  () => import('@/pages/budget'),
+  () => import('@/pages/credit-cards'),
+  () => import('@/pages/credit-cards/bills'),
+  () => import('@/pages/insights'),
+  () => import('@/pages/goals'),
+  () => import('@/pages/recurring-transactions'),
+  () => import('@/pages/users'),
+  () => import('@/pages/companies'),
+  () => import('@/pages/statement'),
+  () => import('@/pages/transactions/new'),
+  () => import('@/pages/import-ofx'),
+  () => import('@/pages/dependents'),
+  () => import('@/pages/income-sources'),
+  () => import('@/pages/payables'),
+  () => import('@/pages/receivables'),
+  () => import('@/pages/payments/new'),
+  () => import('@/pages/monthly-closing'),
+  () => import('@/pages/annual-result'),
+  () => import('@/pages/planner'),
+  () => import('@/pages/ai-classification'),
+  () => import('@/pages/settings'),
+  () => import('@/pages/onboarding'),
+  () => import('@/pages/business-logs'),
+  () => import('@/pages/accounts/statement-schedule/index'),
+  () => import('@/pages/admin/openai-logs'),
+  () => import('@/pages/admin/plans'),
+];
+
+export function preloadProtectedRoutes(): void {
+  PROTECTED_ROUTE_IMPORTS.forEach((load) => void load());
+}
+
 export const router = createBrowserRouter(
   [
     // ==================== PUBLIC ROUTES ====================

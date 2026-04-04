@@ -9,7 +9,7 @@ import { initStorageCleanup } from '@/utils/storageCleanup';
 
 import { MaintenanceProvider } from './components/maintenance/MaintenanceProvider';
 import { ThemeProvider } from './components/ThemeProvider';
-import { router } from './routes';
+import { preloadProtectedRoutes, router } from './routes';
 
 const ReactQueryDevtools = lazy(() =>
   import('@tanstack/react-query-devtools').then((d) => ({
@@ -43,6 +43,15 @@ const queryClient = new QueryClient({
 export function App() {
   useEffect(() => {
     initStorageCleanup();
+  }, []);
+
+  useEffect(() => {
+    if ('requestIdleCallback' in globalThis) {
+      const id = globalThis.requestIdleCallback(() => preloadProtectedRoutes());
+      return () => globalThis.cancelIdleCallback(id);
+    }
+    const id = globalThis.setTimeout(() => preloadProtectedRoutes(), 2000);
+    return () => globalThis.clearTimeout(id);
   }, []);
 
   const isDevelopment = import.meta.env.DEV;
