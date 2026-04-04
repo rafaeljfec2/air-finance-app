@@ -20,14 +20,14 @@ export function ProtectedLayout() {
   const location = useLocation();
 
   return (
-    <ProtectedRoute>
-      <AnnouncementsProvider />
-      <RouteTransitionIndicator />
-      <ErrorBoundary key={location.pathname}>
+    <ErrorBoundary resetKey={location.pathname}>
+      <ProtectedRoute>
+        <AnnouncementsProvider />
+        <RouteTransitionIndicator />
         <Suspense fallback={<SuspenseLoader />}>
           <Outlet />
         </Suspense>
-      </ErrorBoundary>
-    </ProtectedRoute>
+      </ProtectedRoute>
+    </ErrorBoundary>
   );
 }
