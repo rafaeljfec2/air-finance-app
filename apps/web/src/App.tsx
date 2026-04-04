@@ -53,7 +53,7 @@ export function App() {
         <CompanyProvider>
           <ThemeProvider>
             <MaintenanceProvider>
-              <RouterProvider router={router} future={{ v7_startTransition: true }} />
+              <RouterProvider router={router} />
             </MaintenanceProvider>
             <Toaster
               position="top-right"
