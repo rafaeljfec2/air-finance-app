@@ -21,7 +21,7 @@ export const useUsers = () => {
     refetch,
   } = useQuery<User[]>({
     queryKey: ['users'],
-    queryFn: getUsers,
+    queryFn: () => getUsers(),
     staleTime: 0, // Data is always considered stale
     gcTime: 0, // Don't cache data
     refetchOnMount: 'always', // Always refetch when component mounts
