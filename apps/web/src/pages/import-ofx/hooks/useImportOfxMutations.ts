@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from '@/components/ui/toast';
 import {
   createInstallments,
+  importCsv,
   importOfx,
   type InstallmentTransaction,
 } from '@/services/transactionService';
@@ -33,6 +34,11 @@ export function useImportOfxMutations({
       clearCashFlow?: boolean;
     }) => {
       if (!companyId) throw new Error('Selecione uma empresa');
+
+      const isCsv = file.name.toLowerCase().endsWith('.csv');
+      if (isCsv) {
+        return importCsv(companyId, file, accountId, importToCashFlow, clearCashFlow);
+      }
       return importOfx(companyId, file, accountId, importToCashFlow, clearCashFlow);
     },
     onSuccess: (data) => {
@@ -50,7 +56,7 @@ export function useImportOfxMutations({
     onError: (error: Error) => {
       toast({
         title: 'Erro na importação',
-        description: error.message || 'Não foi possível importar o arquivo OFX. Tente novamente.',
+        description: error.message || 'Não foi possível importar o arquivo. Tente novamente.',
         type: 'error',
       });
       onImportError();
@@ -109,8 +115,9 @@ export function useImportOfxMutations({
     importToCashFlow?: boolean,
     clearCashFlow?: boolean,
   ) => {
-    if (!file.name.toLowerCase().endsWith('.ofx')) {
-      throw new Error('Selecione um arquivo com extensão .ofx');
+    const fileName = file.name.toLowerCase();
+    if (!fileName.endsWith('.ofx') && !fileName.endsWith('.csv')) {
+      throw new Error('Selecione um arquivo com extensão .ofx ou .csv');
     }
     return await importMutation.mutateAsync({ file, accountId, importToCashFlow, clearCashFlow });
   };

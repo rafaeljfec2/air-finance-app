@@ -8,7 +8,7 @@ interface UseFileUploadOptions {
 }
 
 export function useFileUpload({
-  accept = '.ofx',
+  accept = '.ofx,.csv',
   maxSize,
   onFileSelect,
   onError,
@@ -19,9 +19,14 @@ export function useFileUpload({
 
   const validateFile = useCallback(
     (file: File): boolean => {
-      if (accept && !file.name.toLowerCase().endsWith(accept.replace('.', ''))) {
-        onError?.(`Apenas arquivos ${accept} são aceitos.`);
-        return false;
+      if (accept) {
+        const extensions = accept.split(',').map((ext) => ext.trim().replace(/^\./, ''));
+        const fileName = file.name.toLowerCase();
+        const isValid = extensions.some((ext) => fileName.endsWith(`.${ext}`));
+        if (!isValid) {
+          onError?.(`Apenas arquivos ${accept} são aceitos.`);
+          return false;
+        }
       }
 
       if (maxSize && file.size > maxSize) {

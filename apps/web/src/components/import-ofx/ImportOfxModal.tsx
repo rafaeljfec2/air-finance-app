@@ -59,7 +59,7 @@ export function ImportOfxModal({
     openFileDialog,
     reset: resetFileUpload,
   } = useFileUpload({
-    accept: '.ofx',
+    accept: '.ofx,.csv',
   });
 
   const handleImport = async () => {
@@ -176,7 +176,7 @@ export function ImportOfxModal({
           selectedFile={selectedFile}
           isDragging={isDragging}
           fileInputRef={fileInputRef}
-          accept=".ofx"
+          accept=".ofx,.csv"
           onFileInputChange={handleFileInputChange}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}

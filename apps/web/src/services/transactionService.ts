@@ -189,13 +189,14 @@ export const deleteTransaction = async (companyId: string, id: string): Promise<
   }
 };
 
-export const importOfx = async (
+async function importFile(
   companyId: string,
   file: File,
   accountId: string,
-  importToCashFlow: boolean = false,
-  clearCashFlow: boolean = false,
-): Promise<ImportOfxResponse> => {
+  endpoint: 'import-ofx' | 'import-csv',
+  importToCashFlow: boolean,
+  clearCashFlow: boolean,
+): Promise<ImportOfxResponse> {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('accountId', accountId);
@@ -203,23 +204,33 @@ export const importOfx = async (
   formData.append('clearCashFlow', String(clearCashFlow));
 
   const response = await apiClient.post(
-    `/companies/${companyId}/transactions/import-ofx`,
+    `/companies/${companyId}/transactions/${endpoint}`,
     formData,
     {
       headers: { 'Content-Type': 'multipart/form-data' },
     },
   );
 
-  try {
-    return ImportOfxResponseSchema.parse(response.data);
-  } catch (error) {
-    console.error('Error parsing ImportOfxResponse:', error);
-    if (error instanceof z.ZodError) {
-      console.error('Zod validation errors:', error.errors);
-    }
-    throw error;
-  }
-};
+  return ImportOfxResponseSchema.parse(response.data);
+}
+
+export const importOfx = (
+  companyId: string,
+  file: File,
+  accountId: string,
+  importToCashFlow: boolean = false,
+  clearCashFlow: boolean = false,
+): Promise<ImportOfxResponse> =>
+  importFile(companyId, file, accountId, 'import-ofx', importToCashFlow, clearCashFlow);
+
+export const importCsv = (
+  companyId: string,
+  file: File,
+  accountId: string,
+  importToCashFlow: boolean = false,
+  clearCashFlow: boolean = false,
+): Promise<ImportOfxResponse> =>
+  importFile(companyId, file, accountId, 'import-csv', importToCashFlow, clearCashFlow);
 
 export const createInstallments = async (
   companyId: string,

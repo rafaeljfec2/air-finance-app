@@ -32,10 +32,10 @@ export function FileUploadArea({
   return (
     <div className="space-y-2">
       <div className="block text-sm font-medium text-text dark:text-text-dark">
-        Arquivo OFX <span className="text-red-500">*</span>
+        Arquivo OFX / CSV <span className="text-red-500">*</span>
       </div>
       <section
-        aria-label="Área de upload de arquivo OFX"
+        aria-label="Área de upload de arquivo OFX ou CSV"
         className={cn(
           'relative border-2 border-dashed rounded-lg p-6 transition-colors',
           isDragging
@@ -81,7 +81,7 @@ export function FileUploadArea({
           <div className="text-center">
             <Upload className="h-10 w-10 mx-auto text-gray-400 dark:text-gray-500 mb-2" />
             <p className="text-sm text-text dark:text-text-dark mb-1">
-              Arraste e solte o arquivo OFX aqui
+              Arraste e solte o arquivo OFX ou CSV aqui
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">ou</p>
             <Button
@@ -94,7 +94,7 @@ export function FileUploadArea({
               Selecionar arquivo
             </Button>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              Apenas arquivos .ofx são aceitos
+              Arquivos .ofx e .csv são aceitos
             </p>
           </div>
         )}
