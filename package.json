@@ -48,7 +48,8 @@
     "picomatch@npm:^2.3.1": "npm:2.3.2",
     "picomatch@npm:^4.0.2": "npm:4.0.4",
     "picomatch@npm:^4.0.3": "npm:4.0.4",
-    "yaml": "2.8.3"
+    "yaml": "2.8.3",
+    "follow-redirects": "1.16.0"
   },
   "packageManager": "yarn@4.13.0",
   "engines": {
