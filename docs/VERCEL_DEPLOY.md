@@ -72,7 +72,7 @@ ENABLE_EXPERIMENTAL_COREPACK=1
 
 #### Node.js Version
 
-- **Node Version**: `18.x` ou `20.x`
+- **Node Version**: `24.x` (matches `engines` in root `package.json`)
 
 #### Ignored Build Step
 
@@ -216,29 +216,27 @@ A Vercel automaticamente:
 - ✅ Otimiza imagens
 - ✅ Cache inteligente
 
-## Limites do Plano Free
+## Hobby plan limits
 
-- **Build Time**: 6.000 minutos/mês
-- **Bandwidth**: 100 GB/mês
-- **Deployments**: Ilimitados
-- **Team Members**: 1
+- Build time: 6,000 minutes/month
+- Bandwidth: 100 GB/month
+- Deployments: Unlimited
+- Team members: 1
 
-Para aumentar, considere o plano Pro.
+See the Pro plan for higher limits.
 
-## Checklist Final
+## Deploy checklist
 
-Antes do primeiro deploy:
+- [ ] Root directory set to `.` (monorepo root) or `apps/web`
+- [ ] Build command: `turbo run build --filter=@air-finance/web`
+- [ ] Output directory: `dist`
+- [ ] Environment variables added (`VITE_API_URL`, `ENABLE_EXPERIMENTAL_COREPACK=1`)
+- [ ] `vercel.json` in root created
+- [ ] `apps/web/vercel.json` with rewrites created
+- [ ] `.vercelignore` configured
+- [ ] Local test: `yarn build`
 
-- [ ] Root Directory configurado para `apps/web`
-- [ ] Build command atualizado
-- [ ] Output directory configurado como `dist`
-- [ ] Variáveis de ambiente adicionadas
-- [ ] `vercel.json` na raiz criado
-- [ ] `apps/web/vercel.json` com rewrites criado
-- [ ] `.vercelignore` configurado
-- [ ] Teste local: `yarn build --filter=@air-finance/web`
-
-## Links Úteis
+## References
 
 - [Vercel Monorepo Guide](https://vercel.com/docs/monorepos)
 - [Turborepo + Vercel](https://turbo.build/repo/docs/handbook/deploying-with-docker#vercel)

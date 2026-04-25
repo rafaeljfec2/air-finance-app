@@ -62,3 +62,7 @@ Turborepo monorepo: React 18 + Vite (`apps/web`), mobile WebView app, and `packa
 - Security: `docs/SECURITY_FIX_REPORT.md`
 - Deploy: `docs/VERCEL_DEPLOY.md`
 - Migration: `docs/MIGRATION.md`
+- Tech stack: `docs/TECH_STACK.md`
+- Business domain: `docs/BUSINESS_DOMAIN.md`
+- Pricing: `docs/PRICING_ANALYSIS.md`
+- UX ideas: `docs/USABILITY_SUGGESTIONS.md`

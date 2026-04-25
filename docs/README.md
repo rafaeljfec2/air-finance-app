@@ -1,243 +1,81 @@
-# Documentação do Projeto Air Finance
+# Air Finance Documentation
 
-Bem-vindo à documentação completa do projeto Air Finance. Esta documentação fornece guias detalhados sobre arquitetura, padrões de desenvolvimento, design system e como criar novas funcionalidades.
+Documentation index for the Air Finance monorepo.
 
-> **Nota**: Esta é a documentação do **monorepo Air Finance**. Para documentação específica do web app, veja [apps/web/docs/](../apps/web/docs/).
-
----
-
-## 🏗️ Estrutura do Monorepo
+## Monorepo structure
 
 ```
 air-finance-app/
 ├── apps/
-│   ├── web/                    # Frontend web (React + Vite)
-│   └── mobile-webview/         # App mobile (Expo + WebView)
+│   ├── web/                    # React 18 + Vite SPA
+│   └── mobile-webview/         # Expo + React Native WebView
 ├── packages/
-│   └── shared/                 # Código compartilhado
-│       ├── types/              # Tipos TypeScript
-│       ├── constants/          # Constantes e configs
-│       └── utils/              # Utilitários
-├── scripts/                    # Scripts de build/deploy
-├── docs/                       # Esta documentação (raiz)
-├── package.json                # Root workspace
-├── turbo.json                  # Configuração Turborepo
-└── yarn.lock                   # Lockfile único
+│   └── shared/                 # Shared types, constants, utils
+├── docs/                       # This documentation folder
+├── turbo.json                  # Turborepo config
+└── package.json                # Root workspace (Yarn 4)
 ```
 
----
-
-## 📚 Documentos Disponíveis
-
-### 🏗️ [Arquitetura do Projeto](./ARCHITECTURE.md)
-
-Guia completo sobre a arquitetura do frontend, incluindo:
-
-- Estrutura de diretórios do monorepo
-- Padrões de componentes
-- Gerenciamento de estado
-- Roteamento
-- Layouts Web vs Mobile
-- Package compartilhado (@air-finance/shared)
-
-**Leia primeiro** se você é novo no projeto ou precisa entender a estrutura geral.
-
----
-
-### 🎨 [Design System](./DESIGN_SYSTEM.md)
-
-Sistema de design completo com:
-
-- Paleta de cores
-- Tipografia
-- Componentes base
-- Padrões de layout
-- Diretrizes de acessibilidade
-- Responsividade e Safe Areas
-
-**Consulte** ao criar novos componentes ou quando precisar manter consistência visual.
-
----
-
-### 🚀 [Criando Novas Telas](./CREATING_PAGES.md)
-
-Guia passo a passo para criar novas páginas:
-
-- Estrutura de arquivos no monorepo
-- Templates base
-- Exemplo completo de CRUD
-- Hooks customizados
-- Uso de tipos compartilhados
-- Checklist final
-
-**Use** sempre que precisar criar uma nova página ou feature.
-
----
-
-### 📱 [Guia Mobile-First](./MOBILE_FIRST_GUIDE.md)
-
-Diretrizes para desenvolvimento mobile-first:
-
-- Breakpoints Tailwind
-- Padrões responsivos
-- Safe Areas (iOS/Android)
-- Princípios mobile-first
-- Exemplos práticos
-- Checklist de responsividade
-
-**Consulte** ao criar componentes responsivos ou ajustar layouts.
-
----
-
-### 🏗️ [Arquitetura Frontend Detalhada](./FRONTEND_ARCHITECTURE.md)
-
-Documentação técnica aprofundada:
-
-- Hierarquia de componentes
-- Fluxo de dados
-- Hooks customizados
-- Padrões avançados
-- Best practices
-
-**Consulte** para entendimento técnico profundo.
-
----
-
-## 🎯 Início Rápido
-
-### Para Desenvolvedores Novos
-
-1. **Setup inicial**: [README principal](../README.md)
-2. **Entenda a arquitetura**: [Arquitetura do Projeto](./ARCHITECTURE.md)
-3. **Conheça o Design System**: [Design System](./DESIGN_SYSTEM.md)
-4. **Crie sua primeira página**: [Criando Novas Telas](./CREATING_PAGES.md)
-
-### Para Criar uma Nova Feature
-
-1. **Planeje a estrutura**: [Arquitetura - Estrutura de Diretórios](./ARCHITECTURE.md#estrutura-de-diretórios)
-2. **Use os templates**: [Criando Novas Telas - Template Base](./CREATING_PAGES.md#template-base)
-3. **Siga o design system**: [Design System](./DESIGN_SYSTEM.md)
-4. **Garanta responsividade**: [Guia Mobile-First](./MOBILE_FIRST_GUIDE.md)
-5. **Use tipos compartilhados**: `@air-finance/shared`
-
-### Para Criar um Novo Componente
-
-1. **Escolha o tipo**: [Arquitetura - Tipos de Componentes](./ARCHITECTURE.md#tipos-de-componentes)
-2. **Use componentes base**: [Design System - Componentes Base](./DESIGN_SYSTEM.md#componentes-base)
-3. **Siga padrões**: [Arquitetura - Padrões de Desenvolvimento](./ARCHITECTURE.md#padrões-de-desenvolvimento)
-
----
-
-## 🔍 Busca Rápida
-
-### "Como criar uma nova página?"
-→ [Criando Novas Telas](./CREATING_PAGES.md)
-
-### "Quais componentes usar?"
-→ [Design System - Componentes Base](./DESIGN_SYSTEM.md#componentes-base)
-
-### "Como fazer responsivo?"
-→ [Guia Mobile-First](./MOBILE_FIRST_GUIDE.md)
-
-### "Onde colocar meus arquivos?"
-→ [Arquitetura - Estrutura de Diretórios](./ARCHITECTURE.md#estrutura-de-diretórios)
-
-### "Como usar código compartilhado?"
-→ [Arquitetura - Package Shared](./ARCHITECTURE.md#package-shared)
-
-### "Como gerenciar estado?"
-→ [Arquitetura - Gerenciamento de Estado](./ARCHITECTURE.md#gerenciamento-de-estado)
-
-### "Quais cores usar?"
-→ [Design System - Paleta de Cores](./DESIGN_SYSTEM.md#paleta-de-cores)
-
-### "Como fazer deploy?"
-→ [Guia de Deploy](../VERCEL_DEPLOY.md)
-
----
-
-## 📦 Workspaces do Monorepo
-
-### @air-finance/web
-Frontend web em React + Vite
-
-**Documentação**: [apps/web/docs/](../apps/web/docs/)  
-**README**: [apps/web/README.md](../apps/web/README.md)
-
-### @air-finance/mobile-webview
-App mobile com Expo + WebView
-
-**README**: [apps/mobile-webview/README.md](../apps/mobile-webview/README.md)
-
-### @air-finance/shared
-Package compartilhado (types, constants, utils)
-
-**Localização**: `packages/shared/`
-
----
-
-## 📋 Checklist Geral
-
-Ao trabalhar no projeto, certifique-se de:
-
-- [ ] Seguir a estrutura de diretórios estabelecida
-- [ ] Usar componentes base quando possível
-- [ ] Importar tipos/utils de `@air-finance/shared` quando aplicável
-- [ ] Implementar mobile-first
-- [ ] Suportar tema escuro
-- [ ] Respeitar Safe Areas (mobile)
-- [ ] Garantir acessibilidade
-- [ ] Tratar estados de loading/error
-- [ ] Usar TypeScript corretamente
-- [ ] Seguir padrões de código do projeto
-- [ ] Executar `yarn typecheck` e `yarn lint` antes de commit
-
----
-
-## 🛠️ Tecnologias Principais
-
-### Monorepo
-- **Yarn 4** (Berry) - Package manager
-- **Turborepo** - Build system
-- **Yarn Workspaces** - Gerenciamento de dependências
-
-### Frontend Web
-- **React 18** + **TypeScript**
-- **Vite** - Build tool
-- **React Router** - Roteamento
-- **Tailwind CSS** - Estilização
-- **Zustand** - Estado global
-- **React Query** - Gerenciamento de dados do servidor
-- **Lucide React** - Ícones
-
-### Mobile
-- **Expo** - Framework React Native
-- **React Native WebView** - Renderização do web app
-
-### Deploy
-- **Vercel** - Hosting e CI/CD
-
----
-
-## 📞 Suporte
-
-Se tiver dúvidas ou precisar de ajuda:
-
-1. Consulte a documentação relevante acima
-2. Verifique exemplos existentes no código
-3. Consulte os componentes base em `apps/web/src/components/ui/`
-4. Veja páginas existentes em `apps/web/src/pages/` como referência
-5. Consulte o package shared em `packages/shared/src/`
-6. Leia o [README principal](../README.md) para comandos do monorepo
-
----
-
-## 🔄 Atualizações
-
-Esta documentação é atualizada conforme o projeto evolui.
-
-**Última atualização**: 2026-01-16 (Migração para monorepo)
-
----
-
-**Boa codificação! 🚀**
+## Document index
+
+| Document | Purpose |
+| --- | --- |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | Monorepo structure, component hierarchy, state management, routing |
+| [FRONTEND_ARCHITECTURE.md](./FRONTEND_ARCHITECTURE.md) | Deep dive: layouts, data flow, safe areas, component patterns |
+| [CREATING_PAGES.md](./CREATING_PAGES.md) | Step-by-step guide for adding new pages and features |
+| [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | Colors, typography, spacing, UI components, accessibility |
+| [MOBILE_FIRST_GUIDE.md](./MOBILE_FIRST_GUIDE.md) | Responsive design principles, breakpoints, testing |
+| [AUTH_SESSION_IMPLEMENTATION.md](./AUTH_SESSION_IMPLEMENTATION.md) | JWT + HttpOnly cookies, token refresh, session flow |
+| [SECURITY_FIX_REPORT.md](./SECURITY_FIX_REPORT.md) | Critical user data leak fix (Jan 2026) |
+| [VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md) | Build config, env vars, Turborepo remote caching |
+| [MIGRATION.md](./MIGRATION.md) | Monorepo migration record (from single-app repo) |
+| [TECH_STACK.md](./TECH_STACK.md) | Exact dependency versions by category |
+| [BUSINESS_DOMAIN.md](./BUSINESS_DOMAIN.md) | Product areas, multi-company model, subscription plans |
+| [PRICING_ANALYSIS.md](./PRICING_ANALYSIS.md) | Subscription pricing strategy and cost analysis |
+| [USABILITY_SUGGESTIONS.md](./USABILITY_SUGGESTIONS.md) | UX improvement ideas (FAB, gestures, haptics) |
+
+## Quick start for new developers
+
+1. Read the root [README.md](../README.md) for setup commands
+2. Understand the architecture: [ARCHITECTURE.md](./ARCHITECTURE.md)
+3. Learn the design system: [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
+4. Create your first page: [CREATING_PAGES.md](./CREATING_PAGES.md)
+
+## Quick start for new features
+
+1. Plan file structure: [ARCHITECTURE.md](./ARCHITECTURE.md)
+2. Follow page templates: [CREATING_PAGES.md](./CREATING_PAGES.md)
+3. Use design tokens: [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
+4. Ensure mobile-first: [MOBILE_FIRST_GUIDE.md](./MOBILE_FIRST_GUIDE.md)
+5. Import shared types from `@air-finance/shared`
+
+## Related files outside docs/
+
+| File | Purpose |
+| --- | --- |
+| `AGENTS.md` | AI agent briefing (structure, commands, guidance) |
+| `CLAUDE.md` | Claude Code doc map, skills, precedence |
+| `HARNESS.md` | Validation checklist (typecheck, lint, build, visual) |
+| `.cursor/rules/general.mdc` | Always-on coding rules |
+| `.cursor/rules/sdd-protocol.mdc` | SDD Protocol (TDD, file placement, quality gates) |
+| `.cursor/rules/architecture.mdc` | Routing, services, state, layouts |
+| `.cursor/rules/domain.mdc` | Business domain context for AI agents |
+
+## Workspace packages
+
+| Package | Path | Description |
+| --- | --- | --- |
+| `@air-finance/web` | `apps/web` | Main product UI (React + Vite + Tailwind) |
+| `@air-finance/mobile-webview` | `apps/mobile-webview` | Expo + WebView wrapper |
+| `@air-finance/shared` | `packages/shared` | Shared types, constants, utilities |
+
+## Checklist (all changes)
+
+- [ ] Follow established directory structure
+- [ ] Use existing UI components from `components/ui/`
+- [ ] Import shared types from `@air-finance/shared` where applicable
+- [ ] Implement mobile-first (base styles, then `sm:`, `md:`, `lg:`)
+- [ ] Support dark mode (`dark:` variants)
+- [ ] Handle loading, error, and empty states
+- [ ] Use strict TypeScript (no `any`)
+- [ ] Run `yarn typecheck` and `yarn lint` before commit

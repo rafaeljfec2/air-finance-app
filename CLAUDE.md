@@ -22,11 +22,13 @@ You MUST read `AGENTS.md` before any substantive code action.
 | `apps/web/src/services/**` | `docs/AUTH_SESSION_IMPLEMENTATION.md` (if auth) |
 | `apps/web/src/layouts/**` | `docs/MOBILE_FIRST_GUIDE.md` + `docs/FRONTEND_ARCHITECTURE.md` |
 | Responsive / mobile | `docs/MOBILE_FIRST_GUIDE.md` |
-| Domain / business | `.cursor/rules/domain.mdc` |
+| Domain / business | `.cursor/rules/domain.mdc` + `docs/BUSINESS_DOMAIN.md` |
 | Architecture decisions | `.cursor/rules/architecture.mdc` |
 | Deploy | `docs/VERCEL_DEPLOY.md` |
 | Monorepo migration | `docs/MIGRATION.md` |
 | Security | `docs/SECURITY_FIX_REPORT.md` |
+| Dependency versions | `docs/TECH_STACK.md` |
+| Subscription / pricing | `docs/PRICING_ANALYSIS.md` |
 
 ## Skills available locally
 
