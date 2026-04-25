@@ -1,0 +1,123 @@
+---
+description: SDD Protocol — Software Design Document compliance for AI-assisted development
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: true
+---
+
+# SDD Protocol — Air Finance App
+
+This rule defines the Software Design Document (SDD) protocol that AI agents (Cursor, Claude Code) MUST follow when working in this repository.
+
+## 1. Before writing any code
+
+1. **Read the relevant documentation** listed in `CLAUDE.md` or `AGENTS.md` for the area you are modifying.
+2. **Understand the existing pattern** by reading at least one neighboring file in the same directory.
+3. **Check for existing implementations** — search before creating. Reuse > recreate.
+
+## 2. File placement rules
+
+| Artifact            | Location                                       | Naming                      |
+| ------------------- | ---------------------------------------------- | --------------------------- |
+| Page component      | `apps/web/src/pages/<feature>/index.tsx`       | PascalCase export           |
+| Page sub-components | `apps/web/src/pages/<feature>/components/`     | `<Feature><Part>.tsx`       |
+| Page hooks          | `apps/web/src/pages/<feature>/hooks/`          | `use<Feature><Action>.ts`   |
+| Global component    | `apps/web/src/components/` or `components/ui/` | PascalCase                  |
+| Service             | `apps/web/src/services/<feature>Service.ts`    | camelCase                   |
+| Hook (global)       | `apps/web/src/hooks/use<Name>.ts`              | camelCase with `use` prefix |
+| Zustand store       | `apps/web/src/stores/<name>.ts`                | camelCase                   |
+| Type                | `apps/web/src/types/<Name>.ts`                 | PascalCase                  |
+| Utility             | `apps/web/src/utils/<name>.ts`                 | camelCase                   |
+| Shared (cross-app)  | `packages/shared/src/`                         | Follow existing structure   |
+| Route               | `apps/web/src/routes/`                         | Follow lazy import pattern  |
+
+## 3. Component creation protocol
+
+Every new page MUST follow this structure:
+
+```
+pages/<feature>/
+├── index.tsx                    # Main page component
+├── components/
+│   ├── <Feature>Header.tsx
+│   ├── <Feature>Filters.tsx
+│   ├── <Feature>List.tsx
+│   ├── <Feature>Card.tsx
+│   ├── <Feature>EmptyState.tsx
+│   └── <Feature>ErrorState.tsx
+└── hooks/
+    ├── use<Feature>Filters.ts
+    └── use<Feature>Sorting.ts
+```
+
+Every page component MUST:
+
+- Wrap content in `ViewDefault` (authenticated) or `LayoutAuth` (public)
+- Handle loading, error, and empty states
+- Be mobile-first responsive
+- Support dark mode
+- Use existing UI primitives from `components/ui/`
+
+## 4. Data flow protocol
+
+```
+Route → Page → Custom Hook → Service (apiClient) → TanStack Query → UI
+                                                  ↕
+                                            Zustand Store (UI state only)
+```
+
+- Server state: TanStack Query (`useQuery`, `useMutation`)
+- Client UI state: Zustand (sidebar, theme, active company, preferences)
+- Form state: react-hook-form + zod schema
+- NEVER mix server state in Zustand stores
+
+## 5. TypeScript constraints
+
+- `any` is FORBIDDEN — use explicit types or `unknown` with narrowing
+- Use `??` instead of `||` for nullish coalescing
+- Props interfaces MUST be `readonly`
+- Prefer `interface` over `type` for object shapes
+- Export types from `types/` when shared across features
+
+## 6. Styling constraints
+
+- Mobile-first: base styles are for mobile; expand with `sm:`, `md:`, `lg:`, `xl:`
+- Use Tailwind utility classes; avoid inline styles
+- Use design system colors: `primary-*`, `text`, `card`, `border`, `background`
+- Dark mode: always include `dark:` variants
+- Touch targets: minimum 44x44px on mobile
+- Use safe area utilities for fixed/absolute positioned elements
+
+## 7. Quality gates
+
+Before considering work complete:
+
+1. `yarn typecheck` passes
+2. `yarn lint` passes
+3. Mobile viewport (375px) renders correctly
+4. Dark mode works
+5. Loading, error, and empty states are handled
+6. No `any` types introduced
+7. No unnecessary comments added
+8. Existing patterns followed (not new abstractions without justification)
+
+## 8. Harness — What to verify after changes
+
+| Check           | Command / Method                            |
+| --------------- | ------------------------------------------- |
+| TypeScript      | `yarn typecheck`                            |
+| Linter          | `yarn lint`                                 |
+| Build           | `yarn build`                                |
+| Mobile layout   | Browser DevTools at 375px width             |
+| Dark mode       | Toggle theme in app or browser              |
+| Route works     | Navigate to the new/changed route           |
+| API integration | Verify service calls match backend contract |
+
+## 9. Forbidden actions
+
+- Do NOT create files > 500 lines — refactor into modules
+- Do NOT modify `.env` files without explicit user authorization
+- Do NOT add new dependencies without checking if equivalent exists
+- Do NOT use simulated/mock data outside of test files
+- Do NOT skip ViewDefault layout for authenticated pages
+- Do NOT use desktop-first responsive patterns
+- Do NOT commit secrets or credentials

@@ -39,11 +39,26 @@ Turborepo monorepo: React 18 + Vite (`apps/web`), mobile WebView app, and `packa
 
 - Configure per app (e.g. `apps/web` Vite env prefixes). Do not commit `.env` files with secrets.
 
+## AI agent guidance
+
+- **CLAUDE.md**: Read first — Claude Code briefing with doc map, skills, and non-negotiable patterns
+- **HARNESS.md**: Validation checklist — run after every change
+- **SDD Protocol**: `.cursor/rules/sdd-protocol.mdc` — mandatory compliance for code generation
+
 ## Cursor
 
 - Rules: `.cursor/rules/*.mdc` (replaces legacy `apps/web/.cursorrules` content)
+- SDD: `.cursor/rules/sdd-protocol.mdc` — always-on protocol for AI-assisted development
 - Repo skill: `.cursor/skills/frontend-dev/SKILL.md`
 
 ## Docs
 
 - Start with `docs/README.md`, `docs/CREATING_PAGES.md`, and `docs/MOBILE_FIRST_GUIDE.md` for new work.
+- Full doc index: `docs/README.md`
+- Architecture: `docs/ARCHITECTURE.md`, `docs/FRONTEND_ARCHITECTURE.md`
+- Design system: `docs/DESIGN_SYSTEM.md`
+- Mobile: `docs/MOBILE_FIRST_GUIDE.md`
+- Auth: `docs/AUTH_SESSION_IMPLEMENTATION.md`
+- Security: `docs/SECURITY_FIX_REPORT.md`
+- Deploy: `docs/VERCEL_DEPLOY.md`
+- Migration: `docs/MIGRATION.md`
