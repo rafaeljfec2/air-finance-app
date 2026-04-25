@@ -1,23 +1,21 @@
-# Guia de Deploy na Vercel
+# Vercel Deploy Guide
 
-## Configuração do Projeto na Vercel
+## Project Setup
 
-### 1. Importar o Projeto
+### 1. Import the Project
 
-1. Acesse [Vercel Dashboard](https://vercel.com/dashboard)
-2. Clique em "Add New..." → "Project"
-3. Selecione o repositório `air-finance-app`
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Click "Add New..." -> "Project"
+3. Select the `air-finance-app` repository
 
-### 2. Configurações do Build
-
-Na tela de configuração do projeto, defina:
+### 2. Build Configuration
 
 #### Framework Preset
 
 - **Framework Preset**: `Other`
-- **Root Directory**: `.` (raiz do monorepo - DEIXE VAZIO ou use `.`)
+- **Root Directory**: `.` (monorepo root -- leave empty or use `.`)
 
-#### Build & Development Settings
+#### Build and Development Settings
 
 **Build Command**:
 
@@ -37,30 +35,30 @@ dist
 corepack enable && yarn install
 ```
 
-> Isso habilita o Corepack para usar Yarn 4.x conforme definido em `packageManager`
+This enables Corepack to use Yarn 4.x as defined in `packageManager`.
 
-**Development Command** (opcional):
+**Development Command** (optional):
 
 ```bash
 yarn dev
 ```
 
-### 3. Variáveis de Ambiente
+### 3. Environment Variables
 
-Adicione as seguintes variáveis de ambiente no painel da Vercel:
+Add these in the Vercel dashboard:
 
-#### Produção
+#### Production
 
 ```
-VITE_API_URL=https://sua-api.com
+VITE_API_URL=https://your-api.com
 VITE_APP_NAME=Air Finance
 VITE_APP_VERSION=1.0.0
 ENABLE_EXPERIMENTAL_COREPACK=1
 ```
 
-> `ENABLE_EXPERIMENTAL_COREPACK=1` garante que a Vercel use Yarn 4.x via Corepack
+`ENABLE_EXPERIMENTAL_COREPACK=1` ensures Vercel uses Yarn 4.x via Corepack.
 
-#### Preview (opcional)
+#### Preview (optional)
 
 ```
 VITE_API_URL=https://staging-api.com
@@ -68,7 +66,7 @@ VITE_APP_NAME=Air Finance (Staging)
 ENABLE_EXPERIMENTAL_COREPACK=1
 ```
 
-### 4. Configurações Avançadas (Opcional)
+### 4. Advanced Settings (optional)
 
 #### Node.js Version
 
@@ -76,29 +74,29 @@ ENABLE_EXPERIMENTAL_COREPACK=1
 
 #### Ignored Build Step
 
-Se você quiser ignorar o build em alguns commits (útil para docs):
+To skip builds on documentation-only commits:
 
 ```bash
 git diff HEAD^ HEAD --quiet . ':!*.md' ':!VERCEL_DEPLOY.md'
 ```
 
-## Estrutura de Arquivos para Vercel
+## File Structure
 
 ```
 air-finance-app/
-├── vercel.json                 # Configuração principal da Vercel (raiz)
-├── .vercelignore              # Arquivos a ignorar no deploy
+├── vercel.json                 # Root Vercel config
+├── .vercelignore               # Files to exclude from deploy
 ├── apps/
 │   └── web/
-│       ├── vercel.json        # Configuração específica do web (rewrites)
-│       ├── dist/              # Output directory (gerado no build)
+│       ├── vercel.json         # Web-specific config (rewrites)
+│       ├── dist/               # Build output directory
 │       └── ...
-└── turbo.json                 # Turborepo usa isso automaticamente
+└── turbo.json                  # Turborepo picks this up automatically
 ```
 
-## Deploy Manual via CLI
+## Manual Deploy via CLI
 
-### Instalar Vercel CLI
+### Install Vercel CLI
 
 ```bash
 npm i -g vercel
@@ -110,113 +108,109 @@ npm i -g vercel
 vercel login
 ```
 
-### Deploy de Produção
+### Production Deploy
 
 ```bash
 cd air-finance-app
 vercel --prod
 ```
 
-### Deploy de Preview
+### Preview Deploy
 
 ```bash
 vercel
 ```
 
-## Turborepo na Vercel
+## Turborepo on Vercel
 
-A Vercel detecta automaticamente monorepos com Turborepo e:
+Vercel automatically detects Turborepo monorepos and:
 
-- ✅ Usa o cache remoto do Turborepo (se configurado)
-- ✅ Faz build apenas do que mudou
-- ✅ Otimiza o tempo de build
+- Uses Turborepo remote cache (if configured)
+- Builds only what changed
+- Optimizes build times
 
-### Habilitar Remote Caching (Opcional)
+### Enable Remote Caching (optional)
 
-1. Faça login no Turborepo:
+1. Login to Turborepo:
 
 ```bash
 npx turbo login
 ```
 
-2. Link o projeto:
+2. Link the project:
 
 ```bash
 npx turbo link
 ```
 
-3. Isso criará um token que a Vercel usará automaticamente
+3. This creates a token that Vercel uses automatically.
 
-## Monitoramento e Logs
+## Monitoring and Logs
 
-### Ver Logs de Build
+### Build Logs
 
-- Acesse o Dashboard da Vercel
-- Vá em "Deployments"
-- Clique no deployment específico
-- Veja a aba "Building"
+- Open the Vercel Dashboard
+- Go to "Deployments"
+- Click the specific deployment
+- Check the "Building" tab
 
-### Ver Logs de Runtime
+### Runtime Logs
 
-- Aba "Functions" → "Logs"
+- "Functions" tab -> "Logs"
 
 ## Troubleshooting
 
-### Erro: "Could not find a production build"
+### Error: "Could not find a production build"
 
-**Solução**: Verifique se o `outputDirectory` está correto: `apps/web/dist`
+**Fix**: Verify `outputDirectory` is correct: `apps/web/dist`
 
-### Erro: "Command failed with exit code 1"
+### Error: "Command failed with exit code 1"
 
-**Solução**:
+**Fix**:
 
-1. Verifique as variáveis de ambiente
-2. Teste o build localmente: `yarn build --filter=@air-finance/web`
-3. Verifique os logs de build na Vercel
+1. Check environment variables
+2. Test build locally: `yarn build --filter=@air-finance/web`
+3. Check Vercel build logs
 
-### Build muito lento
+### Slow builds
 
-**Solução**:
+**Fix**:
 
-- Habilite o Remote Caching do Turborepo
-- Verifique o `.vercelignore` para não enviar arquivos desnecessários
+- Enable Turborepo Remote Caching
+- Check `.vercelignore` to exclude unnecessary files
 
-### Rotas retornam 404
+### Routes return 404
 
-**Solução**: Verifique se `apps/web/vercel.json` tem as rewrites configuradas
+**Fix**: Verify `apps/web/vercel.json` has rewrites configured.
 
-## Domínio Customizado
+## Custom Domain
 
-### Adicionar Domínio
+### Add Domain
 
-1. Vá em "Settings" → "Domains"
-2. Adicione seu domínio
-3. Configure os DNS:
-   - Tipo: `A`
-   - Nome: `@`
-   - Valor: `76.76.21.21`
+1. Go to "Settings" -> "Domains"
+2. Add your domain
+3. Configure DNS:
+   - Type: `A`, Name: `@`, Value: `76.76.21.21`
 
-   ou
-   - Tipo: `CNAME`
-   - Nome: `www`
-   - Valor: `cname.vercel-dns.com`
+   or
+   - Type: `CNAME`, Name: `www`, Value: `cname.vercel-dns.com`
 
 ## Preview Deployments
 
-- Cada push em branches que não sejam `main` cria um Preview Deployment
-- URLs são geradas automaticamente
-- Útil para testar antes do merge
+- Every push to non-`main` branches creates a Preview Deployment
+- URLs are generated automatically
+- Useful for testing before merge
 
-## Configurações de Performance
+## Performance
 
-A Vercel automaticamente:
+Vercel automatically:
 
-- ✅ Comprime assets (gzip, brotli)
-- ✅ Adiciona CDN global
-- ✅ Otimiza imagens
-- ✅ Cache inteligente
+- Compresses assets (gzip, brotli)
+- Serves via global CDN
+- Optimizes images
+- Applies intelligent caching
 
-## Hobby plan limits
+## Hobby Plan Limits
 
 - Build time: 6,000 minutes/month
 - Bandwidth: 100 GB/month
@@ -225,7 +219,7 @@ A Vercel automaticamente:
 
 See the Pro plan for higher limits.
 
-## Deploy checklist
+## Deploy Checklist
 
 - [ ] Root directory set to `.` (monorepo root) or `apps/web`
 - [ ] Build command: `turbo run build --filter=@air-finance/web`
