@@ -1,7 +1,10 @@
 openapi: 3.0.3
 info:
   title: Fragment — POST decision-engine/evaluate-auto
-  version: 0.2.0
+  version: 0.3.0
+  description: >-
+    Composer loads Indebtedness + Dashboard + InstallmentsSnapshot in parallel; response body
+    matches POST .../evaluate (spec 001 contracts/openapi.yaml).
 paths:
   /companies/{companyId}/decision-engine/evaluate-auto:
     post:

@@ -1,6 +1,23 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatPrimaryIssueLabel, problemHeadlineFromPrimaryIssue } from './primaryIssueLabels';
+import { PRIMARY_ISSUE_SLUGS } from '@/types/decisionEngine';
+
+import {
+  formatPrimaryIssueLabel,
+  PRIMARY_ISSUE_LABELS_PT,
+  problemHeadlineFromPrimaryIssue,
+} from './primaryIssueLabels';
+
+describe('PRIMARY_ISSUE_LABELS_PT', () => {
+  it('defines a non-empty PT-BR label for every contract PrimaryIssueSlug', () => {
+    expect(PRIMARY_ISSUE_SLUGS.length).toBeGreaterThanOrEqual(3);
+    for (const slug of PRIMARY_ISSUE_SLUGS) {
+      const label = PRIMARY_ISSUE_LABELS_PT[slug];
+      expect(label.length).toBeGreaterThan(2);
+      expect(label).not.toContain('_');
+    }
+  });
+});
 
 describe('formatPrimaryIssueLabel', () => {
   it('returns PT-BR for canonical primary_issue slugs', () => {

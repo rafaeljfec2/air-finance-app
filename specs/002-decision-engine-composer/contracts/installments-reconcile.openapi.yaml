@@ -1,0 +1,66 @@
+openapi: 3.0.3
+info:
+  title: Fragment — GET decision-engine/installments-reconcile
+  version: 0.1.0
+paths:
+  /companies/{companyId}/decision-engine/installments-reconcile:
+    get:
+      tags: [DecisionEngine]
+      summary: Read-only installments diagnostics (Mongo funnel vs snapshot vs composer bundle)
+      operationId: decisionEngineInstallmentsReconcile
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: companyId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: referencePeriod
+          in: query
+          required: false
+          description: >-
+            YYYY-MM for bundle cross-check period normalization. Diagnostic snapshot uses
+            server-defined start-of-day (see diagnostic.referenceStartOfDayUtc in response).
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}$'
+            example: '2026-05'
+      responses:
+        '200':
+          description: >-
+            Reconcile payload — see InstallmentsReconcileResponseDto in API
+            (complete-plan/dto/installments-reconcile-response.dto.ts) for full nested schema.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallmentsReconcileResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
+  schemas:
+    InstallmentsReconcileResponse:
+      type: object
+      required:
+        - diagnostic
+        - bundleCrossCheck
+        - projection
+        - decisionValidationNotes
+      properties:
+        diagnostic:
+          type: object
+        bundleCrossCheck:
+          type: object
+        projection:
+          type: object
+        decisionValidationNotes:
+          type: array
+          items:
+            type: string

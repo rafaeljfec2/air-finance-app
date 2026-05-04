@@ -1,14 +1,12 @@
 {
-  "from": "reviewer",
+  "from": "architect",
   "to": "user",
   "feature": "002-decision-engine-composer",
-  "phase": "review-done",
-  "summary": "SDD review escrito em specs/002-decision-engine-composer/review.md — Verdict APPROVED. Major: alinhar spec 002 (UI out of scope vs entrega). Minor: copy primary_issue, referencePeriod UI, SIZE outros ficheiros, diff local.",
+  "phase": "tasks",
+  "summary": "tasks.md v0.2: BE hardening T1-T6, FE T7-T9, SHARED T10-T11, DEVOPS T12-T13; baseline delivered section; dispatch order.",
   "next_steps": [
-    "Merge após CI + diff local se necessário",
-    "Ajustar spec 002 ou cross-link 001 (UI)",
-    "Opcional: backlog copy PT / período / e2e; chore SIZE >500"
+    "Dispatch /sdd-implement-be (T1,T4,T3,T2,T5) and/or /sdd-implement-fe (T7,T8,T9) in parallel",
+    "SHARED: T10 spec scope first if legal/product needs single narrative"
   ],
-  "verdict": "APPROVED",
-  "timestamp": "2026-05-04T12:00:00Z"
+  "timestamp": "2026-05-04T19:00:00Z"
 }

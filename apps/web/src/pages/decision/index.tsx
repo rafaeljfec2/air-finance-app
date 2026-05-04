@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { Compass, RefreshCw } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,10 +13,12 @@ import { useCompanyStore } from '@/stores/company';
 import { DecisionCompletePlanSection } from './components/complete-plan/DecisionCompletePlanSection';
 import { DecisionPlaybookCard } from './components/DecisionPlaybookCard';
 import { DecisionPrimaryBlock } from './components/DecisionPrimaryBlock';
+import { DecisionReferencePeriodSelector } from './components/DecisionReferencePeriodSelector';
 import { DecisionSecondaryActions } from './components/DecisionSecondaryActions';
 import { DecisionStatusStrip } from './components/DecisionStatusStrip';
 import { getPlaybook } from './playbooks';
 import { problemHeadlineFromPrimaryIssue } from './primaryIssueLabels';
+import { resolveEvaluateAutoReferencePeriod } from './utils/referencePeriod';
 
 export function FinancialDecisionPage() {
   const { activeCompany } = useCompanyStore();
@@ -24,7 +26,20 @@ export function FinancialDecisionPage() {
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const query = useDecisionEngineEvaluateAuto(companyId);
+  const calendarNow = useMemo(() => new Date(), []);
+  const periodBounds = useMemo(() => {
+    const y = calendarNow.getFullYear();
+    return { minYear: y - 4, maxYear: y };
+  }, [calendarNow]);
+
+  const [refYear, setRefYear] = useState(() => calendarNow.getFullYear());
+  const [refMonth, setRefMonth] = useState(() => calendarNow.getMonth() + 1);
+
+  const referencePeriod = resolveEvaluateAutoReferencePeriod(refYear, refMonth);
+
+  const query = useDecisionEngineEvaluateAuto(companyId, {
+    referencePeriod,
+  });
 
   const displayActions = query.data?.actions ?? [];
   const primaryAction = displayActions[0];
@@ -78,6 +93,17 @@ export function FinancialDecisionPage() {
           </div>
 
           <div className="mx-auto w-full max-w-3xl space-y-6">
+            {!emptyCompany ? (
+              <DecisionReferencePeriodSelector
+                year={refYear}
+                month1To12={refMonth}
+                onYearChange={setRefYear}
+                onMonthChange={setRefMonth}
+                minYear={periodBounds.minYear}
+                maxYear={periodBounds.maxYear}
+              />
+            ) : null}
+
             {emptyCompany ? (
               <Card className="border-border dark:border-border-dark">
                 <CardHeader>
@@ -143,7 +169,10 @@ export function FinancialDecisionPage() {
                   playbook={getPlaybook(query.data.primary_issue)}
                   phase={query.data.theme_phase ?? null}
                 />
-                <DecisionCompletePlanSection companyId={companyId} />
+                <DecisionCompletePlanSection
+                  companyId={companyId}
+                  referencePeriod={referencePeriod}
+                />
               </div>
             ) : null}
           </div>
