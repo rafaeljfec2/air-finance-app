@@ -33,6 +33,13 @@ air-finance-app/
 | [BUSINESS_DOMAIN.md](./BUSINESS_DOMAIN.md) | Product areas, multi-company model, subscription plans |
 | [PRICING_ANALYSIS.md](./PRICING_ANALYSIS.md) | Subscription pricing strategy and cost analysis |
 | [USABILITY_SUGGESTIONS.md](./USABILITY_SUGGESTIONS.md) | UX improvement ideas (FAB, gestures, haptics) |
+| [MODULES.md](./MODULES.md) | SDD: workspace map and in-app layering |
+| [DATA_MODEL.md](./DATA_MODEL.md) | SDD: persistence ownership + conceptual ER |
+| [API.md](./API.md) | SDD: how the web app consumes the REST API |
+| [INTEGRATIONS.md](./INTEGRATIONS.md) | SDD: external systems boundary (client vs API) |
+| [DEVELOPMENT.md](./DEVELOPMENT.md) | SDD: local setup, scripts, troubleshooting |
+| [RUNBOOK.md](./RUNBOOK.md) | SDD: deploy and ops for the frontend |
+| [memory/constitution.md](../memory/constitution.md) | SDD: non-negotiable engineering principles |
 
 ## Quick start for new developers
 

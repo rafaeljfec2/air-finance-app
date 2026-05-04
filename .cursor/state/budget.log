@@ -1,0 +1,2 @@
+# SDD budget log - one record per agent invocation
+# Format: <ISO_TIMESTAMP>|<agent>|<command>|<estimated_tokens>|<estimated_usd>

@@ -1,0 +1,142 @@
+openapi: 3.0.3
+info:
+  title: Air Finance — Decision Engine API fragment
+  version: 1.0.0
+  description: >
+    POST evaluate — deterministic KPI snapshot → decision. NestJS global prefix /meu-financeiro/v1 omitted here; prepend when mounting.
+    SPA sessions typically use HttpOnly JWT cookies (withCredentials); Bearer JWT is also accepted when the client sends Authorization — mirror the live API Swagger security schemes.
+
+paths:
+  /companies/{companyId}/decision-engine/evaluate:
+    post:
+      tags: [DecisionEngine]
+      summary: Evaluate household financial decision from KPI snapshot
+      operationId: decisionEngineEvaluate
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: companyId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionEngineRequest'
+      responses:
+        '200':
+          description: Decision output
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecisionEngineResponse'
+        '400':
+          description: Invalid body
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden for company
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Optional when the client attaches JWT via Authorization header.
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
+      description: Browser session default — actual cookie names follow API auth configuration (see AUTH_SESSION_IMPLEMENTATION).
+
+  schemas:
+    KpiLevel:
+      type: string
+      enum: [ok, warn, alert]
+
+    CashflowViewMode:
+      type: string
+      enum: [cash_flow, accrual]
+
+    KpiSnapshot:
+      type: object
+      required: [level]
+      properties:
+        level:
+          $ref: '#/components/schemas/KpiLevel'
+        value:
+          type: number
+          nullable: true
+        severityDistance:
+          type: number
+          nullable: true
+
+    DecisionEngineRequest:
+      type: object
+      required: [referencePeriod, viewMode, netIncomeMonth, kpis]
+      properties:
+        referencePeriod:
+          type: string
+          example: '2026-05'
+        viewMode:
+          $ref: '#/components/schemas/CashflowViewMode'
+        netIncomeMonth:
+          type: number
+          nullable: true
+          description: Net income for period; null triggers data_incomplete path when required.
+        kpis:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/KpiSnapshot'
+          description: Map keyed by KPI id (savings_rate, monthly_cash_flow, ...).
+
+    DecisionAction:
+      type: object
+      required: [title, description, impact, reason]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        impact:
+          type: string
+        reason:
+          type: array
+          items:
+            type: string
+
+    DecisionEngineResponse:
+      type: object
+      required: [status, primary_issue, ordering_rationale, actions]
+      properties:
+        status:
+          type: string
+          enum: [healthy, attention, critical]
+        primary_issue:
+          type: string
+          enum:
+            - data_incomplete
+            - liquidity_risk
+            - debt_pressure
+            - credit_overuse
+            - high_commitment
+            - low_surplus
+            - low_savings
+            - high_fixed_cost
+            - healthy
+        ordering_rationale:
+          type: string
+          description: PT-BR deterministic explanation for primary_issue selection (US-4); FR-0 lists affected KPIs/data_quality.
+        actions:
+          type: array
+          maxItems: 3
+          items:
+            $ref: '#/components/schemas/DecisionAction'
+        ruleEngineVersion:
+          type: string
+          example: '1.0.1'
