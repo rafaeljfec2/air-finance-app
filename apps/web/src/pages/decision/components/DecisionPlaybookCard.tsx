@@ -48,7 +48,7 @@ const PHASE_ACCENT: Readonly<Record<ThemePhase, string>> = {
 const PHASE_ACTIVE_BG: Readonly<Record<ThemePhase, string>> = {
   red: 'bg-red-50 dark:bg-red-950/30',
   yellow: 'bg-amber-50 dark:bg-amber-950/30',
-  green: 'bg-primary-50 dark:bg-primary-950/30',
+  green: 'bg-primary-50 dark:bg-primary-900/30',
 };
 
 function PhaseSection({
@@ -200,7 +200,7 @@ export function DecisionPlaybookCard({ playbook, phase }: DecisionPlaybookCardPr
           </div>
         </div>
 
-        <div className="flex items-start gap-3 rounded-md border border-border bg-primary-50/50 px-3 py-3 dark:border-border-dark dark:bg-primary-950/20">
+        <div className="flex items-start gap-3 rounded-md border border-border bg-primary-50/50 px-3 py-3 dark:border-border-dark dark:bg-primary-900/20">
           <Lightbulb
             className="mt-0.5 h-4 w-4 shrink-0 text-primary-500 dark:text-primary-400"
             aria-hidden

@@ -10,6 +10,7 @@ import { useDecisionEngineEvaluateAuto } from '@/hooks/useDecisionEngineEvaluate
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
 
+import { DecisionCompletePlanSection } from './components/complete-plan/DecisionCompletePlanSection';
 import { DecisionPlaybookCard } from './components/DecisionPlaybookCard';
 import { DecisionPrimaryBlock } from './components/DecisionPrimaryBlock';
 import { DecisionSecondaryActions } from './components/DecisionSecondaryActions';
@@ -32,7 +33,7 @@ export function FinancialDecisionPage() {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await queryClient.invalidateQueries({
-      queryKey: ['decision-engine', 'evaluate-auto', companyId],
+      queryKey: ['decision-engine'],
     });
     setIsRefreshing(false);
   };
@@ -142,6 +143,7 @@ export function FinancialDecisionPage() {
                   playbook={getPlaybook(query.data.primary_issue)}
                   phase={query.data.theme_phase ?? null}
                 />
+                <DecisionCompletePlanSection companyId={companyId} />
               </div>
             ) : null}
           </div>
