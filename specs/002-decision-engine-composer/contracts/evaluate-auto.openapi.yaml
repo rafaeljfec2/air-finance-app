@@ -1,0 +1,39 @@
+openapi: 3.0.3
+info:
+  title: Fragment — POST decision-engine/evaluate-auto
+  version: 0.2.0
+paths:
+  /companies/{companyId}/decision-engine/evaluate-auto:
+    post:
+      tags: [DecisionEngine]
+      summary: Evaluate decision from persisted metrics (composer + engine)
+      operationId: decisionEngineEvaluateAuto
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: companyId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: referencePeriod
+          in: query
+          required: false
+          description: YYYY-MM (UTC). Omit = current month UTC. Snapshot viewMode is cash_flow only in v1.
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}$'
+            example: '2026-05'
+      responses:
+        '200':
+          description: Same JSON shape as POST .../evaluate (see spec 001 contracts/openapi.yaml DecisionEngineResponse)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token

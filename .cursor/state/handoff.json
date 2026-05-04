@@ -1,13 +1,13 @@
 {
-  "from": "implementer",
+  "from": "backend",
   "to": "reviewer",
-  "feature": "001-financial-decision-engine",
-  "phase": "post-review-fixes",
-  "summary": "Decision Engine: spec/openapi/API aligned (ordering_rationale, FR-7 slugs, FR-0 C1-C9 pointer); backend FR-2 tie-break, FR-5/6 action ordering, data_incomplete reasons from completeness, expanded tests; RULE_ENGINE_VERSION bump.",
+  "feature": "002-decision-engine-composer",
+  "phase": "implement-be-done",
+  "summary": "DecisionEngineComposerService (Dashboard+Indebtedness→DecisionEngineInput), map-sources-to-input + tests, POST evaluate-auto, module imports Dashboard+Indebtedness, docs API_ROUTES + MODULE_MAP; SDD specs/002-*.",
   "next_steps": [
-    "Composer service to build KPI snapshot from Dashboard/Indebtedness (separate task)",
-    "FE: call POST .../decision-engine/evaluate from decision screen",
-    "Optional: mute Logger in DecisionEngineService.spec via jest.spyOn"
+    "FE: consumir evaluate-auto ou evaluate conforme UX",
+    "Opcional: T13 e2e real com supertest; calibrar thresholds com produto",
+    "Quality gates globais (lint/test) no repo API"
   ],
-  "timestamp": "2026-05-04T18:00:00Z"
+  "timestamp": "2026-05-04T23:30:00Z"
 }
