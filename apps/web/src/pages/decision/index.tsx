@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { Compass, RefreshCw } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,14 +12,7 @@ import { useCompanyStore } from '@/stores/company';
 
 import { DecisionActionsList } from './components/DecisionActionsList';
 import { DecisionStatusHero } from './components/DecisionStatusHero';
-
-function formatPrimaryIssueLabel(slug: string): string {
-  const trimmed = slug.trim();
-  if (trimmed === '') {
-    return 'Sem foco definido';
-  }
-  return trimmed.replaceAll('_', ' ');
-}
+import { formatPrimaryIssueLabel } from './primaryIssueLabels';
 
 export function FinancialDecisionPage() {
   const { activeCompany } = useCompanyStore();
@@ -29,10 +22,7 @@ export function FinancialDecisionPage() {
 
   const query = useDecisionEngineEvaluateAuto(companyId);
 
-  const displayActions = useMemo(() => {
-    const list = query.data?.actions ?? [];
-    return list.slice(0, 3);
-  }, [query.data?.actions]);
+  const displayActions = query.data?.actions ?? [];
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
