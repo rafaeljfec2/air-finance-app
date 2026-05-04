@@ -124,6 +124,11 @@ const FinancialHealthPage = lazy(() =>
     default: m.FinancialHealthPage,
   })),
 );
+const FinancialDecisionPage = lazy(() =>
+  import('@/pages/decision').then((m) => ({
+    default: m.FinancialDecisionPage,
+  })),
+);
 
 // SEO Pages
 const GestaoFinanceiraCPFPage = lazy(() =>
@@ -217,6 +222,7 @@ const PROTECTED_ROUTE_IMPORTS: Array<() => Promise<unknown>> = [
   () => import('@/pages/home'),
   () => import('@/pages/home-v2'),
   () => import('@/pages/financial-health/FinancialHealthPage'),
+  () => import('@/pages/decision'),
   () => import('@/pages/transactions'),
   () => import('@/pages/reports'),
   () => import('@/pages/payments'),
@@ -319,6 +325,7 @@ export const router = createBrowserRouter(
         onboardingRoute('/home-v2', <HomePageV2 />),
         onboardingRoute('/dashboard', <Dashboard />),
         onboardingRoute('/financial-health', <FinancialHealthPage />),
+        onboardingRoute('/decision', <FinancialDecisionPage />),
         onboardingRoute('/transactions', <Transactions />),
         onboardingRoute('/reports', <Reports />),
         onboardingRoute('/payments', <PaymentsPage />),

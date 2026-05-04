@@ -1,13 +1,13 @@
 {
-  "from": "backend",
+  "from": "frontend",
   "to": "reviewer",
   "feature": "002-decision-engine-composer",
-  "phase": "implement-be-done",
-  "summary": "DecisionEngineComposerService (Dashboard+Indebtedness→DecisionEngineInput), map-sources-to-input + tests, POST evaluate-auto, module imports Dashboard+Indebtedness, docs API_ROUTES + MODULE_MAP; SDD specs/002-*.",
+  "phase": "implement-fe-done",
+  "summary": "Web: decisionEngineService.evaluateAuto + zod, useDecisionEngineEvaluateAuto (TanStack Query, cache por companyId/período), página /decision (ViewDefault, status forte, primary_issue, até 3 ações com destaque na primeira, loading/erro/sem empresa/sem ações), navegação + preload; testes decisionEngineService + hook.",
   "next_steps": [
-    "FE: consumir evaluate-auto ou evaluate conforme UX",
-    "Opcional: T13 e2e real com supertest; calibrar thresholds com produto",
-    "Quality gates globais (lint/test) no repo API"
+    "Rodar yarn (workspace web) e /quality-check + /sdd-review",
+    "Opcional: copy PT para slugs primary_issue se produto quiser textos fixos",
+    "Opcional: query referencePeriod na UI (mês) se necessário"
   ],
-  "timestamp": "2026-05-04T23:30:00Z"
+  "timestamp": "2026-05-03T12:00:00Z"
 }
