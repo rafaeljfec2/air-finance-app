@@ -35,12 +35,11 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
       <CompanySelectionModal />
       <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
 
-      {/* Botão flutuante para mostrar header quando estiver escondido */}
       {!isHeaderVisible && (
         <div className="fixed top-safe-4 right-safe-4 z-50">
           <button
             onClick={toggleHeaderVisibility}
-            className="p-3 bg-primary-600 text-white rounded-full shadow-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-transform active:scale-95 flex items-center justify-center"
+            className="flex items-center justify-center rounded-full bg-primary-600 p-3 text-white shadow-xl transition-transform hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 active:scale-95"
             aria-label="Mostrar Header"
             title="Mostrar Header"
           >
@@ -62,8 +61,7 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
         />
         <main
           className={cn(
-            'flex-1 overflow-auto p-4 sm:p-6 transition-all duration-300 w-full',
-            // Mobile: padding bottom considers safe area + bottom nav space (5rem)
+            'w-full flex-1 overflow-auto p-4 transition-all duration-300 sm:p-6',
             'pb-20 lg:pb-6',
             isCollapsed ? 'lg:pl-6' : 'lg:pl-8',
           )}
@@ -72,7 +70,6 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
         </main>
       </div>
 
-      {/* Mobile Bottom Navigation */}
       <MobileBottomNav onNewTransaction={() => setIsFabModalOpen(true)} />
     </div>
   );

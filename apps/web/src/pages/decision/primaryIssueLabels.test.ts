@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatPrimaryIssueLabel } from './primaryIssueLabels';
+import { formatPrimaryIssueLabel, problemHeadlineFromPrimaryIssue } from './primaryIssueLabels';
 
 describe('formatPrimaryIssueLabel', () => {
   it('returns PT-BR for canonical primary_issue slugs', () => {
@@ -26,5 +26,47 @@ describe('formatPrimaryIssueLabel', () => {
 
   it('matches catalog keys case-insensitively', () => {
     expect(formatPrimaryIssueLabel('LIQUIDITY_RISK')).toBe('Risco de liquidez');
+  });
+});
+
+describe('problemHeadlineFromPrimaryIssue', () => {
+  it('returns one brutal line per canonical slug', () => {
+    expect(problemHeadlineFromPrimaryIssue('debt_pressure')).toBe(
+      'Suas dívidas estão consumindo sua renda.',
+    );
+    expect(problemHeadlineFromPrimaryIssue('liquidity_risk')).toBe(
+      'O caixa pode não aguentar o que vem pela frente.',
+    );
+    expect(problemHeadlineFromPrimaryIssue('credit_overuse')).toBe(
+      'Crédito cheio aumenta o risco do mês fechar no vermelho.',
+    );
+    expect(problemHeadlineFromPrimaryIssue('high_commitment')).toBe(
+      'Quase toda a renda já tem dono antes do mês acabar.',
+    );
+    expect(problemHeadlineFromPrimaryIssue('low_surplus')).toBe(
+      'Sobra pouco para absorver um imprevisto.',
+    );
+    expect(problemHeadlineFromPrimaryIssue('low_savings')).toBe(
+      'Está ficando pouco para o futuro ou para emergências.',
+    );
+    expect(problemHeadlineFromPrimaryIssue('high_fixed_cost')).toBe(
+      'Contas fixas pesadas deixam pouco espaço para manobrar.',
+    );
+    expect(problemHeadlineFromPrimaryIssue('data_incomplete')).toBe(
+      'Sem dados completos, qualquer conselho vira chute.',
+    );
+    expect(problemHeadlineFromPrimaryIssue('healthy')).toBe('Nada gritando alerta neste mês.');
+  });
+
+  it('returns fallback for empty or unknown slug', () => {
+    expect(problemHeadlineFromPrimaryIssue('')).toBe(
+      'Precisamos de mais contexto para ser diretos.',
+    );
+    expect(problemHeadlineFromPrimaryIssue('   ')).toBe(
+      'Precisamos de mais contexto para ser diretos.',
+    );
+    expect(problemHeadlineFromPrimaryIssue('unknown_slug')).toBe(
+      'Há um ponto de atenção neste mês.',
+    );
   });
 });

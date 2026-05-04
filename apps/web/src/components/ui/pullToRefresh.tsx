@@ -57,12 +57,12 @@ export function PullToRefresh({ children, onRefresh, isRefreshing }: Readonly<Pu
   return (
     <div className="relative">
       {isRefreshing && (
-        <div className="absolute top-0 left-0 right-0 flex justify-center py-2">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-500 dark:border-primary-400" />
+        <div className="absolute left-0 right-0 top-0 flex justify-center py-2">
+          <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-primary-500 dark:border-primary-400" />
         </div>
       )}
       <div
-        className={cn('transition-transform duration-200', isPulling && 'transform translate-y-4')}
+        className={cn('transition-transform duration-200', isPulling && 'translate-y-4 transform')}
         style={{ transform: `translateY(${pullDistance}px)` }}
       >
         {children}
