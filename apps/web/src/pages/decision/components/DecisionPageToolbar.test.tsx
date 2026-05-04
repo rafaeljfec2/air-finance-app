@@ -1,0 +1,38 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+
+import { DecisionPageToolbar } from './DecisionPageToolbar';
+
+describe('DecisionPageToolbar', () => {
+  it('renders title and subtitle and forwards refresh', () => {
+    const onRefresh = vi.fn();
+    render(
+      <DecisionPageToolbar
+        title="Decisão financeira"
+        subtitle="Subtítulo."
+        showRefresh
+        isFetching={false}
+        onRefresh={onRefresh}
+      />,
+    );
+    expect(screen.getByRole('heading', { name: 'Decisão financeira' })).toBeInTheDocument();
+    expect(screen.getByText('Subtítulo.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Atualizar/i }));
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders children when provided', () => {
+    render(
+      <DecisionPageToolbar
+        title="T"
+        subtitle="S"
+        showRefresh={false}
+        isFetching={false}
+        onRefresh={vi.fn()}
+      >
+        <p>Child block</p>
+      </DecisionPageToolbar>,
+    );
+    expect(screen.getByText('Child block')).toBeInTheDocument();
+  });
+});

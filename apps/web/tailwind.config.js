@@ -10,8 +10,10 @@ module.exports = {
           leaf: '#8CCFB0', // Cor da folha
           arrow: '#2D6B4E', // Cor da seta
         },
-        // Cores principais
+        // Cores principais (+ DEFAULT para bg-primary / text-primary)
         primary: {
+          DEFAULT: '#2D6B4E',
+          foreground: 'rgb(var(--primary-foreground) / <alpha-value>)',
           50: '#f0faf5',
           100: '#d5f1e3',
           200: '#8CCFB0', // Mesma cor da folha
@@ -22,6 +24,20 @@ module.exports = {
           700: '#1d4331',
           800: '#152f23',
           900: '#0c1a14',
+        },
+        foreground: 'rgb(var(--foreground) / <alpha-value>)',
+        muted: {
+          foreground: 'rgb(var(--muted-foreground) / <alpha-value>)',
+        },
+        input: 'rgb(var(--border-input) / <alpha-value>)',
+        accent: {
+          DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
+          foreground: 'rgb(var(--accent-foreground) / <alpha-value>)',
+        },
+        ring: 'rgb(var(--ring) / <alpha-value>)',
+        popover: {
+          DEFAULT: 'rgb(var(--popover) / <alpha-value>)',
+          foreground: 'rgb(var(--popover-foreground) / <alpha-value>)',
         },
         // Cores semânticas para o tema claro
         background: '#F8FAF9', // Fundo mais suave, com um toque de verde

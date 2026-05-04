@@ -1,6 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { Compass, RefreshCw } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +10,7 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
 
 import { DecisionCompletePlanSection } from './components/complete-plan/DecisionCompletePlanSection';
+import { DecisionPageToolbar } from './components/DecisionPageToolbar';
 import { DecisionPlaybookCard } from './components/DecisionPlaybookCard';
 import { DecisionPrimaryBlock } from './components/DecisionPrimaryBlock';
 import { DecisionReferencePeriodSelector } from './components/DecisionReferencePeriodSelector';
@@ -26,14 +26,11 @@ export function FinancialDecisionPage() {
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const calendarNow = useMemo(() => new Date(), []);
-  const periodBounds = useMemo(() => {
-    const y = calendarNow.getFullYear();
-    return { minYear: y - 4, maxYear: y };
-  }, [calendarNow]);
+  const maxYear = new Date().getFullYear();
+  const minYear = maxYear - 4;
 
-  const [refYear, setRefYear] = useState(() => calendarNow.getFullYear());
-  const [refMonth, setRefMonth] = useState(() => calendarNow.getMonth() + 1);
+  const [refYear, setRefYear] = useState(() => new Date().getFullYear());
+  const [refMonth, setRefMonth] = useState(() => new Date().getMonth() + 1);
 
   const referencePeriod = resolveEvaluateAutoReferencePeriod(refYear, refMonth);
 
@@ -56,54 +53,35 @@ export function FinancialDecisionPage() {
   const emptyCompany = companyId === '';
   const hasSecondaries = secondaryActions.length > 0;
 
+  const toolbarSubtitle = emptyCompany
+    ? 'Escolha um perfil para ver a leitura do período e o que fazer a seguir.'
+    : 'Leitura do período, estado geral e próximo passo — em sequência, sem ruído visual.';
+
   return (
     <ViewDefault>
       <PullToRefresh onRefresh={handleRefresh} isRefreshing={isRefreshing || query.isFetching}>
-        <div className="space-y-6 px-4 pb-8 pt-0 sm:px-6">
-          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/20">
-                <Compass className="h-6 w-6 text-primary-600 dark:text-primary-400" aria-hidden />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Decisão financeira
-                </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Um passo de cada vez com seu dinheiro.
-                </p>
-              </div>
-            </div>
-            {!emptyCompany ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="md"
-                className="min-h-[44px] shrink-0"
-                onClick={() => void query.refetch()}
-                disabled={query.isFetching}
-              >
-                <RefreshCw
-                  className={`mr-2 h-4 w-4 ${query.isFetching ? 'animate-spin' : ''}`}
-                  aria-hidden
-                />
-                Atualizar
-              </Button>
-            ) : null}
-          </div>
-
-          <div className="mx-auto w-full max-w-3xl space-y-6">
+        <div className="mx-auto w-full max-w-3xl px-4 pb-10 pt-0 sm:px-6">
+          <DecisionPageToolbar
+            title="Decisão financeira"
+            subtitle={toolbarSubtitle}
+            showRefresh={!emptyCompany}
+            isFetching={query.isFetching}
+            onRefresh={() => void query.refetch()}
+          >
             {!emptyCompany ? (
               <DecisionReferencePeriodSelector
+                layout="inline"
                 year={refYear}
                 month1To12={refMonth}
                 onYearChange={setRefYear}
                 onMonthChange={setRefMonth}
-                minYear={periodBounds.minYear}
-                maxYear={periodBounds.maxYear}
+                minYear={minYear}
+                maxYear={maxYear}
               />
             ) : null}
+          </DecisionPageToolbar>
 
+          <div className="mt-6 space-y-6">
             {emptyCompany ? (
               <Card className="border-border dark:border-border-dark">
                 <CardHeader>
@@ -119,9 +97,7 @@ export function FinancialDecisionPage() {
               <Card className="border-border dark:border-border-dark">
                 <CardHeader className="flex flex-col items-center gap-3 py-12">
                   <Spinner size="lg" className="text-primary-500" />
-                  <p className="text-sm text-muted-foreground dark:text-muted-foreground">
-                    Carregando…
-                  </p>
+                  <p className="text-sm text-muted-foreground">Carregando…</p>
                 </CardHeader>
               </Card>
             ) : null}
@@ -151,16 +127,20 @@ export function FinancialDecisionPage() {
 
             {!emptyCompany && query.isSuccess && query.data ? (
               <div className="space-y-6">
-                <DecisionStatusStrip status={query.data.status} />
+                <DecisionStatusStrip
+                  status={query.data.status}
+                  briefingLine={problemHeadlineFromPrimaryIssue(query.data.primary_issue)}
+                />
                 {primaryAction !== undefined ? (
                   <DecisionPrimaryBlock
                     action={primaryAction}
                     status={query.data.status}
                     hasSecondarySteps={hasSecondaries}
                     problemHeadline={problemHeadlineFromPrimaryIssue(query.data.primary_issue)}
+                    showProblemContext={false}
                   />
                 ) : (
-                  <p className="text-center text-sm text-muted-foreground dark:text-muted-foreground">
+                  <p className="text-center text-sm text-muted-foreground">
                     Nada priorizado neste mês.
                   </p>
                 )}

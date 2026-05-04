@@ -39,19 +39,30 @@ const STATUS_COPY: Readonly<
 
 export interface DecisionStatusStripProps {
   readonly status: DecisionEngineStatus;
+  /** When set, replaces the generic status line (e.g. problem headline from the engine). */
+  readonly briefingLine?: string;
 }
 
-export function DecisionStatusStrip({ status }: DecisionStatusStripProps) {
+export function DecisionStatusStrip({ status, briefingLine }: DecisionStatusStripProps) {
   const row = STATUS_COPY[status];
+  const message =
+    briefingLine !== undefined && briefingLine.trim() !== '' ? briefingLine : row.line;
 
   return (
     <Card className={cn('shadow-sm', row.cardAccent)}>
-      <CardHeader className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-6">
-        <Badge variant={row.badgeVariant} className={cn('w-fit', row.badgeClassName)}>
+      <CardHeader className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:p-6">
+        <Badge variant={row.badgeVariant} className={cn('w-fit shrink-0', row.badgeClassName)}>
           {row.label}
         </Badge>
-        <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground sm:text-right">
-          {row.line}
+        <p
+          className={cn(
+            'min-w-0 flex-1 text-pretty sm:text-right',
+            briefingLine !== undefined && briefingLine.trim() !== ''
+              ? 'text-base font-medium leading-snug text-foreground sm:text-left'
+              : 'text-sm font-medium text-muted-foreground',
+          )}
+        >
+          {message}
         </p>
       </CardHeader>
     </Card>

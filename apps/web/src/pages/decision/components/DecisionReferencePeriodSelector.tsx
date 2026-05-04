@@ -5,6 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 const MONTH_LABELS_PT: readonly string[] = [
   'Janeiro',
@@ -29,6 +30,8 @@ export interface DecisionReferencePeriodSelectorProps {
   readonly onMonthChange: (month1To12: number) => void;
   readonly minYear: number;
   readonly maxYear: number;
+  /** `inline`: barra compacta sob o cabeçalho (desktop em linha). */
+  readonly layout?: 'default' | 'inline';
 }
 
 function yearOptions(minYear: number, maxYear: number): number[] {
@@ -46,26 +49,49 @@ export function DecisionReferencePeriodSelector({
   onMonthChange,
   minYear,
   maxYear,
+  layout = 'default',
 }: DecisionReferencePeriodSelectorProps) {
   const years = yearOptions(minYear, maxYear);
+  const inline = layout === 'inline';
 
   return (
     <section
       aria-label="Período de referência"
-      className="w-full rounded-lg border border-border bg-card p-4 dark:border-border-dark dark:bg-card"
+      className={cn(
+        'w-full rounded-xl border border-border bg-card dark:border-border-dark dark:bg-card-dark',
+        inline ? 'p-3 sm:p-4' : 'rounded-lg p-4',
+      )}
     >
-      <div className="space-y-2">
-        <h2 className="text-sm font-medium text-foreground dark:text-foreground">Referência</h2>
-        <p className="text-xs text-muted-foreground dark:text-muted-foreground">
-          Use o mês atual para o comportamento padrão da API. Outro mês envia o filtro na análise
-          automática.
-        </p>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+      <div
+        className={cn(
+          inline
+            ? 'flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4'
+            : 'space-y-2',
+        )}
+      >
+        <div className={cn(inline ? 'min-w-0 shrink-0 sm:max-w-[11rem]' : '')}>
+          <h2 className="text-sm font-medium text-foreground">
+            {inline ? 'Período' : 'Referência'}
+          </h2>
+          <p
+            className={cn(
+              'text-muted-foreground',
+              inline ? 'mt-1 text-xs leading-snug sm:max-w-[14rem]' : 'text-xs',
+            )}
+          >
+            {inline
+              ? 'Padrão = mês atual (API). Outro mês aplica filtro explícito.'
+              : 'Use o mês atual para o comportamento padrão da API. Outro mês envia o filtro na análise automática.'}
+          </p>
+        </div>
+        <div
+          className={cn(
+            'flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end sm:gap-3',
+            inline && 'sm:flex-1',
+          )}
+        >
           <div className="min-w-0 flex-1 space-y-1.5">
-            <label
-              className="text-xs font-medium text-foreground dark:text-foreground"
-              htmlFor="decision-ref-month"
-            >
+            <label className="text-xs font-medium text-foreground" htmlFor="decision-ref-month">
               Mês
             </label>
             <Select
@@ -74,11 +100,7 @@ export function DecisionReferencePeriodSelector({
                 onMonthChange(Number.parseInt(v, 10));
               }}
             >
-              <SelectTrigger
-                id="decision-ref-month"
-                className="dark:border-border-dark dark:bg-background"
-                aria-label="Mês de referência"
-              >
+              <SelectTrigger id="decision-ref-month" aria-label="Mês de referência">
                 <SelectValue placeholder="Mês" />
               </SelectTrigger>
               <SelectContent>
@@ -94,10 +116,7 @@ export function DecisionReferencePeriodSelector({
             </Select>
           </div>
           <div className="min-w-0 flex-1 space-y-1.5">
-            <label
-              className="text-xs font-medium text-foreground dark:text-foreground"
-              htmlFor="decision-ref-year"
-            >
+            <label className="text-xs font-medium text-foreground" htmlFor="decision-ref-year">
               Ano
             </label>
             <Select
@@ -106,11 +125,7 @@ export function DecisionReferencePeriodSelector({
                 onYearChange(Number.parseInt(v, 10));
               }}
             >
-              <SelectTrigger
-                id="decision-ref-year"
-                className="dark:border-border-dark dark:bg-background"
-                aria-label="Ano de referência"
-              >
+              <SelectTrigger id="decision-ref-year" aria-label="Ano de referência">
                 <SelectValue placeholder="Ano" />
               </SelectTrigger>
               <SelectContent>

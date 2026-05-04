@@ -19,6 +19,8 @@ export interface DecisionPrimaryBlockProps {
   readonly status: DecisionEngineStatus;
   readonly hasSecondarySteps: boolean;
   readonly problemHeadline: string;
+  /** When false, hides the context line (e.g. when the parent already shows the same headline). */
+  readonly showProblemContext?: boolean;
 }
 
 const CARD_ACCENT: Readonly<Record<DecisionEngineStatus, string>> = {
@@ -32,6 +34,7 @@ export function DecisionPrimaryBlock({
   status,
   hasSecondarySteps,
   problemHeadline,
+  showProblemContext = true,
 }: DecisionPrimaryBlockProps) {
   const reasonsPlain = formatActionReasonsPlain(action.reason);
   const impactDisplay = humanizeImpactForDisplay(action.impact);
@@ -47,18 +50,26 @@ export function DecisionPrimaryBlock({
   };
 
   return (
-    <Card className={cn('shadow-sm', CARD_ACCENT[status])}>
-      <CardHeader className="space-y-3 p-4 sm:p-6">
-        <p
-          id="decision-context"
-          className="text-center text-sm text-muted-foreground dark:text-muted-foreground"
-        >
-          {problemHeadline}
-        </p>
-        <p className="text-center text-xs font-semibold uppercase tracking-wide text-primary-600 dark:text-primary-400">
-          Próximo passo
-        </p>
-        <CardTitle className="text-xl leading-tight sm:text-2xl">{action.title}</CardTitle>
+    <Card
+      className={cn(
+        'shadow-md ring-1 ring-primary-500/20 dark:ring-primary-400/25',
+        CARD_ACCENT[status],
+      )}
+    >
+      <CardHeader className="space-y-4 p-5 sm:p-7">
+        {showProblemContext ? (
+          <p id="decision-context" className="text-center text-sm text-muted-foreground">
+            {problemHeadline}
+          </p>
+        ) : null}
+        <div className="flex justify-center">
+          <span className="inline-flex rounded-full bg-primary-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-primary-800 dark:bg-primary-900/50 dark:text-primary-100">
+            Próximo passo
+          </span>
+        </div>
+        <CardTitle className="text-center text-2xl font-bold leading-tight tracking-tight text-foreground sm:text-3xl">
+          {action.title}
+        </CardTitle>
         <CardDescription className="text-base leading-relaxed">
           {action.description}
         </CardDescription>
@@ -67,14 +78,9 @@ export function DecisionPrimaryBlock({
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Impacto
         </p>
-        <p className="text-sm font-medium text-foreground dark:text-foreground sm:text-base">
-          {impactDisplay}
-        </p>
+        <p className="text-sm font-medium text-foreground sm:text-base">{impactDisplay}</p>
         {reasonsPlain !== '' ? (
-          <p
-            className="truncate text-xs text-muted-foreground dark:text-muted-foreground"
-            title={reasonsPlain}
-          >
+          <p className="truncate text-xs text-muted-foreground" title={reasonsPlain}>
             Levamos em conta: {reasonsPlain}
           </p>
         ) : null}

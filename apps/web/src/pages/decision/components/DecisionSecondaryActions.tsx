@@ -15,7 +15,7 @@ export function DecisionSecondaryActions({ actions }: DecisionSecondaryActionsPr
 
   return (
     <section id="decision-secondary" className="space-y-3" aria-label="Outros passos opcionais">
-      <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Outros passos</h2>
+      <h2 className="text-lg font-semibold text-foreground">Outros passos</h2>
       <ul className="space-y-3">
         {actions.map((action, index) => {
           const reasonsPlain = formatActionReasonsPlain(action.reason);
@@ -31,15 +31,10 @@ export function DecisionSecondaryActions({ actions }: DecisionSecondaryActionsPr
                     {action.description}
                   </CardDescription>
                   {impactLine !== '' ? (
-                    <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">
-                      {impactLine}
-                    </p>
+                    <p className="text-sm font-medium text-muted-foreground">{impactLine}</p>
                   ) : null}
                   {reasonsPlain !== '' ? (
-                    <p
-                      className="truncate text-xs text-muted-foreground dark:text-muted-foreground"
-                      title={reasonsPlain}
-                    >
+                    <p className="truncate text-xs text-muted-foreground" title={reasonsPlain}>
                       {reasonsPlain}
                     </p>
                   ) : null}
