@@ -1,13 +1,14 @@
 {
-  "from": "frontend",
-  "to": "reviewer",
+  "from": "reviewer",
+  "to": "user",
   "feature": "002-decision-engine-composer",
-  "phase": "implement-fe-done",
-  "summary": "Web: decisionEngineService.evaluateAuto + zod, useDecisionEngineEvaluateAuto (TanStack Query, cache por companyId/período), página /decision (ViewDefault, status forte, primary_issue, até 3 ações com destaque na primeira, loading/erro/sem empresa/sem ações), navegação + preload; testes decisionEngineService + hook.",
+  "phase": "review-done",
+  "summary": "SDD review escrito em specs/002-decision-engine-composer/review.md — Verdict APPROVED. Major: alinhar spec 002 (UI out of scope vs entrega). Minor: copy primary_issue, referencePeriod UI, SIZE outros ficheiros, diff local.",
   "next_steps": [
-    "Rodar yarn (workspace web) e /quality-check + /sdd-review",
-    "Opcional: copy PT para slugs primary_issue se produto quiser textos fixos",
-    "Opcional: query referencePeriod na UI (mês) se necessário"
+    "Merge após CI + diff local se necessário",
+    "Ajustar spec 002 ou cross-link 001 (UI)",
+    "Opcional: backlog copy PT / período / e2e; chore SIZE >500"
   ],
-  "timestamp": "2026-05-03T12:00:00Z"
+  "verdict": "APPROVED",
+  "timestamp": "2026-05-04T12:00:00Z"
 }
