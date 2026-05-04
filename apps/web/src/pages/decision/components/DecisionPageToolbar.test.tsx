@@ -4,9 +4,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { DecisionPageToolbar } from './DecisionPageToolbar';
 
 describe('DecisionPageToolbar', () => {
-  it('renders title and subtitle and forwards refresh', () => {
+  it('renders title, subtitle, decorative icon, and forwards refresh', () => {
     const onRefresh = vi.fn();
-    render(
+    const { container } = render(
       <DecisionPageToolbar
         title="Decisão financeira"
         subtitle="Subtítulo."
@@ -17,6 +17,7 @@ describe('DecisionPageToolbar', () => {
     );
     expect(screen.getByRole('heading', { name: 'Decisão financeira' })).toBeInTheDocument();
     expect(screen.getByText('Subtítulo.')).toBeInTheDocument();
+    expect(container.querySelector('header svg')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Atualizar/i }));
     expect(onRefresh).toHaveBeenCalledTimes(1);
   });

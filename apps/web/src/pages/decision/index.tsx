@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,21 @@ import { DecisionStatusStrip } from './components/DecisionStatusStrip';
 import { getPlaybook } from './playbooks';
 import { problemHeadlineFromPrimaryIssue } from './primaryIssueLabels';
 import { resolveEvaluateAutoReferencePeriod } from './utils/referencePeriod';
+
+const motionContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const motionItem = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 },
+};
 
 export function FinancialDecisionPage() {
   const { activeCompany } = useCompanyStore();
@@ -60,28 +76,35 @@ export function FinancialDecisionPage() {
   return (
     <ViewDefault>
       <PullToRefresh onRefresh={handleRefresh} isRefreshing={isRefreshing || query.isFetching}>
-        <div className="mx-auto w-full max-w-3xl px-4 pb-10 pt-0 sm:px-6">
-          <DecisionPageToolbar
-            title="Decisão financeira"
-            subtitle={toolbarSubtitle}
-            showRefresh={!emptyCompany}
-            isFetching={query.isFetching}
-            onRefresh={() => void query.refetch()}
-          >
-            {!emptyCompany ? (
-              <DecisionReferencePeriodSelector
-                layout="inline"
-                year={refYear}
-                month1To12={refMonth}
-                onYearChange={setRefYear}
-                onMonthChange={setRefMonth}
-                minYear={minYear}
-                maxYear={maxYear}
-              />
-            ) : null}
-          </DecisionPageToolbar>
+        <motion.div
+          variants={motionContainer}
+          initial="hidden"
+          animate="show"
+          className="space-y-6 px-4 pb-8 pt-0 sm:px-6"
+        >
+          <motion.div variants={motionItem}>
+            <DecisionPageToolbar
+              title="Decisão financeira"
+              subtitle={toolbarSubtitle}
+              showRefresh={!emptyCompany}
+              isFetching={query.isFetching}
+              onRefresh={() => void query.refetch()}
+            >
+              {!emptyCompany ? (
+                <DecisionReferencePeriodSelector
+                  layout="inline"
+                  year={refYear}
+                  month1To12={refMonth}
+                  onYearChange={setRefYear}
+                  onMonthChange={setRefMonth}
+                  minYear={minYear}
+                  maxYear={maxYear}
+                />
+              ) : null}
+            </DecisionPageToolbar>
+          </motion.div>
 
-          <div className="mt-6 space-y-6">
+          <motion.div variants={motionItem} className="space-y-6">
             {emptyCompany ? (
               <Card className="border-border dark:border-border-dark">
                 <CardHeader>
@@ -155,8 +178,8 @@ export function FinancialDecisionPage() {
                 />
               </div>
             ) : null}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </PullToRefresh>
     </ViewDefault>
   );
