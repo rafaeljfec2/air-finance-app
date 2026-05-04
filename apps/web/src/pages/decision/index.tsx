@@ -10,9 +10,11 @@ import { useDecisionEngineEvaluateAuto } from '@/hooks/useDecisionEngineEvaluate
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
 
+import { DecisionPlaybookCard } from './components/DecisionPlaybookCard';
 import { DecisionPrimaryBlock } from './components/DecisionPrimaryBlock';
 import { DecisionSecondaryActions } from './components/DecisionSecondaryActions';
 import { DecisionStatusStrip } from './components/DecisionStatusStrip';
+import { getPlaybook } from './playbooks';
 import { problemHeadlineFromPrimaryIssue } from './primaryIssueLabels';
 
 export function FinancialDecisionPage() {
@@ -136,6 +138,10 @@ export function FinancialDecisionPage() {
                   </p>
                 )}
                 <DecisionSecondaryActions actions={secondaryActions} />
+                <DecisionPlaybookCard
+                  playbook={getPlaybook(query.data.primary_issue)}
+                  phase={query.data.theme_phase ?? null}
+                />
               </div>
             ) : null}
           </div>

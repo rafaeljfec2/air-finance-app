@@ -18,6 +18,7 @@ describe('decisionEngineService', () => {
     const payload = {
       status: 'attention' as const,
       primary_issue: 'liquidity_risk',
+      theme_phase: 'yellow' as const,
       ordering_rationale: 'Test rationale',
       actions: [
         {
@@ -39,6 +40,44 @@ describe('decisionEngineService', () => {
       {},
     );
     expect(result).toEqual(payload);
+  });
+
+  it('accepts theme_phase null for data_incomplete payloads', async () => {
+    vi.mocked(apiClient.post).mockResolvedValue({
+      data: {
+        status: 'attention',
+        primary_issue: 'data_incomplete',
+        theme_phase: null,
+        ordering_rationale: 'FR-0',
+        actions: [
+          {
+            title: 'Complete dados',
+            description: 'Vincule sua conta',
+            impact: 'destrava o diagnóstico',
+            reason: ['data_quality'],
+          },
+        ],
+      },
+    });
+
+    const result = await evaluateAuto('c1');
+
+    expect(result.theme_phase).toBeNull();
+  });
+
+  it('parses payload without theme_phase as undefined (backward compatible)', async () => {
+    vi.mocked(apiClient.post).mockResolvedValue({
+      data: {
+        status: 'healthy',
+        primary_issue: 'healthy',
+        ordering_rationale: 'ok',
+        actions: [],
+      },
+    });
+
+    const result = await evaluateAuto('c1');
+
+    expect(result.theme_phase).toBeUndefined();
   });
 
   it('sends referencePeriod as query param when provided', async () => {

@@ -1,0 +1,71 @@
+openapi: 3.0.3
+info:
+  title: Fragment — DecisionEngineResponse delta (theme_phase)
+  version: 0.1.0
+  description: |
+    Delta for `POST /companies/{companyId}/decision-engine/evaluate` and
+    `POST /companies/{companyId}/decision-engine/evaluate-auto` defined in
+    `specs/001-financial-decision-engine/contracts/openapi.yaml` and
+    `specs/002-decision-engine-composer/contracts/evaluate-auto.openapi.yaml`.
+
+    Adds the optional `theme_phase` field to the response. Backward compatible:
+    older clients ignore the field; newer clients accept `red`, `yellow`, `green` or `null`.
+
+paths: {}
+
+components:
+  schemas:
+    ThemePhase:
+      type: string
+      enum: [red, yellow, green]
+      description: |
+        Active phase for the user's primary theme.
+        - `red`: out of control; goal is to stop getting worse.
+        - `yellow`: adjusting; goal is to recover balance.
+        - `green`: healthy; goal is to maintain.
+
+    DecisionEngineResponseDelta:
+      type: object
+      description: Fields added by spec 003 to DecisionEngineResponse.
+      properties:
+        theme_phase:
+          oneOf:
+            - $ref: '#/components/schemas/ThemePhase'
+            - type: 'null'
+          nullable: true
+          description: |
+            null when `primary_issue` is `data_incomplete`.
+            Always `green` when `primary_issue` is `healthy`.
+            Otherwise derived from the level of the KPI driver of the active theme
+            (see specs/003-decision-playbook-3-phases/data-model.md §2).
+          example: yellow
+      required:
+        - theme_phase
+
+  examples:
+    decisionEngineResponseWithThemePhase:
+      summary: Critical liquidity_risk in red phase
+      value:
+        status: critical
+        primary_issue: liquidity_risk
+        theme_phase: red
+        ordering_rationale: 'Priorizamos liquidez imediata: monthly_cash_flow em alerta (FR-1).'
+        actions:
+          - title: Negociar prazo do aluguel
+            description: Pedir 7 a 10 dias extras para recompor o caixa.
+            impact: 'Pode liberar até **R$ 1.200,00** no mês.'
+            reason: [monthly_cash_flow]
+        ruleEngineVersion: '1.0.1'
+    decisionEngineResponseDataIncomplete:
+      summary: Data incomplete (theme_phase null)
+      value:
+        status: attention
+        primary_issue: data_incomplete
+        theme_phase: null
+        ordering_rationale: 'Os dados do período estão incompletos ou inválidos (FR-0); ...'
+        actions:
+          - title: Vincule sua conta principal
+            description: Conecte sua conta para começar o diagnóstico.
+            impact: Destrava o diagnóstico financeiro.
+            reason: [data_quality]
+        ruleEngineVersion: '1.0.1'

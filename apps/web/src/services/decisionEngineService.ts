@@ -6,6 +6,8 @@ import { apiClient } from './apiClient';
 
 const DecisionStatusSchema = z.enum(['healthy', 'attention', 'critical']);
 
+const ThemePhaseSchema = z.enum(['red', 'yellow', 'green']);
+
 const DecisionActionSchema = z.object({
   title: z.string(),
   description: z.string(),
@@ -16,6 +18,7 @@ const DecisionActionSchema = z.object({
 const DecisionEngineEvaluateResponseSchema = z.object({
   status: DecisionStatusSchema,
   primary_issue: z.string(),
+  theme_phase: ThemePhaseSchema.nullable().optional(),
   ordering_rationale: z.string(),
   actions: z.array(DecisionActionSchema).max(3),
   ruleEngineVersion: z.string().optional(),
@@ -24,6 +27,7 @@ const DecisionEngineEvaluateResponseSchema = z.object({
 export type DecisionEngineEvaluateResponse = z.infer<typeof DecisionEngineEvaluateResponseSchema>;
 export type DecisionEngineStatus = DecisionEngineEvaluateResponse['status'];
 export type DecisionAction = DecisionEngineEvaluateResponse['actions'][number];
+export type ThemePhase = z.infer<typeof ThemePhaseSchema>;
 
 export interface EvaluateAutoOptions {
   readonly referencePeriod?: string;
