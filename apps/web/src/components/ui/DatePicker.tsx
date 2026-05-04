@@ -1,107 +1,14 @@
 import flatpickr from 'flatpickr';
-import 'flatpickr/dist/flatpickr.min.css';
 import type { Instance } from 'flatpickr/dist/types/instance';
 import { Calendar, X } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 
 import { cn } from '@/lib/utils';
-import { parseLocalDate } from '@/utils/date';
 
+import { convertValueToDate } from './datePickerConvertValue';
+import { markWeekendDaysInCalendar } from './datePickerMarkWeekends';
+import { datePickerPtLocale } from './datePickerPtLocale';
 import { Input } from './input';
-
-// Portuguese locale configuration
-const ptLocale = {
-  weekdays: {
-    shorthand: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'] as [
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-    ],
-    longhand: [
-      'Domingo',
-      'Segunda-feira',
-      'Terça-feira',
-      'Quarta-feira',
-      'Quinta-feira',
-      'Sexta-feira',
-      'Sábado',
-    ] as [string, string, string, string, string, string, string],
-  },
-  months: {
-    shorthand: [
-      'Jan',
-      'Fev',
-      'Mar',
-      'Abr',
-      'Mai',
-      'Jun',
-      'Jul',
-      'Ago',
-      'Set',
-      'Out',
-      'Nov',
-      'Dez',
-    ] as [
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-    ],
-    longhand: [
-      'Janeiro',
-      'Fevereiro',
-      'Março',
-      'Abril',
-      'Maio',
-      'Junho',
-      'Julho',
-      'Agosto',
-      'Setembro',
-      'Outubro',
-      'Novembro',
-      'Dezembro',
-    ] as [
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-    ],
-  },
-  firstDayOfWeek: 0, // 0 = Sunday (domingo na esquerda)
-  rangeSeparator: ' até ',
-  weekAbbreviation: 'Sem',
-  scrollTitle: 'Scroll para incrementar',
-  toggleTitle: 'Clique para alternar',
-  amPM: ['AM', 'PM'] as [string, string],
-  yearAriaLabel: 'Ano',
-  monthAriaLabel: 'Mês',
-  hourAriaLabel: 'Hora',
-  minuteAriaLabel: 'Minuto',
-  time_24hr: false,
-};
-
-// Register Portuguese locale
-flatpickr.localize(ptLocale);
 
 export interface DatePickerProps {
   /**
@@ -181,74 +88,6 @@ export interface DatePickerProps {
 }
 
 /**
- * Converts a value (string or Date) to a Date object
- * Always creates dates in local timezone to avoid timezone issues
- * This is the central place for all date parsing - ensures consistency across the application
- *
- * Handles:
- * - ISO strings (YYYY-MM-DD) - parses in local timezone
- * - Date objects - normalizes to start of day in local timezone
- * - DD/MM/YYYY format strings - parses in local timezone
- * - ISO strings with time (YYYY-MM-DDTHH:mm:ss) - extracts date part and parses in local timezone
- */
-function convertValueToDate(value: string | Date | null | undefined): Date | null {
-  if (!value) {
-    return null;
-  }
-
-  if (typeof value === 'string') {
-    // Remove time part if present (handle ISO strings with time like "2025-12-01T00:00:00.000Z")
-    // This is critical - we only care about the date part, not the time or timezone
-    const datePart = value.split('T')[0].split(' ')[0].trim();
-
-    // Try to parse ISO string first (YYYY-MM-DD format)
-    const isoDateRegex = /^(\d{4})-(\d{2})-(\d{2})/;
-    const isoDateMatch = isoDateRegex.exec(datePart);
-    if (isoDateMatch) {
-      // Use utility function to parse in local timezone - this is the key fix
-      return parseLocalDate(datePart);
-    }
-
-    // Try to parse DD/MM/YYYY format
-    const ddmmyyyyRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/;
-    const ddmmyyyyMatch = ddmmyyyyRegex.exec(datePart);
-    if (ddmmyyyyMatch) {
-      const [, day, month, year] = ddmmyyyyMatch;
-      // Create date in local timezone (no time component)
-      return new Date(
-        Number.parseInt(year, 10),
-        Number.parseInt(month, 10) - 1,
-        Number.parseInt(day, 10),
-        0,
-        0,
-        0,
-        0,
-      );
-    }
-
-    // Fallback: try to parse as Date, then normalize to local timezone
-    // This handles edge cases but should rarely be needed
-    const parsed = new Date(value);
-    if (!Number.isNaN(parsed.getTime())) {
-      // Normalize to local timezone start of day
-      // This ensures we don't have timezone conversion issues
-      return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate(), 0, 0, 0, 0);
-    }
-
-    return null;
-  }
-
-  // If it's already a Date, normalize to local timezone start of day
-  // This is critical - even if the Date was created from an ISO string,
-  // we normalize it to ensure it represents the correct local date
-  if (value instanceof Date && !Number.isNaN(value.getTime())) {
-    return new Date(value.getFullYear(), value.getMonth(), value.getDate(), 0, 0, 0, 0);
-  }
-
-  return null;
-}
-
-/**
  * Customizable and reusable DatePicker component using flatpickr
  */
 export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
@@ -289,7 +128,7 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
       // Initialize flatpickr
       flatpickrInstance.current = flatpickr(inputRef.current, {
         dateFormat: displayFormat,
-        locale: ptLocale,
+        locale: datePickerPtLocale,
         defaultDate: selectedDate || undefined,
         minDate: minDate,
         maxDate: maxDate,
@@ -415,66 +254,10 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
             }
           }
 
-          // Mark weekend days (Saturday and Sunday)
           const markWeekends = () => {
-            const days = calendar?.querySelectorAll('.flatpickr-day');
-            const currentMonth = instance.currentMonth;
-            const currentYear = instance.currentYear;
-
-            days?.forEach((day) => {
-              const dayElement = day as HTMLElement;
-
-              // Skip disabled days
-              if (dayElement.classList.contains('flatpickr-disabled')) {
-                dayElement.classList.remove('weekend');
-                return;
-              }
-
-              // Skip days from previous or next month - only mark days from current month
-              if (
-                dayElement.classList.contains('prevMonthDay') ||
-                dayElement.classList.contains('nextMonthDay')
-              ) {
-                dayElement.classList.remove('weekend');
-                return;
-              }
-
-              // Get day number from text content
-              const dayNum = dayElement.textContent?.trim();
-              if (!dayNum) {
-                dayElement.classList.remove('weekend');
-                return;
-              }
-
-              const dayValue = Number.parseInt(dayNum, 10);
-              if (Number.isNaN(dayValue) || dayValue < 1 || dayValue > 31) {
-                dayElement.classList.remove('weekend');
-                return;
-              }
-
-              // Create date object for this day in the current month/year
-              const dateObj = new Date(currentYear, currentMonth, dayValue);
-
-              // Verify this date is actually in the current month (handles edge cases like day 31 in months with 30 days)
-              if (
-                dateObj.getMonth() === currentMonth &&
-                dateObj.getFullYear() === currentYear &&
-                dateObj.getDate() === dayValue
-              ) {
-                const dayOfWeek = dateObj.getDay(); // 0 = Sunday, 6 = Saturday
-                if (dayOfWeek === 0 || dayOfWeek === 6) {
-                  dayElement.classList.add('weekend');
-                } else {
-                  dayElement.classList.remove('weekend');
-                }
-              } else {
-                // Date doesn't match - remove weekend class
-                dayElement.classList.remove('weekend');
-              }
-            });
+            markWeekendDaysInCalendar(calendar, instance.currentMonth, instance.currentYear);
           };
 
-          // Mark weekends on ready
           setTimeout(markWeekends, 100);
 
           // Also mark weekends when month changes (observe calendar changes)
@@ -493,63 +276,8 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
             calendar.style.setProperty('z-index', '999999', 'important');
           }
 
-          // Mark weekend days when calendar opens (reuse same logic)
           setTimeout(() => {
-            const days = calendar?.querySelectorAll('.flatpickr-day');
-            const currentMonth = instance.currentMonth;
-            const currentYear = instance.currentYear;
-
-            days?.forEach((day) => {
-              const dayElement = day as HTMLElement;
-
-              // Skip disabled days
-              if (dayElement.classList.contains('flatpickr-disabled')) {
-                dayElement.classList.remove('weekend');
-                return;
-              }
-
-              // Skip days from previous or next month - only mark days from current month
-              if (
-                dayElement.classList.contains('prevMonthDay') ||
-                dayElement.classList.contains('nextMonthDay')
-              ) {
-                dayElement.classList.remove('weekend');
-                return;
-              }
-
-              // Get day number from text content
-              const dayNum = dayElement.textContent?.trim();
-              if (!dayNum) {
-                dayElement.classList.remove('weekend');
-                return;
-              }
-
-              const dayValue = Number.parseInt(dayNum, 10);
-              if (Number.isNaN(dayValue) || dayValue < 1 || dayValue > 31) {
-                dayElement.classList.remove('weekend');
-                return;
-              }
-
-              // Create date object for this day in the current month/year
-              const dateObj = new Date(currentYear, currentMonth, dayValue);
-
-              // Verify this date is actually in the current month (handles edge cases like day 31 in months with 30 days)
-              if (
-                dateObj.getMonth() === currentMonth &&
-                dateObj.getFullYear() === currentYear &&
-                dateObj.getDate() === dayValue
-              ) {
-                const dayOfWeek = dateObj.getDay(); // 0 = Sunday, 6 = Saturday
-                if (dayOfWeek === 0 || dayOfWeek === 6) {
-                  dayElement.classList.add('weekend');
-                } else {
-                  dayElement.classList.remove('weekend');
-                }
-              } else {
-                // Date doesn't match - remove weekend class
-                dayElement.classList.remove('weekend');
-              }
-            });
+            markWeekendDaysInCalendar(calendar, instance.currentMonth, instance.currentYear);
           }, 100);
         },
       });
