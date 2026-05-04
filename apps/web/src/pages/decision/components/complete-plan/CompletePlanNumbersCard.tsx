@@ -38,7 +38,7 @@ export function CompletePlanNumbersCard({ numbers }: CompletePlanNumbersCardProp
           </p>
           <p
             data-testid="committed-pct-legend"
-            className="mt-2 text-[11px] leading-snug text-gray-500 dark:text-gray-400"
+            className="mt-2 text-xs leading-snug text-gray-500 dark:text-gray-400"
           >
             {COMPLETE_PLAN_LABELS.numbersCompositionLegend}
           </p>
