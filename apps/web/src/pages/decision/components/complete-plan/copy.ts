@@ -13,6 +13,7 @@ export const COMPLETE_PLAN_LABELS = {
   projection60: 'Em 60 dias',
   projection90: 'Em 90 dias',
   installmentsTitle: 'Suas parcelas e por onde começar',
+  installmentsCollapsedHint: 'Inclui prioridade baixa e demais parcelas.',
   installmentsEmpty: 'Você não tem parcelas ativas no momento.',
   behaviorTitle: 'Seu comportamento',
   topCategoriesTitle: 'Onde você mais gasta',
@@ -37,3 +38,7 @@ export const ACCOUNT_TYPE_LABEL_PT: Readonly<Record<'credit_card' | 'other', str
   credit_card: 'Cartão de crédito',
   other: 'Outra conta',
 };
+
+export function installmentsCollapsedSummaryLabel(count: number): string {
+  return count === 1 ? 'Ver mais 1 parcela' : `Ver mais ${count} parcelas`;
+}

@@ -1,9 +1,15 @@
-import { CreditCard, Wallet } from 'lucide-react';
+import { ChevronDown, CreditCard, Wallet } from 'lucide-react';
 
-import type { CompletePlanResponse } from '@/services/completePlanService';
+import type { CompletePlanInstallment, CompletePlanResponse } from '@/services/completePlanService';
 
-import { ACCOUNT_TYPE_LABEL_PT, COMPLETE_PLAN_LABELS, PRIORITY_LABEL_PT } from './copy';
+import {
+  ACCOUNT_TYPE_LABEL_PT,
+  COMPLETE_PLAN_LABELS,
+  installmentsCollapsedSummaryLabel,
+  PRIORITY_LABEL_PT,
+} from './copy';
 import { formatBrl, formatDateBr } from './format';
+import { partitionInstallmentsHeadAndRest } from './installmentsPartition';
 
 export interface CompletePlanInstallmentsCardProps {
   readonly strategy: CompletePlanResponse['installmentsStrategy'];
@@ -16,11 +22,51 @@ const PRIORITY_BADGE_CLASSES: Readonly<Record<'high' | 'medium' | 'low', string>
   low: 'border-primary-500/40 bg-primary-50 text-primary-700 dark:border-primary-400/40 dark:bg-primary-900/40 dark:text-primary-200',
 };
 
+function InstallmentRow({ item }: { readonly item: CompletePlanInstallment }) {
+  return (
+    <li className="flex flex-col gap-1.5 rounded-md bg-card px-2.5 py-2 dark:bg-card-dark sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 items-start gap-2.5">
+        {item.accountType === 'credit_card' ? (
+          <CreditCard
+            className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary-500 dark:text-primary-400"
+            aria-hidden
+          />
+        ) : (
+          <Wallet
+            className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary-500 dark:text-primary-400"
+            aria-hidden
+          />
+        )}
+        <div className="min-w-0 space-y-0.5">
+          <p className="truncate text-sm font-medium text-text dark:text-text-dark">
+            {item.description}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {formatBrl(item.monthlyValue)} / mês · {item.remaining} parcela
+            {item.remaining === 1 ? '' : 's'} · termina em {formatDateBr(item.endDate)}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {ACCOUNT_TYPE_LABEL_PT[item.accountType]}
+          </p>
+        </div>
+      </div>
+      <span
+        className={`w-fit rounded-full border px-2 py-0.5 text-[11px] font-medium sm:text-xs ${PRIORITY_BADGE_CLASSES[item.priority]}`}
+      >
+        {PRIORITY_LABEL_PT[item.priority]}
+      </span>
+    </li>
+  );
+}
+
 export function CompletePlanInstallmentsCard({ strategy }: CompletePlanInstallmentsCardProps) {
+  const { head, rest } = partitionInstallmentsHeadAndRest(strategy.items);
+  const restCount = rest.length;
+
   return (
     <section
       aria-labelledby="cp-installments-title"
-      className="space-y-3 rounded-md border border-border bg-background px-4 py-4 dark:border-border-dark dark:bg-background-dark"
+      className="space-y-2 rounded-md border border-border bg-background px-3 py-3 dark:border-border-dark dark:bg-background-dark"
     >
       <h3
         id="cp-installments-title"
@@ -33,47 +79,35 @@ export function CompletePlanInstallmentsCard({ strategy }: CompletePlanInstallme
           {COMPLETE_PLAN_LABELS.installmentsEmpty}
         </p>
       ) : (
-        <ul className="space-y-2">
-          {strategy.items.map((item) => (
-            <li
-              key={`${item.accountId}::${item.description}`}
-              className="flex flex-col gap-2 rounded-md bg-card px-3 py-3 dark:bg-card-dark sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div className="flex items-start gap-3">
-                {item.accountType === 'credit_card' ? (
-                  <CreditCard
-                    className="mt-0.5 h-4 w-4 shrink-0 text-primary-500 dark:text-primary-400"
-                    aria-hidden
-                  />
-                ) : (
-                  <Wallet
-                    className="mt-0.5 h-4 w-4 shrink-0 text-primary-500 dark:text-primary-400"
-                    aria-hidden
-                  />
-                )}
-                <div className="min-w-0 space-y-1">
-                  <p className="truncate text-sm font-medium text-text dark:text-text-dark">
-                    {item.description}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {formatBrl(item.monthlyValue)} / mês · {item.remaining} parcela
-                    {item.remaining === 1 ? '' : 's'} · termina em {formatDateBr(item.endDate)}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {ACCOUNT_TYPE_LABEL_PT[item.accountType]}
-                  </p>
-                </div>
-              </div>
-              <span
-                className={`w-fit rounded-full border px-2 py-0.5 text-xs font-medium ${PRIORITY_BADGE_CLASSES[item.priority]}`}
-              >
-                {PRIORITY_LABEL_PT[item.priority]}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="space-y-1.5">
+            {head.map((item) => (
+              <InstallmentRow key={`${item.accountId}::${item.description}`} item={item} />
+            ))}
+          </ul>
+          {restCount > 0 ? (
+            <details className="rounded-md border border-border/70 dark:border-border-dark/70 [&[open]>summary_svg]:rotate-180">
+              <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 rounded-md px-2 py-2 text-sm font-medium text-primary-600 hover:bg-gray-100 dark:text-primary-400 dark:hover:bg-gray-800/60 [&::-webkit-details-marker]:hidden">
+                <span className="min-w-0 text-left">
+                  {installmentsCollapsedSummaryLabel(restCount)}
+                </span>
+                <ChevronDown className="h-4 w-4 shrink-0 transition-transform" aria-hidden />
+              </summary>
+              <p className="px-2 pb-1 text-xs text-gray-500 dark:text-gray-400">
+                {COMPLETE_PLAN_LABELS.installmentsCollapsedHint}
+              </p>
+              <ul className="space-y-1.5 border-t border-border/60 px-1 pb-1 pt-2 dark:border-border-dark/60">
+                {rest.map((item) => (
+                  <InstallmentRow key={`${item.accountId}::${item.description}`} item={item} />
+                ))}
+              </ul>
+            </details>
+          ) : null}
+        </>
       )}
-      <p className="text-sm text-gray-600 dark:text-gray-300">{strategy.suggestion}</p>
+      <p className="text-xs leading-snug text-gray-600 dark:text-gray-300 sm:text-sm">
+        {strategy.suggestion}
+      </p>
     </section>
   );
 }
