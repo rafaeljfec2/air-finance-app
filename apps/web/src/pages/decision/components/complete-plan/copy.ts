@@ -2,6 +2,7 @@ export const COMPLETE_PLAN_LABELS = {
   sectionTitle: 'Seu plano completo',
   sectionDescription: 'Tudo que está acontecendo, o que mudar e como continuar no controle.',
   diagnosisTitle: 'O que está acontecendo',
+  coherenceTitle: 'Leitura dos números',
   numbersTitle: 'Sua situação em números',
   numbersToday: 'Hoje você compromete',
   numbersHealthy: 'Meta saudável',
@@ -22,10 +23,12 @@ export const COMPLETE_PLAN_LABELS = {
   rulesTitle: 'Regras para você seguir',
   simpleRuleTitle: 'Regra simples para lembrar',
   outcomeTitle: 'O que muda se você seguir o plano',
+  planDetailsSummary: 'Ver detalhes do plano',
+  planDetailsHint: 'Projeção, parcelas, comportamento e regras.',
   loading: 'Carregando seu plano…',
   error: 'Não foi possível carregar seu plano',
   retry: 'Tentar de novo',
-  cachedHint: 'Texto reaproveitado da última análise.',
+  cachedHint: 'Texto reutilizado do cache para o mesmo período e contexto.',
 } as const;
 
 export const PRIORITY_LABEL_PT: Readonly<Record<'high' | 'medium' | 'low', string>> = {

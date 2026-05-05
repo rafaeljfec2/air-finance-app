@@ -1,3 +1,5 @@
+import { Link as RouterLink } from 'react-router-dom';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -11,6 +13,7 @@ import { toast } from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
 import type { DecisionAction, DecisionEngineStatus } from '@/services/decisionEngineService';
 
+import { decisionQuickLinksForIssue } from '../decisionQuickLinks';
 import { humanizeImpactForDisplay } from '../humanizeImpactForDisplay';
 import { formatActionReasonsPlain } from '../kpiPlainLabels';
 
@@ -19,6 +22,7 @@ export interface DecisionPrimaryBlockProps {
   readonly status: DecisionEngineStatus;
   readonly hasSecondarySteps: boolean;
   readonly problemHeadline: string;
+  readonly primaryIssue: string;
   /** When false, hides the context line (e.g. when the parent already shows the same headline). */
   readonly showProblemContext?: boolean;
 }
@@ -34,10 +38,12 @@ export function DecisionPrimaryBlock({
   status,
   hasSecondarySteps,
   problemHeadline,
+  primaryIssue,
   showProblemContext = true,
 }: DecisionPrimaryBlockProps) {
   const reasonsPlain = formatActionReasonsPlain(action.reason);
   const impactDisplay = humanizeImpactForDisplay(action.impact);
+  const quickLinks = decisionQuickLinksForIssue(primaryIssue);
 
   const handleConfirmPriority = async (): Promise<void> => {
     const text = `${action.title}\n${action.description}\n${impactDisplay}`;
@@ -85,7 +91,7 @@ export function DecisionPrimaryBlock({
           </p>
         ) : null}
       </CardContent>
-      <CardFooter className="flex flex-col gap-2 p-4 pt-2 sm:p-6 sm:pt-0">
+      <CardFooter className="flex flex-col gap-3 p-4 pt-2 sm:p-6 sm:pt-0">
         <Button
           type="button"
           variant="default"
@@ -95,6 +101,20 @@ export function DecisionPrimaryBlock({
         >
           {hasSecondarySteps ? 'Vou começar por aqui' : 'Começar agora'}
         </Button>
+        <nav
+          aria-label="Atalhos relacionados"
+          className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-sm"
+        >
+          {quickLinks.map((quickLink) => (
+            <RouterLink
+              key={quickLink.href}
+              to={quickLink.href}
+              className="min-h-[44px] min-w-[44px] content-center text-primary-600 underline-offset-4 hover:underline dark:text-primary-400"
+            >
+              {quickLink.label}
+            </RouterLink>
+          ))}
+        </nav>
       </CardFooter>
     </Card>
   );

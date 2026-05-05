@@ -57,6 +57,7 @@ const CompletePlanResponseSchema = z.object({
   primary_issue: z.string(),
   theme_phase: ThemePhaseSchema.nullable().optional(),
   diagnosis: z.string(),
+  coherenceNote: z.string(),
   numbers: NumbersSchema,
   projection: z.object({
     in30Days: ProjectionStepSchema,
@@ -73,6 +74,8 @@ const CompletePlanResponseSchema = z.object({
   simpleRule: z.string(),
   expectedOutcome: z.string(),
   llmCached: z.boolean(),
+  referencePeriod: z.string(),
+  generatedAt: z.string(),
   ruleEngineVersion: z.string().optional(),
 });
 

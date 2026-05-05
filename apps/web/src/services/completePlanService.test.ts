@@ -14,6 +14,7 @@ const samplePayload = {
   primary_issue: 'high_commitment',
   theme_phase: 'yellow' as const,
   diagnosis: 'd',
+  coherenceNote: 'Compromisso de parcelas em ~30% da renda.',
   numbers: {
     netIncome: 5000,
     totalCommitted: 1500,
@@ -51,6 +52,8 @@ const samplePayload = {
   simpleRule: 'r',
   expectedOutcome: 'o',
   llmCached: false,
+  referencePeriod: '2026-05',
+  generatedAt: '2026-05-01T12:00:00.000Z',
   ruleEngineVersion: '1.0.1',
 };
 

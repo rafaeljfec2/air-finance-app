@@ -1,4 +1,4 @@
-import { ClipboardList } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,6 +6,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useCompletePlan } from '@/hooks/useCompletePlan';
 
 import { CompletePlanBehaviorCard } from './CompletePlanBehaviorCard';
+import { CompletePlanCoherenceNote } from './CompletePlanCoherenceNote';
 import { CompletePlanDiagnosis } from './CompletePlanDiagnosis';
 import { CompletePlanInstallmentsCard } from './CompletePlanInstallmentsCard';
 import { CompletePlanNumbersCard } from './CompletePlanNumbersCard';
@@ -66,29 +67,42 @@ export function DecisionCompletePlanSection({
   return (
     <Card className="border-border dark:border-border-dark">
       <CardHeader className="space-y-2 p-4 sm:p-6">
-        <div className="flex items-start gap-3">
-          <div className="rounded-md bg-primary-100 p-2 dark:bg-primary-900/30">
-            <ClipboardList className="h-5 w-5 text-primary-600 dark:text-primary-300" aria-hidden />
-          </div>
-          <div>
-            <CardTitle className="text-lg text-text dark:text-text-dark sm:text-xl">
-              {COMPLETE_PLAN_LABELS.sectionTitle}
-            </CardTitle>
-            <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
-              {COMPLETE_PLAN_LABELS.sectionDescription}
-            </CardDescription>
-          </div>
-        </div>
+        <CardTitle className="text-lg text-text dark:text-text-dark sm:text-xl">
+          {COMPLETE_PLAN_LABELS.sectionTitle}
+        </CardTitle>
+        <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
+          {COMPLETE_PLAN_LABELS.sectionDescription}
+        </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4 px-4 pb-4 pt-0 sm:px-6">
         <CompletePlanDiagnosis text={data.diagnosis} />
+        <CompletePlanCoherenceNote text={data.coherenceNote} />
         <CompletePlanNumbersCard numbers={data.numbers} />
-        <CompletePlanProjectionCard projection={data.projection} />
-        <CompletePlanInstallmentsCard strategy={data.installmentsStrategy} />
-        <CompletePlanBehaviorCard behavior={data.behavior} />
-        <CompletePlanRulesCard rules={data.personalRules} simpleRule={data.simpleRule} />
-        <CompletePlanOutcome text={data.expectedOutcome} cached={data.llmCached} />
+
+        <details className="rounded-md border border-border/80 open:[&>summary_svg]:rotate-180 dark:border-border-dark/80">
+          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 rounded-md px-2 py-2 text-sm font-medium text-primary-600 hover:bg-gray-100 dark:text-primary-400 dark:hover:bg-gray-800/60 [&::-webkit-details-marker]:hidden">
+            <span className="min-w-0 text-left">
+              {COMPLETE_PLAN_LABELS.planDetailsSummary}
+              <span className="mt-0.5 block text-xs font-normal text-gray-500 dark:text-gray-400">
+                {COMPLETE_PLAN_LABELS.planDetailsHint}
+              </span>
+            </span>
+            <ChevronDown className="h-4 w-4 shrink-0 transition-transform" aria-hidden />
+          </summary>
+          <div className="space-y-4 border-t border-border/60 pt-3 dark:border-border-dark/60">
+            <CompletePlanProjectionCard projection={data.projection} />
+            <CompletePlanInstallmentsCard strategy={data.installmentsStrategy} />
+            <CompletePlanBehaviorCard behavior={data.behavior} />
+            <CompletePlanRulesCard rules={data.personalRules} simpleRule={data.simpleRule} />
+            <CompletePlanOutcome
+              text={data.expectedOutcome}
+              cached={data.llmCached}
+              referencePeriod={data.referencePeriod}
+              generatedAt={data.generatedAt}
+            />
+          </div>
+        </details>
       </CardContent>
     </Card>
   );

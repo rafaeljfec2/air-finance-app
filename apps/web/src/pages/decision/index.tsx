@@ -17,9 +17,14 @@ import { DecisionPrimaryBlock } from './components/DecisionPrimaryBlock';
 import { DecisionReferencePeriodSelector } from './components/DecisionReferencePeriodSelector';
 import { DecisionSecondaryActions } from './components/DecisionSecondaryActions';
 import { DecisionStatusStrip } from './components/DecisionStatusStrip';
+import { DecisionVerdictPanel } from './components/DecisionVerdictPanel';
 import { getPlaybook } from './playbooks';
 import { problemHeadlineFromPrimaryIssue } from './primaryIssueLabels';
-import { resolveEvaluateAutoReferencePeriod } from './utils/referencePeriod';
+import {
+  buildYYYYMM,
+  getCurrentYYYYMM,
+  resolveEvaluateAutoReferencePeriod,
+} from './utils/referencePeriod';
 
 const motionContainer = {
   hidden: { opacity: 0 },
@@ -49,6 +54,8 @@ export function FinancialDecisionPage() {
   const [refMonth, setRefMonth] = useState(() => new Date().getMonth() + 1);
 
   const referencePeriod = resolveEvaluateAutoReferencePeriod(refYear, refMonth);
+  const viewingReferencePeriod = buildYYYYMM(refYear, refMonth);
+  const isNonCurrentDecisionPeriod = viewingReferencePeriod !== getCurrentYYYYMM();
 
   const query = useDecisionEngineEvaluateAuto(companyId, {
     referencePeriod,
@@ -99,6 +106,8 @@ export function FinancialDecisionPage() {
                   onMonthChange={setRefMonth}
                   minYear={minYear}
                   maxYear={maxYear}
+                  viewingReferencePeriod={viewingReferencePeriod}
+                  isNonCurrentPeriod={isNonCurrentDecisionPeriod}
                 />
               ) : null}
             </DecisionPageToolbar>
@@ -154,12 +163,18 @@ export function FinancialDecisionPage() {
                   status={query.data.status}
                   briefingLine={problemHeadlineFromPrimaryIssue(query.data.primary_issue)}
                 />
+                <DecisionVerdictPanel
+                  status={query.data.status}
+                  themePhase={query.data.theme_phase}
+                  orderingRationale={query.data.ordering_rationale}
+                />
                 {primaryAction !== undefined ? (
                   <DecisionPrimaryBlock
                     action={primaryAction}
                     status={query.data.status}
                     hasSecondarySteps={hasSecondaries}
                     problemHeadline={problemHeadlineFromPrimaryIssue(query.data.primary_issue)}
+                    primaryIssue={query.data.primary_issue}
                     showProblemContext={false}
                   />
                 ) : (

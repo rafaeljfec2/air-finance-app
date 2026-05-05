@@ -30,6 +30,10 @@ export interface DecisionReferencePeriodSelectorProps {
   readonly onMonthChange: (month1To12: number) => void;
   readonly minYear: number;
   readonly maxYear: number;
+  /** `YYYY-MM` do período em análise (sempre o mês/ano selecionado nos selects). */
+  readonly viewingReferencePeriod: string;
+  /** Quando true, mostra aviso de que a leitura não é o mês corrente. */
+  readonly isNonCurrentPeriod: boolean;
   /** `inline`: barra compacta sob o cabeçalho (desktop em linha). */
   readonly layout?: 'default' | 'inline';
 }
@@ -49,6 +53,8 @@ export function DecisionReferencePeriodSelector({
   onMonthChange,
   minYear,
   maxYear,
+  viewingReferencePeriod,
+  isNonCurrentPeriod,
   layout = 'default',
 }: DecisionReferencePeriodSelectorProps) {
   const years = yearOptions(minYear, maxYear);
@@ -83,6 +89,14 @@ export function DecisionReferencePeriodSelector({
               ? 'Padrão = mês atual (API). Outro mês aplica filtro explícito.'
               : 'Use o mês atual para o comportamento padrão da API. Outro mês envia o filtro na análise automática.'}
           </p>
+          {isNonCurrentPeriod ? (
+            <p
+              role="status"
+              className="mt-2 rounded-md border border-amber-500/40 bg-amber-50 px-2 py-2 text-xs font-medium text-amber-950 dark:border-amber-500/35 dark:bg-amber-950/30 dark:text-amber-100"
+            >
+              A ver: {viewingReferencePeriod}. Outro período = outra leitura.
+            </p>
+          ) : null}
         </div>
         <div
           className={cn(

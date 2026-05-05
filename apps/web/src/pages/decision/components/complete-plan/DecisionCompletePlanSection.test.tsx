@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -16,6 +16,7 @@ const samplePayload: CompletePlanResponse = {
   primary_issue: 'high_commitment',
   theme_phase: 'yellow',
   diagnosis: 'Você está comprometendo bastante.',
+  coherenceNote: 'O foco em parcelas combina com o compromisso acima da meta.',
   numbers: {
     netIncome: 5000,
     totalCommitted: 1500,
@@ -55,6 +56,8 @@ const samplePayload: CompletePlanResponse = {
   simpleRule: 'Nunca comprometer mais de 25% da renda com parcelas.',
   expectedOutcome: 'Você libera espaço no orçamento.',
   llmCached: false,
+  referencePeriod: '2026-05',
+  generatedAt: '2026-05-01T12:00:00.000Z',
   ruleEngineVersion: '1.0.1',
 };
 
@@ -78,7 +81,7 @@ describe('DecisionCompletePlanSection', () => {
     expect(screen.getByText('Carregando seu plano…')).toBeInTheDocument();
   });
 
-  it('renders diagnosis, numbers, installments, behavior, rules and outcome on success', async () => {
+  it('renders diagnosis, coherence note and numbers; keeps detailed plan inside a closed disclosure', async () => {
     vi.mocked(fetchCompletePlan).mockResolvedValue(samplePayload);
 
     renderWithClient(<DecisionCompletePlanSection companyId="c1" />);
@@ -86,7 +89,19 @@ describe('DecisionCompletePlanSection', () => {
     await waitFor(() =>
       expect(screen.getByText('Você está comprometendo bastante.')).toBeInTheDocument(),
     );
+    expect(screen.getByText('Leitura dos números')).toBeInTheDocument();
+    expect(
+      screen.getByText('O foco em parcelas combina com o compromisso acima da meta.'),
+    ).toBeInTheDocument();
     expect(screen.getByText('Sua situação em números')).toBeInTheDocument();
+
+    const details = screen.getByText('Ver detalhes do plano').closest('details');
+    expect(details).not.toBeNull();
+    expect(details).not.toHaveAttribute('open');
+
+    fireEvent.click(screen.getByText('Ver detalhes do plano'));
+
+    expect(details).toHaveAttribute('open');
     expect(screen.getByText('Suas parcelas e por onde começar')).toBeInTheDocument();
     expect(screen.getByText('Compra X')).toBeInTheDocument();
     expect(screen.getByText(/Alimenta/)).toBeInTheDocument();
@@ -95,6 +110,7 @@ describe('DecisionCompletePlanSection', () => {
       screen.getByText('Nunca comprometer mais de 25% da renda com parcelas.'),
     ).toBeInTheDocument();
     expect(screen.getByText('Você libera espaço no orçamento.')).toBeInTheDocument();
+    expect(screen.getByText(/Período: 2026-05/)).toBeInTheDocument();
   });
 
   it('shows an error card with retry when the request fails', async () => {
@@ -116,6 +132,10 @@ describe('DecisionCompletePlanSection', () => {
 
     renderWithClient(<DecisionCompletePlanSection companyId="c1" />);
 
+    await waitFor(() =>
+      expect(screen.getByText('Você está comprometendo bastante.')).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByText('Ver detalhes do plano'));
     await waitFor(() =>
       expect(screen.getByText('Você não tem parcelas ativas no momento.')).toBeInTheDocument(),
     );
