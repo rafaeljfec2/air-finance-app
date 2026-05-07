@@ -111,6 +111,37 @@ components:
           items: { type: integer, minimum: 1, maximum: 31 }
         creditUtilizationTrend:
           type: 'null'
+    VariableSpending:
+      type: object
+      required:
+        - bucketHealth
+        - totalVariable
+        - previousTotalVariable
+        - percentOfIncome
+        - monthOverMonthChangePct
+        - topCategories
+        - peakDaysOfMonth
+      properties:
+        bucketHealth:
+          $ref: '#/components/schemas/Status'
+          description: Saúde do bucket variável (não é o status do motor evaluate-auto).
+        totalVariable: { type: number }
+        previousTotalVariable: { type: number }
+        percentOfIncome:
+          type: number
+          nullable: true
+          description: Proporção 0..1 sobre a mesma base de renda do período (summary.income).
+        monthOverMonthChangePct:
+          type: number
+          nullable: true
+          description: Variação % total variável vs mês anterior.
+        topCategories:
+          type: array
+          items: { $ref: '#/components/schemas/Category' }
+        peakDaysOfMonth:
+          type: array
+          nullable: true
+          items: { type: integer, minimum: 1, maximum: 31 }
     Rule:
       type: object
       required: [id, text, rationale]
@@ -125,27 +156,35 @@ components:
         - primary_issue
         - theme_phase
         - diagnosis
+        - coherenceNote
         - numbers
         - projection
         - installmentsStrategy
         - behavior
+        - variableSpending
         - personalRules
         - simpleRule
         - expectedOutcome
         - llmCached
+        - referencePeriod
+        - generatedAt
       properties:
         status: { $ref: '#/components/schemas/Status' }
         primary_issue: { type: string }
         theme_phase: { $ref: '#/components/schemas/ThemePhase' }
         diagnosis: { type: string }
+        coherenceNote: { type: string }
         numbers: { $ref: '#/components/schemas/Numbers' }
         projection: { $ref: '#/components/schemas/Projection' }
         installmentsStrategy: { $ref: '#/components/schemas/InstallmentsStrategy' }
         behavior: { $ref: '#/components/schemas/Behavior' }
+        variableSpending: { $ref: '#/components/schemas/VariableSpending' }
         personalRules:
           type: array
           items: { $ref: '#/components/schemas/Rule' }
         simpleRule: { type: string }
         expectedOutcome: { type: string }
         llmCached: { type: boolean }
+        referencePeriod: { type: string, example: '2026-05' }
+        generatedAt: { type: string, format: date-time }
         ruleEngineVersion: { type: string }

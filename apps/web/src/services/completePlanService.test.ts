@@ -48,6 +48,15 @@ const samplePayload = {
     peakDaysOfMonth: [5],
     creditUtilizationTrend: null,
   },
+  variableSpending: {
+    bucketHealth: 'attention' as const,
+    totalVariable: 900,
+    previousTotalVariable: 700,
+    percentOfIncome: 0.18,
+    monthOverMonthChangePct: 28.57,
+    topCategories: [{ name: 'Lazer', amount: 400, share: 0.44 }],
+    peakDaysOfMonth: [6],
+  },
   personalRules: [{ id: 'a', text: 't', rationale: 'r' }],
   simpleRule: 'r',
   expectedOutcome: 'o',
@@ -70,6 +79,8 @@ describe('completePlanService', () => {
     expect(result.primary_issue).toBe('high_commitment');
     expect(result.installmentsStrategy.items).toHaveLength(1);
     expect(result.behavior.creditUtilizationTrend).toBeNull();
+    expect(result.variableSpending.totalVariable).toBe(900);
+    expect(result.variableSpending.bucketHealth).toBe('attention');
   });
 
   it('sends referencePeriod as query param when provided', async () => {

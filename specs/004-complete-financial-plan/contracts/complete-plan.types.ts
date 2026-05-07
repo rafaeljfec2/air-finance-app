@@ -52,6 +52,18 @@ export interface CompletePlanBehavior {
   readonly creditUtilizationTrend: null;
 }
 
+export type CompletePlanVariableSpendingBucketHealth = 'healthy' | 'attention' | 'critical';
+
+export interface CompletePlanVariableSpending {
+  readonly bucketHealth: CompletePlanVariableSpendingBucketHealth;
+  readonly totalVariable: number;
+  readonly previousTotalVariable: number;
+  readonly percentOfIncome: number | null;
+  readonly monthOverMonthChangePct: number | null;
+  readonly topCategories: readonly CompletePlanCategory[];
+  readonly peakDaysOfMonth: readonly number[] | null;
+}
+
 export interface CompletePlanRule {
   readonly id: string;
   readonly text: string;
@@ -63,13 +75,17 @@ export interface CompletePlanResponse {
   readonly primary_issue: string;
   readonly theme_phase: CompletePlanThemePhase;
   readonly diagnosis: string;
+  readonly coherenceNote: string;
   readonly numbers: CompletePlanNumbers;
   readonly projection: CompletePlanProjection;
   readonly installmentsStrategy: CompletePlanInstallmentsStrategy;
   readonly behavior: CompletePlanBehavior;
+  readonly variableSpending: CompletePlanVariableSpending;
   readonly personalRules: readonly CompletePlanRule[];
   readonly simpleRule: string;
   readonly expectedOutcome: string;
   readonly llmCached: boolean;
+  readonly referencePeriod: string;
+  readonly generatedAt: string;
   readonly ruleEngineVersion?: string;
 }

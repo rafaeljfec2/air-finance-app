@@ -46,6 +46,16 @@ const BehaviorSchema = z.object({
   creditUtilizationTrend: z.null(),
 });
 
+const VariableSpendingSchema = z.object({
+  bucketHealth: StatusSchema,
+  totalVariable: z.number(),
+  previousTotalVariable: z.number(),
+  percentOfIncome: z.number().nullable(),
+  monthOverMonthChangePct: z.number().nullable(),
+  topCategories: z.array(CategorySchema),
+  peakDaysOfMonth: z.array(z.number()).nullable(),
+});
+
 const RuleSchema = z.object({
   id: z.string(),
   text: z.string(),
@@ -70,6 +80,7 @@ const CompletePlanResponseSchema = z.object({
     suggestion: z.string(),
   }),
   behavior: BehaviorSchema,
+  variableSpending: VariableSpendingSchema,
   personalRules: z.array(RuleSchema),
   simpleRule: z.string(),
   expectedOutcome: z.string(),
@@ -86,6 +97,7 @@ export type CompletePlanCategory = z.infer<typeof CategorySchema>;
 export type CompletePlanProjectionStep = z.infer<typeof ProjectionStepSchema>;
 export type CompletePlanNumbers = z.infer<typeof NumbersSchema>;
 export type CompletePlanThemePhase = z.infer<typeof ThemePhaseSchema>;
+export type CompletePlanVariableSpending = z.infer<typeof VariableSpendingSchema>;
 
 export interface FetchCompletePlanOptions {
   readonly referencePeriod?: string;

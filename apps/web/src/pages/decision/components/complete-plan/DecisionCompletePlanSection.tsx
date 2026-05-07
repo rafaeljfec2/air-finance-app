@@ -1,4 +1,5 @@
 import { ChevronDown } from 'lucide-react';
+import { useRef } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +14,41 @@ import { CompletePlanNumbersCard } from './CompletePlanNumbersCard';
 import { CompletePlanOutcome } from './CompletePlanOutcome';
 import { CompletePlanProjectionCard } from './CompletePlanProjectionCard';
 import { CompletePlanRulesCard } from './CompletePlanRulesCard';
+import { CompletePlanVariableSpendingCard } from './CompletePlanVariableSpendingCard';
 import { COMPLETE_PLAN_LABELS } from './copy';
+import { formatBrl, formatPercent, formatSignedOneDecimalPercent } from './format';
+
+const VARIABLE_SUMMARY_BADGE: Readonly<Record<'healthy' | 'attention' | 'critical', string>> = {
+  healthy:
+    'inline-flex w-fit rounded-full border border-emerald-500/35 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 dark:border-emerald-400/35 dark:bg-emerald-950/35 dark:text-emerald-100',
+  attention:
+    'inline-flex w-fit rounded-full border border-amber-500/40 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:border-amber-400/40 dark:bg-amber-950/40 dark:text-amber-100',
+  critical:
+    'inline-flex w-fit rounded-full border border-red-500/40 bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-800 dark:border-red-400/40 dark:bg-red-950/40 dark:text-red-100',
+};
+
+const VARIABLE_SUMMARY_BUCKET_LABEL: Readonly<
+  Record<'healthy' | 'attention' | 'critical', string>
+> = {
+  healthy: COMPLETE_PLAN_LABELS.variableSpendingBucketHealthy,
+  attention: COMPLETE_PLAN_LABELS.variableSpendingBucketAttention,
+  critical: COMPLETE_PLAN_LABELS.variableSpendingBucketCritical,
+};
+
+function revealPlanDetailAndScroll(
+  panel: HTMLDetailsElement | null,
+  anchorElementId: string,
+): void {
+  if (panel) {
+    panel.open = true;
+  }
+  window.requestAnimationFrame(() => {
+    document.getElementById(anchorElementId)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  });
+}
 
 export interface DecisionCompletePlanSectionProps {
   readonly companyId: string;
@@ -24,6 +59,7 @@ export function DecisionCompletePlanSection({
   companyId,
   referencePeriod,
 }: DecisionCompletePlanSectionProps) {
+  const planDetailsRef = useRef<HTMLDetailsElement>(null);
   const query = useCompletePlan(companyId, { referencePeriod });
 
   if (query.isLoading) {
@@ -80,7 +116,65 @@ export function DecisionCompletePlanSection({
         <CompletePlanCoherenceNote text={data.coherenceNote} />
         <CompletePlanNumbersCard numbers={data.numbers} />
 
-        <details className="rounded-md border border-border/80 open:[&>summary_svg]:rotate-180 dark:border-border-dark/80">
+        <section
+          aria-label={COMPLETE_PLAN_LABELS.variableSpendingSummaryTitle}
+          className="rounded-md border border-border/80 bg-card/40 px-3 py-3 dark:border-border-dark/80 dark:bg-card-dark/30 sm:px-4"
+        >
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                {COMPLETE_PLAN_LABELS.variableSpendingSummaryTitle}
+              </p>
+              <p className="text-sm font-medium text-text dark:text-text-dark">
+                <span className="font-semibold">
+                  {formatBrl(data.variableSpending.totalVariable)}
+                </span>
+                {data.variableSpending.percentOfIncome !== null ? (
+                  <>
+                    {' '}
+                    · {formatPercent(data.variableSpending.percentOfIncome)}{' '}
+                    {COMPLETE_PLAN_LABELS.variableSpendingVsIncome}
+                  </>
+                ) : null}
+                {data.variableSpending.monthOverMonthChangePct !== null ? (
+                  <>
+                    {' '}
+                    · {formatSignedOneDecimalPercent(
+                      data.variableSpending.monthOverMonthChangePct,
+                    )}{' '}
+                    {COMPLETE_PLAN_LABELS.variableSpendingMomLabel}
+                  </>
+                ) : null}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {COMPLETE_PLAN_LABELS.variableSpendingSummaryHint}
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+              <span
+                role="status"
+                className={VARIABLE_SUMMARY_BADGE[data.variableSpending.bucketHealth]}
+              >
+                {VARIABLE_SUMMARY_BUCKET_LABEL[data.variableSpending.bucketHealth]}
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                className="min-h-[44px] justify-start px-2 text-primary-600 hover:bg-transparent dark:text-primary-400 sm:justify-end"
+                onClick={() =>
+                  revealPlanDetailAndScroll(planDetailsRef.current, 'complete-plan-variable-detail')
+                }
+              >
+                {COMPLETE_PLAN_LABELS.variableSpendingOpenDetail}
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        <details
+          ref={planDetailsRef}
+          className="rounded-md border border-border/80 open:[&>summary_svg]:rotate-180 dark:border-border-dark/80"
+        >
           <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 rounded-md px-2 py-2 text-sm font-medium text-primary-600 hover:bg-gray-100 dark:text-primary-400 dark:hover:bg-gray-800/60 [&::-webkit-details-marker]:hidden">
             <span className="min-w-0 text-left">
               {COMPLETE_PLAN_LABELS.planDetailsSummary}
@@ -93,6 +187,7 @@ export function DecisionCompletePlanSection({
           <div className="space-y-4 border-t border-border/60 pt-3 dark:border-border-dark/60">
             <CompletePlanProjectionCard projection={data.projection} />
             <CompletePlanInstallmentsCard strategy={data.installmentsStrategy} />
+            <CompletePlanVariableSpendingCard variableSpending={data.variableSpending} />
             <CompletePlanBehaviorCard behavior={data.behavior} />
             <CompletePlanRulesCard rules={data.personalRules} simpleRule={data.simpleRule} />
             <CompletePlanOutcome

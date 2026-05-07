@@ -50,6 +50,15 @@ const samplePayload: CompletePlanResponse = {
     peakDaysOfMonth: [5, 10],
     creditUtilizationTrend: null,
   },
+  variableSpending: {
+    bucketHealth: 'attention',
+    totalVariable: 900,
+    previousTotalVariable: 700,
+    percentOfIncome: 0.18,
+    monthOverMonthChangePct: 28.57,
+    topCategories: [{ name: 'Lazer', amount: 400, share: 0.44 }],
+    peakDaysOfMonth: [6],
+  },
   personalRules: [
     { id: 'anchor:high_commitment', text: 'Limite as parcelas a 25%.', rationale: 'Anchor.' },
   ],
@@ -94,6 +103,8 @@ describe('DecisionCompletePlanSection', () => {
       screen.getByText('O foco em parcelas combina com o compromisso acima da meta.'),
     ).toBeInTheDocument();
     expect(screen.getByText('Sua situação em números')).toBeInTheDocument();
+    expect(screen.getByText('Resumo do gasto variável')).toBeInTheDocument();
+    expect(screen.getAllByText('Pediu atenção').length).toBeGreaterThanOrEqual(1);
 
     const details = screen.getByText('Ver detalhes do plano').closest('details');
     expect(details).not.toBeNull();
@@ -105,6 +116,8 @@ describe('DecisionCompletePlanSection', () => {
     expect(screen.getByText('Suas parcelas e por onde começar')).toBeInTheDocument();
     expect(screen.getByText('Compra X')).toBeInTheDocument();
     expect(screen.getByText(/Alimenta/)).toBeInTheDocument();
+    expect(screen.getByText('Gastos variáveis')).toBeInTheDocument();
+    expect(screen.getByText('Onde cortar primeiro')).toBeInTheDocument();
     expect(screen.getByText('Limite as parcelas a 25%.')).toBeInTheDocument();
     expect(
       screen.getByText('Nunca comprometer mais de 25% da renda com parcelas.'),
