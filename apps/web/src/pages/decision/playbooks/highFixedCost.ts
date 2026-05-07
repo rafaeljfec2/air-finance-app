@@ -4,26 +4,26 @@ export const highFixedCostPlaybook: Playbook = {
   slug: 'high_fixed_cost',
   title: 'Contas fixas pesando demais',
   explanation:
-    'Boa parte do seu mês já está comprometida com contas fixas (aluguel, escola, plano, contrato). Sobra pouco espaço para ajustar.',
+    'Boa parte do que você paga todo mês é previsível: financiamento, aluguel, escola, planos. Esses compromissos mudam devagar — a folga costuma vir do que você ainda controla no curto prazo.',
   phases: {
     red: {
       headline: 'Pare de piorar',
-      objective: 'Mapear e renegociar o que é grande.',
+      objective: 'Separar contrato longo do que dá para revisar em semanas.',
       actions: [
-        'Liste todas as contas fixas com valor e vencimento',
-        'Marque as que você pode renegociar agora (plano, internet, escola)',
-        'Cancele contratos de baixo uso',
-        'Adie qualquer novo contrato fixo até ter folga',
+        'Liste fixos com valor e data e marque o que é financiamento, aluguel ou contrato longo',
+        'Marque o que tem ciclo curto (internet, streaming, academia, seguro) para revisar ou cancelar',
+        'Não assuma novos contratos fixos até a margem melhorar',
+        'Adie compras parceladas que não são essenciais',
       ],
     },
     yellow: {
       headline: 'Voltando a respirar',
-      objective: 'Reduzir o peso das contas fixas.',
+      objective: 'Aumentar folga sem prometer cortes irreais no essencial.',
       actions: [
-        'Renegocie pelo menos uma conta fixa grande',
-        'Troque planos caros por opções mais baratas com função parecida',
-        'Defina um teto para contas fixas (ex.: até 50% da renda)',
-        'Antes de assinar algo novo, verifique se cabe nesse teto',
+        'Reduza gastos variáveis (mercado, delivery, lazer) antes de mirar financiamento ou aluguel',
+        'Troque ou cancele pelo menos um plano de ciclo curto que você usa pouco',
+        'Defina um teto: não criar novo compromisso fixo até sobrar margem confortável',
+        'Se pensar em refinanciar casa ou carro, só com simulação e custo total comparado',
       ],
     },
     green: {

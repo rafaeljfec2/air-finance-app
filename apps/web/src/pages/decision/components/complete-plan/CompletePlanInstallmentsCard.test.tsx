@@ -58,4 +58,26 @@ describe('CompletePlanInstallmentsCard', () => {
 
     expect(screen.getByText('Ver mais 1 parcela')).toBeInTheDocument();
   });
+
+  it('renders plural parcelas without a stray space before the s', () => {
+    render(
+      <CompletePlanInstallmentsCard
+        strategy={{
+          suggestion: 'Sug.',
+          items: [
+            {
+              ...baseItem,
+              accountId: 'a',
+              description: 'Item parcelado',
+              priority: 'high',
+              remaining: 14,
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.getByText(/14 parcelas · termina em/i)).toBeInTheDocument();
+    expect(screen.queryByText(/parcela s/i)).not.toBeInTheDocument();
+  });
 });

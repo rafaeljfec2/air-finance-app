@@ -10,13 +10,17 @@ const KPI_PLAIN_PT: Readonly<Record<string, string>> = {
   data_quality: 'Qualidade dos dados',
 };
 
-function phraseForReason(id: string): string {
+export function kpiPlainLabelPt(id: string): string {
   const key = id.trim().toLowerCase();
   const mapped = KPI_PLAIN_PT[key];
   if (mapped !== undefined) {
     return mapped;
   }
   return id.replaceAll('_', ' ');
+}
+
+function phraseForReason(id: string): string {
+  return kpiPlainLabelPt(id);
 }
 
 export function formatActionReasonsPlain(reasons: readonly string[]): string {

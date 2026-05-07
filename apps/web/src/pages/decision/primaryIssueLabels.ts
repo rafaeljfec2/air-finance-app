@@ -19,7 +19,8 @@ const PROBLEM_HEADLINE_PT: Readonly<Record<string, string>> = {
   high_commitment: 'Quase toda a renda já tem dono antes do mês acabar.',
   low_surplus: 'Sobra pouco para absorver um imprevisto.',
   low_savings: 'Está ficando pouco para o futuro ou para emergências.',
-  high_fixed_cost: 'Contas fixas pesadas deixam pouco espaço para manobrar.',
+  high_fixed_cost:
+    'Muito do mês é conta fixa — grande parte é longa duração, com pouca margem para manobra rápida.',
   data_incomplete: 'Sem dados completos, qualquer conselho vira chute.',
   healthy: 'Nada gritando alerta neste mês.',
 };

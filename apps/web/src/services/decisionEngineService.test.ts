@@ -39,7 +39,7 @@ describe('decisionEngineService', () => {
       {},
       {},
     );
-    expect(result).toEqual(payload);
+    expect(result).toEqual({ ...payload, issue_drivers: [] });
   });
 
   it('accepts theme_phase null for data_incomplete payloads', async () => {
@@ -63,6 +63,7 @@ describe('decisionEngineService', () => {
     const result = await evaluateAuto('c1');
 
     expect(result.theme_phase).toBeNull();
+    expect(result.issue_drivers).toEqual([]);
   });
 
   it('parses payload without theme_phase as undefined (backward compatible)', async () => {
@@ -78,6 +79,7 @@ describe('decisionEngineService', () => {
     const result = await evaluateAuto('c1');
 
     expect(result.theme_phase).toBeUndefined();
+    expect(result.issue_drivers).toEqual([]);
   });
 
   it('sends referencePeriod as query param when provided', async () => {
@@ -97,5 +99,39 @@ describe('decisionEngineService', () => {
       {},
       { params: { referencePeriod: '2026-01' } },
     );
+  });
+
+  it('parses issue_drivers and period_coverage when present', async () => {
+    vi.mocked(apiClient.post).mockResolvedValue({
+      data: {
+        status: 'healthy',
+        primary_issue: 'healthy',
+        ordering_rationale: 'ok',
+        actions: [],
+        issue_drivers: [{ kpi_id: 'savings_rate', level: 'warn', value: 0.05 }],
+        period_coverage: { has_income: true, has_expense: false },
+      },
+    });
+
+    const result = await evaluateAuto('c1');
+
+    expect(result.issue_drivers).toEqual([{ kpi_id: 'savings_rate', level: 'warn', value: 0.05 }]);
+    expect(result.period_coverage).toEqual({ has_income: true, has_expense: false });
+  });
+
+  it('rejects payload with unknown primary_issue', async () => {
+    vi.mocked(apiClient.post).mockResolvedValue({
+      data: {
+        status: 'healthy',
+        primary_issue: 'unexpected_issue_slug',
+        ordering_rationale: 'ok',
+        actions: [],
+      },
+    });
+
+    await expect(evaluateAuto('c1')).rejects.toMatchObject({
+      status: 400,
+      error: 'VALIDATION_ERROR',
+    });
   });
 });

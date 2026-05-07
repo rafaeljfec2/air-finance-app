@@ -21,7 +21,6 @@ function formatGeneratedAt(iso: string): string {
 
 export function CompletePlanOutcome({
   text,
-  cached,
   referencePeriod,
   generatedAt,
 }: CompletePlanOutcomeProps) {
@@ -57,11 +56,6 @@ export function CompletePlanOutcome({
           <p className="whitespace-pre-line text-sm leading-relaxed text-text dark:text-text-dark sm:text-base">
             {text}
           </p>
-          {cached === true ? (
-            <p className="text-[11px] text-gray-500 dark:text-gray-400">
-              {COMPLETE_PLAN_LABELS.cachedHint}
-            </p>
-          ) : null}
         </div>
       </div>
     </section>

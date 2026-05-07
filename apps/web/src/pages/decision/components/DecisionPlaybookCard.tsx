@@ -1,5 +1,5 @@
 import { ChevronDown, Circle, Lightbulb, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -138,6 +138,17 @@ function PhaseSection({
 export function DecisionPlaybookCard({ playbook, phase }: DecisionPlaybookCardProps) {
   const initialPhase: ThemePhase = phase ?? 'green';
   const [expandedPhase, setExpandedPhase] = useState<ThemePhase>(initialPhase);
+  const phaseSeenRef = useRef<ThemePhase | null | undefined>(phase);
+
+  useEffect(() => {
+    if (phase === null || phase === undefined) {
+      return;
+    }
+    if (phaseSeenRef.current !== phase) {
+      phaseSeenRef.current = phase;
+      setExpandedPhase(phase);
+    }
+  }, [phase]);
 
   const handleToggle = (target: ThemePhase): void => {
     setExpandedPhase((prev) => (prev === target ? prev : target));

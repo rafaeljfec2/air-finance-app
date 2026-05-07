@@ -5,6 +5,17 @@ import { parseApiError } from '@/utils/apiErrorHandler';
 import { apiClient } from './apiClient';
 
 const DecisionStatusSchema = z.enum(['healthy', 'attention', 'critical']);
+const PrimaryIssueSchema = z.enum([
+  'data_incomplete',
+  'liquidity_risk',
+  'debt_pressure',
+  'credit_overuse',
+  'high_commitment',
+  'low_surplus',
+  'low_savings',
+  'high_fixed_cost',
+  'healthy',
+]);
 
 const ThemePhaseSchema = z.enum(['red', 'yellow', 'green']);
 
@@ -15,12 +26,25 @@ const DecisionActionSchema = z.object({
   reason: z.array(z.string()),
 });
 
+const DecisionIssueDriverSchema = z.object({
+  kpi_id: z.string(),
+  level: z.enum(['ok', 'warn', 'alert']),
+  value: z.number().nullable().optional(),
+});
+
+const DecisionPeriodCoverageSchema = z.object({
+  has_income: z.boolean(),
+  has_expense: z.boolean(),
+});
+
 const DecisionEngineEvaluateResponseSchema = z.object({
   status: DecisionStatusSchema,
-  primary_issue: z.string(),
+  primary_issue: PrimaryIssueSchema,
   theme_phase: ThemePhaseSchema.nullable().optional(),
   ordering_rationale: z.string(),
   actions: z.array(DecisionActionSchema).max(3),
+  issue_drivers: z.array(DecisionIssueDriverSchema).default([]),
+  period_coverage: DecisionPeriodCoverageSchema.optional(),
   ruleEngineVersion: z.string().optional(),
 });
 

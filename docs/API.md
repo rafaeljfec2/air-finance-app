@@ -32,7 +32,7 @@ The API global prefix is **`/meu-financeiro/v1`** (see backend `main.ts`).
 | --- | --- | --- |
 | Auth | `/auth/*` | Login, refresh, logout, OAuth callbacks |
 | Company-scoped data | `/companies/:companyId/*` | Accounts, transactions, budget, goals, banking, dashboard, … |
-| Decision Engine | `POST /companies/:companyId/decision-engine/evaluate` | KPI snapshot → `status`, `primary_issue`, `ordering_rationale`, actions (see API OpenAPI/Swagger; SDD spec `specs/001-financial-decision-engine/`) |
+| Decision Engine | `POST /companies/:companyId/decision-engine/evaluate` and `POST /companies/:companyId/decision-engine/evaluate-auto` | Returns `status`, `primary_issue`, `ordering_rationale`, `actions`, `issue_drivers`; `evaluate-auto` may also include `period_coverage` for month completeness context (see API OpenAPI/Swagger; SDD specs `specs/001-financial-decision-engine/` and `specs/002-decision-engine-composer/`) |
 | Subscription | `/subscription/*` | Stripe checkout, plan changes (exact paths in API Swagger) |
 | Health | `/health` (if exposed) | API process checks |
 

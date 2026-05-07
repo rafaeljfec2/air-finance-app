@@ -67,7 +67,7 @@ describe('problemHeadlineFromPrimaryIssue', () => {
       'Está ficando pouco para o futuro ou para emergências.',
     );
     expect(problemHeadlineFromPrimaryIssue('high_fixed_cost')).toBe(
-      'Contas fixas pesadas deixam pouco espaço para manobrar.',
+      'Muito do mês é conta fixa — grande parte é longa duração, com pouca margem para manobra rápida.',
     );
     expect(problemHeadlineFromPrimaryIssue('data_incomplete')).toBe(
       'Sem dados completos, qualquer conselho vira chute.',

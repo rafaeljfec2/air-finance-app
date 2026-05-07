@@ -110,9 +110,30 @@ components:
           items:
             type: string
 
+    DecisionIssueDriver:
+      type: object
+      required: [kpi_id, level]
+      properties:
+        kpi_id:
+          type: string
+        level:
+          $ref: '#/components/schemas/KpiLevel'
+        value:
+          type: number
+          nullable: true
+
+    DecisionPeriodCoverage:
+      type: object
+      required: [has_income, has_expense]
+      properties:
+        has_income:
+          type: boolean
+        has_expense:
+          type: boolean
+
     DecisionEngineResponse:
       type: object
-      required: [status, primary_issue, ordering_rationale, actions]
+      required: [status, primary_issue, ordering_rationale, actions, issue_drivers]
       properties:
         status:
           type: string
@@ -137,6 +158,15 @@ components:
           maxItems: 3
           items:
             $ref: '#/components/schemas/DecisionAction'
+        issue_drivers:
+          type: array
+          maxItems: 3
+          description: KPI signals backing issue prioritization; empty array when healthy.
+          items:
+            $ref: '#/components/schemas/DecisionIssueDriver'
+        period_coverage:
+          description: Present on evaluate-auto response; omitted on manual evaluate payloads.
+          $ref: '#/components/schemas/DecisionPeriodCoverage'
         ruleEngineVersion:
           type: string
           example: '1.0.1'

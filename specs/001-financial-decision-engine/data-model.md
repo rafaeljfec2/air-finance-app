@@ -120,7 +120,7 @@ Parametrização: placeholders `{amount}`, `{pct}`, `{days}` substituídos quand
 
 | # | title | description | impact | reason |
 | --- | --- | --- | --- | --- |
-| 1 | Reduzir peso de custos fixos | Priorize moradia, escola, financiamento — um item grande vale mais que micro cortes. | Meta: baixar participação fixa em **{pct} p.p.** | `fixed_vs_variable_split` |
+| 1 | Ganhar folga no que ainda dá para mexer | Financiamento de casa ou carro, aluguel e escola costumam ser contratos de longo prazo — priorize variável, evite novos fixos e revise planos de ciclo curto antes de mirar renegociação grande. | Direção: melhorar o equilíbrio entre fixos e o restante do mês em cerca de **{pct} p.p.** | `fixed_vs_variable_split` |
 
 **Seleção:** por `primary_issue`, escolher até **3** linhas de cima para baixo; remover linhas cujo `reason` não intersecta KPIs em `warn`/`alert` **exceto** primeira linha âncora do tema quando aplicável.
 

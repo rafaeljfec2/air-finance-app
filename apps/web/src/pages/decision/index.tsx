@@ -12,6 +12,7 @@ import { useCompanyStore } from '@/stores/company';
 
 import { DecisionCompletePlanSection } from './components/complete-plan/DecisionCompletePlanSection';
 import { DecisionPageToolbar } from './components/DecisionPageToolbar';
+import { DecisionPeriodCoverageBanner } from './components/DecisionPeriodCoverageBanner';
 import { DecisionPlaybookCard } from './components/DecisionPlaybookCard';
 import { DecisionPrimaryBlock } from './components/DecisionPrimaryBlock';
 import { DecisionReferencePeriodSelector } from './components/DecisionReferencePeriodSelector';
@@ -163,10 +164,15 @@ export function FinancialDecisionPage() {
                   status={query.data.status}
                   briefingLine={problemHeadlineFromPrimaryIssue(query.data.primary_issue)}
                 />
+                {query.data.period_coverage !== undefined ? (
+                  <DecisionPeriodCoverageBanner periodCoverage={query.data.period_coverage} />
+                ) : null}
                 <DecisionVerdictPanel
                   status={query.data.status}
                   themePhase={query.data.theme_phase}
                   orderingRationale={query.data.ordering_rationale}
+                  primaryIssue={query.data.primary_issue}
+                  issueDrivers={query.data.issue_drivers}
                 />
                 {primaryAction !== undefined ? (
                   <DecisionPrimaryBlock

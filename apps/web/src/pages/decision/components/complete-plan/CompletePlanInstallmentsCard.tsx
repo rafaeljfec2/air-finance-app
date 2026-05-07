@@ -42,8 +42,7 @@ function InstallmentRow({ item }: { readonly item: CompletePlanInstallment }) {
             {item.description}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            {formatBrl(item.monthlyValue)} / mês · {item.remaining} parcela
-            {item.remaining === 1 ? '' : 's'} · termina em {formatDateBr(item.endDate)}
+            {`${formatBrl(item.monthlyValue)} / mês · ${item.remaining} ${item.remaining === 1 ? 'parcela' : 'parcelas'} · termina em ${formatDateBr(item.endDate)}`}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">
             {ACCOUNT_TYPE_LABEL_PT[item.accountType]}

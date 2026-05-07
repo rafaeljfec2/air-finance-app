@@ -30,7 +30,11 @@ paths:
             example: '2026-05'
       responses:
         '200':
-          description: Same JSON shape as POST .../evaluate (see spec 001 contracts/openapi.yaml DecisionEngineResponse)
+          description: Decision output with issue drivers and optional period coverage for the selected month.
+          content:
+            application/json:
+              schema:
+                $ref: '../../001-financial-decision-engine/contracts/openapi.yaml#/components/schemas/DecisionEngineResponse'
 components:
   securitySchemes:
     bearerAuth:

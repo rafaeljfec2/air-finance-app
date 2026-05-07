@@ -59,12 +59,30 @@ export interface DecisionAction {
   readonly reason: readonly KnownKpiId[];
 }
 
+export interface DecisionIssueDriver {
+  readonly kpi_id: string;
+  readonly level: KpiLevel;
+  readonly value?: number | null;
+}
+
+export interface DecisionPeriodCoverage {
+  readonly has_income: boolean;
+  readonly has_expense: boolean;
+}
+
 export interface DecisionEngineOutput {
   readonly status: DecisionStatus;
   readonly primary_issue: PrimaryIssueSlug;
   /** PT-BR deterministic explanation for primary_issue (US-4 / FR-12). */
   readonly ordering_rationale: string;
   readonly actions: readonly DecisionAction[];
+  /** Up to three KPI signals backing the verdict (non-ok first), empty when healthy. */
+  readonly issue_drivers: readonly DecisionIssueDriver[];
+  /**
+   * Transaction-summary coverage for the reference month (evaluate-auto only).
+   * Omitted on manual evaluate-with-body responses.
+   */
+  readonly period_coverage?: DecisionPeriodCoverage;
   /** Echo for tracing; optional on wire if only logged server-side. */
   readonly ruleEngineVersion?: string;
 }

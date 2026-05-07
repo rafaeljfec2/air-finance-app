@@ -28,7 +28,6 @@ export const COMPLETE_PLAN_LABELS = {
   loading: 'Carregando seu plano…',
   error: 'Não foi possível carregar seu plano',
   retry: 'Tentar de novo',
-  cachedHint: 'Texto reutilizado do cache para o mesmo período e contexto.',
 } as const;
 
 export const PRIORITY_LABEL_PT: Readonly<Record<'high' | 'medium' | 'low', string>> = {
