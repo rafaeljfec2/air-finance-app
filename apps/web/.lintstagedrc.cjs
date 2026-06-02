@@ -1,6 +1,9 @@
 const path = require('path');
 
 const WEB_ROOT = path.resolve(__dirname);
+const REPO_ROOT = path.resolve(WEB_ROOT, '../..');
+const ESLINT_SH = path.join(REPO_ROOT, '.husky/lint-staged-eslint.sh');
+const PRETTIER_SH = path.join(REPO_ROOT, '.husky/lint-staged-prettier.sh');
 
 const BATCH_SIZE = process.platform === 'win32' ? 8 : 24;
 
@@ -35,12 +38,8 @@ module.exports = {
     }
     const q = (s) => JSON.stringify(s);
     const batches = chunkPaths(files, BATCH_SIZE);
-    const eslintCmds = batches.map(
-      (batch) => `yarn workspace @air-finance/web eslint --fix ${batch.map(q).join(' ')}`,
-    );
-    const prettierCmds = batches.map(
-      (batch) => `yarn workspace @air-finance/web prettier --write ${batch.map(q).join(' ')}`,
-    );
+    const eslintCmds = batches.map((batch) => `${q(ESLINT_SH)} ${batch.map(q).join(' ')}`);
+    const prettierCmds = batches.map((batch) => `${q(PRETTIER_SH)} ${batch.map(q).join(' ')}`);
     return [...eslintCmds, ...prettierCmds];
   },
 };

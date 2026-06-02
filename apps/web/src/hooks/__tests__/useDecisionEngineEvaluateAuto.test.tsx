@@ -4,6 +4,7 @@ import { type ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as decisionEngineService from '@/services/decisionEngineService';
+import type { DecisionEngineEvaluateResponse } from '@/services/decisionEngineService';
 
 import { useDecisionEngineEvaluateAuto } from '../useDecisionEngineEvaluateAuto';
 
@@ -36,10 +37,11 @@ describe('useDecisionEngineEvaluateAuto', () => {
   });
 
   it('fetches evaluate-auto when companyId is set', async () => {
-    const payload = {
-      status: 'attention' as const,
+    const payload: DecisionEngineEvaluateResponse = {
+      status: 'attention',
       primary_issue: 'liquidity_risk',
       ordering_rationale: 'Test',
+      issue_drivers: [],
       actions: [
         {
           title: 'Reserve',
@@ -65,6 +67,7 @@ describe('useDecisionEngineEvaluateAuto', () => {
       status: 'healthy',
       primary_issue: 'healthy',
       ordering_rationale: 'ok',
+      issue_drivers: [],
       actions: [],
     });
 

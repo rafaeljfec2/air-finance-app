@@ -13,8 +13,7 @@ import {
 import type { Payable } from '@/types/budget';
 import { formatDate } from '@/utils/date';
 
-import { useEditableValue } from '../hooks/useEditableValue';
-import { usePayableStatus } from '../hooks/usePayableStatus';
+import { usePayableActions } from '../hooks/usePayableActions';
 
 interface PayablesSectionProps {
   readonly payables: Payable[];
@@ -29,8 +28,9 @@ interface PayableRowProps {
   readonly isUpdating: boolean;
   readonly togglingId: string | null;
   readonly isToggleable: (id: string) => boolean;
+  readonly isValueEditable: (id: string) => boolean;
   readonly onStartEditing: (id: string, value: number) => void;
-  readonly onSaveValue: (id: string) => void;
+  readonly onValueBlur: (id: string) => void;
   readonly onValueChange: (value: string) => void;
   readonly onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>, id: string) => void;
   readonly onToggleStatus: (id: string, status: Payable['status']) => void;
@@ -51,20 +51,22 @@ function PayableRow({
   inputRef,
   isUpdating,
   togglingId,
+  isValueEditable,
   isToggleable,
   onStartEditing,
-  onSaveValue,
+  onValueBlur,
   onValueChange,
   onKeyDown,
   onToggleStatus,
 }: PayableRowProps) {
   const isPaid = payable.status === 'PAID';
   const canToggle = isToggleable(payable.id);
+  const canEditValue = isValueEditable(payable.id);
   const isEditing = editingId === payable.id;
 
   const handleBlur = useCallback(() => {
-    setTimeout(() => onSaveValue(payable.id), 200);
-  }, [onSaveValue, payable.id]);
+    onValueBlur(payable.id);
+  }, [onValueBlur, payable.id]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -95,6 +97,7 @@ function PayableRow({
         <EditableValueCell
           value={payable.value}
           isEditing={isEditing}
+          canEdit={canEditValue}
           editingValue={editingValue}
           inputRef={inputRef}
           isUpdating={isUpdating}
@@ -137,13 +140,15 @@ export function PayablesSection({ payables, isLoading }: PayablesSectionProps) {
     editingValue,
     inputRef,
     isUpdating,
+    togglingId,
+    isToggleable,
+    isValueEditable,
     startEditing,
-    saveValue,
+    commitValueOnBlur,
     handleKeyDown,
     handleValueChange,
-  } = useEditableValue();
-
-  const { togglingId, isToggleable, toggleStatus } = usePayableStatus();
+    toggleStatus,
+  } = usePayableActions();
 
   const { creditCardPayables, recurringPayables, total } = useMemo(() => {
     const creditCards: Payable[] = [];
@@ -182,8 +187,9 @@ export function PayablesSection({ payables, isLoading }: PayablesSectionProps) {
     isUpdating,
     togglingId,
     isToggleable,
+    isValueEditable,
     onStartEditing: startEditing,
-    onSaveValue: saveValue,
+    onValueBlur: commitValueOnBlur,
     onValueChange: handleValueChange,
     onKeyDown: handleKeyDown,
     onToggleStatus: toggleStatus,

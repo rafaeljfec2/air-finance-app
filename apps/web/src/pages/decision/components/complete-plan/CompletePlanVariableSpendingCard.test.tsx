@@ -31,10 +31,27 @@ describe('CompletePlanVariableSpendingCard', () => {
     const payload: CompletePlanVariableSpending = {
       ...base,
       monthOverMonthChangePct: null,
+      previousTotalVariable: 0,
     };
     render(<CompletePlanVariableSpendingCard variableSpending={payload} />);
 
     expect(screen.getByText('Sem comparação com o mês anterior.')).toBeInTheDocument();
+  });
+
+  it('shows zero-current copy when there was variable spending last month but none this month', () => {
+    const payload: CompletePlanVariableSpending = {
+      ...base,
+      totalVariable: 0,
+      previousTotalVariable: 400,
+      percentOfIncome: 0,
+      monthOverMonthChangePct: null,
+      topCategories: [],
+    };
+    render(<CompletePlanVariableSpendingCard variableSpending={payload} />);
+
+    expect(
+      screen.getByText('Neste mês não há gasto variável registrado; no mês anterior houve.'),
+    ).toBeInTheDocument();
   });
 
   it('shows an empty-state message when there are no variable categories', () => {

@@ -144,6 +144,9 @@ export function DecisionCompletePlanSection({
                     )}{' '}
                     {COMPLETE_PLAN_LABELS.variableSpendingMomLabel}
                   </>
+                ) : data.variableSpending.totalVariable <= 0 &&
+                  data.variableSpending.previousTotalVariable > 0 ? (
+                  <> · {COMPLETE_PLAN_LABELS.variableSpendingMomZeroCurrent}</>
                 ) : null}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">

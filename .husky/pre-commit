@@ -1,1 +1,36 @@
-npx lint-staged
+#!/usr/bin/env sh
+cd "$(dirname "$0")/.." || exit 1
+
+# Git hooks from IDE/WSL often omit Node from PATH (npx: not found).
+if [ -s "$HOME/.nvm/nvm.sh" ]; then
+  # shellcheck disable=SC1090
+  . "$HOME/.nvm/nvm.sh"
+fi
+
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --shell sh 2>/dev/null)" || true
+fi
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "husky pre-commit: node not found. Install Node or load nvm/fnm in your shell." >&2
+  exit 127
+fi
+
+NODE_BIN="$(dirname "$(command -v node)")"
+export PATH="$NODE_BIN:$PATH"
+
+# Use Yarn 4 from packageManager (avoid global Yarn 1.x on /usr/bin).
+if command -v corepack >/dev/null 2>&1; then
+  corepack enable >/dev/null 2>&1 || true
+fi
+
+if [ -x "./node_modules/.bin/lint-staged" ]; then
+  exec ./node_modules/.bin/lint-staged "$@"
+fi
+
+if command -v yarn >/dev/null 2>&1; then
+  exec yarn lint-staged "$@"
+fi
+
+echo "husky pre-commit: lint-staged not found. Run yarn at the repo root." >&2
+exit 127

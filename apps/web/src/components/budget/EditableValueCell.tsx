@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 interface EditableValueCellProps {
   value: number;
   isEditing: boolean;
+  canEdit: boolean;
   editingValue: string;
   inputRef: React.RefObject<HTMLInputElement>;
   isUpdating: boolean;
@@ -17,6 +18,7 @@ interface EditableValueCellProps {
 export function EditableValueCell({
   value,
   isEditing,
+  canEdit,
   editingValue,
   inputRef,
   isUpdating,
@@ -44,6 +46,19 @@ export function EditableValueCell({
     );
   }
 
+  const formatted = `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+
+  if (!canEdit) {
+    return (
+      <span
+        className="px-2 py-1 text-right font-medium whitespace-nowrap text-white dark:text-white"
+        title="Valor da fatura calculado automaticamente"
+      >
+        {formatted}
+      </span>
+    );
+  }
+
   return (
     <button
       type="button"
@@ -51,7 +66,7 @@ export function EditableValueCell({
       onDoubleClick={onDoubleClick}
       title="Clique duas vezes para editar"
     >
-      R$ {value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+      {formatted}
     </button>
   );
 }

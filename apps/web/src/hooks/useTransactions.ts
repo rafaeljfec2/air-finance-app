@@ -61,6 +61,7 @@ export const useTransactions = (companyId: string, filters?: TransactionFilters)
     error,
     createTransaction: createMutation.mutate,
     updateTransaction: updateMutation.mutate,
+    updateTransactionAsync: updateMutation.mutateAsync,
     deleteTransaction: deleteMutation.mutateAsync,
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,

@@ -30,7 +30,9 @@ export function CompletePlanVariableSpendingCard({
   const momText =
     variableSpending.monthOverMonthChangePct !== null
       ? `${COMPLETE_PLAN_LABELS.variableSpendingMomLabel}: ${formatSignedOneDecimalPercent(variableSpending.monthOverMonthChangePct)}`
-      : COMPLETE_PLAN_LABELS.variableSpendingMomUnavailable;
+      : variableSpending.totalVariable <= 0 && variableSpending.previousTotalVariable > 0
+        ? COMPLETE_PLAN_LABELS.variableSpendingMomZeroCurrent
+        : COMPLETE_PLAN_LABELS.variableSpendingMomUnavailable;
 
   return (
     <section

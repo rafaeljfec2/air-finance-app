@@ -26,6 +26,8 @@ export const COMPLETE_PLAN_LABELS = {
   variableSpendingCardIncomeRowLabel: 'Parte da renda neste mês',
   variableSpendingMomLabel: 'vs mês anterior',
   variableSpendingMomUnavailable: 'Sem comparação com o mês anterior.',
+  variableSpendingMomZeroCurrent:
+    'Neste mês não há gasto variável registrado; no mês anterior houve.',
   variableSpendingTopCategoriesTitle: 'Onde cortar primeiro',
   variableSpendingPeakDaysTitle: 'Dias com mais gasto variável',
   variableSpendingFootnote:
