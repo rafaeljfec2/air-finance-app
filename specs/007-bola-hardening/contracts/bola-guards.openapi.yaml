@@ -1,0 +1,26 @@
+openapi: 3.0.3
+info:
+  title: BOLA Hardening — Affected Routes
+  version: 1.0.0
+paths:
+  /banking/accounts/{accountId}/payment/pix:
+    post:
+      summary: PIX payment — requires account ownership
+      responses:
+        '404':
+          description: Account not found or not accessible
+  /user/{id}:
+    get:
+      responses:
+        '404':
+          description: User not found or not accessible
+  /notifications:
+    get:
+      responses:
+        '200':
+          description: Only notifications for JWT user
+  /companies:
+    get:
+      responses:
+        '200':
+          description: Scoped to user.companyIds unless god role

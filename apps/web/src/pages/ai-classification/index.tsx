@@ -3,14 +3,15 @@ import { useEffect, useState } from 'react';
 
 import { TableSkeleton } from '@/components/skeletons';
 import { Button } from '@/components/ui/button';
-import { useCompanyStore } from '@/contexts/companyContext';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { cn } from '@/lib/utils';
 import { Category, getCategories } from '@/services/categoryService';
 import { getTransactions, Transaction, updateTransaction } from '@/services/transactionService';
+import { useCompanyStore } from '@/stores/company';
 
 export function AiClassificationPage() {
-  const { companyId } = useCompanyStore();
+  const activeCompany = useCompanyStore((state) => state.activeCompany);
+  const companyId = activeCompany?.id ?? '';
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);

@@ -39,7 +39,7 @@ export const useCreditCards = (companyId: string) => {
   function useGetStatement(id: string, month: number, year: number) {
     return useQuery({
       queryKey: ['credit-card-statement', companyId, id, month, year],
-      queryFn: () => getCreditCardStatement(id, month, year),
+      queryFn: () => getCreditCardStatement(companyId, id, month, year),
       enabled: !!id && !!companyId,
     });
   }
