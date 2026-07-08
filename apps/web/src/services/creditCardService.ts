@@ -133,6 +133,7 @@ export const deleteCreditCard = async (companyId: string, id: string): Promise<v
 };
 
 export const getCreditCardStatement = async (
+  companyId: string,
   id: string,
   month: number,
   year: number,
@@ -148,9 +149,10 @@ export const getCreditCardStatement = async (
   }>;
 }> => {
   try {
-    const response = await apiClient.get(`/credit-cards/${id}/statement`, {
-      params: { month, year },
-    });
+    const monthKey = `${year}-${String(month).padStart(2, '0')}`;
+    const response = await apiClient.get(
+      `/companies/${companyId}/credit-cards/${id}/bills/${monthKey}`,
+    );
     return response.data;
   } catch (error) {
     throw parseApiError(error);
