@@ -51,8 +51,13 @@ const CreditCardsPage = lazy(() =>
   import('@/pages/credit-cards').then((m) => ({ default: m.CreditCardsPage })),
 );
 const CreditCardBillsPage = lazy(() =>
-  import('@/pages/credit-cards/bills').then((m) => ({
-    default: m.CreditCardBillsPage,
+  import('@/pages/credit-cards/bills/CreditCardBillsGodGate').then((m) => ({
+    default: m.CreditCardBillsGodGate,
+  })),
+);
+const CreditCardsV2Page = lazy(() =>
+  import('@/pages/credit-cards-v2').then((m) => ({
+    default: m.CreditCardsV2Page,
   })),
 );
 const InsightsPage = lazy(() =>
@@ -233,7 +238,8 @@ const PROTECTED_ROUTE_IMPORTS: Array<() => Promise<unknown>> = [
   () => import('@/pages/profile'),
   () => import('@/pages/budget'),
   () => import('@/pages/credit-cards'),
-  () => import('@/pages/credit-cards/bills'),
+  () => import('@/pages/credit-cards/bills/CreditCardBillsGodGate'),
+  () => import('@/pages/credit-cards-v2'),
   () => import('@/pages/insights'),
   () => import('@/pages/goals'),
   () => import('@/pages/recurring-transactions'),
@@ -346,6 +352,7 @@ export const router = createBrowserRouter(
         simpleRoute('/transactions/new', <NewTransaction />),
         simpleRoute('/credit-cards', <CreditCardsPage />),
         simpleRoute('/credit-cards/bills', <CreditCardBillsPage />),
+        simpleRoute('/credit-cards-v2', <CreditCardsV2Page />),
         simpleRoute('/insights', <InsightsPage />),
         simpleRoute('/goals', <GoalsPage />),
         simpleRoute('/recurring-transactions', <RecurringTransactionsPage />),

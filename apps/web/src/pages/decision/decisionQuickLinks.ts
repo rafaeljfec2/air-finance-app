@@ -16,14 +16,14 @@ export function decisionQuickLinksForIssue(primaryIssue: string): readonly Decis
   const pairs: Readonly<Record<PrimaryIssueSlug, readonly DecisionQuickLink[]>> = {
     high_commitment: [
       { href: '/transactions', label: 'Ver transações' },
-      { href: '/credit-cards', label: 'Cartões' },
+      { href: '/credit-cards-v2', label: 'Cartões' },
     ],
     debt_pressure: [
-      { href: '/credit-cards', label: 'Cartões e faturas' },
+      { href: '/credit-cards-v2', label: 'Cartões' },
       { href: '/transactions', label: 'Ver transações' },
     ],
     credit_overuse: [
-      { href: '/credit-cards', label: 'Cartões' },
+      { href: '/credit-cards-v2', label: 'Cartões' },
       { href: '/transactions', label: 'Transações' },
     ],
     liquidity_risk: [

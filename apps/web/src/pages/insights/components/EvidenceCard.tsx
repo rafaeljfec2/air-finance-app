@@ -25,17 +25,17 @@ function getCtaConfig(type: string): { label: string; path: string } {
     case 'SPENDING_PATTERN':
       return { label: 'Ver transações', path: '/transactions' };
     case 'LIMIT_USAGE':
-      return { label: 'Ver limite', path: '/credit-cards/bills' };
+      return { label: 'Ver limite', path: '/credit-cards-v2' };
     case 'INSTALLMENT_IMPACT':
-      return { label: 'Ver parcelas', path: '/credit-cards/bills' };
+      return { label: 'Ver parcelas', path: '/credit-cards-v2' };
     case 'BILL_COMPOSITION':
-      return { label: 'Ver fatura', path: '/credit-cards/bills' };
+      return { label: 'Ver extrato', path: '/credit-cards-v2' };
     case 'CATEGORY_ANALYSIS':
       return { label: 'Ver categorias', path: '/categories' };
     case 'TREND_COMPARISON':
       return { label: 'Ver histórico', path: '/reports' };
     default:
-      return { label: 'Ver detalhes', path: '/credit-cards/bills' };
+      return { label: 'Ver detalhes', path: '/credit-cards-v2' };
   }
 }
 

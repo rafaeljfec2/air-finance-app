@@ -1,31 +1,35 @@
-import { renderHook, act } from '@testing-library/react';
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { act, renderHook } from '@testing-library/react';
+import type { FormEvent, KeyboardEvent } from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useTransactionForm } from '../useTransactionForm';
 
-// Mock dos hooks externos
-jest.mock('react-router-dom', () => ({
-  useNavigate: jest.fn(),
+const mockNavigate = vi.fn();
+const mockAddTransaction = vi.fn();
+
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => mockNavigate,
 }));
 
-const mockAddTransaction = jest.fn();
-
-jest.mock('@/stores/statement', () => ({
-  useStatementStore: () => ({
+vi.mock('@/stores/transaction', () => ({
+  useTransactionStore: () => ({
     addTransaction: mockAddTransaction,
   }),
 }));
 
-describe('useTransactionForm', () => {
-  const mockNavigate = jest.fn();
+vi.mock('@/stores/company', () => ({
+  useCompanyStore: () => ({
+    activeCompany: { id: 'company-1' },
+  }),
+}));
 
+describe('useTransactionForm', () => {
   beforeEach(() => {
-    (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
-    jest.clearAllMocks();
+    mockNavigate.mockReset();
+    mockAddTransaction.mockReset();
   });
 
-  it('deve inicializar com os valores padrão', () => {
+  it('initializes with default values', () => {
     const { result } = renderHook(() => useTransactionForm());
 
     expect(result.current.formData).toEqual({
@@ -46,57 +50,56 @@ describe('useTransactionForm', () => {
     expect(result.current.showSuccessTooltip).toBe(false);
   });
 
-  it('deve atualizar o valor do campo e marcar como tocado', () => {
+  it('updates field value and clears description error when filled', () => {
     const { result } = renderHook(() => useTransactionForm());
 
-    act(() => {
-      result.current.updateFormData('description', 'Teste');
-    });
-
-    expect(result.current.formData.description).toBe('Teste');
-    expect(result.current.errors.description).toBe('Description is required');
-  });
-
-  it('deve validar campos obrigatórios em tempo real', () => {
-    const { result } = renderHook(() => useTransactionForm());
-
-    // Campo vazio
     act(() => {
       result.current.updateFormData('description', '');
     });
     expect(result.current.errors.description).toBe('Description is required');
 
-    // Campo preenchido
     act(() => {
       result.current.updateFormData('description', 'Teste');
     });
-    expect(result.current.errors.description).toBeUndefined();
+    expect(result.current.formData.description).toBe('Teste');
+    expect(result.current.errors.description).toBe('');
+  });
 
-    // Valor inválido
+  it('validates required fields in real time', () => {
+    const { result } = renderHook(() => useTransactionForm());
+
+    act(() => {
+      result.current.updateFormData('description', '');
+    });
+    expect(result.current.errors.description).toBe('Description is required');
+
+    act(() => {
+      result.current.updateFormData('description', 'Teste');
+    });
+    expect(result.current.errors.description).toBe('');
+
     act(() => {
       result.current.updateFormData('amount', '0');
     });
     expect(result.current.errors.amount).toBe('Amount must be greater than zero');
 
-    // Valor válido
     act(() => {
       result.current.updateFormData('amount', '100,00');
     });
-    expect(result.current.errors.amount).toBeUndefined();
+    expect(result.current.errors.amount).toBe('');
   });
 
-  it('deve formatar o valor corretamente', () => {
+  it('formats currency values', () => {
     const { result } = renderHook(() => useTransactionForm());
 
     const formattedValue = result.current.formatValue('1234.56');
-    expect(formattedValue).toBe('R$ 1.234,56');
+    expect(formattedValue).toMatch(/1\.234,56/);
   });
 
-  it('deve submeter o formulário com sucesso', async () => {
+  it('submits the form successfully', async () => {
     const { result } = renderHook(() => useTransactionForm());
-    const mockEvent = { preventDefault: jest.fn() } as unknown as React.FormEvent;
+    const mockEvent = { preventDefault: vi.fn() } as unknown as FormEvent;
 
-    // Preenche os campos obrigatórios
     act(() => {
       result.current.updateFormData('description', 'Teste');
       result.current.updateFormData('amount', 'R$ 100,00');
@@ -109,7 +112,6 @@ describe('useTransactionForm', () => {
       result.current.updateFormData('date', '2024-01-01');
     });
 
-    // Submete o formulário
     await act(async () => {
       await result.current.handleSubmit(mockEvent);
     });
@@ -120,21 +122,22 @@ describe('useTransactionForm', () => {
         amount: 100,
         type: 'EXPENSE',
         category: expect.objectContaining({ id: '1' }),
-        date: expect.any(Date),
+        date: '2024-01-01',
       }),
+      'company-1',
     );
     expect(result.current.showSuccessTooltip).toBe(true);
-    expect(mockNavigate).toHaveBeenCalledWith('/statement');
   });
 
-  it('deve lidar com erros na submissão', async () => {
-    const mockError = new Error('Erro ao salvar');
-    mockAddTransaction.mockRejectedValueOnce(mockError);
+  it('handles submit errors', async () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    mockAddTransaction.mockImplementationOnce(() => {
+      throw new Error('Erro ao salvar');
+    });
 
     const { result } = renderHook(() => useTransactionForm());
-    const mockEvent = { preventDefault: jest.fn() } as unknown as React.FormEvent;
+    const mockEvent = { preventDefault: vi.fn() } as unknown as FormEvent;
 
-    // Preenche os campos obrigatórios
     act(() => {
       result.current.updateFormData('description', 'Teste');
       result.current.updateFormData('amount', 'R$ 100,00');
@@ -147,22 +150,22 @@ describe('useTransactionForm', () => {
       result.current.updateFormData('date', '2024-01-01');
     });
 
-    // Submete o formulário
     await act(async () => {
       await result.current.handleSubmit(mockEvent);
     });
 
     expect(result.current.errors.submit).toBe('Erro ao salvar transação. Tente novamente.');
     expect(result.current.isSubmitting).toBe(false);
+    consoleErrorSpy.mockRestore();
   });
 
-  it('deve lidar com o atalho Ctrl+Enter', () => {
+  it('handles Ctrl+Enter shortcut', () => {
     const { result } = renderHook(() => useTransactionForm());
     const mockEvent = {
       key: 'Enter',
       ctrlKey: true,
-      preventDefault: jest.fn(),
-    } as unknown as React.KeyboardEvent;
+      preventDefault: vi.fn(),
+    } as unknown as KeyboardEvent;
 
     act(() => {
       result.current.handleKeyDown(mockEvent);

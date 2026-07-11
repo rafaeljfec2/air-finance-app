@@ -20,7 +20,7 @@ import { useCreditCardFilters } from './hooks/useCreditCardFilters';
 import { useCreditCardSorting } from './hooks/useCreditCardSorting';
 
 export function CreditCardsPage() {
-  return <Navigate to="/credit-cards/bills" replace />;
+  return <Navigate to="/credit-cards-v2" replace />;
 }
 
 export function CreditCardsManagementPage() {

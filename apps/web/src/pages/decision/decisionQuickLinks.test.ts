@@ -5,7 +5,7 @@ import { decisionQuickLinksForIssue } from './decisionQuickLinks';
 describe('decisionQuickLinksForIssue', () => {
   it('returns credit and transactions for credit_overuse', () => {
     const links = decisionQuickLinksForIssue('credit_overuse');
-    expect(links.map((l) => l.href)).toEqual(['/credit-cards', '/transactions']);
+    expect(links.map((l) => l.href)).toEqual(['/credit-cards-v2', '/transactions']);
   });
 
   it('falls back for unknown slug', () => {
