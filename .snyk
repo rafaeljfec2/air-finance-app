@@ -1,0 +1,21 @@
+# Snyk (https://snyk.io) policy file
+version: v1.25.0
+ignore:
+  SNYK-JS-IMAGESIZE-17295814:
+    - '*':
+        reason: >-
+          No fixed version upstream (HEIF/JP2/JXL zero-size box bypass).
+          Transitive via Expo/Metro image-size@2.0.2.
+        expires: '2026-10-11T00:00:00.000Z'
+  SNYK-JS-IMAGESIZE-17295816:
+    - '*':
+        reason: >-
+          No fixed version upstream (CVE-2025-71330 / ICNS infinite loop).
+          Transitive via Expo/Metro image-size@2.0.2.
+        expires: '2026-10-11T00:00:00.000Z'
+  SNYK-JS-IMAGESIZE-9634164:
+    - '*':
+        reason: >-
+          Patched in image-size@2.0.2 (CVE-2025-71319). Ignore if scanner still reports it.
+        expires: '2026-10-11T00:00:00.000Z'
+patch: {}
