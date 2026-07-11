@@ -38,7 +38,7 @@ export function HomePage() {
   } = useHomePageData();
 
   const handleCreditCardClick = () => {
-    navigate('/credit-cards/bills');
+    navigate('/credit-cards-v2');
   };
 
   const handleAccountsClick = () => {

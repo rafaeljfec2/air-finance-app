@@ -32,7 +32,7 @@ export function CreditCardsSection({
             Cartões de Crédito
           </h3>
           <Link
-            to="/credit-cards/bills"
+            to="/credit-cards-v2"
             className="text-sm text-primary-600 dark:text-primary-400 hover:underline font-medium flex items-center gap-1"
           >
             <Plus size={16} />
@@ -52,7 +52,7 @@ export function CreditCardsSection({
 
                 return (
                   <div key={card.id} className="space-y-2">
-                    <Link to="/credit-cards/bills" className="block">
+                    <Link to="/credit-cards-v2" className="block">
                       <div
                         className="relative overflow-hidden rounded-xl p-4 cursor-pointer hover:opacity-90 transition-opacity"
                         style={{

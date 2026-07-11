@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { DecisionAction, DecisionEngineStatus } from '@/services/decisionEngineService';
+import { TestMemoryRouter } from '@/test/TestMemoryRouter';
 
 import { DecisionPrimaryBlock } from './DecisionPrimaryBlock';
 
@@ -24,7 +24,7 @@ function renderBlock(props: {
   const status = props.status ?? 'attention';
   const primaryIssue = props.primaryIssue ?? 'high_commitment';
   return render(
-    <MemoryRouter>
+    <TestMemoryRouter>
       <DecisionPrimaryBlock
         action={baseAction}
         status={status}
@@ -32,7 +32,7 @@ function renderBlock(props: {
         problemHeadline="Compromisso alto"
         primaryIssue={primaryIssue}
       />
-    </MemoryRouter>,
+    </TestMemoryRouter>,
   );
 }
 
@@ -44,7 +44,10 @@ describe('DecisionPrimaryBlock', () => {
       'href',
       '/transactions',
     );
-    expect(screen.getByRole('link', { name: 'Cartões' })).toHaveAttribute('href', '/credit-cards');
+    expect(screen.getByRole('link', { name: 'Cartões' })).toHaveAttribute(
+      'href',
+      '/credit-cards-v2',
+    );
   });
 
   it('falls back to data_incomplete links for unknown primary issue', () => {
