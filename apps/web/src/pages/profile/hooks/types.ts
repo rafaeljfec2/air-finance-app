@@ -7,10 +7,10 @@ export interface ProfileFormData {
 }
 
 export interface PreferencesData {
-  readonly currency: string;
-  readonly language: string;
-  readonly theme: string;
-  readonly dateFormat: string;
+  readonly currency: 'BRL' | 'USD' | 'EUR';
+  readonly language: 'pt-BR' | 'en-US' | 'es-ES';
+  readonly theme: 'light' | 'dark' | 'system';
+  readonly dateFormat: 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
 }
 
 export interface NotificationsData {
@@ -29,16 +29,15 @@ export interface IntegrationsData {
   readonly hasOpenaiKey: boolean;
 }
 
-export const VALID_TABS = [
-  'personal',
-  'preferences',
-  'notifications',
-  'integrations',
-  'api-tokens',
-  'subscription',
-] as const;
+export {
+  PROFILE_TABS,
+  resolveProfileTab,
+  isProfileTab,
+  type ProfileTab,
+} from '../utils/resolveProfileTab';
 
-export type TabValue = (typeof VALID_TABS)[number];
+/** @deprecated Use ProfileTab — kept for gradual migration */
+export type TabValue = import('../utils/resolveProfileTab').ProfileTab;
 
 export const DEFAULT_PROFILE_DATA: ProfileFormData = {
   name: '',

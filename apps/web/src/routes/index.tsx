@@ -375,11 +375,15 @@ export const router = createBrowserRouter(
         },
         {
           path: '/settings/notifications',
-          element: <Navigate to="/profile?tab=notifications" replace />,
+          element: <Navigate to="/profile?tab=preferences" replace />,
         },
         {
           path: '/settings/integrations',
-          element: <Navigate to="/profile?tab=integrations" replace />,
+          element: <Navigate to="/profile?tab=developer" replace />,
+        },
+        {
+          path: '/settings/api-tokens',
+          element: <Navigate to="/profile?tab=developer" replace />,
         },
         {
           path: '/settings/subscription',

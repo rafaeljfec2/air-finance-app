@@ -28,8 +28,28 @@ export const UserSchema = z.object({
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   companyRoles: z.record(z.string()).optional(),
+  phone: z
+    .string()
+    .nullish()
+    .transform((v) => v ?? undefined),
+  location: z
+    .string()
+    .nullish()
+    .transform((v) => v ?? undefined),
+  bio: z
+    .string()
+    .nullish()
+    .transform((v) => v ?? undefined),
+  avatar: z
+    .string()
+    .nullish()
+    .transform((v) => v ?? undefined),
   integrations: z
     .object({
+      openaiApiKey: z
+        .string()
+        .nullish()
+        .transform((v) => v ?? undefined),
       openaiModel: z.enum(['gpt-4o-mini', 'gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo']).optional(),
       hasOpenaiKey: z.boolean().optional(),
     })
@@ -61,8 +81,50 @@ export const CreateUserSchema = UserSchema.omit({
   companyRoles: z.record(z.string()).optional(),
 });
 
+export const UpdateUserInputSchema = z.object({
+  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres').optional(),
+  email: z.string().email('E-mail inválido').optional(),
+  role: z
+    .enum(['god', 'sys_admin', 'user', 'owner', 'admin', 'editor', 'operator', 'viewer'])
+    .optional(),
+  status: z.enum(['active', 'inactive']).optional(),
+  plan: z.enum(['free', 'starter', 'pro', 'business']).optional(),
+  emailVerified: z.boolean().optional(),
+  onboardingCompleted: z.boolean().optional(),
+  companyIds: z.array(z.string()).optional(),
+  companyRoles: z.record(z.string()).optional(),
+  phone: z.string().optional(),
+  location: z.string().optional(),
+  bio: z.string().optional(),
+  avatar: z.string().max(700_000, 'Avatar too large').optional(),
+  integrations: z
+    .object({
+      openaiApiKey: z.string().optional(),
+      openaiModel: z.enum(['gpt-4o-mini', 'gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo']).optional(),
+    })
+    .optional(),
+  notifications: z
+    .object({
+      email: z.boolean(),
+      push: z.boolean(),
+      updates: z.boolean(),
+      marketing: z.boolean(),
+      security: z.boolean(),
+    })
+    .optional(),
+  preferences: z
+    .object({
+      currency: z.enum(['BRL', 'USD', 'EUR']),
+      language: z.enum(['pt-BR', 'en-US', 'es-ES']),
+      theme: z.enum(['light', 'dark', 'system']),
+      dateFormat: z.enum(['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY-MM-DD']),
+    })
+    .optional(),
+});
+
 export type User = z.infer<typeof UserSchema>;
 export type CreateUser = z.infer<typeof CreateUserSchema>;
+export type UpdateUserInput = z.infer<typeof UpdateUserInputSchema>;
 export type { UserRole, UserStatus } from '@/types/user';
 
 export async function getUsers(): Promise<User[]>;
@@ -140,9 +202,9 @@ export const createUser = async (data: CreateUser): Promise<User> => {
   }
 };
 
-export const updateUser = async (id: string, data: Partial<CreateUser>): Promise<User> => {
+export const updateUser = async (id: string, data: UpdateUserInput): Promise<User> => {
   try {
-    const validatedData = CreateUserSchema.partial().parse(data);
+    const validatedData = UpdateUserInputSchema.parse(data);
     const response = await apiClient.put<User>(`/user/${id}`, validatedData);
     return UserSchema.parse(response.data);
   } catch (error) {

@@ -33,7 +33,7 @@ export function ProfileApiTokensSection() {
 
   if (isLoading) {
     return (
-      <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark p-6">
+      <Card className="rounded-2xl border border-border bg-card p-5 shadow-sm dark:border-border-dark dark:bg-card-dark sm:p-6">
         <div className="space-y-4 py-2">
           <Skeleton className="h-5 w-1/4" />
           <Skeleton className="h-10 w-full rounded-md" />
@@ -46,10 +46,10 @@ export function ProfileApiTokensSection() {
 
   return (
     <>
-      <Card className="relative overflow-hidden bg-card dark:bg-card-dark border-border dark:border-border-dark p-0">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-500 to-primary-300 opacity-60" />
+      <Card className="relative overflow-hidden rounded-2xl border border-border bg-card p-0 shadow-sm dark:border-border-dark dark:bg-card-dark">
+        <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-primary-500 to-primary-300 opacity-60" />
 
-        <div className="p-6">
+        <div className="p-5 sm:p-6">
           <SectionHeader
             activeCount={activeCount}
             hasTokens={hasTokens}
@@ -133,7 +133,7 @@ function SectionHeader({
           type="button"
           onClick={onCreateClick}
           disabled={!canCreate}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+          className="inline-flex min-h-[44px] flex-shrink-0 items-center gap-2 rounded-xl bg-primary-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Plus className="h-4 w-4" />
           <span className="hidden sm:inline">Novo Token</span>

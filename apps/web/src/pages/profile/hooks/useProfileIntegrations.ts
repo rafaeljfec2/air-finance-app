@@ -5,6 +5,9 @@ import { updateUser } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
 import { mapUserServiceToUserType } from '@/utils/userMapper';
 
+import type { ProfileIntegrationsFormValues } from '../schemas';
+
+import { buildIntegrationsUpdatePayload } from './buildIntegrationsUpdatePayload';
 import type { IntegrationsData } from './types';
 
 interface UseProfileIntegrationsParams {
@@ -15,7 +18,7 @@ interface UseProfileIntegrationsParams {
 interface UseProfileIntegrationsReturn {
   readonly isSaving: boolean;
   readonly handleChange: (key: keyof IntegrationsData, value: string | boolean) => void;
-  readonly handleSave: () => Promise<void>;
+  readonly handleSave: (values?: ProfileIntegrationsFormValues) => Promise<void>;
 }
 
 export function useProfileIntegrations({
@@ -32,30 +35,39 @@ export function useProfileIntegrations({
     [setIntegrations],
   );
 
-  const handleSave = useCallback(async () => {
-    if (!user?.id) return;
+  const handleSave = useCallback(
+    async (values?: ProfileIntegrationsFormValues) => {
+      if (!user?.id) return;
 
-    setIsSaving(true);
-    try {
-      const updateData = { integrations: { ...integrations } };
-      const updatedUser = await updateUser(user.id, updateData);
-      setUser(mapUserServiceToUserType(updatedUser));
-      toast({
-        title: 'Sucesso',
-        description: 'Integrações atualizadas com sucesso!',
-        type: 'success',
-      });
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: 'Erro',
-        description: 'Erro ao salvar integrações',
-        type: 'error',
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  }, [user?.id, integrations, setUser]);
+      const payload = values ?? integrations;
+      setIsSaving(true);
+      try {
+        const updatedUser = await updateUser(user.id, buildIntegrationsUpdatePayload(payload));
+        setUser(mapUserServiceToUserType(updatedUser));
+        setIntegrations({
+          ...payload,
+          openaiApiKey: '',
+          hasOpenaiKey:
+            Boolean(updatedUser.integrations?.hasOpenaiKey) || Boolean(payload.openaiApiKey.trim()),
+        });
+        toast({
+          title: 'Sucesso',
+          description: 'Integrações atualizadas com sucesso!',
+          type: 'success',
+        });
+      } catch (error) {
+        console.error(error);
+        toast({
+          title: 'Erro',
+          description: 'Erro ao salvar integrações',
+          type: 'error',
+        });
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [user?.id, integrations, setUser, setIntegrations],
+  );
 
   return {
     isSaving,

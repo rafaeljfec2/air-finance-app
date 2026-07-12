@@ -1,8 +1,7 @@
-import { Bell, Bot, CreditCard, Key, Palette, User } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
 import { FormSkeleton } from '@/components/skeletons';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useAuthStore } from '@/stores/auth';
 
@@ -13,10 +12,12 @@ import {
   ProfileIntegrationsSection,
   ProfileApiTokensSection,
   ProfileSubscriptionSection,
+  ProfileHeader,
+  ProfileTabsNav,
 } from './components';
 import {
-  VALID_TABS,
-  TabValue,
+  isProfileTab,
+  resolveProfileTab,
   useProfileData,
   useProfilePersonal,
   useProfilePreferences,
@@ -64,24 +65,25 @@ export function Profile() {
     setIntegrations,
   });
 
-  const tabFromUrl = searchParams.get('tab') as TabValue | null;
-  const defaultTab: TabValue = VALID_TABS.includes(tabFromUrl as TabValue)
-    ? (tabFromUrl as TabValue)
-    : 'personal';
+  const activeTab = resolveProfileTab(searchParams.get('tab'));
 
   const handleTabChange = (value: string) => {
-    if (value === 'personal') {
-      searchParams.delete('tab');
-    } else {
-      searchParams.set('tab', value);
+    if (!isProfileTab(value)) {
+      return;
     }
-    setSearchParams(searchParams, { replace: true });
+    const params = new URLSearchParams(searchParams);
+    if (value === 'personal') {
+      params.delete('tab');
+    } else {
+      params.set('tab', value);
+    }
+    setSearchParams(params, { replace: true });
   };
 
   if (isLoading) {
     return (
       <ViewDefault>
-        <div className="container mx-auto px-4 sm:px-6 py-10">
+        <div className="container mx-auto px-4 py-6 sm:px-6 sm:py-8">
           <FormSkeleton title="Perfil" fields={6} />
         </div>
       </ViewDefault>
@@ -91,53 +93,25 @@ export function Profile() {
   return (
     <ViewDefault>
       <div className="flex-1 overflow-x-hidden overflow-y-auto bg-background dark:bg-background-dark">
-        <div className="container mx-auto py-6">
-          <div className="mb-6">
-            <div className="flex items-center gap-3 mb-2">
-              <User className="h-8 w-8 text-primary-400" />
-              <h1 className="text-2xl font-bold text-text dark:text-text-dark">Minha Conta</h1>
-            </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Gerencie suas informações pessoais, preferências e integrações
-            </p>
-          </div>
+        <div className="container mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+          <ProfileHeader userName={user?.name} />
 
-          <Tabs defaultValue={defaultTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 mb-6">
-              <TabsTrigger value="personal" className="gap-2">
-                <User className="h-4 w-4" />
-                <span className="hidden sm:inline">Pessoal</span>
-              </TabsTrigger>
-              <TabsTrigger value="preferences" className="gap-2">
-                <Palette className="h-4 w-4" />
-                <span className="hidden sm:inline">Preferências</span>
-              </TabsTrigger>
-              <TabsTrigger value="notifications" className="gap-2">
-                <Bell className="h-4 w-4" />
-                <span className="hidden sm:inline">Notificações</span>
-              </TabsTrigger>
-              <TabsTrigger value="integrations" className="gap-2">
-                <Bot className="h-4 w-4" />
-                <span className="hidden sm:inline">Integrações</span>
-              </TabsTrigger>
-              <TabsTrigger value="api-tokens" className="gap-2">
-                <Key className="h-4 w-4" />
-                <span className="hidden sm:inline">API Tokens</span>
-              </TabsTrigger>
-              <TabsTrigger value="subscription" className="gap-2">
-                <CreditCard className="h-4 w-4" />
-                <span className="hidden sm:inline">Assinatura</span>
-              </TabsTrigger>
-            </TabsList>
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+            <ProfileTabsNav />
 
-            <TabsContent value="personal">
+            <TabsContent value="personal" className="mt-0 space-y-6">
               <ProfilePersonalSection
                 formData={profileData}
                 avatar={avatar}
-                userId={user?.id}
+                accountMeta={{
+                  plan: user?.plan,
+                  role: user?.role,
+                  emailVerified: user?.emailVerified,
+                  companyCount: user?.companyIds?.length ?? 0,
+                  memberSince: user?.createdAt,
+                }}
                 isEditing={personal.isEditing}
                 isSaving={personal.isSaving}
-                onFormChange={personal.handleFormChange}
                 onAvatarChange={personal.handleAvatarChange}
                 onSave={personal.handleSave}
                 onCancel={personal.handleCancel}
@@ -145,39 +119,32 @@ export function Profile() {
               />
             </TabsContent>
 
-            <TabsContent value="preferences">
+            <TabsContent value="preferences" className="mt-0 space-y-6">
               <ProfilePreferencesSection
                 preferences={preferences}
                 isSaving={preferencesSection.isSaving}
                 onChange={preferencesSection.handleChange}
                 onSave={preferencesSection.handleSave}
               />
-            </TabsContent>
-
-            <TabsContent value="notifications">
               <ProfileNotificationsSection
                 notifications={notifications}
                 isSaving={notificationsSection.isSaving}
                 onToggle={notificationsSection.handleToggle}
-                onSave={notificationsSection.handleSave}
               />
             </TabsContent>
 
-            <TabsContent value="integrations">
+            <TabsContent value="subscription" className="mt-0 space-y-6">
+              <ProfileSubscriptionSection />
+            </TabsContent>
+
+            <TabsContent value="developer" className="mt-0 space-y-6">
               <ProfileIntegrationsSection
                 integrations={integrations}
                 isSaving={integrationsSection.isSaving}
                 onChange={integrationsSection.handleChange}
                 onSave={integrationsSection.handleSave}
               />
-            </TabsContent>
-
-            <TabsContent value="api-tokens">
               <ProfileApiTokensSection />
-            </TabsContent>
-
-            <TabsContent value="subscription">
-              <ProfileSubscriptionSection />
             </TabsContent>
           </Tabs>
         </div>
