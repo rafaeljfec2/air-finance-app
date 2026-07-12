@@ -1,70 +1,40 @@
+import { MARKETING_PLANS } from '@/constants/marketingPlans';
 import { Plan } from '@/types/subscription';
 
-export const PLANS: Plan[] = [
-  {
-    id: 'free',
-    name: 'Free',
-    price: 0,
-    displayPrice: 'R$ 0,00',
-    features: [
-      'Controle manual de receitas e despesas',
-      'Dashboard mensal',
-      'Até 2 contas bancárias',
-      'Até 2 cartões de crédito',
-      'Suporte via comunidade',
-    ],
-    limits: {
-      maxAccounts: 2,
-      maxCards: 2,
-      aiEnabled: false,
-      bankIntegrationEnabled: false,
-      multiUser: false,
-      multiCompany: false,
-    },
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
-    price: 29.9,
-    displayPrice: 'R$ 29,90',
-    features: [
-      'Tudo do plano Free',
-      'Inteligência Artificial Ilimitada',
-      'Contas e cartões ilimitados',
-      'Importação de OFX/CSV',
-      'Gestão de metas avançada',
-      'Relatórios de tendências',
-    ],
-    limits: {
-      maxAccounts: -1,
-      maxCards: -1,
-      aiEnabled: true,
-      bankIntegrationEnabled: false,
-      multiUser: false,
-      multiCompany: false,
-    },
-    highlight: true,
-  },
-  {
-    id: 'business',
-    name: 'Business',
-    price: 79.9,
-    displayPrice: 'R$ 79,90',
-    features: [
-      'Tudo do plano Pro',
-      'Integração Bancária Automática (Inter e Nubank)',
-      'Gestão Multi-empresas (CNPJ)',
-      'Múltiplos usuários e permissões',
-      'Conciliação bancária automática',
-      'Suporte prioritário',
-    ],
-    limits: {
-      maxAccounts: -1,
-      maxCards: -1,
-      aiEnabled: true,
-      bankIntegrationEnabled: true,
-      multiUser: true,
-      multiCompany: true,
-    },
-  },
-];
+export const PLANS: Plan[] = MARKETING_PLANS.map((marketingPlan) => ({
+  id: marketingPlan.backendSlug,
+  name: marketingPlan.name,
+  price: marketingPlan.priceMonthly,
+  priceMonthly: marketingPlan.priceMonthly,
+  displayPrice: marketingPlan.displayPrice,
+  description: marketingPlan.description,
+  features: [...marketingPlan.features],
+  highlight: marketingPlan.popular,
+  limits:
+    marketingPlan.backendSlug === 'starter'
+      ? {
+          maxAccounts: 1,
+          maxCards: 1,
+          aiEnabled: false,
+          bankIntegrationEnabled: false,
+          multiUser: false,
+          multiCompany: false,
+        }
+      : marketingPlan.backendSlug === 'pro'
+        ? {
+            maxAccounts: 2,
+            maxCards: -1,
+            aiEnabled: true,
+            bankIntegrationEnabled: true,
+            multiUser: false,
+            multiCompany: false,
+          }
+        : {
+            maxAccounts: -1,
+            maxCards: -1,
+            aiEnabled: true,
+            bankIntegrationEnabled: true,
+            multiUser: true,
+            multiCompany: true,
+          },
+}));

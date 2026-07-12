@@ -22,7 +22,7 @@ export const UserSchema = z.object({
   status: z.enum(['active', 'inactive'], {
     errorMap: () => ({ message: 'Status inválido' }),
   }),
-  plan: z.enum(['free', 'pro', 'business']).default('free'),
+  plan: z.enum(['free', 'starter', 'pro', 'business']).default('free'),
   emailVerified: z.boolean().optional(),
   onboardingCompleted: z.boolean().optional(),
   createdAt: z.string().datetime(),

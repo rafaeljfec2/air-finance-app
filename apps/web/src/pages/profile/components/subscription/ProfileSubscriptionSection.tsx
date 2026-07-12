@@ -32,7 +32,18 @@ export function ProfileSubscriptionSection() {
   });
 
   const currentPlanId = subscription?.plan ?? 'free';
-  const currentPlan = PLANS.find((p) => p.id === currentPlanId) ?? PLANS[0];
+  const currentPlan =
+    PLANS.find((p) => p.id === currentPlanId) ??
+    (currentPlanId === 'free'
+      ? {
+          ...PLANS[0],
+          id: 'free',
+          name: 'Sem assinatura',
+          displayPrice: 'R$ 0,00',
+          price: 0,
+          priceMonthly: 0,
+        }
+      : PLANS[0]);
   const obSlotPrice =
     plans?.find((p) => p.name === 'open_banking')?.priceMonthly ?? FALLBACK_OB_PRICE;
 

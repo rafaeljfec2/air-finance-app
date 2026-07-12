@@ -5,8 +5,8 @@ import { env } from '@/utils/env';
 
 const plans = [
   {
-    id: 'free',
-    name: 'Gratuito',
+    id: 'starter',
+    name: 'Starter',
     price: 'R$ 10',
     period: '/mês',
     features: [
@@ -20,7 +20,7 @@ const plans = [
       'Relatórios básicos por categoria e período',
       'Gestão financeira manual (sem Open Finance)',
     ],
-    cta: 'Começar agora',
+    cta: 'Selecionar plano',
     popular: false,
   },
   {
@@ -29,17 +29,17 @@ const plans = [
     price: 'R$ 29',
     period: '/mês',
     features: [
-      'Tudo do plano Gratuito',
+      'Tudo do plano Starter',
       'Ideal para freelancers, autônomos e profissionais liberais',
       'Até 2 contas bancárias com sincronização automática',
-      'R$ 9,90 por conta bancária adicional',
+      'R$ 7,99 por conta Open Finance adicional',
       'Relatórios financeiros avançados',
       'Metas inteligentes de economia',
       'Exportação de dados (Excel e CSV)',
       'Insights financeiros gerados por IA',
-      'Integração automática via Open Finance (Pierre Finance)',
+      'Integração automática via Open Finance',
     ],
-    cta: 'Escolher este plano',
+    cta: 'Selecionar plano',
     popular: true,
   },
   {
@@ -51,20 +51,14 @@ const plans = [
       'Tudo do plano Pro',
       'Ideal para empresas e famílias',
       'Até 2 empresas inclusas',
-      'R$ 29,90 por empresa adicional',
-      'Até 2 contas bancárias por empresa',
-      'R$ 19,90 por conta bancária adicional',
+      'R$ 7,99 por conta Open Finance adicional',
       'Integração bancária automática via Open Finance',
-      'Integração via API do Banco Inter',
       'Insights financeiros gerados por IA',
       'Múltiplos usuários por empresa',
-      'Compartilhamento de contas',
-      'Metas financeiras compartilhadas',
-      'Controle de gastos familiar',
       'Relatórios empresariais avançados',
       'Suporte prioritário',
     ],
-    cta: 'Escolher este plano',
+    cta: 'Selecionar plano',
     popular: false,
   },
 ];
@@ -132,11 +126,11 @@ export function PricingV2() {
                         isProduction ? 'text-2xl md:text-3xl' : 'text-lg'
                       }`}
                     >
-                      FASE BETA - USE GRÁTIS
+                      FASE BETA — PLANOS DISPONÍVEIS
                     </span>
                     <div className="px-3 py-1 bg-white/30 backdrop-blur-sm rounded-full whitespace-nowrap">
                       <span className="text-xs font-bold text-white uppercase tracking-wide">
-                        Tempo limitado
+                        Assinatura mensal
                       </span>
                     </div>
                   </div>
@@ -145,17 +139,17 @@ export function PricingV2() {
                       isProduction ? 'text-base md:text-lg' : 'text-sm'
                     }`}
                   >
-                    Use qualquer plano gratuitamente durante a fase beta. Se fizer sentido para
-                    você, pode contribuir e nos ajudar a melhorar o Airfinance.
+                    Starter, Pro e Business com preços transparentes. Escolha o plano e conclua o
+                    pagamento com segurança via Stripe.
                   </p>
                 </div>
 
                 {/* CTA Button - Only in Production */}
                 {isProduction && (
                   <div className="flex-shrink-0">
-                    <Link to="/register">
+                    <Link to="/pricing">
                       <button className="px-6 py-3 bg-white text-[#10b981] font-bold rounded-xl hover:bg-gray-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform">
-                        Começar Agora
+                        Ver planos
                       </button>
                     </Link>
                   </div>
@@ -246,7 +240,7 @@ export function PricingV2() {
                   </div>
                 )}
 
-                <Link to="/register" className="w-full">
+                <Link to="/pricing" className="w-full">
                   <button
                     className={`w-full py-3 rounded-lg font-semibold text-base transition-all duration-300 ${
                       plan.popular

@@ -1,189 +1,188 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { ShieldCheck, RefreshCw, Zap } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { PlanCard } from '@/components/subscription/PlanCard';
+import { isPaidPlanSlug } from '@/constants/marketingPlans';
 import { PLANS } from '@/constants/plans';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { subscriptionService } from '@/services/subscriptionService';
 import { useAuthStore } from '@/stores/auth';
-import { User } from '@/types/user';
+import { getUserFriendlyMessage, parseApiError } from '@/utils/apiErrorHandler';
+
+import { mergePlansForPricing } from './mergePlansForPricing';
+import { selectPricingPlan, shouldUseChangePlan } from './selectPricingPlan';
+
+const TRUST_ITEMS = [
+  {
+    icon: ShieldCheck,
+    title: 'Pagamento seguro',
+    description: 'Checkout via Stripe.',
+  },
+  {
+    icon: RefreshCw,
+    title: 'Troque quando quiser',
+    description: 'Upgrade ou downgrade a qualquer momento.',
+  },
+  {
+    icon: Zap,
+    title: 'Ativação imediata',
+    description: 'Recursos liberados após a confirmação.',
+  },
+] as const;
 
 export function PricingPage() {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
 
-  const { data: plansData = [] } = useQuery({
+  const { data: plansData = PLANS } = useQuery({
     queryKey: ['plans'],
     queryFn: subscriptionService.getPlans,
     initialData: PLANS,
   });
 
-  const handleSelectPlan = async (planId: string) => {
-    if (!user) {
-      window.location.href = '/register';
-      return;
-    }
+  const {
+    data: mySubscription,
+    isFetched: isSubscriptionFetched,
+    isError: isSubscriptionError,
+  } = useQuery({
+    queryKey: ['subscription', 'me'],
+    queryFn: () => subscriptionService.getMySubscription(),
+    enabled: Boolean(user),
+  });
 
+  const subscriptionStatusKnown = !user || isSubscriptionFetched || isSubscriptionError;
+  const currentPlanId = mySubscription?.plan ?? user?.plan ?? 'free';
+
+  const pricingPlans = useMemo(
+    () => mergePlansForPricing(Array.isArray(plansData) ? plansData : PLANS),
+    [plansData],
+  );
+
+  const handleSelectPlan = async (planId: string) => {
     try {
       setLoadingPlanId(planId);
-      const data = await subscriptionService.createCheckoutSession(user.id, planId);
 
-      if (data && data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error('No checkout URL returned');
+      const result = await selectPricingPlan({
+        planId,
+        isAuthenticated: Boolean(user),
+        subscriptionStatusKnown,
+        hasActivePaidSubscription: shouldUseChangePlan(mySubscription),
+        createCheckout: (selectedPlanId) =>
+          subscriptionService.createCheckoutSession(selectedPlanId),
+        changePlan: (selectedPlanId) => subscriptionService.changePlan(selectedPlanId),
+      });
+
+      if (result.type === 'auth_required') {
+        setLoadingPlanId(null);
+        navigate('/login', { state: { from: { pathname: '/pricing' } } });
+        return;
       }
+
+      if (result.type === 'subscription_pending') {
+        setLoadingPlanId(null);
+        toast.info('Carregando sua assinatura. Tente novamente em instantes.');
+        return;
+      }
+
+      if (result.type === 'changed') {
+        setLoadingPlanId(null);
+        toast.success('Plano atualizado com sucesso.');
+        navigate('/settings/subscription');
+        return;
+      }
+
+      globalThis.location.href = result.url;
     } catch (error) {
-      alert(`Erro ao iniciar pagamento: ${(error as Error).message}`);
-    } finally {
+      const apiError = parseApiError(error);
+      toast.error(getUserFriendlyMessage(apiError));
       setLoadingPlanId(null);
     }
   };
 
   return (
     <ViewDefault>
-      <div className="bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 min-h-screen">
-        <div className="container mx-auto px-4 py-10 sm:py-16">
-          <div className="text-center max-w-3xl mx-auto mb-10">
-            <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-5xl mb-4">
-              Invista no futuro do seu negócio
+      <div className="min-h-screen bg-background dark:bg-background-dark">
+        <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
+          <header className="mb-6 max-w-2xl sm:mb-8">
+            <h1 className="text-2xl font-bold tracking-tight text-text dark:text-text-dark sm:text-3xl">
+              Escolha seu plano
             </h1>
-            <p className="text-xl text-gray-500 dark:text-gray-400">
-              Escolha o plano ideal para suas necessidades e comece a transformar sua gestão
-              financeira hoje mesmo.
+            <p className="mt-2 text-sm text-muted-foreground sm:text-base">
+              Compare recursos e selecione o plano que faz sentido para o seu uso. Você pode mudar
+              depois.
             </p>
-          </div>
+          </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto relative">
-            {/* Decorative Background Blob */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-full max-h-[500px] bg-emerald-500/5 dark:bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
-
-            {Array.isArray(plansData) &&
-              plansData.map((plan) => (
-                <PlanCard
-                  key={plan.id}
-                  plan={plan}
-                  onSelect={handleSelectPlan}
-                  isLoading={loadingPlanId === plan.id}
-                  currentPlanId={(user as User)?.plan || 'free'}
-                />
-              ))}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:items-stretch md:gap-5">
+            {pricingPlans.map((plan) => (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                onSelect={handleSelectPlan}
+                isLoading={loadingPlanId === plan.id || (Boolean(user) && !subscriptionStatusKnown)}
+                currentPlanId={isPaidPlanSlug(currentPlanId) ? currentPlanId : undefined}
+              />
+            ))}
           </div>
 
           {!Array.isArray(plansData) && (
-            <div className="text-center text-red-500 mt-8">
+            <div className="mt-6 text-center text-sm text-error">
               Erro ao carregar planos. Por favor, recarregue a página.
             </div>
           )}
 
-          {/* Trust Signals */}
-          <div className="mt-24 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 text-center border-t border-gray-100 dark:border-gray-800 pt-12">
-            <div className="flex flex-col items-center">
-              <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full mb-4">
-                <svg
-                  className="w-6 h-6 text-blue-600 dark:text-blue-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  />
-                </svg>
+          <div className="mt-8 grid grid-cols-1 gap-3 border-t border-border pt-6 dark:border-border-dark sm:grid-cols-3">
+            {TRUST_ITEMS.map((item) => (
+              <div key={item.title} className="flex items-start gap-3 rounded-xl px-1 py-2">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-900/30">
+                  <item.icon className="h-4 w-4 text-primary-600 dark:text-primary-300" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-text dark:text-text-dark">
+                    {item.title}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{item.description}</p>
+                </div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Pagamento 100% Seguro
-              </h3>
-              <p className="mt-2 text-gray-500 dark:text-gray-400 text-sm">
-                Processado via Stripe com criptografia de ponta a ponta.
-              </p>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-emerald-100 dark:bg-emerald-900/30 p-3 rounded-full mb-4">
-                <svg
-                  className="w-6 h-6 text-emerald-600 dark:text-emerald-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Cancele quando quiser
-              </h3>
-              <p className="mt-2 text-gray-500 dark:text-gray-400 text-sm">
-                Sem contratos de longo prazo ou taxas ocultas.
-              </p>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full mb-4">
-                <svg
-                  className="w-6 h-6 text-purple-600 dark:text-purple-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Acesso Imediato
-              </h3>
-              <p className="mt-2 text-gray-500 dark:text-gray-400 text-sm">
-                Desbloqueie todos os recursos assim que confirmar o pagamento.
-              </p>
-            </div>
+            ))}
           </div>
 
-          {/* FAQ Section */}
-          <div className="mt-24 max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-              Perguntas Frequentes
+          <section className="mt-8 max-w-3xl">
+            <h2 className="mb-4 text-lg font-bold text-text dark:text-text-dark">
+              Dúvidas rápidas
             </h2>
-            <div className="space-y-6">
-              <div className="bg-white dark:bg-card-dark rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
-                <h4 className="font-semibold text-gray-900 dark:text-white text-lg mb-2">
+            <div className="space-y-3">
+              <details className="rounded-xl border border-border bg-card p-4 dark:border-border-dark dark:bg-card-dark">
+                <summary className="cursor-pointer text-sm font-semibold text-text dark:text-text-dark">
                   Posso mudar de plano depois?
-                </h4>
-                <p className="text-gray-600 dark:text-gray-300">
-                  Sim! Você pode fazer upgrade ou downgrade a qualquer momento através do painel de
-                  configurações. A mudança é imediata.
+                </summary>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Sim. Faça upgrade ou downgrade a qualquer momento nas configurações.
                 </p>
-              </div>
-              <div className="bg-white dark:bg-card-dark rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
-                <h4 className="font-semibold text-gray-900 dark:text-white text-lg mb-2">
-                  Como funciona a integração bancária?
-                </h4>
-                <p className="text-gray-600 dark:text-gray-300">
-                  Nossos planos Business incluem integração direta com APIs de bancos (como Inter).
-                  Para outros planos, você pode importar seus extratos OFX facilmente.
+              </details>
+              <details className="rounded-xl border border-border bg-card p-4 dark:border-border-dark dark:bg-card-dark">
+                <summary className="cursor-pointer text-sm font-semibold text-text dark:text-text-dark">
+                  Como funciona o Open Finance?
+                </summary>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Pro e Business incluem até 2 contas. Contas extras custam R$ 7,99 por conexão/mês.
+                  No Starter, use importação OFX.
                 </p>
-              </div>
-              <div className="bg-white dark:bg-card-dark rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
-                <h4 className="font-semibold text-gray-900 dark:text-white text-lg mb-2">
-                  Existe algum período de fidelidade?
-                </h4>
-                <p className="text-gray-600 dark:text-gray-300">
-                  Não. O Airfinance funciona no modelo de assinatura mensal. Você é livre para
-                  cancelar quando desejar, sem multas.
+              </details>
+              <details className="rounded-xl border border-border bg-card p-4 dark:border-border-dark dark:bg-card-dark">
+                <summary className="cursor-pointer text-sm font-semibold text-text dark:text-text-dark">
+                  Há fidelidade?
+                </summary>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Não. Assinatura mensal, sem multa de cancelamento.
                 </p>
-              </div>
+              </details>
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </ViewDefault>

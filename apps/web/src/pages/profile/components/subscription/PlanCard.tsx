@@ -23,13 +23,13 @@ interface PlanCardProps {
 
 function getPlanDescription(isCancelScheduled: boolean, currentPlanId: string): string {
   if (isCancelScheduled) return 'Sua assinatura será cancelada ao final do período atual';
-  if (currentPlanId === 'free') return 'Plano gratuito com recursos essenciais';
+  if (currentPlanId === 'free') return 'Sem assinatura ativa. Escolha um plano para continuar.';
   return 'Sua assinatura está ativa e será renovada automaticamente';
 }
 
 function getBillingLabel(isCancelScheduled: boolean, currentPlanId: string): string {
   if (isCancelScheduled) return 'Acesso até';
-  if (currentPlanId === 'free') return 'Renovação';
+  if (currentPlanId === 'free') return 'Cobrança';
   return 'Próxima cobrança';
 }
 
@@ -142,7 +142,7 @@ export function PlanCard({ currentPlan, currentPlanId, subscription }: PlanCardP
               <div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Pagamento</p>
                 <p className="text-sm font-semibold text-text dark:text-text-dark">
-                  {currentPlanId === 'free' ? 'Gratuito' : `${currentPlan.displayPrice}/mês`}
+                  {currentPlanId === 'free' ? 'Sem assinatura' : `${currentPlan.displayPrice}/mês`}
                 </p>
               </div>
             </div>
@@ -156,7 +156,7 @@ export function PlanCard({ currentPlan, currentPlanId, subscription }: PlanCardP
                   {getBillingLabel(isCancelScheduled, currentPlanId)}
                 </p>
                 <p className="text-sm font-semibold text-text dark:text-text-dark">
-                  {currentPlanId === 'free' ? 'Sem cobrança' : (nextBillingDate ?? 'N/A')}
+                  {currentPlanId === 'free' ? '—' : (nextBillingDate ?? 'N/A')}
                 </p>
               </div>
             </div>

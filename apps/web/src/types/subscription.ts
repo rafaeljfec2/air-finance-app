@@ -1,4 +1,4 @@
-export type PlanName = 'free' | 'pro' | 'business' | 'open_banking';
+export type PlanName = 'free' | 'starter' | 'pro' | 'business' | 'open_banking';
 
 export interface PlanLimits {
   maxAccounts: number; // -1 for unlimited
@@ -16,6 +16,7 @@ export interface Plan {
   price?: number; // Monthly price (deprecated, use priceMonthly)
   priceMonthly?: number; // Monthly price
   displayPrice: string;
+  description?: string;
   stripePriceId?: string;
   features: string[];
   limits: PlanLimits;

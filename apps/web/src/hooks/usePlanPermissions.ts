@@ -25,8 +25,8 @@ export function usePlanPermissions() {
     canUseAI: false,
     canUseBankIntegration: false,
     canUseMultiUser: false,
-    maxAccounts: 2,
-    maxCards: 2,
+    maxAccounts: 1,
+    maxCards: 1,
   };
 
   return {
