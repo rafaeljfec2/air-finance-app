@@ -5,25 +5,28 @@ import { Loading } from '@/components/Loading';
 import { ComboBox, ComboBoxOption } from '@/components/ui/ComboBox';
 import { useActiveCompany } from '@/hooks/useActiveCompany';
 import { useAuth } from '@/hooks/useAuth';
+import { usePlanPermissions } from '@/hooks/usePlanPermissions';
 import { companyService } from '@/services/companyService';
 import { Company } from '@/types/company';
 import { maskDocument } from '@/utils/formatDocument';
 
+import { shouldShowCompanySelector } from './shouldShowCompanySelector';
+
 interface CompanySelectorProps {
-  size?: 'default' | 'compact' | 'large';
+  readonly size?: 'default' | 'compact' | 'large';
 }
 
 export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {}) => {
   const { user, isLoadingUser } = useAuth();
   const { activeCompany, changeActiveCompany } = useActiveCompany();
+  const { canCreateMultipleCompanies, isLoading: isLoadingPermissions } = usePlanPermissions();
 
-  const { data: companies, isLoading } = useQuery({
+  const { data: companies, isLoading: isLoadingCompanies } = useQuery({
     queryKey: ['companies', user?.id],
     queryFn: () => companyService.getUserCompanies(),
     enabled: !!user && !isLoadingUser,
   });
 
-  // Convert companies to ComboBox options (must be before early returns)
   const companyOptions: ComboBoxOption<string>[] = useMemo(
     () =>
       (companies ?? []).map((company) => ({
@@ -33,18 +36,24 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
     [companies],
   );
 
-  if (!user) return null;
+  const companyCount = companies?.length ?? 0;
+  const showSelector = shouldShowCompanySelector({
+    companyCount,
+    canCreateMultipleCompanies,
+  });
 
-  // Hide company switcher when the plan does not allow multiple companies.
-  if (user.plan === 'free' || user.plan === 'starter' || user.plan === 'pro') {
+  if (!user) {
     return null;
   }
 
-  if (isLoading) {
+  if (isLoadingCompanies || (isLoadingPermissions && companyCount <= 1)) {
     return <Loading size="small" />;
   }
 
-  // Mostrar seletor para planos Pro e Business quando houver empresas
+  if (!showSelector) {
+    return null;
+  }
+
   if (!companies?.length) {
     return <div className="text-sm text-gray-500">Nenhuma empresa cadastrada</div>;
   }
@@ -55,33 +64,33 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
       return;
     }
     const selectedCompany = companies.find((company: Company) => company.id === companyId);
-    changeActiveCompany(selectedCompany || null);
+    changeActiveCompany(selectedCompany ?? null);
   };
 
-  // Custom render for company items (name + CNPJ/CPF in two lines)
   const renderCompanyItem = (option: ComboBoxOption<string>) => {
     const company = companies.find((c) => c.id === option.value);
-    if (!company) return <span>{option.label}</span>;
+    if (!company) {
+      return <span>{option.label}</span>;
+    }
 
     return (
       <div className="flex flex-col items-start">
-        <span className="font-medium leading-tight text-xs">{company.name}</span>
-        <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+        <span className="text-xs font-medium leading-tight">{company.name}</span>
+        <span className="mt-0.5 text-[10px] text-gray-500 dark:text-gray-400">
           {maskDocument(company.cnpj)}
         </span>
       </div>
     );
   };
 
-  // Custom render for trigger (name + CNPJ/CPF in two lines)
   const renderCompanyTrigger = (
     option: ComboBoxOption<string> | undefined,
     displayValue: string,
   ) => {
     if (!option) {
       return (
-        <div className="flex flex-col items-start justify-center flex-1 min-w-0 pl-1">
-          <span className="font-bold text-text dark:text-text-dark leading-tight text-xs uppercase">
+        <div className="flex min-w-0 flex-1 flex-col items-start justify-center pl-1">
+          <span className="text-xs font-bold uppercase leading-tight text-text dark:text-text-dark">
             {displayValue}
           </span>
         </div>
@@ -91,8 +100,8 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
     const company = companies.find((c) => c.id === option.value);
     if (!company) {
       return (
-        <div className="flex flex-col items-start justify-center flex-1 min-w-0 pl-1">
-          <span className="font-bold text-text dark:text-text-dark leading-tight text-xs uppercase">
+        <div className="flex min-w-0 flex-1 flex-col items-start justify-center pl-1">
+          <span className="text-xs font-bold uppercase leading-tight text-text dark:text-text-dark">
             {displayValue}
           </span>
         </div>
@@ -100,11 +109,11 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
     }
 
     return (
-      <div className="flex flex-col items-start justify-center flex-1 min-w-0 pl-1">
-        <span className="font-bold text-text dark:text-text-dark leading-tight text-xs uppercase">
+      <div className="flex min-w-0 flex-1 flex-col items-start justify-center pl-1">
+        <span className="text-xs font-bold uppercase leading-tight text-text dark:text-text-dark">
           {company.name}
         </span>
-        <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 leading-tight">
+        <span className="mt-0.5 text-[10px] leading-tight text-gray-500 dark:text-gray-400">
           {maskDocument(company.cnpj)}
         </span>
       </div>
@@ -126,7 +135,7 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
   }
 
   return (
-    <div className="w-full min-w-0 flex items-center justify-start">
+    <div className="flex w-full min-w-0 items-center justify-start">
       <ComboBox
         options={companyOptions}
         value={activeCompany?.id || null}

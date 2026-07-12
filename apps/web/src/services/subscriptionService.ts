@@ -2,7 +2,7 @@ import { Plan } from '@/types/subscription';
 
 import { apiClient } from './apiClient';
 
-export type PlanSlug = 'free' | 'starter' | 'pro' | 'business';
+export type PlanSlug = 'free' | 'starter' | 'pro' | 'business' | 'open_banking';
 export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'trialing' | 'incomplete';
 
 export interface CheckoutResponse {

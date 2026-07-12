@@ -17,6 +17,10 @@
     "format": "prettier --write \"apps\" \"packages\" \"package.json\"",
     "format:check": "prettier --check \"apps\" \"packages\" \"package.json\"",
     "typecheck": "turbo run type-check",
+    "test": "yarn test:web",
+    "test:web": "yarn workspace @air-finance/web test:run",
+    "test:web:watch": "yarn workspace @air-finance/web test",
+    "test:web:coverage": "yarn workspace @air-finance/web test:coverage",
     "clean": "turbo run clean && rm -rf node_modules apps/*/node_modules packages/*/node_modules",
     "prepare": "husky"
   },

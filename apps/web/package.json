@@ -14,6 +14,7 @@
     "preview:prod": "vite preview --mode production",
     "preview:dev": "vite preview --mode development",
     "test": "vitest",
+    "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "type-check": "tsc --noEmit"
