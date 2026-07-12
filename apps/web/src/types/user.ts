@@ -67,6 +67,7 @@ export interface UserIntegrations {
 
 export enum UserPlan {
   FREE = 'free',
+  STARTER = 'starter',
   PRO = 'pro',
   BUSINESS = 'business',
 }

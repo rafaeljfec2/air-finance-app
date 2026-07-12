@@ -2,7 +2,7 @@ import { Plan } from '@/types/subscription';
 
 import { apiClient } from './apiClient';
 
-export type PlanSlug = 'free' | 'pro' | 'business';
+export type PlanSlug = 'free' | 'starter' | 'pro' | 'business';
 export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'trialing' | 'incomplete';
 
 export interface CheckoutResponse {
@@ -29,10 +29,8 @@ export interface PlanPermissions {
 }
 
 export const subscriptionService = {
-  async createCheckoutSession(userId: string, planId: string): Promise<CheckoutResponse> {
-    console.log('subscriptionService sending checkout:', { userId, planId });
+  async createCheckoutSession(planId: string): Promise<CheckoutResponse> {
     const { data } = await apiClient.post<CheckoutResponse>('/subscription/checkout', {
-      userId,
       planId,
     });
     return data;

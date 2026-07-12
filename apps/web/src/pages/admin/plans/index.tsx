@@ -28,7 +28,7 @@ export function PlansAdminPage() {
 
   const updatePlanMutation = useMutation({
     mutationFn: ({ planName, data }: { planName: string; data: UpdatePlanData }) =>
-      subscriptionService.updatePlan(planName as 'free' | 'pro' | 'business', data),
+      subscriptionService.updatePlan(planName as 'free' | 'starter' | 'pro' | 'business', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-plans'] });
       queryClient.invalidateQueries({ queryKey: ['plan-permissions'] });
@@ -53,7 +53,7 @@ export function PlansAdminPage() {
 
   const sortedPlans = useMemo(() => {
     if (!plans) return [];
-    const order = ['free', 'pro', 'business'];
+    const order = ['free', 'starter', 'pro', 'business'];
     return [...plans].sort((a, b) => {
       const indexA = order.indexOf(a.name);
       const indexB = order.indexOf(b.name);

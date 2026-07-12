@@ -1,76 +1,9 @@
 import { Check, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import { MARKETING_PLANS } from '@/constants/marketingPlans';
+
 import { ScrollReveal, StaggerContainer, StaggerItem } from './animations';
-
-interface Plan {
-  readonly id: string;
-  readonly name: string;
-  readonly price: string;
-  readonly cents: string;
-  readonly period: string;
-  readonly description: string;
-  readonly features: readonly string[];
-  readonly cta: string;
-  readonly popular: boolean;
-}
-
-const PLANS: readonly Plan[] = [
-  {
-    id: 'starter',
-    name: 'Starter',
-    price: 'R$ 10',
-    cents: ',90',
-    period: '/mês',
-    description: 'Para quem quer começar a organizar suas finanças com simplicidade.',
-    features: [
-      '1 conta bancária',
-      '1 cartão de crédito',
-      'Dashboard de receitas e despesas',
-      'Importação de extratos via OFX',
-      'Classificação automática de gastos',
-      'Relatórios básicos por categoria',
-    ],
-    cta: 'Começar grátis',
-    popular: false,
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
-    price: 'R$ 29',
-    cents: ',90',
-    period: '/mês',
-    description: 'Para freelancers e autônomos que querem controle total via Open Finance.',
-    features: [
-      'Tudo do Starter',
-      'Até 2 contas bancárias via Open Finance',
-      'Categorização com IA',
-      'Metas de economia',
-      'Relatórios avançados',
-      'Exportação Excel e CSV',
-    ],
-    cta: 'Começar grátis',
-    popular: true,
-  },
-  {
-    id: 'business',
-    name: 'Business',
-    price: 'R$ 149',
-    cents: ',90',
-    period: '/mês',
-    description: 'Para empresas e famílias que precisam separar e compartilhar finanças.',
-    features: [
-      'Tudo do Pro',
-      'Até 2 empresas inclusas',
-      'Multi-usuário por empresa',
-      'Integração bancária automática',
-      'Relatórios empresariais',
-      'Suporte prioritário',
-    ],
-    cta: 'Começar grátis',
-    popular: false,
-  },
-] as const;
 
 export function PricingV3() {
   return (
@@ -80,23 +13,15 @@ export function PricingV3() {
           <div className="v3-badge mx-auto mb-4">Preços</div>
           <h2 className="v3-h2 mb-4">Simples e transparente</h2>
           <p className="v3-body max-w-xl mx-auto">
-            Escolha o plano ideal para você. Todos estão gratuitos durante o beta.
+            Escolha o plano ideal para o seu momento. Assinatura mensal, sem fidelidade.
           </p>
-        </ScrollReveal>
-
-        <ScrollReveal className="max-w-sm mx-auto mb-10" delay={0.1}>
-          <div className="bg-emerald-500 text-white rounded-xl px-5 py-3 text-center">
-            <span className="text-sm font-bold uppercase tracking-wide">
-              Beta gratuito — Sem cartão de crédito
-            </span>
-          </div>
         </ScrollReveal>
 
         <StaggerContainer
           className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto"
           staggerDelay={0.1}
         >
-          {PLANS.map((plan) => (
+          {MARKETING_PLANS.map((plan) => (
             <StaggerItem key={plan.id} variant="scale">
               <div
                 className={`v3-card flex flex-col relative h-full ${
@@ -120,9 +45,6 @@ export function PricingV3() {
                     <span className="text-xl font-semibold text-gray-400">{plan.cents}</span>
                     <span className="text-sm text-gray-400 ml-1">{plan.period}</span>
                   </div>
-                  <span className="text-xs text-emerald-600 font-semibold">
-                    Grátis durante o beta
-                  </span>
                 </div>
 
                 <ul className="space-y-2.5 mb-6 flex-grow">
@@ -136,7 +58,7 @@ export function PricingV3() {
                   ))}
                 </ul>
 
-                <Link to="/register" className="w-full mt-auto">
+                <Link to="/pricing" className="w-full mt-auto">
                   <button
                     className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
                       plan.popular

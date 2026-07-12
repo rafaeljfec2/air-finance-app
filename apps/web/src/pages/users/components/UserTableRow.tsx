@@ -21,16 +21,19 @@ export interface UserTableRowProps {
 }
 
 const PLAN_LABELS: Record<string, string> = {
+  free: 'Sem assinatura',
+  starter: 'Starter',
   pro: 'Pro',
   business: 'Business',
-  free: 'Gratuito',
 };
 
 const PLAN_STYLES: Record<string, string> = {
+  free: 'bg-gray-100/50 text-gray-700 dark:bg-gray-900/10 dark:text-gray-400 border-gray-200 dark:border-gray-800',
+  starter:
+    'bg-emerald-100/50 text-emerald-700 dark:bg-emerald-900/10 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
   pro: 'bg-purple-100/50 text-purple-700 dark:bg-purple-900/10 dark:text-purple-400 border-purple-200 dark:border-purple-800',
   business:
     'bg-amber-100/50 text-amber-700 dark:bg-amber-900/10 dark:text-amber-400 border-amber-200 dark:border-amber-800',
-  free: 'bg-green-100/50 text-green-700 dark:bg-green-900/10 dark:text-green-400 border-green-200 dark:border-green-800',
 };
 
 export function UserTableRow({
@@ -102,7 +105,7 @@ export function UserTableRow({
               PLAN_STYLES[user.plan] || PLAN_STYLES.free,
             )}
           >
-            {PLAN_LABELS[user.plan] || 'Gratuito'}
+            {PLAN_LABELS[user.plan] ?? 'Sem assinatura'}
           </span>
         </div>
       </td>

@@ -11,6 +11,12 @@ export const PLAN_ACCENT: Record<
     text: 'text-gray-600 dark:text-gray-400',
     icon: 'text-gray-500 dark:text-gray-400',
   },
+  starter: {
+    border: 'border-emerald-400 dark:border-emerald-500',
+    bg: 'bg-emerald-50 dark:bg-emerald-900/20',
+    text: 'text-emerald-700 dark:text-emerald-400',
+    icon: 'text-emerald-600 dark:text-emerald-400',
+  },
   pro: {
     border: 'border-blue-400 dark:border-blue-500',
     bg: 'bg-blue-50 dark:bg-blue-900/20',
@@ -27,6 +33,7 @@ export const PLAN_ACCENT: Record<
 
 export const PLAN_ICON: Record<string, React.ReactNode> = {
   free: React.createElement(Zap, { className: 'h-5 w-5' }),
+  starter: React.createElement(Zap, { className: 'h-5 w-5' }),
   pro: React.createElement(Sparkles, { className: 'h-5 w-5' }),
   business: React.createElement(Crown, { className: 'h-5 w-5' }),
 };

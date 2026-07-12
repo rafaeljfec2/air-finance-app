@@ -35,8 +35,8 @@ export const CompanySelector = ({ size = 'default' }: CompanySelectorProps = {})
 
   if (!user) return null;
 
-  // Ocultar seletor no plano Free (apenas uma empresa permitida)
-  if (user.plan === 'free') {
+  // Hide company switcher when the plan does not allow multiple companies.
+  if (user.plan === 'free' || user.plan === 'starter' || user.plan === 'pro') {
     return null;
   }
 
