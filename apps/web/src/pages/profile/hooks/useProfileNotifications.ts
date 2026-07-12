@@ -5,6 +5,8 @@ import { updateUser } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
 import { mapUserServiceToUserType } from '@/utils/userMapper';
 
+import type { ProfileNotificationsFormValues } from '../schemas';
+
 import type { NotificationsData } from './types';
 
 interface UseProfileNotificationsParams {
@@ -14,8 +16,7 @@ interface UseProfileNotificationsParams {
 
 interface UseProfileNotificationsReturn {
   readonly isSaving: boolean;
-  readonly handleToggle: (key: keyof NotificationsData) => void;
-  readonly handleSave: () => Promise<void>;
+  readonly handleToggle: (key: keyof NotificationsData) => Promise<void>;
 }
 
 export function useProfileNotifications({
@@ -26,40 +27,37 @@ export function useProfileNotifications({
   const [isSaving, setIsSaving] = useState(false);
 
   const handleToggle = useCallback(
-    (key: keyof NotificationsData) => {
-      setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
+    async (key: keyof NotificationsData) => {
+      if (!user?.id || isSaving) return;
+
+      const previous = notifications;
+      const next: ProfileNotificationsFormValues = {
+        ...notifications,
+        [key]: !notifications[key],
+      };
+
+      setNotifications(next);
+      setIsSaving(true);
+      try {
+        const updatedUser = await updateUser(user.id, { notifications: next });
+        setUser(mapUserServiceToUserType(updatedUser));
+      } catch (error) {
+        console.error(error);
+        setNotifications(previous);
+        toast({
+          title: 'Erro',
+          description: 'Não foi possível salvar a notificação. Tente de novo.',
+          type: 'error',
+        });
+      } finally {
+        setIsSaving(false);
+      }
     },
-    [setNotifications],
+    [user?.id, notifications, setNotifications, setUser, isSaving],
   );
-
-  const handleSave = useCallback(async () => {
-    if (!user?.id) return;
-
-    setIsSaving(true);
-    try {
-      const updateData = { notifications: { ...notifications } };
-      const updatedUser = await updateUser(user.id, updateData);
-      setUser(mapUserServiceToUserType(updatedUser));
-      toast({
-        title: 'Sucesso',
-        description: 'Notificações atualizadas com sucesso!',
-        type: 'success',
-      });
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: 'Erro',
-        description: 'Erro ao salvar notificações',
-        type: 'error',
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  }, [user?.id, notifications, setUser]);
 
   return {
     isSaving,
     handleToggle,
-    handleSave,
   };
 }

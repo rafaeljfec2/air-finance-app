@@ -108,18 +108,18 @@ export function PlanCard({ currentPlan, currentPlanId, subscription }: PlanCardP
   return (
     <>
       <Card
-        className={`relative overflow-hidden bg-card dark:bg-card-dark border-2 ${accent.border} p-0`}
+        className={`relative overflow-hidden rounded-2xl border-2 bg-card p-0 dark:bg-card-dark ${accent.border}`}
       >
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500 opacity-60" />
+        <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500 opacity-60" />
 
-        <div className="p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
+        <div className="p-5 sm:p-6">
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-2">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2">
                 <PlanBadge planId={currentPlanId} planName={currentPlan.name} />
                 {getStatusBadge(subscription)}
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 {getPlanDescription(isCancelScheduled, currentPlanId)}
               </p>
             </div>
@@ -129,30 +129,30 @@ export function PlanCard({ currentPlan, currentPlanId, subscription }: PlanCardP
                 <span className="text-3xl font-bold text-text dark:text-text-dark">
                   {currentPlan.displayPrice}
                 </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">/mês</span>
+                <span className="text-sm text-muted-foreground">/mês</span>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50">
-              <div className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-background/60 p-3 dark:border-border-dark dark:bg-background-dark/40">
+              <div className="rounded-lg bg-blue-500/10 p-2">
                 <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Pagamento</p>
+                <p className="text-xs text-muted-foreground">Pagamento</p>
                 <p className="text-sm font-semibold text-text dark:text-text-dark">
                   {currentPlanId === 'free' ? 'Sem assinatura' : `${currentPlan.displayPrice}/mês`}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50">
-              <div className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-background/60 p-3 dark:border-border-dark dark:bg-background-dark/40">
+              <div className="rounded-lg bg-emerald-500/10 p-2">
                 <Calendar className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-muted-foreground">
                   {getBillingLabel(isCancelScheduled, currentPlanId)}
                 </p>
                 <p className="text-sm font-semibold text-text dark:text-text-dark">
@@ -163,42 +163,42 @@ export function PlanCard({ currentPlan, currentPlanId, subscription }: PlanCardP
           </div>
 
           <div className="mb-6">
-            <h4 className="text-sm font-semibold text-text dark:text-text-dark mb-3 flex items-center gap-2">
+            <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold text-text dark:text-text-dark">
               <CheckCircle2 className="h-4 w-4 text-emerald-500" />
               Recursos inclusos
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {currentPlan.features.map((feature) => (
                 <div
                   key={feature}
-                  className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300"
+                  className="flex items-center gap-2 text-sm text-muted-foreground"
                 >
-                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
+                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-500" />
                   {feature}
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row pt-4 border-t border-gray-100 dark:border-gray-700/50">
+          <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row dark:border-border-dark">
             <Button
               onClick={() => navigate('/pricing')}
-              className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+              className="min-h-[44px] gap-2 bg-emerald-600 text-white shadow-sm hover:bg-emerald-700"
             >
               {currentPlanId === 'free' ? (
                 <>
                   <ArrowUpRight className="h-4 w-4" />
-                  Fazer Upgrade
+                  Ver planos
                 </>
               ) : (
-                'Alterar Plano'
+                'Alterar plano'
               )}
             </Button>
             {canCancel && (
               <Button
                 variant="ghost"
                 onClick={() => setShowCancelModal(true)}
-                className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/10"
+                className="min-h-[44px] text-rose-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/10"
               >
                 Cancelar assinatura
               </Button>

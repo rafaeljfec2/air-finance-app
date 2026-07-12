@@ -3,6 +3,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from '@/components/ui/toast';
 import { getCurrentUser } from '@/services/authService';
 import { useAuthStore } from '@/stores/auth';
+import { useTheme, type ThemePreference } from '@/stores/useTheme';
+
+import { ProfilePreferencesSchema } from '../schemas';
 
 import {
   ProfileFormData,
@@ -31,8 +34,25 @@ interface UseProfileDataReturn {
   readonly refetch: () => Promise<void>;
 }
 
+function isThemePreference(value: string): value is ThemePreference {
+  return value === 'light' || value === 'dark' || value === 'system';
+}
+
+function toOpenaiModel(value: string | undefined): OpenaiModelType {
+  if (
+    value === 'gpt-4o-mini' ||
+    value === 'gpt-4o' ||
+    value === 'gpt-4-turbo' ||
+    value === 'gpt-3.5-turbo'
+  ) {
+    return value;
+  }
+  return 'gpt-4o-mini';
+}
+
 export function useProfileData(): UseProfileDataReturn {
   const { user } = useAuthStore();
+  const { setPreference } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [profileData, setProfileData] = useState<ProfileFormData>(DEFAULT_PROFILE_DATA);
   const [preferences, setPreferences] = useState<PreferencesData>(DEFAULT_PREFERENCES);
@@ -58,12 +78,17 @@ export function useProfileData(): UseProfileDataReturn {
       setAvatar(fullUser.avatar ?? user.avatar ?? '/avatars/default.png');
 
       if (fullUser.preferences) {
-        setPreferences({
+        const parsed = ProfilePreferencesSchema.safeParse({
           currency: fullUser.preferences.currency ?? 'BRL',
           language: fullUser.preferences.language ?? 'pt-BR',
           theme: fullUser.preferences.theme ?? 'system',
           dateFormat: fullUser.preferences.dateFormat ?? 'DD/MM/YYYY',
         });
+        const nextPreferences = parsed.success ? parsed.data : DEFAULT_PREFERENCES;
+        setPreferences(nextPreferences);
+        if (isThemePreference(nextPreferences.theme)) {
+          setPreference(nextPreferences.theme);
+        }
       }
 
       if (fullUser.notifications) {
@@ -79,7 +104,7 @@ export function useProfileData(): UseProfileDataReturn {
       if (fullUser.integrations) {
         setIntegrations((prev) => ({
           ...prev,
-          openaiModel: (fullUser.integrations?.openaiModel ?? 'gpt-4o-mini') as OpenaiModelType,
+          openaiModel: toOpenaiModel(fullUser.integrations?.openaiModel),
           hasOpenaiKey: fullUser.integrations?.hasOpenaiKey ?? false,
         }));
       }
@@ -93,7 +118,7 @@ export function useProfileData(): UseProfileDataReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id, user?.avatar]);
+  }, [user?.id, user?.avatar, setPreference]);
 
   useEffect(() => {
     fetchUserData();

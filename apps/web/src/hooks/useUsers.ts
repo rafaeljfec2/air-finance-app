@@ -7,7 +7,7 @@ import {
   deleteUser,
   getUsers,
   updateUser,
-  type CreateUser,
+  type UpdateUserInput,
   type User,
 } from '../services/userService';
 
@@ -36,7 +36,7 @@ export const useUsers = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<CreateUser> }) => updateUser(id, data),
+    mutationFn: ({ id, data }: { id: string; data: UpdateUserInput }) => updateUser(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       queryClient.invalidateQueries({ queryKey: ['user', id] });

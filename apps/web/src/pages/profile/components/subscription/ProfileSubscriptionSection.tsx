@@ -49,7 +49,7 @@ export function ProfileSubscriptionSection() {
 
   if (isLoadingSub) {
     return (
-      <Card className="bg-card dark:bg-card-dark border-border dark:border-border-dark p-6">
+      <Card className="rounded-2xl border border-border bg-card p-5 shadow-sm dark:border-border-dark dark:bg-card-dark sm:p-6">
         <div className="flex justify-center py-8">
           <Spinner className="text-primary-500" />
         </div>
@@ -58,7 +58,16 @@ export function ProfileSubscriptionSection() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
+      <div>
+        <h2 className="text-base font-semibold text-text dark:text-text-dark">
+          Assinatura e cobrança
+        </h2>
+        <p className="mt-0.5 text-sm text-muted-foreground">
+          Plano atual, slots de Open Finance e histórico de pagamentos
+        </p>
+      </div>
+
       <PlanCard
         currentPlan={currentPlan}
         currentPlanId={currentPlanId}
