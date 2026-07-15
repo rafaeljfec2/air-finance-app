@@ -88,7 +88,7 @@ describe('resolveDecisionDashboard', () => {
     );
 
     expect(payload.status_lines?.[2]).toMatch(/não use o cartão/i);
-    expect(payload.status).not.toMatch(/travessia/i);
+    expect(payload.status_lines?.[2]).toMatch(/:/);
     expect(payload.action_of_the_day.label).toMatch(/Ultraviolet nem o Signature/i);
     expect(payload.action_of_the_day.label).not.toMatch(/folga/i);
     expect(payload.action_of_the_day.cta_label).toMatch(/segurar os dois cartões/i);

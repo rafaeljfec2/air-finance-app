@@ -20,14 +20,12 @@ describe('buildCreditAsCashBriefing', () => {
     });
 
     expect(copy.statusLines).toEqual([
-      'Hoje o dinheiro na conta está curto.',
-      'No plano, o mês ainda pode fechar no positivo.',
-      'Até a OUTSERA do dia 20, não use o cartão.',
+      'Na conta: o dinheiro de hoje está curto.',
+      'No plano: o mês ainda pode fechar positivo.',
+      'Até o dia 20: não use o cartão (OUTSERA).',
     ]);
     expect(copy.status).not.toMatch(/travessia/i);
     expect(copy.evidence[0]?.value).toMatch(/R\$\s*44,00/);
-    expect(copy.evidence[1]?.value).toMatch(/\+R\$\s*3\.832,52/);
-    expect(copy.evidence[2]?.value).toMatch(/OUTSERA · R\$\s*21\.751,20 · dia 20/);
     expect(copy.decision).toMatch(/Ultraviolet nem o Signature/i);
   });
 

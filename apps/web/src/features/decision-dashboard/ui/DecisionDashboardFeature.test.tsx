@@ -93,10 +93,10 @@ describe('DecisionDashboardFeature', () => {
     render(<DecisionDashboardFeature />);
 
     expect(screen.getByText(/Rafael/)).toBeInTheDocument();
-    expect(screen.getByText(/Olhamos com calma/i)).toBeInTheDocument();
+    expect(screen.getByText(/Uma decisão clara para o seu caixa hoje/i)).toBeInTheDocument();
     expect(screen.getByText(/^Por quê$/i)).toBeInTheDocument();
     expect(screen.getByText(/Chegamos a essa conclusão porque/i)).toBeInTheDocument();
-    expect(screen.getByText(/Parecer de hoje/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Hoje$/)).toBeInTheDocument();
     expect(screen.getByText(/Se eu estivesse no seu lugar/i)).toBeInTheDocument();
     expect(screen.getByText(/^O que muda$/i)).toBeInTheDocument();
     expect(screen.getByLabelText("Today's commitment")).toHaveTextContent(/Quero priorizar isso/i);
@@ -104,6 +104,8 @@ describe('DecisionDashboardFeature', () => {
     expect(screen.queryByText(/Em volta disso/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/O que percebemos/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/FP-1/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Parecer de hoje/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Olhamos com calma/i)).not.toBeInTheDocument();
 
     const evidence = screen.getByLabelText('Conclusion evidence');
     const action = screen.getByLabelText('Action of the day');

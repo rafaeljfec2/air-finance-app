@@ -44,23 +44,23 @@ export function buildCreditAsCashBriefing(
   const operating = facts?.operatingCardName ? shortCardName(facts.operatingCardName) : undefined;
   const idle = facts?.idleCardName ? shortCardName(facts.idleCardName) : undefined;
 
-  const bridgeName = anchor ? `${anchor.label} do dia ${anchor.dueDay}` : 'próxima entrada';
-
   const cashLine =
     cash !== undefined && cash < 500
-      ? 'Hoje o dinheiro na conta está curto.'
-      : 'Hoje ainda há algum dinheiro na conta.';
+      ? 'Na conta: o dinheiro de hoje está curto.'
+      : 'Na conta: ainda há algum dinheiro hoje.';
 
   let planLine: string;
   if (projected === undefined) {
-    planLine = 'Ainda não dá para cravar se o mês fecha só pelo planejamento.';
+    planLine = 'No plano: ainda não dá para cravar o fechamento.';
   } else if (projected >= 0) {
-    planLine = 'No plano, o mês ainda pode fechar no positivo.';
+    planLine = 'No plano: o mês ainda pode fechar positivo.';
   } else {
-    planLine = 'No plano, o mês ainda pode fechar no negativo.';
+    planLine = 'No plano: o mês ainda pode fechar negativo.';
   }
 
-  const bridgeLine = `Até a ${bridgeName}, não use o cartão.`;
+  const dayPart = anchor ? `Até o dia ${anchor.dueDay}` : 'Até a próxima entrada';
+  const bridgeDetail = anchor ? `não use o cartão (${anchor.label}).` : 'não use o cartão.';
+  const bridgeLine = `${dayPart}: ${bridgeDetail}`;
   const statusLines = [cashLine, planLine, bridgeLine] as const;
   const status = statusLines.join(' ');
 
