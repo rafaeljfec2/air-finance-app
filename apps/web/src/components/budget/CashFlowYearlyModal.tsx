@@ -221,7 +221,7 @@ function MobileCards({ rows }: { readonly rows: YearlyRow[] }) {
 export function CashFlowYearlyModal({ open, onClose, year }: CashFlowYearlyModalProps) {
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? null;
-  const { data, isLoading } = useYearlyCashFlow(companyId, year);
+  const { data, isLoading } = useYearlyCashFlow(companyId, year, { enabled: open });
 
   return (
     <Modal
