@@ -70,7 +70,7 @@ describe('problemHeadlineFromPrimaryIssue', () => {
       'Muito do mês é conta fixa — grande parte é longa duração, com pouca margem para manobra rápida.',
     );
     expect(problemHeadlineFromPrimaryIssue('data_incomplete')).toBe(
-      'Sem dados completos, qualquer conselho vira chute.',
+      'Cobertura incompleta neste perfil — faltam fatos para uma leitura segura.',
     );
     expect(problemHeadlineFromPrimaryIssue('healthy')).toBe('Nada gritando alerta neste mês.');
   });

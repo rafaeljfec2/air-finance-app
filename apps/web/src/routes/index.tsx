@@ -63,6 +63,9 @@ const CreditCardsV2Page = lazy(() =>
 const InsightsPage = lazy(() =>
   import('@/pages/insights').then((m) => ({ default: m.InsightsPage })),
 );
+const Dashboard = lazy(() =>
+  import('@/pages/dashboard/Dashboard').then((m) => ({ default: m.Dashboard })),
+);
 const HomePage = lazy(() => import('@/pages/home').then((m) => ({ default: m.HomePage })));
 const DependentsPage = lazy(() =>
   import('@/pages/dependents').then((m) => ({ default: m.DependentsPage })),
@@ -329,11 +332,7 @@ export const router = createBrowserRouter(
           path: '/home-v2',
           element: <Navigate to="/home" replace />,
         },
-        // Deprecated KPI Dashboard: redirected to Home (Decision Dashboard). Code kept for TD sprint cleanup.
-        {
-          path: '/dashboard',
-          element: <Navigate to="/home" replace />,
-        },
+        onboardingRoute('/dashboard', <Dashboard />),
         onboardingRoute('/financial-health', <FinancialHealthPage />),
         onboardingRoute('/decision', <FinancialDecisionPage />),
         onboardingRoute('/transactions', <Transactions />),

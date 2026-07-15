@@ -14,8 +14,8 @@ describe('DecisionVerdictPanel', () => {
         issueDrivers={[]}
       />,
     );
-    expect(screen.getByText(/Veredito: atenção/i)).toBeInTheDocument();
-    expect(screen.getByText(/voltar a respirar/i)).toBeInTheDocument();
+    expect(screen.getByText(/Leitura: há o que ajustar/i)).toBeInTheDocument();
+    expect(screen.getByText(/recuperar folga/i)).toBeInTheDocument();
     expect(screen.getByText('Priorizamos o que pesa mais no mês.')).toBeInTheDocument();
   });
 
@@ -29,7 +29,7 @@ describe('DecisionVerdictPanel', () => {
         issueDrivers={[]}
       />,
     );
-    expect(screen.getByText(/Veredito: manter/i)).toBeInTheDocument();
+    expect(screen.getByText(/Leitura: o período sustenta/i)).toBeInTheDocument();
     expect(container.querySelectorAll('p')).toHaveLength(1);
   });
 

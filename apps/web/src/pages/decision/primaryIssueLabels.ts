@@ -21,7 +21,7 @@ const PROBLEM_HEADLINE_PT: Readonly<Record<string, string>> = {
   low_savings: 'Está ficando pouco para o futuro ou para emergências.',
   high_fixed_cost:
     'Muito do mês é conta fixa — grande parte é longa duração, com pouca margem para manobra rápida.',
-  data_incomplete: 'Sem dados completos, qualquer conselho vira chute.',
+  data_incomplete: 'Cobertura incompleta neste perfil — faltam fatos para uma leitura segura.',
   healthy: 'Nada gritando alerta neste mês.',
 };
 

@@ -14,25 +14,25 @@ export interface DecisionVerdictPanelProps {
   readonly issueDrivers: readonly IssueDriverWire[];
 }
 
-function verdictHeadline(
+function readingHeadline(
   status: DecisionEngineStatus,
   themePhase: ThemePhase | null | undefined,
 ): string {
   if (status === 'critical') {
-    return 'Veredito: ação urgente.';
+    return 'Leitura: fatos insuficientes ou pressão alta neste período.';
   }
   if (status === 'healthy') {
-    return 'Veredito: manter o que funciona — sem ação obrigatória agora.';
+    return 'Leitura: o período sustenta o que já funciona — sem obrigação extra aqui.';
   }
   const phaseHint =
     themePhase === 'red'
-      ? ' (fase: pare de piorar)'
+      ? ' (fase: estabilizar primeiro)'
       : themePhase === 'yellow'
-        ? ' (fase: voltar a respirar)'
+        ? ' (fase: recuperar folga)'
         : themePhase === 'green'
-          ? ' (fase: no verde)'
+          ? ' (fase: manutenção)'
           : '';
-  return `Veredito: atenção — ajustar com calma.${phaseHint}`;
+  return `Leitura: há o que ajustar neste período, com calma.${phaseHint}`;
 }
 
 export function DecisionVerdictPanel({
@@ -47,7 +47,7 @@ export function DecisionVerdictPanel({
   return (
     <div className="rounded-md border border-border bg-card px-3 py-3 dark:border-border-dark dark:bg-card-dark">
       <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-        {verdictHeadline(status, themePhase)}
+        {readingHeadline(status, themePhase)}
       </p>
       {rationale !== '' ? (
         <p className="mt-2 line-clamp-4 text-xs leading-relaxed text-gray-600 dark:text-gray-400 sm:text-sm">

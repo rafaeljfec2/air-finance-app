@@ -1,14 +1,17 @@
 import { ChevronDown } from 'lucide-react';
 import { useRef } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { useCompletePlan } from '@/hooks/useCompletePlan';
+import type { CompletePlanResponse } from '@/services/completePlanService';
 
 import { CompletePlanBehaviorCard } from './CompletePlanBehaviorCard';
 import { CompletePlanCoherenceNote } from './CompletePlanCoherenceNote';
 import { CompletePlanDiagnosis } from './CompletePlanDiagnosis';
+import { CompletePlanInfoHint } from './CompletePlanInfoHint';
 import { CompletePlanInstallmentsCard } from './CompletePlanInstallmentsCard';
 import { CompletePlanNumbersCard } from './CompletePlanNumbersCard';
 import { CompletePlanOutcome } from './CompletePlanOutcome';
@@ -35,6 +38,13 @@ const VARIABLE_SUMMARY_BUCKET_LABEL: Readonly<
   critical: COMPLETE_PLAN_LABELS.variableSpendingBucketCritical,
 };
 
+const VARIABLE_SUMMARY_BUCKET_HINT: Readonly<Record<'healthy' | 'attention' | 'critical', string>> =
+  {
+    healthy: COMPLETE_PLAN_LABELS.variableSpendingBucketHealthyHint,
+    attention: COMPLETE_PLAN_LABELS.variableSpendingBucketAttentionHint,
+    critical: COMPLETE_PLAN_LABELS.variableSpendingBucketCriticalHint,
+  };
+
 function revealPlanDetailAndScroll(
   panel: HTMLDetailsElement | null,
   anchorElementId: string,
@@ -48,6 +58,17 @@ function revealPlanDetailAndScroll(
       block: 'start',
     });
   });
+}
+
+function isSparseCompletePlan(data: CompletePlanResponse): boolean {
+  if (data.primary_issue === 'data_incomplete') {
+    return true;
+  }
+  return (
+    data.numbers.netIncome === 0 &&
+    data.numbers.totalCommitted === 0 &&
+    data.variableSpending.totalVariable === 0
+  );
 }
 
 export interface DecisionCompletePlanSectionProps {
@@ -100,6 +121,49 @@ export function DecisionCompletePlanSection({
 
   const data = query.data;
 
+  if (isSparseCompletePlan(data)) {
+    return (
+      <Card className="border-border dark:border-border-dark">
+        <CardHeader className="space-y-2 p-4 sm:p-5">
+          <CardTitle className="text-lg text-text dark:text-text-dark">
+            {COMPLETE_PLAN_LABELS.sparseTitle}
+          </CardTitle>
+          <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
+            {COMPLETE_PLAN_LABELS.sparseDescription}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3 px-4 pb-4 pt-0 sm:px-5">
+          {data.diagnosis.trim() !== '' ? (
+            <p className="text-sm leading-relaxed text-text/90 dark:text-text-dark/90">
+              {data.diagnosis}
+            </p>
+          ) : null}
+          <p className="text-xs text-muted-foreground">{COMPLETE_PLAN_LABELS.sparseCtaHint}</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+            <RouterLink
+              to="/home"
+              className="min-h-[44px] content-center font-medium text-primary-600 underline-offset-4 hover:underline dark:text-primary-400"
+            >
+              Ir para a Home
+            </RouterLink>
+            <RouterLink
+              to="/budget"
+              className="min-h-[44px] content-center text-primary-600 underline-offset-4 hover:underline dark:text-primary-400"
+            >
+              Orçamento
+            </RouterLink>
+            <RouterLink
+              to="/transactions"
+              className="min-h-[44px] content-center text-primary-600 underline-offset-4 hover:underline dark:text-primary-400"
+            >
+              Transações
+            </RouterLink>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="border-border dark:border-border-dark">
       <CardHeader className="space-y-2 p-4 sm:p-6">
@@ -122,9 +186,16 @@ export function DecisionCompletePlanSection({
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0 flex-1 space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                {COMPLETE_PLAN_LABELS.variableSpendingSummaryTitle}
-              </p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  {COMPLETE_PLAN_LABELS.variableSpendingSummaryTitle}
+                </p>
+                <CompletePlanInfoHint
+                  testId="variable-spending-summary-info"
+                  ariaLabel={COMPLETE_PLAN_LABELS.variableSpendingSummaryInfoToggle}
+                  content={COMPLETE_PLAN_LABELS.variableSpendingSummaryHint}
+                />
+              </div>
               <p className="text-sm font-medium text-text dark:text-text-dark">
                 <span className="font-semibold">
                   {formatBrl(data.variableSpending.totalVariable)}
@@ -149,17 +220,21 @@ export function DecisionCompletePlanSection({
                   <> · {COMPLETE_PLAN_LABELS.variableSpendingMomZeroCurrent}</>
                 ) : null}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {COMPLETE_PLAN_LABELS.variableSpendingSummaryHint}
-              </p>
             </div>
             <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-              <span
-                role="status"
-                className={VARIABLE_SUMMARY_BADGE[data.variableSpending.bucketHealth]}
-              >
-                {VARIABLE_SUMMARY_BUCKET_LABEL[data.variableSpending.bucketHealth]}
-              </span>
+              <div className="flex items-center gap-1">
+                <span
+                  role="status"
+                  className={VARIABLE_SUMMARY_BADGE[data.variableSpending.bucketHealth]}
+                >
+                  {VARIABLE_SUMMARY_BUCKET_LABEL[data.variableSpending.bucketHealth]}
+                </span>
+                <CompletePlanInfoHint
+                  testId="variable-spending-bucket-info"
+                  ariaLabel={COMPLETE_PLAN_LABELS.variableSpendingBucketInfoToggle}
+                  content={VARIABLE_SUMMARY_BUCKET_HINT[data.variableSpending.bucketHealth]}
+                />
+              </div>
               <Button
                 type="button"
                 variant="ghost"

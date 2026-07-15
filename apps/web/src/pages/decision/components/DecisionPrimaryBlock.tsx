@@ -28,10 +28,14 @@ export interface DecisionPrimaryBlockProps {
 }
 
 const CARD_ACCENT: Readonly<Record<DecisionEngineStatus, string>> = {
-  critical: 'border-l-4 border-l-red-500',
-  attention: 'border-l-4 border-l-amber-500',
+  critical: 'border-l-4 border-l-border dark:border-l-border-dark',
+  attention: 'border-l-4 border-l-amber-500/70',
   healthy: 'border-l-4 border-l-primary-500',
 };
+
+function isHygieneIssue(primaryIssue: string): boolean {
+  return primaryIssue === 'data_incomplete';
+}
 
 export function DecisionPrimaryBlock({
   action,
@@ -41,6 +45,7 @@ export function DecisionPrimaryBlock({
   primaryIssue,
   showProblemContext = true,
 }: DecisionPrimaryBlockProps) {
+  const hygiene = isHygieneIssue(primaryIssue);
   const reasonsPlain = formatActionReasonsPlain(action.reason);
   const impactDisplay = humanizeImpactForDisplay(action.impact);
   const quickLinks = decisionQuickLinksForIssue(primaryIssue);
@@ -49,40 +54,45 @@ export function DecisionPrimaryBlock({
     const text = `${action.title}\n${action.description}\n${impactDisplay}`;
     try {
       await navigator.clipboard.writeText(text);
-      toast.success('Passo copiado. Cole onde você organiza o mês.');
+      toast.success(
+        hygiene
+          ? 'Atalho copiado. Complete os dados para habilitar a leitura.'
+          : 'Passo do período copiado. A decisão de hoje continua na Home.',
+      );
     } catch {
-      toast.info('Seu passo prioritário está no cartão acima.');
+      toast.info(hygiene ? 'Complete os dados pelos atalhos abaixo.' : 'Detalhe no cartão acima.');
     }
   };
 
   return (
     <Card
       className={cn(
-        'shadow-md ring-1 ring-primary-500/20 dark:ring-primary-400/25',
+        'shadow-sm',
+        hygiene ? 'ring-1 ring-border/60 dark:ring-border-dark/60' : 'ring-1 ring-border/80',
         CARD_ACCENT[status],
       )}
     >
-      <CardHeader className="space-y-4 p-5 sm:p-7">
+      <CardHeader className="space-y-3 p-4 sm:p-5">
         {showProblemContext ? (
           <p id="decision-context" className="text-center text-sm text-muted-foreground">
             {problemHeadline}
           </p>
         ) : null}
         <div className="flex justify-center">
-          <span className="inline-flex rounded-full bg-primary-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-primary-800 dark:bg-primary-900/50 dark:text-primary-100">
-            Próximo passo
+          <span className="inline-flex rounded-full bg-muted/50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground dark:bg-muted/20">
+            {hygiene ? 'Para habilitar a leitura' : 'Higiene do período'}
           </span>
         </div>
-        <CardTitle className="text-center text-2xl font-bold leading-tight tracking-tight text-foreground sm:text-3xl">
+        <CardTitle className="text-center text-xl font-semibold leading-tight tracking-tight text-foreground sm:text-2xl">
           {action.title}
         </CardTitle>
-        <CardDescription className="text-base leading-relaxed">
+        <CardDescription className="text-sm leading-relaxed sm:text-base">
           {action.description}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-2 px-4 pb-2 pt-0 sm:px-6">
+      <CardContent className="space-y-2 px-4 pb-2 pt-0 sm:px-5">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Impacto
+          {hygiene ? 'Por quê' : 'Impacto no período'}
         </p>
         <p className="text-sm font-medium text-foreground sm:text-base">{impactDisplay}</p>
         {reasonsPlain !== '' ? (
@@ -91,16 +101,30 @@ export function DecisionPrimaryBlock({
           </p>
         ) : null}
       </CardContent>
-      <CardFooter className="flex flex-col gap-3 p-4 pt-2 sm:p-6 sm:pt-0">
+      <CardFooter className="flex flex-col gap-3 p-4 pt-2 sm:p-5 sm:pt-0">
         <Button
           type="button"
-          variant="default"
+          variant={hygiene ? 'outline' : 'default'}
           size="lg"
           className="min-h-[44px] w-full"
           onClick={() => void handleConfirmPriority()}
         >
-          {hasSecondarySteps ? 'Vou começar por aqui' : 'Começar agora'}
+          {hygiene
+            ? 'Copiar lembrete de cadastro'
+            : hasSecondarySteps
+              ? 'Copiar passo do período'
+              : 'Copiar passo do período'}
         </Button>
+        <p className="text-center text-xs text-muted-foreground">
+          Isto não substitui a decisão de hoje na{' '}
+          <RouterLink
+            to="/home"
+            className="font-medium text-primary-600 underline-offset-4 hover:underline dark:text-primary-400"
+          >
+            Home
+          </RouterLink>
+          .
+        </p>
         <nav
           aria-label="Atalhos relacionados"
           className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-sm"

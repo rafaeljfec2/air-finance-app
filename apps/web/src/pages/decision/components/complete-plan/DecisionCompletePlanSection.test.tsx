@@ -4,6 +4,7 @@ import type { ReactElement } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchCompletePlan, type CompletePlanResponse } from '@/services/completePlanService';
+import { TestMemoryRouter } from '@/test/TestMemoryRouter';
 
 import { DecisionCompletePlanSection } from './DecisionCompletePlanSection';
 
@@ -74,7 +75,11 @@ function renderWithClient(ui: ReactElement) {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  return render(<QueryClientProvider client={client}>{ui}</QueryClientProvider>);
+  return render(
+    <TestMemoryRouter>
+      <QueryClientProvider client={client}>{ui}</QueryClientProvider>
+    </TestMemoryRouter>,
+  );
 }
 
 describe('DecisionCompletePlanSection', () => {
@@ -160,5 +165,37 @@ describe('DecisionCompletePlanSection', () => {
     renderWithClient(<DecisionCompletePlanSection companyId="" />);
 
     expect(fetchCompletePlan).not.toHaveBeenCalled();
+  });
+
+  it('shows a single sparse block for data_incomplete instead of zero mosaics', async () => {
+    vi.mocked(fetchCompletePlan).mockResolvedValue({
+      ...samplePayload,
+      primary_issue: 'data_incomplete',
+      diagnosis: 'Cadastre renda e movimentos para ler o período.',
+      numbers: {
+        netIncome: 0,
+        totalCommitted: 0,
+        committedPct: 0,
+        healthyTargetPct: 0.25,
+        reductionNeeded: 0,
+      },
+      variableSpending: {
+        ...samplePayload.variableSpending,
+        totalVariable: 0,
+        previousTotalVariable: 0,
+        percentOfIncome: null,
+      },
+    });
+
+    renderWithClient(<DecisionCompletePlanSection companyId="c1" />);
+
+    await waitFor(() =>
+      expect(screen.getByText('Leitura do período indisponível')).toBeInTheDocument(),
+    );
+    expect(screen.getByText('Cadastre renda e movimentos para ler o período.')).toBeInTheDocument();
+    expect(screen.queryByText('Sua situação em números')).not.toBeInTheDocument();
+    expect(screen.queryByText('Resumo do gasto variável')).not.toBeInTheDocument();
+    expect(screen.queryByText('Equilibrado')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Ir para a Home' })).toHaveAttribute('href', '/home');
   });
 });

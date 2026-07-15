@@ -11,6 +11,7 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
 
 import { DecisionCompletePlanSection } from './components/complete-plan/DecisionCompletePlanSection';
+import { DecisionHomePointer } from './components/DecisionHomePointer';
 import { DecisionPageToolbar } from './components/DecisionPageToolbar';
 import { DecisionPeriodCoverageBanner } from './components/DecisionPeriodCoverageBanner';
 import { DecisionPlaybookCard } from './components/DecisionPlaybookCard';
@@ -45,6 +46,7 @@ const motionItem = {
 export function FinancialDecisionPage() {
   const { activeCompany } = useCompanyStore();
   const companyId = activeCompany?.id ?? '';
+  const companyName = activeCompany?.name?.trim() ?? '';
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -65,6 +67,8 @@ export function FinancialDecisionPage() {
   const displayActions = query.data?.actions ?? [];
   const primaryAction = displayActions[0];
   const secondaryActions = displayActions.slice(1);
+  const primaryIssue = query.data?.primary_issue ?? '';
+  const isDataIncomplete = primaryIssue === 'data_incomplete';
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -75,11 +79,10 @@ export function FinancialDecisionPage() {
   };
 
   const emptyCompany = companyId === '';
-  const hasSecondaries = secondaryActions.length > 0;
 
   const toolbarSubtitle = emptyCompany
-    ? 'Escolha um perfil para ver a leitura do período e o que fazer a seguir.'
-    : 'Leitura do período, estado geral e próximo passo — em sequência, sem ruído visual.';
+    ? 'Escolha um perfil para ver a leitura deste período.'
+    : 'Exploração do mês — cobertura, lacunas e detalhe. A decisão de hoje está na Home.';
 
   return (
     <ViewDefault>
@@ -88,11 +91,11 @@ export function FinancialDecisionPage() {
           variants={motionContainer}
           initial="hidden"
           animate="show"
-          className="space-y-6 px-4 pb-8 pt-0 sm:px-6"
+          className="space-y-5 px-4 pb-8 pt-0 sm:px-6"
         >
           <motion.div variants={motionItem}>
             <DecisionPageToolbar
-              title="Decisão financeira"
+              title="Leitura do período"
               subtitle={toolbarSubtitle}
               showRefresh={!emptyCompany}
               isFetching={query.isFetching}
@@ -114,16 +117,26 @@ export function FinancialDecisionPage() {
             </DecisionPageToolbar>
           </motion.div>
 
-          <motion.div variants={motionItem} className="space-y-6">
+          <motion.div variants={motionItem} className="space-y-5">
             {emptyCompany ? (
               <Card className="border-border dark:border-border-dark">
                 <CardHeader>
                   <CardTitle className="text-lg">Escolha um perfil</CardTitle>
                   <CardDescription>
-                    Selecione uma empresa no menu de perfis para carregar a decisão deste mês.
+                    Selecione uma empresa no menu de perfis para carregar a leitura deste mês.
                   </CardDescription>
                 </CardHeader>
               </Card>
+            ) : null}
+
+            {!emptyCompany ? <DecisionHomePointer /> : null}
+
+            {!emptyCompany && companyName !== '' && isDataIncomplete ? (
+              <p className="text-xs leading-snug text-muted-foreground">
+                Perfil ativo: <span className="font-medium text-foreground">{companyName}</span>.
+                Este perfil não tem fatos suficientes — o parecer de hoje pode estar em outro perfil
+                na Home.
+              </p>
             ) : null}
 
             {!emptyCompany && query.isLoading ? (
@@ -159,7 +172,7 @@ export function FinancialDecisionPage() {
             ) : null}
 
             {!emptyCompany && query.isSuccess && query.data ? (
-              <div className="space-y-6">
+              <div className="space-y-5">
                 <DecisionStatusStrip
                   status={query.data.status}
                   briefingLine={problemHeadlineFromPrimaryIssue(query.data.primary_issue)}
@@ -178,17 +191,17 @@ export function FinancialDecisionPage() {
                   <DecisionPrimaryBlock
                     action={primaryAction}
                     status={query.data.status}
-                    hasSecondarySteps={hasSecondaries}
+                    hasSecondarySteps={!isDataIncomplete && secondaryActions.length > 0}
                     problemHeadline={problemHeadlineFromPrimaryIssue(query.data.primary_issue)}
                     primaryIssue={query.data.primary_issue}
                     showProblemContext={false}
                   />
                 ) : (
                   <p className="text-center text-sm text-muted-foreground">
-                    Nada priorizado neste mês.
+                    Nada priorizado neste período.
                   </p>
                 )}
-                <DecisionSecondaryActions actions={secondaryActions} />
+                {!isDataIncomplete ? <DecisionSecondaryActions actions={secondaryActions} /> : null}
                 <DecisionPlaybookCard
                   playbook={getPlaybook(query.data.primary_issue)}
                   phase={query.data.theme_phase ?? null}
