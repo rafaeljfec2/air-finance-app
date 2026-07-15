@@ -7,7 +7,7 @@ interface DecisionInsightBlockProps {
 }
 
 /**
- * Benefit moment of the parecer — "What changes if I do this?"
+ * Benefit moment — sits inside the recommendation surface.
  */
 export function DecisionInsightBlock({ message, rationale }: DecisionInsightBlockProps) {
   const fromInsight = message ? humanizeInsightCopy(message) : '';
@@ -20,11 +20,12 @@ export function DecisionInsightBlock({ message, rationale }: DecisionInsightBloc
         : 'Isso melhora sua margem de tranquilidade para o que vem a seguir.';
 
   return (
-    <section aria-label="Recommendation benefit" className="space-y-1.5 max-w-xl">
-      <p className="text-sm font-medium text-primary-600 dark:text-primary-400">
-        O que muda se você fizer isso
-      </p>
-      <p className="text-sm text-muted-foreground leading-snug">{benefit}</p>
-    </section>
+    <div
+      aria-label="Recommendation benefit"
+      className="space-y-1 border-t border-primary-200/40 pt-3 dark:border-primary-700/30"
+    >
+      <p className="text-xs font-medium text-muted-foreground">O que muda se você fizer isso</p>
+      <p className="text-sm text-text dark:text-text-dark leading-snug">{benefit}</p>
+    </div>
   );
 }

@@ -22,7 +22,7 @@ export function DecisionDashboardFeature() {
   if (isAwaitingCompany) {
     return (
       <div
-        className="py-12 text-center max-w-lg mx-auto space-y-2"
+        className="rounded-2xl border border-border/60 bg-card px-5 py-10 text-center dark:border-border-dark/60 dark:bg-card-dark"
         aria-label="Awaiting company selection"
       >
         <p className="text-sm text-muted-foreground leading-relaxed">
@@ -35,21 +35,27 @@ export function DecisionDashboardFeature() {
   if (isLoading) {
     return (
       <div
-        className="mx-auto w-full max-w-2xl animate-pulse space-y-4 border-l-2 border-primary-500/40 pl-4 sm:pl-5"
+        className="animate-pulse space-y-5 rounded-2xl border border-border/60 bg-card p-5 dark:border-border-dark/60 dark:bg-card-dark sm:p-6"
         aria-busy="true"
         aria-label="Loading decision dashboard"
       >
-        <div className="h-3 w-32 rounded bg-primary-500/20" />
-        <div className="h-9 w-full rounded bg-muted/40 dark:bg-muted/20" />
-        <div className="h-5 w-4/5 rounded bg-muted/30 dark:bg-muted/15" />
-        <div className="h-16 w-full max-w-md rounded bg-muted/25 dark:bg-muted/15" />
+        <div className="flex justify-between gap-3">
+          <div className="h-4 w-36 rounded bg-primary-500/20" />
+          <div className="h-3 w-24 rounded bg-muted/30" />
+        </div>
+        <div className="h-10 w-full rounded bg-muted/40 dark:bg-muted/20" />
+        <div className="h-16 w-full rounded-lg bg-muted/25" />
+        <div className="h-28 w-full rounded-xl bg-primary-500/10" />
       </div>
     );
   }
 
   if (isError || !viewModel) {
     return (
-      <div role="alert" className="py-12 text-center max-w-lg mx-auto space-y-3">
+      <div
+        role="alert"
+        className="space-y-3 rounded-2xl border border-border/60 bg-card px-5 py-10 text-center dark:border-border-dark/60 dark:bg-card-dark"
+      >
         <p className="text-sm text-muted-foreground leading-relaxed">
           Não conseguimos montar seu parecer agora. Vamos tentar de novo?
         </p>
@@ -64,33 +70,29 @@ export function DecisionDashboardFeature() {
     Boolean(viewModel.insightMessage) || viewModel.action.rationale.trim().length > 0;
 
   return (
-    <div className="mx-auto flex h-full min-h-0 w-full max-w-2xl flex-col">
-      <div className="flex min-h-0 flex-1 flex-col gap-5 border-l-2 border-primary-500 dark:border-primary-400 pl-4 sm:gap-6 sm:pl-5">
-        {/* 1. Conclusão */}
+    <article className="rounded-2xl border border-border/60 bg-card shadow-sm dark:border-border-dark/60 dark:bg-card-dark">
+      <div className="space-y-5 p-4 sm:space-y-6 sm:p-6 md:p-7">
         <DecisionDashboardStatus
           question={viewModel.question}
           status={viewModel.status}
           dataState={viewModel.dataState}
         />
 
-        {/* 2. Evidências */}
         <PriorityDecisionCards cards={viewModel.priorityCards} />
 
-        {/* 3. Recomendação */}
         <ActionOfTheDayBlock
           label={viewModel.action.label}
           rationale={viewModel.action.rationale}
+          benefitSlot={
+            showBenefit ? (
+              <DecisionInsightBlock
+                message={viewModel.insightMessage}
+                rationale={viewModel.action.rationale}
+              />
+            ) : null
+          }
         />
 
-        {/* 4. Benefício */}
-        {showBenefit ? (
-          <DecisionInsightBlock
-            message={viewModel.insightMessage}
-            rationale={viewModel.action.rationale}
-          />
-        ) : null}
-
-        {/* 5. Exploração */}
         {viewModel.showSecondary ? (
           <DecisionDashboardSecondary
             cards={viewModel.secondaryCards}
@@ -100,6 +102,6 @@ export function DecisionDashboardFeature() {
           />
         ) : null}
       </div>
-    </div>
+    </article>
   );
 }

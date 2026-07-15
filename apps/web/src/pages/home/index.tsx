@@ -3,12 +3,12 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 
 /**
  * Product Home — hosts the Decision Dashboard feature only.
- * Fills the shell viewport without inventing a second scroll.
+ * Experience logic lives in `features/decision-dashboard` (Domain → Mapper → UI).
  */
 export function HomePage() {
   return (
     <ViewDefault>
-      <div className="box-border flex h-full min-h-0 flex-col overflow-hidden -m-4 p-3 sm:-m-6 sm:p-4 md:p-5">
+      <div className="mx-auto w-full max-w-3xl px-1 py-2 sm:px-2 sm:py-4 md:py-6">
         <DecisionDashboardFeature />
       </div>
     </ViewDefault>

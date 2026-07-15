@@ -93,7 +93,9 @@ describe('DecisionDashboardFeature', () => {
     render(<DecisionDashboardFeature />);
 
     expect(screen.getByText(/Rafael/)).toBeInTheDocument();
+    expect(screen.getByText(/^Por quê$/i)).toBeInTheDocument();
     expect(screen.getByText(/Chegamos a essa conclusão porque/i)).toBeInTheDocument();
+    expect(screen.getByText(/Parecer de hoje/i)).toBeInTheDocument();
     expect(screen.getByText(/Se eu estivesse no seu lugar/i)).toBeInTheDocument();
     expect(screen.getByText(/O que muda se você fizer isso/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Quero priorizar isso/i })).toBeInTheDocument();
