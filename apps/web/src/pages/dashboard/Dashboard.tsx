@@ -26,6 +26,7 @@ import { formatCurrency } from '@/utils/formatters';
 import { useFinancialHealthCheckup } from './hooks/useFinancialHealthCheckup';
 import {
   Callout,
+  ChartAxisTick,
   Divider,
   DocCard,
   Grid,
@@ -313,18 +314,39 @@ export function Dashboard() {
                           <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
                           <XAxis
                             dataKey="label"
-                            tick={chartTheme.tick}
+                            tick={(props) => (
+                              <ChartAxisTick
+                                {...props}
+                                fill={chartTheme.tick.fill}
+                                fontSize={chartTheme.tick.fontSize}
+                                opacity={chartTheme.tick.opacity}
+                                dy={10}
+                              />
+                            )}
+                            stroke={chartTheme.tick.fill}
                             axisLine={false}
                             tickLine={false}
                           />
                           <YAxis
-                            tick={chartTheme.tick}
+                            tick={(props) => (
+                              <ChartAxisTick
+                                {...props}
+                                fill={chartTheme.tick.fill}
+                                fontSize={chartTheme.tick.fontSize}
+                                opacity={chartTheme.tick.opacity}
+                                textAnchor="end"
+                                dx={-4}
+                              />
+                            )}
+                            stroke={chartTheme.tick.fill}
                             width={56}
                             axisLine={false}
                             tickLine={false}
                           />
                           <Tooltip
                             contentStyle={chartTheme.tooltip}
+                            labelStyle={{ color: chartTheme.tooltip.color }}
+                            itemStyle={{ color: chartTheme.tooltip.color }}
                             cursor={{ fill: chartTheme.cursor, opacity: 0.35 }}
                             formatter={(value: number) => formatCurrency(value)}
                           />
@@ -347,18 +369,39 @@ export function Dashboard() {
                           <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
                           <XAxis
                             dataKey="label"
-                            tick={chartTheme.tick}
+                            tick={(props) => (
+                              <ChartAxisTick
+                                {...props}
+                                fill={chartTheme.tick.fill}
+                                fontSize={chartTheme.tick.fontSize}
+                                opacity={chartTheme.tick.opacity}
+                                dy={10}
+                              />
+                            )}
+                            stroke={chartTheme.tick.fill}
                             axisLine={false}
                             tickLine={false}
                           />
                           <YAxis
-                            tick={chartTheme.tick}
+                            tick={(props) => (
+                              <ChartAxisTick
+                                {...props}
+                                fill={chartTheme.tick.fill}
+                                fontSize={chartTheme.tick.fontSize}
+                                opacity={chartTheme.tick.opacity}
+                                textAnchor="end"
+                                dx={-4}
+                              />
+                            )}
+                            stroke={chartTheme.tick.fill}
                             width={56}
                             axisLine={false}
                             tickLine={false}
                           />
                           <Tooltip
                             contentStyle={chartTheme.tooltip}
+                            labelStyle={{ color: chartTheme.tooltip.color }}
+                            itemStyle={{ color: chartTheme.tooltip.color }}
                             cursor={{ fill: chartTheme.cursor, opacity: 0.35 }}
                             formatter={(value: number) => formatCurrency(value)}
                           />

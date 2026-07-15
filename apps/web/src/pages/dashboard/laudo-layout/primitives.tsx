@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/stores/useTheme';
@@ -254,19 +254,38 @@ export function Divider({ className }: Readonly<{ className?: string }>) {
 }
 
 export interface LaudoChartTheme {
-  readonly tick: { readonly fill: string; readonly fontSize: number };
+  readonly tick: { readonly fill: string; readonly fontSize: number; readonly opacity?: number };
   readonly grid: string;
   readonly tooltip: CSSProperties;
   readonly cursor: string;
 }
 
-/** Recharts does not resolve Tailwind classes — colors must follow theme explicitly. */
+/**
+ * Chart colors follow the live `dark` class on <html> (same as Tailwind),
+ * not only zustand — avoids black axis ticks when store lags behind CSS.
+ */
 export function useLaudoChartTheme(): LaudoChartTheme {
-  const isDarkMode = useTheme((state) => state.isDarkMode);
+  const storeDark = useTheme((state) => state.isDarkMode);
+  const [domDark, setDomDark] = useState(() =>
+    typeof document !== 'undefined'
+      ? document.documentElement.classList.contains('dark')
+      : storeDark,
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const sync = () => setDomDark(root.classList.contains('dark'));
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
+  const isDarkMode = domDark || storeDark;
 
   if (isDarkMode) {
     return {
-      tick: { fill: '#9CA3AF', fontSize: 11 },
+      tick: { fill: '#F9FAFB', fontSize: 11, opacity: 0.9 },
       grid: '#374151',
       tooltip: {
         backgroundColor: '#1f2937',
@@ -280,7 +299,7 @@ export function useLaudoChartTheme(): LaudoChartTheme {
   }
 
   return {
-    tick: { fill: '#64746E', fontSize: 11 },
+    tick: { fill: '#1A2825', fontSize: 11, opacity: 0.75 },
     grid: '#E8EFEC',
     tooltip: {
       backgroundColor: '#FFFFFF',
@@ -291,4 +310,42 @@ export function useLaudoChartTheme(): LaudoChartTheme {
     },
     cursor: '#F3F4F6',
   };
+}
+
+/** Custom axis tick — Recharts sometimes ignores style objects; SVG fill is explicit. */
+export function ChartAxisTick({
+  x,
+  y,
+  payload,
+  fill,
+  fontSize = 11,
+  opacity = 0.9,
+  textAnchor = 'middle',
+  dy = 0,
+  dx = 0,
+}: Readonly<{
+  x?: number;
+  y?: number;
+  payload?: { readonly value?: string | number };
+  fill: string;
+  fontSize?: number;
+  opacity?: number;
+  textAnchor?: 'start' | 'middle' | 'end';
+  dy?: number;
+  dx?: number;
+}>) {
+  return (
+    <text
+      x={x}
+      y={y}
+      dy={dy}
+      dx={dx}
+      textAnchor={textAnchor}
+      fill={fill}
+      opacity={opacity}
+      fontSize={fontSize}
+    >
+      {payload?.value}
+    </text>
+  );
 }
