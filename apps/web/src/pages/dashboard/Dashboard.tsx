@@ -1,372 +1,608 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { format, subMonths, startOfMonth, isSameMonth } from 'date-fns';
+import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { motion } from 'framer-motion';
-import { Banknote, BarChart3, Calendar, List } from 'lucide-react';
 import { useMemo, useState } from 'react';
-
-import { AccountBalancesCard } from '@/components/dashboard/AccountBalancesCard';
-import { CreditCardExpensesCard } from '@/components/dashboard/CreditCardExpensesCard';
-import { ExpensesDistributionCard } from '@/components/dashboard/ExpensesDistributionCard';
-import { FinancialGoalsCard } from '@/components/dashboard/FinancialGoalsCard';
-import { MonthlyComparisonCard } from '@/components/dashboard/MonthlyComparisonCard';
-import { RecentTransactionsCard } from '@/components/dashboard/RecentTransactionsCard';
-import { SummaryCardsRow } from '@/components/dashboard/SummaryCardsRow';
-import { Button } from '@/components/ui/button';
-import { Modal } from '@/components/ui/Modal';
-import { PullToRefresh } from '@/components/ui/pullToRefresh';
 import {
-  useDashboardBalanceHistory,
-  useDashboardExpensesByCategory,
-  useDashboardGoalsSummary,
-  useDashboardRecentTransactions,
-} from '@/hooks/useDashboard';
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+
+import { Button } from '@/components/ui/button';
+import { PullToRefresh } from '@/components/ui/pullToRefresh';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
-import type { DashboardFilters, DashboardTimeRange } from '@/types/dashboard';
+import type { DashboardFilters } from '@/types/dashboard';
 import { formatCurrency } from '@/utils/formatters';
 
-/** KPI mosaic Dashboard — available via menu `/dashboard`. */
+import { useFinancialHealthCheckup } from './hooks/useFinancialHealthCheckup';
+import {
+  Callout,
+  Divider,
+  DocCard,
+  Grid,
+  H1,
+  H2,
+  H3,
+  Pill,
+  Stack,
+  Stat,
+  Text,
+  useLaudoChartTheme,
+} from './laudo-layout/primitives';
+import type { CapacityState } from './types';
+import { CAPACITY_STATE_LABEL } from './types';
+
+const CHART_INCOME = '#2D6B4E';
+const CHART_EXPENSE = '#8CCFB0';
+const CHART_FOLGA_POS = '#4aaf7d';
+const CHART_FOLGA_NEG = '#6b7280';
+
+/** Distinct palette for light/dark — avoids monochrome brand greens. */
+const CATEGORY_FALLBACK_COLORS = [
+  '#3B82F6', // blue
+  '#F59E0B', // amber
+  '#EF4444', // red
+  '#8B5CF6', // purple
+  '#EC4899', // pink
+  '#06B6D4', // cyan
+  '#F97316', // orange
+  '#6366F1', // indigo
+] as const;
+
+const CATEGORY_COLOR_BY_NAME: Readonly<Record<string, string>> = {
+  carro: '#6366F1',
+  transporte: '#3B82F6',
+  moradia: '#EF4444',
+  alimentacao: '#F59E0B',
+  internet: '#06B6D4',
+  saude: '#EC4899',
+  servicos: '#8B5CF6',
+  outros: '#94A3B8',
+  doacoes: '#10B981',
+  lazer: '#A855F7',
+  educacao: '#0EA5E9',
+  vestuario: '#F43F5E',
+};
+
+function normalizeCategoryKey(name: string): string {
+  return name.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim();
+}
+
+function isCssHexColor(value: string): boolean {
+  return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value);
+}
+
+function resolveCategoryColor(apiColor: string | undefined, name: string, index: number): string {
+  const semantic = CATEGORY_COLOR_BY_NAME[normalizeCategoryKey(name)];
+  if (semantic) {
+    return semantic;
+  }
+  const fromApi = apiColor?.trim() ?? '';
+  if (isCssHexColor(fromApi)) {
+    return fromApi;
+  }
+  return CATEGORY_FALLBACK_COLORS[index % CATEGORY_FALLBACK_COLORS.length];
+}
+
+function stateTone(state: CapacityState): 'neutral' | 'info' | 'warning' | 'success' | 'danger' {
+  switch (state) {
+    case 'excellent':
+    case 'good':
+      return 'success';
+    case 'attention':
+      return 'warning';
+    case 'critical':
+      return 'danger';
+    case 'inconclusive':
+      return 'info';
+    default:
+      return 'neutral';
+  }
+}
+
+type FlowPoint = { readonly label: string; readonly income: number; readonly expenses: number };
+
+function buildActivityFolga(points: readonly FlowPoint[]): Array<{ label: string; folga: number }> {
+  const withActivity = points
+    .map((row) => ({ label: row.label, folga: row.income - row.expenses }))
+    .filter((row) => row.folga !== 0);
+  if (withActivity.length > 0) {
+    return withActivity;
+  }
+  return points.map((row) => ({ label: row.label, folga: row.income - row.expenses }));
+}
+
+/** Financial Health `/dashboard` — canvas v5 document layout + live data. */
 export function Dashboard() {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
-  // Create array of last 6 months for the filter
-  const last6Months = useMemo(() => {
-    return Array.from({ length: 6 })
-      .map((_, i) => {
-        const date = subMonths(new Date(), i);
-        return startOfMonth(date);
-      })
-      .reverse();
-  }, []);
-
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [timeRange, setTimeRange] = useState<DashboardTimeRange>('month');
-  const [selectedView, setSelectedView] = useState<'overview' | 'details'>('overview');
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [showCategoriesModal, setShowCategoriesModal] = useState(false);
-  const [showGoalsModal, setShowGoalsModal] = useState(false);
-
-  const queryClient = useQueryClient();
   const { activeCompany } = useCompanyStore();
-  const companyId = activeCompany?.id || '';
-
-  // Define variants
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 },
-  };
+  const companyId = activeCompany?.id ?? '';
+  const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const filters: DashboardFilters = useMemo(
     () => ({
-      timeRange,
-      referenceDate: selectedDate.toISOString(),
+      timeRange: 'month',
+      referenceDate: new Date().toISOString(),
     }),
-    [timeRange, selectedDate],
+    [],
   );
 
-  const balanceHistoryQuery = useDashboardBalanceHistory(companyId, filters);
-  const expensesByCategoryQuery = useDashboardExpensesByCategory(companyId, filters);
-  const goalsSummaryQuery = useDashboardGoalsSummary(companyId);
-  const recentTransactionsQuery = useDashboardRecentTransactions(companyId, filters, 50);
+  const {
+    checkup,
+    isLoading,
+    isError,
+    isPartial,
+    refetch,
+    summary,
+    balanceHistory,
+    expensesByCategory,
+    indebtedness,
+  } = useFinancialHealthCheckup(companyId, filters);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-    await balanceHistoryQuery.refetch();
-    await expensesByCategoryQuery.refetch();
-    await goalsSummaryQuery.refetch();
-    await recentTransactionsQuery.refetch();
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+      queryClient.invalidateQueries({ queryKey: ['indebtedness'] }),
+      refetch(),
+    ]);
     setIsRefreshing(false);
   };
 
-  const formattedDate = format(selectedDate, "MMMM 'de' yyyy", { locale: ptBR });
+  const periodLabel = useMemo(() => {
+    const start = summary.data?.periodStart;
+    if (!start) {
+      return format(new Date(), 'MMM yyyy', { locale: ptBR });
+    }
+    return format(new Date(start), 'MMM yyyy', { locale: ptBR });
+  }, [summary.data?.periodStart]);
 
-  const expensesByCategory = expensesByCategoryQuery.data ?? [];
-  const totalExpenses = expensesByCategory.reduce((sum, cat) => sum + cat.value, 0);
+  const periodCompareData = useMemo(() => {
+    if (!summary.data) {
+      return [];
+    }
+    return [
+      { label: 'Receita', value: Math.round(summary.data.income), fill: CHART_INCOME },
+      { label: 'Despesa', value: Math.round(summary.data.expenses), fill: CHART_EXPENSE },
+    ];
+  }, [summary.data]);
 
-  const goalsSummary = goalsSummaryQuery.data ?? [];
+  const flowChartData = useMemo((): FlowPoint[] => {
+    const points = balanceHistory.data ?? [];
+    if (points.length === 0 && summary.data) {
+      return [
+        {
+          label: periodLabel,
+          income: Math.round(summary.data.income),
+          expenses: Math.round(summary.data.expenses),
+        },
+      ];
+    }
+    return points.map((point) => ({
+      label: format(new Date(point.date), 'dd/MM', { locale: ptBR }),
+      income: Math.round(point.income),
+      expenses: Math.round(point.expenses),
+    }));
+  }, [balanceHistory.data, summary.data, periodLabel]);
 
-  const detailedMovements =
-    recentTransactionsQuery.data?.map((tx) => {
-      // Backend returns values as positive numbers, so we need to apply the sign
-      // Revenue: positive, Expense: negative
-      const value = tx.launchType === 'revenue' ? Math.abs(tx.value) : -Math.abs(tx.value);
-      return {
-        date: tx.paymentDate,
-        description: tx.description,
-        value,
-        type: tx.launchType === 'revenue' ? 'INCOME' : 'EXPENSE',
-      };
-    }) ?? [];
+  const folgaChartData = useMemo(() => buildActivityFolga(flowChartData), [flowChartData]);
+
+  const categoryPie = useMemo(() => {
+    const rows = expensesByCategory.data ?? [];
+    const mapped = rows.slice(0, 8).map((row, index) => ({
+      name: row.name,
+      value: Math.round(row.value),
+      color: resolveCategoryColor(row.color, row.name, index),
+    }));
+    const total = mapped.reduce((acc, row) => acc + row.value, 0);
+    return mapped.map((row) => ({
+      ...row,
+      share: total > 0 ? Math.round((row.value / total) * 100) : 0,
+    }));
+  }, [expensesByCategory.data]);
+
+  const income = summary.data?.income ?? 0;
+  const expenses = summary.data?.expenses ?? 0;
+  const balance = summary.data?.balance ?? 0;
+  const liquidity = indebtedness.data?.liquidity.available;
+  const creditPct = indebtedness.data?.creditUtilization.percentage;
+  const chartTheme = useLaudoChartTheme();
 
   return (
     <ViewDefault>
-      {/* Modais */}
-      <Modal
-        open={showDetailsModal}
-        onClose={() => setShowDetailsModal(false)}
-        title="Saldo das Contas"
-        className="max-w-4xl"
-      >
-        <AccountBalancesCard companyId={companyId} />
-        <div className="border-t border-border dark:border-border-dark pt-4 mt-6">
-          <h3 className="text-sm font-medium text-text dark:text-text-dark mb-3">
-            Movimentações Recentes
-          </h3>
-          <div className="overflow-y-auto max-h-80 pr-2">
-            <table className="min-w-full text-sm">
-              <thead className="sticky top-0 bg-card dark:bg-card-dark">
-                <tr className="text-left text-gray-500 dark:text-gray-400">
-                  <th className="py-2 pr-4 font-medium">Data</th>
-                  <th className="py-2 pr-4 font-medium">Descrição</th>
-                  <th className="py-2 pr-4 font-medium text-right">Valor</th>
-                  <th className="py-2 font-medium">Tipo</th>
-                </tr>
-              </thead>
-              <tbody>
-                {detailedMovements.map((mov, idx) => (
-                  <tr
-                    key={`${mov.date}-${mov.description}-${idx}`}
-                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-background/50 dark:hover:bg-background-dark/50"
-                  >
-                    <td className="py-2 pr-4 text-text dark:text-text-dark">
-                      {format(new Date(mov.date), 'dd/MM/yyyy')}
-                    </td>
-                    <td className="py-2 pr-4 text-text dark:text-text-dark">{mov.description}</td>
-                    <td
-                      className={`py-2 pr-4 text-right font-medium ${mov.value >= 0 ? 'text-emerald-400' : 'text-red-400'}`}
-                    >
-                      {mov.value >= 0
-                        ? `+${formatCurrency(Math.abs(mov.value))}`
-                        : formatCurrency(mov.value)}
-                    </td>
-                    <td className="py-2 text-text dark:text-text-dark">
-                      {mov.type === 'INCOME' ? 'Receita' : 'Despesa'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </Modal>
-
-      <Modal
-        open={showCategoriesModal}
-        onClose={() => setShowCategoriesModal(false)}
-        title="Despesas por Categoria"
-      >
-        {/* ... content ... */}
-        <div className="space-y-4">
-          {expensesByCategory.map((cat) => {
-            const percentage = totalExpenses > 0 ? (cat.value / totalExpenses) * 100 : 0;
-            return (
-              <div key={cat.categoryId} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="inline-block w-3 h-3 rounded-full"
-                    style={{ background: cat.color }}
-                  />
-                  <span className="font-medium text-base text-gray-900 dark:text-gray-100">
-                    {cat.name}
-                  </span>
-                </div>
-                <div className="flex-1 mx-4">
-                  <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full">
-                    <div
-                      className="h-2 rounded-full"
-                      style={{ width: `${percentage}%`, background: cat.color }}
-                    />
-                  </div>
-                </div>
-                <span className="font-medium text-base text-gray-700 dark:text-gray-200">
-                  {formatCurrency(cat.value)}
-                </span>
-                <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
-                  {percentage.toFixed(1)}%
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </Modal>
-
       <PullToRefresh onRefresh={handleRefresh} isRefreshing={isRefreshing}>
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="space-y-4 pt-0 pb-6 px-6"
-        >
-          {/* Header with Date and Filters */}
-          <motion.div
-            variants={item}
-            className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary-100 dark:bg-primary-900/20 rounded-lg">
-                <Banknote className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Dashboard Financeiro
-                </h1>
-                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                  <Calendar className="h-4 w-4" />
-                  <span className="capitalize">{formattedDate}</span>
-                </div>
-              </div>
-            </div>
+        <div className="mx-auto w-full max-w-[1080px] p-4 pb-16 sm:p-6 lg:p-8">
+          {!companyId ? (
+            <Callout tone="neutral">
+              Selecione um contexto para montar a leitura de capacidade do sistema.
+            </Callout>
+          ) : null}
 
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <div className="bg-muted/30 p-1 rounded-full flex items-center justify-center gap-1 overflow-x-auto scrollbar-none border border-border/50">
-                {last6Months.map((date) => {
-                  const isSelected = isSameMonth(date, selectedDate) && timeRange === 'month';
-                  return (
-                    <Button
-                      key={date.toISOString()}
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedDate(date);
-                        setTimeRange('month');
-                      }}
-                      className={`
-                        relative min-h-[44px] min-w-[44px] px-3 rounded-full text-xs font-semibold
-                        transition-all duration-300 ease-in-out
-                        ${
-                          isSelected
-                            ? 'bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20 scale-100 z-10'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+          {companyId && isLoading ? (
+            <Stack gap={16}>
+              <Skeleton className="h-10 w-3/4 bg-muted/30" />
+              <Skeleton className="h-20 w-full bg-muted/20" />
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                <Skeleton className="h-20 bg-muted/20" />
+                <Skeleton className="h-20 bg-muted/20" />
+                <Skeleton className="h-20 bg-muted/20" />
+                <Skeleton className="h-20 bg-muted/20" />
+              </div>
+            </Stack>
+          ) : null}
+
+          {companyId && isError && !checkup ? (
+            <Stack gap={12}>
+              <Callout tone="warning">
+                Não foi possível carregar os sinais de capacidade neste momento.
+              </Callout>
+              <Button type="button" variant="outline" onClick={() => void handleRefresh()}>
+                Tentar novamente
+              </Button>
+            </Stack>
+          ) : null}
+
+          {checkup ? (
+            <Stack gap={32}>
+              <Stack gap={12}>
+                <Stack gap={8}>
+                  <H1>Capacidade do sistema financeiro — {periodLabel}</H1>
+                  <Text tone="secondary">
+                    Leitura sistêmica · dados ao vivo · layout do laudo executivo (canvas v5). Sem
+                    Recommendation, Planner ou parecer do dia.
+                  </Text>
+                </Stack>
+                <Callout tone="info">
+                  Esta superfície analisa a capacidade de um sistema financeiro vivo — não julga uma
+                  pessoa. Expressões de identidade permanente são evitadas; hipóteses são
+                  revisáveis.
+                </Callout>
+                <RowPills checkup={checkup} />
+                {isPartial ? (
+                  <Text size="small" tone="secondary">
+                    Lacunas declaradas (Inconclusivo) quando o sinal é proxy — sem inventar
+                    Excelente.
+                  </Text>
+                ) : null}
+              </Stack>
+
+              <Grid columns={4} gap={16}>
+                <Stat label="Receita do período" value={formatCurrency(income)} />
+                <Stat label="Despesa do período" value={formatCurrency(expenses)} tone="warning" />
+                <Stat
+                  label="Resultado"
+                  value={formatCurrency(balance)}
+                  tone={balance >= 0 ? 'success' : 'danger'}
+                />
+                <Stat
+                  label={liquidity !== undefined ? 'Caixa disponível' : 'Utilização do crédito'}
+                  value={
+                    liquidity !== undefined
+                      ? formatCurrency(liquidity)
+                      : creditPct !== undefined
+                        ? `${creditPct.toFixed(1)}%`
+                        : '—'
+                  }
+                />
+              </Grid>
+
+              <Stack gap={16}>
+                <Stack gap={4}>
+                  <H2>Leituras visuais</H2>
+                  <Text size="small" tone="secondary">
+                    Source: dados ao vivo da company · período {periodLabel}.
+                  </Text>
+                </Stack>
+                <Grid columns={2} gap={16}>
+                  <DocCard
+                    header="Receita × despesa (R$)"
+                    footer="Totais do período — leitura executiva, não diária."
+                  >
+                    <div className="h-[240px] w-full text-text dark:text-text-dark">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={periodCompareData} barCategoryGap="28%">
+                          <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+                          <XAxis
+                            dataKey="label"
+                            tick={chartTheme.tick}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <YAxis
+                            tick={chartTheme.tick}
+                            width={56}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <Tooltip
+                            contentStyle={chartTheme.tooltip}
+                            cursor={{ fill: chartTheme.cursor, opacity: 0.35 }}
+                            formatter={(value: number) => formatCurrency(value)}
+                          />
+                          <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                            {periodCompareData.map((entry) => (
+                              <Cell key={entry.label} fill={entry.fill} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </DocCard>
+                  <DocCard
+                    header="Folga do período (R$)"
+                    footer="Folga = receita − despesa nos dias com movimento."
+                  >
+                    <div className="h-[240px] w-full text-text dark:text-text-dark">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={folgaChartData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+                          <XAxis
+                            dataKey="label"
+                            tick={chartTheme.tick}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <YAxis
+                            tick={chartTheme.tick}
+                            width={56}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <Tooltip
+                            contentStyle={chartTheme.tooltip}
+                            cursor={{ fill: chartTheme.cursor, opacity: 0.35 }}
+                            formatter={(value: number) => formatCurrency(value)}
+                          />
+                          <Bar dataKey="folga" name="Folga" radius={[4, 4, 0, 0]}>
+                            {folgaChartData.map((entry) => (
+                              <Cell
+                                key={entry.label}
+                                fill={entry.folga >= 0 ? CHART_FOLGA_POS : CHART_FOLGA_NEG}
+                              />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </DocCard>
+                </Grid>
+                {categoryPie.length > 0 ? (
+                  <Grid columns={2} gap={16}>
+                    <DocCard header="Destino das despesas (topo)">
+                      <div className="h-[260px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={categoryPie}
+                              dataKey="value"
+                              nameKey="name"
+                              innerRadius={52}
+                              outerRadius={92}
+                              paddingAngle={2}
+                            >
+                              {categoryPie.map((entry) => (
+                                <Cell key={entry.name} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            <Tooltip
+                              contentStyle={chartTheme.tooltip}
+                              formatter={(value: number) => formatCurrency(value)}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </DocCard>
+                    <DocCard header="Composição (topo)" footer="Percentuais sobre o topo exibido.">
+                      <Stack gap={8}>
+                        {categoryPie.map((entry) => (
+                          <div
+                            key={entry.name}
+                            className="flex items-center justify-between gap-3 text-sm"
+                          >
+                            <div className="flex min-w-0 items-center gap-2">
+                              <span
+                                className="h-2.5 w-2.5 shrink-0 rounded-full"
+                                style={{ backgroundColor: entry.color }}
+                              />
+                              <span className="truncate text-text dark:text-text-dark">
+                                {entry.name}
+                              </span>
+                            </div>
+                            <span className="shrink-0 tabular-nums text-muted-foreground">
+                              {entry.share}% · {formatCurrency(entry.value)}
+                            </span>
+                          </div>
+                        ))}
+                      </Stack>
+                    </DocCard>
+                  </Grid>
+                ) : null}
+              </Stack>
+
+              <Divider />
+
+              <Stack gap={12}>
+                <H2>Estado atual do sistema financeiro</H2>
+                <DocCard>
+                  <Stack gap={12}>
+                    <Text>
+                      <Text as="span" weight="semibold">
+                        1. Estado sustentado pelos dados.{' '}
+                      </Text>
+                      {checkup.closingSynthesis}
+                    </Text>
+                    <Text>
+                      <Text as="span" weight="semibold">
+                        2. Principal ativo hoje.{' '}
+                      </Text>
+                      Previsibilidade e legibilidade dos sinais disponíveis — mesmo quando algum
+                      pilar permanece inconclusivo.
+                    </Text>
+                    <Text>
+                      <Text as="span" weight="semibold">
+                        3. Principal tensão hoje.{' '}
+                      </Text>
+                      {checkup.hasCriticalBase
+                        ? 'Liquidez e/ou fluxo em estado crítico orientam a leitura; demais pilares contextualizam.'
+                        : 'A tensão dominante, quando existe, aparece nos pilares em Atenção ou Crítica abaixo.'}
+                    </Text>
+                    <Text>
+                      <Text as="span" weight="semibold">
+                        4. Se nada mudar…{' '}
+                      </Text>
+                      A direção permanece a capacidade atual do sistema — sem previsão de colapso e
+                      sem decisão prescrita nesta superfície.
+                    </Text>
+                  </Stack>
+                </DocCard>
+              </Stack>
+
+              <Divider />
+
+              <Stack gap={10}>
+                <H2>Padrão de capacidade (seis pilares)</H2>
+                <Text tone="secondary">
+                  Ordem canônica: Liquidez → Fluxo → Estrutura → Crédito → Resiliência → Patrimônio.
+                </Text>
+                <RowPills checkup={checkup} />
+              </Stack>
+
+              {checkup.pillars.map((pillar) => (
+                <Stack key={pillar.id} gap={12}>
+                  <Divider />
+                  <Stack gap={8}>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <H2>{pillar.name}</H2>
+                      <Pill tone={stateTone(pillar.state)}>
+                        {CAPACITY_STATE_LABEL[pillar.state]}
+                      </Pill>
+                    </div>
+                    <Text weight="semibold">{pillar.question}</Text>
+                    <Grid columns={2} gap={12}>
+                      <Stat
+                        label={pillar.primaryLabel}
+                        value={pillar.primaryFormatted ?? '—'}
+                        tone={
+                          pillar.state === 'critical'
+                            ? 'danger'
+                            : pillar.state === 'attention'
+                              ? 'warning'
+                              : pillar.state === 'excellent' || pillar.state === 'good'
+                                ? 'success'
+                                : 'default'
                         }
-                      `}
-                    >
-                      {format(date, 'MMM', { locale: ptBR }).toUpperCase()}
-                      {isSelected && (
-                        <motion.div
-                          layoutId="activeMonth"
-                          className="absolute inset-0 bg-white/10 rounded-full"
-                          initial={false}
-                          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                        />
-                      )}
-                    </Button>
-                  );
-                })}
-              </div>
+                      />
+                      <DocCard>
+                        <Stack gap={8}>
+                          <H3>Interpretação</H3>
+                          <Text>{pillar.interpretation}</Text>
+                          {pillar.hasGap ? (
+                            <Callout tone="warning">
+                              Lacuna declarada: leitura parcial ou proxy — sem inventar certeza.
+                            </Callout>
+                          ) : null}
+                        </Stack>
+                      </DocCard>
+                    </Grid>
+                    <Grid columns={2} gap={12}>
+                      <DocCard header="O que faz melhorar">
+                        <Stack gap={8}>
+                          {pillar.influencers.improves.map((item) => (
+                            <Text key={item}>· {item}</Text>
+                          ))}
+                        </Stack>
+                      </DocCard>
+                      <DocCard header="O que faz piorar">
+                        <Stack gap={8}>
+                          {pillar.influencers.worsens.map((item) => (
+                            <Text key={item}>· {item}</Text>
+                          ))}
+                        </Stack>
+                      </DocCard>
+                    </Grid>
+                    <Text size="small" tone="secondary">
+                      Conexões: {pillar.connections.join(' · ')}
+                    </Text>
+                    <Text weight="semibold">{pillar.summarySentence}</Text>
+                    {pillar.exploreHint ? (
+                      <Text size="small" tone="secondary">
+                        Explorar: {pillar.exploreHint}
+                      </Text>
+                    ) : null}
+                  </Stack>
+                </Stack>
+              ))}
 
-              <div className="flex gap-2">
-                <Button
-                  variant={selectedView === 'overview' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedView('overview')}
-                  className="flex items-center gap-2"
-                >
-                  <BarChart3 className="h-4 w-4" />
-                  <span className="hidden sm:inline">Visão Geral</span>
-                </Button>
-                <Button
-                  variant={selectedView === 'details' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedView('details')}
-                  className="flex items-center gap-2"
-                >
-                  <List className="h-4 w-4" />
-                  <span className="hidden sm:inline">Detalhes</span>
-                </Button>
-              </div>
-            </div>
-          </motion.div>
+              <Divider />
 
-          {/* Financial Summary Cards */}
-          <motion.div variants={item}>
-            <SummaryCardsRow companyId={companyId} filters={filters} />
-          </motion.div>
+              <Stack gap={10}>
+                <H2>Hipótese de capacidade</H2>
+                <Callout tone="warning">{checkup.closingSynthesis}</Callout>
+                <Text>
+                  A hipótese amarra os pilares observados sem recomendar gesto do dia. Capacidade ≠
+                  parecer da Home.
+                </Text>
+              </Stack>
 
-          {selectedView === 'overview' ? (
-            /* Overview - Charts and Additional Info */
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-fr">
-              {/* Row 1 */}
-              <motion.div variants={item} className="h-full">
-                <AccountBalancesCard companyId={companyId} />
-              </motion.div>
-              <motion.div variants={item} className="h-full">
-                <ExpensesDistributionCard
-                  companyId={companyId}
-                  filters={filters}
-                  onOpenCategories={() => setShowCategoriesModal(true)}
-                />
-              </motion.div>
+              <Divider />
 
-              {/* Row 2 */}
-              <motion.div variants={item} className="h-full">
-                <MonthlyComparisonCard companyId={companyId} filters={filters} />
-              </motion.div>
-              <motion.div variants={item} className="h-full">
-                <CreditCardExpensesCard companyId={companyId} filters={filters} />
-              </motion.div>
+              <Stack gap={10}>
+                <H2>Resumo executivo do sistema</H2>
+                <DocCard>
+                  <Stack gap={8}>
+                    {checkup.pillars.map((pillar) => (
+                      <Text key={pillar.id}>
+                        <Text as="span" weight="semibold">
+                          {pillar.name}:{' '}
+                        </Text>
+                        {CAPACITY_STATE_LABEL[pillar.state]}
+                        {pillar.primaryFormatted ? ` · ${pillar.primaryFormatted}` : ''}
+                      </Text>
+                    ))}
+                    <Text weight="semibold">{checkup.surfaceQuestion}</Text>
+                  </Stack>
+                </DocCard>
+              </Stack>
 
-              {/* Row 3 - Full width */}
-              <motion.div variants={item} className="md:col-span-2">
-                <FinancialGoalsCard
-                  companyId={companyId}
-                  onViewAll={() => setShowGoalsModal(true)}
-                />
-              </motion.div>
-            </div>
-          ) : (
-            /* Details - Transaction List */
-            <motion.div variants={item}>
-              <RecentTransactionsCard
-                companyId={companyId}
-                filters={filters}
-                limit={10}
-                onViewAll={() => {}}
-              />
-            </motion.div>
-          )}
-        </motion.div>
-      </PullToRefresh>
+              <Divider />
 
-      <Modal
-        open={showGoalsModal}
-        onClose={() => setShowGoalsModal(false)}
-        title="Metas Financeiras"
-      >
-        <div className="space-y-6">
-          {goalsSummary.map((goal) => (
-            <div key={goal.id} className="mb-2">
-              <div className="flex items-center justify-between mb-1">
-                <span className="font-medium text-purple-600 dark:text-purple-400">
-                  {goal.name}
-                </span>
-                <span className="text-sm text-gray-500">
-                  {formatCurrency(goal.currentAmount)} de {formatCurrency(goal.targetAmount)}
-                </span>
-              </div>
-              <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full">
-                <div
-                  className="h-2 bg-purple-500 rounded-full transition-all duration-500"
-                  style={{
-                    width: `${Math.min((goal.currentAmount / goal.targetAmount) * 100, 100)}%`,
-                  }}
-                />
-              </div>
-            </div>
-          ))}
+              <Stack gap={10}>
+                <H2>Pergunta estratégica</H2>
+                <Callout tone="info">{checkup.surfaceQuestion}</Callout>
+                <Text size="small" tone="secondary">
+                  Pergunta para orientar a leitura de capacidade — sem resposta prescrita; revisável
+                  quando o sistema mudar. Sem Recommendation · sem Planner · sem substituir a Home.
+                </Text>
+              </Stack>
+            </Stack>
+          ) : null}
         </div>
-      </Modal>
+      </PullToRefresh>
     </ViewDefault>
+  );
+}
+
+function RowPills({
+  checkup,
+}: {
+  readonly checkup: NonNullable<ReturnType<typeof useFinancialHealthCheckup>['checkup']>;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {checkup.pillars.map((pillar) => (
+        <Pill key={pillar.id} tone={stateTone(pillar.state)}>
+          {pillar.name}: {CAPACITY_STATE_LABEL[pillar.state]}
+        </Pill>
+      ))}
+    </div>
   );
 }
