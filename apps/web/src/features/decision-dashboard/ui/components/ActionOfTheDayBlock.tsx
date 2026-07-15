@@ -21,7 +21,7 @@ export function ActionOfTheDayBlock({
   return (
     <section
       aria-label="Action of the day"
-      className="space-y-4 rounded-xl border border-border/70 bg-muted/20 px-3.5 py-4 dark:border-border-dark/70 dark:bg-muted/10 sm:px-4 sm:py-5"
+      className="space-y-3 rounded-xl border border-border/70 bg-muted/20 px-3.5 py-3.5 dark:border-border-dark/70 dark:bg-muted/10 sm:px-4"
     >
       <div className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">

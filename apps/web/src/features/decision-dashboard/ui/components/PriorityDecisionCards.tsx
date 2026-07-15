@@ -26,14 +26,14 @@ export function PriorityDecisionCards({ cards }: PriorityDecisionCardsProps) {
 
   if (isFactReadout(cards)) {
     return (
-      <section aria-label="Conclusion evidence" className="space-y-3">
+      <section aria-label="Conclusion evidence" className="space-y-2">
         <p className="text-sm text-muted-foreground">Por quê</p>
         <p className="sr-only">Chegamos a essa conclusão porque…</p>
         <ul className="overflow-hidden rounded-xl border border-border/70 divide-y divide-border/60 dark:border-border-dark/70 dark:divide-border-dark/60">
           {cards.map((card) => (
             <li
               key={card.code}
-              className="flex flex-col gap-0.5 px-3.5 py-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4"
+              className="flex flex-col gap-0.5 px-3.5 py-2.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4"
             >
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 {card.title}

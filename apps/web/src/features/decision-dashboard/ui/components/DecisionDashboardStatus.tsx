@@ -24,7 +24,7 @@ export function DecisionDashboardStatus({
       : [humanizeStatusAnswer(status)];
 
   return (
-    <section aria-label="Decision status" className="space-y-4" data-state={dataState}>
+    <section aria-label="Decision status" className="space-y-3" data-state={dataState}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1 min-w-0">
           <p className="text-base font-semibold text-primary-600 dark:text-primary-400 tracking-tight">
@@ -37,10 +37,10 @@ export function DecisionDashboardStatus({
         <p className="shrink-0 text-xs font-medium text-muted-foreground tabular-nums">Hoje</p>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         <p className="text-sm text-muted-foreground leading-relaxed">{question}</p>
 
-        <ul className="space-y-2.5">
+        <ul className="space-y-2">
           {lines.map((line, index) => {
             const separator = line.indexOf(':');
             const hasLabel = separator > 0 && separator < 24;

@@ -27,9 +27,9 @@ function GuidancePanel({
       : 'bg-amber-500/80 dark:bg-amber-400/80';
 
   return (
-    <div className={`rounded-xl border px-3.5 py-3.5 space-y-2.5 ${toneClass}`}>
+    <div className={`rounded-xl border px-3.5 py-3 space-y-2 ${toneClass}`}>
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-1.5">
         {items.map((item) => (
           <li key={item} className="flex gap-2.5 items-start">
             <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${dotClass}`} aria-hidden />

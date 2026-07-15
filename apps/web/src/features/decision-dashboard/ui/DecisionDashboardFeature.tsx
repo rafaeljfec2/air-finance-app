@@ -99,7 +99,7 @@ export function DecisionDashboardFeature() {
 
   return (
     <BriefingShell>
-      <div className="space-y-6 p-4 sm:space-y-7 sm:p-5 md:p-6">
+      <div className="space-y-4 p-4 sm:space-y-5 sm:p-5">
         <DecisionDashboardStatus
           question={viewModel.question}
           status={viewModel.status}
