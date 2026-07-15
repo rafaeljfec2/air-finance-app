@@ -19,7 +19,7 @@ describe('missionCopy helpers', () => {
     expect(cta).toBe('Quero priorizar isso');
     expect(cta).not.toBe(title);
     expect(buildCompanionCtaLabel('Ganhar folga no que ainda dá para mexer')).toBe(
-      'Quero melhorar isso',
+      'Quero cuidar disso',
     );
   });
 });

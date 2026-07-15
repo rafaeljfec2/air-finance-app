@@ -5,7 +5,7 @@ import { humanizeStatusAnswer } from './humanizeStatusAnswer';
 describe('humanizeStatusAnswer', () => {
   it('softens system-like risk language', () => {
     expect(humanizeStatusAnswer('O ciclo está em risco.')).toBe(
-      'Hoje o mês pede um pouco mais de atenção.',
+      'Hoje o mês pede um pouco mais de atenção — e dá para cuidar disso.',
     );
   });
 

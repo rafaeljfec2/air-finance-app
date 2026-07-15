@@ -43,13 +43,23 @@ export function buildCompanionCtaLabel(actionLabel: string): string {
     return 'Quero proteger meu mês';
   }
   if (normalized.includes('folga') || normalized.includes('mexer')) {
-    return 'Quero melhorar isso';
+    return 'Quero cuidar disso';
+  }
+  if (
+    normalized.includes('congel') ||
+    normalized.includes('segurar') ||
+    normalized.includes('evitar') ||
+    normalized.includes('parar') ||
+    normalized.includes('cartão') ||
+    normalized.includes('cartao')
+  ) {
+    return 'Vou seguir esse passo';
   }
   if (normalized.includes('revis') || normalized.includes('review')) {
     return 'Começar agora';
   }
 
-  return 'Quero melhorar isso';
+  return 'Quero cuidar disso';
 }
 
 /** @deprecated Prefer toMissionSupportLine */

@@ -9,7 +9,11 @@ export function humanizeStatusAnswer(status: string): string {
   }
 
   let soft = trimmed
-    .replace(/\bO ciclo está em risco\.?/gi, 'Hoje o mês pede um pouco mais de atenção.')
+    .replace(
+      /\bO ciclo está em risco\.?/gi,
+      'Hoje o mês pede um pouco mais de atenção — e dá para cuidar disso.',
+    )
+    .replace(/\bem risco\.?/gi, 'pede um pouco mais de atenção.')
     .replace(
       /\bCom os dados atuais, o ciclo parece sob controle\.?/gi,
       'Com o que vemos hoje, o mês parece mais estável.',

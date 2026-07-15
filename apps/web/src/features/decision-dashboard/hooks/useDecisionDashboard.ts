@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useMemo, useState } from 'react';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import {
   useDashboardExpensesByCategory,
   useDashboardRecentTransactions,
@@ -15,6 +16,7 @@ import type { DashboardFilters } from '@/types/dashboard';
 
 import { resolveDecisionDashboard } from '../domain/resolveDecisionDashboard';
 import { resolveFesStub } from '../domain/resolveFesStub';
+import { deriveBriefingFacts } from '../mappers/deriveBriefingFacts';
 import { deriveCreditPressure } from '../mappers/deriveCreditPressure';
 import { mapApiToDecisionSignals } from '../mappers/mapApiToDecisionSignals';
 import {
@@ -51,6 +53,7 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
   const companyId = activeCompany?.id ?? '';
   const fes = resolveFesStub();
   const [showSecondaryExpanded, setShowSecondaryExpanded] = useState(false);
+  const { accounts, isLoading: accountsLoading } = useAccounts();
 
   const dashboardFilters: DashboardFilters = { timeRange: 'month' };
   const budgetFilters = currentBudgetFilters();
@@ -71,7 +74,7 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
   const surfaceState = resolveDashboardSurfaceState({
     companyId,
     summaryLoading: summaryQuery.isLoading,
-    budgetLoading: budgetQuery.isLoading,
+    budgetLoading: budgetQuery.isLoading || accountsLoading,
     recentTxLoading: recentTxQuery.isLoading,
     expensesLoading: expensesQuery.isLoading,
     indebtednessLoading: indebtednessQuery.isLoading,
@@ -98,6 +101,13 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
 
     const topExpense = [...(expensesQuery.data ?? [])].sort((a, b) => b.value - a.value)[0];
 
+    const briefingFacts = deriveBriefingFacts({
+      accounts: accounts ?? [],
+      receivables: budgetQuery.data?.receivables ?? [],
+      creditCards: budgetQuery.data?.creditCards ?? [],
+      cashFlow: budgetQuery.data?.cashFlow,
+    });
+
     const signals = mapApiToDecisionSignals({
       summary: {
         income: summaryQuery.data.income,
@@ -111,6 +121,7 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
       isFirstAccess: fes.isFirstAccess,
       readyForNext: fes.readyForNext,
       topExpenseLabel: topExpense?.name,
+      briefingFacts,
       engine: engineQuery.data
         ? {
             primary_issue: engineQuery.data.primary_issue,
@@ -134,6 +145,7 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
     expensesQuery.data,
     engineQuery.data,
     indebtednessQuery.data,
+    accounts,
     fes.archetype,
     fes.isFirstAccess,
     fes.readyForNext,

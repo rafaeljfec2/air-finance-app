@@ -20,6 +20,8 @@ export interface ActionOfTheDay {
   readonly archetype: FinancialArchetype;
   readonly urgency: ActionUrgency;
   readonly completion_hint?: string;
+  /** Button label when it must not mirror the decision title. */
+  readonly cta_label?: string;
 }
 
 export interface DecisionCard {
@@ -48,14 +50,35 @@ export interface DashboardPayload {
   readonly data_state: DashboardDataState;
   readonly question: string;
   readonly status: string;
+  /** Optional scannable conclusion beats (Phase-1 credit-as-cash). */
+  readonly status_lines?: readonly string[];
   readonly action_of_the_day: ActionOfTheDay;
   readonly priority_cards: readonly DecisionCard[];
   readonly insight?: DecisionInsight;
+  /** Phase-1: capacity to protect (plain language). */
+  readonly preserve?: readonly string[];
+  /** Phase-1: capacity-reducing behaviors to avoid (plain language). */
+  readonly avoid?: readonly string[];
   readonly evolution_banner?: never;
   readonly ai_block?: never;
   readonly secondary_available: boolean;
   readonly next_journey_stage: NextJourneyStage;
   readonly secondary_cards?: readonly DecisionCard[];
+}
+
+export interface DecisionBriefingFactsSignal {
+  readonly operationalCash: number;
+  readonly projectedMonthBalance?: number;
+  readonly anchorReceivable?: {
+    readonly label: string;
+    readonly amount: number;
+    readonly dueDay: number;
+    readonly dueMonthShort: string;
+    readonly dueDateShort: string;
+  };
+  readonly operatingCardName?: string;
+  readonly operatingCardBillTotal?: number;
+  readonly idleCardName?: string;
 }
 
 export interface DecisionDashboardSignals {
@@ -73,6 +96,7 @@ export interface DecisionDashboardSignals {
   readonly engineOrderingRationale?: string;
   readonly topExpenseLabel?: string;
   readonly readyForNext: boolean;
+  readonly briefingFacts?: DecisionBriefingFactsSignal;
 }
 
 export interface ResolveDecisionDashboardInput {

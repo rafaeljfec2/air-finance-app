@@ -8,7 +8,7 @@ import { ViewDefault } from '@/layouts/ViewDefault';
 export function HomePage() {
   return (
     <ViewDefault>
-      <div className="mx-auto w-full max-w-3xl px-1 py-2 sm:px-2 sm:py-4 md:py-6">
+      <div className="container mx-auto w-full max-w-3xl px-2 pb-6 pt-0 sm:px-6">
         <DecisionDashboardFeature />
       </div>
     </ViewDefault>

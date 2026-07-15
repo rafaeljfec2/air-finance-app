@@ -59,6 +59,46 @@ describe('resolveDecisionDashboard', () => {
     expect(payload.evolution_banner).toBeUndefined();
   });
 
+  it('answers credit-as-cash with FRM briefing, not generic engine folga', () => {
+    const payload = resolveDecisionDashboard(
+      buildInput({
+        signals: {
+          ...sufficientSurvivorSignals(),
+          balance: 40,
+          enginePrimaryIssue: 'high_fixed_cost',
+          engineActionTitle: 'Ganhar folga no que ainda dá para mexer',
+          engineActionDescription: 'Cut discretionary fixed costs',
+          engineOrderingRationale: 'fixed_vs_variable_split',
+          briefingFacts: {
+            operationalCash: 44,
+            projectedMonthBalance: 3832,
+            anchorReceivable: {
+              label: 'OUTSERA',
+              amount: 21751.2,
+              dueDay: 20,
+              dueMonthShort: 'jul',
+              dueDateShort: '20/07',
+            },
+            operatingCardName: 'ultraviolet-black MASTERCARD',
+            operatingCardBillTotal: 11066,
+            idleCardName: 'Signature',
+          },
+        },
+      }),
+    );
+
+    expect(payload.status_lines?.[2]).toMatch(/não use o cartão/i);
+    expect(payload.status).not.toMatch(/travessia/i);
+    expect(payload.action_of_the_day.label).toMatch(/Ultraviolet nem o Signature/i);
+    expect(payload.action_of_the_day.label).not.toMatch(/folga/i);
+    expect(payload.action_of_the_day.cta_label).toMatch(/segurar os dois cartões/i);
+    expect(payload.preserve?.join(' ')).toMatch(/conta|combinado/i);
+    expect(payload.avoid?.join(' ')).toMatch(/cartão|Signature|limite/i);
+    expect(payload.insight).toBeUndefined();
+    expect(payload.priority_cards.some((c) => c.title === 'Na conta hoje')).toBe(true);
+    expect(payload.priority_cards.some((c) => /R\$\s*44,00/.test(c.summary))).toBe(true);
+  });
+
   it('never includes goals, health, or reports cards for survivor', () => {
     const payload = resolveDecisionDashboard(buildInput());
     const codes = [

@@ -17,15 +17,20 @@ export function resolveDecisionDashboard(input: ResolveDecisionDashboardInput): 
   const allowInsight =
     dataState === 'sufficient' || dataState === 'advanced' || dataState === 'sparse';
   const insight = allowInsight ? pkg.buildInsight(signals) : undefined;
+  const preserve = pkg.buildPreserve?.(signals);
+  const avoid = pkg.buildAvoid?.(signals);
 
   return {
     archetype,
     data_state: dataState,
     question: pkg.question,
     status: pkg.buildStatus(signals),
+    status_lines: pkg.buildStatusLines?.(signals),
     action_of_the_day: action,
     priority_cards: priorityCards,
     insight,
+    preserve,
+    avoid,
     secondary_available: secondaryCards.length > 0,
     secondary_cards: secondaryCards,
     next_journey_stage: nextJourneyStage,

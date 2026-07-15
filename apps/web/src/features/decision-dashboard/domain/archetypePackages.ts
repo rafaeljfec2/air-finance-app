@@ -6,15 +6,20 @@ import type {
   FinancialArchetype,
 } from '@/types/decisionDashboard';
 
+import { buildCreditAsCashBriefing } from './buildCreditAsCashBriefing';
+
 interface ArchetypePackage {
   readonly question: string;
   readonly buildStatus: (signals: DecisionDashboardSignals) => string;
+  readonly buildStatusLines?: (signals: DecisionDashboardSignals) => readonly string[] | undefined;
   readonly buildPriorityCards: (
     signals: DecisionDashboardSignals,
     actionId: string,
   ) => DecisionCard[];
   readonly buildSecondaryCards: (signals: DecisionDashboardSignals) => DecisionCard[];
   readonly buildInsight: (signals: DecisionDashboardSignals) => DecisionInsight | undefined;
+  readonly buildPreserve?: (signals: DecisionDashboardSignals) => readonly string[] | undefined;
+  readonly buildAvoid?: (signals: DecisionDashboardSignals) => readonly string[] | undefined;
   readonly buildAction: (signals: DecisionDashboardSignals) => ActionOfTheDay;
   readonly buildCaptureAction: () => ActionOfTheDay;
 }
@@ -48,11 +53,19 @@ function hasCashflowEvidence(signals: DecisionDashboardSignals): boolean {
   return signals.income > 0 || signals.expenses > 0;
 }
 
+/** Credit used as operating cash — FRM Patterns → Diagnosis path for Survivors. */
+function isCreditAsOperatingCash(signals: DecisionDashboardSignals): boolean {
+  return signals.hasCreditPressure && (signals.hasPayables || signals.hasReceivables);
+}
+
 const SURVIVOR_PACKAGE: ArchetypePackage = {
   question: 'Vou conseguir fechar este mês?',
   buildStatus: (signals) => {
     if (!signals.hasPayables && !signals.hasReceivables) {
       return 'Ainda não há dados suficientes para responder se o ciclo fecha.';
+    }
+    if (isCreditAsOperatingCash(signals)) {
+      return buildCreditAsCashBriefing(signals.briefingFacts).status;
     }
     if (signals.enginePrimaryIssue === 'liquidity_risk' || signals.balance < 0) {
       return 'O ciclo está em risco — há pressão de saídas sobre a capacidade atual.';
@@ -66,7 +79,20 @@ const SURVIVOR_PACKAGE: ArchetypePackage = {
     }
     return 'A leitura do ciclo ainda é parcial — o essencial já aponta o próximo gesto.';
   },
+  buildStatusLines: (signals) => {
+    if (!isCreditAsOperatingCash(signals)) {
+      return undefined;
+    }
+    return buildCreditAsCashBriefing(signals.briefingFacts).statusLines;
+  },
   buildPriorityCards: (signals, actionId) => {
+    if (isCreditAsOperatingCash(signals)) {
+      const briefing = buildCreditAsCashBriefing(signals.briefingFacts);
+      return briefing.evidence.map((fact, index) =>
+        card(`S-evidence-${index + 1}`, fact.label, fact.value, actionId),
+      );
+    }
+
     const cards: DecisionCard[] = [
       card(
         'S2',
@@ -107,6 +133,9 @@ const SURVIVOR_PACKAGE: ArchetypePackage = {
     ),
   ],
   buildInsight: (signals) => {
+    if (isCreditAsOperatingCash(signals)) {
+      return undefined;
+    }
     if (signals.engineOrderingRationale) {
       return { id: 'survivor-insight', message: signals.engineOrderingRationale };
     }
@@ -117,31 +146,54 @@ const SURVIVOR_PACKAGE: ArchetypePackage = {
     ) {
       return {
         id: 'survivor-insight',
-        message:
-          'O ciclo parece sob controle — o foco agora é um gesto que preserve essa estabilidade.',
+        message: 'O mês parece sob controle — o gesto de hoje é o que mais protege essa folga.',
       };
     }
     if (!hasCashflowEvidence(signals) && (signals.hasPayables || signals.hasReceivables)) {
       return {
         id: 'survivor-insight',
-        message:
-          'Há compromissos no ciclo, mas ainda falta evidência de entradas e saídas para confirmar o fechamento.',
+        message: 'Há contas no mês, mas ainda falta ver entradas e saídas para saber se fecha.',
       };
     }
     return {
       id: 'survivor-insight',
-      message: 'Há risco de apertar o ciclo — o gesto de hoje é o que mais protege o fechamento.',
+      message: 'Há risco de apertar o mês — o gesto de hoje é o que mais protege o fechamento.',
     };
   },
-  buildAction: (signals) => ({
-    id: 'survivor-action',
-    label: signals.engineActionTitle ?? 'Proteger o ciclo com um único gesto hoje',
-    rationale:
-      signals.engineActionDescription ??
-      'Concentre energia no que mais reduz o risco de não fechar o mês.',
-    archetype: 'survivor',
-    urgency: 'today',
-  }),
+  buildPreserve: (signals) => {
+    if (!isCreditAsOperatingCash(signals)) {
+      return undefined;
+    }
+    return buildCreditAsCashBriefing(signals.briefingFacts).preserve;
+  },
+  buildAvoid: (signals) => {
+    if (!isCreditAsOperatingCash(signals)) {
+      return undefined;
+    }
+    return buildCreditAsCashBriefing(signals.briefingFacts).avoid;
+  },
+  buildAction: (signals) => {
+    if (isCreditAsOperatingCash(signals)) {
+      const briefing = buildCreditAsCashBriefing(signals.briefingFacts);
+      return {
+        id: 'survivor-hold-credit',
+        label: briefing.decision,
+        rationale: '',
+        cta_label: briefing.ctaLabel,
+        archetype: 'survivor',
+        urgency: 'today',
+      };
+    }
+
+    return {
+      id: 'survivor-action',
+      label: signals.engineActionTitle ?? 'Proteger o mês com um único gesto hoje',
+      rationale:
+        signals.engineActionDescription ?? 'Foque no que mais reduz o risco de o mês apertar.',
+      archetype: 'survivor',
+      urgency: 'today',
+    };
+  },
   buildCaptureAction: () =>
     captureAction(
       'survivor',

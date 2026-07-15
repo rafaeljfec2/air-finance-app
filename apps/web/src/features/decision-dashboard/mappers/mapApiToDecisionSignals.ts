@@ -1,4 +1,7 @@
-import type { DecisionDashboardSignals } from '@/types/decisionDashboard';
+import type {
+  DecisionBriefingFactsSignal,
+  DecisionDashboardSignals,
+} from '@/types/decisionDashboard';
 
 export interface DecisionDashboardApiSnapshot {
   readonly summary: {
@@ -13,6 +16,7 @@ export interface DecisionDashboardApiSnapshot {
   readonly isFirstAccess: boolean;
   readonly readyForNext: boolean;
   readonly topExpenseLabel?: string;
+  readonly briefingFacts?: DecisionBriefingFactsSignal;
   readonly engine?: {
     readonly primary_issue?: string;
     readonly ordering_rationale?: string;
@@ -43,5 +47,6 @@ export function mapApiToDecisionSignals(
     engineOrderingRationale: snapshot.engine?.ordering_rationale,
     topExpenseLabel: snapshot.topExpenseLabel,
     readyForNext: snapshot.readyForNext,
+    briefingFacts: snapshot.briefingFacts,
   };
 }

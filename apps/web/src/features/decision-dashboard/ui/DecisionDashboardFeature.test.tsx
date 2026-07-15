@@ -93,12 +93,14 @@ describe('DecisionDashboardFeature', () => {
     render(<DecisionDashboardFeature />);
 
     expect(screen.getByText(/Rafael/)).toBeInTheDocument();
+    expect(screen.getByText(/Olhamos com calma/i)).toBeInTheDocument();
     expect(screen.getByText(/^Por quê$/i)).toBeInTheDocument();
     expect(screen.getByText(/Chegamos a essa conclusão porque/i)).toBeInTheDocument();
     expect(screen.getByText(/Parecer de hoje/i)).toBeInTheDocument();
     expect(screen.getByText(/Se eu estivesse no seu lugar/i)).toBeInTheDocument();
-    expect(screen.getByText(/O que muda se você fizer isso/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Quero priorizar isso/i })).toBeInTheDocument();
+    expect(screen.getByText(/^O que muda$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText("Today's commitment")).toHaveTextContent(/Quero priorizar isso/i);
+    expect(screen.queryByRole('button', { name: /Quero priorizar isso/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/Em volta disso/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/O que percebemos/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/FP-1/i)).not.toBeInTheDocument();
@@ -140,8 +142,59 @@ describe('DecisionDashboardFeature', () => {
     expect(
       screen.getByRole('heading', { name: 'Registrar o mínimo do ciclo' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Começar o registro' })).toBeInTheDocument();
+    expect(screen.getByLabelText("Today's commitment")).toHaveTextContent('Começar o registro');
+    expect(screen.queryByRole('button', { name: 'Começar o registro' })).not.toBeInTheDocument();
     expect(screen.getByLabelText('Recommendation benefit')).toBeInTheDocument();
+  });
+
+  it('renders preserve, avoid, and custom CTA for hold-credit decision', () => {
+    mockedHook.mockReturnValue({
+      ...baseReady,
+      viewModel: {
+        question: 'Vou conseguir fechar este mês?',
+        status: 'Hoje na conta tem cerca de R$ 44. No planejamento, o mês pode fechar positivo.',
+        dataState: 'sufficient',
+        action: {
+          id: 'survivor-hold-credit',
+          label: 'Não use o Ultraviolet nem o Signature até a OUTSERA de 20/07.',
+          rationale: '',
+          ctaLabel: 'Vou segurar os dois cartões até o dia 20',
+        },
+        priorityCards: [
+          { code: 'S1', title: 'Caixa', summary: 'Dinheiro na conta hoje: cerca de R$ 44' },
+        ],
+        secondaryCards: [],
+        preserveLines: [
+          'O dinheiro que ainda resta na conta até a próxima entrada chegar',
+          'Sua folga para pagar o que já está combinado, sem precisar abrir mais dívida',
+        ],
+        avoidLines: [
+          'Usar o cartão como se fosse o salário do mês',
+          'Abrir o Signature ou qualquer limite novo antes da OUTSERA chegar',
+        ],
+        showSecondary: false,
+        showNextJourneyStage: false,
+        nextJourneyStageLabel: 'Enxergar',
+        nextJourneyStageSummary: 'Clarity',
+        nextJourneyStageReason: 'Because clarity follows',
+        showAiBlock: false,
+        showEvolutionBanner: false,
+      },
+    });
+
+    render(<DecisionDashboardFeature />);
+
+    expect(screen.getByText(/Decisão de hoje/i)).toBeInTheDocument();
+    expect(screen.getByText(/^O que proteger$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^O que evitar$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText("Today's commitment")).toHaveTextContent(
+      /Vou segurar os dois cartões até o dia 20/i,
+    );
+    expect(
+      screen.queryByRole('button', { name: /Vou segurar os dois cartões até o dia 20/i }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Recommendation benefit')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Gerar Caixa/i)).not.toBeInTheDocument();
   });
 
   it('shows awaiting company idle state instead of error', () => {

@@ -7,7 +7,7 @@ interface DecisionInsightBlockProps {
 }
 
 /**
- * Benefit moment — sits inside the recommendation surface.
+ * Benefit moment — calm consequence, never alarm.
  */
 export function DecisionInsightBlock({ message, rationale }: DecisionInsightBlockProps) {
   const fromInsight = message ? humanizeInsightCopy(message) : '';
@@ -17,15 +17,15 @@ export function DecisionInsightBlock({ message, rationale }: DecisionInsightBloc
       ? fromInsight
       : fromRationale.length > 0
         ? fromRationale
-        : 'Isso melhora sua margem de tranquilidade para o que vem a seguir.';
+        : 'Isso abre um pouco mais de espaço e clareza para o que vem a seguir.';
 
   return (
     <div
       aria-label="Recommendation benefit"
-      className="space-y-1 border-t border-primary-200/40 pt-3 dark:border-primary-700/30"
+      className="space-y-1.5 border-t border-border/60 pt-4 dark:border-border-dark/60"
     >
-      <p className="text-xs font-medium text-muted-foreground">O que muda se você fizer isso</p>
-      <p className="text-sm text-text dark:text-text-dark leading-snug">{benefit}</p>
+      <p className="text-xs font-medium tracking-wide text-muted-foreground">O que muda</p>
+      <p className="text-sm text-text/90 dark:text-text-dark/90 leading-relaxed">{benefit}</p>
     </div>
   );
 }

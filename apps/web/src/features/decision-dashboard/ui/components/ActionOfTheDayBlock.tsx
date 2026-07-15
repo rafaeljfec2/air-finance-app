@@ -1,37 +1,47 @@
 import type { ReactNode } from 'react';
 
-import { Button } from '@/components/ui/button';
-
 import { buildCompanionCtaLabel } from '../helpers/missionCopy';
 
 interface ActionOfTheDayBlockProps {
   readonly label: string;
   readonly rationale: string;
+  readonly ctaLabel?: string;
   readonly benefitSlot?: ReactNode;
+  readonly inactionSlot?: ReactNode;
 }
 
-export function ActionOfTheDayBlock({ label, benefitSlot }: ActionOfTheDayBlockProps) {
-  const ctaLabel = buildCompanionCtaLabel(label);
+export function ActionOfTheDayBlock({
+  label,
+  ctaLabel,
+  benefitSlot,
+  inactionSlot,
+}: ActionOfTheDayBlockProps) {
+  const commitment = ctaLabel ?? buildCompanionCtaLabel(label);
 
   return (
     <section
       aria-label="Action of the day"
-      className="space-y-3 rounded-xl border border-primary-200/50 bg-primary-50/60 px-4 py-4 dark:border-primary-700/40 dark:bg-primary-900/20 sm:px-5 sm:py-5"
+      className="space-y-4 rounded-xl border border-border/70 bg-muted/20 px-3.5 py-4 dark:border-border-dark/70 dark:bg-muted/10 sm:px-4 sm:py-5"
     >
-      <p className="text-sm text-primary-700 dark:text-primary-300">
-        Se eu estivesse no seu lugar, começaria por aqui:
-      </p>
-      <h2 className="text-lg sm:text-xl font-semibold text-text dark:text-text-dark leading-snug tracking-tight">
-        {label}
-      </h2>
-      <Button
-        type="button"
-        size="md"
-        className="min-h-11 px-5 shadow-sm bg-primary-500 hover:bg-primary-600 text-white dark:bg-primary-500 dark:hover:bg-primary-400"
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Decisão de hoje
+        </p>
+        <p className="text-xs text-muted-foreground leading-snug">
+          Se eu estivesse no seu lugar, começaria por aqui — um passo de cada vez:
+        </p>
+        <h2 className="text-lg sm:text-xl font-semibold text-text dark:text-text-dark leading-snug tracking-tight text-balance">
+          {label}
+        </h2>
+      </div>
+      <p
+        aria-label="Today's commitment"
+        className="rounded-xl border border-primary-500/25 bg-primary-500/10 px-4 py-3 text-sm font-medium text-primary-700 dark:border-primary-400/30 dark:bg-primary-500/15 dark:text-primary-300 leading-snug"
       >
-        {ctaLabel}
-      </Button>
+        {commitment}
+      </p>
       {benefitSlot}
+      {inactionSlot}
     </section>
   );
 }
