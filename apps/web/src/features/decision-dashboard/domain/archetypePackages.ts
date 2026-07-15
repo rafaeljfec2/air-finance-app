@@ -20,6 +20,7 @@ interface ArchetypePackage {
   readonly buildInsight: (signals: DecisionDashboardSignals) => DecisionInsight | undefined;
   readonly buildPreserve?: (signals: DecisionDashboardSignals) => readonly string[] | undefined;
   readonly buildAvoid?: (signals: DecisionDashboardSignals) => readonly string[] | undefined;
+  readonly buildHistory?: (signals: DecisionDashboardSignals) => readonly string[] | undefined;
   readonly buildAction: (signals: DecisionDashboardSignals) => ActionOfTheDay;
   readonly buildCaptureAction: () => ActionOfTheDay;
 }
@@ -65,7 +66,7 @@ const SURVIVOR_PACKAGE: ArchetypePackage = {
       return 'Ainda não há dados suficientes para responder se o ciclo fecha.';
     }
     if (isCreditAsOperatingCash(signals)) {
-      return buildCreditAsCashBriefing(signals.briefingFacts).status;
+      return buildCreditAsCashBriefing(signals.briefingFacts, signals.behaviorEvidence).status;
     }
     if (signals.enginePrimaryIssue === 'liquidity_risk' || signals.balance < 0) {
       return 'O ciclo está em risco — há pressão de saídas sobre a capacidade atual.';
@@ -83,11 +84,11 @@ const SURVIVOR_PACKAGE: ArchetypePackage = {
     if (!isCreditAsOperatingCash(signals)) {
       return undefined;
     }
-    return buildCreditAsCashBriefing(signals.briefingFacts).statusLines;
+    return buildCreditAsCashBriefing(signals.briefingFacts, signals.behaviorEvidence).statusLines;
   },
   buildPriorityCards: (signals, actionId) => {
     if (isCreditAsOperatingCash(signals)) {
-      const briefing = buildCreditAsCashBriefing(signals.briefingFacts);
+      const briefing = buildCreditAsCashBriefing(signals.briefingFacts, signals.behaviorEvidence);
       return briefing.evidence.map((fact, index) =>
         card(`S-evidence-${index + 1}`, fact.label, fact.value, actionId),
       );
@@ -164,17 +165,23 @@ const SURVIVOR_PACKAGE: ArchetypePackage = {
     if (!isCreditAsOperatingCash(signals)) {
       return undefined;
     }
-    return buildCreditAsCashBriefing(signals.briefingFacts).preserve;
+    return buildCreditAsCashBriefing(signals.briefingFacts, signals.behaviorEvidence).preserve;
   },
   buildAvoid: (signals) => {
     if (!isCreditAsOperatingCash(signals)) {
       return undefined;
     }
-    return buildCreditAsCashBriefing(signals.briefingFacts).avoid;
+    return buildCreditAsCashBriefing(signals.briefingFacts, signals.behaviorEvidence).avoid;
+  },
+  buildHistory: (signals) => {
+    if (!isCreditAsOperatingCash(signals)) {
+      return undefined;
+    }
+    return buildCreditAsCashBriefing(signals.briefingFacts, signals.behaviorEvidence).historyLines;
   },
   buildAction: (signals) => {
     if (isCreditAsOperatingCash(signals)) {
-      const briefing = buildCreditAsCashBriefing(signals.briefingFacts);
+      const briefing = buildCreditAsCashBriefing(signals.briefingFacts, signals.behaviorEvidence);
       return {
         id: 'survivor-hold-credit',
         label: briefing.decision,

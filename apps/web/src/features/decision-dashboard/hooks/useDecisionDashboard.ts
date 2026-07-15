@@ -11,9 +11,11 @@ import {
 import { useDecisionEngineEvaluateAuto } from '@/hooks/useDecisionEngineEvaluateAuto';
 import { useIndebtedness } from '@/hooks/useIndebtedness';
 import { budgetService } from '@/services/budgetService';
+import { getTransactions } from '@/services/transactionService';
 import { useCompanyStore } from '@/stores/company';
 import type { DashboardFilters } from '@/types/dashboard';
 
+import { deriveBehaviorEvidence } from '../domain/deriveBehaviorEvidence';
 import { resolveDecisionDashboard } from '../domain/resolveDecisionDashboard';
 import { resolveFesStub } from '../domain/resolveFesStub';
 import { deriveBriefingFacts } from '../mappers/deriveBriefingFacts';
@@ -34,6 +36,16 @@ function currentBudgetFilters(): { year: string; month: string } {
   return {
     year: format(now, 'yyyy'),
     month: format(now, 'MM'),
+  };
+}
+
+function historyWindow(): { startDate: string; endDate: string } {
+  const end = new Date();
+  const start = new Date();
+  start.setUTCDate(start.getUTCDate() - 120);
+  return {
+    startDate: start.toISOString().slice(0, 10),
+    endDate: end.toISOString().slice(0, 10),
   };
 }
 
@@ -69,6 +81,20 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
     queryFn: () => budgetService.getBudget(companyId, budgetFilters),
     enabled: !!companyId,
     staleTime: 30_000,
+  });
+
+  const historyRange = historyWindow();
+  const historyQuery = useQuery({
+    queryKey: [
+      'decision-dashboard',
+      'behavior-history',
+      companyId,
+      historyRange.startDate,
+      historyRange.endDate,
+    ],
+    queryFn: () => getTransactions(companyId, historyRange),
+    enabled: !!companyId,
+    staleTime: 60_000,
   });
 
   const surfaceState = resolveDashboardSurfaceState({
@@ -108,6 +134,15 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
       cashFlow: budgetQuery.data?.cashFlow,
     });
 
+    const behaviorEvidence = deriveBehaviorEvidence(
+      (historyQuery.data ?? []).map((tx) => ({
+        description: tx.description,
+        amount: tx.value,
+        date: tx.paymentDate,
+        kind: tx.launchType === 'revenue' ? 'income' : 'expense',
+      })),
+    );
+
     const signals = mapApiToDecisionSignals({
       summary: {
         income: summaryQuery.data.income,
@@ -122,6 +157,7 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
       readyForNext: fes.readyForNext,
       topExpenseLabel: topExpense?.name,
       briefingFacts,
+      behaviorEvidence,
       engine: engineQuery.data
         ? {
             primary_issue: engineQuery.data.primary_issue,
@@ -145,6 +181,7 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
     expensesQuery.data,
     engineQuery.data,
     indebtednessQuery.data,
+    historyQuery.data,
     accounts,
     fes.archetype,
     fes.isFirstAccess,

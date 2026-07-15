@@ -27,6 +27,7 @@ describe('buildCreditAsCashBriefing', () => {
     expect(copy.status).not.toMatch(/travessia/i);
     expect(copy.evidence[0]?.value).toMatch(/R\$\s*44,00/);
     expect(copy.decision).toMatch(/Ultraviolet nem o Signature/i);
+    expect(copy.historyLines[0]).toMatch(/histórico suficiente/i);
   });
 
   it('falls back without inventing entity names', () => {

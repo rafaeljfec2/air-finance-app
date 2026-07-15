@@ -22,6 +22,7 @@ export interface DecisionDashboardViewModel {
   readonly insightMessage?: string;
   readonly preserveLines?: readonly string[];
   readonly avoidLines?: readonly string[];
+  readonly historyLines?: readonly string[];
   readonly showSecondary: boolean;
   readonly showNextJourneyStage: boolean;
   readonly nextJourneyStageLabel: string;
@@ -58,6 +59,7 @@ export function mapDashboardPayloadToViewModel(
     insightMessage: payload.insight?.message,
     preserveLines: payload.preserve,
     avoidLines: payload.avoid,
+    historyLines: payload.history,
     showSecondary: payload.secondary_available,
     showNextJourneyStage: payload.next_journey_stage.visibility === 'available',
     nextJourneyStageLabel: payload.next_journey_stage.label,

@@ -59,6 +59,8 @@ export interface DashboardPayload {
   readonly preserve?: readonly string[];
   /** Phase-1: capacity-reducing behaviors to avoid (plain language). */
   readonly avoid?: readonly string[];
+  /** Phase-2 history lines that support (not replace) the day decision. */
+  readonly history?: readonly string[];
   readonly evolution_banner?: never;
   readonly ai_block?: never;
   readonly secondary_available: boolean;
@@ -81,6 +83,22 @@ export interface DecisionBriefingFactsSignal {
   readonly idleCardName?: string;
 }
 
+export interface BehaviorEvidenceSignal {
+  readonly hasSufficientHistory: boolean;
+  readonly creditAsCashPattern: boolean;
+  readonly creditAsCashMonths: number;
+  readonly recurringPressure?: {
+    readonly label: string;
+    readonly hitCount: number;
+    readonly averageAmount: number;
+  };
+  readonly savingsOpportunity?: {
+    readonly label: string;
+    readonly hitCount: number;
+    readonly averageAmount: number;
+  };
+}
+
 export interface DecisionDashboardSignals {
   readonly hasAnyTransactions: boolean;
   readonly hasPayables: boolean;
@@ -97,6 +115,7 @@ export interface DecisionDashboardSignals {
   readonly topExpenseLabel?: string;
   readonly readyForNext: boolean;
   readonly briefingFacts?: DecisionBriefingFactsSignal;
+  readonly behaviorEvidence?: BehaviorEvidenceSignal;
 }
 
 export interface ResolveDecisionDashboardInput {

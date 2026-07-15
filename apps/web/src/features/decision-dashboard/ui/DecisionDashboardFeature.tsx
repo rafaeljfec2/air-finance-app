@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useDecisionDashboard } from '../hooks/useDecisionDashboard';
 
 import { ActionOfTheDayBlock } from './components/ActionOfTheDayBlock';
+import { BehaviorHistoryBlock } from './components/BehaviorHistoryBlock';
 import { DecisionDashboardSecondary } from './components/DecisionDashboardSecondary';
 import { DecisionDashboardStatus } from './components/DecisionDashboardStatus';
 import { DecisionInsightBlock } from './components/DecisionInsightBlock';
@@ -91,6 +92,7 @@ export function DecisionDashboardFeature() {
 
   const preserve = viewModel.preserveLines ?? [];
   const avoid = viewModel.avoidLines ?? [];
+  const history = viewModel.historyLines ?? [];
   const showBenefit =
     preserve.length === 0 &&
     (Boolean(viewModel.insightMessage) || viewModel.action.rationale.trim().length > 0);
@@ -106,6 +108,8 @@ export function DecisionDashboardFeature() {
         />
 
         <PriorityDecisionCards cards={viewModel.priorityCards} />
+
+        <BehaviorHistoryBlock lines={history} />
 
         <PreserveAvoidBlock preserve={preserve} avoid={avoid} />
 

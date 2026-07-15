@@ -19,6 +19,7 @@ export function resolveDecisionDashboard(input: ResolveDecisionDashboardInput): 
   const insight = allowInsight ? pkg.buildInsight(signals) : undefined;
   const preserve = pkg.buildPreserve?.(signals);
   const avoid = pkg.buildAvoid?.(signals);
+  const history = pkg.buildHistory?.(signals);
 
   return {
     archetype,
@@ -31,6 +32,7 @@ export function resolveDecisionDashboard(input: ResolveDecisionDashboardInput): 
     insight,
     preserve,
     avoid,
+    history,
     secondary_available: secondaryCards.length > 0,
     secondary_cards: secondaryCards,
     next_journey_stage: nextJourneyStage,

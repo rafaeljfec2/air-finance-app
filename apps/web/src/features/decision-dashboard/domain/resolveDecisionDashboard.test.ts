@@ -97,6 +97,7 @@ describe('resolveDecisionDashboard', () => {
     expect(payload.insight).toBeUndefined();
     expect(payload.priority_cards.some((c) => c.title === 'Na conta hoje')).toBe(true);
     expect(payload.priority_cards.some((c) => /R\$\s*44,00/.test(c.summary))).toBe(true);
+    expect(payload.history?.[0]).toMatch(/histórico suficiente|cartão cobre|se repete/i);
   });
 
   it('never includes goals, health, or reports cards for survivor', () => {

@@ -1,5 +1,7 @@
 import type { DecisionBriefingFacts } from '../mappers/deriveBriefingFacts';
 
+import { buildBehaviorHistoryLines, type BehaviorEvidence } from './deriveBehaviorEvidence';
+
 function formatBrl(value: number): string {
   return value.toLocaleString('pt-BR', {
     style: 'currency',
@@ -28,6 +30,7 @@ export interface CreditAsCashBriefingCopy {
   readonly evidence: readonly BriefingEvidenceFact[];
   readonly preserve: readonly string[];
   readonly avoid: readonly string[];
+  readonly historyLines: readonly string[];
   readonly decision: string;
   readonly ctaLabel: string;
 }
@@ -37,6 +40,7 @@ export interface CreditAsCashBriefingCopy {
  */
 export function buildCreditAsCashBriefing(
   facts: DecisionBriefingFacts | undefined,
+  behavior?: BehaviorEvidence,
 ): CreditAsCashBriefingCopy {
   const anchor = facts?.anchorReceivable;
   const cash = facts?.operationalCash;
@@ -102,6 +106,10 @@ export function buildCreditAsCashBriefing(
     avoidLines[1] = `Abrir o ${idle} ou qualquer limite novo antes da ${anchor?.label ?? 'próxima entrada'} chegar`;
   }
 
+  if (behavior?.creditAsCashPattern) {
+    avoidLines[0] = 'Usar o cartão como salário — o histórico mostra que esse padrão se repete';
+  }
+
   let decision: string;
   let ctaLabel: string;
 
@@ -117,12 +125,17 @@ export function buildCreditAsCashBriefing(
     ctaLabel = 'Vou seguir esse passo';
   }
 
+  const historyLines = behavior
+    ? buildBehaviorHistoryLines(behavior)
+    : ['Ainda não temos histórico suficiente para recomendar mudanças de comportamento.'];
+
   return {
     status,
     statusLines,
     evidence: evidence.slice(0, 3),
     preserve,
     avoid: avoidLines.slice(0, 2),
+    historyLines,
     decision,
     ctaLabel,
   };
