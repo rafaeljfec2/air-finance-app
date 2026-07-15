@@ -26,6 +26,11 @@ import { useCompanyStore } from '@/stores/company';
 import type { DashboardFilters, DashboardTimeRange } from '@/types/dashboard';
 import { formatCurrency } from '@/utils/formatters';
 
+/**
+ * @deprecated KPI mosaic Dashboard — discontinued as product Home (IS01).
+ * Route `/dashboard` redirects to `/home` (Decision Dashboard).
+ * Keep this module until the Technical Debt sprint removes the legacy surface.
+ */
 export function Dashboard() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 

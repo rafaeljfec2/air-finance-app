@@ -7,7 +7,6 @@ import {
   Flag,
   Home,
   Import,
-  LayoutDashboard,
   Link2,
   Scale,
   Plus,
@@ -26,7 +25,6 @@ export const navigation: NavigationSection[] = [
     section: '📊 Visão Geral',
     items: [
       { name: 'Home', href: '/home', icon: Home },
-      { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
       {
         name: 'Decisão financeira',
         href: '/decision',

@@ -46,7 +46,7 @@ export function BalanceSection({
           </button>
         </div>
         <Link
-          to="/dashboard"
+          to="/home"
           className="text-sm text-primary-600 dark:text-primary-400 hover:underline font-medium"
         >
           Ver Detalhes
