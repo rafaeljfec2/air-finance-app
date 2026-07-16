@@ -55,9 +55,10 @@ export function RecentMovementsCard({ movements, isLoading }: Readonly<RecentMov
         <h2 className="text-sm font-semibold text-text dark:text-text-dark">Últimos movimentos</h2>
         <Link
           to="/movements"
-          className="text-xs font-medium text-emerald-500 hover:text-emerald-400"
+          className="inline-flex items-center gap-2 text-xs font-medium text-text-muted hover:text-text dark:text-text-muted-dark dark:hover:text-text-dark"
         >
-          Ver todos
+          <span>Ver todos</span>
+          <span aria-hidden>→</span>
         </Link>
       </div>
 
@@ -79,16 +80,18 @@ export function RecentMovementsCard({ movements, isLoading }: Readonly<RecentMov
       ) : null}
 
       {!isLoading && movements.length > 0 ? (
-        <ul className="mt-3 space-y-3">
+        <ul className="mt-3 divide-y divide-border dark:divide-border-dark">
           {movements.map((movement) => {
             const isRevenue = movement.launchType === 'revenue';
             const Icon = resolveMovementIcon(movement);
             return (
-              <li key={movement.id} className="flex items-center gap-3">
+              <li key={movement.id} className="flex min-h-14 items-center gap-3 py-2.5">
                 <div
                   className={cn(
-                    'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
-                    isRevenue ? 'bg-emerald-500/15 text-emerald-500' : 'bg-red-500/15 text-red-400',
+                    'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border',
+                    isRevenue
+                      ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
+                      : 'border-red-500/40 bg-red-500/10 text-red-400',
                   )}
                 >
                   <Icon className="h-4 w-4" aria-hidden />
@@ -132,7 +135,7 @@ export function RecentMovementsCard({ movements, isLoading }: Readonly<RecentMov
       <div className="mt-auto border-t border-border pt-3 dark:border-border-dark">
         <Link
           to="/movements"
-          className="inline-flex text-sm font-medium text-emerald-500 hover:text-emerald-400"
+          className="inline-flex text-sm font-medium text-text-muted hover:text-text dark:text-text-muted-dark dark:hover:text-text-dark"
         >
           Acessar movimentos financeiros →
         </Link>

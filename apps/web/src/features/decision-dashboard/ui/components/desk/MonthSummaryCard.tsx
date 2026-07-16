@@ -40,7 +40,7 @@ export function MonthSummaryCard({ summary, movementCount }: Readonly<MonthSumma
         </span>
       </div>
 
-      <div className="mt-3 grid grid-cols-3 divide-x divide-border dark:divide-border-dark">
+      <div className="mt-6 grid grid-cols-3 divide-x divide-border dark:divide-border-dark">
         <div className="pr-3">
           <p className="text-xs text-text-muted dark:text-text-muted-dark">Entradas</p>
           <p className="mt-1 text-base font-bold tabular-nums text-emerald-500 sm:text-lg">
@@ -55,14 +55,14 @@ export function MonthSummaryCard({ summary, movementCount }: Readonly<MonthSumma
         </div>
         <div className="pl-3">
           <p className="text-xs text-text-muted dark:text-text-muted-dark">Saldo do período</p>
-          <p className="mt-1 text-base font-bold tabular-nums text-text dark:text-text-dark sm:text-lg">
+          <p className="mt-1 text-base font-bold tabular-nums text-sky-400 sm:text-lg">
             {formatCurrency(balance)}
           </p>
         </div>
       </div>
 
       <div
-        className="mt-3 flex h-2 overflow-hidden rounded-full bg-border/60 dark:bg-border-dark/60"
+        className="mt-4 flex h-2 overflow-hidden rounded-full bg-border/60 dark:bg-border-dark/60"
         aria-hidden
       >
         <div
@@ -75,31 +75,33 @@ export function MonthSummaryCard({ summary, movementCount }: Readonly<MonthSumma
         />
       </div>
 
-      <div className="mb-3 mt-3 grid grid-cols-3 gap-3 border-t border-border pt-3 dark:border-border-dark">
-        <div>
-          <p className="text-sm font-bold tabular-nums text-text dark:text-text-dark">
+      <div className="mb-3 mt-auto grid grid-cols-3 divide-x divide-border pt-4 dark:divide-border-dark">
+        <div className="pr-3">
+          <p className="text-base font-bold tabular-nums text-text dark:text-text-dark">
             {movementCount}
           </p>
-          <p className="text-xs text-text-muted dark:text-text-muted-dark">movimentos</p>
+          <p className="mt-0.5 text-xs text-text-muted dark:text-text-muted-dark">movimentos</p>
         </div>
-        <div>
-          <p className="text-sm font-bold tabular-nums text-text dark:text-text-dark">
+        <div className="px-3">
+          <p className="text-base font-bold tabular-nums text-text dark:text-text-dark">
             {daysElapsed}
           </p>
-          <p className="text-xs text-text-muted dark:text-text-muted-dark">dias decorridos</p>
+          <p className="mt-0.5 text-xs text-text-muted dark:text-text-muted-dark">
+            dias decorridos
+          </p>
         </div>
-        <div>
-          <p className="text-sm font-bold tabular-nums text-text dark:text-text-dark">
+        <div className="pl-3">
+          <p className="text-base font-bold tabular-nums text-text dark:text-text-dark">
             {formatCurrency(dailyAverage)}
           </p>
-          <p className="text-xs text-text-muted dark:text-text-muted-dark">média diária</p>
+          <p className="mt-0.5 text-xs text-text-muted dark:text-text-muted-dark">média diária</p>
         </div>
       </div>
 
-      <div className="mt-auto border-t border-border pt-3 dark:border-border-dark">
+      <div className="border-t border-border pt-3 dark:border-border-dark">
         <Link
           to="/dashboard"
-          className="inline-flex text-sm font-medium text-emerald-500 hover:text-emerald-400"
+          className="inline-flex text-sm font-medium text-text-muted hover:text-text dark:text-text-muted-dark dark:hover:text-text-dark"
         >
           Ver dashboard completo →
         </Link>
