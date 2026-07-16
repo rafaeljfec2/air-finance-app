@@ -1,4 +1,4 @@
-import { ScrollReveal } from './animations';
+import { ScrollReveal, StaggerContainer, StaggerItem } from './animations';
 
 /** Master questions from DASHBOARD01 — marketing only, no invented metrics. */
 const PILLARS = [
@@ -41,34 +41,42 @@ export function CheckupPillarsV3() {
           </p>
         </ScrollReveal>
 
-        <ScrollReveal className="max-w-xl mx-auto">
-          <ol className="relative">
-            {PILLARS.map((pillar, index) => (
-              <li key={pillar.name} className="relative flex gap-4 pb-8 last:pb-0">
-                <div className="relative flex w-8 shrink-0 flex-col items-center">
-                  <span className="z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-emerald-500 bg-[var(--v3-bg)] text-xs font-bold text-emerald-400">
-                    {index + 1}
-                  </span>
-                  {index < PILLARS.length - 1 ? (
-                    <span className="absolute top-8 bottom-0 w-px bg-gray-800" aria-hidden />
-                  ) : null}
-                </div>
-                <div className={index < 3 ? 'pt-0.5 pb-2' : 'pt-1'}>
-                  <h3
-                    className={
-                      index < 3
-                        ? 'text-lg font-semibold text-gray-50 mb-1'
-                        : 'text-base font-semibold text-gray-50 mb-1'
-                    }
-                  >
-                    {pillar.name}
-                  </h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">{pillar.question}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </ScrollReveal>
+        <StaggerContainer
+          as="ol"
+          className="relative max-w-xl mx-auto"
+          staggerDelay={0.09}
+          delayChildren={0.06}
+        >
+          {PILLARS.map((pillar, index) => (
+            <StaggerItem
+              key={pillar.name}
+              as="li"
+              variant="fadeRight"
+              className="relative flex gap-4 pb-8 last:pb-0 group"
+            >
+              <div className="relative flex w-8 shrink-0 flex-col items-center">
+                <span className="z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-emerald-500 bg-[var(--v3-bg)] text-xs font-bold text-emerald-400 transition-transform duration-200 group-hover:scale-110">
+                  {index + 1}
+                </span>
+                {index < PILLARS.length - 1 ? (
+                  <span className="absolute top-8 bottom-0 w-px bg-gray-800" aria-hidden />
+                ) : null}
+              </div>
+              <div className={index < 3 ? 'pt-0.5 pb-2' : 'pt-1'}>
+                <h3
+                  className={
+                    index < 3
+                      ? 'text-lg font-semibold text-gray-50 mb-1 transition-colors duration-200 group-hover:text-emerald-300'
+                      : 'text-base font-semibold text-gray-50 mb-1 transition-colors duration-200 group-hover:text-emerald-300'
+                  }
+                >
+                  {pillar.name}
+                </h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{pillar.question}</p>
+              </div>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
       </div>
     </section>
   );

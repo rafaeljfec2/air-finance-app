@@ -14,9 +14,9 @@ export function PreviewDashboardV3() {
           </p>
         </ScrollReveal>
 
-        <ScrollReveal className="max-w-md mx-auto" delay={0.1}>
+        <div className="max-w-md mx-auto">
           <DashboardPreview />
-        </ScrollReveal>
+        </div>
       </div>
     </section>
   );

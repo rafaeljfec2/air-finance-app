@@ -45,9 +45,9 @@ export function InterpretSystemV3() {
             const Icon = point.icon;
             return (
               <StaggerItem key={point.title}>
-                <div className="flex gap-4 items-start rounded-2xl border border-gray-800 bg-[var(--v3-bg)] p-5 md:p-6">
+                <div className="group flex gap-4 items-start rounded-2xl border border-gray-800 bg-[var(--v3-bg)] p-5 md:p-6 transition-colors duration-200 hover:border-emerald-500/35">
                   <div className="shrink-0 flex flex-col items-center">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400 transition-transform duration-200 group-hover:scale-105">
                       <Icon className="h-5 w-5" />
                     </span>
                     {index < POINTS.length - 1 ? (

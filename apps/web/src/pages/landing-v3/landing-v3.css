@@ -32,6 +32,7 @@
   --v3-shadow-accent: 0 4px 14px rgba(16, 185, 129, 0.3);
   background: var(--v3-bg);
   color: var(--v3-text);
+  scroll-behavior: smooth;
 }
 
 .landing-v3-page html,
@@ -291,5 +292,28 @@
     font-size: 0.9375rem;
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-v3-page {
+    scroll-behavior: auto;
+  }
+
+  .v3-btn-primary,
+  .v3-btn-secondary,
+  .v3-btn-ghost,
+  .v3-card {
+    transition: none;
+  }
+
+  .v3-btn-primary:hover,
+  .v3-btn-primary:active {
+    transform: none;
+  }
+
+  .v3-animate-in,
+  .v3-animate-fade {
+    animation: none;
   }
 }

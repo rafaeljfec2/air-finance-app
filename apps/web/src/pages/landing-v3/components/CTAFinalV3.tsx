@@ -1,15 +1,25 @@
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import { ScrollReveal } from './animations';
+import { AmbientBlob, ScrollReveal } from './animations';
 
 export function CTAFinalV3() {
   const navigate = useNavigate();
 
   return (
     <section id="cta-capacity" className="v3-section v3-section-dark relative overflow-hidden">
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl" />
+      <AmbientBlob
+        className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"
+        duration={16}
+        x={20}
+        y={10}
+      />
+      <AmbientBlob
+        className="absolute bottom-0 right-1/4 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"
+        duration={20}
+        x={-16}
+        y={12}
+      />
 
       <div className="v3-container relative z-10">
         <ScrollReveal variant="scale" className="text-center max-w-2xl mx-auto">
@@ -24,12 +34,13 @@ export function CTAFinalV3() {
           </p>
 
           <button
+            type="button"
             onClick={() => navigate('/register')}
             className="v3-btn-primary !px-8 !py-4 !text-base group"
             aria-label="Começar a entender meu sistema"
           >
             Começar a entender meu sistema
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
           </button>
         </ScrollReveal>
       </div>

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import { SEOHead } from '../landing/components/SEOHead';
 
+import { ScrollProgress } from './components/animations';
 import { CheckupPillarsV3 } from './components/CheckupPillarsV3';
 import { CTAFinalV3 } from './components/CTAFinalV3';
 import { FAQV3 } from './components/FAQV3';
@@ -50,6 +51,7 @@ export function LandingPageV3() {
     <>
       <SEOHead />
       <div className="landing-v3-page w-full antialiased">
+        <ScrollProgress />
         <HeaderV3 />
         <main className="relative w-full">
           <HeroV3 />
