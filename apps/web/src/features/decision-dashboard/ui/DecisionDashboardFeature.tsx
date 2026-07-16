@@ -4,14 +4,17 @@ import { Button } from '@/components/ui/button';
 
 import { useDecisionDashboard } from '../hooks/useDecisionDashboard';
 
-import { ActionOfTheDayBlock } from './components/ActionOfTheDayBlock';
-import { BehaviorHistoryBlock } from './components/BehaviorHistoryBlock';
 import { DecisionDashboardLoading } from './components/DecisionDashboardLoading';
-import { DecisionDashboardSecondary } from './components/DecisionDashboardSecondary';
-import { DecisionDashboardStatus } from './components/DecisionDashboardStatus';
-import { DecisionInsightBlock } from './components/DecisionInsightBlock';
-import { PreserveAvoidBlock } from './components/PreserveAvoidBlock';
-import { PriorityDecisionCards } from './components/PriorityDecisionCards';
+import { CurrentSituationCard } from './components/desk/CurrentSituationCard';
+import { DailyTipFooter } from './components/desk/DailyTipFooter';
+import { DecisionBlock } from './components/desk/DecisionBlock';
+import { DeskHeader } from './components/desk/DeskHeader';
+import { MonthSummaryCard } from './components/desk/MonthSummaryCard';
+import { QuickTasksCard } from './components/desk/QuickTasksCard';
+import { RecentMovementsCard } from './components/desk/RecentMovementsCard';
+import { SpendingDonutCard } from './components/desk/SpendingDonutCard';
+import { countMovements } from './desk/deskMetrics';
+import { resolveDailyTip } from './desk/resolveDailyTip';
 
 function BriefingShell({
   children,
@@ -38,9 +41,10 @@ export function DecisionDashboardFeature() {
     loadingMessage,
     loadingSteps,
     viewModel,
-    showSecondaryExpanded,
-    expandSecondary,
-    collapseSecondary,
+    summary,
+    expensesByCategory,
+    recentMovements,
+    isRecentMovementsLoading,
   } = useDecisionDashboard();
 
   if (isAwaitingCompany) {
@@ -79,52 +83,46 @@ export function DecisionDashboardFeature() {
     );
   }
 
-  const preserve = viewModel.preserveLines ?? [];
-  const avoid = viewModel.avoidLines ?? [];
-  const history = viewModel.historyLines ?? [];
-  const showBenefit =
-    preserve.length === 0 &&
-    (Boolean(viewModel.insightMessage) || viewModel.action.rationale.trim().length > 0);
+  const movementCount = countMovements(recentMovements);
+  const tip = resolveDailyTip(summary);
 
   return (
-    <BriefingShell>
-      <div className="space-y-4 p-4 sm:space-y-5 sm:p-5">
-        <DecisionDashboardStatus
-          question={viewModel.question}
-          status={viewModel.status}
-          statusLines={viewModel.statusLines}
-          dataState={viewModel.dataState}
+    <div className="space-y-3.5" aria-label="Decision desk">
+      <DeskHeader />
+
+      <section className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm dark:border-border-dark dark:bg-card-dark lg:h-[168px]">
+        <div className="absolute inset-x-0 top-0 h-1 bg-emerald-500 opacity-80" aria-hidden />
+        <div className="grid h-full grid-cols-1 gap-3 p-3 lg:grid-cols-5">
+          <div className="lg:col-span-3">
+            <DecisionBlock
+              label={viewModel.action.label}
+              rationale={viewModel.action.rationale}
+              insightMessage={viewModel.insightMessage}
+            />
+          </div>
+          <div className="lg:col-span-2 lg:py-2">
+            <CurrentSituationCard
+              cards={viewModel.priorityCards}
+              statusLines={viewModel.statusLines}
+            />
+          </div>
+        </div>
+      </section>
+
+      <div className="grid grid-cols-1 gap-3 lg:h-[297px] lg:grid-cols-2">
+        <MonthSummaryCard summary={summary} movementCount={movementCount} />
+        <SpendingDonutCard
+          expensesByCategory={expensesByCategory}
+          totalExpenses={summary?.expenses ?? 0}
         />
-
-        <PriorityDecisionCards cards={viewModel.priorityCards} />
-
-        <BehaviorHistoryBlock lines={history} />
-
-        <PreserveAvoidBlock preserve={preserve} avoid={avoid} />
-
-        <ActionOfTheDayBlock
-          label={viewModel.action.label}
-          rationale={viewModel.action.rationale}
-          ctaLabel={viewModel.action.ctaLabel}
-          benefitSlot={
-            showBenefit ? (
-              <DecisionInsightBlock
-                message={viewModel.insightMessage}
-                rationale={viewModel.action.rationale}
-              />
-            ) : null
-          }
-        />
-
-        {viewModel.showSecondary ? (
-          <DecisionDashboardSecondary
-            cards={viewModel.secondaryCards}
-            expanded={showSecondaryExpanded}
-            onExpand={expandSecondary}
-            onCollapse={collapseSecondary}
-          />
-        ) : null}
       </div>
-    </BriefingShell>
+
+      <div className="grid grid-cols-1 gap-3 lg:h-[332px] lg:grid-cols-2">
+        <RecentMovementsCard movements={recentMovements} isLoading={isRecentMovementsLoading} />
+        <QuickTasksCard />
+      </div>
+
+      <DailyTipFooter tip={tip} />
+    </div>
   );
 }

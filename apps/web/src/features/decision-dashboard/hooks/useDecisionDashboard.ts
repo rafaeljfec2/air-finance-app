@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
+import { endOfMonth, format, startOfMonth } from 'date-fns';
 import { useMemo, useState } from 'react';
 
+import type { TransactionGridTransaction } from '@/components/transactions/TransactionGrid.types';
 import { useAccounts } from '@/hooks/useAccounts';
+import { useCategories } from '@/hooks/useCategories';
 import {
   useDashboardExpensesByCategory,
   useDashboardRecentTransactions,
@@ -10,10 +12,12 @@ import {
 } from '@/hooks/useDashboard';
 import { useDecisionEngineEvaluateAuto } from '@/hooks/useDecisionEngineEvaluateAuto';
 import { useIndebtedness } from '@/hooks/useIndebtedness';
+import { usePreviousBalance, useTransactions } from '@/hooks/useTransactions';
 import { budgetService } from '@/services/budgetService';
 import { getTransactions } from '@/services/transactionService';
 import { useCompanyStore } from '@/stores/company';
-import type { DashboardFilters } from '@/types/dashboard';
+import type { DashboardFilters, DashboardSummary, ExpenseByCategory } from '@/types/dashboard';
+import { formatDateToLocalISO } from '@/utils/date';
 
 import { deriveBehaviorEvidence } from '../domain/deriveBehaviorEvidence';
 import { resolveDecisionDashboard } from '../domain/resolveDecisionDashboard';
@@ -25,6 +29,10 @@ import {
   mapDashboardPayloadToViewModel,
   type DecisionDashboardViewModel,
 } from '../mappers/mapDashboardPayloadToViewModel';
+import {
+  mapRecentMovementsWithBalance,
+  type DeskRecentMovement,
+} from '../ui/desk/mapRecentMovementsWithBalance';
 
 import type { DashboardLoadingStep } from './resolveDashboardLoadingPhase';
 import {
@@ -38,6 +46,14 @@ function currentBudgetFilters(): { year: string; month: string } {
   return {
     year: format(now, 'yyyy'),
     month: format(now, 'MM'),
+  };
+}
+
+function currentMonthRange(): { startDate: string; endDate: string } {
+  const now = new Date();
+  return {
+    startDate: formatDateToLocalISO(startOfMonth(now)),
+    endDate: formatDateToLocalISO(endOfMonth(now)),
   };
 }
 
@@ -59,6 +75,10 @@ export interface UseDecisionDashboardResult {
   readonly loadingMessage: string | null;
   readonly loadingSteps: readonly DashboardLoadingStep[];
   readonly viewModel: DecisionDashboardViewModel | null;
+  readonly summary: DashboardSummary | null;
+  readonly expensesByCategory: readonly ExpenseByCategory[];
+  readonly recentMovements: readonly DeskRecentMovement[];
+  readonly isRecentMovementsLoading: boolean;
   readonly showSecondaryExpanded: boolean;
   readonly expandSecondary: () => void;
   readonly collapseSecondary: () => void;
@@ -70,15 +90,23 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
   const fes = resolveFesStub();
   const [showSecondaryExpanded, setShowSecondaryExpanded] = useState(false);
   const { accounts, isLoading: accountsLoading } = useAccounts();
+  const { categories } = useCategories(companyId);
 
   const dashboardFilters: DashboardFilters = { timeRange: 'month' };
   const budgetFilters = currentBudgetFilters();
+  const monthRange = currentMonthRange();
 
   const summaryQuery = useDashboardSummary(companyId, dashboardFilters);
   const expensesQuery = useDashboardExpensesByCategory(companyId, dashboardFilters);
   const recentTxQuery = useDashboardRecentTransactions(companyId, dashboardFilters, 20);
   const engineQuery = useDecisionEngineEvaluateAuto(companyId, { enabled: !!companyId });
   const indebtednessQuery = useIndebtedness(companyId);
+
+  const monthTransactionsQuery = useTransactions(companyId, monthRange);
+  const { previousBalance, isLoading: previousBalanceLoading } = usePreviousBalance(
+    companyId,
+    monthRange.startDate,
+  );
 
   const budgetQuery = useQuery({
     queryKey: ['decision-dashboard', 'budget', companyId, budgetFilters.year, budgetFilters.month],
@@ -212,6 +240,32 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
     fes.readyForNext,
   ]);
 
+  const recentMovements = useMemo(() => {
+    const categoryMap = new Map((categories ?? []).map((category) => [category.id, category.name]));
+    const accountMap = new Map((accounts ?? []).map((account) => [account.id, account.name]));
+
+    const labeled = (monthTransactionsQuery.transactions ?? []).map(
+      (tx): TransactionGridTransaction => ({
+        ...tx,
+        categoryId: categoryMap.get(tx.categoryId) ?? tx.categoryId,
+        accountId: accountMap.get(tx.accountId) ?? tx.accountId,
+      }),
+    );
+
+    return mapRecentMovementsWithBalance({
+      transactions: labeled,
+      previousBalance,
+      startDate: monthRange.startDate,
+      limit: 4,
+    });
+  }, [
+    monthTransactionsQuery.transactions,
+    categories,
+    accounts,
+    previousBalance,
+    monthRange.startDate,
+  ]);
+
   return {
     surfaceState,
     isLoading,
@@ -220,6 +274,10 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
     loadingMessage,
     loadingSteps,
     viewModel,
+    summary: summaryQuery.data ?? null,
+    expensesByCategory: expensesQuery.data ?? [],
+    recentMovements,
+    isRecentMovementsLoading: monthTransactionsQuery.isLoading || previousBalanceLoading,
     showSecondaryExpanded,
     expandSecondary: () => setShowSecondaryExpanded(true),
     collapseSecondary: () => setShowSecondaryExpanded(false),

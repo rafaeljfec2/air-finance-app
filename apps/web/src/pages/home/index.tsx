@@ -7,8 +7,8 @@ import { ViewDefault } from '@/layouts/ViewDefault';
  */
 export function HomePage() {
   return (
-    <ViewDefault>
-      <div className="container mx-auto w-full max-w-3xl px-2 pb-3 pt-0 sm:px-6">
+    <ViewDefault immersiveDesktop>
+      <div className="container mx-auto w-full max-w-7xl px-3 pb-4 pt-0">
         <DecisionDashboardFeature />
       </div>
     </ViewDefault>

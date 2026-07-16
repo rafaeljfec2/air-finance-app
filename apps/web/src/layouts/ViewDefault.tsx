@@ -11,10 +11,11 @@ import { usePreferencesStore } from '@/stores/preferences';
 import { useSidebarStore } from '@/stores/sidebar';
 
 interface ViewDefaultProps {
-  children: ReactNode;
+  readonly children: ReactNode;
+  readonly immersiveDesktop?: boolean;
 }
 
-export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
+export function ViewDefault({ children, immersiveDesktop = false }: Readonly<ViewDefaultProps>) {
   const isCollapsed = useSidebarStore((state) => state.isCollapsed);
   const isHeaderVisible = usePreferencesStore((state) => state.isHeaderVisible);
   const toggleHeaderVisibility = usePreferencesStore((state) => state.toggleHeaderVisibility);
@@ -31,7 +32,11 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
 
   return (
     <div className="min-h-screen bg-background dark:bg-background-dark relative">
-      {isHeaderVisible && <Header onOpenSidebar={handleOpenSidebar} />}
+      {isHeaderVisible && (
+        <div className={cn(immersiveDesktop && 'lg:hidden')}>
+          <Header onOpenSidebar={handleOpenSidebar} />
+        </div>
+      )}
       <CompanySelectionModal />
       <TransactionTypeModal isOpen={isFabModalOpen} onClose={() => setIsFabModalOpen(false)} />
 
@@ -52,12 +57,13 @@ export function ViewDefault({ children }: Readonly<ViewDefaultProps>) {
         className={cn(
           'flex transition-all duration-300',
           isHeaderVisible ? 'h-[calc(100dvh-4rem)]' : 'h-[100dvh]',
+          immersiveDesktop && 'lg:h-[100dvh]',
         )}
       >
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={handleCloseSidebar}
-          isHeaderVisible={isHeaderVisible}
+          isHeaderVisible={isHeaderVisible && !immersiveDesktop}
         />
         <main
           className={cn(

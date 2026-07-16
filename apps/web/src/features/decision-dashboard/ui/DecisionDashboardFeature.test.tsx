@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
 import { useDecisionDashboard } from '../hooks/useDecisionDashboard';
@@ -23,13 +24,52 @@ const baseReady = {
   isAwaitingCompany: false,
   loadingMessage: null,
   loadingSteps: [],
+  summary: {
+    income: 14475.39,
+    expenses: 11067.92,
+    balance: 3407.47,
+    previousIncome: null,
+    previousExpenses: null,
+    previousBalance: null,
+    accumulatedBalance: null,
+    incomeChangePct: null,
+    expensesChangePct: null,
+    balanceChangePct: null,
+    periodStart: '2026-07-01',
+    periodEnd: '2026-07-31',
+  },
+  expensesByCategory: [
+    { categoryId: '1', name: 'Moradia', color: '#3B82F6', value: 4450 },
+    { categoryId: '2', name: 'Alimentação', color: '#F59E0B', value: 1920 },
+  ],
+  recentMovements: [
+    {
+      id: 'tx-1',
+      description: 'Cursor AI',
+      categoryLabel: 'Software',
+      accountLabel: 'Nubank',
+      value: -108.19,
+      launchType: 'expense' as const,
+      paymentDate: '2026-07-16T10:00:00.000Z',
+      balanceAfter: 44.22,
+    },
+  ],
+  isRecentMovementsLoading: false,
   showSecondaryExpanded: false,
   expandSecondary: vi.fn(),
   collapseSecondary: vi.fn(),
 };
 
+function renderFeature() {
+  return render(
+    <MemoryRouter>
+      <DecisionDashboardFeature />
+    </MemoryRouter>,
+  );
+}
+
 describe('DecisionDashboardFeature', () => {
-  it('renders parecer reading order: conclusion, evidence, recommendation, benefit', () => {
+  it('renders decision desk hierarchy: decision, situation, summary, movements', () => {
     mockedHook.mockReturnValue({
       ...baseReady,
       viewModel: {
@@ -38,14 +78,20 @@ describe('DecisionDashboardFeature', () => {
         dataState: 'sufficient',
         action: {
           id: 'a1',
-          label: 'Prioritize the critical payment',
+          label: 'Não use o Ultraviolet até a OUTSERA de 20/07.',
           rationale: 'Protect the cycle today',
         },
         priorityCards: [
-          { code: 'S2', title: 'Saídas críticas', summary: 'There are upcoming outs' },
+          { code: 'S1', title: 'Na conta hoje', summary: 'R$ 44,22' },
+          { code: 'S2', title: 'No plano do mês', summary: '+R$ 4.816,08' },
+          {
+            code: 'S3',
+            title: 'Próxima entrada',
+            summary: 'OUTSERA · R$ 21.751,20 · dia 20',
+          },
         ],
         secondaryCards: [],
-        insightMessage: 'Focus on the cycle',
+        insightMessage: 'Seguindo isso, você mantém o plano e evita comprometer seu futuro.',
         showSecondary: false,
         showNextJourneyStage: false,
         nextJourneyStageLabel: 'Enxergar',
@@ -56,21 +102,29 @@ describe('DecisionDashboardFeature', () => {
       },
     });
 
-    render(<DecisionDashboardFeature />);
+    renderFeature();
 
-    expect(screen.getByLabelText('Decision status')).toBeInTheDocument();
-    expect(screen.getByLabelText('Conclusion evidence')).toBeInTheDocument();
-    expect(screen.getByLabelText('Action of the day')).toBeInTheDocument();
-    expect(screen.getByLabelText('Recommendation benefit')).toBeInTheDocument();
-    expect(screen.queryByText(/Metas/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Decision desk')).toBeInTheDocument();
+    expect(screen.getByLabelText('Sua decisão de hoje')).toBeInTheDocument();
+    expect(screen.getByLabelText('Situação atual')).toBeInTheDocument();
+    expect(screen.getByLabelText('Resumo do mês')).toBeInTheDocument();
+    expect(screen.getByLabelText('Últimos movimentos')).toBeInTheDocument();
+    expect(screen.getByText(/Rafael/)).toBeInTheDocument();
+    expect(screen.getByText(/Uma decisão clara para o seu caixa hoje/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Ver detalhes da decisão/i })).toBeInTheDocument();
+    expect(screen.getByText('Na conta hoje')).toBeInTheDocument();
+    expect(screen.getByText('Cursor AI')).toBeInTheDocument();
+    expect(screen.queryByText(/^O que proteger$/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^O que evitar$/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Ver um pouco mais/i)).not.toBeInTheDocument();
   });
 
-  it('uses parecer language and puts recommendation after evidence', () => {
+  it('keeps decision before situation and summary in document order', () => {
     mockedHook.mockReturnValue({
       ...baseReady,
       viewModel: {
         question: 'Vou conseguir fechar este mês?',
-        status: 'Você está no caminho para fechar este mês com tranquilidade.',
+        status: 'Você está no caminho.',
         dataState: 'sufficient',
         action: {
           id: 'a1',
@@ -81,7 +135,7 @@ describe('DecisionDashboardFeature', () => {
           { code: 'S2', title: 'Saídas críticas', summary: 'Há vencimentos próximos.' },
         ],
         secondaryCards: [],
-        insightMessage: 'Isso reduz a pressão do ciclo — FP-1 e engine ordering S2.',
+        insightMessage: 'Isso reduz a pressão do mês.',
         showSecondary: false,
         showNextJourneyStage: false,
         nextJourneyStageLabel: 'Enxergar',
@@ -92,113 +146,18 @@ describe('DecisionDashboardFeature', () => {
       },
     });
 
-    render(<DecisionDashboardFeature />);
+    renderFeature();
 
-    expect(screen.getByText(/Rafael/)).toBeInTheDocument();
-    expect(screen.getByText(/Uma decisão clara para o seu caixa hoje/i)).toBeInTheDocument();
-    expect(screen.getByText(/^Por quê$/i)).toBeInTheDocument();
-    expect(screen.getByText(/Chegamos a essa conclusão porque/i)).toBeInTheDocument();
-    expect(screen.getByText(/^Hoje$/)).toBeInTheDocument();
-    expect(screen.getByText(/Se eu estivesse no seu lugar/i)).toBeInTheDocument();
-    expect(screen.getByText(/^O que muda$/i)).toBeInTheDocument();
-    expect(screen.getByLabelText("Today's commitment")).toHaveTextContent(/Quero priorizar isso/i);
-    expect(screen.queryByRole('button', { name: /Quero priorizar isso/i })).not.toBeInTheDocument();
-    expect(screen.queryByText(/Em volta disso/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/O que percebemos/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/FP-1/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Parecer de hoje/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Olhamos com calma/i)).not.toBeInTheDocument();
+    const decision = screen.getByLabelText('Sua decisão de hoje');
+    const situation = screen.getByLabelText('Situação atual');
+    const summary = screen.getByLabelText('Resumo do mês');
 
-    const evidence = screen.getByLabelText('Conclusion evidence');
-    const action = screen.getByLabelText('Action of the day');
     expect(
-      evidence.compareDocumentPosition(action) & Node.DOCUMENT_POSITION_FOLLOWING,
+      decision.compareDocumentPosition(situation) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
-  });
-
-  it('does not render benefit-only from empty insight on no_data when rationale exists', () => {
-    mockedHook.mockReturnValue({
-      ...baseReady,
-      viewModel: {
-        question: 'Vou conseguir fechar este mês?',
-        status: 'Ainda não há dados suficientes.',
-        dataState: 'no_data',
-        action: {
-          id: 'capture-survivor',
-          label: 'Registrar o mínimo do ciclo',
-          rationale: 'Complete essentials.',
-        },
-        priorityCards: [],
-        secondaryCards: [],
-        showSecondary: false,
-        showNextJourneyStage: false,
-        nextJourneyStageLabel: 'Enxergar',
-        nextJourneyStageSummary: 'Clarity',
-        nextJourneyStageReason: 'Reason',
-        showAiBlock: false,
-        showEvolutionBanner: false,
-      },
-    });
-
-    render(<DecisionDashboardFeature />);
-
-    expect(screen.queryByLabelText('Conclusion evidence')).not.toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Registrar o mínimo do ciclo' }),
-    ).toBeInTheDocument();
-    expect(screen.getByLabelText("Today's commitment")).toHaveTextContent('Começar o registro');
-    expect(screen.queryByRole('button', { name: 'Começar o registro' })).not.toBeInTheDocument();
-    expect(screen.getByLabelText('Recommendation benefit')).toBeInTheDocument();
-  });
-
-  it('renders preserve, avoid, and custom CTA for hold-credit decision', () => {
-    mockedHook.mockReturnValue({
-      ...baseReady,
-      viewModel: {
-        question: 'Vou conseguir fechar este mês?',
-        status: 'Hoje na conta tem cerca de R$ 44. No planejamento, o mês pode fechar positivo.',
-        dataState: 'sufficient',
-        action: {
-          id: 'survivor-hold-credit',
-          label: 'Não use o Ultraviolet nem o Signature até a OUTSERA de 20/07.',
-          rationale: '',
-          ctaLabel: 'Vou segurar os dois cartões até o dia 20',
-        },
-        priorityCards: [
-          { code: 'S1', title: 'Caixa', summary: 'Dinheiro na conta hoje: cerca de R$ 44' },
-        ],
-        secondaryCards: [],
-        preserveLines: [
-          'O dinheiro que ainda resta na conta até a próxima entrada chegar',
-          'Sua folga para pagar o que já está combinado, sem precisar abrir mais dívida',
-        ],
-        avoidLines: [
-          'Usar o cartão como se fosse o salário do mês',
-          'Abrir o Signature ou qualquer limite novo antes da OUTSERA chegar',
-        ],
-        showSecondary: false,
-        showNextJourneyStage: false,
-        nextJourneyStageLabel: 'Enxergar',
-        nextJourneyStageSummary: 'Clarity',
-        nextJourneyStageReason: 'Because clarity follows',
-        showAiBlock: false,
-        showEvolutionBanner: false,
-      },
-    });
-
-    render(<DecisionDashboardFeature />);
-
-    expect(screen.getByText(/Decisão de hoje/i)).toBeInTheDocument();
-    expect(screen.getByText(/^O que proteger$/i)).toBeInTheDocument();
-    expect(screen.getByText(/^O que evitar$/i)).toBeInTheDocument();
-    expect(screen.getByLabelText("Today's commitment")).toHaveTextContent(
-      /Vou segurar os dois cartões até o dia 20/i,
-    );
-    expect(
-      screen.queryByRole('button', { name: /Vou segurar os dois cartões até o dia 20/i }),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('Recommendation benefit')).not.toBeInTheDocument();
-    expect(screen.queryByText(/Gerar Caixa/i)).not.toBeInTheDocument();
+      situation.compareDocumentPosition(summary) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it('shows awaiting company idle state instead of error', () => {
@@ -207,15 +166,18 @@ describe('DecisionDashboardFeature', () => {
       surfaceState: 'awaiting_company',
       isAwaitingCompany: true,
       viewModel: null,
+      summary: null,
+      expensesByCategory: [],
+      recentMovements: [],
     });
 
-    render(<DecisionDashboardFeature />);
+    renderFeature();
 
     expect(screen.getByLabelText('Awaiting company selection')).toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  it('renders centered loading feedback with evolution steps', () => {
+  it('preserves centered loading feedback with evolution steps', () => {
     mockedHook.mockReturnValue({
       ...baseReady,
       surfaceState: 'loading',
@@ -249,9 +211,12 @@ describe('DecisionDashboardFeature', () => {
         },
       ],
       viewModel: null,
+      summary: null,
+      expensesByCategory: [],
+      recentMovements: [],
     });
 
-    render(<DecisionDashboardFeature />);
+    renderFeature();
 
     const loadingRegion = screen.getByLabelText('Montando parecer de hoje');
     expect(loadingRegion).toHaveAttribute('aria-busy', 'true');
@@ -260,6 +225,6 @@ describe('DecisionDashboardFeature', () => {
     expect(screen.getByLabelText('Loading progress')).toBeInTheDocument();
     expect(screen.getByLabelText('Progresso do parecer')).toBeInTheDocument();
     expect(screen.getByText('4 de 5 etapas concluídas')).toBeInTheDocument();
-    expect(screen.queryByLabelText('Loading decision status')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Decision desk')).not.toBeInTheDocument();
   });
 });
