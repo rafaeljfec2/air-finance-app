@@ -37,18 +37,19 @@ export function HeroV3() {
                 AirFinance
               </p>
               <h1 className="v3-h1 mb-6">
-                Descubra a capacidade
+                Compreenda sua vida
                 <br />
-                do seu sistema
+                financeira para
                 <br />
-                <span className="text-emerald-400">financeiro.</span>
+                <span className="text-emerald-400">decidir melhor.</span>
               </h1>
             </HeroAnimation>
 
             <HeroAnimation delay={0.16}>
               <p className="v3-body-lg mb-8 max-w-lg">
-                Clareza para decidir com confiança — não mais saldo no app e incerteza na cabeça.
-                Sem culpa. Sem score. Sem o produto decidir por você.
+                O AirFinance interpreta o seu sistema financeiro e transforma dados dispersos em
+                compreensão — clareza para a próxima decisão. Sem culpa. Sem score. Sem decidir por
+                você.
               </p>
             </HeroAnimation>
 
@@ -58,9 +59,9 @@ export function HeroV3() {
                   type="button"
                   onClick={() => navigate('/register')}
                   className="v3-btn-primary group"
-                  aria-label="Descobrir minha capacidade"
+                  aria-label="Descobrir minha capacidade financeira"
                 >
-                  Descobrir minha capacidade
+                  Descobrir minha capacidade financeira
                   <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </button>
                 <button
