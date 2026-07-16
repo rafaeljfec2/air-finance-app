@@ -2,57 +2,66 @@ import { useEffect } from 'react';
 
 import { SEOHead } from '../landing/components/SEOHead';
 
-import { ComparisonV3 } from './components/ComparisonV3';
+import { ScrollProgress } from './components/animations';
+import { CheckupPillarsV3 } from './components/CheckupPillarsV3';
 import { CTAFinalV3 } from './components/CTAFinalV3';
 import { FAQV3 } from './components/FAQV3';
-import { FeaturesV3 } from './components/FeaturesV3';
 import { FooterV3 } from './components/FooterV3';
 import { HeaderV3 } from './components/HeaderV3';
 import { HeroV3 } from './components/HeroV3';
-import { HowItWorksV3 } from './components/HowItWorksV3';
+import { InterpretSystemV3 } from './components/InterpretSystemV3';
+import { PreviewDashboardV3 } from './components/PreviewDashboardV3';
 import { PricingV3 } from './components/PricingV3';
 import { ProblemV3 } from './components/ProblemV3';
-import { SocialProofV3 } from './components/SocialProofV3';
-import { SolutionV3 } from './components/SolutionV3';
-import { TestimonialsV3 } from './components/TestimonialsV3';
 
 import './landing-v3.css';
 
+/**
+ * Landing narrativa de capacidade (Product OS + UX02):
+ * Hero → Problema → Interpretação → Check-up → Preview (no Hero) → CTA → Pricing/FAQ.
+ */
 export function LandingPageV3() {
   useEffect(() => {
     const htmlElement = document.documentElement;
     const bodyElement = document.body;
+    const hadDarkClass = htmlElement.classList.contains('dark');
 
+    htmlElement.classList.add('dark');
+    htmlElement.style.colorScheme = 'dark';
     htmlElement.style.overflow = 'auto';
     htmlElement.style.height = 'auto';
     bodyElement.style.overflow = 'auto';
     bodyElement.style.height = 'auto';
+    bodyElement.style.backgroundColor = '#0b1120';
 
     return () => {
+      if (!hadDarkClass) {
+        htmlElement.classList.remove('dark');
+      }
+      htmlElement.style.colorScheme = '';
       htmlElement.style.overflow = '';
       htmlElement.style.height = '';
       bodyElement.style.overflow = '';
       bodyElement.style.height = '';
+      bodyElement.style.backgroundColor = '';
     };
   }, []);
 
   return (
     <>
       <SEOHead />
-      <div className="landing-v3-page w-full bg-white text-gray-900 antialiased">
+      <div className="landing-v3-page w-full antialiased">
+        <ScrollProgress />
         <HeaderV3 />
         <main className="relative w-full">
           <HeroV3 />
-          <SocialProofV3 />
           <ProblemV3 />
-          <SolutionV3 />
-          <FeaturesV3 />
-          <HowItWorksV3 />
-          <ComparisonV3 />
-          <TestimonialsV3 />
+          <InterpretSystemV3 />
+          <CheckupPillarsV3 />
+          <PreviewDashboardV3 />
+          <CTAFinalV3 />
           <PricingV3 />
           <FAQV3 />
-          <CTAFinalV3 />
         </main>
         <FooterV3 />
       </div>

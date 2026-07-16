@@ -1,59 +1,61 @@
-import { CreditCard, ClipboardList, HelpCircle } from 'lucide-react';
+import { EyeOff, MessageCircleQuestion, Scale } from 'lucide-react';
 
-import { ScrollReveal, StaggerContainer, StaggerItem } from './animations';
+import { HoverLift, ScrollReveal, StaggerContainer, StaggerItem } from './animations';
 
 const PROBLEMS = [
   {
-    icon: CreditCard,
-    title: 'Contas espalhadas',
+    icon: EyeOff,
+    title: 'Incerteza no lugar da clareza',
     description:
-      'Nubank, Inter, banco do salário. Cada um com seu app, seu extrato, seus números. Nenhum mostra o todo.',
+      'Você sente o dinheiro apertar, mas não consegue dizer com lucidez como está a capacidade do seu sistema.',
   },
   {
-    icon: ClipboardList,
-    title: 'Controle manual cansa',
+    icon: MessageCircleQuestion,
+    title: 'Difícil explicar a alguém',
     description:
-      'Você já tentou a planilha. Funcionou por 10 dias. Depois, a vida aconteceu e você parou de preencher.',
+      'Se alguém perguntar “como está sua saúde financeira?”, a resposta vira um emaranhado de apps, saldos e impressões.',
   },
   {
-    icon: HelpCircle,
-    title: 'Sem visão real',
+    icon: Scale,
+    title: 'Números sem decisão',
     description:
-      'Chega no fim do mês sem saber para onde foi o dinheiro. Quanto gastou em alimentação? Transporte? Impossível dizer.',
+      'Planilhas e painéis acumulam dados. O que falta é uma leitura que oriente a próxima decisão — sem culpa nem pressa artificial.',
   },
 ] as const;
 
 export function ProblemV3() {
   return (
-    <section className="v3-section bg-white">
+    <section className="v3-section bg-[var(--v3-bg)]">
       <div className="v3-container">
         <ScrollReveal className="text-center mb-12 md:mb-16">
           <h2 className="v3-h2 mb-4">
-            Você sabe quanto gastou
+            Você consegue explicar
             <br className="hidden sm:block" />
-            <span className="text-gray-400"> no mês passado?</span>
+            <span className="text-gray-500"> a capacidade do seu sistema?</span>
           </h2>
           <p className="v3-body max-w-2xl mx-auto">
-            A maioria não sabe. Contas em bancos diferentes, cartões de crédito espalhados, Pix que
-            some sem você perceber. O resultado: você desiste e continua no escuro.
+            A maioria vive no escuro operacional: dados espalhados, impressões soltas, nenhuma
+            leitura que una liquidez, fluxo e o restante em uma conversa humana.
           </p>
         </ScrollReveal>
 
         <StaggerContainer
           className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto"
-          staggerDelay={0.12}
+          staggerDelay={0.1}
         >
           {PROBLEMS.map((problem) => {
             const Icon = problem.icon;
             return (
               <StaggerItem key={problem.title}>
-                <div className="v3-card text-center group h-full">
-                  <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center mx-auto mb-4 group-hover:bg-red-100 transition-colors">
-                    <Icon className="w-6 h-6 text-red-500" />
+                <HoverLift className="h-full">
+                  <div className="v3-card text-center group h-full">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/15 text-emerald-400 mb-4 group-hover:bg-emerald-500/25 transition-colors duration-200">
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-50 mb-2">{problem.title}</h3>
+                    <p className="text-sm text-gray-400 leading-relaxed">{problem.description}</p>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{problem.title}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{problem.description}</p>
-                </div>
+                </HoverLift>
               </StaggerItem>
             );
           })}

@@ -28,7 +28,7 @@ export const navigation: NavigationSection[] = [
       { name: 'Home', href: '/home', icon: Home },
       { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
       {
-        name: 'Decisão financeira',
+        name: 'Leitura do período',
         href: '/decision',
         icon: Scale,
       },

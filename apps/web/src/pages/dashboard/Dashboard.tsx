@@ -1,371 +1,186 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { format, subMonths, startOfMonth, isSameMonth } from 'date-fns';
+import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { motion } from 'framer-motion';
-import { Banknote, BarChart3, Calendar, List } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 
-import { AccountBalancesCard } from '@/components/dashboard/AccountBalancesCard';
-import { CreditCardExpensesCard } from '@/components/dashboard/CreditCardExpensesCard';
-import { ExpensesDistributionCard } from '@/components/dashboard/ExpensesDistributionCard';
-import { FinancialGoalsCard } from '@/components/dashboard/FinancialGoalsCard';
-import { MonthlyComparisonCard } from '@/components/dashboard/MonthlyComparisonCard';
-import { RecentTransactionsCard } from '@/components/dashboard/RecentTransactionsCard';
-import { SummaryCardsRow } from '@/components/dashboard/SummaryCardsRow';
 import { Button } from '@/components/ui/button';
-import { Modal } from '@/components/ui/Modal';
 import { PullToRefresh } from '@/components/ui/pullToRefresh';
-import {
-  useDashboardBalanceHistory,
-  useDashboardExpensesByCategory,
-  useDashboardGoalsSummary,
-  useDashboardRecentTransactions,
-} from '@/hooks/useDashboard';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
-import type { DashboardFilters, DashboardTimeRange } from '@/types/dashboard';
-import { formatCurrency } from '@/utils/formatters';
+import type { DashboardFilters } from '@/types/dashboard';
 
+import { CapacityHypothesis } from './components/CapacityHypothesis';
+import { ExecutiveSummary } from './components/ExecutiveSummary';
+import { PillarTimeline } from './components/PillarTimeline';
+import { VisualReadings, type FlowPoint } from './components/VisualReadings';
+import { buildExecutiveSummary } from './copy/buildExecutiveSummary';
+import { useFinancialHealthCheckup } from './hooks/useFinancialHealthCheckup';
+import { Callout, Stack } from './laudo-layout/primitives';
+import {
+  reducedSectionContainerVariants,
+  reducedSectionItemVariants,
+  sectionContainerVariants,
+  sectionItemVariants,
+} from './motion';
+import type { PillarId } from './types';
+
+/** Financial Health `/dashboard` — UX02 vertical progressive reading + pillar timeline. */
 export function Dashboard() {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
-  // Create array of last 6 months for the filter
-  const last6Months = useMemo(() => {
-    return Array.from({ length: 6 })
-      .map((_, i) => {
-        const date = subMonths(new Date(), i);
-        return startOfMonth(date);
-      })
-      .reverse();
-  }, []);
-
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [timeRange, setTimeRange] = useState<DashboardTimeRange>('month');
-  const [selectedView, setSelectedView] = useState<'overview' | 'details'>('overview');
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [showCategoriesModal, setShowCategoriesModal] = useState(false);
-  const [showGoalsModal, setShowGoalsModal] = useState(false);
-
-  const queryClient = useQueryClient();
   const { activeCompany } = useCompanyStore();
-  const companyId = activeCompany?.id || '';
-
-  // Define variants
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 },
-  };
+  const companyId = activeCompany?.id ?? '';
+  const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [expandedPillarId, setExpandedPillarId] = useState<PillarId | null>(null);
+  const reduceMotion = useReducedMotion();
 
   const filters: DashboardFilters = useMemo(
     () => ({
-      timeRange,
-      referenceDate: selectedDate.toISOString(),
+      timeRange: 'month',
+      referenceDate: new Date().toISOString(),
     }),
-    [timeRange, selectedDate],
+    [],
   );
 
-  const balanceHistoryQuery = useDashboardBalanceHistory(companyId, filters);
-  const expensesByCategoryQuery = useDashboardExpensesByCategory(companyId, filters);
-  const goalsSummaryQuery = useDashboardGoalsSummary(companyId);
-  const recentTransactionsQuery = useDashboardRecentTransactions(companyId, filters, 50);
+  const {
+    checkup,
+    isLoading,
+    isError,
+    refetch,
+    summary,
+    balanceHistory,
+    expensesByCategory,
+    indebtedness,
+  } = useFinancialHealthCheckup(companyId, filters);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-    await balanceHistoryQuery.refetch();
-    await expensesByCategoryQuery.refetch();
-    await goalsSummaryQuery.refetch();
-    await recentTransactionsQuery.refetch();
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+      queryClient.invalidateQueries({ queryKey: ['indebtedness'] }),
+      refetch(),
+    ]);
     setIsRefreshing(false);
   };
 
-  const formattedDate = format(selectedDate, "MMMM 'de' yyyy", { locale: ptBR });
+  const periodLabel = useMemo(() => {
+    const start = summary.data?.periodStart;
+    if (!start) {
+      return format(new Date(), 'MMM yyyy', { locale: ptBR });
+    }
+    return format(new Date(start), 'MMM yyyy', { locale: ptBR });
+  }, [summary.data?.periodStart]);
 
-  const expensesByCategory = expensesByCategoryQuery.data ?? [];
-  const totalExpenses = expensesByCategory.reduce((sum, cat) => sum + cat.value, 0);
+  const flowChartData = useMemo((): FlowPoint[] => {
+    const points = balanceHistory.data ?? [];
+    if (points.length === 0 && summary.data) {
+      return [
+        {
+          label: periodLabel,
+          income: Math.round(summary.data.income),
+          expenses: Math.round(summary.data.expenses),
+        },
+      ];
+    }
+    return points.map((point) => ({
+      label: format(new Date(point.date), 'dd/MM', { locale: ptBR }),
+      income: Math.round(point.income),
+      expenses: Math.round(point.expenses),
+    }));
+  }, [balanceHistory.data, summary.data, periodLabel]);
 
-  const goalsSummary = goalsSummaryQuery.data ?? [];
+  const executiveLines = useMemo(
+    () => (checkup ? buildExecutiveSummary(checkup) : null),
+    [checkup],
+  );
 
-  const detailedMovements =
-    recentTransactionsQuery.data?.map((tx) => {
-      // Backend returns values as positive numbers, so we need to apply the sign
-      // Revenue: positive, Expense: negative
-      const value = tx.launchType === 'revenue' ? Math.abs(tx.value) : -Math.abs(tx.value);
-      return {
-        date: tx.paymentDate,
-        description: tx.description,
-        value,
-        type: tx.launchType === 'revenue' ? 'INCOME' : 'EXPENSE',
-      };
-    }) ?? [];
+  const containerVariants = reduceMotion
+    ? reducedSectionContainerVariants
+    : sectionContainerVariants;
+  const itemVariants = reduceMotion ? reducedSectionItemVariants : sectionItemVariants;
 
   return (
     <ViewDefault>
-      {/* Modais */}
-      <Modal
-        open={showDetailsModal}
-        onClose={() => setShowDetailsModal(false)}
-        title="Saldo das Contas"
-        className="max-w-4xl"
-      >
-        <AccountBalancesCard companyId={companyId} />
-        <div className="border-t border-border dark:border-border-dark pt-4 mt-6">
-          <h3 className="text-sm font-medium text-text dark:text-text-dark mb-3">
-            Movimentações Recentes
-          </h3>
-          <div className="overflow-y-auto max-h-80 pr-2">
-            <table className="min-w-full text-sm">
-              <thead className="sticky top-0 bg-card dark:bg-card-dark">
-                <tr className="text-left text-gray-500 dark:text-gray-400">
-                  <th className="py-2 pr-4 font-medium">Data</th>
-                  <th className="py-2 pr-4 font-medium">Descrição</th>
-                  <th className="py-2 pr-4 font-medium text-right">Valor</th>
-                  <th className="py-2 font-medium">Tipo</th>
-                </tr>
-              </thead>
-              <tbody>
-                {detailedMovements.map((mov, idx) => (
-                  <tr
-                    key={`${mov.date}-${mov.description}-${idx}`}
-                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-background/50 dark:hover:bg-background-dark/50"
-                  >
-                    <td className="py-2 pr-4 text-text dark:text-text-dark">
-                      {format(new Date(mov.date), 'dd/MM/yyyy')}
-                    </td>
-                    <td className="py-2 pr-4 text-text dark:text-text-dark">{mov.description}</td>
-                    <td
-                      className={`py-2 pr-4 text-right font-medium ${mov.value >= 0 ? 'text-emerald-400' : 'text-red-400'}`}
-                    >
-                      {mov.value >= 0
-                        ? `+${formatCurrency(Math.abs(mov.value))}`
-                        : formatCurrency(mov.value)}
-                    </td>
-                    <td className="py-2 text-text dark:text-text-dark">
-                      {mov.type === 'INCOME' ? 'Receita' : 'Despesa'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </Modal>
-
-      <Modal
-        open={showCategoriesModal}
-        onClose={() => setShowCategoriesModal(false)}
-        title="Despesas por Categoria"
-      >
-        {/* ... content ... */}
-        <div className="space-y-4">
-          {expensesByCategory.map((cat) => {
-            const percentage = totalExpenses > 0 ? (cat.value / totalExpenses) * 100 : 0;
-            return (
-              <div key={cat.categoryId} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="inline-block w-3 h-3 rounded-full"
-                    style={{ background: cat.color }}
-                  />
-                  <span className="font-medium text-base text-gray-900 dark:text-gray-100">
-                    {cat.name}
-                  </span>
-                </div>
-                <div className="flex-1 mx-4">
-                  <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full">
-                    <div
-                      className="h-2 rounded-full"
-                      style={{ width: `${percentage}%`, background: cat.color }}
-                    />
-                  </div>
-                </div>
-                <span className="font-medium text-base text-gray-700 dark:text-gray-200">
-                  {formatCurrency(cat.value)}
-                </span>
-                <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
-                  {percentage.toFixed(1)}%
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </Modal>
-
       <PullToRefresh onRefresh={handleRefresh} isRefreshing={isRefreshing}>
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="space-y-4 pt-0 pb-6 px-6"
-        >
-          {/* Header with Date and Filters */}
-          <motion.div
-            variants={item}
-            className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary-100 dark:bg-primary-900/20 rounded-lg">
-                <Banknote className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Dashboard Financeiro
-                </h1>
-                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                  <Calendar className="h-4 w-4" />
-                  <span className="capitalize">{formattedDate}</span>
-                </div>
-              </div>
-            </div>
+        <div className="mx-auto w-full max-w-[720px] p-4 pb-16 sm:p-6 lg:p-8">
+          {!companyId ? (
+            <Callout tone="neutral">
+              Selecione um contexto para montar a leitura de capacidade do sistema.
+            </Callout>
+          ) : null}
 
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <div className="bg-muted/30 p-1 rounded-full flex items-center justify-center gap-1 overflow-x-auto scrollbar-none border border-border/50">
-                {last6Months.map((date) => {
-                  const isSelected = isSameMonth(date, selectedDate) && timeRange === 'month';
-                  return (
-                    <Button
-                      key={date.toISOString()}
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedDate(date);
-                        setTimeRange('month');
-                      }}
-                      className={`
-                        relative min-h-[44px] min-w-[44px] px-3 rounded-full text-xs font-semibold
-                        transition-all duration-300 ease-in-out
-                        ${
-                          isSelected
-                            ? 'bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20 scale-100 z-10'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
-                        }
-                      `}
-                    >
-                      {format(date, 'MMM', { locale: ptBR }).toUpperCase()}
-                      {isSelected && (
-                        <motion.div
-                          layoutId="activeMonth"
-                          className="absolute inset-0 bg-white/10 rounded-full"
-                          initial={false}
-                          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                        />
-                      )}
-                    </Button>
-                  );
-                })}
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  variant={selectedView === 'overview' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedView('overview')}
-                  className="flex items-center gap-2"
-                >
-                  <BarChart3 className="h-4 w-4" />
-                  <span className="hidden sm:inline">Visão Geral</span>
-                </Button>
-                <Button
-                  variant={selectedView === 'details' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedView('details')}
-                  className="flex items-center gap-2"
-                >
-                  <List className="h-4 w-4" />
-                  <span className="hidden sm:inline">Detalhes</span>
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Financial Summary Cards */}
-          <motion.div variants={item}>
-            <SummaryCardsRow companyId={companyId} filters={filters} />
-          </motion.div>
-
-          {selectedView === 'overview' ? (
-            /* Overview - Charts and Additional Info */
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-fr">
-              {/* Row 1 */}
-              <motion.div variants={item} className="h-full">
-                <AccountBalancesCard companyId={companyId} />
+          <AnimatePresence mode="wait">
+            {companyId && isLoading ? (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: reduceMotion ? 0.01 : 0.2 }}
+              >
+                <Stack gap={16}>
+                  <Skeleton className="h-10 w-3/4 bg-muted/30" />
+                  <Skeleton className="h-28 w-full bg-muted/20" />
+                  <Skeleton className="h-24 w-full bg-muted/20" />
+                </Stack>
               </motion.div>
-              <motion.div variants={item} className="h-full">
-                <ExpensesDistributionCard
-                  companyId={companyId}
-                  filters={filters}
-                  onOpenCategories={() => setShowCategoriesModal(true)}
+            ) : null}
+          </AnimatePresence>
+
+          {companyId && isError && !checkup ? (
+            <Stack gap={12}>
+              <Callout tone="warning">
+                Não foi possível carregar os sinais de capacidade neste momento.
+              </Callout>
+              <Button type="button" variant="outline" onClick={() => void handleRefresh()}>
+                Tentar novamente
+              </Button>
+            </Stack>
+          ) : null}
+
+          {checkup && executiveLines ? (
+            <motion.div
+              key="ready"
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              className="flex flex-col gap-10"
+            >
+              <motion.div variants={itemVariants}>
+                <ExecutiveSummary
+                  lines={executiveLines}
+                  periodLabel={periodLabel}
+                  surfaceQuestion={checkup.surfaceQuestion}
                 />
               </motion.div>
 
-              {/* Row 2 */}
-              <motion.div variants={item} className="h-full">
-                <MonthlyComparisonCard companyId={companyId} filters={filters} />
-              </motion.div>
-              <motion.div variants={item} className="h-full">
-                <CreditCardExpensesCard companyId={companyId} filters={filters} />
-              </motion.div>
-
-              {/* Row 3 - Full width */}
-              <motion.div variants={item} className="md:col-span-2">
-                <FinancialGoalsCard
-                  companyId={companyId}
-                  onViewAll={() => setShowGoalsModal(true)}
+              <motion.div variants={itemVariants}>
+                <PillarTimeline
+                  pillars={checkup.pillars}
+                  expandedPillarId={expandedPillarId}
+                  onToggle={(id) => setExpandedPillarId((current) => (current === id ? null : id))}
                 />
               </motion.div>
-            </div>
-          ) : (
-            /* Details - Transaction List */
-            <motion.div variants={item}>
-              <RecentTransactionsCard
-                companyId={companyId}
-                filters={filters}
-                limit={10}
-                onViewAll={() => {}}
-              />
+
+              <motion.div variants={itemVariants}>
+                <CapacityHypothesis synthesis={checkup.closingSynthesis} />
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <VisualReadings
+                  periodLabel={periodLabel}
+                  summary={summary.data}
+                  flowChartData={flowChartData}
+                  expensesByCategory={expensesByCategory.data ?? []}
+                  liquidityAvailable={indebtedness.data?.liquidity.available}
+                  creditPct={indebtedness.data?.creditUtilization.percentage}
+                />
+              </motion.div>
             </motion.div>
-          )}
-        </motion.div>
-      </PullToRefresh>
-
-      <Modal
-        open={showGoalsModal}
-        onClose={() => setShowGoalsModal(false)}
-        title="Metas Financeiras"
-      >
-        <div className="space-y-6">
-          {goalsSummary.map((goal) => (
-            <div key={goal.id} className="mb-2">
-              <div className="flex items-center justify-between mb-1">
-                <span className="font-medium text-purple-600 dark:text-purple-400">
-                  {goal.name}
-                </span>
-                <span className="text-sm text-gray-500">
-                  {formatCurrency(goal.currentAmount)} de {formatCurrency(goal.targetAmount)}
-                </span>
-              </div>
-              <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full">
-                <div
-                  className="h-2 bg-purple-500 rounded-full transition-all duration-500"
-                  style={{
-                    width: `${Math.min((goal.currentAmount / goal.targetAmount) * 100, 100)}%`,
-                  }}
-                />
-              </div>
-            </div>
-          ))}
+          ) : null}
         </div>
-      </Modal>
+      </PullToRefresh>
     </ViewDefault>
   );
 }

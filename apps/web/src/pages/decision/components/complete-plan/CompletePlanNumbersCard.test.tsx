@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import type { CompletePlanNumbers } from '@/services/completePlanService';
 
 import { CompletePlanNumbersCard } from './CompletePlanNumbersCard';
+import { COMPLETE_PLAN_LABELS } from './copy';
 
 const baseNumbers: CompletePlanNumbers = {
   netIncome: 27000,
@@ -21,12 +22,20 @@ describe('CompletePlanNumbersCard', () => {
     expect(screen.getByText(/Meta saudável/i)).toBeInTheDocument();
   });
 
-  it('shows a legend that explains how the committed percentage is composed', () => {
+  it('attaches hover info hints for each KPI', () => {
     render(<CompletePlanNumbersCard numbers={baseNumbers} />);
 
-    const legend = screen.getByTestId('committed-pct-legend');
-    expect(legend.textContent).toMatch(/parcelas/i);
-    expect(legend.textContent).toMatch(/cart[ãa]o|rotativo/i);
-    expect(legend.textContent).toMatch(/cheque especial/i);
+    expect(screen.getByTestId('committed-pct-legend')).toHaveAttribute(
+      'aria-label',
+      COMPLETE_PLAN_LABELS.numbersInfoToggle,
+    );
+    expect(screen.getByTestId('healthy-target-legend')).toHaveAttribute(
+      'aria-label',
+      COMPLETE_PLAN_LABELS.numbersInfoToggle,
+    );
+    expect(screen.getByTestId('reduction-needed-legend')).toHaveAttribute(
+      'aria-label',
+      COMPLETE_PLAN_LABELS.numbersInfoToggle,
+    );
   });
 });

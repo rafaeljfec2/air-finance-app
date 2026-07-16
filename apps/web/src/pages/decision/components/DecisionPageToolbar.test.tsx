@@ -8,14 +8,14 @@ describe('DecisionPageToolbar', () => {
     const onRefresh = vi.fn();
     const { container } = render(
       <DecisionPageToolbar
-        title="Decisão financeira"
+        title="Leitura do período"
         subtitle="Subtítulo."
         showRefresh
         isFetching={false}
         onRefresh={onRefresh}
       />,
     );
-    expect(screen.getByRole('heading', { name: 'Decisão financeira' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Leitura do período' })).toBeInTheDocument();
     expect(screen.getByText('Subtítulo.')).toBeInTheDocument();
     expect(container.querySelector('header svg')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Atualizar/i }));

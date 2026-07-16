@@ -1,14 +1,25 @@
 export const COMPLETE_PLAN_LABELS = {
   sectionTitle: 'Seu plano completo',
   sectionDescription: 'Tudo que está acontecendo, o que mudar e como continuar no controle.',
+  sparseTitle: 'Leitura do período indisponível',
+  sparseDescription:
+    'Ainda faltam fatos neste perfil. Complete renda, cartões e movimentos para montar o detalhe do mês — sem inventar números.',
+  sparseCtaHint: 'A decisão de hoje continua na Home; aqui só habilitamos a leitura do período.',
   diagnosisTitle: 'O que está acontecendo',
   coherenceTitle: 'Leitura dos números',
   numbersTitle: 'Sua situação em números',
   numbersToday: 'Hoje você compromete',
   numbersHealthy: 'Meta saudável',
   numbersReduce: 'Para chegar na meta, reduza',
+  numbersInfoToggle: 'Por que esse valor?',
   numbersCompositionLegend:
     'Considera parcelas mensais ativas + juros estimados do cartão (rotativo) + cheque especial.',
+  numbersHealthyLegend:
+    'Referência do plano: manter o comprometimento com parcelas e encargos até 25% da renda.',
+  numbersReduceLegendPositive:
+    'É a diferença entre o valor comprometido hoje e o teto da meta saudável (25% da renda).',
+  numbersReduceLegendZero:
+    'Seu comprometimento já está na meta ou abaixo — não há redução obrigatória neste KPI.',
   projectionTitle: 'O que muda nos próximos 90 dias',
   projection30: 'Em 30 dias',
   projection60: 'Em 60 dias',
@@ -20,6 +31,14 @@ export const COMPLETE_PLAN_LABELS = {
   variableSpendingSummaryTitle: 'Resumo do gasto variável',
   variableSpendingSummaryHint:
     'Despesas marcadas como não fixas e que não repetem todo mês — mesmo critério da página inicial.',
+  variableSpendingSummaryInfoToggle: 'O que entra nesse total?',
+  variableSpendingBucketInfoToggle: 'O que significa o status?',
+  variableSpendingBucketHealthyHint:
+    'O total variável está em faixa confortável frente à renda neste critério.',
+  variableSpendingBucketAttentionHint:
+    'O total variável pediu atenção — vale olhar onde cortar primeiro no detalhe.',
+  variableSpendingBucketCriticalHint:
+    'O total variável está alto frente à renda — priorize o detalhe e o plano de corte.',
   variableSpendingOpenDetail: 'Ver no plano detalhado',
   variableSpendingCardTitle: 'Gastos variáveis',
   variableSpendingVsIncome: 'da sua renda neste mês',

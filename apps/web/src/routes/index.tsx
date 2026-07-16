@@ -67,7 +67,6 @@ const Dashboard = lazy(() =>
   import('@/pages/dashboard/Dashboard').then((m) => ({ default: m.Dashboard })),
 );
 const HomePage = lazy(() => import('@/pages/home').then((m) => ({ default: m.HomePage })));
-const HomePageV2 = lazy(() => import('@/pages/home-v2').then((m) => ({ default: m.HomePageV2 })));
 const DependentsPage = lazy(() =>
   import('@/pages/dependents').then((m) => ({ default: m.DependentsPage })),
 );
@@ -328,7 +327,11 @@ export const router = createBrowserRouter(
         // --- Routes with onboarding guard ---
         onboardingRoute('/onboarding', <OnboardingPage />),
         onboardingRoute('/home', <HomePage />),
-        onboardingRoute('/home-v2', <HomePageV2 />),
+        // Deprecated parallel Home KPI: redirected to Decision Dashboard Home. Code kept for TD sprint cleanup.
+        {
+          path: '/home-v2',
+          element: <Navigate to="/home" replace />,
+        },
         onboardingRoute('/dashboard', <Dashboard />),
         onboardingRoute('/financial-health', <FinancialHealthPage />),
         onboardingRoute('/decision', <FinancialDecisionPage />),

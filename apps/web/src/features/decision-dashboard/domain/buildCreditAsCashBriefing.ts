@@ -1,0 +1,142 @@
+import type { DecisionBriefingFacts } from '../mappers/deriveBriefingFacts';
+
+import { buildBehaviorHistoryLines, type BehaviorEvidence } from './deriveBehaviorEvidence';
+
+function formatBrl(value: number): string {
+  return value.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+}
+
+function shortCardName(name: string): string {
+  const cleaned = name
+    .replace(/\b(mastercard|visa|elo|amex)\b/gi, '')
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const first = cleaned.split(' ')[0] ?? cleaned;
+  return first.charAt(0).toUpperCase() + first.slice(1);
+}
+
+export interface BriefingEvidenceFact {
+  readonly label: string;
+  readonly value: string;
+}
+
+export interface CreditAsCashBriefingCopy {
+  readonly status: string;
+  readonly statusLines: readonly string[];
+  readonly evidence: readonly BriefingEvidenceFact[];
+  readonly preserve: readonly string[];
+  readonly avoid: readonly string[];
+  readonly historyLines: readonly string[];
+  readonly decision: string;
+  readonly ctaLabel: string;
+}
+
+/**
+ * Phase-1 Home briefing — plain language only. Layout stays in UI components.
+ */
+export function buildCreditAsCashBriefing(
+  facts: DecisionBriefingFacts | undefined,
+  behavior?: BehaviorEvidence,
+): CreditAsCashBriefingCopy {
+  const anchor = facts?.anchorReceivable;
+  const cash = facts?.operationalCash;
+  const projected = facts?.projectedMonthBalance;
+  const operating = facts?.operatingCardName ? shortCardName(facts.operatingCardName) : undefined;
+  const idle = facts?.idleCardName ? shortCardName(facts.idleCardName) : undefined;
+
+  const cashLine =
+    cash !== undefined && cash < 500
+      ? 'Na conta: o dinheiro de hoje está curto.'
+      : 'Na conta: ainda há algum dinheiro hoje.';
+
+  let planLine: string;
+  if (projected === undefined) {
+    planLine = 'No plano: ainda não dá para cravar o fechamento.';
+  } else if (projected >= 0) {
+    planLine = 'No plano: o mês ainda pode fechar positivo.';
+  } else {
+    planLine = 'No plano: o mês ainda pode fechar negativo.';
+  }
+
+  const dayPart = anchor ? `Até o dia ${anchor.dueDay}` : 'Até a próxima entrada';
+  const bridgeDetail = anchor ? `não use o cartão (${anchor.label}).` : 'não use o cartão.';
+  const bridgeLine = `${dayPart}: ${bridgeDetail}`;
+  const statusLines = [cashLine, planLine, bridgeLine] as const;
+  const status = statusLines.join(' ');
+
+  const evidence: BriefingEvidenceFact[] = [];
+  if (cash !== undefined) {
+    evidence.push({
+      label: 'Na conta hoje',
+      value: formatBrl(cash),
+    });
+  }
+  if (projected !== undefined) {
+    evidence.push({
+      label: 'No plano do mês',
+      value: projected >= 0 ? `+${formatBrl(projected)}` : formatBrl(projected),
+    });
+  }
+  if (anchor) {
+    evidence.push({
+      label: 'Próxima entrada',
+      value: `${anchor.label} · ${formatBrl(anchor.amount)} · dia ${anchor.dueDay}`,
+    });
+  } else {
+    evidence.push({
+      label: 'Próxima entrada',
+      value: 'Ainda sem data clara',
+    });
+  }
+
+  const preserve = [
+    'O dinheiro que ainda resta na conta até a próxima entrada chegar',
+    'Sua folga para pagar o que já está combinado, sem abrir mais dívida',
+  ];
+
+  const avoidLines: string[] = [
+    'Usar o cartão como se fosse o salário do mês',
+    'Fazer compra nova ou assumir compromisso novo antes da entrada cair',
+  ];
+  if (idle) {
+    avoidLines[1] = `Abrir o ${idle} ou qualquer limite novo antes da ${anchor?.label ?? 'próxima entrada'} chegar`;
+  }
+
+  if (behavior?.creditAsCashPattern) {
+    avoidLines[0] = 'Usar o cartão como salário — o histórico mostra que esse padrão se repete';
+  }
+
+  let decision: string;
+  let ctaLabel: string;
+
+  if (operating && idle && anchor) {
+    decision = `Não use o ${operating} nem o ${idle} até a ${anchor.label} de ${anchor.dueDateShort}.`;
+    ctaLabel = `Vou segurar os dois cartões até o dia ${anchor.dueDay}`;
+  } else if (operating && anchor) {
+    decision = `Não use o ${operating} até a ${anchor.label} de ${anchor.dueDateShort}.`;
+    ctaLabel = `Vou segurar o cartão até o dia ${anchor.dueDay}`;
+  } else {
+    decision =
+      'Não use o cartão — nem um segundo limite — até o dinheiro da próxima entrada cair na conta.';
+    ctaLabel = 'Vou seguir esse passo';
+  }
+
+  const historyLines = behavior
+    ? buildBehaviorHistoryLines(behavior)
+    : ['Ainda não temos histórico suficiente para recomendar mudanças de comportamento.'];
+
+  return {
+    status,
+    statusLines,
+    evidence: evidence.slice(0, 3),
+    preserve,
+    avoid: avoidLines.slice(0, 2),
+    historyLines,
+    decision,
+    ctaLabel,
+  };
+}

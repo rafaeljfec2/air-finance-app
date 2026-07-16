@@ -30,7 +30,7 @@ export function EmailPendingPage() {
 
   if (user?.emailVerified === true) {
     if (user.onboardingCompleted === true) {
-      navigate('/dashboard', { replace: true });
+      navigate('/home', { replace: true });
     } else {
       navigate('/onboarding', { replace: true });
     }

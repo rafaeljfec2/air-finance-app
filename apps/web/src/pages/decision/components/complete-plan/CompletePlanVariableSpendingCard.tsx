@@ -2,6 +2,7 @@ import { Gauge } from 'lucide-react';
 
 import type { CompletePlanVariableSpending } from '@/services/completePlanService';
 
+import { CompletePlanInfoHint } from './CompletePlanInfoHint';
 import { COMPLETE_PLAN_LABELS } from './copy';
 import { formatBrl, formatPercent, formatSignedOneDecimalPercent } from './format';
 
@@ -41,7 +42,7 @@ export function CompletePlanVariableSpendingCard({
       className="space-y-4 rounded-md border border-border bg-background px-4 py-4 dark:border-border-dark dark:bg-background-dark"
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Gauge className="h-4 w-4 text-primary-500 dark:text-primary-400" aria-hidden />
           <h3
             id="cp-variable-title"
@@ -49,6 +50,10 @@ export function CompletePlanVariableSpendingCard({
           >
             {COMPLETE_PLAN_LABELS.variableSpendingCardTitle}
           </h3>
+          <CompletePlanInfoHint
+            ariaLabel={COMPLETE_PLAN_LABELS.variableSpendingSummaryInfoToggle}
+            content={COMPLETE_PLAN_LABELS.variableSpendingFootnote}
+          />
         </div>
         <span
           role="status"
@@ -138,10 +143,6 @@ export function CompletePlanVariableSpendingCard({
           </p>
         )}
       </div>
-
-      <p className="text-xs text-gray-500 dark:text-gray-400">
-        {COMPLETE_PLAN_LABELS.variableSpendingFootnote}
-      </p>
     </section>
   );
 }

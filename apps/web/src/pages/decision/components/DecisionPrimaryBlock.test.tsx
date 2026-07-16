@@ -56,4 +56,15 @@ describe('DecisionPrimaryBlock', () => {
     expect(screen.getByRole('link', { name: 'Ver transações' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Orçamento' })).toHaveAttribute('href', '/budget');
   });
+
+  it('frames data_incomplete as hygiene to enable reading, not today decision', () => {
+    renderBlock({ primaryIssue: 'data_incomplete' });
+
+    expect(screen.getByText(/Para habilitar a leitura/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Copiar lembrete de cadastro/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/home');
+    expect(screen.queryByText(/^Próximo passo$/i)).not.toBeInTheDocument();
+  });
 });

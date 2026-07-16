@@ -45,23 +45,23 @@ function FAQAccordionItem({ item }: { readonly item: FAQItem }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border-b border-gray-100 last:border-b-0">
+    <div className="border-b border-gray-800 last:border-b-0">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between py-5 text-left group"
         aria-expanded={isOpen}
       >
-        <span className="text-sm md:text-base font-semibold text-gray-900 pr-4 group-hover:text-emerald-600 transition-colors">
+        <span className="text-sm md:text-base font-semibold text-gray-50 pr-4 group-hover:text-emerald-400 transition-colors">
           {item.question}
         </span>
         <ChevronDown
-          className={`w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200 ${
+          className={`w-5 h-5 text-gray-500 shrink-0 transition-transform duration-200 ${
             isOpen ? 'rotate-180' : ''
           }`}
         />
       </button>
       <Collapse isOpen={isOpen}>
-        <p className="text-sm text-gray-500 leading-relaxed pr-8 pb-5">{item.answer}</p>
+        <p className="text-sm text-gray-400 leading-relaxed pr-8 pb-5">{item.answer}</p>
       </Collapse>
     </div>
   );
@@ -69,7 +69,7 @@ function FAQAccordionItem({ item }: { readonly item: FAQItem }) {
 
 export function FAQV3() {
   return (
-    <section className="v3-section bg-white">
+    <section className="v3-section bg-[var(--v3-bg)]">
       <div className="v3-container">
         <ScrollReveal className="text-center mb-12 md:mb-16">
           <h2 className="v3-h2 mb-4">Perguntas frequentes</h2>
