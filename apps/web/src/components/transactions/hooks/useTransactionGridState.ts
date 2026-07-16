@@ -17,18 +17,19 @@ interface UseTransactionGridStateProps {
   transactions: TransactionGridTransaction[];
   resetPageKey?: string | number;
   onActionClick?: (transaction: TransactionGridTransaction) => void;
+  initialSortConfig?: { field: SortField; direction: SortDirection };
 }
 
 export function useTransactionGridState({
   transactions,
   resetPageKey,
   onActionClick,
+  initialSortConfig,
 }: UseTransactionGridStateProps) {
   const navigate = useNavigate();
-  const [sortConfig, setSortConfig] = useState<{ field: SortField; direction: SortDirection }>({
-    field: 'date',
-    direction: 'asc',
-  });
+  const [sortConfig, setSortConfig] = useState<{ field: SortField; direction: SortDirection }>(
+    initialSortConfig ?? { field: 'date', direction: 'asc' },
+  );
   const [activeFilter, setActiveFilter] = useState<SortField | null>(null);
   const [filters, setFilters] = useState<FilterValue[]>([]);
 

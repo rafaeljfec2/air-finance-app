@@ -115,6 +115,9 @@ const Statement = lazy(() => import('@/pages/statement').then((m) => ({ default:
 const Transactions = lazy(() =>
   import('@/pages/transactions').then((m) => ({ default: m.Transactions })),
 );
+const TransactionsV2Page = lazy(() =>
+  import('@/pages/transactions-v2').then((m) => ({ default: m.TransactionsV2Page })),
+);
 const NewTransaction = lazy(() =>
   import('@/pages/transactions/new').then((m) => ({ default: m.NewTransaction })),
 );
@@ -336,6 +339,11 @@ export const router = createBrowserRouter(
         onboardingRoute('/financial-health', <FinancialHealthPage />),
         onboardingRoute('/decision', <FinancialDecisionPage />),
         onboardingRoute('/transactions', <Transactions />),
+        onboardingRoute('/movements', <TransactionsV2Page />),
+        {
+          path: '/transactions-v2',
+          element: <Navigate to="/movements" replace />,
+        },
         onboardingRoute('/reports', <Reports />),
         onboardingRoute('/payments', <PaymentsPage />),
 

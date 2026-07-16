@@ -91,11 +91,18 @@ function isRecurringTransaction(formData: TransactionFormData): boolean {
   );
 }
 
+export interface UseTransactionFormOptions {
+  readonly onSuccess?: () => void;
+  readonly persistDraft?: boolean;
+}
+
 /**
  * Hook for managing transaction form state and submission
  */
-export function useTransactionForm() {
+export function useTransactionForm(options?: UseTransactionFormOptions) {
   const navigate = useNavigate();
+  const onSuccessOption = options?.onSuccess;
+  const persistDraft = options?.persistDraft ?? true;
   const [searchParams] = useSearchParams();
   const queryType = searchParams.get('type');
   const initialType: TransactionType =
@@ -114,6 +121,15 @@ export function useTransactionForm() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const handleCreationSuccess = useCallback(() => {
+    sessionStorage.removeItem('transaction_draft');
+    if (onSuccessOption) {
+      onSuccessOption();
+    } else {
+      navigate('/transactions');
+    }
+  }, [onSuccessOption, navigate]);
+
   /**
    * Mutation for creating recurring transactions
    */
@@ -126,8 +142,7 @@ export function useTransactionForm() {
         description: 'Transação recorrente cadastrada com sucesso!',
         type: 'success',
       });
-      sessionStorage.removeItem('transaction_draft');
-      navigate('/transactions');
+      handleCreationSuccess();
     },
     onError: (error) => {
       toast({
@@ -143,6 +158,7 @@ export function useTransactionForm() {
    * Load draft from sessionStorage on mount
    */
   useEffect(() => {
+    if (!persistDraft) return;
     try {
       const draft = sessionStorage.getItem('transaction_draft');
       if (draft) {
@@ -153,18 +169,19 @@ export function useTransactionForm() {
       console.warn('Failed to load transaction draft:', error);
       sessionStorage.removeItem('transaction_draft');
     }
-  }, []);
+  }, [persistDraft]);
 
   /**
    * Save draft to sessionStorage when form data changes
    */
   useEffect(() => {
+    if (!persistDraft) return;
     try {
       sessionStorage.setItem('transaction_draft', JSON.stringify(formData));
     } catch (error) {
       console.warn('Failed to save transaction draft:', error);
     }
-  }, [formData]);
+  }, [formData, persistDraft]);
 
   /**
    * Update companyId when activeCompany changes
@@ -253,8 +270,7 @@ export function useTransactionForm() {
       createTransaction(payload, {
         onSuccess: () => {
           toast({ type: 'success', description: 'Transação salva com sucesso!' });
-          sessionStorage.removeItem('transaction_draft');
-          navigate('/transactions');
+          handleCreationSuccess();
         },
         onError: (error) => {
           toast({
@@ -264,7 +280,7 @@ export function useTransactionForm() {
         },
       });
     },
-    [formData, companyId, createTransaction, createRecurringMutation, navigate],
+    [formData, companyId, createTransaction, createRecurringMutation, handleCreationSuccess],
   );
 
   return {
