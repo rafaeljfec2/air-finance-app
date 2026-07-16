@@ -5,7 +5,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 import { Logo } from '@/components/Logo';
 
-import { FadePresence, V3_EASE } from './animations';
+import { FadePresence } from './animations';
+import { V3_EASE } from './motion';
 
 const NAV_ITEMS = [
   { label: 'Check-up', hash: '#checkup-pillars' },

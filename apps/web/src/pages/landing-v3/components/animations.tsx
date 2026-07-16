@@ -10,7 +10,7 @@ import {
 import { type ReactNode } from 'react';
 import { useInView } from 'react-intersection-observer';
 
-export const V3_EASE: Transition['ease'] = [0.22, 1, 0.36, 1];
+import { V3_EASE } from './motion';
 
 const MOTION: Transition = {
   duration: 0.55,

@@ -252,10 +252,6 @@ export function Divider({ className }: Readonly<{ className?: string }>) {
   return <hr className={cn('border-border dark:border-border-dark', className)} />;
 }
 
-/** @deprecated Import from `./useLaudoChartTheme` — kept for HMR/compat. */
-export { useLaudoChartTheme } from './useLaudoChartTheme';
-export type { LaudoChartTheme } from './useLaudoChartTheme';
-
 /** Custom axis tick — Recharts sometimes ignores style objects; SVG fill is explicit. */
 export function ChartAxisTick({
   x,

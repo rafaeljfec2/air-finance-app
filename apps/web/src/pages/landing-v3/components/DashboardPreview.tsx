@@ -1,7 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
-import { V3_EASE } from './animations';
+import { V3_EASE } from './motion';
 
 const PREVIEW_PILLARS = [
   { name: 'Liquidez', state: 'Boa', value: 'R$ 12.400', question: 'Consigo operar agora?' },
