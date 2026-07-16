@@ -21,6 +21,8 @@ const baseReady = {
   isLoading: false,
   isError: false,
   isAwaitingCompany: false,
+  loadingMessage: null,
+  loadingSteps: [],
   showSecondaryExpanded: false,
   expandSecondary: vi.fn(),
   collapseSecondary: vi.fn(),
@@ -211,5 +213,53 @@ describe('DecisionDashboardFeature', () => {
 
     expect(screen.getByLabelText('Awaiting company selection')).toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('renders centered loading feedback with evolution steps', () => {
+    mockedHook.mockReturnValue({
+      ...baseReady,
+      surfaceState: 'loading',
+      isLoading: true,
+      loadingMessage: 'Montando seu parecer de hoje…',
+      loadingSteps: [
+        {
+          id: 'accounts_budget',
+          label: 'Organizando contas e planejamento do mês…',
+          status: 'done',
+        },
+        {
+          id: 'summary',
+          label: 'Lendo entradas, saídas e saldo do mês…',
+          status: 'done',
+        },
+        {
+          id: 'movements',
+          label: 'Revisando movimentações recentes…',
+          status: 'done',
+        },
+        {
+          id: 'credit',
+          label: 'Verificando pressão de crédito…',
+          status: 'done',
+        },
+        {
+          id: 'assembly',
+          label: 'Montando seu parecer de hoje…',
+          status: 'active',
+        },
+      ],
+      viewModel: null,
+    });
+
+    render(<DecisionDashboardFeature />);
+
+    const loadingRegion = screen.getByLabelText('Montando parecer de hoje');
+    expect(loadingRegion).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByText('Montando seu parecer de hoje')).toBeInTheDocument();
+    expect(screen.getAllByText('Montando seu parecer de hoje…').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByLabelText('Loading progress')).toBeInTheDocument();
+    expect(screen.getByLabelText('Progresso do parecer')).toBeInTheDocument();
+    expect(screen.getByText('4 de 5 etapas concluídas')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Loading decision status')).not.toBeInTheDocument();
   });
 });

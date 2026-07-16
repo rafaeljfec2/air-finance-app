@@ -6,6 +6,7 @@ import { useDecisionDashboard } from '../hooks/useDecisionDashboard';
 
 import { ActionOfTheDayBlock } from './components/ActionOfTheDayBlock';
 import { BehaviorHistoryBlock } from './components/BehaviorHistoryBlock';
+import { DecisionDashboardLoading } from './components/DecisionDashboardLoading';
 import { DecisionDashboardSecondary } from './components/DecisionDashboardSecondary';
 import { DecisionDashboardStatus } from './components/DecisionDashboardStatus';
 import { DecisionInsightBlock } from './components/DecisionInsightBlock';
@@ -34,6 +35,8 @@ export function DecisionDashboardFeature() {
     isLoading,
     isError,
     isAwaitingCompany,
+    loadingMessage,
+    loadingSteps,
     viewModel,
     showSecondaryExpanded,
     expandSecondary,
@@ -54,24 +57,10 @@ export function DecisionDashboardFeature() {
 
   if (isLoading) {
     return (
-      <BriefingShell>
-        <div
-          className="animate-pulse space-y-6 p-4 sm:p-5"
-          aria-busy="true"
-          aria-label="Loading decision dashboard"
-        >
-          <div className="flex justify-between gap-3">
-            <div className="h-4 w-40 rounded-full bg-primary-500/15" />
-            <div className="h-3 w-24 rounded-full bg-muted/25" />
-          </div>
-          <div className="space-y-2">
-            <div className="h-8 w-[92%] rounded-lg bg-muted/30 dark:bg-muted/15" />
-            <div className="h-8 w-[70%] rounded-lg bg-muted/25 dark:bg-muted/10" />
-          </div>
-          <div className="h-20 w-full rounded-xl bg-muted/20" />
-          <div className="h-24 w-full rounded-xl bg-muted/15" />
-        </div>
-      </BriefingShell>
+      <DecisionDashboardLoading
+        message={loadingMessage ?? 'Montando seu parecer de hoje…'}
+        steps={loadingSteps}
+      />
     );
   }
 

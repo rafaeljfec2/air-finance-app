@@ -26,10 +26,12 @@ import {
   type DecisionDashboardViewModel,
 } from '../mappers/mapDashboardPayloadToViewModel';
 
+import type { DashboardLoadingStep } from './resolveDashboardLoadingPhase';
 import {
   resolveDashboardSurfaceState,
   type DashboardSurfaceState,
 } from './resolveDashboardSurfaceState';
+import { useDashboardLoadingPlayback } from './useDashboardLoadingPlayback';
 
 function currentBudgetFilters(): { year: string; month: string } {
   const now = new Date();
@@ -54,6 +56,8 @@ export interface UseDecisionDashboardResult {
   readonly isLoading: boolean;
   readonly isError: boolean;
   readonly isAwaitingCompany: boolean;
+  readonly loadingMessage: string | null;
+  readonly loadingSteps: readonly DashboardLoadingStep[];
   readonly viewModel: DecisionDashboardViewModel | null;
   readonly showSecondaryExpanded: boolean;
   readonly expandSecondary: () => void;
@@ -97,18 +101,38 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
     staleTime: 60_000,
   });
 
+  const summaryLoading = summaryQuery.isLoading;
+  const budgetLoading = budgetQuery.isLoading || accountsLoading;
+  const recentTxLoading = recentTxQuery.isLoading;
+  const expensesLoading = expensesQuery.isLoading;
+  const indebtednessLoading = indebtednessQuery.isLoading;
+
   const surfaceState = resolveDashboardSurfaceState({
     companyId,
-    summaryLoading: summaryQuery.isLoading,
-    budgetLoading: budgetQuery.isLoading || accountsLoading,
-    recentTxLoading: recentTxQuery.isLoading,
-    expensesLoading: expensesQuery.isLoading,
-    indebtednessLoading: indebtednessQuery.isLoading,
+    summaryLoading,
+    budgetLoading,
+    recentTxLoading,
+    expensesLoading,
+    indebtednessLoading,
     summaryError: summaryQuery.isError,
     budgetError: budgetQuery.isError,
     recentTxError: recentTxQuery.isError,
     hasSummaryData: summaryQuery.data !== undefined,
   });
+
+  const dataReady = surfaceState === 'ready';
+  const playbackEnabled =
+    companyId.length > 0 && surfaceState !== 'error' && surfaceState !== 'awaiting_company';
+
+  const { isPlaybackActive, loadingPhase } = useDashboardLoadingPlayback({
+    companyId,
+    enabled: playbackEnabled,
+    dataReady,
+  });
+
+  const loadingMessage = loadingPhase?.message ?? null;
+  const loadingSteps = loadingPhase?.steps ?? [];
+  const isLoading = isPlaybackActive;
 
   const viewModel = useMemo(() => {
     if (surfaceState !== 'ready' || !summaryQuery.data) {
@@ -190,9 +214,11 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
 
   return {
     surfaceState,
-    isLoading: surfaceState === 'loading',
+    isLoading,
     isError: surfaceState === 'error',
     isAwaitingCompany: surfaceState === 'awaiting_company',
+    loadingMessage,
+    loadingSteps,
     viewModel,
     showSecondaryExpanded,
     expandSecondary: () => setShowSecondaryExpanded(true),
