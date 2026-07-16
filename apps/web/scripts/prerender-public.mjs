@@ -28,7 +28,8 @@ const PUBLIC_ROUTES = [
   {
     route: '/pricing',
     title: 'Planos e preços | Air Finance',
-    description: 'Conheça os planos do Air Finance e escolha o que faz sentido para a sua evolução financeira.',
+    description:
+      'Conheça os planos do Air Finance e escolha o que faz sentido para a sua evolução financeira.',
     heading: 'Planos e preços',
     body: 'Página pública de pricing do Air Finance.',
   },
@@ -67,7 +68,8 @@ const PUBLIC_ROUTES = [
   {
     route: '/gestao-financeira-cpf/gestao-financeira-com-inteligencia-artificial',
     title: 'Gestão financeira com inteligência artificial: uso real no dia a dia',
-    description: 'Veja como a inteligência artificial pode ajudar na gestão financeira pessoal sem promessas irreais.',
+    description:
+      'Veja como a inteligência artificial pode ajudar na gestão financeira pessoal sem promessas irreais.',
     heading: 'Gestão financeira com inteligência artificial',
     body: 'Uso real de IA na gestão financeira pessoal, sem marketing vazio.',
   },
