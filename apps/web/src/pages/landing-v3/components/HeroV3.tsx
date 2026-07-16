@@ -37,7 +37,7 @@ export function HeroV3() {
                 AirFinance
               </p>
               <h1 className="v3-h1 mb-6">
-                Entenda a capacidade
+                Descubra a capacidade
                 <br />
                 do seu sistema
                 <br />
@@ -47,8 +47,8 @@ export function HeroV3() {
 
             <HeroAnimation delay={0.16}>
               <p className="v3-body-lg mb-8 max-w-lg">
-                Um check-up claro da saúde do seu dinheiro — para você tomar melhores decisões. Sem
-                culpa. Sem score. Sem o produto decidir por você.
+                Clareza para decidir com confiança — não mais saldo no app e incerteza na cabeça.
+                Sem culpa. Sem score. Sem o produto decidir por você.
               </p>
             </HeroAnimation>
 
@@ -58,22 +58,22 @@ export function HeroV3() {
                   type="button"
                   onClick={() => navigate('/register')}
                   className="v3-btn-primary group"
-                  aria-label="Começar a entender meu sistema"
+                  aria-label="Descobrir minha capacidade"
                 >
-                  Começar a entender meu sistema
+                  Descobrir minha capacidade
                   <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     document
-                      .getElementById('checkup-pillars')
+                      .getElementById('dashboard-preview')
                       ?.scrollIntoView({ behavior: 'smooth' });
                   }}
                   className="v3-btn-secondary"
-                  aria-label="Ver o check-up"
+                  aria-label="Ver um exemplo"
                 >
-                  Ver o check-up
+                  Ver um exemplo
                 </button>
               </div>
 

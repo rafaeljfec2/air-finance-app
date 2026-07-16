@@ -1,19 +1,19 @@
-import { BookOpen, Layers, Shield } from 'lucide-react';
+import { BookOpen, Compass, Shield } from 'lucide-react';
 
 import { ScrollReveal, StaggerContainer, StaggerItem } from './animations';
 
 const POINTS = [
   {
-    icon: Layers,
-    title: 'Lê o sistema por pilares',
+    icon: Compass,
+    title: 'Interpreta o sistema',
     description:
-      'Liquidez, fluxo, estrutura, crédito, resiliência e patrimônio — na ordem em que a capacidade se compreende.',
+      'Transforma dados espalhados em uma leitura da capacidade financeira — o que sustenta e o que merece atenção.',
   },
   {
     icon: BookOpen,
-    title: 'Revela em camadas',
+    title: 'Dados viram compreensão',
     description:
-      'Primeiro o resumo. Depois cada pilar, escaneável. O detalhe só aparece quando você escolhe explorar.',
+      'Primeiro o resumo. Depois o que importa explorar. O detalhe só aparece quando você escolhe ir mais fundo.',
   },
   {
     icon: Shield,
@@ -28,15 +28,14 @@ export function InterpretSystemV3() {
     <section id="interpret-system" className="v3-section bg-[var(--v3-bg-alt)]">
       <div className="v3-container">
         <ScrollReveal className="text-center mb-12 md:mb-16">
-          <div className="v3-badge mx-auto mb-4">Leitura</div>
+          <div className="v3-badge mx-auto mb-4">Solução</div>
           <h2 className="v3-h2 mb-4">
-            Como o AirFinance interpreta
-            <br className="hidden sm:block" />
-            um sistema financeiro
+            O AirFinance interpreta
+            <br className="hidden sm:block" />o seu sistema financeiro
           </h2>
           <p className="v3-body max-w-2xl mx-auto">
-            Não é um painel de métricas competindo por atenção. É um check-up conduzido: entender,
-            interpretar, explorar — nessa ordem.
+            Não é um painel de métricas competindo por atenção. É uma leitura conduzida: entender,
+            interpretar, decidir — nessa ordem.
           </p>
         </ScrollReveal>
 
@@ -63,13 +62,6 @@ export function InterpretSystemV3() {
             );
           })}
         </StaggerContainer>
-
-        <ScrollReveal className="text-center mt-10" delay={0.2}>
-          <p className="text-xs text-gray-500 max-w-lg mx-auto">
-            Open Finance e inteligência artificial entram como infraestrutura de dados — nunca como
-            a mensagem principal do produto.
-          </p>
-        </ScrollReveal>
       </div>
     </section>
   );

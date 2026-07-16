@@ -5,8 +5,8 @@ import { Logo } from '@/components/Logo';
 
 const FOOTER_LINKS = {
   produto: [
-    { name: 'Check-up', href: '/#checkup-pillars' },
-    { name: 'Experiência', href: '/#dashboard-preview' },
+    { name: 'Como funciona', href: '/#how-it-works' },
+    { name: 'Exemplo', href: '/#dashboard-preview' },
     { name: 'Preços', href: '/#pricing' },
   ],
   conteudo: [

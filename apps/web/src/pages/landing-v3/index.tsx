@@ -3,12 +3,12 @@ import { useEffect } from 'react';
 import { SEOHead } from '../landing/components/SEOHead';
 
 import { ScrollProgress } from './components/animations';
-import { CheckupPillarsV3 } from './components/CheckupPillarsV3';
 import { CTAFinalV3 } from './components/CTAFinalV3';
 import { FAQV3 } from './components/FAQV3';
 import { FooterV3 } from './components/FooterV3';
 import { HeaderV3 } from './components/HeaderV3';
 import { HeroV3 } from './components/HeroV3';
+import { HowItWorksV3 } from './components/HowItWorksV3';
 import { InterpretSystemV3 } from './components/InterpretSystemV3';
 import { PreviewDashboardV3 } from './components/PreviewDashboardV3';
 import { PricingV3 } from './components/PricingV3';
@@ -16,10 +16,6 @@ import { ProblemV3 } from './components/ProblemV3';
 
 import './landing-v3.css';
 
-/**
- * Landing narrativa de capacidade (Product OS + UX02):
- * Hero → Problema → Interpretação → Check-up → Preview (no Hero) → CTA → Pricing/FAQ.
- */
 export function LandingPageV3() {
   useEffect(() => {
     const htmlElement = document.documentElement;
@@ -57,7 +53,7 @@ export function LandingPageV3() {
           <HeroV3 />
           <ProblemV3 />
           <InterpretSystemV3 />
-          <CheckupPillarsV3 />
+          <HowItWorksV3 />
           <PreviewDashboardV3 />
           <CTAFinalV3 />
           <PricingV3 />

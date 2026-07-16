@@ -10,19 +10,19 @@ interface FAQItem {
 
 const FAQ_ITEMS: readonly FAQItem[] = [
   {
-    question: 'O que é Open Finance?',
+    question: 'O que o AirFinance faz de diferente?',
     answer:
-      'Open Finance é um sistema regulado pelo Banco Central do Brasil que permite compartilhar seus dados financeiros entre instituições de forma segura. Com ele, o Airfinance acessa seus extratos bancários automaticamente, sem que você precise digitar nada.',
+      'Ele interpreta a capacidade do seu sistema financeiro — o que sustenta e o que merece atenção — para você decidir com menos incerteza. Não é um painel de saldos nem um score de “nota financeira”.',
   },
   {
     question: 'Meus dados estão seguros?',
     answer:
-      'Sim. Toda a comunicação é feita via Open Finance, que é regulado e fiscalizado pelo Banco Central. Usamos criptografia em todas as conexões e seguimos a LGPD. Não armazenamos suas credenciais bancárias.',
+      'Sim. Quando você conecta bancos, a comunicação usa Open Finance (regulado pelo Banco Central), com criptografia e respeito à LGPD. Não armazenamos suas credenciais bancárias.',
   },
   {
-    question: 'Posso usar sem conectar meu banco?',
+    question: 'Preciso conectar meu banco?',
     answer:
-      'Sim. Você pode importar seus extratos bancários manualmente em formato OFX, que é o padrão usado pela maioria dos bancos brasileiros. A conexão via Open Finance é opcional.',
+      'Não é obrigatório. Você pode começar importando extratos em OFX. Conectar via Open Finance é opcional e acelera a leitura do sistema.',
   },
   {
     question: 'O beta é realmente grátis?',
@@ -30,14 +30,14 @@ const FAQ_ITEMS: readonly FAQItem[] = [
       'Sim. Durante a fase beta, todos os planos estão disponíveis gratuitamente. Não pedimos cartão de crédito. Quando o beta encerrar, você será avisado com antecedência e poderá escolher seu plano.',
   },
   {
-    question: 'Funciona com quais bancos?',
+    question: 'O produto decide por mim?',
     answer:
-      'Funcionamos com os principais bancos do Brasil via Open Finance: Nubank, Inter, Itaú, Bradesco, Santander, C6 Bank, Banco do Brasil, Caixa, entre outros. A lista cresce conforme mais bancos aderem ao Open Finance.',
+      'Não. O AirFinance aconselha e organiza a leitura. A decisão continua sendo sua — silêncio é o default, sem pressão artificial.',
   },
   {
-    question: 'Como a IA categoriza minhas transações?',
+    question: 'Funciona com quais bancos?',
     answer:
-      'Nossa IA analisa a descrição de cada transação e a classifica automaticamente (ex: supermercado, transporte, restaurante). Ela aprende com suas correções, ficando mais precisa com o tempo.',
+      'Com os principais bancos do Brasil via Open Finance: Nubank, Inter, Itaú, Bradesco, Santander, C6 Bank, Banco do Brasil, Caixa, entre outros. A lista cresce conforme mais bancos aderem.',
   },
 ] as const;
 

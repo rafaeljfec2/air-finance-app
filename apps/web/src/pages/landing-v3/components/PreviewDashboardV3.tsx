@@ -6,16 +6,16 @@ export function PreviewDashboardV3() {
     <section id="dashboard-preview" className="v3-section bg-[var(--v3-bg-alt)]">
       <div className="v3-container">
         <ScrollReveal className="text-center mb-10 md:mb-14">
-          <div className="v3-badge mx-auto mb-4">Produto</div>
-          <h2 className="v3-h2 mb-4">A experiência do check-up</h2>
+          <div className="v3-badge mx-auto mb-4">Exemplo</div>
+          <h2 className="v3-h2 mb-4">Um resumo executivo da capacidade</h2>
           <p className="v3-body max-w-2xl mx-auto">
-            Resumo primeiro. Pilares em timeline. Detalhe sob demanda. Gráficos só para comprovar —
-            nunca para liderar a conversa.
+            Poucas frases. Uma leitura clara. O detalhe completo fica dentro do produto — quando
+            você estiver pronto.
           </p>
         </ScrollReveal>
 
         <div className="max-w-md mx-auto">
-          <DashboardPreview />
+          <DashboardPreview showCheckupCta />
         </div>
       </div>
     </section>

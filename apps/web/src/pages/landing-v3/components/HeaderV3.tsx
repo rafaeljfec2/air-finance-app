@@ -9,8 +9,8 @@ import { FadePresence } from './animations';
 import { V3_EASE } from './motion';
 
 const NAV_ITEMS = [
-  { label: 'Check-up', hash: '#checkup-pillars' },
-  { label: 'Experiência', hash: '#dashboard-preview' },
+  { label: 'Como funciona', hash: '#how-it-works' },
+  { label: 'Exemplo', hash: '#dashboard-preview' },
   { label: 'Preços', hash: '#pricing' },
 ] as const;
 

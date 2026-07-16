@@ -4,22 +4,22 @@ import { HoverLift, ScrollReveal, StaggerContainer, StaggerItem } from './animat
 
 const PROBLEMS = [
   {
-    icon: EyeOff,
-    title: 'Incerteza no lugar da clareza',
+    icon: Scale,
+    title: 'Saldo não é capacidade',
     description:
-      'Você sente o dinheiro apertar, mas não consegue dizer com lucidez como está a capacidade do seu sistema.',
+      'Ver o saldo do banco não diz se o sistema aguenta o mês, o imprevisto ou a próxima decisão grande.',
+  },
+  {
+    icon: EyeOff,
+    title: 'Gráficos não são decisão',
+    description:
+      'Planilhas e painéis acumulam números. O que falta é uma leitura que reduza a incerteza — sem culpa.',
   },
   {
     icon: MessageCircleQuestion,
     title: 'Difícil explicar a alguém',
     description:
-      'Se alguém perguntar “como está sua saúde financeira?”, a resposta vira um emaranhado de apps, saldos e impressões.',
-  },
-  {
-    icon: Scale,
-    title: 'Números sem decisão',
-    description:
-      'Planilhas e painéis acumulam dados. O que falta é uma leitura que oriente a próxima decisão — sem culpa nem pressa artificial.',
+      'Se perguntarem “como está sua saúde financeira?”, a resposta vira apps, saldos e impressões soltas.',
   },
 ] as const;
 
@@ -29,13 +29,13 @@ export function ProblemV3() {
       <div className="v3-container">
         <ScrollReveal className="text-center mb-12 md:mb-16">
           <h2 className="v3-h2 mb-4">
-            Você consegue explicar
+            Você sabe a capacidade
             <br className="hidden sm:block" />
-            <span className="text-gray-500"> a capacidade do seu sistema?</span>
+            <span className="text-gray-500"> do seu sistema?</span>
           </h2>
           <p className="v3-body max-w-2xl mx-auto">
             A maioria vive no escuro operacional: dados espalhados, impressões soltas, nenhuma
-            leitura que una liquidez, fluxo e o restante em uma conversa humana.
+            leitura que una o dinheiro em uma conversa humana.
           </p>
         </ScrollReveal>
 
