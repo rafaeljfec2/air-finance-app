@@ -1,10 +1,9 @@
 import { ChevronRight, Home } from 'lucide-react';
 
 import { InternalLink } from '@/components/seo/InternalLink';
+import { PublicDarkLayout } from '@/components/seo/PublicDarkLayout';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { usePageScroll } from '@/hooks/usePageScroll';
-import { Footer } from '@/pages/landing/components/Footer';
-import { Header } from '@/pages/landing/components/Header';
 
 export function CategorizacaoAutomaticaGastosPage() {
   usePageScroll();
@@ -45,34 +44,35 @@ export function CategorizacaoAutomaticaGastosPage() {
         }}
         faqSchema={faqItems}
       />
-      <div className="min-h-screen bg-background text-text">
-        <Header />
-        <div className="pt-24">
-          <header className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-16 z-30">
+      <PublicDarkLayout>
+        <div>
+          <header className="border-b border-gray-800 bg-[#0b1120]/95 backdrop-blur-sm sticky top-0 z-30">
             <div className="mx-auto max-w-4xl px-6 py-4">
-              <nav className="flex items-center gap-2 text-sm text-text/70">
+              <nav className="flex items-center gap-2 text-sm text-gray-400">
                 <InternalLink
                   to="/"
-                  className="flex items-center gap-1 hover:text-brand-arrow transition-colors"
+                  className="flex items-center gap-1 hover:text-emerald-400 transition-colors"
                 >
                   <Home className="w-4 h-4" />
                   <span>Início</span>
                 </InternalLink>
-                <ChevronRight className="w-4 h-4 text-text/40" />
+                <ChevronRight className="w-4 h-4 text-gray-500" />
                 <InternalLink
                   to="/gestao-financeira-cpf"
-                  className="hover:text-brand-arrow transition-colors"
+                  className="hover:text-emerald-400 transition-colors"
                 >
                   Gestão Financeira CPF
                 </InternalLink>
-                <ChevronRight className="w-4 h-4 text-text/40" />
-                <span className="text-text font-medium">Categorização Automática de Gastos</span>
+                <ChevronRight className="w-4 h-4 text-gray-500" />
+                <span className="text-gray-100 font-medium">
+                  Categorização Automática de Gastos
+                </span>
               </nav>
             </div>
           </header>
 
           <main className="mx-auto max-w-4xl px-6 py-12 pb-24">
-            <article className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-text dark:prose-headings:text-text prose-headings:font-bold prose-headings:tracking-tight prose-h1:text-4xl prose-h1:mb-6 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-text/80 dark:prose-p:text-text/80 prose-p:leading-relaxed prose-a:text-brand-arrow prose-a:no-underline hover:prose-a:underline prose-a:font-medium prose-strong:text-text dark:prose-strong:text-text prose-strong:font-semibold prose-li:text-text/80 dark:prose-li:text-text/80 prose-ul:text-text/80 dark:prose-ul:text-text/80 prose-ol:text-text/80 dark:prose-ol:text-text/80 prose-li:my-2">
+            <article className="prose prose-lg prose-invert max-w-none prose-headings:text-gray-50 prose-headings:font-bold prose-headings:tracking-tight prose-h1:text-4xl prose-h1:mb-6 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-gray-300 prose-p:leading-relaxed prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-a:font-medium prose-strong:text-gray-100 prose-strong:font-semibold prose-li:text-gray-300 prose-ul:text-gray-300 prose-ol:text-gray-300 prose-li:my-2">
               <h1>Categorização Automática de Gastos: Como IA Classifica Suas Transações</h1>
 
               <section className="mb-12">
@@ -282,7 +282,7 @@ export function CategorizacaoAutomaticaGastosPage() {
                   <li>
                     <InternalLink
                       to="/gestao-financeira-cpf"
-                      className="hover:text-brand-arrow transition-colors"
+                      className="hover:text-emerald-400 transition-colors"
                     >
                       Gestão Financeira CPF: Guia Completo
                     </InternalLink>
@@ -309,7 +309,7 @@ export function CategorizacaoAutomaticaGastosPage() {
                       className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
                     >
                       <h3 className="text-xl font-semibold text-text mb-3">{item.question}</h3>
-                      <p className="text-text/80 leading-relaxed">{item.answer}</p>
+                      <p className="text-gray-300 leading-relaxed">{item.answer}</p>
                     </div>
                   ))}
                 </div>
@@ -317,12 +317,12 @@ export function CategorizacaoAutomaticaGastosPage() {
 
               <section className="mt-16 border-t border-border pt-12">
                 <div className="bg-gradient-to-r from-brand-arrow/5 to-transparent rounded-2xl p-8 border border-border/50">
-                  <p className="text-text/80 mb-6 text-lg">
+                  <p className="text-gray-300 mb-6 text-lg">
                     Pronto para melhorar sua gestão financeira?
                   </p>
                   <InternalLink
                     to="/register"
-                    className="group inline-flex items-center gap-2 px-8 py-4 bg-brand-arrow text-white rounded-xl font-semibold hover:bg-brand-arrow/90 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-brand-arrow/25 focus:outline-none focus:ring-2 focus:ring-brand-arrow focus:ring-offset-2 transform hover:-translate-y-0.5 [&>*]:text-white"
+                    className="group inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 text-white rounded-xl font-semibold hover:bg-emerald-400 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/25 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-[#0b1120] transform hover:-translate-y-0.5 [&>*]:text-white"
                   >
                     <span className="text-white">Comece agora</span>
                     <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
@@ -332,8 +332,7 @@ export function CategorizacaoAutomaticaGastosPage() {
             </article>
           </main>
         </div>
-        <Footer />
-      </div>
+      </PublicDarkLayout>
     </>
   );
 }

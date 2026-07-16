@@ -1,10 +1,9 @@
 import { ChevronRight, Home } from 'lucide-react';
 
 import { InternalLink } from '@/components/seo/InternalLink';
+import { PublicDarkLayout } from '@/components/seo/PublicDarkLayout';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { usePageScroll } from '@/hooks/usePageScroll';
-import { Footer } from '@/pages/landing/components/Footer';
-import { Header } from '@/pages/landing/components/Header';
 
 export function GestaoFinanceiraCPFPage() {
   usePageScroll();
@@ -50,31 +49,30 @@ export function GestaoFinanceiraCPFPage() {
         }}
         faqSchema={faqItems}
       />
-      <div className="min-h-screen bg-background text-text">
-        <Header />
-        <div className="pt-24">
-          <header className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-16 z-30">
+      <PublicDarkLayout>
+        <div>
+          <header className="border-b border-gray-800 bg-[#0b1120]/95 backdrop-blur-sm sticky top-0 z-30">
             <div className="mx-auto max-w-4xl px-6 py-4">
-              <nav className="flex items-center gap-2 text-sm text-text/70">
+              <nav className="flex items-center gap-2 text-sm text-gray-400">
                 <InternalLink
                   to="/"
-                  className="flex items-center gap-1 hover:text-brand-arrow transition-colors"
+                  className="flex items-center gap-1 hover:text-emerald-400 transition-colors"
                 >
                   <Home className="w-4 h-4" />
                   <span>Início</span>
                 </InternalLink>
-                <ChevronRight className="w-4 h-4 text-text/40 text-white" />
-                <span className="text-text font-medium">Gestão Financeira CPF</span>
+                <ChevronRight className="w-4 h-4 text-gray-500 text-white" />
+                <span className="text-gray-100 font-medium">Gestão Financeira CPF</span>
               </nav>
             </div>
           </header>
 
           <main className="mx-auto max-w-4xl px-6 py-12 pb-24">
-            <article className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-text dark:prose-headings:text-text prose-headings:font-bold prose-headings:tracking-tight prose-h1:text-4xl prose-h1:mb-6 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-text/80 dark:prose-p:text-text/80 prose-p:leading-relaxed prose-a:text-brand-arrow prose-a:no-underline hover:prose-a:underline prose-a:font-medium prose-strong:text-text dark:prose-strong:text-text prose-strong:font-semibold prose-li:text-text/80 dark:prose-li:text-text/80 prose-ul:text-text/80 dark:prose-ul:text-text/80 prose-ol:text-text/80 dark:prose-ol:text-text/80 prose-li:my-2">
+            <article className="prose prose-lg prose-invert max-w-none prose-headings:text-gray-50 prose-headings:font-bold prose-headings:tracking-tight prose-h1:text-4xl prose-h1:mb-6 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-gray-300 prose-p:leading-relaxed prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-a:font-medium prose-strong:text-gray-100 prose-strong:font-semibold prose-li:text-gray-300 prose-ul:text-gray-300 prose-ol:text-gray-300 prose-li:my-2">
               <h1>Gestão financeira pessoal: como organizar suas finanças de forma inteligente</h1>
 
               <section>
-                <p className="lead border-l-4 border-brand-arrow pl-4 bg-brand-arrow/5 rounded-r-lg py-2">
+                <p className="lead border-l-4 border-emerald-500 pl-4 bg-emerald-500/10 rounded-r-lg py-2">
                   No fim do mês, você olha o saldo bancário e não entende para onde foi o dinheiro.
                   Receitas conhecidas, gastos que pareciam controlados, mas o resultado não fecha.
                   Essa falta de clareza financeira acontece porque o dinheiro se move de forma
@@ -326,7 +324,7 @@ export function GestaoFinanceiraCPFPage() {
                       className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
                     >
                       <h3 className="text-xl font-semibold text-text mb-3">{item.question}</h3>
-                      <p className="text-text/80 leading-relaxed">{item.answer}</p>
+                      <p className="text-gray-300 leading-relaxed">{item.answer}</p>
                     </div>
                   ))}
                 </div>
@@ -368,14 +366,14 @@ export function GestaoFinanceiraCPFPage() {
                   <h2 className="text-2xl font-bold text-text mb-4">
                     Comece a organizar suas finanças hoje
                   </h2>
-                  <p className="text-text/80 mb-6 text-lg">
+                  <p className="text-gray-300 mb-6 text-lg">
                     Gestão financeira pessoal eficiente requer método e ferramentas adequadas.
                     Comece registrando seus gastos por 30 dias. Depois, use uma plataforma que
                     automatize o processo e forneça insights baseados em seus dados reais.
                   </p>
                   <InternalLink
                     to="/register"
-                    className="group inline-flex items-center gap-2 px-8 py-4 bg-brand-arrow text-white rounded-xl font-semibold hover:bg-brand-arrow/90 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-brand-arrow/25 focus:outline-none focus:ring-2 focus:ring-brand-arrow focus:ring-offset-2 transform hover:-translate-y-0.5 [&>*]:text-white"
+                    className="group inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 text-white rounded-xl font-semibold hover:bg-emerald-400 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/25 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-[#0b1120] transform hover:-translate-y-0.5 [&>*]:text-white"
                   >
                     <span className="text-white">Experimente gratuitamente</span>
                     <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform text-white" />
@@ -385,8 +383,7 @@ export function GestaoFinanceiraCPFPage() {
             </article>
           </main>
         </div>
-        <Footer />
-      </div>
+      </PublicDarkLayout>
     </>
   );
 }

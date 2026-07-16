@@ -35,7 +35,7 @@ export function HeaderV3() {
       const element = document.querySelector(hash);
       element?.scrollIntoView({ behavior: 'smooth' });
     } else {
-      navigate('/landing-v3');
+      navigate({ pathname: '/', hash: hash.replace(/^#/, '') });
       setTimeout(() => {
         const element = document.querySelector(hash);
         element?.scrollIntoView({ behavior: 'smooth' });
@@ -58,7 +58,7 @@ export function HeaderV3() {
         <button
           type="button"
           onClick={() => {
-            navigate('/landing-v3');
+            navigate('/');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           className="cursor-pointer hover:opacity-80 transition-opacity bg-transparent border-none p-0 focus:outline-none"
