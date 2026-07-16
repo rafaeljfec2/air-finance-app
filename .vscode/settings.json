@@ -49,6 +49,5 @@
     "./apps/mobile-webview",
     "./packages/shared"
   ],
-  "snyk.advanced.autoSelectOrganization": true,
-  "snyk.advanced.organization": "121cccf5-70af-49f3-9ee8-09d17a5ecd33"
+  "snyk.advanced.autoSelectOrganization": true
 }

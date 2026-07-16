@@ -23,19 +23,22 @@ export function HeroV3() {
             </HeroAnimation>
 
             <HeroAnimation delay={0.1}>
+              <p className="text-sm font-semibold uppercase tracking-wide text-emerald-600 mb-3">
+                AirFinance
+              </p>
               <h1 className="v3-h1 mb-6">
-                Suas finanças.
+                Entenda a capacidade
                 <br />
-                Todas as contas.
+                do seu sistema
                 <br />
-                <span className="text-emerald-500">Um só painel.</span>
+                <span className="text-emerald-500">financeiro.</span>
               </h1>
             </HeroAnimation>
 
             <HeroAnimation delay={0.2}>
               <p className="v3-body-lg mb-8 max-w-lg">
-                Conecte seus bancos via Open Finance, categorize gastos automaticamente com IA e
-                saiba exatamente para onde seu dinheiro está indo. Sem planilha. Sem esforço manual.
+                Um check-up claro da saúde do seu dinheiro — para você tomar melhores decisões. Sem
+                culpa. Sem score. Sem o produto decidir por você.
               </p>
             </HeroAnimation>
 
@@ -44,19 +47,21 @@ export function HeroV3() {
                 <button
                   onClick={() => navigate('/register')}
                   className="v3-btn-primary"
-                  aria-label="Criar conta grátis no Airfinance"
+                  aria-label="Começar a entender meu sistema"
                 >
-                  Criar conta grátis
+                  Começar a entender meu sistema
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => {
-                    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+                    document
+                      .getElementById('checkup-pillars')
+                      ?.scrollIntoView({ behavior: 'smooth' });
                   }}
                   className="v3-btn-secondary"
-                  aria-label="Ver como funciona"
+                  aria-label="Ver o check-up"
                 >
-                  Ver como funciona
+                  Ver o check-up
                 </button>
               </div>
 

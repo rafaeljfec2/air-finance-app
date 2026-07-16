@@ -5,9 +5,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Logo } from '@/components/Logo';
 
 const NAV_ITEMS = [
-  { label: 'Recursos', hash: '#features' },
+  { label: 'Check-up', hash: '#checkup-pillars' },
+  { label: 'Experiência', hash: '#dashboard-preview' },
   { label: 'Preços', hash: '#pricing' },
-  { label: 'Como funciona', hash: '#how-it-works' },
 ] as const;
 
 export function HeaderV3() {
