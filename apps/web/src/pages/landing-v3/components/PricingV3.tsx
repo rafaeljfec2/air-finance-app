@@ -11,7 +11,7 @@ export function PricingV3() {
       <div className="v3-container">
         <ScrollReveal className="text-center mb-6">
           <div className="v3-badge mx-auto mb-4">Preços</div>
-          <h2 className="v3-h2 mb-4">Escolha o ritmo da sua clareza</h2>
+          <h2 className="v3-h2 mb-4">Escolha o ritmo do seu Check-up</h2>
           <p className="v3-body max-w-xl mx-auto">
             Você começa quando fizer sentido. Assinatura mensal, sem fidelidade.
           </p>

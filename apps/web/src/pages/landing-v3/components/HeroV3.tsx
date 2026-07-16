@@ -28,7 +28,7 @@ export function HeroV3() {
             <HeroAnimation delay={0}>
               <div className="v3-badge mb-6">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Grátis durante o beta</span>
+                <span>Check-up Financeiro · grátis no beta</span>
               </div>
             </HeroAnimation>
 
@@ -47,9 +47,8 @@ export function HeroV3() {
 
             <HeroAnimation delay={0.16}>
               <p className="v3-body-lg mb-8 max-w-lg">
-                Com o AirFinance você passa a entender a capacidade do seu sistema — dados dispersos
-                viram compreensão para a próxima decisão. Sem culpa. Sem score. Sem ninguém decidir
-                por você.
+                Com o AirFinance você consegue interpretar como o seu sistema financeiro funciona —
+                não apenas ver números. Clareza para a próxima decisão. Sem culpa. Sem score.
               </p>
             </HeroAnimation>
 
@@ -59,9 +58,9 @@ export function HeroV3() {
                   type="button"
                   onClick={() => navigate('/register')}
                   className="v3-btn-primary group"
-                  aria-label="Descobrir minha capacidade financeira"
+                  aria-label="Fazer meu check-up financeiro"
                 >
-                  Descobrir minha capacidade financeira
+                  Fazer meu check-up financeiro
                   <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </button>
                 <button
@@ -72,7 +71,7 @@ export function HeroV3() {
                       ?.scrollIntoView({ behavior: 'smooth' });
                   }}
                   className="v3-btn-secondary"
-                  aria-label="Ver um exemplo"
+                  aria-label="Ver um exemplo do check-up"
                 >
                   Ver um exemplo
                 </button>

@@ -7,13 +7,14 @@ const STEPS = [
     icon: Link2,
     number: '01',
     title: 'Trazer seus dados',
-    description: 'Você conecta o que precisa — no seu ritmo, com segurança.',
+    description:
+      'Você conecta o que precisa — no seu ritmo. Conexões bancárias são um meio, não o produto.',
   },
   {
     icon: Compass,
     number: '02',
-    title: 'Ganhar uma leitura',
-    description: 'Você passa a ver a capacidade do seu sistema em uma conversa clara.',
+    title: 'Receber o Check-up',
+    description: 'Você passa a ver como as partes do sistema se relacionam até a capacidade.',
   },
   {
     icon: Lightbulb,
@@ -35,9 +36,9 @@ export function HowItWorksV3() {
       <div className="v3-container">
         <ScrollReveal className="text-center mb-12 md:mb-16">
           <div className="v3-badge mx-auto mb-4">Como funciona</div>
-          <h2 className="v3-h2 mb-4">Do primeiro passo à clareza</h2>
+          <h2 className="v3-h2 mb-4">Do primeiro passo ao Check-up</h2>
           <p className="v3-body max-w-xl mx-auto">
-            Quatro etapas. Você não acumula recursos — você ganha compreensão.
+            Quatro etapas até a compreensão. Sem lista de recursos — só o caminho da descoberta.
           </p>
         </ScrollReveal>
 
@@ -70,6 +71,13 @@ export function HowItWorksV3() {
             );
           })}
         </StaggerContainer>
+
+        <ScrollReveal className="text-center mt-10" delay={0.15}>
+          <p className="text-xs text-gray-500 max-w-lg mx-auto leading-relaxed">
+            Open Finance e inteligência artificial entram como infraestrutura para reunir e
+            organizar dados — o protagonismo é a interpretação do seu sistema.
+          </p>
+        </ScrollReveal>
       </div>
     </section>
   );

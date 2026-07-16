@@ -12,17 +12,22 @@ const RELATION_CHAIN = [
   'Patrimônio',
 ] as const;
 
+/** Proprietary positioning: how AirFinance thinks — relations, not isolated numbers. */
 export function ModelBehindV3() {
   return (
-    <section id="model-behind" className="v3-section bg-[var(--v3-bg)]">
+    <section id="how-airfinance-thinks" className="v3-section bg-[var(--v3-bg)]">
       <div className="v3-container">
         <ScrollReveal className="text-center mb-10 md:mb-14">
-          <div className="v3-badge mx-auto mb-4">O modelo</div>
+          <div className="v3-badge mx-auto mb-4">Como o AirFinance pensa</div>
           <h2 className="v3-h2 mb-4">
             Não analisamos números.
             <br className="hidden sm:block" />
             <span className="text-emerald-400">Interpretamos relações.</span>
           </h2>
+          <p className="v3-body max-w-2xl mx-auto mt-4">
+            Por trás do Check-up Financeiro há um modelo de compreensão: as partes do sistema se
+            conectam até a capacidade financeira.
+          </p>
         </ScrollReveal>
 
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-5xl mx-auto">
@@ -33,16 +38,18 @@ export function ModelBehindV3() {
                 Uma boa liquidez não significa uma estrutura saudável.
               </p>
               <p className="v3-body text-gray-300">
-                Um fluxo positivo não garante capacidade de longo prazo.
+                Um fluxo positivo não garante capacidade financeira.
               </p>
               <p className="v3-body text-gray-400 pt-2">
                 Cada parte conta apenas um pedaço da história. O AirFinance conecta essas relações
                 para explicar como o seu sistema financeiro realmente funciona.
               </p>
               <p className="text-base font-semibold text-gray-50 pt-4 leading-relaxed">
-                Outros aplicativos mostram dados.
+                Dashboards tradicionais mostram dados.
                 <br />
-                <span className="text-emerald-400">O AirFinance interpreta o sistema.</span>
+                <span className="text-emerald-400">
+                  O AirFinance interpreta como o sistema funciona.
+                </span>
               </p>
             </div>
           </ScrollReveal>
@@ -50,10 +57,10 @@ export function ModelBehindV3() {
           <ScrollReveal delay={0.12}>
             <div
               className="rounded-2xl border border-gray-800 bg-[var(--v3-bg-alt)] px-5 py-6 md:px-8 md:py-8"
-              aria-label="Diagrama conceitual: relações até a capacidade financeira"
+              aria-label="Ilustração conceitual do Check-up Financeiro"
             >
               <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 text-center mb-5">
-                Como as partes se relacionam
+                Modelo de compreensão
               </p>
 
               <StaggerContainer className="flex flex-col items-center" staggerDelay={0.06}>
@@ -82,7 +89,7 @@ export function ModelBehindV3() {
               </StaggerContainer>
 
               <p className="text-xs text-gray-500 text-center mt-5 leading-relaxed">
-                Não é uma lista de métricas. É um modelo de relações.
+                Não é uma lista de métricas. É o raciocínio do Check-up Financeiro.
               </p>
             </div>
           </ScrollReveal>

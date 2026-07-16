@@ -10,9 +10,19 @@ interface FAQItem {
 
 const FAQ_ITEMS: readonly FAQItem[] = [
   {
+    question: 'O que torna o AirFinance diferente?',
+    answer:
+      'O AirFinance não mostra apenas números. Ele interpreta como o seu sistema financeiro funciona — as relações entre as partes até a capacidade. Isso é o Check-up Financeiro.',
+  },
+  {
     question: 'O que muda na minha vida financeira?',
     answer:
-      'Você passa a compreender a capacidade do seu sistema — o que sustenta e o que merece atenção — e decide com menos incerteza. Não é mais um painel de saldos nem uma “nota” financeira.',
+      'Você passa a compreender a capacidade do sistema e o que merece atenção — e decide com menos incerteza. Sem score e sem o produto decidir por você.',
+  },
+  {
+    question: 'Open Finance e IA são o produto?',
+    answer:
+      'Não. São meios: ajudam a reunir e organizar dados. O posicionamento do AirFinance é interpretar o sistema e entregar compreensão — o Check-up Financeiro.',
   },
   {
     question: 'Meus dados estão seguros?',
@@ -22,22 +32,12 @@ const FAQ_ITEMS: readonly FAQItem[] = [
   {
     question: 'Preciso conectar meu banco?',
     answer:
-      'Não é obrigatório. Você pode começar importando extratos em OFX. Conectar via Open Finance é opcional e acelera o caminho até a compreensão.',
+      'Não é obrigatório. Você pode começar importando extratos em OFX. Conectar bancos acelera o caminho até o Check-up — é opcional.',
   },
   {
     question: 'O beta é realmente grátis?',
     answer:
       'Sim. Durante a fase beta, todos os planos estão disponíveis gratuitamente. Não pedimos cartão de crédito. Quando o beta encerrar, você será avisado com antecedência e poderá escolher seu plano.',
-  },
-  {
-    question: 'Alguém decide por mim?',
-    answer:
-      'Não. Você recebe clareza e orientação. A decisão continua sendo sua — sem pressão artificial.',
-  },
-  {
-    question: 'Funciona com quais bancos?',
-    answer:
-      'Com os principais bancos do Brasil via Open Finance: Nubank, Inter, Itaú, Bradesco, Santander, C6 Bank, Banco do Brasil, Caixa, entre outros. A lista cresce conforme mais bancos aderem.',
   },
 ] as const;
 

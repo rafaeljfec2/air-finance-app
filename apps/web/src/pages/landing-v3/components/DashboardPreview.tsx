@@ -59,7 +59,7 @@ export function DashboardPreview({
         >
           <div className="flex items-center justify-between gap-3 mb-5">
             <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-              Capacidade financeira
+              Check-up · capacidade financeira
             </p>
             <span className="text-[11px] font-medium text-emerald-300 bg-emerald-500/15 px-2.5 py-1 rounded-full">
               Boa
@@ -104,9 +104,9 @@ export function DashboardPreview({
               type="button"
               onClick={() => navigate('/register')}
               className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors group"
-              aria-label="Ver a análise completa"
+              aria-label="Fazer meu check-up financeiro"
             >
-              Quero ver a análise completa
+              Quero fazer meu check-up financeiro
               <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
             </button>
           </div>

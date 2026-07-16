@@ -5,21 +5,21 @@ import { HoverLift, ScrollReveal, StaggerContainer, StaggerItem } from './animat
 const IDEAS = [
   {
     icon: BarChart3,
-    title: 'Mais gráficos não bastam',
+    title: 'Mostrar dados não é explicar',
     description:
-      'Você já viu o que aconteceu no mês. Quase nunca ouviu se o sistema aguenta a próxima decisão.',
+      'Dashboards tradicionais exibem o que aconteceu. Quase nunca explicam se o sistema aguenta a próxima decisão.',
   },
   {
     icon: Layers,
-    title: 'Mais dados não trazem clareza',
+    title: 'Partes isoladas confundem',
     description:
-      'Saldos, categorias e extratos aumentam a informação — e a incerteza continua no mesmo lugar.',
+      'Saldo, fluxo e categorias separados aumentam a informação — e a compreensão do sistema continua faltando.',
   },
   {
     icon: Sparkles,
-    title: 'O que muda é a compreensão',
+    title: 'O salto é interpretar relações',
     description:
-      'Você finalmente consegue transformar números em uma conversa clara sobre capacidade e o que merece atenção.',
+      'Com o Check-up Financeiro você passa a ver como as partes se conectam até a capacidade financeira.',
   },
 ] as const;
 
@@ -35,8 +35,8 @@ export function NewMindsetV3() {
             <span className="text-gray-500"> que entender o seu sistema.</span>
           </h2>
           <p className="v3-body max-w-2xl mx-auto">
-            Organizar dados ajuda. O salto acontece quando você passa a compreender a capacidade
-            financeira — e decide com menos incerteza.
+            Organizar dados ajuda. O diferencial é interpretar relações — e chegar à compreensão da
+            capacidade financeira.
           </p>
         </ScrollReveal>
 

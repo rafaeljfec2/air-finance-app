@@ -96,9 +96,9 @@ export function HeaderV3() {
               type="button"
               onClick={() => navigate('/register')}
               className="box-border inline-flex h-12 items-center justify-center rounded-xl border-[1.5px] border-transparent bg-emerald-500 px-7 text-base font-semibold text-white shadow-[var(--v3-shadow-accent)] transition-all duration-200 hover:bg-emerald-400"
-              aria-label="Criar conta grátis"
+              aria-label="Fazer meu check-up financeiro"
             >
-              Criar conta grátis
+              Fazer meu check-up
             </button>
           </div>
         </nav>
@@ -108,9 +108,9 @@ export function HeaderV3() {
             type="button"
             onClick={() => navigate('/register')}
             className="v3-btn-primary !px-4 !py-2 !text-sm"
-            aria-label="Criar conta grátis"
+            aria-label="Fazer meu check-up financeiro"
           >
-            Criar conta
+            Check-up
           </button>
           <button
             type="button"

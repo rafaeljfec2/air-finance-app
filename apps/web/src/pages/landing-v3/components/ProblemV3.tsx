@@ -19,7 +19,7 @@ const PROBLEMS = [
     icon: MessageCircleQuestion,
     title: 'Sem uma leitura que una tudo',
     description:
-      'Apps e planilhas acumulam impressões. Você ainda não tem uma conversa clara sobre o seu dinheiro.',
+      'Apps e planilhas acumulam impressões. Falta um Check-up Financeiro que una o sistema em uma conversa clara.',
   },
 ] as const;
 
@@ -34,8 +34,8 @@ export function ProblemV3() {
             <span className="text-gray-500"> como está o seu dinheiro?</span>
           </h2>
           <p className="v3-body max-w-2xl mx-auto">
-            O problema não é falta de aplicativo. É viver sem clareza sobre a própria capacidade
-            financeira — e decidir no escuro.
+            O problema não é falta de aplicativo. É viver sem compreender como o seu sistema
+            financeiro funciona — e decidir no escuro.
           </p>
         </ScrollReveal>
 

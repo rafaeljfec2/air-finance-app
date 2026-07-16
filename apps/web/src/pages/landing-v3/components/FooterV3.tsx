@@ -37,7 +37,7 @@ export function FooterV3() {
           <div>
             <Logo className="mb-4" variant="white" />
             <p className="text-sm text-gray-400 leading-relaxed mb-4">
-              Você finalmente consegue explicar a sua vida financeira — e decidir com clareza.
+              Check-up Financeiro: você interpreta como o sistema funciona — e decide com clareza.
             </p>
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-emerald-400" />
