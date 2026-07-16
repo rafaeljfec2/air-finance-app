@@ -24,22 +24,23 @@ export function CTAFinalV3() {
       <div className="v3-container relative z-10">
         <ScrollReveal variant="scale" className="text-center max-w-2xl mx-auto">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight tracking-tight">
-            Descubra a capacidade
+            Finalmente explique
             <br />
-            <span className="text-emerald-400">do seu sistema.</span>
+            <span className="text-emerald-400">a sua vida financeira.</span>
           </h2>
 
           <p className="text-base md:text-lg text-gray-400 mb-8 max-w-lg mx-auto leading-relaxed">
-            Clareza para decidir melhor — grátis no beta, sem cartão de crédito.
+            Você passa a compreender a capacidade do seu sistema — grátis no beta, sem cartão de
+            crédito.
           </p>
 
           <button
             type="button"
             onClick={() => navigate('/register')}
             className="v3-btn-primary !px-8 !py-4 !text-base group"
-            aria-label="Descobrir minha capacidade"
+            aria-label="Descobrir minha capacidade financeira"
           >
-            Descobrir minha capacidade
+            Descobrir minha capacidade financeira
             <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
           </button>
         </ScrollReveal>

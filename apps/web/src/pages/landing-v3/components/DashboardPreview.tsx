@@ -1,19 +1,20 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import { useNavigate } from 'react-router-dom';
 
 import { V3_EASE } from './motion';
 
-const TEASER_LINES = [
-  'Fluxo sustenta a capacidade operacional.',
-  'Estrutura merece atenção neste momento.',
-  'Liquidez confortável para o curto prazo.',
+/** Compact pillar hints — names + state only; no values or deep copy. */
+const TEASER_PILLARS = [
+  { name: 'Fluxo', state: 'Sustenta' },
+  { name: 'Estrutura', state: 'Atenção' },
+  { name: 'Liquidez', state: 'Confortável' },
 ] as const;
 
 interface DashboardPreviewProps {
   readonly animateOnMount?: boolean;
-  /** When true, shows “Ver o check-up completo” → /register (curiosity CTA). */
+  /** When true, shows curiosity CTA → /register. */
   readonly showCheckupCta?: boolean;
 }
 
@@ -56,7 +57,7 @@ export function DashboardPreview({
           animate={active ? { opacity: 1 } : { opacity: 0 }}
           transition={reduced ? { duration: 0.01 } : { duration: 0.4, delay: 0.12, ease: V3_EASE }}
         >
-          <div className="flex items-center justify-between gap-3 mb-4">
+          <div className="flex items-center justify-between gap-3 mb-5">
             <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
               Capacidade financeira
             </p>
@@ -65,14 +66,11 @@ export function DashboardPreview({
             </span>
           </div>
 
-          <p className="text-sm font-semibold text-gray-50 leading-snug mb-4">
-            Qual é a capacidade financeira do meu sistema?
-          </p>
-
-          <ul className="space-y-2.5 text-sm text-gray-300 leading-relaxed">
-            {TEASER_LINES.map((line, index) => (
+          <ul className="space-y-2 mb-5">
+            {TEASER_PILLARS.map((pillar, index) => (
               <motion.li
-                key={line}
+                key={pillar.name}
+                className="flex items-center justify-between gap-3 rounded-xl border border-gray-700/80 bg-[#1f2937]/80 px-3 py-2.5"
                 initial={reduced ? { opacity: 0 } : { opacity: 0, y: 8 }}
                 animate={
                   active
@@ -86,13 +84,18 @@ export function DashboardPreview({
                 transition={
                   reduced
                     ? { duration: 0.01 }
-                    : { duration: 0.4, delay: 0.22 + index * 0.1, ease: V3_EASE }
+                    : { duration: 0.35, delay: 0.2 + index * 0.08, ease: V3_EASE }
                 }
               >
-                {line}
+                <span className="text-sm font-medium text-gray-50">{pillar.name}</span>
+                <span className="text-[11px] font-medium text-gray-400">{pillar.state}</span>
               </motion.li>
             ))}
           </ul>
+
+          <p className="text-sm text-gray-400 leading-relaxed">
+            O sistema sustenta o curto prazo. Há um ponto que merece um olhar mais perto.
+          </p>
         </motion.div>
 
         {showCheckupCta ? (
@@ -100,11 +103,11 @@ export function DashboardPreview({
             <button
               type="button"
               onClick={() => navigate('/register')}
-              className="w-full flex items-center justify-center gap-2 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
-              aria-label="Ver o check-up completo"
+              className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors group"
+              aria-label="Ver a análise completa"
             >
-              Ver o check-up completo
-              <ChevronDown className="w-4 h-4" />
+              Quero ver a análise completa
+              <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
             </button>
           </div>
         ) : (

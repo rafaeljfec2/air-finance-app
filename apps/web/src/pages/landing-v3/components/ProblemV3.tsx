@@ -7,19 +7,19 @@ const PROBLEMS = [
     icon: Scale,
     title: 'Saldo não é capacidade',
     description:
-      'Ver o saldo do banco não diz se o sistema aguenta o mês, o imprevisto ou a próxima decisão grande.',
+      'Você vê quanto tem na conta — e ainda assim não sabe se o mês fecha, se o imprevisto cabe ou se a decisão grande é segura.',
   },
   {
     icon: EyeOff,
-    title: 'Gráficos não são decisão',
+    title: 'Incerteza no lugar da clareza',
     description:
-      'Planilhas e painéis acumulam números. O que falta é uma leitura que reduza a incerteza — sem culpa.',
+      'Você sente o dinheiro apertar, mas não consegue explicar com lucidez como está a sua vida financeira.',
   },
   {
     icon: MessageCircleQuestion,
-    title: 'Difícil explicar a alguém',
+    title: 'Sem uma leitura que una tudo',
     description:
-      'Se perguntarem “como está sua saúde financeira?”, a resposta vira apps, saldos e impressões soltas.',
+      'Apps e planilhas acumulam impressões. Você ainda não tem uma conversa clara sobre o seu dinheiro.',
   },
 ] as const;
 
@@ -29,13 +29,13 @@ export function ProblemV3() {
       <div className="v3-container">
         <ScrollReveal className="text-center mb-12 md:mb-16">
           <h2 className="v3-h2 mb-4">
-            Você sabe a capacidade
+            Você consegue explicar
             <br className="hidden sm:block" />
-            <span className="text-gray-500"> do seu sistema?</span>
+            <span className="text-gray-500"> como está o seu dinheiro?</span>
           </h2>
           <p className="v3-body max-w-2xl mx-auto">
-            A maioria vive no escuro operacional: dados espalhados, impressões soltas, nenhuma
-            leitura que una o dinheiro em uma conversa humana.
+            O problema não é falta de aplicativo. É viver sem clareza sobre a própria capacidade
+            financeira — e decidir no escuro.
           </p>
         </ScrollReveal>
 

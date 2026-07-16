@@ -10,6 +10,7 @@ import { HeaderV3 } from './components/HeaderV3';
 import { HeroV3 } from './components/HeroV3';
 import { HowItWorksV3 } from './components/HowItWorksV3';
 import { InterpretSystemV3 } from './components/InterpretSystemV3';
+import { NewMindsetV3 } from './components/NewMindsetV3';
 import { PreviewDashboardV3 } from './components/PreviewDashboardV3';
 import { PricingV3 } from './components/PricingV3';
 import { ProblemV3 } from './components/ProblemV3';
@@ -52,9 +53,10 @@ export function LandingPageV3() {
         <main className="relative w-full">
           <HeroV3 />
           <ProblemV3 />
+          <NewMindsetV3 />
           <InterpretSystemV3 />
-          <HowItWorksV3 />
           <PreviewDashboardV3 />
+          <HowItWorksV3 />
           <CTAFinalV3 />
           <PricingV3 />
           <FAQV3 />

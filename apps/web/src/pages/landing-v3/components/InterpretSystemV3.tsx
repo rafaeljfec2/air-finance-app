@@ -5,37 +5,38 @@ import { ScrollReveal, StaggerContainer, StaggerItem } from './animations';
 const POINTS = [
   {
     icon: Compass,
-    title: 'Interpreta o sistema',
+    title: 'Você passa a ver o sistema inteiro',
     description:
-      'Transforma dados espalhados em uma leitura da capacidade financeira — o que sustenta e o que merece atenção.',
+      'Em vez de se perder em métricas, você entende o que sustenta e o que merece atenção.',
   },
   {
     icon: BookOpen,
-    title: 'Dados viram compreensão',
+    title: 'Você aprofunda no seu ritmo',
     description:
-      'Primeiro o resumo. Depois o que importa explorar. O detalhe só aparece quando você escolhe ir mais fundo.',
+      'Primeiro a compreensão do conjunto. Depois o detalhe — só quando você escolhe ir mais longe.',
   },
   {
     icon: Shield,
-    title: 'Aconselha sem decidir por você',
+    title: 'Você decide com honestidade',
     description:
-      'O produto mostra capacidade e lacunas com honestidade. A decisão continua sendo sua — silêncio é o default.',
+      'Capacidade e lacunas ficam claras. Sem pressão artificial — a decisão continua sendo sua.',
   },
 ] as const;
 
 export function InterpretSystemV3() {
   return (
-    <section id="interpret-system" className="v3-section bg-[var(--v3-bg-alt)]">
+    <section id="interpret-system" className="v3-section bg-[var(--v3-bg)]">
       <div className="v3-container">
         <ScrollReveal className="text-center mb-12 md:mb-16">
-          <div className="v3-badge mx-auto mb-4">Solução</div>
+          <div className="v3-badge mx-auto mb-4">Compreensão</div>
           <h2 className="v3-h2 mb-4">
-            O AirFinance interpreta
-            <br className="hidden sm:block" />o seu sistema financeiro
+            Você finalmente consegue
+            <br className="hidden sm:block" />
+            explicar a capacidade do seu sistema
           </h2>
           <p className="v3-body max-w-2xl mx-auto">
-            Não é um painel de métricas competindo por atenção. É uma leitura conduzida: entender,
-            interpretar, decidir — nessa ordem.
+            Com o AirFinance você passa a entender, interpretar e explorar — nessa ordem. Não é
+            acumular números em uma tela lotada.
           </p>
         </ScrollReveal>
 
@@ -44,7 +45,7 @@ export function InterpretSystemV3() {
             const Icon = point.icon;
             return (
               <StaggerItem key={point.title}>
-                <div className="group flex gap-4 items-start rounded-2xl border border-gray-800 bg-[var(--v3-bg)] p-5 md:p-6 transition-colors duration-200 hover:border-emerald-500/35">
+                <div className="group flex gap-4 items-start rounded-2xl border border-gray-800 bg-[var(--v3-bg-alt)] p-5 md:p-6 transition-colors duration-200 hover:border-emerald-500/35">
                   <div className="shrink-0 flex flex-col items-center">
                     <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400 transition-transform duration-200 group-hover:scale-105">
                       <Icon className="h-5 w-5" />

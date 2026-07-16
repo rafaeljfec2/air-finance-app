@@ -47,9 +47,9 @@ export function HeroV3() {
 
             <HeroAnimation delay={0.16}>
               <p className="v3-body-lg mb-8 max-w-lg">
-                O AirFinance interpreta o seu sistema financeiro e transforma dados dispersos em
-                compreensão — clareza para a próxima decisão. Sem culpa. Sem score. Sem decidir por
-                você.
+                Com o AirFinance você passa a entender a capacidade do seu sistema — dados dispersos
+                viram compreensão para a próxima decisão. Sem culpa. Sem score. Sem ninguém decidir
+                por você.
               </p>
             </HeroAnimation>
 

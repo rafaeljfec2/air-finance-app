@@ -10,9 +10,9 @@ interface FAQItem {
 
 const FAQ_ITEMS: readonly FAQItem[] = [
   {
-    question: 'O que o AirFinance faz de diferente?',
+    question: 'O que muda na minha vida financeira?',
     answer:
-      'Ele interpreta a capacidade do seu sistema financeiro — o que sustenta e o que merece atenção — para você decidir com menos incerteza. Não é um painel de saldos nem um score de “nota financeira”.',
+      'Você passa a compreender a capacidade do seu sistema — o que sustenta e o que merece atenção — e decide com menos incerteza. Não é mais um painel de saldos nem uma “nota” financeira.',
   },
   {
     question: 'Meus dados estão seguros?',
@@ -22,7 +22,7 @@ const FAQ_ITEMS: readonly FAQItem[] = [
   {
     question: 'Preciso conectar meu banco?',
     answer:
-      'Não é obrigatório. Você pode começar importando extratos em OFX. Conectar via Open Finance é opcional e acelera a leitura do sistema.',
+      'Não é obrigatório. Você pode começar importando extratos em OFX. Conectar via Open Finance é opcional e acelera o caminho até a compreensão.',
   },
   {
     question: 'O beta é realmente grátis?',
@@ -30,9 +30,9 @@ const FAQ_ITEMS: readonly FAQItem[] = [
       'Sim. Durante a fase beta, todos os planos estão disponíveis gratuitamente. Não pedimos cartão de crédito. Quando o beta encerrar, você será avisado com antecedência e poderá escolher seu plano.',
   },
   {
-    question: 'O produto decide por mim?',
+    question: 'Alguém decide por mim?',
     answer:
-      'Não. O AirFinance aconselha e organiza a leitura. A decisão continua sendo sua — silêncio é o default, sem pressão artificial.',
+      'Não. Você recebe clareza e orientação. A decisão continua sendo sua — sem pressão artificial.',
   },
   {
     question: 'Funciona com quais bancos?',
@@ -73,7 +73,9 @@ export function FAQV3() {
       <div className="v3-container">
         <ScrollReveal className="text-center mb-12 md:mb-16">
           <h2 className="v3-h2 mb-4">Perguntas frequentes</h2>
-          <p className="v3-body max-w-xl mx-auto">Respostas rápidas para as dúvidas mais comuns.</p>
+          <p className="v3-body max-w-xl mx-auto">
+            O essencial para você começar com clareza — sem jargão de produto.
+          </p>
         </ScrollReveal>
 
         <StaggerContainer className="max-w-2xl mx-auto" staggerDelay={0.06}>

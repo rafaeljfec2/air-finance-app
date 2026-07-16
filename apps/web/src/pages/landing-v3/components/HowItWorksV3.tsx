@@ -6,26 +6,26 @@ const STEPS = [
   {
     icon: Link2,
     number: '01',
-    title: 'Conectar',
-    description: 'Traga seus dados financeiros — de forma segura e no seu ritmo.',
+    title: 'Trazer seus dados',
+    description: 'Você conecta o que precisa — no seu ritmo, com segurança.',
   },
   {
     icon: Compass,
     number: '02',
-    title: 'Interpretar',
-    description: 'O AirFinance lê o sistema e organiza a capacidade em uma conversa clara.',
+    title: 'Ganhar uma leitura',
+    description: 'Você passa a ver a capacidade do seu sistema em uma conversa clara.',
   },
   {
     icon: Lightbulb,
     number: '03',
-    title: 'Compreender',
-    description: 'Você vê o que sustenta e o que merece atenção — sem score nem culpa.',
+    title: 'Compreender o essencial',
+    description: 'Você entende o que sustenta e o que merece atenção — sem score.',
   },
   {
     icon: CheckCircle2,
     number: '04',
-    title: 'Melhores decisões',
-    description: 'Com menos incerteza, a próxima decisão financeira fica mais simples.',
+    title: 'Decidir com clareza',
+    description: 'Você escolhe o próximo passo com menos incerteza.',
   },
 ] as const;
 
@@ -35,9 +35,9 @@ export function HowItWorksV3() {
       <div className="v3-container">
         <ScrollReveal className="text-center mb-12 md:mb-16">
           <div className="v3-badge mx-auto mb-4">Como funciona</div>
-          <h2 className="v3-h2 mb-4">Do dado à decisão</h2>
+          <h2 className="v3-h2 mb-4">Do primeiro passo à clareza</h2>
           <p className="v3-body max-w-xl mx-auto">
-            Quatro etapas. Sem lista de features. Sem parede de gráficos.
+            Quatro etapas. Você não acumula recursos — você ganha compreensão.
           </p>
         </ScrollReveal>
 
