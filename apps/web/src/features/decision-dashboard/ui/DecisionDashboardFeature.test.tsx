@@ -182,32 +182,43 @@ describe('DecisionDashboardFeature', () => {
       ...baseReady,
       surfaceState: 'loading',
       isLoading: true,
-      loadingMessage: 'Montando seu parecer de hoje…',
+      loadingMessage: 'Avaliando pressão financeira',
       loadingSteps: [
         {
-          id: 'accounts_budget',
-          label: 'Organizando contas e planejamento do mês…',
-          status: 'done',
-        },
-        {
-          id: 'summary',
-          label: 'Lendo entradas, saídas e saldo do mês…',
-          status: 'done',
-        },
-        {
           id: 'movements',
-          label: 'Revisando movimentações recentes…',
+          label: 'Organizando movimentações',
+          description: 'Reunindo as movimentações deste período.',
           status: 'done',
         },
         {
-          id: 'credit',
-          label: 'Verificando pressão de crédito…',
+          id: 'inflows_outflows',
+          label: 'Entendendo entradas e saídas',
+          description: 'Classificando as transações do mês.',
           status: 'done',
         },
         {
-          id: 'assembly',
-          label: 'Montando seu parecer de hoje…',
+          id: 'commitments',
+          label: 'Identificando compromissos',
+          description: 'Mapeando seus gastos fixos e parcelas.',
+          status: 'done',
+        },
+        {
+          id: 'pressure',
+          label: 'Avaliando pressão financeira',
+          description: 'Verificando se o crédito está ajudando ou escondendo pressão no fluxo.',
           status: 'active',
+        },
+        {
+          id: 'history_patterns',
+          label: 'Cruzando padrões do histórico',
+          description: 'Comparando com os últimos 6 meses.',
+          status: 'pending',
+        },
+        {
+          id: 'report',
+          label: 'Escrevendo seu parecer',
+          description: 'Montando insights e recomendações.',
+          status: 'pending',
         },
       ],
       viewModel: null,
@@ -218,13 +229,13 @@ describe('DecisionDashboardFeature', () => {
 
     renderFeature();
 
-    const loadingRegion = screen.getByLabelText('Montando parecer de hoje');
+    const loadingRegion = screen.getByLabelText('Analisando seu sistema financeiro');
     expect(loadingRegion).toHaveAttribute('aria-busy', 'true');
-    expect(screen.getByText('Montando seu parecer de hoje')).toBeInTheDocument();
-    expect(screen.getAllByText('Montando seu parecer de hoje…').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Analisando seu sistema financeiro')).toBeInTheDocument();
+    expect(screen.getByText('Avaliando pressão financeira')).toBeInTheDocument();
+    expect(screen.getByText('Comparando com os últimos 6 meses.')).toBeInTheDocument();
     expect(screen.getByLabelText('Loading progress')).toBeInTheDocument();
-    expect(screen.getByLabelText('Progresso do parecer')).toBeInTheDocument();
-    expect(screen.getByText('4 de 5 etapas concluídas')).toBeInTheDocument();
+    expect(screen.getByText('Seus dados estão seguros e criptografados.')).toBeInTheDocument();
     expect(screen.queryByLabelText('Decision desk')).not.toBeInTheDocument();
   });
 });

@@ -11,6 +11,7 @@ export type DashboardLoadingStepStatus = 'done' | 'active' | 'pending';
 export interface DashboardLoadingStep {
   readonly id: string;
   readonly label: string;
+  readonly description: string;
   readonly status: DashboardLoadingStepStatus;
 }
 
@@ -21,29 +22,39 @@ export interface DashboardLoadingPhase {
 
 const LOADING_STEP_DEFINITIONS = [
   {
-    id: 'accounts_budget',
-    label: 'Organizando contas e planejamento do mês…',
-    isPending: (input: DashboardLoadingPhaseInput) => input.budgetLoading,
+    id: 'movements',
+    label: 'Organizando movimentações',
+    description: 'Reunindo as movimentações deste período.',
+    isPending: (input: DashboardLoadingPhaseInput) => input.recentTxLoading,
   },
   {
-    id: 'summary',
-    label: 'Lendo entradas, saídas e saldo do mês…',
+    id: 'inflows_outflows',
+    label: 'Entendendo entradas e saídas',
+    description: 'Classificando as transações do mês.',
     isPending: (input: DashboardLoadingPhaseInput) => input.summaryLoading,
   },
   {
-    id: 'movements',
-    label: 'Revisando movimentações recentes…',
-    isPending: (input: DashboardLoadingPhaseInput) =>
-      input.recentTxLoading || input.expensesLoading,
+    id: 'commitments',
+    label: 'Identificando compromissos',
+    description: 'Mapeando seus gastos fixos e parcelas.',
+    isPending: (input: DashboardLoadingPhaseInput) => input.budgetLoading,
   },
   {
-    id: 'credit',
-    label: 'Verificando pressão de crédito…',
+    id: 'pressure',
+    label: 'Avaliando pressão financeira',
+    description: 'Verificando se o crédito está ajudando ou escondendo pressão no fluxo.',
     isPending: (input: DashboardLoadingPhaseInput) => input.indebtednessLoading,
   },
   {
-    id: 'assembly',
-    label: 'Montando seu parecer de hoje…',
+    id: 'history_patterns',
+    label: 'Cruzando padrões do histórico',
+    description: 'Comparando com os últimos 6 meses.',
+    isPending: (input: DashboardLoadingPhaseInput) => input.expensesLoading,
+  },
+  {
+    id: 'report',
+    label: 'Escrevendo seu parecer',
+    description: 'Montando insights e recomendações.',
     isPending: () => false,
   },
 ] as const;
@@ -57,6 +68,7 @@ function buildLoadingPhase(activeIndex: number): DashboardLoadingPhase {
   const steps = LOADING_STEP_DEFINITIONS.map((step, index) => ({
     id: step.id,
     label: step.label,
+    description: step.description,
     status:
       index < clampedIndex
         ? ('done' as const)
@@ -66,7 +78,7 @@ function buildLoadingPhase(activeIndex: number): DashboardLoadingPhase {
   }));
 
   return {
-    message: LOADING_STEP_DEFINITIONS[clampedIndex]?.label ?? 'Montando seu parecer de hoje…',
+    message: LOADING_STEP_DEFINITIONS[clampedIndex]?.label ?? 'Escrevendo seu parecer',
     steps,
   };
 }

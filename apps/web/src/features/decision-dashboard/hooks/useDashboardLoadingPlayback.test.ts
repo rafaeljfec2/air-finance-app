@@ -34,15 +34,15 @@ describe('useDashboardLoadingPlayback', () => {
     );
 
     expect(result.current.isPlaybackActive).toBe(true);
-    expect(result.current.loadingPhase?.message).toBe('Organizando contas e planejamento do mês…');
+    expect(result.current.loadingPhase?.message).toBe('Organizando movimentações');
 
     advanceLoadingSteps(1);
 
-    expect(result.current.loadingPhase?.message).toBe('Lendo entradas, saídas e saldo do mês…');
+    expect(result.current.loadingPhase?.message).toBe('Entendendo entradas e saídas');
 
     advanceLoadingSteps(DASHBOARD_LOADING_STEP_COUNT - 2);
 
-    expect(result.current.loadingPhase?.message).toBe('Montando seu parecer de hoje…');
+    expect(result.current.loadingPhase?.message).toBe('Escrevendo seu parecer');
 
     advanceLoadingSteps(1);
 
@@ -63,7 +63,7 @@ describe('useDashboardLoadingPlayback', () => {
 
     advanceLoadingSteps(DASHBOARD_LOADING_STEP_COUNT - 1);
 
-    expect(result.current.loadingPhase?.message).toBe('Montando seu parecer de hoje…');
+    expect(result.current.loadingPhase?.message).toBe('Escrevendo seu parecer');
     expect(result.current.isPlaybackActive).toBe(true);
 
     advanceLoadingSteps(1);
@@ -92,6 +92,6 @@ describe('useDashboardLoadingPlayback', () => {
 
     rerender({ companyId: 'company-2' });
 
-    expect(result.current.loadingPhase?.message).toBe('Organizando contas e planejamento do mês…');
+    expect(result.current.loadingPhase?.message).toBe('Organizando movimentações');
   });
 });

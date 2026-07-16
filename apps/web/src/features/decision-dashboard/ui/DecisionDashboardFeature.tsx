@@ -38,7 +38,6 @@ export function DecisionDashboardFeature() {
     isLoading,
     isError,
     isAwaitingCompany,
-    loadingMessage,
     loadingSteps,
     viewModel,
     summary,
@@ -60,12 +59,7 @@ export function DecisionDashboardFeature() {
   }
 
   if (isLoading) {
-    return (
-      <DecisionDashboardLoading
-        message={loadingMessage ?? 'Montando seu parecer de hoje…'}
-        steps={loadingSteps}
-      />
-    );
+    return <DecisionDashboardLoading steps={loadingSteps} />;
   }
 
   if (isError || !viewModel) {
