@@ -5,9 +5,9 @@ import { Logo } from '@/components/Logo';
 
 const FOOTER_LINKS = {
   produto: [
-    { name: 'Check-up', href: '#checkup-pillars' },
-    { name: 'Experiência', href: '#dashboard-preview' },
-    { name: 'Preços', href: '#pricing' },
+    { name: 'Check-up', href: '/#checkup-pillars' },
+    { name: 'Experiência', href: '/#dashboard-preview' },
+    { name: 'Preços', href: '/#pricing' },
   ],
   conteudo: [
     { name: 'Gestão Financeira CPF', href: '/gestao-financeira-cpf', isRoute: true },

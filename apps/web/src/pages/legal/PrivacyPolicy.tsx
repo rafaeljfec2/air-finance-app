@@ -1,22 +1,20 @@
+import { PublicDarkLayout } from '@/components/seo/PublicDarkLayout';
 import { usePageScroll } from '@/hooks/usePageScroll';
-import { Footer } from '@/pages/landing/components/Footer';
-import { Header } from '@/pages/landing/components/Header';
 
 export function PrivacyPolicy() {
   usePageScroll();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header />
-      <main className="flex-grow pt-36 pb-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
-        <div className="bg-white shadow-sm rounded-lg p-8 md:p-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Política de Privacidade</h1>
+    <PublicDarkLayout>
+      <main className="mx-auto w-full max-w-4xl flex-grow px-4 pb-16 pt-10 sm:px-6 lg:px-8">
+        <div className="rounded-2xl border border-gray-800 bg-[#111827] p-8 shadow-lg md:p-12">
+          <h1 className="mb-8 text-3xl font-bold text-gray-50">Política de Privacidade</h1>
 
-          <div className="space-y-6 text-gray-600">
+          <div className="space-y-6 text-gray-300">
             <p>Última atualização: {new Date().toLocaleDateString('pt-BR')}</p>
 
             <section>
-              <h2 className="text-xl font-semibold text-gray-800 mb-3">1. Coleta de Informações</h2>
+              <h2 className="mb-3 text-xl font-semibold text-gray-100">1. Coleta de Informações</h2>
               <p>
                 Coletamos informações que você nos fornece diretamente, como nome, e-mail e dados
                 financeiros inseridos na plataforma. Também podemos coletar dados automaticamente,
@@ -25,7 +23,7 @@ export function PrivacyPolicy() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-gray-800 mb-3">2. Uso das Informações</h2>
+              <h2 className="mb-3 text-xl font-semibold text-gray-100">2. Uso das Informações</h2>
               <p>
                 Usamos suas informações para fornecer, manter e melhorar nossos serviços, processar
                 transações, enviar notificações e responder a solicitações de suporte.
@@ -33,7 +31,7 @@ export function PrivacyPolicy() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-gray-800 mb-3">
+              <h2 className="mb-3 text-xl font-semibold text-gray-100">
                 3. Compartilhamento de Dados
               </h2>
               <p>
@@ -44,7 +42,7 @@ export function PrivacyPolicy() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-gray-800 mb-3">4. Segurança de Dados</h2>
+              <h2 className="mb-3 text-xl font-semibold text-gray-100">4. Segurança de Dados</h2>
               <p>
                 Implementamos medidas de segurança técnicas e organizacionais para proteger suas
                 informações contra acesso não autorizado, alteração, divulgação ou destruição.
@@ -52,7 +50,7 @@ export function PrivacyPolicy() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-gray-800 mb-3">5. Seus Direitos</h2>
+              <h2 className="mb-3 text-xl font-semibold text-gray-100">5. Seus Direitos</h2>
               <p>
                 Você tem o direito de acessar, corrigir ou excluir suas informações pessoais. Você
                 também pode optar por não receber comunicações de marketing a qualquer momento.
@@ -60,7 +58,7 @@ export function PrivacyPolicy() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-gray-800 mb-3">6. Cookies</h2>
+              <h2 className="mb-3 text-xl font-semibold text-gray-100">6. Cookies</h2>
               <p>
                 Utilizamos cookies e tecnologias semelhantes para melhorar sua experiência, analisar
                 tendências e administrar o site.
@@ -68,7 +66,7 @@ export function PrivacyPolicy() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-gray-800 mb-3">
+              <h2 className="mb-3 text-xl font-semibold text-gray-100">
                 7. Alterações nesta Política
               </h2>
               <p>
@@ -78,7 +76,7 @@ export function PrivacyPolicy() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-gray-800 mb-3">8. Contato</h2>
+              <h2 className="mb-3 text-xl font-semibold text-gray-100">8. Contato</h2>
               <p>
                 Se você tiver dúvidas sobre esta Política de Privacidade, entre em contato conosco
                 através do nosso suporte.
@@ -87,7 +85,6 @@ export function PrivacyPolicy() {
           </div>
         </div>
       </main>
-      <Footer />
-    </div>
+    </PublicDarkLayout>
   );
 }

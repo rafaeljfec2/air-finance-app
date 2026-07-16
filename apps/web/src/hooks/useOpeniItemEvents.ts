@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 import { useAuthStore } from '@/stores/auth';
+import { env } from '@/utils/env';
 
 const getTokenFromStorage = (): string | null => {
   try {
@@ -18,7 +19,7 @@ const getTokenFromStorage = (): string | null => {
 
 const getTokenFromApi = async (): Promise<string | null> => {
   try {
-    const apiUrl = import.meta.env.VITE_API_URL;
+    const apiUrl = env.VITE_API_URL;
     const baseUrl = apiUrl.endsWith('/v1') ? apiUrl : `${apiUrl.replace(/\/$/, '')}/v1`;
     const response = await fetch(`${baseUrl}/auth/sse-token`, {
       method: 'GET',
@@ -156,7 +157,7 @@ export const useOpeniItemEvents = ({
 
   const buildSseUrl = useCallback(
     (tokenToUse: string): string => {
-      const apiUrl = import.meta.env.VITE_API_URL;
+      const apiUrl = env.VITE_API_URL;
       const baseUrl = apiUrl.endsWith('/v1') ? apiUrl : `${apiUrl.replace(/\/$/, '')}/v1`;
       return `${baseUrl}/companies/${companyId}/banking/openi/items/${itemId}/events?token=${encodeURIComponent(tokenToUse)}`;
     },

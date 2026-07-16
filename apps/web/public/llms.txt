@@ -1,0 +1,31 @@
+# Air Finance
+
+> Air Finance helps people understand their financial capacity and make clearer money decisions.
+> Public marketing and educational pages only. Authenticated app surfaces are out of scope for agents.
+
+## Canonical site
+
+https://www.airfinance.com.br/
+
+## Optional
+
+- [llms.txt](https://www.airfinance.com.br/llms.txt): this file
+- [Sitemap](https://www.airfinance.com.br/sitemap.xml)
+
+## Public pages
+
+- [Home](https://www.airfinance.com.br/): Product landing — financial capacity narrative
+- [Pricing](https://www.airfinance.com.br/pricing): Plans and pricing
+- [Gestão financeira pessoal](https://www.airfinance.com.br/gestao-financeira-cpf): SEO guide hub
+- [Controle financeiro pessoal](https://www.airfinance.com.br/gestao-financeira-cpf/controle-financeiro-pessoal)
+- [Organização financeira pessoal](https://www.airfinance.com.br/gestao-financeira-cpf/organizacao-financeira-pessoal)
+- [Categorização automática de gastos](https://www.airfinance.com.br/gestao-financeira-cpf/categorizacao-automatica-gastos)
+- [Gestão financeira com IA](https://www.airfinance.com.br/gestao-financeira-cpf/gestao-financeira-com-inteligencia-artificial)
+- [Score de crédito e finanças pessoais](https://www.airfinance.com.br/gestao-financeira-cpf/score-credito-e-financas-pessoais)
+- [Privacy](https://www.airfinance.com.br/privacy)
+- [Terms](https://www.airfinance.com.br/terms)
+
+## Notes for agents
+
+- Prefer HTML content from the URLs above; do not attempt to log in or scrape authenticated routes.
+- If a page shell fails to load JavaScript chunks, retry once or use the static HTML body / headings present in the document.

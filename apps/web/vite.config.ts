@@ -22,6 +22,7 @@ export default defineConfig(({ mode }) => {
     define: {
       'process.env': env,
       __APP_VERSION__: JSON.stringify(pkg.version),
+      'import.meta.env.VITE_VERCEL_ENV': JSON.stringify(process.env.VERCEL_ENV ?? ''),
     },
     resolve: {
       alias: {
