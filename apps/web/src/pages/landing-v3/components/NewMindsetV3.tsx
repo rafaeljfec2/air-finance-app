@@ -19,7 +19,7 @@ const IDEAS = [
     icon: Sparkles,
     title: 'O que muda é a compreensão',
     description:
-      'Você finalmente consegue transformar números em uma conversa sobre capacidade, tensão e o que merece atenção.',
+      'Você finalmente consegue transformar números em uma conversa clara sobre capacidade e o que merece atenção.',
   },
 ] as const;
 

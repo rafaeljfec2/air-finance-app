@@ -10,6 +10,7 @@ import { HeaderV3 } from './components/HeaderV3';
 import { HeroV3 } from './components/HeroV3';
 import { HowItWorksV3 } from './components/HowItWorksV3';
 import { InterpretSystemV3 } from './components/InterpretSystemV3';
+import { ModelBehindV3 } from './components/ModelBehindV3';
 import { NewMindsetV3 } from './components/NewMindsetV3';
 import { PreviewDashboardV3 } from './components/PreviewDashboardV3';
 import { PricingV3 } from './components/PricingV3';
@@ -54,6 +55,7 @@ export function LandingPageV3() {
           <HeroV3 />
           <ProblemV3 />
           <NewMindsetV3 />
+          <ModelBehindV3 />
           <InterpretSystemV3 />
           <PreviewDashboardV3 />
           <HowItWorksV3 />
