@@ -1,5 +1,11 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 
+import {
+  attemptChunkLoadRecovery,
+  clearChunkReloadFlag,
+  isChunkLoadError,
+} from '@/utils/chunkLoadRecovery';
+
 import { ErrorPage } from './ErrorPage';
 
 interface Props {
@@ -25,7 +31,9 @@ function logErrorPayload(error: Error, errorInfo: ErrorInfo): void {
 
 export function registerGlobalErrorListeners(): void {
   if (globalThis.window === undefined) return;
+
   globalThis.window.onerror = (message, source, lineno, colno, error) => {
+    const recovered = attemptChunkLoadRecovery(error ?? message);
     console.error('[window.onerror]', {
       message,
       source,
@@ -34,15 +42,27 @@ export function registerGlobalErrorListeners(): void {
       error: error?.message,
       stack: error?.stack,
       href: globalThis.window.location.href,
+      chunkRecovered: recovered,
     });
-    return false;
+    return recovered;
   };
+
   globalThis.window.addEventListener('unhandledrejection', (event) => {
+    const recovered = attemptChunkLoadRecovery(event.reason);
     console.error('[unhandledrejection]', {
       reason: event.reason,
       href: globalThis.window.location.href,
+      chunkRecovered: recovered,
     });
+    if (recovered) {
+      event.preventDefault();
+    }
   });
+
+  // Allow another recovery later in the same tab only after a healthy boot.
+  globalThis.window.setTimeout(() => {
+    clearChunkReloadFlag();
+  }, 10_000);
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -52,10 +72,16 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   public static getDerivedStateFromError(error: Error): State {
+    if (isChunkLoadError(error)) {
+      return { hasError: false, error: null };
+    }
     return { hasError: true, error };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    if (attemptChunkLoadRecovery(error)) {
+      return;
+    }
     logErrorPayload(error, errorInfo);
   }
 
