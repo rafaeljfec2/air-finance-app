@@ -4,6 +4,7 @@ import {
   attemptChunkLoadRecovery,
   clearChunkReloadFlag,
   isChunkLoadError,
+  stripChunkReloadQueryParam,
 } from '@/utils/chunkLoadRecovery';
 
 import { ErrorPage } from './ErrorPage';
@@ -32,20 +33,21 @@ function logErrorPayload(error: Error, errorInfo: ErrorInfo): void {
 export function registerGlobalErrorListeners(): void {
   if (globalThis.window === undefined) return;
 
-  globalThis.window.onerror = (message, source, lineno, colno, error) => {
-    const recovered = attemptChunkLoadRecovery(error ?? message);
-    console.error('[window.onerror]', {
-      message,
-      source,
-      lineno,
-      colno,
-      error: error?.message,
-      stack: error?.stack,
+  stripChunkReloadQueryParam();
+
+  globalThis.window.addEventListener('error', (event) => {
+    const recovered = attemptChunkLoadRecovery(event.error ?? event.message);
+    if (recovered) {
+      event.preventDefault();
+    }
+    console.error('[window.error]', {
+      message: event.message,
+      source: event.filename,
+      error: event.error?.message,
       href: globalThis.window.location.href,
       chunkRecovered: recovered,
     });
-    return recovered;
-  };
+  });
 
   globalThis.window.addEventListener('unhandledrejection', (event) => {
     const recovered = attemptChunkLoadRecovery(event.reason);
@@ -58,6 +60,19 @@ export function registerGlobalErrorListeners(): void {
       event.preventDefault();
     }
   });
+
+  // Vite fires this when a dynamically imported chunk 404s after a new deploy.
+  globalThis.window.addEventListener('vite:preloadError', ((event: Event) => {
+    const preloadEvent = event as Event & { payload?: unknown; preventDefault(): void };
+    preloadEvent.preventDefault();
+    const recovered = attemptChunkLoadRecovery(
+      preloadEvent.payload ?? new Error('Failed to fetch dynamically imported module'),
+    );
+    console.error('[vite:preloadError]', {
+      href: globalThis.window.location.href,
+      chunkRecovered: recovered,
+    });
+  }) as EventListener);
 
   // Allow another recovery later in the same tab only after a healthy boot.
   globalThis.window.setTimeout(() => {

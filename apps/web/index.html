@@ -20,6 +20,44 @@
   </head>
   <body>
     <div id="root"></div>
+    <!--
+      Early recovery when a deploy invalidates hashed chunks.
+      Runs before the module graph; covers entry 404s that React never sees.
+    -->
+    <script>
+      (function () {
+        var KEY = 'airfinance:chunk-reload-once';
+        var PATTERN =
+          /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|Loading chunk [\w-]+ failed|ChunkLoadError|Unable to preload CSS/i;
+
+        function recover(msg) {
+          try {
+            if (!PATTERN.test(String(msg || ''))) return;
+            if (sessionStorage.getItem(KEY) === '1') return;
+            sessionStorage.setItem(KEY, '1');
+            var url = new URL(location.href);
+            url.searchParams.set('_chunk', String(Date.now()));
+            location.replace(url.pathname + url.search + url.hash);
+          } catch (e) {}
+        }
+
+        window.addEventListener(
+          'error',
+          function (e) {
+            recover((e && e.message) || (e && e.error && e.error.message));
+          },
+          true,
+        );
+        window.addEventListener('unhandledrejection', function (e) {
+          var reason = e && e.reason;
+          recover((reason && reason.message) || reason);
+        });
+        window.addEventListener('vite:preloadError', function (e) {
+          e.preventDefault();
+          recover('Failed to fetch dynamically imported module');
+        });
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

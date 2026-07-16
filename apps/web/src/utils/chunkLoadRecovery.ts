@@ -6,6 +6,7 @@ const CHUNK_LOAD_ERROR_PATTERNS = [
   /error loading dynamically imported module/i,
   /Loading chunk [\w-]+ failed/i,
   /ChunkLoadError/i,
+  /Unable to preload CSS/i,
 ] as const;
 
 export function isChunkLoadError(error: unknown): boolean {
@@ -36,6 +37,27 @@ export interface AttemptChunkReloadOptions {
   readonly reload?: () => void;
 }
 
+export interface HardReloadLocation {
+  readonly href: string;
+  replace(url: string): void;
+}
+
+/**
+ * Forces a document navigation that re-fetches HTML (must-revalidate) and
+ * bypasses bfcache via a one-shot `_chunk` query param.
+ */
+export function hardReloadDocument(
+  location: HardReloadLocation | undefined = globalThis.window?.location,
+): void {
+  if (location == null) {
+    return;
+  }
+
+  const url = new URL(location.href);
+  url.searchParams.set('_chunk', String(Date.now()));
+  location.replace(`${url.pathname}${url.search}${url.hash}`);
+}
+
 /**
  * Reloads once per browser session when a stale chunk fails after deploy.
  * Returns true when a reload was triggered.
@@ -58,7 +80,7 @@ export function attemptChunkLoadRecovery(
   }
 
   storage.setItem(CHUNK_RELOAD_STORAGE_KEY, '1');
-  const reload = options.reload ?? (() => globalThis.window?.location.reload());
+  const reload = options.reload ?? (() => hardReloadDocument());
   reload();
   return true;
 }
@@ -66,6 +88,23 @@ export function attemptChunkLoadRecovery(
 export function clearChunkReloadFlag(storage?: ChunkReloadStorage | null): void {
   const target = storage ?? getDefaultSessionStorage();
   target?.removeItem(CHUNK_RELOAD_STORAGE_KEY);
+}
+
+/** Strip one-shot cache-bust param after a healthy boot. */
+export function stripChunkReloadQueryParam(
+  href: string = globalThis.window?.location.href ?? '',
+): void {
+  if (!href || globalThis.window == null) {
+    return;
+  }
+
+  const url = new URL(href);
+  if (!url.searchParams.has('_chunk')) {
+    return;
+  }
+
+  url.searchParams.delete('_chunk');
+  globalThis.window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
 }
 
 function getDefaultSessionStorage(): ChunkReloadStorage | null {
