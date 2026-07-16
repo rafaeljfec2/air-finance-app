@@ -151,11 +151,18 @@ export function useDecisionDashboard(): UseDecisionDashboardResult {
   const dataReady = surfaceState === 'ready';
   const playbackEnabled =
     companyId.length > 0 && surfaceState !== 'error' && surfaceState !== 'awaiting_company';
+  const isRefreshing =
+    summaryQuery.isFetching ||
+    budgetQuery.isFetching ||
+    recentTxQuery.isFetching ||
+    expensesQuery.isFetching ||
+    indebtednessQuery.isFetching;
 
   const { isPlaybackActive, loadingPhase } = useDashboardLoadingPlayback({
     companyId,
     enabled: playbackEnabled,
     dataReady,
+    isRefreshing,
   });
 
   const loadingMessage = loadingPhase?.message ?? null;

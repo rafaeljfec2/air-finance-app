@@ -24,13 +24,30 @@ describe('useDashboardLoadingPlayback', () => {
     vi.useRealTimers();
   });
 
-  it('advances through all steps even when data is already ready', () => {
+  it('skips playback entirely when cached data is fresh at mount', () => {
     const { result } = renderHook(() =>
       useDashboardLoadingPlayback({
         companyId: 'company-1',
         enabled: true,
         dataReady: true,
+        isRefreshing: false,
       }),
+    );
+
+    expect(result.current.isPlaybackActive).toBe(false);
+    expect(result.current.loadingPhase).toBeNull();
+  });
+
+  it('runs playback on a cold load when data is not ready', () => {
+    const { result, rerender } = renderHook(
+      (props: { dataReady: boolean; isRefreshing: boolean }) =>
+        useDashboardLoadingPlayback({
+          companyId: 'company-1',
+          enabled: true,
+          dataReady: props.dataReady,
+          isRefreshing: props.isRefreshing,
+        }),
+      { initialProps: { dataReady: false, isRefreshing: true } },
     );
 
     expect(result.current.isPlaybackActive).toBe(true);
@@ -39,6 +56,8 @@ describe('useDashboardLoadingPlayback', () => {
     advanceLoadingSteps(1);
 
     expect(result.current.loadingPhase?.message).toBe('Entendendo entradas e saídas');
+
+    rerender({ dataReady: true, isRefreshing: false });
 
     advanceLoadingSteps(DASHBOARD_LOADING_STEP_COUNT - 2);
 
@@ -50,6 +69,42 @@ describe('useDashboardLoadingPlayback', () => {
     expect(result.current.loadingPhase).toBeNull();
   });
 
+  it('runs playback when cache is stale and refetching at mount', () => {
+    const { result } = renderHook(() =>
+      useDashboardLoadingPlayback({
+        companyId: 'company-1',
+        enabled: true,
+        dataReady: true,
+        isRefreshing: true,
+      }),
+    );
+
+    expect(result.current.isPlaybackActive).toBe(true);
+
+    advanceLoadingSteps(DASHBOARD_LOADING_STEP_COUNT);
+
+    expect(result.current.isPlaybackActive).toBe(false);
+  });
+
+  it('does not restart playback when a refetch starts while mounted', () => {
+    const { result, rerender } = renderHook(
+      (props: { isRefreshing: boolean }) =>
+        useDashboardLoadingPlayback({
+          companyId: 'company-1',
+          enabled: true,
+          dataReady: true,
+          isRefreshing: props.isRefreshing,
+        }),
+      { initialProps: { isRefreshing: false } },
+    );
+
+    expect(result.current.isPlaybackActive).toBe(false);
+
+    rerender({ isRefreshing: true });
+
+    expect(result.current.isPlaybackActive).toBe(false);
+  });
+
   it('holds on the last step until data becomes ready', () => {
     const { result, rerender } = renderHook(
       (props: { dataReady: boolean }) =>
@@ -57,6 +112,7 @@ describe('useDashboardLoadingPlayback', () => {
           companyId: 'company-1',
           enabled: true,
           dataReady: props.dataReady,
+          isRefreshing: !props.dataReady,
         }),
       { initialProps: { dataReady: false } },
     );
@@ -77,21 +133,41 @@ describe('useDashboardLoadingPlayback', () => {
     expect(result.current.isPlaybackActive).toBe(false);
   });
 
-  it('resets playback when company changes', () => {
+  it('restarts playback when company changes and the new company is loading', () => {
     const { result, rerender } = renderHook(
-      (props: { companyId: string }) =>
+      (props: { companyId: string; dataReady: boolean }) =>
         useDashboardLoadingPlayback({
           companyId: props.companyId,
           enabled: true,
-          dataReady: true,
+          dataReady: props.dataReady,
+          isRefreshing: !props.dataReady,
         }),
-      { initialProps: { companyId: 'company-1' } },
+      { initialProps: { companyId: 'company-1', dataReady: false } },
     );
 
     advanceLoadingSteps(2);
 
-    rerender({ companyId: 'company-2' });
+    rerender({ companyId: 'company-2', dataReady: false });
 
     expect(result.current.loadingPhase?.message).toBe('Organizando movimentações');
+  });
+
+  it('skips playback when company changes and its data is already fresh', () => {
+    const { result, rerender } = renderHook(
+      (props: { companyId: string; dataReady: boolean; isRefreshing: boolean }) =>
+        useDashboardLoadingPlayback({
+          companyId: props.companyId,
+          enabled: true,
+          dataReady: props.dataReady,
+          isRefreshing: props.isRefreshing,
+        }),
+      { initialProps: { companyId: 'company-1', dataReady: false, isRefreshing: true } },
+    );
+
+    expect(result.current.isPlaybackActive).toBe(true);
+
+    rerender({ companyId: 'company-2', dataReady: true, isRefreshing: false });
+
+    expect(result.current.isPlaybackActive).toBe(false);
   });
 });

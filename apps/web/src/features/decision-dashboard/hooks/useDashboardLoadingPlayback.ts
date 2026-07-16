@@ -11,6 +11,7 @@ export interface UseDashboardLoadingPlaybackInput {
   readonly companyId: string;
   readonly enabled: boolean;
   readonly dataReady: boolean;
+  readonly isRefreshing: boolean;
 }
 
 export interface UseDashboardLoadingPlaybackResult {
@@ -18,25 +19,39 @@ export interface UseDashboardLoadingPlaybackResult {
   readonly loadingPhase: DashboardLoadingPhase | null;
 }
 
+interface PlaybackState {
+  readonly companyId: string;
+  readonly stepIndex: number;
+  readonly complete: boolean;
+}
+
 export function useDashboardLoadingPlayback({
   companyId,
   enabled,
   dataReady,
+  isRefreshing,
 }: UseDashboardLoadingPlaybackInput): UseDashboardLoadingPlaybackResult {
-  const [stepIndex, setStepIndex] = useState(0);
-  const [playbackComplete, setPlaybackComplete] = useState(false);
+  // Playback only runs when data is actually being fetched at the moment the
+  // surface (or a new company) mounts: full page refresh, cold cache, or
+  // stale cache being revalidated. Fresh cached data renders instantly.
+  const hasFreshData = dataReady && !isRefreshing;
+
+  const [playback, setPlayback] = useState<PlaybackState>(() => ({
+    companyId,
+    stepIndex: 0,
+    complete: hasFreshData,
+  }));
+
+  if (playback.companyId !== companyId) {
+    setPlayback({ companyId, stepIndex: 0, complete: hasFreshData });
+  }
 
   useEffect(() => {
-    setStepIndex(0);
-    setPlaybackComplete(false);
-  }, [companyId]);
-
-  useEffect(() => {
-    if (!enabled || playbackComplete) {
+    if (!enabled || playback.complete) {
       return undefined;
     }
 
-    const isLastStep = stepIndex >= DASHBOARD_LOADING_STEP_COUNT - 1;
+    const isLastStep = playback.stepIndex >= DASHBOARD_LOADING_STEP_COUNT - 1;
 
     if (isLastStep) {
       if (!dataReady) {
@@ -44,21 +59,23 @@ export function useDashboardLoadingPlayback({
       }
 
       const timer = window.setTimeout(() => {
-        setPlaybackComplete(true);
+        setPlayback((current) => ({ ...current, complete: true }));
       }, DASHBOARD_LOADING_STEP_MIN_MS);
 
       return () => window.clearTimeout(timer);
     }
 
     const timer = window.setTimeout(() => {
-      setStepIndex((current) => current + 1);
+      setPlayback((current) => ({ ...current, stepIndex: current.stepIndex + 1 }));
     }, DASHBOARD_LOADING_STEP_MIN_MS);
 
     return () => window.clearTimeout(timer);
-  }, [enabled, playbackComplete, stepIndex, dataReady]);
+  }, [enabled, playback.complete, playback.stepIndex, dataReady]);
 
-  const isPlaybackActive = enabled && !playbackComplete;
-  const loadingPhase = isPlaybackActive ? resolveDashboardLoadingPhaseFromIndex(stepIndex) : null;
+  const isPlaybackActive = enabled && !playback.complete;
+  const loadingPhase = isPlaybackActive
+    ? resolveDashboardLoadingPhaseFromIndex(playback.stepIndex)
+    : null;
 
   return {
     isPlaybackActive,
