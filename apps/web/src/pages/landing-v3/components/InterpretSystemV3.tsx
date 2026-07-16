@@ -25,7 +25,7 @@ const POINTS = [
 
 export function InterpretSystemV3() {
   return (
-    <section id="interpret-system" className="v3-section bg-gray-50">
+    <section id="interpret-system" className="v3-section bg-[var(--v3-bg-alt)]">
       <div className="v3-container">
         <ScrollReveal className="text-center mb-12 md:mb-16">
           <div className="v3-badge mx-auto mb-4">Leitura</div>
@@ -45,18 +45,18 @@ export function InterpretSystemV3() {
             const Icon = point.icon;
             return (
               <StaggerItem key={point.title}>
-                <div className="flex gap-4 items-start rounded-2xl border border-gray-200 bg-white p-5 md:p-6">
+                <div className="flex gap-4 items-start rounded-2xl border border-gray-800 bg-[var(--v3-bg)] p-5 md:p-6">
                   <div className="shrink-0 flex flex-col items-center">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400">
                       <Icon className="h-5 w-5" />
                     </span>
                     {index < POINTS.length - 1 ? (
-                      <span className="mt-2 hidden h-6 w-px bg-gray-200 md:block" aria-hidden />
+                      <span className="mt-2 hidden h-6 w-px bg-gray-800 md:block" aria-hidden />
                     ) : null}
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{point.title}</h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">{point.description}</p>
+                    <h3 className="text-lg font-semibold text-gray-50 mb-1">{point.title}</h3>
+                    <p className="text-sm text-gray-400 leading-relaxed">{point.description}</p>
                   </div>
                 </div>
               </StaggerItem>
@@ -65,7 +65,7 @@ export function InterpretSystemV3() {
         </StaggerContainer>
 
         <ScrollReveal className="text-center mt-10" delay={0.2}>
-          <p className="text-xs text-gray-400 max-w-lg mx-auto">
+          <p className="text-xs text-gray-500 max-w-lg mx-auto">
             Open Finance e inteligência artificial entram como infraestrutura de dados — nunca como
             a mensagem principal do produto.
           </p>

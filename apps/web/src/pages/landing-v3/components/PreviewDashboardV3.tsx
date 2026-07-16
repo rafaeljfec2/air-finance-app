@@ -3,7 +3,7 @@ import { DashboardPreview } from './DashboardPreview';
 
 export function PreviewDashboardV3() {
   return (
-    <section id="dashboard-preview" className="v3-section bg-gray-50">
+    <section id="dashboard-preview" className="v3-section bg-[var(--v3-bg-alt)]">
       <div className="v3-container">
         <ScrollReveal className="text-center mb-10 md:mb-14">
           <div className="v3-badge mx-auto mb-4">Produto</div>

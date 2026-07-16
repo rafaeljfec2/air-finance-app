@@ -30,7 +30,7 @@ const PILLARS = [
 
 export function CheckupPillarsV3() {
   return (
-    <section id="checkup-pillars" className="v3-section bg-white">
+    <section id="checkup-pillars" className="v3-section bg-[var(--v3-bg)]">
       <div className="v3-container">
         <ScrollReveal className="text-center mb-12 md:mb-16">
           <div className="v3-badge mx-auto mb-4">Check-up</div>
@@ -46,24 +46,24 @@ export function CheckupPillarsV3() {
             {PILLARS.map((pillar, index) => (
               <li key={pillar.name} className="relative flex gap-4 pb-8 last:pb-0">
                 <div className="relative flex w-8 shrink-0 flex-col items-center">
-                  <span className="z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-emerald-500 bg-white text-xs font-bold text-emerald-700">
+                  <span className="z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-emerald-500 bg-[var(--v3-bg)] text-xs font-bold text-emerald-400">
                     {index + 1}
                   </span>
                   {index < PILLARS.length - 1 ? (
-                    <span className="absolute top-8 bottom-0 w-px bg-emerald-100" aria-hidden />
+                    <span className="absolute top-8 bottom-0 w-px bg-gray-800" aria-hidden />
                   ) : null}
                 </div>
                 <div className={index < 3 ? 'pt-0.5 pb-2' : 'pt-1'}>
                   <h3
                     className={
                       index < 3
-                        ? 'text-lg font-semibold text-gray-900 mb-1'
-                        : 'text-base font-semibold text-gray-900 mb-1'
+                        ? 'text-lg font-semibold text-gray-50 mb-1'
+                        : 'text-base font-semibold text-gray-50 mb-1'
                     }
                   >
                     {pillar.name}
                   </h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{pillar.question}</p>
+                  <p className="text-sm text-gray-400 leading-relaxed">{pillar.question}</p>
                 </div>
               </li>
             ))}

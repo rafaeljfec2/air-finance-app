@@ -7,7 +7,7 @@ import { ScrollReveal, StaggerContainer, StaggerItem } from './animations';
 
 export function PricingV3() {
   return (
-    <section id="pricing" className="v3-section bg-gray-50">
+    <section id="pricing" className="v3-section bg-[var(--v3-bg-alt)]">
       <div className="v3-container">
         <ScrollReveal className="text-center mb-6">
           <div className="v3-badge mx-auto mb-4">Preços</div>
@@ -35,25 +35,25 @@ export function PricingV3() {
                 )}
 
                 <div className="mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{plan.name}</h3>
-                  <p className="text-sm text-gray-500">{plan.description}</p>
+                  <h3 className="text-xl font-bold text-gray-50 mb-1">{plan.name}</h3>
+                  <p className="text-sm text-gray-400">{plan.description}</p>
                 </div>
 
                 <div className="mb-5">
                   <div className="flex items-baseline gap-0.5">
-                    <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                    <span className="text-xl font-semibold text-gray-400">{plan.cents}</span>
-                    <span className="text-sm text-gray-400 ml-1">{plan.period}</span>
+                    <span className="text-4xl font-bold text-gray-50">{plan.price}</span>
+                    <span className="text-xl font-semibold text-gray-500">{plan.cents}</span>
+                    <span className="text-sm text-gray-500 ml-1">{plan.period}</span>
                   </div>
                 </div>
 
                 <ul className="space-y-2.5 mb-6 flex-grow">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center mt-0.5">
-                        <Check className="w-3 h-3 text-emerald-600" />
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/15 flex items-center justify-center mt-0.5">
+                        <Check className="w-3 h-3 text-emerald-400" />
                       </div>
-                      <span className="text-sm text-gray-600 leading-snug">{feature}</span>
+                      <span className="text-sm text-gray-300 leading-snug">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -63,7 +63,7 @@ export function PricingV3() {
                     className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
                       plan.popular
                         ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-md'
-                        : 'bg-gray-900 text-white hover:bg-gray-800'
+                        : 'bg-gray-800 text-gray-100 hover:bg-gray-700 border border-gray-700'
                     }`}
                     aria-label={`${plan.cta} - Plano ${plan.name}`}
                   >

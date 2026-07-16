@@ -25,13 +25,13 @@ const PROBLEMS = [
 
 export function ProblemV3() {
   return (
-    <section className="v3-section bg-white">
+    <section className="v3-section bg-[var(--v3-bg)]">
       <div className="v3-container">
         <ScrollReveal className="text-center mb-12 md:mb-16">
           <h2 className="v3-h2 mb-4">
             Você consegue explicar
             <br className="hidden sm:block" />
-            <span className="text-gray-400"> a capacidade do seu sistema?</span>
+            <span className="text-gray-500"> a capacidade do seu sistema?</span>
           </h2>
           <p className="v3-body max-w-2xl mx-auto">
             A maioria vive no escuro operacional: dados espalhados, impressões soltas, nenhuma
@@ -48,11 +48,11 @@ export function ProblemV3() {
             return (
               <StaggerItem key={problem.title}>
                 <div className="v3-card text-center group h-full">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 mb-4 group-hover:bg-emerald-100 transition-colors">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/15 text-emerald-400 mb-4 group-hover:bg-emerald-500/25 transition-colors">
                     <Icon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{problem.title}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{problem.description}</p>
+                  <h3 className="text-lg font-semibold text-gray-50 mb-2">{problem.title}</h3>
+                  <p className="text-sm text-gray-400 leading-relaxed">{problem.description}</p>
                 </div>
               </StaggerItem>
             );

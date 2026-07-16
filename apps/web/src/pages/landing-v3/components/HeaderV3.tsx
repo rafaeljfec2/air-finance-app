@@ -42,8 +42,8 @@ export function HeaderV3() {
     <header
       className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-200 ${
         scrolled
-          ? 'bg-white/95 backdrop-blur-lg border-b border-gray-200/80 shadow-sm'
-          : 'bg-white/80 backdrop-blur-md'
+          ? 'bg-[#0b1120]/95 backdrop-blur-lg border-b border-gray-800 shadow-sm'
+          : 'bg-[#0b1120]/80 backdrop-blur-md'
       }`}
     >
       <div className="v3-container flex items-center justify-between h-16">
@@ -56,7 +56,7 @@ export function HeaderV3() {
           className="cursor-pointer hover:opacity-80 transition-opacity bg-transparent border-none p-0 focus:outline-none"
           aria-label="Ir para a página inicial"
         >
-          <Logo />
+          <Logo variant="white" />
         </button>
 
         <nav
@@ -69,7 +69,7 @@ export function HeaderV3() {
               key={item.hash}
               href={item.hash}
               onClick={(e) => handleNavClick(e, item.hash)}
-              className="px-3 py-2 text-gray-600 hover:text-gray-900 transition-colors font-medium text-sm rounded-lg hover:bg-gray-50"
+              className="px-3 py-2 text-gray-400 hover:text-gray-50 transition-colors font-medium text-sm rounded-lg hover:bg-white/5"
             >
               {item.label}
             </a>
@@ -103,7 +103,7 @@ export function HeaderV3() {
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-50 transition-colors"
             aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -112,14 +112,14 @@ export function HeaderV3() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
+        <div className="md:hidden bg-[#111827] border-t border-gray-800 shadow-lg">
           <div className="v3-container py-4 flex flex-col gap-1">
             {NAV_ITEMS.map((item) => (
               <a
                 key={item.hash}
                 href={item.hash}
                 onClick={(e) => handleNavClick(e, item.hash)}
-                className="px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors font-medium text-sm rounded-lg"
+                className="px-4 py-3 text-gray-300 hover:text-gray-50 hover:bg-white/5 transition-colors font-medium text-sm rounded-lg"
               >
                 {item.label}
               </a>
@@ -130,7 +130,7 @@ export function HeaderV3() {
                 setMobileMenuOpen(false);
                 navigate('/login');
               }}
-              className="px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors font-medium text-sm rounded-lg text-left"
+              className="px-4 py-3 text-gray-300 hover:text-gray-50 hover:bg-white/5 transition-colors font-medium text-sm rounded-lg text-left"
             >
               Entrar
             </button>

@@ -23,24 +23,33 @@ export function LandingPageV3() {
   useEffect(() => {
     const htmlElement = document.documentElement;
     const bodyElement = document.body;
+    const hadDarkClass = htmlElement.classList.contains('dark');
 
+    htmlElement.classList.add('dark');
+    htmlElement.style.colorScheme = 'dark';
     htmlElement.style.overflow = 'auto';
     htmlElement.style.height = 'auto';
     bodyElement.style.overflow = 'auto';
     bodyElement.style.height = 'auto';
+    bodyElement.style.backgroundColor = '#0b1120';
 
     return () => {
+      if (!hadDarkClass) {
+        htmlElement.classList.remove('dark');
+      }
+      htmlElement.style.colorScheme = '';
       htmlElement.style.overflow = '';
       htmlElement.style.height = '';
       bodyElement.style.overflow = '';
       bodyElement.style.height = '';
+      bodyElement.style.backgroundColor = '';
     };
   }, []);
 
   return (
     <>
       <SEOHead />
-      <div className="landing-v3-page w-full bg-white text-gray-900 antialiased">
+      <div className="landing-v3-page w-full antialiased">
         <HeaderV3 />
         <main className="relative w-full">
           <HeroV3 />
