@@ -47,7 +47,7 @@ export const navigation: NavigationSection[] = [
     section: '💸 Movimentações',
     items: [
       { name: 'Nova Transação', href: '/transactions/new', icon: Plus },
-      { name: 'Fluxo de Caixa', href: '/transactions', icon: ArrowRightLeft },
+      { name: 'Movimentos Financeiros', href: '/movements', icon: ArrowRightLeft },
       { name: 'Importar Extrato', href: '/import-ofx', icon: Import },
       { name: 'Pagamentos', href: '/payments', icon: Send },
     ],
