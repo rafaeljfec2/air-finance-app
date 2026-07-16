@@ -18,22 +18,6 @@ import { formatCurrency } from '@/utils/formatters';
 import { ChartAxisTick, DocCard, Stack, Stat, Text } from '../laudo-layout/primitives';
 import { useLaudoChartTheme } from '../laudo-layout/useLaudoChartTheme';
 
-const CHART_INCOME = '#2D6B4E';
-const CHART_EXPENSE = '#8CCFB0';
-const CHART_FOLGA_POS = '#4aaf7d';
-const CHART_FOLGA_NEG = '#6b7280';
-
-const CATEGORY_FALLBACK_COLORS = [
-  '#3B82F6',
-  '#F59E0B',
-  '#EF4444',
-  '#8B5CF6',
-  '#EC4899',
-  '#06B6D4',
-  '#F97316',
-  '#6366F1',
-] as const;
-
 type FlowPoint = { readonly label: string; readonly income: number; readonly expenses: number };
 
 function buildActivityFolga(points: readonly FlowPoint[]): Array<{ label: string; folga: number }> {
@@ -44,6 +28,10 @@ function buildActivityFolga(points: readonly FlowPoint[]): Array<{ label: string
     return withActivity;
   }
   return points.map((row) => ({ label: row.label, folga: row.income - row.expenses }));
+}
+
+function formatTooltipCurrency(value: number): [string, string] {
+  return [formatCurrency(value), 'Valor'];
 }
 
 export function VisualReadings({
@@ -68,10 +56,10 @@ export function VisualReadings({
       return [];
     }
     return [
-      { label: 'Receita', value: Math.round(summary.income), fill: CHART_INCOME },
-      { label: 'Despesa', value: Math.round(summary.expenses), fill: CHART_EXPENSE },
+      { label: 'Receita', value: Math.round(summary.income), fill: chartTheme.income },
+      { label: 'Despesa', value: Math.round(summary.expenses), fill: chartTheme.expense },
     ];
-  }, [summary]);
+  }, [summary, chartTheme.income, chartTheme.expense]);
 
   const folgaChartData = useMemo(() => buildActivityFolga(flowChartData), [flowChartData]);
 
@@ -81,13 +69,21 @@ export function VisualReadings({
       value: Math.round(row.value),
       color: row.color?.startsWith('#')
         ? row.color
-        : CATEGORY_FALLBACK_COLORS[index % CATEGORY_FALLBACK_COLORS.length],
+        : chartTheme.categoryColors[index % chartTheme.categoryColors.length],
     }));
-  }, [expensesByCategory]);
+  }, [expensesByCategory, chartTheme.categoryColors]);
 
   const income = summary?.income ?? 0;
   const expenses = summary?.expenses ?? 0;
   const balance = summary?.balance ?? 0;
+
+  const tooltipProps = {
+    contentStyle: chartTheme.tooltip,
+    labelStyle: chartTheme.tooltipLabel,
+    itemStyle: chartTheme.tooltipItem,
+    cursor: chartTheme.cursor,
+    formatter: formatTooltipCurrency,
+  } as const;
 
   return (
     <Stack gap={16}>
@@ -123,8 +119,12 @@ export function VisualReadings({
       <DocCard header="Receita × despesa (R$)" footer="Totais do período.">
         <div className="h-[240px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={periodCompareData} barCategoryGap="28%">
-              <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+            <BarChart
+              data={periodCompareData}
+              barCategoryGap="32%"
+              margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
               <XAxis
                 dataKey="label"
                 tick={(props) => <ChartAxisTick {...props} fill={chartTheme.tick.fill} dy={10} />}
@@ -139,11 +139,14 @@ export function VisualReadings({
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip
-                contentStyle={chartTheme.tooltip}
-                formatter={(value: number) => formatCurrency(value)}
-              />
-              <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+              <Tooltip {...tooltipProps} />
+              <Bar
+                dataKey="value"
+                radius={[8, 8, 0, 0]}
+                maxBarSize={56}
+                animationDuration={700}
+                animationBegin={80}
+              >
                 {periodCompareData.map((entry) => (
                   <Cell key={entry.label} fill={entry.fill} />
                 ))}
@@ -156,8 +159,8 @@ export function VisualReadings({
       <DocCard header="Folga do período (R$)" footer="Folga = receita − despesa.">
         <div className="h-[240px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={folgaChartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+            <BarChart data={folgaChartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
               <XAxis
                 dataKey="label"
                 tick={(props) => <ChartAxisTick {...props} fill={chartTheme.tick.fill} dy={10} />}
@@ -172,15 +175,18 @@ export function VisualReadings({
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip
-                contentStyle={chartTheme.tooltip}
-                formatter={(value: number) => formatCurrency(value)}
-              />
-              <Bar dataKey="folga" radius={[4, 4, 0, 0]}>
+              <Tooltip {...tooltipProps} />
+              <Bar
+                dataKey="folga"
+                radius={[6, 6, 6, 6]}
+                maxBarSize={40}
+                animationDuration={700}
+                animationBegin={120}
+              >
                 {folgaChartData.map((entry) => (
                   <Cell
                     key={entry.label}
-                    fill={entry.folga >= 0 ? CHART_FOLGA_POS : CHART_FOLGA_NEG}
+                    fill={entry.folga >= 0 ? chartTheme.folgaPos : chartTheme.folgaNeg}
                   />
                 ))}
               </Bar>
@@ -198,17 +204,23 @@ export function VisualReadings({
                   data={categoryPie}
                   dataKey="value"
                   nameKey="name"
-                  innerRadius={48}
-                  outerRadius={88}
-                  paddingAngle={2}
+                  innerRadius={52}
+                  outerRadius={90}
+                  paddingAngle={3}
+                  stroke={chartTheme.pieStroke}
+                  strokeWidth={2}
+                  animationDuration={700}
+                  animationBegin={100}
                 >
                   {categoryPie.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
+                    <Cell key={entry.name} fill={entry.color} stroke={chartTheme.pieStroke} />
                   ))}
                 </Pie>
                 <Tooltip
                   contentStyle={chartTheme.tooltip}
-                  formatter={(value: number) => formatCurrency(value)}
+                  labelStyle={chartTheme.tooltipLabel}
+                  itemStyle={chartTheme.tooltipItem}
+                  formatter={formatTooltipCurrency}
                 />
               </PieChart>
             </ResponsiveContainer>

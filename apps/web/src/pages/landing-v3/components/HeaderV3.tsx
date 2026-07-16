@@ -86,7 +86,7 @@ export function HeaderV3() {
             <button
               type="button"
               onClick={() => navigate('/login')}
-              className="v3-btn-ghost"
+              className="box-border inline-flex h-12 items-center justify-center rounded-xl border-[1.5px] border-emerald-500/50 bg-emerald-500/10 px-7 text-base font-semibold text-emerald-300 transition-all duration-200 hover:border-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-200"
               aria-label="Entrar na aplicação"
             >
               Entrar
@@ -94,7 +94,7 @@ export function HeaderV3() {
             <button
               type="button"
               onClick={() => navigate('/register')}
-              className="v3-btn-primary"
+              className="box-border inline-flex h-12 items-center justify-center rounded-xl border-[1.5px] border-transparent bg-emerald-500 px-7 text-base font-semibold text-white shadow-[var(--v3-shadow-accent)] transition-all duration-200 hover:bg-emerald-400"
               aria-label="Criar conta grátis"
             >
               Criar conta grátis
@@ -145,7 +145,7 @@ export function HeaderV3() {
               setMobileMenuOpen(false);
               navigate('/login');
             }}
-            className="px-4 py-3 text-gray-300 hover:text-gray-50 hover:bg-white/5 transition-colors font-medium text-sm rounded-lg text-left"
+            className="mt-1 w-full rounded-xl border border-emerald-500/50 bg-emerald-500/10 px-4 py-3 text-left text-sm font-semibold text-emerald-300 transition-colors hover:border-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-200"
           >
             Entrar
           </button>
