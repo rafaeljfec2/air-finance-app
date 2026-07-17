@@ -45,7 +45,7 @@ function StepIndicator({ status }: { readonly status: DashboardLoadingStepStatus
 
 function AnalysisRing() {
   return (
-    <div className="relative flex h-24 w-24 items-center justify-center">
+    <div className="relative flex h-20 w-20 items-center justify-center">
       <span
         aria-hidden
         className="absolute inset-0 rounded-full bg-emerald-500/10 blur-xl motion-safe:animate-pulse"
@@ -74,7 +74,7 @@ function AnalysisRing() {
           className="stroke-emerald-500 dark:stroke-emerald-400"
         />
       </svg>
-      <TrendingUp aria-hidden className="relative h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+      <TrendingUp aria-hidden className="relative h-7 w-7 text-emerald-600 dark:text-emerald-400" />
     </div>
   );
 }
@@ -145,28 +145,28 @@ export function DecisionDashboardLoading({ steps }: DecisionDashboardLoadingProp
         className="pointer-events-none absolute -right-16 bottom-1/4 h-64 w-64 rounded-full bg-sky-500/5 blur-3xl"
       />
 
-      <div className="w-full max-w-[420px]">
-        <div className="rounded-3xl border border-border/60 bg-card px-6 py-7 shadow-2xl dark:border-border-dark/60 dark:bg-card-dark sm:px-7">
-          <div className="flex flex-col items-center space-y-5 text-center">
+      <div className="w-full max-w-md sm:max-w-[600px]">
+        <div className="rounded-3xl border border-border/60 bg-card px-6 py-6 shadow-2xl dark:border-border-dark/60 dark:bg-card-dark sm:px-10">
+          <div className="flex flex-col items-center space-y-4 text-center">
             <Logo className="scale-75" />
 
             <AnalysisRing />
 
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <h2 className="text-lg font-semibold tracking-tight text-text dark:text-text-dark sm:text-xl">
                 Analisando seu sistema financeiro
               </h2>
-              <p className="mx-auto max-w-[290px] text-sm leading-relaxed text-muted-foreground text-balance">
+              <p className="mx-auto max-w-[420px] text-sm leading-relaxed text-muted-foreground text-balance">
                 Estamos conectando os fatos mais importantes para entender o momento atual.
               </p>
             </div>
           </div>
 
-          <ol aria-label="Loading progress" className="mt-7">
+          <ol aria-label="Loading progress" className="mt-6">
             {steps.map((step, index) => {
               const isLast = index === steps.length - 1;
               return (
-                <li key={step.id} className={cn('relative flex gap-3', !isLast && 'pb-5')}>
+                <li key={step.id} className={cn('relative flex gap-3', !isLast && 'pb-4')}>
                   {!isLast && (
                     <span
                       aria-hidden
@@ -208,7 +208,7 @@ export function DecisionDashboardLoading({ steps }: DecisionDashboardLoadingProp
             })}
           </ol>
 
-          <div className="mt-6 border-t border-border/60 pt-5 dark:border-border-dark/60">
+          <div className="mt-5 border-t border-border/60 pt-4 dark:border-border-dark/60">
             <div className="flex items-center gap-3">
               <span
                 aria-hidden
@@ -228,7 +228,7 @@ export function DecisionDashboardLoading({ steps }: DecisionDashboardLoadingProp
             </div>
           </div>
 
-          <p className="mt-5 flex items-center justify-center gap-1.5 border-t border-border/60 pt-4 text-[11px] text-muted-foreground/70 dark:border-border-dark/60">
+          <p className="mt-4 flex items-center justify-center gap-1.5 border-t border-border/60 pt-3.5 text-[11px] text-muted-foreground/70 dark:border-border-dark/60">
             <Lock aria-hidden className="h-3 w-3" />
             Seus dados estão seguros e criptografados.
           </p>
