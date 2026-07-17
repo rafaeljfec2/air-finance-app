@@ -11,6 +11,8 @@ export interface FinancialHealthPillar {
   readonly id: PillarId;
   readonly name: string;
   readonly question: string;
+  /** Human horizon for this pillar (short / this period / long). */
+  readonly horizonLabel: string;
   readonly primaryLabel: string;
   readonly primaryValue: number | null;
   readonly primaryFormatted: string | null;
@@ -20,6 +22,7 @@ export interface FinancialHealthPillar {
   readonly connections: readonly string[];
   readonly summarySentence: string;
   readonly hasGap: boolean;
+  /** Human limitation / inclusion note for L2–L3 (never internal IDs or jargon). */
   readonly exploreHint: string | null;
 }
 

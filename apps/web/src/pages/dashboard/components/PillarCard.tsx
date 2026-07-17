@@ -80,13 +80,18 @@ export function PillarCard({ pillar, onExplore }: PillarCardProps) {
         {pillar.name}
       </h3>
 
-      <p className="mt-1.5 truncate text-xl font-bold tabular-nums tracking-tight text-text dark:text-text-dark">
+      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{pillar.question}</p>
+      <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/80">
+        {pillar.horizonLabel}
+      </p>
+
+      <p className="mt-3 truncate text-xl font-bold tabular-nums tracking-tight text-text dark:text-text-dark">
         {pillar.primaryFormatted ?? '—'}
       </p>
       <p className="mt-0.5 text-xs text-muted-foreground">{pillar.primaryLabel}</p>
 
-      <p className="mt-3 line-clamp-2 flex-1 text-xs leading-relaxed text-muted-foreground">
-        {pillar.question}
+      <p className="mt-3 line-clamp-2 flex-1 text-xs leading-relaxed text-text/80 dark:text-text-dark/80">
+        {pillar.summarySentence}
       </p>
 
       <button
@@ -94,7 +99,7 @@ export function PillarCard({ pillar, onExplore }: PillarCardProps) {
         onClick={onExplore}
         className="mt-3 inline-flex min-h-[32px] items-center gap-1 self-start text-xs font-medium text-primary-600 hover:text-primary-500 dark:text-primary-300 dark:hover:text-primary-200"
       >
-        Explorar
+        Entender este pilar
         <span aria-hidden>→</span>
       </button>
     </article>

@@ -20,6 +20,7 @@ interface BuiltPillarCore {
   readonly id: PillarId;
   readonly name: string;
   readonly question: string;
+  readonly horizonLabel: string;
   readonly primaryLabel: string;
   readonly primaryValue: number | null;
   readonly primaryFormatted: string | null;
@@ -106,7 +107,7 @@ function mapStructureState(debtToRevenuePct: number | null | undefined): Capacit
   return 'critical';
 }
 
-function mapRunwayMonths(
+function mapCashCoverageMonths(
   cash: number,
   monthlyExpenses: number,
 ): { months: number | null; state: CapacityState } {
@@ -147,13 +148,14 @@ function buildLiquidity(
       id: 'liquidity',
       name: 'Liquidez',
       question: 'Consigo operar agora e no horizonte curto?',
+      horizonLabel: 'Horizonte curto',
       primaryLabel: 'Caixa disponível',
       primaryValue: null,
       primaryFormatted: null,
       state: 'inconclusive',
       connections: ['Crédito', 'Fluxo', 'Resiliência'],
       hasGap: true,
-      exploreHint: null,
+      exploreHint: 'Ainda faltam saldos e obrigações curtas confiáveis para esta leitura.',
     });
   }
 
@@ -162,13 +164,14 @@ function buildLiquidity(
     id: 'liquidity',
     name: 'Liquidez',
     question: 'Consigo operar agora e no horizonte curto?',
+    horizonLabel: 'Horizonte curto',
     primaryLabel: 'Caixa disponível',
     primaryValue: available,
     primaryFormatted: formatCurrency(available),
     state: mapLiquidityState(indebtedness.liquidity.status),
     connections: ['Crédito', 'Fluxo', 'Resiliência'],
     hasGap: false,
-    exploreHint: `Obrigações curtas: ${formatCurrency(indebtedness.liquidity.obligations)}`,
+    exploreHint: `Inclui saldos disponíveis. Obrigações curtas conhecidas: ${formatCurrency(indebtedness.liquidity.obligations)}.`,
   });
 }
 
@@ -178,13 +181,14 @@ function buildFlow(summary: DashboardSummary | null | undefined): FinancialHealt
       id: 'flow',
       name: 'Fluxo',
       question: 'O ciclo gera folga de verdade?',
+      horizonLabel: 'Este período',
       primaryLabel: 'Resultado do período',
       primaryValue: null,
       primaryFormatted: null,
       state: 'inconclusive',
       connections: ['Estrutura', 'Liquidez', 'Patrimônio'],
       hasGap: true,
-      exploreHint: null,
+      exploreHint: 'Ainda faltam receita e despesa do período selecionado.',
     });
   }
 
@@ -192,13 +196,14 @@ function buildFlow(summary: DashboardSummary | null | undefined): FinancialHealt
     id: 'flow',
     name: 'Fluxo',
     question: 'O ciclo gera folga de verdade?',
+    horizonLabel: 'Este período',
     primaryLabel: 'Resultado do período',
     primaryValue: summary.balance,
     primaryFormatted: formatCurrency(summary.balance),
     state: mapFlowState(summary.balance, summary.income),
     connections: ['Estrutura', 'Liquidez', 'Patrimônio'],
     hasGap: false,
-    exploreHint: `Receita ${formatCurrency(summary.income)} · Despesa ${formatCurrency(summary.expenses)}`,
+    exploreHint: `Resultado = receita ${formatCurrency(summary.income)} − despesa ${formatCurrency(summary.expenses)} no período selecionado.`,
   });
 }
 
@@ -211,13 +216,15 @@ function buildStructure(
       id: 'structure',
       name: 'Estrutura',
       question: 'Quão rígido ou ajustável é o sistema?',
-      primaryLabel: 'Endividamento sobre renda (proxy)',
+      horizonLabel: 'Este período',
+      primaryLabel: 'Compromissos sobre a renda',
       primaryValue: null,
       primaryFormatted: null,
       state: 'inconclusive',
       connections: ['Fluxo', 'Liquidez', 'Crédito'],
       hasGap: true,
-      exploreHint: 'FIN-12/13/14 canônicos ainda não disponíveis — proxy parcial.',
+      exploreHint:
+        'Leitura ainda incompleta: falta um sinal confiável de comprometimento da renda.',
     });
   }
 
@@ -225,13 +232,15 @@ function buildStructure(
     id: 'structure',
     name: 'Estrutura',
     question: 'Quão rígido ou ajustável é o sistema?',
-    primaryLabel: 'Endividamento sobre renda (proxy)',
+    horizonLabel: 'Este período',
+    primaryLabel: 'Compromissos sobre a renda',
     primaryValue: pct,
     primaryFormatted: `${pct.toFixed(1)}%`,
     state: mapStructureState(pct),
     connections: ['Fluxo', 'Liquidez', 'Crédito'],
     hasGap: true,
-    exploreHint: 'Proxy de rigidez via dívida/renda — não é FIN-12 completo.',
+    exploreHint:
+      'Leitura parcial: usa endividamento sobre a renda como aproximação da rigidez do ciclo.',
   });
 }
 
@@ -241,13 +250,14 @@ function buildCredit(indebtedness: IndebtednessMetrics | null | undefined): Fina
       id: 'credit',
       name: 'Crédito',
       question: 'Crédito é ponte ou muleta do sistema?',
-      primaryLabel: 'Utilização do crédito',
+      horizonLabel: 'Horizonte curto',
+      primaryLabel: 'Utilização do cartão',
       primaryValue: null,
       primaryFormatted: null,
       state: 'inconclusive',
       connections: ['Liquidez', 'Fluxo', 'Resiliência', 'Patrimônio'],
       hasGap: true,
-      exploreHint: null,
+      exploreHint: 'Ainda faltam limite e utilização de crédito confiáveis.',
     });
   }
 
@@ -256,13 +266,14 @@ function buildCredit(indebtedness: IndebtednessMetrics | null | undefined): Fina
     id: 'credit',
     name: 'Crédito',
     question: 'Crédito é ponte ou muleta do sistema?',
-    primaryLabel: 'Utilização do crédito',
+    horizonLabel: 'Horizonte curto',
+    primaryLabel: 'Utilização do cartão',
     primaryValue: percentage,
     primaryFormatted: `${percentage.toFixed(1)}%`,
     state: mapCreditState(indebtedness.creditUtilization.status),
     connections: ['Liquidez', 'Fluxo', 'Resiliência', 'Patrimônio'],
     hasGap: false,
-    exploreHint: `Utilizado ${formatCurrency(indebtedness.creditUtilization.used)} de ${formatCurrency(indebtedness.creditUtilization.total)}`,
+    exploreHint: `Em uso: ${formatCurrency(indebtedness.creditUtilization.used)} de ${formatCurrency(indebtedness.creditUtilization.total)}.`,
   });
 }
 
@@ -277,28 +288,31 @@ function buildResilience(
       id: 'resilience',
       name: 'Resiliência',
       question: 'Quanto choque o sistema aguenta?',
-      primaryLabel: 'Runway estimado (meses)',
+      horizonLabel: 'Próximos meses',
+      primaryLabel: 'Tempo estimado de caixa',
       primaryValue: null,
       primaryFormatted: null,
       state: 'inconclusive',
       connections: ['Liquidez', 'Crédito', 'Patrimônio'],
       hasGap: true,
-      exploreHint: 'Reserva marcada (FIN-08) ainda não disponível.',
+      exploreHint: 'Leitura parcial: reserva marcada ainda não está disponível com segurança.',
     });
   }
 
-  const { months, state } = mapRunwayMonths(cash, expenses);
+  const { months, state } = mapCashCoverageMonths(cash, expenses);
   return buildPillar({
     id: 'resilience',
     name: 'Resiliência',
     question: 'Quanto choque o sistema aguenta?',
-    primaryLabel: 'Runway estimado (meses)',
+    horizonLabel: 'Próximos meses',
+    primaryLabel: 'Tempo estimado de caixa',
     primaryValue: months,
     primaryFormatted: months === null ? null : `${months.toFixed(1)} meses`,
     state,
     connections: ['Liquidez', 'Crédito', 'Patrimônio'],
     hasGap: true,
-    exploreHint: 'Estimativa caixa ÷ despesa do período — não é reserva marcada.',
+    exploreHint:
+      'Estimativa: caixa disponível ÷ despesa do período. Não é uma reserva marcada separada.',
   });
 }
 
@@ -309,13 +323,14 @@ function buildWealth(indebtedness: IndebtednessMetrics | null | undefined): Fina
       id: 'wealth',
       name: 'Patrimônio',
       question: 'O que a posição patrimonial observa sobre o sistema?',
+      horizonLabel: 'Longo prazo',
       primaryLabel: 'Posição líquida observável',
       primaryValue: null,
       primaryFormatted: null,
       state: 'inconclusive',
       connections: ['Fluxo', 'Crédito', 'Liquidez'],
       hasGap: true,
-      exploreHint: 'Inventário FIN-09 incompleto — saldos líquidos são proxy parcial.',
+      exploreHint: 'Inventário de ativos e passivos ainda incompleto para esta leitura.',
     });
   }
 
@@ -330,13 +345,15 @@ function buildWealth(indebtedness: IndebtednessMetrics | null | undefined): Fina
     id: 'wealth',
     name: 'Patrimônio',
     question: 'O que a posição patrimonial observa sobre o sistema?',
-    primaryLabel: 'Saldos líquidos (proxy)',
+    horizonLabel: 'Longo prazo',
+    primaryLabel: 'Posição líquida observável',
     primaryValue: net,
     primaryFormatted: formatCurrency(net),
     state,
     connections: ['Fluxo', 'Crédito', 'Liquidez'],
     hasGap: true,
-    exploreHint: 'Proxy de saldos — não inventário patrimonial completo (FIN-09).',
+    exploreHint:
+      'Leitura parcial: usa saldos líquidos das contas — não um inventário patrimonial completo.',
   });
 }
 

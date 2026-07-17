@@ -33,6 +33,15 @@ export function PillarDetailModal({ pillar, onClose }: PillarDetailModalProps) {
   return (
     <Modal open onClose={onClose} title={pillar.name} className="max-w-xl">
       <div className="space-y-5">
+        <Stack gap={8}>
+          <Text size="small" tone="secondary">
+            {pillar.question}
+          </Text>
+          <Text size="small" tone="secondary">
+            Período desta leitura: {pillar.horizonLabel}
+          </Text>
+        </Stack>
+
         <div className="flex flex-wrap items-center gap-3">
           <p className="text-2xl font-bold tabular-nums tracking-tight text-text dark:text-text-dark">
             {pillar.primaryFormatted ?? '—'}
@@ -42,7 +51,7 @@ export function PillarDetailModal({ pillar, onClose }: PillarDetailModalProps) {
         <p className="text-xs text-muted-foreground">{pillar.primaryLabel}</p>
 
         <Stack gap={8}>
-          <Text weight="semibold">Interpretação</Text>
+          <Text weight="semibold">O que este número significa</Text>
           <Text>{pillar.interpretation}</Text>
         </Stack>
 
@@ -65,14 +74,16 @@ export function PillarDetailModal({ pillar, onClose }: PillarDetailModalProps) {
         </Stack>
 
         <Text size="small" tone="secondary">
-          Conexões: {pillar.connections.join(' · ')}
+          Como este pilar se conecta: {pillar.connections.join(' · ')}
         </Text>
 
         {pillar.hasGap || pillar.exploreHint ? (
           <Callout tone="warning">
-            {pillar.hasGap
-              ? 'Lacuna declarada: leitura parcial ou proxy — sem inventar certeza.'
-              : null}
+            {pillar.hasGap ? (
+              <Text size="small">
+                Lacuna declarada: a leitura é parcial ou ainda incompleta — sem inventar certeza.
+              </Text>
+            ) : null}
             {pillar.exploreHint ? (
               <Text size="small" className={pillar.hasGap ? 'mt-2' : undefined}>
                 Limitação: {pillar.exploreHint}
@@ -80,6 +91,10 @@ export function PillarDetailModal({ pillar, onClose }: PillarDetailModalProps) {
             ) : null}
           </Callout>
         ) : null}
+
+        <Text size="small" tone="secondary">
+          Este detalhe explica capacidade. Não recomenda um gesto do dia — isso fica na Home.
+        </Text>
       </div>
     </Modal>
   );

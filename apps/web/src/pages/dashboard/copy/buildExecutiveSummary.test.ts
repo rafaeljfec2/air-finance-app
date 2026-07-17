@@ -9,6 +9,7 @@ function pillar(
 ): FinancialHealthPillar {
   return {
     question: 'Pergunta?',
+    horizonLabel: 'Este período',
     primaryLabel: 'Métrica',
     primaryValue: null,
     primaryFormatted: null,

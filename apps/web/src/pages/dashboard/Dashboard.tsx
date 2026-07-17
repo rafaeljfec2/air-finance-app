@@ -79,7 +79,8 @@ export function Dashboard() {
         <div className="mx-auto w-full max-w-7xl p-4 pb-16 sm:p-6 lg:p-8">
           {!companyId ? (
             <Callout tone="neutral">
-              Selecione um contexto para montar a leitura de capacidade do sistema.
+              Selecione um contexto (empresa/perfil) para montar a leitura de capacidade do sistema
+              neste período. Sem contexto, os números não podem ser interpretados com segurança.
             </Callout>
           ) : null}
 
@@ -108,10 +109,11 @@ export function Dashboard() {
           {companyId && isError && !checkup ? (
             <Stack gap={12}>
               <Callout tone="warning">
-                Não foi possível carregar os sinais de capacidade neste momento.
+                Não foi possível carregar os sinais de capacidade deste período. A leitura ficou
+                pausada para não inventar certeza — você pode tentar de novo quando quiser.
               </Callout>
               <Button type="button" variant="outline" onClick={() => void handleRefresh()}>
-                Tentar novamente
+                Tentar carregar de novo
               </Button>
             </Stack>
           ) : null}
@@ -140,9 +142,16 @@ export function Dashboard() {
 
               <motion.div variants={itemVariants}>
                 <section aria-label="Seis pilares da capacidade" className="space-y-4">
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    Check-up · seis pilares
-                  </h2>
+                  <div className="space-y-1">
+                    <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                      Check-up · seis pilares
+                    </h2>
+                    <p className="text-xs text-muted-foreground">
+                      Ordem de leitura: pergunta e horizonte primeiro; o número entra como
+                      evidência. Toque em um pilar para ver o que fortalece, o que enfraquece e as
+                      limitações da leitura.
+                    </p>
+                  </div>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                     {checkup.pillars.map((pillar) => (
                       <PillarCard

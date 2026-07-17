@@ -82,7 +82,8 @@ export function VisualReadings({
           Leituras visuais
         </h2>
         <Text size="small" tone="secondary">
-          Comprovam a interpretação acima · período {periodLabel}.
+          Evidências do período {periodLabel}. Ajudam a comprovar a interpretação dos pilares — não
+          são a decisão do dia.
         </Text>
       </div>
 
@@ -90,12 +91,16 @@ export function VisualReadings({
         <Stat label="Receita do período" value={formatCurrency(income)} />
         <Stat label="Despesa do período" value={formatCurrency(expenses)} tone="warning" />
         <Stat
-          label="Resultado"
+          label="Resultado do período"
           value={formatCurrency(balance)}
           tone={balance >= 0 ? 'success' : 'danger'}
         />
         <Stat
-          label={liquidityAvailable !== undefined ? 'Caixa disponível' : 'Utilização do crédito'}
+          label={
+            liquidityAvailable !== undefined
+              ? 'Caixa disponível agora'
+              : 'Utilização do cartão agora'
+          }
           value={
             liquidityAvailable !== undefined
               ? formatCurrency(liquidityAvailable)
@@ -105,9 +110,14 @@ export function VisualReadings({
           }
         />
       </div>
+      <Text size="small" tone="secondary">
+        Resultado do período = receita − despesa em {periodLabel}. Caixa e cartão refletem a posição
+        observada agora, não o mesmo recorte do resultado.
+      </Text>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <DocCard header="Receita × despesa (R$)" footer="Totais por semana do mês.">
+        <DocCard header="Receita × despesa (R$)" footer={`Totais por semana de ${periodLabel}.`}>
+          {' '}
           <div className="h-[240px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
@@ -159,7 +169,10 @@ export function VisualReadings({
           </div>
         </DocCard>
 
-        <DocCard header="Folga do período (R$)" footer="Folga = receita − despesa por dia.">
+        <DocCard
+          header="Folga do período (R$)"
+          footer={`Folga diária = receita − despesa em ${periodLabel}.`}
+        >
           <div className="h-[240px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={folgaData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>

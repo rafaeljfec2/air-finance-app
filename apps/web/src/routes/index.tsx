@@ -126,11 +126,6 @@ const OnboardingPage = lazy(() =>
   import('@/pages/onboarding').then((m) => ({ default: m.default })),
 );
 const PricingPage = lazy(() => import('@/pages/pricing').then((m) => ({ default: m.PricingPage })));
-const FinancialHealthPage = lazy(() =>
-  import('@/pages/financial-health/FinancialHealthPage').then((m) => ({
-    default: m.FinancialHealthPage,
-  })),
-);
 const FinancialDecisionPage = lazy(() =>
   import('@/pages/decision').then((m) => ({
     default: m.FinancialDecisionPage,
@@ -228,7 +223,6 @@ const PROTECTED_ROUTE_IMPORTS: Array<() => Promise<unknown>> = [
   () => import('@/pages/dashboard/Dashboard'),
   () => import('@/pages/home'),
   () => import('@/pages/home-v2'),
-  () => import('@/pages/financial-health/FinancialHealthPage'),
   () => import('@/pages/decision'),
   () => import('@/pages/transactions'),
   () => import('@/pages/reports'),
@@ -336,7 +330,10 @@ export const router = createBrowserRouter(
           element: <Navigate to="/home" replace />,
         },
         onboardingRoute('/dashboard', <Dashboard />),
-        onboardingRoute('/financial-health', <FinancialHealthPage />),
+        {
+          path: '/financial-health',
+          element: <Navigate to="/dashboard" replace />,
+        },
         onboardingRoute('/decision', <FinancialDecisionPage />),
         onboardingRoute('/transactions', <Transactions />),
         onboardingRoute('/movements', <TransactionsV2Page />),

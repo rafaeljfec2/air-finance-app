@@ -31,9 +31,16 @@ export function DashboardHeader({
   return (
     <header className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
       <div className="min-w-0 space-y-3">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Check-up de capacidade · {monthLabel}
+        </p>
         <h1 className="text-2xl font-bold tracking-tight text-text dark:text-text-dark sm:text-3xl">
           {surfaceQuestion}
         </h1>
+        <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          Os números abaixo descrevem a capacidade do sistema neste período. Não substituem o
+          parecer do dia na Home.
+        </p>
         {lines ? (
           <div className="max-w-3xl space-y-1">
             <p className="text-sm font-medium leading-relaxed text-text dark:text-text-dark sm:text-base">

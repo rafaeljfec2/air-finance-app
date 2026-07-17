@@ -29,7 +29,7 @@ const sharedImproves = {
     'Menos dependência estrutural do cartão',
   ],
   resilience: [
-    'Maior runway de caixa',
+    'Maior tempo estimado de caixa',
     'Colchão marcado para imprevistos',
     'Menor pressão recorrente de curto prazo',
   ],
@@ -57,7 +57,11 @@ const sharedWorsens = {
     'Crédito carregando o timing do ciclo',
     'Serviço de dívida comprimindo folga',
   ],
-  resilience: ['Runway curto', 'Ausência de reserva marcada', 'Choques de curto prazo recorrentes'],
+  resilience: [
+    'Tempo estimado de caixa curto',
+    'Ausência de reserva marcada',
+    'Choques de curto prazo recorrentes',
+  ],
   wealth: [
     'Consumo de base',
     'Passivos crescendo sem inventário claro',
@@ -152,7 +156,7 @@ const byPillarState: Record<PillarId, Partial<Record<CapacityState, TemplateBloc
     ),
     inconclusive: block(
       'Ainda falta sinal confiável de comprometimento para ler a rigidez do sistema.',
-      'Estrutura inconclusiva até haver proxy de comprometimento.',
+      'Estrutura inconclusiva até haver leitura confiável de comprometimento.',
       'structure',
     ),
   },
@@ -185,7 +189,7 @@ const byPillarState: Record<PillarId, Partial<Record<CapacityState, TemplateBloc
   },
   resilience: {
     excellent: block(
-      'O runway observável sugere boa capacidade de absorver choques de curto prazo.',
+      'O tempo estimado de caixa sugere boa capacidade de absorver choques de curto prazo.',
       'Resiliência folgada no horizonte observável.',
       'resilience',
     ),
@@ -205,8 +209,8 @@ const byPillarState: Record<PillarId, Partial<Record<CapacityState, TemplateBloc
       'resilience',
     ),
     inconclusive: block(
-      'Reserva marcada e runway completo ainda não estão disponíveis com segurança.',
-      'Resiliência inconclusiva — lacuna de reserva/runway.',
+      'Reserva marcada e tempo estimado de caixa ainda não estão disponíveis com segurança.',
+      'Resiliência inconclusiva — lacuna de reserva ou tempo de caixa.',
       'resilience',
     ),
   },

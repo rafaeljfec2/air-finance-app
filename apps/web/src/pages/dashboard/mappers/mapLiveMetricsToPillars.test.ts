@@ -47,6 +47,25 @@ const sampleIndebtedness = (): IndebtednessMetrics => ({
   },
 });
 
+function collectUserFacingCopy(checkup: ReturnType<typeof mapLiveMetricsToPillars>): string {
+  return checkup.pillars
+    .flatMap((pillar) => [
+      pillar.name,
+      pillar.question,
+      pillar.horizonLabel,
+      pillar.primaryLabel,
+      pillar.primaryFormatted ?? '',
+      pillar.interpretation,
+      pillar.summarySentence,
+      pillar.exploreHint ?? '',
+      ...pillar.influencers.improves,
+      ...pillar.influencers.worsens,
+      ...pillar.connections,
+    ])
+    .concat([checkup.surfaceQuestion, checkup.closingSynthesis])
+    .join(' ');
+}
+
 describe('mapLiveMetricsToPillars', () => {
   it('returns six pillars in canonical order', () => {
     const checkup = mapLiveMetricsToPillars({
@@ -72,6 +91,7 @@ describe('mapLiveMetricsToPillars', () => {
     });
 
     expect(checkup.pillars.every((p) => p.state === 'inconclusive')).toBe(true);
+    expect(checkup.pillars.every((p) => p.horizonLabel.trim().length > 0)).toBe(true);
   });
 
   it('maps critical liquidity and flow without inventing recommendations', () => {
@@ -87,5 +107,33 @@ describe('mapLiveMetricsToPillars', () => {
     const checkup = mapLiveMetricsToPillars({ summary, indebtedness });
     expect(checkup.hasCriticalBase).toBe(true);
     expect(checkup.closingSynthesis.toLowerCase()).not.toContain('recomend');
+  });
+
+  it('keeps user-facing copy free of internal jargon and ids', () => {
+    const checkup = mapLiveMetricsToPillars({
+      summary: emptySummary(),
+      indebtedness: sampleIndebtedness(),
+    });
+    const copy = collectUserFacingCopy(checkup);
+
+    expect(copy).not.toMatch(/\bproxy\b/i);
+    expect(copy).not.toMatch(/\brunway\b/i);
+    expect(copy).not.toMatch(/\bFIN-\d+/i);
+    expect(copy).not.toMatch(/\bBEH-\d+/i);
+  });
+
+  it('declares human limitations when structure and wealth use partial readings', () => {
+    const checkup = mapLiveMetricsToPillars({
+      summary: emptySummary(),
+      indebtedness: sampleIndebtedness(),
+    });
+    const structure = checkup.pillars.find((pillar) => pillar.id === 'structure');
+    const wealth = checkup.pillars.find((pillar) => pillar.id === 'wealth');
+    const resilience = checkup.pillars.find((pillar) => pillar.id === 'resilience');
+
+    expect(structure?.hasGap).toBe(true);
+    expect(structure?.exploreHint ?? '').toMatch(/leitura parcial|ainda incompleta/i);
+    expect(wealth?.exploreHint ?? '').toMatch(/inventário|parcial|incompleta/i);
+    expect(resilience?.exploreHint ?? '').toMatch(/estimativa|reserva marcada|parcial/i);
   });
 });
