@@ -89,4 +89,27 @@ describe('buildDayCardStats', () => {
     expect(stats.refundsCount).toBe(0);
     expect(stats.refundsTotal).toBe(0);
   });
+
+  it('does not count bill payments as refunds', () => {
+    const stats = buildDayCardStats(
+      [
+        buildTransaction({
+          accountId: 'card-1',
+          launchType: 'revenue',
+          description: 'PAGAMENTO RECEBIDO',
+          value: 14228.96,
+        }),
+        buildTransaction({
+          accountId: 'card-1',
+          launchType: 'revenue',
+          description: 'Estorno de compra',
+          value: 30,
+        }),
+      ],
+      ACCOUNTS,
+    );
+
+    expect(stats.refundsCount).toBe(1);
+    expect(stats.refundsTotal).toBe(30);
+  });
 });

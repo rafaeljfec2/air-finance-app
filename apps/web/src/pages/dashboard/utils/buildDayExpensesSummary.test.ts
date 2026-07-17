@@ -78,7 +78,7 @@ describe('buildDayExpensesSummary', () => {
     expect(summary.groups[1]).toMatchObject({ accountId: 'acc-2', subtotal: 30 });
   });
 
-  it('ignores revenue transactions', () => {
+  it('ignores revenue on non-card accounts', () => {
     const transactions = [
       makeTransaction({ id: 'a', value: -100 }),
       makeTransaction({ id: 'b', launchType: 'revenue', value: 500 }),
@@ -88,6 +88,57 @@ describe('buildDayExpensesSummary', () => {
 
     expect(summary.total).toBe(100);
     expect(summary.count).toBe(1);
+    expect(summary.refundsCount).toBe(0);
+  });
+
+  it('does not create groups for accounts with only ignored revenues', () => {
+    const transactions = [
+      makeTransaction({ id: 'a', accountId: 'acc-1', value: -100 }),
+      makeTransaction({ id: 'b', accountId: 'acc-2', launchType: 'revenue', value: 500 }),
+    ];
+    const accounts = [makeAccount({ id: 'acc-1' }), makeAccount({ id: 'acc-2' })];
+
+    const summary = buildDayExpensesSummary(transactions, accounts, [makeCategory({})]);
+
+    expect(summary.groups).toHaveLength(1);
+    expect(summary.groups[0].accountId).toBe('acc-1');
+  });
+
+  it('includes card refunds as marked rows without changing expense totals', () => {
+    const transactions = [
+      makeTransaction({ id: 'a', accountId: 'card-1', value: -100 }),
+      makeTransaction({
+        id: 'b',
+        accountId: 'card-1',
+        launchType: 'revenue',
+        description: 'Estorno de compra',
+        value: 244.99,
+      }),
+      makeTransaction({
+        id: 'c',
+        accountId: 'card-1',
+        launchType: 'revenue',
+        description: 'PAGAMENTO RECEBIDO',
+        value: 14228.96,
+      }),
+    ];
+    const accounts = [makeAccount({ id: 'card-1', name: 'Nubank', type: 'credit_card' })];
+
+    const summary = buildDayExpensesSummary(transactions, accounts, [makeCategory({})]);
+
+    expect(summary.total).toBe(100);
+    expect(summary.count).toBe(1);
+    expect(summary.refundsTotal).toBe(244.99);
+    expect(summary.refundsCount).toBe(1);
+    expect(summary.groups[0].subtotal).toBeCloseTo(100 - 244.99);
+    expect(summary.groups[0].rows).toHaveLength(2);
+    expect(summary.groups[0].rows[0].id).toBe('a');
+    expect(summary.groups[0].rows[0].isRefund).toBeUndefined();
+    expect(summary.groups[0].rows[1]).toMatchObject({
+      id: 'b',
+      isRefund: true,
+      amount: 244.99,
+    });
   });
 
   it('sorts groups by subtotal desc and rows by amount desc', () => {
@@ -142,6 +193,8 @@ describe('buildDayExpensesSummary', () => {
       count: 0,
       average: 0,
       accountsUsed: 0,
+      refundsTotal: 0,
+      refundsCount: 0,
       groups: [],
     });
   });

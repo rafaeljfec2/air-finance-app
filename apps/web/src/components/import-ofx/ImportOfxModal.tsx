@@ -1,5 +1,5 @@
-import { Upload } from 'lucide-react';
-import { useState } from 'react';
+import { AlertCircle, Upload } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 import { Loading } from '@/components/Loading';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { AccountSelector } from './AccountSelector';
 import { FileUploadArea } from './FileUploadArea';
 import { useFileUpload } from './hooks/useFileUpload';
 import { InstallmentsModal } from './InstallmentsModal';
+import { isOpenFinanceConnectedAccount } from './utils/isOpenFinanceConnectedAccount';
 
 interface ImportOfxModalProps {
   open: boolean;
@@ -143,6 +144,12 @@ export function ImportOfxModal({
 
   const canImport = selectedFile && selectedAccountId && !isImporting && !isCreatingInstallments;
 
+  const selectedAccount = useMemo(
+    () => accounts.find((account) => account.id === selectedAccountId) ?? null,
+    [accounts, selectedAccountId],
+  );
+  const showOpenFinanceReconciliationNotice = isOpenFinanceConnectedAccount(selectedAccount);
+
   // Reset form when modal closes
   const handleModalClose = () => {
     if (!isImporting && !isCreatingInstallments) {
@@ -171,6 +178,21 @@ export function ImportOfxModal({
           selectedAccountId={selectedAccountId}
           onAccountChange={setSelectedAccountId}
         />
+
+        {showOpenFinanceReconciliationNotice ? (
+          <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+            <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                Esta conta também recebe atualizações do banco em tempo real
+              </p>
+              <p className="text-xs text-amber-700 dark:text-amber-300">
+                O extrato importado vira a base reconciliada. Os gastos novos depois dessa data
+                continuam entrando automaticamente, sem duplicar o que já veio no arquivo.
+              </p>
+            </div>
+          </div>
+        ) : null}
 
         <FileUploadArea
           selectedFile={selectedFile}

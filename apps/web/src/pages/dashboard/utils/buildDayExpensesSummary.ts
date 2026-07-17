@@ -1,3 +1,4 @@
+import { isCardRefundTransaction } from '@/pages/credit-cards-v2/mappers/isCardRefundTransaction';
 import type { Account } from '@/services/accountService';
 import type { Category } from '@/services/categoryService';
 import type { Transaction } from '@/services/transactionService';
@@ -10,6 +11,7 @@ export interface DayExpenseRow {
   readonly amount: number;
   readonly categoryName: string;
   readonly categoryColor: string;
+  readonly isRefund?: boolean;
 }
 
 export interface DayExpenseGroup {
@@ -21,6 +23,7 @@ export interface DayExpenseGroup {
   readonly kindLabel: string;
   readonly paymentMethodLabel: string;
   readonly maskedNumber?: string;
+  /** Net amount for the group: expenses minus card refunds. */
   readonly subtotal: number;
   readonly rows: readonly DayExpenseRow[];
 }
@@ -30,6 +33,8 @@ export interface DayExpensesSummary {
   readonly count: number;
   readonly average: number;
   readonly accountsUsed: number;
+  readonly refundsTotal: number;
+  readonly refundsCount: number;
   readonly groups: readonly DayExpenseGroup[];
 }
 
@@ -38,6 +43,7 @@ const UNKNOWN_CATEGORY_NAME = 'Sem categoria';
 const DEFAULT_ACCOUNT_COLOR = '#8A05BE';
 const DEFAULT_CATEGORY_COLOR = '#94A3B8';
 const DEFAULT_ACCOUNT_ICON = 'Banknote';
+const REFUND_CATEGORY_FALLBACK = 'Estorno';
 
 interface MutableGroup {
   accountId: string;
@@ -87,10 +93,23 @@ function createGroup(accountId: string, account?: Account): MutableGroup {
   };
 }
 
+function ensureGroup(
+  groupsByAccount: Map<string, MutableGroup>,
+  accountsById: Map<string, Account>,
+  accountId: string,
+): MutableGroup {
+  let group = groupsByAccount.get(accountId);
+  if (!group) {
+    group = createGroup(accountId, accountsById.get(accountId));
+    groupsByAccount.set(accountId, group);
+  }
+  return group;
+}
+
 /**
  * Aggregates a single day's expense transactions into account/card groups with
- * subtotals plus day-level totals. Revenue transactions are ignored and values
- * are normalized to positive amounts regardless of the stored sign.
+ * subtotals plus day-level totals. Card refunds (revenue on credit cards that
+ * are not bill payments) are included as marked rows; other revenues are ignored.
  */
 export function buildDayExpensesSummary(
   transactions: readonly Transaction[],
@@ -99,42 +118,60 @@ export function buildDayExpensesSummary(
 ): DayExpensesSummary {
   const accountsById = toMap(accounts);
   const categoriesById = toMap(categories);
+  const creditCardAccountIds = new Set(
+    accounts.filter((account) => account.type === 'credit_card').map((account) => account.id),
+  );
   const groupsByAccount = new Map<string, MutableGroup>();
 
   let total = 0;
   let count = 0;
+  let refundsTotal = 0;
+  let refundsCount = 0;
 
   for (const transaction of transactions) {
-    if (transaction.launchType !== 'expense') {
-      continue;
-    }
-
     const amount = Math.abs(transaction.value);
     const category = categoriesById.get(transaction.categoryId);
 
-    let group = groupsByAccount.get(transaction.accountId);
-    if (!group) {
-      group = createGroup(transaction.accountId, accountsById.get(transaction.accountId));
-      groupsByAccount.set(transaction.accountId, group);
+    if (transaction.launchType === 'expense') {
+      const group = ensureGroup(groupsByAccount, accountsById, transaction.accountId);
+      group.rows.push({
+        id: transaction.id,
+        description: transaction.description,
+        amount,
+        categoryName: category?.name ?? UNKNOWN_CATEGORY_NAME,
+        categoryColor: category?.color ?? DEFAULT_CATEGORY_COLOR,
+      });
+      group.subtotal += amount;
+      total += amount;
+      count += 1;
+      continue;
     }
 
-    group.rows.push({
-      id: transaction.id,
-      description: transaction.description,
-      amount,
-      categoryName: category?.name ?? UNKNOWN_CATEGORY_NAME,
-      categoryColor: category?.color ?? DEFAULT_CATEGORY_COLOR,
-    });
-    group.subtotal += amount;
-
-    total += amount;
-    count += 1;
+    if (isCardRefundTransaction(transaction, creditCardAccountIds)) {
+      const group = ensureGroup(groupsByAccount, accountsById, transaction.accountId);
+      group.rows.push({
+        id: transaction.id,
+        description: transaction.description,
+        amount,
+        categoryName: category?.name ?? REFUND_CATEGORY_FALLBACK,
+        categoryColor: category?.color ?? DEFAULT_CATEGORY_COLOR,
+        isRefund: true,
+      });
+      group.subtotal -= amount;
+      refundsTotal += amount;
+      refundsCount += 1;
+    }
   }
 
   const groups: DayExpenseGroup[] = [...groupsByAccount.values()]
     .map((group) => ({
       ...group,
-      rows: [...group.rows].sort((a, b) => b.amount - a.amount),
+      rows: [...group.rows].sort((a, b) => {
+        if (a.isRefund !== b.isRefund) {
+          return a.isRefund ? 1 : -1;
+        }
+        return b.amount - a.amount;
+      }),
     }))
     .sort((a, b) => b.subtotal - a.subtotal);
 
@@ -143,6 +180,8 @@ export function buildDayExpensesSummary(
     count,
     average: count > 0 ? total / count : 0,
     accountsUsed: groups.length,
+    refundsTotal,
+    refundsCount,
     groups,
   };
 }

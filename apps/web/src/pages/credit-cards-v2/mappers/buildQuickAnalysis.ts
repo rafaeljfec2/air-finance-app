@@ -1,6 +1,8 @@
 import type { Transaction } from '@/services/transactionService';
 import { formatDateToLocalISO } from '@/utils/date';
 
+import { isBillPaymentDescription } from './isCardRefundTransaction';
+
 export type QuickAnalysisDirection = 'below' | 'above' | 'stable';
 
 export type QuickAnalysis =
@@ -24,10 +26,23 @@ function paymentDateOnly(transaction: Transaction): string {
   return transaction.paymentDate.split('T')[0] ?? transaction.paymentDate;
 }
 
+/** Signed impact of a card transaction on spend: expense adds, refund deducts. */
+function spendImpact(transaction: Transaction): number {
+  const amount = Math.abs(transaction.value);
+  if (transaction.launchType === 'expense') {
+    return amount;
+  }
+  if (transaction.launchType === 'revenue' && !isBillPaymentDescription(transaction.description)) {
+    return -amount;
+  }
+  return 0;
+}
+
 /**
  * Compares the average daily spend of the last 7 days against the average of
- * the last 30 days. Returns `inconclusive` when there is not enough expense
- * data in the 30-day window to support a claim.
+ * the last 30 days. Refunds reduce the spend; bill payments are ignored.
+ * Returns `inconclusive` when there is not enough expense data in the 30-day
+ * window to support a claim. Expects transactions already scoped to card accounts.
  */
 export function buildQuickAnalysis(
   transactions: readonly Transaction[],
@@ -41,17 +56,17 @@ export function buildQuickAnalysis(
   let shortTotal = 0;
 
   for (const transaction of transactions) {
-    if (transaction.launchType !== 'expense') {
+    const impact = spendImpact(transaction);
+    if (impact === 0) {
       continue;
     }
     const date = paymentDateOnly(transaction);
     if (date < longWindowStart || date > referenceIso) {
       continue;
     }
-    const amount = Math.abs(transaction.value);
-    longTotal += amount;
+    longTotal += impact;
     if (date >= shortWindowStart) {
-      shortTotal += amount;
+      shortTotal += impact;
     }
   }
 

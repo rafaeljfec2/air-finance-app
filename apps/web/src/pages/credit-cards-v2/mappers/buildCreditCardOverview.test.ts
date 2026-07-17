@@ -101,6 +101,7 @@ describe('buildCreditCardOverview', () => {
     expect(overview.cycleBillAmount).toBe(200);
     expect(overview.projectedInstallmentsAmount).toBe(105.95);
     expect(overview.isBillEstimated).toBe(true);
+    expect(overview.sourceFreshnessLabel).toBeNull();
     expect(overview.projectedInstallments).toHaveLength(1);
     expect(overview.currentBillDueDate).toBe('2026-08-06');
     expect(overview.lastClosedBillId).toBe('bill-jul');
@@ -116,9 +117,16 @@ describe('buildCreditCardOverview', () => {
       }),
       openBill: null,
       referenceDate: REFERENCE_DATE,
+      sourceState: {
+        mode: 'COMBINED',
+        ofxReconciledUntil: '2026-07-17T12:00:00.000Z',
+      },
     });
 
     expect(overview.currentBillAmount).toBeNull();
+    expect(overview.sourceFreshnessLabel).toBe(
+      'Extrato importado em 17/07/2026 + gastos recentes do banco',
+    );
     expect(overview.cycleBillAmount).toBeNull();
     expect(overview.isBillEstimated).toBe(false);
     expect(overview.currentBillDueDate).toBe('2026-08-06');

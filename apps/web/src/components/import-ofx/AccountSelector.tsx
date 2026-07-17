@@ -4,6 +4,8 @@ import { ComboBox, type ComboBoxOption } from '@/components/ui/ComboBox';
 import { getAccountNumber } from '@/services/accountHelpers';
 import type { Account } from '@/services/accountService';
 
+import { isOpenFinanceConnectedAccount } from './utils/isOpenFinanceConnectedAccount';
+
 interface AccountSelectorProps {
   accounts: Account[];
   selectedAccountId: string | null;
@@ -25,6 +27,13 @@ export function AccountSelector({
     }));
   }, [accounts]);
 
+  const selectedAccount = useMemo(
+    () => accounts.find((account) => account.id === selectedAccountId) ?? null,
+    [accounts, selectedAccountId],
+  );
+
+  const isOpenFinanceConnected = isOpenFinanceConnectedAccount(selectedAccount);
+
   return (
     <div className="space-y-2">
       <div className="block text-sm font-medium text-text dark:text-text-dark">
@@ -42,12 +51,18 @@ export function AccountSelector({
         renderItem={(option) => {
           const account = accounts.find((acc) => acc.id === option.value);
           if (!account) return <span>{option.label}</span>;
+          const connected = isOpenFinanceConnectedAccount(account);
           return (
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">{account.name}</span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 {getAccountNumber(account)}
               </span>
+              {connected ? (
+                <span className="text-[10px] uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+                  Banco conectado
+                </span>
+              ) : null}
             </div>
           );
         }}
@@ -65,10 +80,20 @@ export function AccountSelector({
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 {getAccountNumber(account)}
               </span>
+              {isOpenFinanceConnectedAccount(account) ? (
+                <span className="text-[10px] uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+                  Banco conectado
+                </span>
+              ) : null}
             </div>
           );
         }}
       />
+      {isOpenFinanceConnected ? (
+        <p className="text-xs text-muted-foreground dark:text-gray-400">
+          Conta com atualização automática do banco ativa.
+        </p>
+      ) : null}
     </div>
   );
 }

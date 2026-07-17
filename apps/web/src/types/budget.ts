@@ -40,11 +40,20 @@ export interface CreditCardBill {
   }>;
 }
 
+export type CreditCardSourceMode = 'OFX' | 'OPEN_FINANCE' | 'COMBINED' | 'MANUAL';
+
+export interface CreditCardSourceState {
+  mode: CreditCardSourceMode;
+  ofxReconciledUntil?: string;
+  lastOpenFinanceSyncAt?: string;
+}
+
 export interface CreditCard {
   id: string;
   accountId: string;
   name: string;
   brand: 'nubank' | 'itau';
   limit: number;
+  sourceState?: CreditCardSourceState;
   bills: CreditCardBill[];
 }

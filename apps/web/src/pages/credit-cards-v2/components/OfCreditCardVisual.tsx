@@ -87,9 +87,11 @@ export function OfCreditCardVisual({
     showingClosed && closedBillOverride ? closedBillOverride.dueDate : overview.currentBillDueDate;
   const billLabel = showingClosed ? 'Fatura fechada' : 'Fatura do mês';
 
-  const footerText = overview.isActive
-    ? `Final ${overview.digits ?? '——'} • Open Finance conectado`
-    : `Final ${overview.digits ?? '——'} • Conecte para ativar`;
+  const footerText = overview.sourceFreshnessLabel
+    ? `Final ${overview.digits ?? '——'} • ${overview.sourceFreshnessLabel}`
+    : overview.isActive
+      ? `Final ${overview.digits ?? '——'} • Open Finance conectado`
+      : `Final ${overview.digits ?? '——'} • Conecte para ativar`;
 
   return (
     <button

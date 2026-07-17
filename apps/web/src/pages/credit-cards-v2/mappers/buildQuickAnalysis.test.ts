@@ -95,4 +95,27 @@ describe('buildQuickAnalysis', () => {
 
     expect(buildQuickAnalysis(old, REFERENCE_DATE).status).toBe('inconclusive');
   });
+
+  it('nets refunds against spend and ignores bill payments', () => {
+    const flat = spreadDailyExpenses(100, 30, REFERENCE_DATE);
+    const refundInWeek = buildTransaction({
+      launchType: 'revenue',
+      description: 'Estorno de compra',
+      value: 350,
+      paymentDate: '2026-07-16',
+    });
+    const paymentInWeek = buildTransaction({
+      launchType: 'revenue',
+      description: 'PAGAMENTO RECEBIDO',
+      value: 3000,
+      paymentDate: '2026-07-15',
+    });
+
+    const result = buildQuickAnalysis([...flat, refundInWeek, paymentInWeek], REFERENCE_DATE);
+
+    expect(result.status).toBe('ready');
+    if (result.status === 'ready') {
+      expect(result.direction).toBe('below');
+    }
+  });
 });

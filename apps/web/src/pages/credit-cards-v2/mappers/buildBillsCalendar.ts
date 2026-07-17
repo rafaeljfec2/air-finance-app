@@ -1,11 +1,14 @@
 import type { Transaction } from '@/services/transactionService';
 
+import { isBillPaymentDescription } from './isCardRefundTransaction';
+
 export interface BillsCalendarDay {
   readonly day: number;
   readonly hasExpense: boolean;
   readonly hasInstallment: boolean;
   readonly hasClosing: boolean;
   readonly hasDue: boolean;
+  readonly hasRefund: boolean;
 }
 
 export interface BillsCalendar {
@@ -26,6 +29,7 @@ interface MutableDayFlags {
   hasInstallment: boolean;
   hasClosing: boolean;
   hasDue: boolean;
+  hasRefund: boolean;
 }
 
 function paymentDateOnly(transaction: Transaction): string {
@@ -34,7 +38,8 @@ function paymentDateOnly(transaction: Transaction): string {
 
 /**
  * Builds a sunday-aligned calendar for the reference month, flagging days with
- * registered expenses, installment purchases, card closings and bill due dates.
+ * registered expenses, installment purchases, refunds, card closings and bill
+ * due dates. Expects transactions already scoped to card accounts.
  */
 export function buildBillsCalendar({
   referenceDate,
@@ -53,25 +58,39 @@ export function buildBillsCalendar({
   const getFlags = (day: number): MutableDayFlags => {
     let flags = flagsByDay.get(day);
     if (!flags) {
-      flags = { hasExpense: false, hasInstallment: false, hasClosing: false, hasDue: false };
+      flags = {
+        hasExpense: false,
+        hasInstallment: false,
+        hasClosing: false,
+        hasDue: false,
+        hasRefund: false,
+      };
       flagsByDay.set(day, flags);
     }
     return flags;
   };
 
   for (const transaction of transactions) {
-    if (transaction.launchType !== 'expense') {
-      continue;
-    }
     const date = paymentDateOnly(transaction);
     if (!date.startsWith(monthPrefix)) {
       continue;
     }
     const day = Number(date.slice(-2));
-    const flags = getFlags(day);
-    flags.hasExpense = true;
-    if (transaction.quantityInstallments > 1) {
-      flags.hasInstallment = true;
+
+    if (transaction.launchType === 'expense') {
+      const flags = getFlags(day);
+      flags.hasExpense = true;
+      if (transaction.quantityInstallments > 1) {
+        flags.hasInstallment = true;
+      }
+      continue;
+    }
+
+    if (
+      transaction.launchType === 'revenue' &&
+      !isBillPaymentDescription(transaction.description)
+    ) {
+      getFlags(day).hasRefund = true;
     }
   }
 
@@ -95,6 +114,7 @@ export function buildBillsCalendar({
       hasInstallment: flags?.hasInstallment ?? false,
       hasClosing: flags?.hasClosing ?? false,
       hasDue: flags?.hasDue ?? false,
+      hasRefund: flags?.hasRefund ?? false,
     });
   }
 

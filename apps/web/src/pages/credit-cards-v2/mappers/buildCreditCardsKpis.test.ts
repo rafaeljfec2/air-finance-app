@@ -16,6 +16,7 @@ function buildOverview(overrides: Partial<CreditCardOverview> = {}): CreditCardO
     projectedInstallmentsAmount: 5590.07,
     projectedInstallments: [],
     isBillEstimated: true,
+    sourceFreshnessLabel: null,
     currentBillDueDate: '2026-08-05',
     lastClosedBillId: null,
     lastClosedBillAmount: null,

@@ -24,6 +24,7 @@ import { StatementErrorState } from './components/StatementErrorState';
 import { UpcomingBillsCard } from './components/UpcomingBillsCard';
 import { useAllCardDetails } from './hooks/useAllCardDetails';
 import { useAllCardsOpenBills } from './hooks/useAllCardsOpenBills';
+import { useComposedCreditCardBills } from './hooks/useComposedCreditCardBills';
 import { useOpenFinanceCreditCards } from './hooks/useOpenFinanceCreditCards';
 import { useTransactionsRange } from './hooks/useTransactionsRange';
 import { buildCreditCardOverview } from './mappers/buildCreditCardOverview';
@@ -31,6 +32,7 @@ import { buildCreditCardsKpis } from './mappers/buildCreditCardsKpis';
 import { buildQuickAnalysis } from './mappers/buildQuickAnalysis';
 import { filterTransactionsByAccountIds } from './mappers/filterTransactionsByAccountIds';
 import { getBestPurchaseDay } from './mappers/getBestPurchaseDay';
+import { resolveComposedOpenBill } from './mappers/resolveComposedOpenBill';
 
 const QUICK_ANALYSIS_WINDOW_DAYS = 30;
 
@@ -55,6 +57,7 @@ export function CreditCardsV2PageDesktop() {
   const { accounts } = useAccounts();
   const { detailsByCardId } = useAllCardDetails(companyId, cards);
   const { openBillByCardId } = useAllCardsOpenBills(companyId, cards, today);
+  const { composedByAccountId } = useComposedCreditCardBills(companyId, today);
 
   const [selectedCardId, setSelectedCardId] = useState('');
   const [selectedBillId, setSelectedBillId] = useState<string | null>(null);
@@ -70,15 +73,23 @@ export function CreditCardsV2PageDesktop() {
 
   const overviews = useMemo(
     () =>
-      cards.map((card) =>
-        buildCreditCardOverview({
+      cards.map((card) => {
+        const composed = composedByAccountId.get(card.id);
+        const openBill = resolveComposedOpenBill({
+          openBill: openBillByCardId.get(card.id) ?? null,
+          composedTotal: composed?.total ?? null,
+          sourceState: composed?.sourceState,
+        });
+
+        return buildCreditCardOverview({
           card,
           details: detailsByCardId.get(card.id) ?? null,
-          openBill: openBillByCardId.get(card.id) ?? null,
+          openBill,
           referenceDate: today,
-        }),
-      ),
-    [cards, detailsByCardId, openBillByCardId, today],
+          sourceState: composed?.sourceState ?? null,
+        });
+      }),
+    [cards, composedByAccountId, detailsByCardId, openBillByCardId, today],
   );
 
   const kpis = useMemo(() => buildCreditCardsKpis(overviews), [overviews]);
@@ -212,6 +223,7 @@ export function CreditCardsV2PageDesktop() {
               cycleBillAmount={selectedOverview?.cycleBillAmount ?? null}
               projectedInstallmentsAmount={selectedOverview?.projectedInstallmentsAmount ?? null}
               isBillEstimated={selectedOverview?.isBillEstimated ?? false}
+              sourceFreshnessLabel={selectedOverview?.sourceFreshnessLabel ?? null}
               onSelectBill={setSelectedBillId}
             />
           }

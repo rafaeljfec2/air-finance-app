@@ -19,6 +19,7 @@ interface BillSelectorProps {
   readonly cycleBillAmount?: number | null;
   readonly projectedInstallmentsAmount?: number | null;
   readonly isBillEstimated?: boolean;
+  readonly sourceFreshnessLabel?: string | null;
   readonly onSelectBill: (billId: string | null) => void;
 }
 
@@ -33,6 +34,7 @@ export function BillSelector({
   cycleBillAmount = null,
   projectedInstallmentsAmount = null,
   isBillEstimated = false,
+  sourceFreshnessLabel = null,
   onSelectBill,
 }: Readonly<BillSelectorProps>) {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,7 +52,9 @@ export function BillSelector({
       ? 'Carregando…'
       : isBillEstimated
         ? `${formatCurrency(openBillAmount)} · ${formatCurrency(cycleBillAmount ?? 0)} ciclo · ${formatCurrency(projectedInstallmentsAmount ?? 0)} parcelas`
-        : formatCurrency(openBillAmount);
+        : sourceFreshnessLabel
+          ? `${formatCurrency(openBillAmount)} · ${sourceFreshnessLabel}`
+          : formatCurrency(openBillAmount);
 
   const triggerLabel = selectedClosed
     ? `Venceu ${formatShortDayMonth(toDateOnly(selectedClosed.dueDate))} · ${formatCurrency(selectedClosed.amount)}`

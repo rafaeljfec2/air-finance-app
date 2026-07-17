@@ -45,7 +45,8 @@ function downloadCsv(csv: string, date: string) {
 }
 
 function ExpenseTableRow({ row, group }: Readonly<FlatExpenseRow>) {
-  const CategoryIcon = getCategoryIcon(row.categoryName, 'expense');
+  const isRefund = row.isRefund === true;
+  const CategoryIcon = getCategoryIcon(row.categoryName, isRefund ? 'revenue' : 'expense');
 
   return (
     <li className={`px-3 py-3 ${ROW_GRID}`}>
@@ -57,7 +58,16 @@ function ExpenseTableRow({ row, group }: Readonly<FlatExpenseRow>) {
         >
           <CategoryIcon className="h-4 w-4" />
         </span>
-        <p className="truncate text-sm text-text dark:text-text-dark">{row.description}</p>
+        <div className="min-w-0">
+          <p title={row.description} className="truncate text-sm text-text dark:text-text-dark">
+            {row.description}
+          </p>
+          {isRefund ? (
+            <span className="mt-0.5 inline-flex rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+              Estorno
+            </span>
+          ) : null}
+        </div>
       </div>
 
       <span className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
@@ -71,11 +81,27 @@ function ExpenseTableRow({ row, group }: Readonly<FlatExpenseRow>) {
 
       <span className="truncate text-xs text-muted-foreground">{group.paymentMethodLabel}</span>
 
-      <span className="text-right text-sm font-medium tabular-nums text-red-500 dark:text-red-400">
-        {formatCurrency(-row.amount)}
+      <span
+        className={
+          isRefund
+            ? 'text-right text-sm font-medium tabular-nums text-emerald-600 dark:text-emerald-400'
+            : 'text-right text-sm font-medium tabular-nums text-red-500 dark:text-red-400'
+        }
+      >
+        {formatCurrency(isRefund ? row.amount : -row.amount)}
       </span>
     </li>
   );
+}
+
+function buildPanelBadge(summary: {
+  readonly count: number;
+  readonly refundsCount: number;
+}): string {
+  if (summary.refundsCount > 0) {
+    return `${summary.count} despesas · ${summary.refundsCount} estornos`;
+  }
+  return `${summary.count} despesas`;
 }
 
 function PanelLoading() {
@@ -127,16 +153,18 @@ export function DayExpensesPanel({
               Despesas de {titleDate}
             </h2>
             <span className="rounded-full bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground dark:bg-background-dark">
-              {summary.count} despesas
+              {buildPanelBadge(summary)}
             </span>
           </div>
-          <p className="mt-0.5 text-xs text-muted-foreground">Despesas do cartão selecionado</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Despesas e estornos do cartão selecionado
+          </p>
         </div>
 
         <button
           type="button"
           onClick={() => downloadCsv(buildDayExpensesCsv(summary), date)}
-          disabled={summary.count === 0}
+          disabled={summary.count === 0 && summary.refundsCount === 0}
           className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text hover:bg-background/60 disabled:cursor-not-allowed disabled:opacity-40 dark:border-border-dark dark:text-text-dark dark:hover:bg-background-dark/60"
         >
           <Upload className="h-3.5 w-3.5" aria-hidden />
@@ -167,7 +195,7 @@ export function DayExpensesPanel({
           {flatRows.length === 0 ? (
             <div className="mx-2 mb-4 flex flex-1 items-center justify-center rounded-lg border border-dashed border-border px-4 py-8 dark:border-border-dark">
               <p className="text-center text-sm text-muted-foreground">
-                Nenhuma despesa registrada neste dia.
+                Nenhuma despesa ou estorno registrado neste dia.
               </p>
             </div>
           ) : (

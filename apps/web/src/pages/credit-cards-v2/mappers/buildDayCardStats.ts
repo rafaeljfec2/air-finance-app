@@ -1,6 +1,8 @@
 import type { Account } from '@/services/accountService';
 import type { Transaction } from '@/services/transactionService';
 
+import { isCardRefundTransaction } from './isCardRefundTransaction';
+
 export interface DayCardStats {
   readonly expensesTotal: number;
   readonly expensesCount: number;
@@ -53,7 +55,7 @@ export function buildDayCardStats(
       continue;
     }
 
-    if (isCardAccount) {
+    if (isCardRefundTransaction(transaction, cardAccountIds)) {
       refundsTotal += amount;
       refundsCount += 1;
     }

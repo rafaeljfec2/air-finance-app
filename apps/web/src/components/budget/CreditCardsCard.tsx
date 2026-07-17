@@ -7,6 +7,7 @@ import { CreditCardBrandIcon } from '@/components/budget/CreditCardBrandIcon';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import type { CreditCardBill, CreditCard as CreditCardType } from '@/types/budget';
+import { buildCreditCardSourceFreshnessLabel } from '@/utils/creditCardSourceLabel';
 
 interface CreditCardsCardProps {
   cards: CreditCardType[];
@@ -34,11 +35,9 @@ export function CreditCardsCard({
   onExpand,
 }: Readonly<CreditCardsCardProps>) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  // Sort transactions: first those that are finishing (fewer remaining installments), then the rest
   const sortedTransactions = useMemo(() => {
     const transactions = activeBill?.transactions ?? [];
     return [...transactions].sort((a, b) => {
-      // Extract installment info from description (e.g., "Parcela 3/5" or "3/5")
       const extractInstallment = (desc: string): { current: number; total: number } | null => {
         const regex1 = /parcela\s+(\d+)\/(\d+)/i;
         const regex2 = /(?:^|\s|-)(\d+)\/(\d+)(?:\s|$)/;
@@ -56,23 +55,17 @@ export function CreditCardsCard({
       const installmentA = extractInstallment(a.description);
       const installmentB = extractInstallment(b.description);
 
-      // If neither has installment info, keep original order
       if (!installmentA && !installmentB) return 0;
-
-      // Transactions with installments come first
       if (!installmentA) return 1;
       if (!installmentB) return -1;
 
-      // Calculate remaining installments
       const remainingA = installmentA.total - installmentA.current;
       const remainingB = installmentB.total - installmentB.current;
 
-      // First: those with fewer remaining installments (finishing first)
       if (remainingA !== remainingB) {
         return remainingA - remainingB;
       }
 
-      // If same remaining, sort by current installment (higher current first)
       return installmentB.current - installmentA.current;
     });
   }, [activeBill?.transactions]);
@@ -91,6 +84,11 @@ export function CreditCardsCard({
   };
 
   const totalBillValue = activeBill?.total ?? 0;
+  const activeCard = useMemo(
+    () => cards.find((card) => card.id === activeCardId),
+    [activeCardId, cards],
+  );
+  const sourceFreshnessLabel = buildCreditCardSourceFreshnessLabel(activeCard?.sourceState);
 
   return (
     <CardContainer color="violet" className={isCollapsed ? 'min-h-0' : 'min-h-[250px]'}>
@@ -113,6 +111,11 @@ export function CreditCardsCard({
         </Button>
       </CardHeader>
       <CardTotal value={totalBillValue} color="violet" label="Total da Fatura" />
+      {sourceFreshnessLabel ? (
+        <p className="text-[11px] text-muted-foreground dark:text-gray-400 -mt-3 mb-3">
+          {sourceFreshnessLabel}
+        </p>
+      ) : null}
       <AnimatePresence initial={false}>
         {!isCollapsed && (
           <motion.div
@@ -162,7 +165,6 @@ export function CreditCardsCard({
                     })}
                   </div>
 
-                  {/* Exibição do Saldo da Conta */}
                   {typeof activeCardBalance === 'number' && (
                     <div className="flex justify-center items-center gap-2 text-xs mb-2">
                       <span className="text-gray-500 dark:text-gray-400">Saldo da Conta:</span>

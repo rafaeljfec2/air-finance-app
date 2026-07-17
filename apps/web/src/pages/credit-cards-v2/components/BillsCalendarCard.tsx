@@ -40,6 +40,7 @@ const LEGEND = [
   { label: 'Fatura vence', className: 'bg-amber-500' },
   { label: 'Despesa registrada', className: 'bg-violet-500' },
   { label: 'Parcelas', className: 'bg-rose-500' },
+  { label: 'Estorno', className: 'bg-sky-500' },
 ] as const;
 
 function monthRange(referenceDate: Date): { start: string; end: string } {
@@ -58,6 +59,7 @@ function DayMarkers({ day }: Readonly<{ day: BillsCalendarDay }>) {
       {day.hasDue ? <span className="h-1 w-1 rounded-full bg-amber-500" /> : null}
       {day.hasExpense ? <span className="h-1 w-1 rounded-full bg-violet-500" /> : null}
       {day.hasInstallment ? <span className="h-1 w-1 rounded-full bg-rose-500" /> : null}
+      {day.hasRefund ? <span className="h-1 w-1 rounded-full bg-sky-500" /> : null}
     </span>
   );
 }

@@ -49,12 +49,19 @@ const CreditCardBillSchema = z.object({
   transactions: z.array(CreditCardTransactionSchema),
 });
 
+const CreditCardSourceStateSchema = z.object({
+  mode: z.enum(['OFX', 'OPEN_FINANCE', 'COMBINED', 'MANUAL']),
+  ofxReconciledUntil: z.string().optional(),
+  lastOpenFinanceSyncAt: z.string().optional(),
+});
+
 const CreditCardSchema = z.object({
   id: z.string(),
   accountId: z.string(),
   name: z.string(),
   brand: z.enum(['nubank', 'itau']),
   limit: z.number(),
+  sourceState: CreditCardSourceStateSchema.optional(),
   bills: z.array(CreditCardBillSchema),
 });
 

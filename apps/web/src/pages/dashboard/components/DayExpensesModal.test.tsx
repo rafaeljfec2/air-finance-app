@@ -115,7 +115,9 @@ describe('DayExpensesModal', () => {
 
     render(<DayExpensesModal companyId="c1" date="2026-07-18" onClose={vi.fn()} />);
 
-    expect(screen.getByText(/Nenhuma despesa registrada neste dia/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Nenhuma despesa ou estorno registrado neste dia/i),
+    ).toBeInTheDocument();
   });
 
   it('shows a loading state while fetching', () => {
@@ -144,9 +146,11 @@ describe('DayExpensesModal', () => {
       <DayExpensesModal companyId="c1" date="2026-07-18" accountId="acc-2" onClose={vi.fn()} />,
     );
 
-    expect(screen.getByText('Despesas do cartão selecionado.')).toBeInTheDocument();
+    expect(screen.getByText('Despesas e estornos do cartão selecionado.')).toBeInTheDocument();
     expect(
-      screen.getByText(/Os valores consideram as despesas do cartão selecionado neste dia/i),
+      screen.getByText(
+        /Os valores consideram as despesas e estornos do cartão selecionado neste dia/i,
+      ),
     ).toBeInTheDocument();
     expect(
       screen.queryByText(/todas as despesas registradas em todos os caixas e cartões/i),

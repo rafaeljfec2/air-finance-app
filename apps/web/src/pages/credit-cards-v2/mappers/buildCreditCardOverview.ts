@@ -1,4 +1,6 @@
 import type { OpeniCreditCardDetailsPayload } from '@/services/openiService';
+import type { CreditCardSourceState } from '@/types/budget';
+import { buildCreditCardSourceFreshnessLabel } from '@/utils/creditCardSourceLabel';
 import { formatDateToLocalISO } from '@/utils/date';
 
 import type { OpenFinanceCreditCard } from './mapAccountToOpenFinanceCreditCard';
@@ -18,6 +20,7 @@ export interface CreditCardOverview {
   readonly projectedInstallmentsAmount: number | null;
   readonly projectedInstallments: ReadonlyArray<ProjectedInstallment>;
   readonly isBillEstimated: boolean;
+  readonly sourceFreshnessLabel: string | null;
   /** Calculated due date of the open bill. */
   readonly currentBillDueDate: string | null;
   readonly lastClosedBillId: string | null;
@@ -35,6 +38,7 @@ interface BuildCreditCardOverviewParams {
   readonly details: OpeniCreditCardDetailsPayload | null;
   readonly openBill: OpenBillProjection | null;
   readonly referenceDate: Date;
+  readonly sourceState?: CreditCardSourceState | null;
 }
 
 const INACTIVE_STATUSES = new Set(['ERROR', 'DISCONNECTED', 'LOGIN_ERROR', 'OUTDATED']);
@@ -108,6 +112,7 @@ export function buildCreditCardOverview({
   details,
   openBill,
   referenceDate,
+  sourceState = null,
 }: BuildCreditCardOverviewParams): CreditCardOverview {
   const lastClosed = details ? resolveLastClosedBill(details.bills, referenceDate) : null;
   const limitTotal = details?.limitTotal ?? null;
@@ -125,6 +130,7 @@ export function buildCreditCardOverview({
     projectedInstallmentsAmount: openBill?.projectedAmount ?? null,
     projectedInstallments: openBill?.projectedInstallments ?? [],
     isBillEstimated: openBill?.isEstimated ?? false,
+    sourceFreshnessLabel: buildCreditCardSourceFreshnessLabel(sourceState),
     currentBillDueDate: resolveOpenBillDueDate(card.closingDay, card.dueDay, referenceDate),
     lastClosedBillId: lastClosed?.id ?? null,
     lastClosedBillAmount: lastClosed?.amount ?? null,

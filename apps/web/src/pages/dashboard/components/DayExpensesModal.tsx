@@ -108,8 +108,14 @@ function GroupHeader({ group }: Readonly<{ group: DayExpenseGroup }>) {
           </p>
         </div>
       </div>
-      <span className="shrink-0 text-sm font-semibold tabular-nums text-red-500 dark:text-red-400">
-        {formatCurrency(group.subtotal)}
+      <span
+        className={
+          group.subtotal < 0
+            ? 'shrink-0 text-sm font-semibold tabular-nums text-emerald-600 dark:text-emerald-400'
+            : 'shrink-0 text-sm font-semibold tabular-nums text-red-500 dark:text-red-400'
+        }
+      >
+        {formatCurrency(Math.abs(group.subtotal))}
       </span>
     </div>
   );
@@ -119,7 +125,8 @@ function ExpenseRow({
   row,
   paymentMethodLabel,
 }: Readonly<{ row: DayExpenseRow; paymentMethodLabel: string }>) {
-  const CategoryIcon = getCategoryIcon(row.categoryName, 'expense');
+  const isRefund = row.isRefund === true;
+  const CategoryIcon = getCategoryIcon(row.categoryName, isRefund ? 'revenue' : 'expense');
 
   return (
     <li className={`px-3 py-3.5 ${ROW_GRID}`}>
@@ -131,7 +138,16 @@ function ExpenseRow({
         >
           <CategoryIcon className="h-4 w-4" />
         </span>
-        <p className="truncate text-sm text-text dark:text-text-dark">{row.description}</p>
+        <div className="min-w-0">
+          <p title={row.description} className="truncate text-sm text-text dark:text-text-dark">
+            {row.description}
+          </p>
+          {isRefund ? (
+            <span className="mt-0.5 inline-flex rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+              Estorno
+            </span>
+          ) : null}
+        </div>
       </div>
 
       <span className="mt-1 flex min-w-0 items-center gap-1.5 pl-[42px] text-xs text-muted-foreground sm:mt-0 sm:pl-0">
@@ -145,8 +161,14 @@ function ExpenseRow({
 
       <span className="hidden text-xs text-muted-foreground sm:block">{paymentMethodLabel}</span>
 
-      <span className="mt-1 block pl-[42px] text-sm font-medium tabular-nums text-red-500 dark:text-red-400 sm:mt-0 sm:pl-0 sm:text-right">
-        {formatCurrency(-row.amount)}
+      <span
+        className={
+          isRefund
+            ? 'mt-1 block pl-[42px] text-sm font-medium tabular-nums text-emerald-600 dark:text-emerald-400 sm:mt-0 sm:pl-0 sm:text-right'
+            : 'mt-1 block pl-[42px] text-sm font-medium tabular-nums text-red-500 dark:text-red-400 sm:mt-0 sm:pl-0 sm:text-right'
+        }
+      >
+        {formatCurrency(isRefund ? row.amount : -row.amount)}
       </span>
     </li>
   );
@@ -156,20 +178,34 @@ function DayExpensesBody({
   summary,
   scopedToCard,
 }: Readonly<{ summary: DayExpensesSummary; scopedToCard: boolean }>) {
-  if (summary.count === 0) {
+  const hasRows = summary.count > 0 || summary.refundsCount > 0;
+
+  if (!hasRows) {
     return (
       <p className="rounded-lg border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground dark:border-border-dark">
-        Nenhuma despesa registrada neste dia.
+        Nenhuma despesa ou estorno registrado neste dia.
       </p>
     );
   }
+
+  const quantityLabel =
+    summary.refundsCount > 0
+      ? `${summary.count} despesas · ${summary.refundsCount} estornos`
+      : `${summary.count} despesas`;
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         <StatCard label="Total de despesas" value={formatCurrency(summary.total)} emphasis />
-        <StatCard label="Quantidade" value={`${summary.count} despesas`} />
-        <StatCard label="Média por despesa" value={formatCurrency(summary.average)} />
+        <StatCard label="Quantidade" value={quantityLabel} />
+        <StatCard
+          label={summary.refundsCount > 0 ? 'Estornos' : 'Média por despesa'}
+          value={
+            summary.refundsCount > 0
+              ? formatCurrency(summary.refundsTotal)
+              : formatCurrency(summary.average)
+          }
+        />
         <StatCard
           label={scopedToCard ? 'Cartão' : 'Caixas utilizados'}
           value={
@@ -203,7 +239,7 @@ function DayExpensesBody({
       <p className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/40 px-3 py-2.5 text-[11px] text-muted-foreground dark:border-border-dark/60 dark:bg-background-dark/40">
         <Info className="h-3.5 w-3.5 shrink-0" aria-hidden />
         {scopedToCard
-          ? 'Os valores consideram as despesas do cartão selecionado neste dia.'
+          ? 'Os valores consideram as despesas e estornos do cartão selecionado neste dia.'
           : 'Os valores consideram todas as despesas registradas neste dia, em todos os caixas e cartões.'}
       </p>
     </div>
@@ -267,7 +303,7 @@ export function DayExpensesModal({ companyId, date, onClose, accountId }: DayExp
           </h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
             {scopedToCard
-              ? 'Despesas do cartão selecionado.'
+              ? 'Despesas e estornos do cartão selecionado.'
               : 'Todas as despesas registradas em todos os caixas e cartões.'}
           </p>
         </div>
@@ -277,7 +313,7 @@ export function DayExpensesModal({ companyId, date, onClose, accountId }: DayExp
         <button
           type="button"
           onClick={handleExport}
-          disabled={summary.count === 0}
+          disabled={summary.count === 0 && summary.refundsCount === 0}
           className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text hover:bg-background/60 disabled:cursor-not-allowed disabled:opacity-40 dark:border-border-dark dark:text-text-dark dark:hover:bg-background-dark/60"
         >
           <Upload className="h-3.5 w-3.5" aria-hidden />

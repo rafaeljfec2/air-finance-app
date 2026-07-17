@@ -64,6 +64,30 @@ describe('buildBillsCalendar', () => {
     expect(day21.hasExpense).toBe(false);
   });
 
+  it('marks days with refunds and ignores bill payments', () => {
+    const calendar = buildBillsCalendar({
+      referenceDate: JULY_2026,
+      transactions: [
+        buildTransaction({
+          paymentDate: '2026-07-07',
+          launchType: 'revenue',
+          description: 'Estorno de compra',
+        }),
+        buildTransaction({
+          paymentDate: '2026-07-01',
+          launchType: 'revenue',
+          description: 'PAGAMENTO RECEBIDO',
+        }),
+      ],
+      closingDays: [],
+      dueDates: [],
+    });
+
+    expect(calendar.days[6].hasRefund).toBe(true);
+    expect(calendar.days[6].hasExpense).toBe(false);
+    expect(calendar.days[0].hasRefund).toBe(false);
+  });
+
   it('marks closing days clamped to the month length', () => {
     const february = new Date(2026, 1, 1);
     const calendar = buildBillsCalendar({
