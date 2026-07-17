@@ -1,53 +1,178 @@
-import { useMemo } from 'react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { useCallback, useMemo, useState } from 'react';
 
 import { DetailSkeleton } from '@/components/skeletons';
+import { useAccounts } from '@/hooks/useAccounts';
 import { ViewDefault } from '@/layouts/ViewDefault';
+import { DayExpensesModal } from '@/pages/dashboard/components/DayExpensesModal';
+import { useCompanyStore } from '@/stores/company';
+import { formatDateToLocalISO, parseLocalDate } from '@/utils/date';
 
+import { BillsCalendarCard } from './components/BillsCalendarCard';
+import { BillSelector, type ClosedBillOption } from './components/BillSelector';
+import { CreditCardsKpiStrip } from './components/CreditCardsKpiStrip';
+import { CreditCardsV2Header } from './components/CreditCardsV2Header';
+import { DayExpensesPanel } from './components/DayExpensesPanel';
 import { EmptyOpenFinanceCards } from './components/EmptyOpenFinanceCards';
+import { MonthSummaryCard } from './components/MonthSummaryCard';
 import { OfCardsContainer } from './components/OfCardsContainer';
-import { OpenFinanceBillsStrip } from './components/OpenFinanceBillsStrip';
+import type { ClosedBillDisplay } from './components/OfCreditCardVisual';
+import { ProjectedInstallmentsModal } from './components/ProjectedInstallmentsModal';
+import { QuickAnalysisCard } from './components/QuickAnalysisCard';
 import { StatementErrorState } from './components/StatementErrorState';
-import { StatementPanel } from './components/StatementPanel';
-import { StatementPeriodSummary } from './components/StatementPeriodSummary';
-import { useCreditCardsV2Controller } from './hooks/useCreditCardsV2Controller';
+import { UpcomingBillsCard } from './components/UpcomingBillsCard';
+import { useAllCardDetails } from './hooks/useAllCardDetails';
+import { useAllCardsOpenBills } from './hooks/useAllCardsOpenBills';
+import { useOpenFinanceCreditCards } from './hooks/useOpenFinanceCreditCards';
+import { useTransactionsRange } from './hooks/useTransactionsRange';
+import { buildCreditCardOverview } from './mappers/buildCreditCardOverview';
+import { buildCreditCardsKpis } from './mappers/buildCreditCardsKpis';
+import { buildQuickAnalysis } from './mappers/buildQuickAnalysis';
+import { filterTransactionsByAccountIds } from './mappers/filterTransactionsByAccountIds';
+import { getBestPurchaseDay } from './mappers/getBestPurchaseDay';
+
+const QUICK_ANALYSIS_WINDOW_DAYS = 30;
+
+function isoDaysAgo(reference: Date, days: number): string {
+  const date = new Date(reference);
+  date.setDate(date.getDate() - days);
+  return formatDateToLocalISO(date);
+}
+
+function toDateOnly(value: string): string {
+  return value.split('T')[0] ?? value;
+}
 
 export function CreditCardsV2PageDesktop() {
-  const {
-    cards,
-    isLoadingCards,
-    cardsError,
-    selectedCardId,
-    bills,
-    isLoadingBills,
-    selectedBillId,
-    selectedBill,
-    selectedBillLabel,
-    preset,
-    windowOffset,
-    fetchPeriod,
-    transactions,
-    isLoadingStatement,
-    statementError,
-    refetch,
-    handleSelectCard,
-    handleSelectBill,
-    handlePresetChange,
-    handlePreviousPeriod,
-    handleNextPeriod,
-  } = useCreditCardsV2Controller();
+  const { activeCompany } = useCompanyStore();
+  const companyId = activeCompany?.id ?? '';
 
-  const periodTotals = useMemo(() => {
-    let totalDebit = 0;
-    let totalCredit = 0;
-    for (const tx of transactions) {
-      if (tx.type === 'CREDIT') {
-        totalCredit += Math.abs(tx.amount);
-      } else {
-        totalDebit += Math.abs(tx.amount);
-      }
+  const [todayIso] = useState(() => formatDateToLocalISO(new Date()));
+  const today = useMemo(() => parseLocalDate(todayIso), [todayIso]);
+
+  const { cards, isLoading: isLoadingCards, error: cardsError } = useOpenFinanceCreditCards();
+  const { accounts } = useAccounts();
+  const { detailsByCardId } = useAllCardDetails(companyId, cards);
+  const { openBillByCardId } = useAllCardsOpenBills(companyId, cards, today);
+
+  const [selectedCardId, setSelectedCardId] = useState('');
+  const [selectedBillId, setSelectedBillId] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState(todayIso);
+  const [modalDate, setModalDate] = useState<string | null>(null);
+  const [isProjectedModalOpen, setIsProjectedModalOpen] = useState(false);
+
+  const handleCardSelect = useCallback((cardId: string) => {
+    setSelectedCardId(cardId);
+    setSelectedBillId(null);
+    setIsProjectedModalOpen(false);
+  }, []);
+
+  const overviews = useMemo(
+    () =>
+      cards.map((card) =>
+        buildCreditCardOverview({
+          card,
+          details: detailsByCardId.get(card.id) ?? null,
+          openBill: openBillByCardId.get(card.id) ?? null,
+          referenceDate: today,
+        }),
+      ),
+    [cards, detailsByCardId, openBillByCardId, today],
+  );
+
+  const kpis = useMemo(() => buildCreditCardsKpis(overviews), [overviews]);
+
+  const bestPurchaseDay = useMemo(
+    () =>
+      getBestPurchaseDay(
+        cards.map((card) => ({
+          name: card.name,
+          closingDay: card.closingDay,
+          dueDay: card.dueDay,
+          isActive: overviews.find((overview) => overview.cardId === card.id)?.isActive ?? false,
+        })),
+        today,
+      ),
+    [cards, overviews, today],
+  );
+
+  const effectiveSelectedCardId = selectedCardId || (cards[0]?.id ?? '');
+
+  const selectedCard = useMemo(
+    () => cards.find((card) => card.id === effectiveSelectedCardId) ?? cards[0] ?? null,
+    [cards, effectiveSelectedCardId],
+  );
+
+  const selectedOverview = useMemo(
+    () => overviews.find((overview) => overview.cardId === effectiveSelectedCardId) ?? null,
+    [overviews, effectiveSelectedCardId],
+  );
+
+  const closedBills = useMemo<ClosedBillOption[]>(() => {
+    if (!selectedCard) {
+      return [];
     }
-    return { totalDebit, totalCredit, transactionCount: transactions.length };
-  }, [transactions]);
+    const details = detailsByCardId.get(selectedCard.id);
+    if (!details) {
+      return [];
+    }
+    const referenceIso = todayIso;
+    return details.bills
+      .filter((bill) => toDateOnly(bill.dueDate) < referenceIso)
+      .map((bill) => ({
+        id: bill.id,
+        amount: bill.amount,
+        dueDate: toDateOnly(bill.dueDate),
+      }));
+  }, [detailsByCardId, selectedCard, todayIso]);
+
+  const closedBillOverride = useMemo<ClosedBillDisplay | null>(() => {
+    if (!selectedBillId) {
+      return null;
+    }
+    const bill = closedBills.find((item) => item.id === selectedBillId);
+    if (!bill) {
+      return null;
+    }
+    return { amount: bill.amount, dueDate: bill.dueDate };
+  }, [closedBills, selectedBillId]);
+
+  const closingDays = useMemo(() => {
+    if (typeof selectedCard?.closingDay !== 'number') {
+      return [];
+    }
+    return [selectedCard.closingDay];
+  }, [selectedCard]);
+
+  const dueDates = useMemo(() => {
+    if (!selectedCard) {
+      return [];
+    }
+    const details = detailsByCardId.get(selectedCard.id);
+    if (!details) {
+      return [];
+    }
+    return details.bills.map((bill) => bill.dueDate);
+  }, [detailsByCardId, selectedCard]);
+
+  const cardAccountIds = useMemo(() => new Set(cards.map((card) => card.id)), [cards]);
+
+  const quickAnalysisQuery = useTransactionsRange(
+    companyId,
+    isoDaysAgo(today, QUICK_ANALYSIS_WINDOW_DAYS - 1),
+    todayIso,
+  );
+  const quickAnalysis = useMemo(
+    () =>
+      buildQuickAnalysis(
+        filterTransactionsByAccountIds(quickAnalysisQuery.data ?? [], cardAccountIds),
+        today,
+      ),
+    [quickAnalysisQuery.data, cardAccountIds, today],
+  );
+
+  const monthSummaryLabel = `até ${format(today, 'd MMM', { locale: ptBR })}.`;
 
   if (isLoadingCards) {
     return (
@@ -78,52 +203,81 @@ export function CreditCardsV2PageDesktop() {
   return (
     <ViewDefault>
       <div className="-m-4 sm:-m-6 lg:-m-6">
-        <OfCardsContainer
-          creditCards={cards}
-          selectedCardId={selectedCardId}
-          onCardSelect={handleSelectCard}
-        />
-
-        <OpenFinanceBillsStrip
-          bills={bills}
-          selectedBillId={selectedBillId}
-          onSelectBill={handleSelectBill}
-          isLoading={isLoadingBills}
-        />
-
-        <StatementPeriodSummary
-          totalDebit={periodTotals.totalDebit}
-          totalCredit={periodTotals.totalCredit}
-          transactionCount={periodTotals.transactionCount}
-        />
-
-        <div className="px-4 pb-6 lg:px-6">
-          {statementError ? (
-            <div className="rounded-xl border border-border bg-card dark:border-border-dark dark:bg-card-dark">
-              <StatementErrorState error={statementError} onRetry={refetch} />
-            </div>
-          ) : (
-            <StatementPanel
-              preset={preset}
-              onPresetChange={handlePresetChange}
-              startDate={fetchPeriod.startDate}
-              endDate={fetchPeriod.endDate}
-              onPreviousPeriod={handlePreviousPeriod}
-              onNextPeriod={handleNextPeriod}
-              canGoNext={windowOffset > 0}
-              transactions={transactions}
-              isLoading={isLoadingStatement}
-              selectedBillLabel={selectedBillLabel}
-              selectedBillAmount={selectedBill?.amount ?? null}
-              emptyMessage={
-                selectedBillId
-                  ? 'Nenhum lançamento vinculado a esta fatura no Open Finance.'
-                  : undefined
-              }
+        <CreditCardsV2Header
+          billSelector={
+            <BillSelector
+              closedBills={closedBills}
+              selectedBillId={selectedBillId}
+              openBillAmount={selectedOverview?.currentBillAmount ?? null}
+              cycleBillAmount={selectedOverview?.cycleBillAmount ?? null}
+              projectedInstallmentsAmount={selectedOverview?.projectedInstallmentsAmount ?? null}
+              isBillEstimated={selectedOverview?.isBillEstimated ?? false}
+              onSelectBill={setSelectedBillId}
             />
-          )}
+          }
+        />
+
+        <OfCardsContainer
+          overviews={overviews}
+          selectedCardId={effectiveSelectedCardId}
+          onCardSelect={handleCardSelect}
+          closedBillOverride={closedBillOverride}
+        />
+
+        <CreditCardsKpiStrip
+          kpis={kpis}
+          bestPurchaseDay={bestPurchaseDay}
+          onOpenProjectedInstallments={() => setIsProjectedModalOpen(true)}
+        />
+
+        <div className="grid grid-cols-1 items-stretch gap-4 px-4 pb-6 pt-2 lg:px-6 xl:grid-cols-[minmax(0,27fr)_minmax(0,46fr)_minmax(0,27fr)]">
+          <BillsCalendarCard
+            companyId={companyId}
+            accounts={accounts ?? []}
+            accountId={effectiveSelectedCardId}
+            closingDays={closingDays}
+            dueDates={dueDates}
+            selectedDate={selectedDate}
+            onSelectDate={setSelectedDate}
+            onOpenDayDetails={() => setModalDate(selectedDate)}
+          />
+
+          {/* Wrapper keeps the row height defined by the sibling columns on xl:
+              the panel fills it absolutely and scrolls internally. */}
+          <div className="relative xl:min-h-0">
+            <DayExpensesPanel
+              className="xl:absolute xl:inset-0"
+              companyId={companyId}
+              date={selectedDate}
+              accountId={effectiveSelectedCardId}
+              onOpenDayDetails={() => setModalDate(selectedDate)}
+            />
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <MonthSummaryCard kpis={kpis} referenceLabel={monthSummaryLabel} />
+            <UpcomingBillsCard overviews={overviews} />
+            <QuickAnalysisCard analysis={quickAnalysis} />
+          </div>
         </div>
       </div>
+
+      <DayExpensesModal
+        companyId={companyId}
+        date={modalDate}
+        accountId={effectiveSelectedCardId}
+        onClose={() => setModalDate(null)}
+      />
+
+      <ProjectedInstallmentsModal
+        open={isProjectedModalOpen}
+        cardName={selectedOverview?.name ?? ''}
+        projectedAmount={selectedOverview?.projectedInstallmentsAmount ?? 0}
+        cycleAmount={selectedOverview?.cycleBillAmount ?? 0}
+        totalEstimated={selectedOverview?.currentBillAmount ?? 0}
+        installments={selectedOverview?.projectedInstallments ?? []}
+        onClose={() => setIsProjectedModalOpen(false)}
+      />
     </ViewDefault>
   );
 }

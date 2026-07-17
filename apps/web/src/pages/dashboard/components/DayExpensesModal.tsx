@@ -24,6 +24,8 @@ interface DayExpensesModalProps {
   readonly companyId: string;
   readonly date: string | null;
   readonly onClose: () => void;
+  /** When set, only expenses from this account are shown (credit-cards screen). */
+  readonly accountId?: string;
 }
 
 const ROW_GRID =
@@ -150,7 +152,10 @@ function ExpenseRow({
   );
 }
 
-function DayExpensesBody({ summary }: Readonly<{ summary: DayExpensesSummary }>) {
+function DayExpensesBody({
+  summary,
+  scopedToCard,
+}: Readonly<{ summary: DayExpensesSummary; scopedToCard: boolean }>) {
   if (summary.count === 0) {
     return (
       <p className="rounded-lg border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground dark:border-border-dark">
@@ -165,7 +170,14 @@ function DayExpensesBody({ summary }: Readonly<{ summary: DayExpensesSummary }>)
         <StatCard label="Total de despesas" value={formatCurrency(summary.total)} emphasis />
         <StatCard label="Quantidade" value={`${summary.count} despesas`} />
         <StatCard label="Média por despesa" value={formatCurrency(summary.average)} />
-        <StatCard label="Caixas utilizados" value={`${summary.accountsUsed} contas/cartões`} />
+        <StatCard
+          label={scopedToCard ? 'Cartão' : 'Caixas utilizados'}
+          value={
+            scopedToCard
+              ? `${summary.accountsUsed} cartão`
+              : `${summary.accountsUsed} contas/cartões`
+          }
+        />
       </div>
 
       <div>
@@ -190,7 +202,9 @@ function DayExpensesBody({ summary }: Readonly<{ summary: DayExpensesSummary }>)
 
       <p className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/40 px-3 py-2.5 text-[11px] text-muted-foreground dark:border-border-dark/60 dark:bg-background-dark/40">
         <Info className="h-3.5 w-3.5 shrink-0" aria-hidden />
-        Os valores consideram todas as despesas registradas neste dia, em todos os caixas e cartões.
+        {scopedToCard
+          ? 'Os valores consideram as despesas do cartão selecionado neste dia.'
+          : 'Os valores consideram todas as despesas registradas neste dia, em todos os caixas e cartões.'}
       </p>
     </div>
   );
@@ -217,15 +231,18 @@ function LoadingState() {
   );
 }
 
-export function DayExpensesModal({ companyId, date, onClose }: DayExpensesModalProps) {
+export function DayExpensesModal({ companyId, date, onClose, accountId }: DayExpensesModalProps) {
   const query = useDayExpenses(companyId, date);
   const { accounts } = useAccounts();
   const { categories } = useCategories(companyId);
+  const scopedToCard = Boolean(accountId);
 
-  const summary = useMemo(
-    () => buildDayExpensesSummary(query.data ?? [], accounts ?? [], categories ?? []),
-    [query.data, accounts, categories],
-  );
+  const summary = useMemo(() => {
+    const transactions = accountId
+      ? (query.data ?? []).filter((transaction) => transaction.accountId === accountId)
+      : (query.data ?? []);
+    return buildDayExpensesSummary(transactions, accounts ?? [], categories ?? []);
+  }, [query.data, accounts, categories, accountId]);
 
   if (!date) {
     return null;
@@ -249,7 +266,9 @@ export function DayExpensesModal({ companyId, date, onClose }: DayExpensesModalP
             Despesas do dia {formatDayTitle(date)}
           </h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Todas as despesas registradas em todos os caixas e cartões.
+            {scopedToCard
+              ? 'Despesas do cartão selecionado.'
+              : 'Todas as despesas registradas em todos os caixas e cartões.'}
           </p>
         </div>
       </header>
@@ -274,7 +293,7 @@ export function DayExpensesModal({ companyId, date, onClose }: DayExpensesModalP
             Não foi possível carregar as despesas deste dia.
           </p>
         ) : (
-          <DayExpensesBody summary={summary} />
+          <DayExpensesBody summary={summary} scopedToCard={scopedToCard} />
         )}
       </div>
     </Modal>,

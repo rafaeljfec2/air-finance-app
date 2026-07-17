@@ -37,7 +37,18 @@ describe('mapAccountToOpenFinanceCreditCard', () => {
       digits: '7890',
       status: 'CONNECTED',
       color: '#8A05BE',
+      closingDay: undefined,
+      dueDay: undefined,
     });
+  });
+
+  it('maps closing and due days when the account has credit card settings', () => {
+    const card = mapAccountToOpenFinanceCreditCard(
+      buildAccount({ creditCard: { limit: 5000, closingDay: 28, dueDay: 5 } }),
+    );
+
+    expect(card?.closingDay).toBe(28);
+    expect(card?.dueDay).toBe(5);
   });
 
   it('returns null for checking accounts', () => {

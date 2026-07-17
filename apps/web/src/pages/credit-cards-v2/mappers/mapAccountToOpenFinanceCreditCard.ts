@@ -1,5 +1,7 @@
 import {
   getAccountNumber,
+  getClosingDay,
+  getDueDay,
   getOpeniAccountId,
   getOpeniItemId,
   getOpeniItemStatus,
@@ -15,6 +17,8 @@ export interface OpenFinanceCreditCard {
   readonly digits?: string;
   readonly status?: string;
   readonly color: string;
+  readonly closingDay?: number;
+  readonly dueDay?: number;
 }
 
 function resolveDigits(account: Account): string | undefined {
@@ -47,6 +51,8 @@ export function mapAccountToOpenFinanceCreditCard(account: Account): OpenFinance
     digits: resolveDigits(account),
     status: getOpeniItemStatus(account) ?? undefined,
     color: account.color ?? '#8A05BE',
+    closingDay: getClosingDay(account),
+    dueDay: getDueDay(account),
   };
 }
 

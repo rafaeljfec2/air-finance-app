@@ -125,4 +125,31 @@ describe('DayExpensesModal', () => {
 
     expect(screen.getByTestId('day-expenses-loading')).toBeInTheDocument();
   });
+
+  it('filters expenses to the selected account when accountId is provided', () => {
+    render(
+      <DayExpensesModal companyId="c1" date="2026-07-18" accountId="acc-2" onClose={vi.fn()} />,
+    );
+
+    expect(screen.getByText('iFood')).toBeInTheDocument();
+    expect(screen.queryByText('Mercado')).not.toBeInTheDocument();
+    expect(screen.getByText('Nubank')).toBeInTheDocument();
+    expect(screen.queryByText('Banco do Brasil')).not.toBeInTheDocument();
+    expect(screen.getAllByText('R$ 50,00').length).toBeGreaterThan(0);
+    expect(screen.getByText(/1 despesa/i)).toBeInTheDocument();
+  });
+
+  it('uses card-scoped copy when accountId is provided', () => {
+    render(
+      <DayExpensesModal companyId="c1" date="2026-07-18" accountId="acc-2" onClose={vi.fn()} />,
+    );
+
+    expect(screen.getByText('Despesas do cartão selecionado.')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Os valores consideram as despesas do cartão selecionado neste dia/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/todas as despesas registradas em todos os caixas e cartões/i),
+    ).not.toBeInTheDocument();
+  });
 });

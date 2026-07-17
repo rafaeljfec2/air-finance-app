@@ -3,34 +3,36 @@ import { useMemo } from 'react';
 
 import { useHorizontalScroll } from '@/pages/credit-cards/bills/hooks/useHorizontalScroll';
 
-import type { OpenFinanceCreditCard } from '../mappers/mapAccountToOpenFinanceCreditCard';
+import type { CreditCardOverview } from '../mappers/buildCreditCardOverview';
 
 import { ConnectOpenFinanceCard } from './ConnectOpenFinanceCard';
-import { OfCreditCardVisual } from './OfCreditCardVisual';
+import { OfCreditCardVisual, type ClosedBillDisplay } from './OfCreditCardVisual';
 
 interface OfCardsContainerProps {
-  readonly creditCards: ReadonlyArray<OpenFinanceCreditCard>;
+  readonly overviews: ReadonlyArray<CreditCardOverview>;
   readonly selectedCardId: string;
   readonly onCardSelect: (cardId: string) => void;
+  readonly closedBillOverride?: ClosedBillDisplay | null;
 }
 
 const SCROLL_CONFIG = {
-  cardWidth: 240,
+  cardWidth: 300,
   gap: 12,
   padding: 12,
 } as const;
 
 export function OfCardsContainer({
-  creditCards,
+  overviews,
   selectedCardId,
   onCardSelect,
+  closedBillOverride = null,
 }: Readonly<OfCardsContainerProps>) {
   const selectedIndex = useMemo(
-    () => creditCards.findIndex((card) => card.id === selectedCardId),
-    [creditCards, selectedCardId],
+    () => overviews.findIndex((overview) => overview.cardId === selectedCardId),
+    [overviews, selectedCardId],
   );
 
-  const totalItems = creditCards.length + 1;
+  const totalItems = overviews.length + 1;
 
   const { scrollContainerRef, canScrollLeft, canScrollRight, scrollTo } = useHorizontalScroll(
     totalItems,
@@ -63,12 +65,15 @@ export function OfCardsContainer({
             <div style={{ scrollSnapAlign: 'start' }}>
               <ConnectOpenFinanceCard />
             </div>
-            {creditCards.map((card) => (
-              <div key={card.id} style={{ scrollSnapAlign: 'start' }}>
+            {overviews.map((overview) => (
+              <div key={overview.cardId} style={{ scrollSnapAlign: 'start' }}>
                 <OfCreditCardVisual
-                  card={card}
-                  isSelected={card.id === selectedCardId}
-                  onClick={() => onCardSelect(card.id)}
+                  overview={overview}
+                  isSelected={overview.cardId === selectedCardId}
+                  onClick={() => onCardSelect(overview.cardId)}
+                  closedBillOverride={
+                    overview.cardId === selectedCardId ? closedBillOverride : null
+                  }
                 />
               </div>
             ))}

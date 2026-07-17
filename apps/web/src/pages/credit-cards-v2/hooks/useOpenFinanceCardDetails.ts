@@ -30,11 +30,12 @@ export function useOpenFinanceCardDetails({
     queryKey: ['openi-credit-card-details', companyId, card?.id, card?.openiCardId],
     queryFn: async () => {
       if (!card) {
-        return [];
+        return null;
       }
-      const details = await getCreditCard(companyId, card.itemId, card.openiCardId, card.id);
-      return sortOpeniBillsByDueDateDesc(details.bills);
+      return getCreditCard(companyId, card.itemId, card.openiCardId, card.id);
     },
+    // Cache keeps the raw payload so the key can be shared with useAllCardDetails.
+    select: (details) => (details ? sortOpeniBillsByDueDateDesc(details.bills) : []),
     enabled,
   });
 
