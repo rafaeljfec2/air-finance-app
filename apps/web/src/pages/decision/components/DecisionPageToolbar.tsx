@@ -9,6 +9,8 @@ export interface DecisionPageToolbarProps {
   readonly showRefresh: boolean;
   readonly isFetching: boolean;
   readonly onRefresh: () => void;
+  /** Rendered inline next to the refresh button (e.g. period dropdown). */
+  readonly actions?: ReactNode;
   readonly children?: ReactNode;
 }
 
@@ -18,6 +20,7 @@ export function DecisionPageToolbar({
   showRefresh,
   isFetching,
   onRefresh,
+  actions,
   children,
 }: DecisionPageToolbarProps) {
   return (
@@ -34,18 +37,23 @@ export function DecisionPageToolbar({
             </p>
           </div>
         </div>
-        {showRefresh ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="min-h-[44px] shrink-0 gap-2 self-start sm:self-center"
-            onClick={() => void onRefresh()}
-            disabled={isFetching}
-          >
-            <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} aria-hidden />
-            Atualizar
-          </Button>
+        {actions !== undefined || showRefresh ? (
+          <div className="flex shrink-0 flex-wrap items-center gap-2 self-start sm:self-center">
+            {actions}
+            {showRefresh ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="min-h-[44px] shrink-0 gap-2"
+                onClick={() => void onRefresh()}
+                disabled={isFetching}
+              >
+                <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} aria-hidden />
+                Atualizar
+              </Button>
+            ) : null}
+          </div>
         ) : null}
       </div>
       {children !== undefined ? <div className="mt-4">{children}</div> : null}

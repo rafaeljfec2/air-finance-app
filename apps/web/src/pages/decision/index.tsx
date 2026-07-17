@@ -10,18 +10,10 @@ import { useDecisionEngineEvaluateAuto } from '@/hooks/useDecisionEngineEvaluate
 import { ViewDefault } from '@/layouts/ViewDefault';
 import { useCompanyStore } from '@/stores/company';
 
-import { DecisionCompletePlanSection } from './components/complete-plan/DecisionCompletePlanSection';
-import { DecisionHomePointer } from './components/DecisionHomePointer';
 import { DecisionPageToolbar } from './components/DecisionPageToolbar';
 import { DecisionPeriodCoverageBanner } from './components/DecisionPeriodCoverageBanner';
-import { DecisionPlaybookCard } from './components/DecisionPlaybookCard';
-import { DecisionPrimaryBlock } from './components/DecisionPrimaryBlock';
-import { DecisionReferencePeriodSelector } from './components/DecisionReferencePeriodSelector';
-import { DecisionSecondaryActions } from './components/DecisionSecondaryActions';
-import { DecisionStatusStrip } from './components/DecisionStatusStrip';
-import { DecisionVerdictPanel } from './components/DecisionVerdictPanel';
-import { getPlaybook } from './playbooks';
-import { problemHeadlineFromPrimaryIssue } from './primaryIssueLabels';
+import { DecisionPeriodDropdown } from './components/DecisionPeriodDropdown';
+import { PeriodReadingBody } from './components/period-reading/PeriodReadingBody';
 import {
   buildYYYYMM,
   getCurrentYYYYMM,
@@ -33,13 +25,13 @@ const motionContainer = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.08,
     },
   },
 };
 
 const motionItem = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 16 },
   show: { opacity: 1, y: 0 },
 };
 
@@ -64,9 +56,6 @@ export function FinancialDecisionPage() {
     referencePeriod,
   });
 
-  const displayActions = query.data?.actions ?? [];
-  const primaryAction = displayActions[0];
-  const secondaryActions = displayActions.slice(1);
   const primaryIssue = query.data?.primary_issue ?? '';
   const isDataIncomplete = primaryIssue === 'data_incomplete';
 
@@ -75,6 +64,15 @@ export function FinancialDecisionPage() {
     await queryClient.invalidateQueries({
       queryKey: ['decision-engine'],
     });
+    await queryClient.invalidateQueries({
+      queryKey: ['accounts', 'total-balance'],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ['dashboard', 'summary'],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ['budget', 'receivables'],
+    });
     setIsRefreshing(false);
   };
 
@@ -82,7 +80,7 @@ export function FinancialDecisionPage() {
 
   const toolbarSubtitle = emptyCompany
     ? 'Escolha um perfil para ver a leitura deste período.'
-    : 'Exploração do mês — cobertura, lacunas e detalhe. A decisão de hoje está na Home.';
+    : 'Exploração do mês — cobertura, lacunas e detalhe.';
 
   return (
     <ViewDefault>
@@ -100,21 +98,20 @@ export function FinancialDecisionPage() {
               showRefresh={!emptyCompany}
               isFetching={query.isFetching}
               onRefresh={() => void query.refetch()}
-            >
-              {!emptyCompany ? (
-                <DecisionReferencePeriodSelector
-                  layout="inline"
-                  year={refYear}
-                  month1To12={refMonth}
-                  onYearChange={setRefYear}
-                  onMonthChange={setRefMonth}
-                  minYear={minYear}
-                  maxYear={maxYear}
-                  viewingReferencePeriod={viewingReferencePeriod}
-                  isNonCurrentPeriod={isNonCurrentDecisionPeriod}
-                />
-              ) : null}
-            </DecisionPageToolbar>
+              actions={
+                !emptyCompany ? (
+                  <DecisionPeriodDropdown
+                    year={refYear}
+                    month1To12={refMonth}
+                    onYearChange={setRefYear}
+                    onMonthChange={setRefMonth}
+                    minYear={minYear}
+                    maxYear={maxYear}
+                    isNonCurrentPeriod={isNonCurrentDecisionPeriod}
+                  />
+                ) : undefined
+              }
+            />
           </motion.div>
 
           <motion.div variants={motionItem} className="space-y-5">
@@ -128,8 +125,6 @@ export function FinancialDecisionPage() {
                 </CardHeader>
               </Card>
             ) : null}
-
-            {!emptyCompany ? <DecisionHomePointer /> : null}
 
             {!emptyCompany && companyName !== '' && isDataIncomplete ? (
               <p className="text-xs leading-snug text-muted-foreground">
@@ -173,42 +168,13 @@ export function FinancialDecisionPage() {
 
             {!emptyCompany && query.isSuccess && query.data ? (
               <div className="space-y-5">
-                <DecisionStatusStrip
-                  status={query.data.status}
-                  briefingLine={problemHeadlineFromPrimaryIssue(query.data.primary_issue)}
-                />
                 {query.data.period_coverage !== undefined ? (
                   <DecisionPeriodCoverageBanner periodCoverage={query.data.period_coverage} />
                 ) : null}
-                <DecisionVerdictPanel
-                  status={query.data.status}
-                  themePhase={query.data.theme_phase}
-                  orderingRationale={query.data.ordering_rationale}
-                  primaryIssue={query.data.primary_issue}
-                  issueDrivers={query.data.issue_drivers}
-                />
-                {primaryAction !== undefined ? (
-                  <DecisionPrimaryBlock
-                    action={primaryAction}
-                    status={query.data.status}
-                    hasSecondarySteps={!isDataIncomplete && secondaryActions.length > 0}
-                    problemHeadline={problemHeadlineFromPrimaryIssue(query.data.primary_issue)}
-                    primaryIssue={query.data.primary_issue}
-                    showProblemContext={false}
-                  />
-                ) : (
-                  <p className="text-center text-sm text-muted-foreground">
-                    Nada priorizado neste período.
-                  </p>
-                )}
-                {!isDataIncomplete ? <DecisionSecondaryActions actions={secondaryActions} /> : null}
-                <DecisionPlaybookCard
-                  playbook={getPlaybook(query.data.primary_issue)}
-                  phase={query.data.theme_phase ?? null}
-                />
-                <DecisionCompletePlanSection
+                <PeriodReadingBody
                   companyId={companyId}
-                  referencePeriod={referencePeriod}
+                  referencePeriod={viewingReferencePeriod}
+                  evaluation={query.data}
                 />
               </div>
             ) : null}

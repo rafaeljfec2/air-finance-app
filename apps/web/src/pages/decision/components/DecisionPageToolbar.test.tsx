@@ -22,6 +22,21 @@ describe('DecisionPageToolbar', () => {
     expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 
+  it('renders actions next to the refresh button when provided', () => {
+    render(
+      <DecisionPageToolbar
+        title="T"
+        subtitle="S"
+        showRefresh
+        isFetching={false}
+        onRefresh={vi.fn()}
+        actions={<button type="button">Período</button>}
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Período' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Atualizar/i })).toBeInTheDocument();
+  });
+
   it('renders children when provided', () => {
     render(
       <DecisionPageToolbar
