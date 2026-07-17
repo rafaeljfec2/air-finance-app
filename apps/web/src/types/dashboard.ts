@@ -1,5 +1,7 @@
 export type DashboardTimeRange = 'day' | 'week' | 'month' | '6months' | 'year';
 
+export type DashboardAccountScope = 'cash' | 'all';
+
 export interface DashboardSummary {
   income: number;
   expenses: number;
@@ -20,6 +22,7 @@ export interface BalanceHistoryPoint {
   balance: number;
   income: number;
   expenses: number;
+  expenseTransactionCount: number;
 }
 
 export interface ExpenseByCategory {
@@ -53,4 +56,5 @@ export interface DashboardGoalSummary {
 export interface DashboardFilters {
   timeRange: DashboardTimeRange;
   referenceDate?: string;
+  accountScope?: DashboardAccountScope;
 }

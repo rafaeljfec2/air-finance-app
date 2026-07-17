@@ -28,6 +28,7 @@ export const useDashboardBalanceHistory = (companyId: string, filters: Dashboard
       companyId,
       filters.timeRange,
       filters.referenceDate ?? null,
+      filters.accountScope ?? 'cash',
     ],
     queryFn: () => dashboardService.fetchBalanceHistory(companyId, filters),
     enabled: !!companyId,

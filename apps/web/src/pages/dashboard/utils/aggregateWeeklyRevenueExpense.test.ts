@@ -5,7 +5,13 @@ import type { BalanceHistoryPoint } from '@/types/dashboard';
 import { aggregateWeeklyRevenueExpense } from './aggregateWeeklyRevenueExpense';
 
 function point(date: string, income: number, expenses: number): BalanceHistoryPoint {
-  return { date, income, expenses, balance: income - expenses };
+  return {
+    date,
+    income,
+    expenses,
+    balance: income - expenses,
+    expenseTransactionCount: expenses > 0 ? 1 : 0,
+  };
 }
 
 describe('aggregateWeeklyRevenueExpense', () => {

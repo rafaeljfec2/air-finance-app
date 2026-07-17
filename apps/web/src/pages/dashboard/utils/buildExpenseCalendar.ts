@@ -3,6 +3,7 @@ import type { BalanceHistoryPoint } from '@/types/dashboard';
 export interface ExpenseCalendarDay {
   readonly day: number;
   readonly expenses: number;
+  readonly expenseTransactionCount: number;
   readonly hasExpense: boolean;
 }
 
@@ -10,6 +11,11 @@ export interface ExpenseCalendar {
   readonly leadingDays: readonly number[];
   readonly trailingDays: readonly number[];
   readonly days: readonly ExpenseCalendarDay[];
+}
+
+interface DayAggregate {
+  expenses: number;
+  expenseTransactionCount: number;
 }
 
 /**
@@ -27,20 +33,30 @@ export function buildExpenseCalendar(
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const daysInPreviousMonth = new Date(year, month, 0).getDate();
 
-  const expensesByDay = new Map<number, number>();
+  const aggregatesByDay = new Map<number, DayAggregate>();
   for (const point of points) {
     const date = new Date(point.date);
     if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month) {
       continue;
     }
     const day = date.getUTCDate();
-    expensesByDay.set(day, (expensesByDay.get(day) ?? 0) + point.expenses);
+    const current = aggregatesByDay.get(day) ?? { expenses: 0, expenseTransactionCount: 0 };
+    current.expenses += point.expenses;
+    current.expenseTransactionCount += point.expenseTransactionCount ?? 0;
+    aggregatesByDay.set(day, current);
   }
 
   const days: ExpenseCalendarDay[] = [];
   for (let day = 1; day <= daysInMonth; day += 1) {
-    const expenses = Math.round((expensesByDay.get(day) ?? 0) * 100) / 100;
-    days.push({ day, expenses, hasExpense: expenses > 0 });
+    const aggregate = aggregatesByDay.get(day);
+    const expenses = Math.round((aggregate?.expenses ?? 0) * 100) / 100;
+    const expenseTransactionCount = aggregate?.expenseTransactionCount ?? 0;
+    days.push({
+      day,
+      expenses,
+      expenseTransactionCount,
+      hasExpense: expenses > 0 || expenseTransactionCount > 0,
+    });
   }
 
   const leadingDays = Array.from(

@@ -34,6 +34,7 @@ const BalanceHistoryPointSchema = z.object({
   balance: z.number(),
   income: z.number(),
   expenses: z.number(),
+  expenseTransactionCount: z.number().default(0),
 });
 
 const ExpenseByCategorySchema = z.object({
@@ -79,6 +80,10 @@ function buildParams(filters: DashboardFilters) {
 
   if (filters.referenceDate) {
     params.referenceDate = filters.referenceDate;
+  }
+
+  if (filters.accountScope) {
+    params.accountScope = filters.accountScope;
   }
 
   return params;

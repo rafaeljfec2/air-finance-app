@@ -44,24 +44,20 @@ function formatTooltipCurrency(value: number, name: string): [string, string] {
 
 export function VisualReadings({
   periodLabel,
-  referenceDate,
   summary,
   balanceHistory,
   liquidityAvailable,
   creditPct,
-  isCurrentMonth,
-  onPreviousMonth,
-  onNextMonth,
+  companyId,
+  initialCalendarReferenceDate,
 }: Readonly<{
   periodLabel: string;
-  referenceDate: Date;
   summary: DashboardSummary | null | undefined;
   balanceHistory: readonly BalanceHistoryPoint[];
   liquidityAvailable: number | undefined;
   creditPct: number | undefined;
-  isCurrentMonth: boolean;
-  onPreviousMonth: () => void;
-  onNextMonth: () => void;
+  companyId: string;
+  initialCalendarReferenceDate?: string;
 }>) {
   const chartTheme = useLaudoChartTheme();
 
@@ -210,12 +206,8 @@ export function VisualReadings({
         </DocCard>
 
         <ExpenseCalendarCard
-          referenceDate={referenceDate}
-          monthLabel={periodLabel}
-          points={balanceHistory}
-          isCurrentMonth={isCurrentMonth}
-          onPreviousMonth={onPreviousMonth}
-          onNextMonth={onNextMonth}
+          companyId={companyId}
+          initialReferenceDate={initialCalendarReferenceDate}
         />
       </div>
     </section>

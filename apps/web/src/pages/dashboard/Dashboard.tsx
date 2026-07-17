@@ -51,11 +51,6 @@ export function Dashboard() {
     setIsRefreshing(false);
   };
 
-  const referenceDate = useMemo(
-    () => (filters.referenceDate ? new Date(filters.referenceDate) : new Date()),
-    [filters.referenceDate],
-  );
-
   const executiveLines = useMemo(
     () => (checkup ? buildExecutiveSummary(checkup) : null),
     [checkup],
@@ -170,14 +165,12 @@ export function Dashboard() {
               <motion.div variants={itemVariants}>
                 <VisualReadings
                   periodLabel={monthLabel}
-                  referenceDate={referenceDate}
                   summary={summary.data}
                   balanceHistory={balanceHistory.data ?? []}
                   liquidityAvailable={indebtedness.data?.liquidity.available}
                   creditPct={indebtedness.data?.creditUtilization.percentage}
-                  isCurrentMonth={isCurrentMonth}
-                  onPreviousMonth={goToPreviousMonth}
-                  onNextMonth={goToNextMonth}
+                  companyId={companyId}
+                  initialCalendarReferenceDate={filters.referenceDate}
                 />
               </motion.div>
             </motion.div>
