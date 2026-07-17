@@ -9,6 +9,43 @@ import { buildCategoryShares } from '../../desk/deskMetrics';
 
 const DONUT_COLORS = ['#10B981', '#EF4444', '#F59E0B', '#F43F5E', '#3B82F6', '#8B5CF6'];
 
+interface DonutTooltipProps {
+  readonly active?: boolean;
+  readonly payload?: ReadonlyArray<{
+    readonly name?: string;
+    readonly value?: number;
+    readonly payload?: { readonly color?: string; readonly percentage?: number };
+  }>;
+}
+
+function DonutTooltip({ active, payload }: Readonly<DonutTooltipProps>) {
+  const entry = payload?.[0];
+  if (!active || !entry || typeof entry.value !== 'number') {
+    return null;
+  }
+  const percentage = entry.payload?.percentage;
+  return (
+    <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-lg dark:border-border-dark dark:bg-card-dark">
+      <div className="flex items-center gap-2">
+        <span
+          className="h-2.5 w-2.5 shrink-0 rounded-full"
+          style={{ backgroundColor: entry.payload?.color }}
+          aria-hidden
+        />
+        <p className="text-xs font-medium text-text dark:text-text-dark">{entry.name}</p>
+      </div>
+      <p className="mt-1 text-sm font-bold tabular-nums text-text dark:text-text-dark">
+        {formatCurrency(entry.value)}
+        {typeof percentage === 'number' ? (
+          <span className="ml-1.5 text-xs font-normal text-text-muted dark:text-text-muted-dark">
+            {percentage.toFixed(1).replace('.', ',')}%
+          </span>
+        ) : null}
+      </p>
+    </div>
+  );
+}
+
 interface SpendingDonutCardProps {
   readonly expensesByCategory: readonly ExpenseByCategory[];
   readonly totalExpenses: number;
@@ -73,14 +110,7 @@ export function SpendingDonutCard({
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip
-                  formatter={(value: number) => formatCurrency(value)}
-                  contentStyle={{
-                    borderRadius: 12,
-                    border: '1px solid var(--border, #333)',
-                    background: 'var(--card, #1a1a1a)',
-                  }}
-                />
+                <Tooltip content={<DonutTooltip />} />
               </PieChart>
             </ResponsiveContainer>
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
