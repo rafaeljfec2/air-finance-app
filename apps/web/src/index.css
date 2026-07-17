@@ -342,6 +342,10 @@
   }
 
   /* Safe Area with custom spacing */
+  .top-safe-3 {
+    top: calc(0.75rem + var(--safe-area-inset-top));
+  }
+
   .top-safe-4 {
     top: calc(1rem + var(--safe-area-inset-top));
   }
@@ -356,6 +360,10 @@
 
   .bottom-safe-6 {
     bottom: calc(1.5rem + var(--safe-area-inset-bottom));
+  }
+
+  .right-safe-3 {
+    right: calc(0.75rem + var(--safe-area-inset-right));
   }
 
   .right-safe-4 {

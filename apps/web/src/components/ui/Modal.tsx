@@ -65,7 +65,7 @@ export function Modal({
         {dismissible && (
           <button
             onClick={onClose}
-            className="absolute top-safe-3 right-safe-3 lg:top-3 lg:right-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-text-muted dark:text-text-muted-dark hover:text-text dark:hover:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-md"
+            className="absolute top-safe-3 right-safe-3 lg:top-3 lg:right-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-black hover:opacity-70 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-md"
             aria-label="Fechar"
           >
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24">

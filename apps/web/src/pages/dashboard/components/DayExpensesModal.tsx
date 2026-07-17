@@ -72,7 +72,7 @@ function StatCard({
 function ColumnHeaders() {
   return (
     <div
-      className={`hidden border-b border-border/60 px-3 pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground dark:border-border-dark/60 ${ROW_GRID}`}
+      className={`hidden border-b border-border/25 px-3 pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground dark:border-white/10 ${ROW_GRID}`}
       aria-hidden
     >
       <span>Descrição</span>
@@ -120,7 +120,7 @@ function ExpenseRow({
   const CategoryIcon = getCategoryIcon(row.categoryName, 'expense');
 
   return (
-    <li className={`px-3 py-2.5 ${ROW_GRID}`}>
+    <li className={`px-3 py-3.5 ${ROW_GRID}`}>
       <div className="flex min-w-0 items-center gap-2.5">
         <span
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
@@ -174,7 +174,7 @@ function DayExpensesBody({ summary }: Readonly<{ summary: DayExpensesSummary }>)
           {summary.groups.map((group) => (
             <div key={group.accountId} className="space-y-1">
               <GroupHeader group={group} />
-              <ul className="divide-y divide-border/40 dark:divide-border-dark/40">
+              <ul className="divide-y divide-border/15 dark:divide-white/5">
                 {group.rows.map((row) => (
                   <ExpenseRow
                     key={row.id}
@@ -236,7 +236,7 @@ export function DayExpensesModal({ companyId, date, onClose }: DayExpensesModalP
   };
 
   return createPortal(
-    <Modal open onClose={onClose} className="max-w-3xl">
+    <Modal open onClose={onClose} className="max-w-3xl h-[52rem] flex flex-col overflow-hidden">
       <header className="flex items-start gap-3 pr-10">
         <span
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border text-text dark:border-border-dark dark:text-text-dark"
@@ -266,7 +266,7 @@ export function DayExpensesModal({ companyId, date, onClose }: DayExpensesModalP
         </button>
       </div>
 
-      <div className="mt-3">
+      <div className="mt-3 min-h-0 flex-1 overflow-y-auto">
         {query.isLoading ? (
           <LoadingState />
         ) : query.isError ? (
