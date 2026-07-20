@@ -168,7 +168,7 @@ function ExpenseRow({
             : 'mt-1 block pl-[42px] text-sm font-medium tabular-nums text-red-500 dark:text-red-400 sm:mt-0 sm:pl-0 sm:text-right'
         }
       >
-        {formatCurrency(isRefund ? row.amount : -row.amount)}
+        {formatCurrency(row.amount)}
       </span>
     </li>
   );

@@ -88,7 +88,7 @@ function ExpenseTableRow({ row, group }: Readonly<FlatExpenseRow>) {
             : 'text-right text-sm font-medium tabular-nums text-red-500 dark:text-red-400'
         }
       >
-        {formatCurrency(isRefund ? row.amount : -row.amount)}
+        {formatCurrency(row.amount)}
       </span>
     </li>
   );
@@ -208,15 +208,32 @@ export function DayExpensesPanel({
         </div>
       )}
 
-      <footer className="mt-auto px-4 pb-4 pt-2">
+      <footer className="mt-auto flex items-center justify-between gap-3 border-t border-border/40 px-4 py-3 dark:border-white/10">
         <button
           type="button"
           onClick={onOpenDayDetails}
-          className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 transition-colors hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
+          className="flex min-w-0 items-center gap-1.5 text-xs font-semibold text-emerald-600 transition-colors hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
         >
-          Ver todas as despesas do dia
-          <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+          <span className="truncate">Ver todas as despesas do dia</span>
+          <ArrowRight className="h-3.5 w-3.5 shrink-0" aria-hidden />
         </button>
+
+        {flatRows.length > 0 ? (
+          <div
+            data-testid="day-expenses-panel-total"
+            className="flex shrink-0 items-baseline gap-2"
+          >
+            <span className="text-xs font-medium text-muted-foreground sm:text-sm sm:font-semibold sm:text-text dark:sm:text-text-dark">
+              Total do dia
+            </span>
+            <span
+              className="text-sm font-semibold tabular-nums text-red-500 dark:text-red-400"
+              aria-label={`Total gasto no dia: ${formatCurrency(summary.total)}`}
+            >
+              {formatCurrency(summary.total)}
+            </span>
+          </div>
+        ) : null}
       </footer>
     </section>
   );
