@@ -3,7 +3,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from '@/components/ui/toast';
 import { getCurrentUser } from '@/services/authService';
 import { useAuthStore } from '@/stores/auth';
-import { useTheme, type ThemePreference } from '@/stores/useTheme';
 
 import { ProfilePreferencesSchema } from '../schemas';
 
@@ -34,10 +33,6 @@ interface UseProfileDataReturn {
   readonly refetch: () => Promise<void>;
 }
 
-function isThemePreference(value: string): value is ThemePreference {
-  return value === 'light' || value === 'dark' || value === 'system';
-}
-
 function toOpenaiModel(value: string | undefined): OpenaiModelType {
   if (
     value === 'gpt-4o-mini' ||
@@ -52,7 +47,6 @@ function toOpenaiModel(value: string | undefined): OpenaiModelType {
 
 export function useProfileData(): UseProfileDataReturn {
   const { user } = useAuthStore();
-  const { setPreference } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [profileData, setProfileData] = useState<ProfileFormData>(DEFAULT_PROFILE_DATA);
   const [preferences, setPreferences] = useState<PreferencesData>(DEFAULT_PREFERENCES);
@@ -85,10 +79,9 @@ export function useProfileData(): UseProfileDataReturn {
           dateFormat: fullUser.preferences.dateFormat ?? 'DD/MM/YYYY',
         });
         const nextPreferences = parsed.success ? parsed.data : DEFAULT_PREFERENCES;
+        // Only hydrate form state — do not apply server theme to the live UI.
+        // Theme changes happen via Preferences section click/save.
         setPreferences(nextPreferences);
-        if (isThemePreference(nextPreferences.theme)) {
-          setPreference(nextPreferences.theme);
-        }
       }
 
       if (fullUser.notifications) {
@@ -118,7 +111,7 @@ export function useProfileData(): UseProfileDataReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id, user?.avatar, setPreference]);
+  }, [user?.id, user?.avatar]);
 
   useEffect(() => {
     fetchUserData();
