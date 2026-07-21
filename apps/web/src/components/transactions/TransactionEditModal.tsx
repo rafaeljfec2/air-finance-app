@@ -85,10 +85,23 @@ export function TransactionEditModal({
           ? Math.abs(transaction.value).toFixed(2)
           : ((transaction.value as string)?.replace(/^-/, '') ?? '');
 
+      const resolvedCategoryId =
+        categories.find((category) => category.id === transaction.categoryId)?.id ??
+        categories.find((category) => category.name === transaction.categoryId)?.id ??
+        transaction.rawCategoryId ??
+        transaction.categoryId ??
+        '';
+
+      const resolvedAccountId =
+        accounts.find((account) => account.id === transaction.accountId)?.id ??
+        transaction.rawAccountId ??
+        transaction.accountId ??
+        '';
+
       setForm({
         description: transaction.description ?? '',
-        categoryId: transaction.categoryId ?? '',
-        accountId: transaction.accountId ?? '',
+        categoryId: resolvedCategoryId,
+        accountId: resolvedAccountId,
         value: displayValue,
         launchType: transaction.launchType ?? 'revenue',
         // DatePicker handles string parsing internally - no need to convert to Date
@@ -98,7 +111,7 @@ export function TransactionEditModal({
       });
       setErrors({});
     }
-  }, [open, transaction]);
+  }, [open, transaction, categories, accounts]);
 
   if (!open || !transaction) return null;
 

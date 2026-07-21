@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+import { toTransactionEditPayload } from '@/components/transactions/toTransactionEditPayload';
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal';
 import {
   TransactionGrid,
@@ -76,13 +77,7 @@ export function Transactions() {
   });
 
   const handleEdit = (transaction: TransactionGridTransaction) => {
-    const txForEdit = {
-      ...transaction,
-      accountId:
-        (transaction as TransactionGridTransaction & { rawAccountId?: string }).rawAccountId ||
-        transaction.accountId,
-    };
-    setTransactionToEdit(txForEdit);
+    setTransactionToEdit(toTransactionEditPayload(transaction));
     setShowEditModal(true);
   };
 

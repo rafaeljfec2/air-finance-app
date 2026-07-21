@@ -17,6 +17,7 @@ export type TransactionGridTransaction = {
   updatedAt: string;
   balance?: number;
   rawAccountId?: string;
+  rawCategoryId?: string;
   bankingPaymentId?: string;
   paymentStatus?: 'PROCESSANDO' | 'CONCLUIDO' | 'FALHOU' | 'CANCELADO';
 };

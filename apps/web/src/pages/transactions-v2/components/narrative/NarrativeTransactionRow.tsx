@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { getCategoryIcon, getCategoryIconColor } from '@/utils/categoryIcons';
 import { formatCurrency } from '@/utils/formatters';
 
+import { buildTransactionMetaLine } from '../../utils/buildTransactionMetaLine';
 import {
   classifyTransactionVisualWeight,
   type TransactionVisualWeight,
@@ -99,11 +100,9 @@ export function NarrativeTransactionRow({
             {context && visualWeight !== 'micro' ? <ContextBadge context={context} /> : null}
           </div>
 
-          {visualWeight !== 'micro' ? (
-            <p className="mt-0.5 truncate text-[10px] leading-tight text-text-muted dark:text-text-muted-dark">
-              {transaction.categoryId || 'Sem categoria'} · {transaction.accountId || 'Sem conta'}
-            </p>
-          ) : null}
+          <p className="mt-0.5 truncate text-[10px] leading-tight text-text-muted dark:text-text-muted-dark">
+            {buildTransactionMetaLine(transaction)}
+          </p>
         </div>
 
         <div className="flex shrink-0 items-center gap-3">

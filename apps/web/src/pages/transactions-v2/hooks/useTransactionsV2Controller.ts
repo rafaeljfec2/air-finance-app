@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+import { toTransactionEditPayload } from '@/components/transactions/toTransactionEditPayload';
 import type { TransactionGridTransaction } from '@/components/transactions/TransactionGrid.types';
 import { toast } from '@/components/ui/toast';
 import { useTransactionLogic } from '@/pages/transactions/hooks/useTransactionLogic';
@@ -215,13 +216,7 @@ export function useTransactionsV2Controller(): TransactionsV2Controller {
   }, []);
 
   const handleEdit = useCallback((transaction: TransactionGridTransaction) => {
-    const txForEdit = {
-      ...transaction,
-      accountId:
-        (transaction as TransactionGridTransaction & { rawAccountId?: string }).rawAccountId ??
-        transaction.accountId,
-    };
-    setTransactionToEdit(txForEdit);
+    setTransactionToEdit(toTransactionEditPayload(transaction));
     setShowEditModal(true);
   }, []);
 

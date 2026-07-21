@@ -50,14 +50,18 @@ export function useTransactionLogic({
     return map;
   }, [accounts]);
 
-  type TransactionWithRawAccount = TransactionGridTransaction & { rawAccountId: string };
+  type TransactionWithRawIds = TransactionGridTransaction & {
+    rawAccountId: string;
+    rawCategoryId: string;
+  };
 
   const transactionsWithLabels = useMemo(
     () =>
       [...transactions].map(
-        (tx): TransactionWithRawAccount => ({
+        (tx): TransactionWithRawIds => ({
           ...tx,
           rawAccountId: tx.accountId,
+          rawCategoryId: tx.categoryId,
           categoryId: categoryMap.get(tx.categoryId) ?? tx.categoryId,
           accountId: accountMap.get(tx.accountId) ?? tx.accountId,
         }),
@@ -147,10 +151,11 @@ export function useTransactionLogic({
       const previousBalanceWithRaw = {
         ...previousBalanceRow,
         rawAccountId: 'previous-balance',
+        rawCategoryId: 'previous-balance',
         categoryId: 'Saldo Anterior',
         accountId: selectedAccountId ? (accountMap.get(selectedAccountId) ?? 'Todas') : 'Todas',
       };
-      transactionsList = [previousBalanceWithRaw as TransactionWithRawAccount, ...transactionsList];
+      transactionsList = [previousBalanceWithRaw as TransactionWithRawIds, ...transactionsList];
     }
 
     return calculateBalance(transactionsList);
