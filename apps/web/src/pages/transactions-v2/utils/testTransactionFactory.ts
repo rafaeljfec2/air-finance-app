@@ -1,9 +1,10 @@
 import type { TransactionGridTransaction } from '@/components/transactions/TransactionGrid.types';
 
 export function buildTransaction(
-  overrides: Partial<TransactionGridTransaction> & Pick<TransactionGridTransaction, 'id'>,
+  overrides: Partial<TransactionGridTransaction> = {},
 ): TransactionGridTransaction {
   return {
+    id: 'tx-1',
     description: 'Test',
     value: 100,
     launchType: 'expense',
