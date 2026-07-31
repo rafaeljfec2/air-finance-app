@@ -2,7 +2,7 @@ import type { CreditCardSourceState } from '@/types/budget';
 
 export type { CreditCardSourceMode, CreditCardSourceState } from '@/types/budget';
 
-function formatDateLabel(value?: string): string | null {
+function formatDateLabel(value?: string | null): string | null {
   if (!value) {
     return null;
   }

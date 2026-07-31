@@ -44,8 +44,8 @@ export type CreditCardSourceMode = 'OFX' | 'OPEN_FINANCE' | 'COMBINED' | 'MANUAL
 
 export interface CreditCardSourceState {
   mode: CreditCardSourceMode;
-  ofxReconciledUntil?: string;
-  lastOpenFinanceSyncAt?: string;
+  ofxReconciledUntil?: string | null;
+  lastOpenFinanceSyncAt?: string | null;
 }
 
 export interface CreditCard {
