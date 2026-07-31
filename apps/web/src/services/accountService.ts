@@ -32,18 +32,19 @@ const AccountBaseSchema = z.object({
   color: z
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida')
+    .nullable()
     .optional(),
-  icon: z.string().min(1, 'Ícone é obrigatório').optional(),
+  icon: z.string().min(1, 'Ícone é obrigatório').nullable().optional(),
   createdAt: z.string().nullable().optional(),
   updatedAt: z.string().nullable().optional(),
 
   // === Nova estrutura (subdocumentos) - campos principais ===
   bankDetails: z
     .object({
-      institution: z.string().optional(),
-      bankCode: z.string().optional(),
-      agency: z.string().optional(),
-      accountNumber: z.string().optional(),
+      institution: z.string().optional().nullable(),
+      bankCode: z.string().optional().nullable(),
+      agency: z.string().optional().nullable(),
+      accountNumber: z.string().optional().nullable(),
       pixKey: z.string().optional().nullable(),
     })
     .optional(),
@@ -72,6 +73,7 @@ const AccountBaseSchema = z.object({
           enabled: z.boolean().default(false),
           cronExpression: z.string().optional().nullable(),
           lastSyncAt: z.string().optional().nullable(),
+          ofxReconciledUntil: z.string().optional().nullable(),
           autoImportToCashFlow: z.boolean().default(false),
         })
         .optional(),

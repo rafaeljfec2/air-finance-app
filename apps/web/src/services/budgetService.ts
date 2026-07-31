@@ -51,8 +51,8 @@ const CreditCardBillSchema = z.object({
 
 const CreditCardSourceStateSchema = z.object({
   mode: z.enum(['OFX', 'OPEN_FINANCE', 'COMBINED', 'MANUAL']),
-  ofxReconciledUntil: z.string().optional(),
-  lastOpenFinanceSyncAt: z.string().optional(),
+  ofxReconciledUntil: z.string().nullable().optional(),
+  lastOpenFinanceSyncAt: z.string().nullable().optional(),
 });
 
 const CreditCardSchema = z.object({

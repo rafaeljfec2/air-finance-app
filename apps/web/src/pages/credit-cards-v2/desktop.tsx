@@ -195,18 +195,18 @@ export function CreditCardsV2PageDesktop() {
     );
   }
 
-  if (cardsError) {
-    return (
-      <ViewDefault>
-        <StatementErrorState error={cardsError} />
-      </ViewDefault>
-    );
-  }
-
   if (cards.length === 0) {
     return (
       <ViewDefault>
         <EmptyOpenFinanceCards />
+      </ViewDefault>
+    );
+  }
+
+  if (cardsError) {
+    return (
+      <ViewDefault>
+        <StatementErrorState error={cardsError} />
       </ViewDefault>
     );
   }

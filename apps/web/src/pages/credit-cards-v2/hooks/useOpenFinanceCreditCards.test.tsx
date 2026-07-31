@@ -93,4 +93,34 @@ describe('useOpenFinanceCreditCards', () => {
 
     expect(result.current.error?.message).toBe('Failed to load accounts');
   });
+
+  it('normalizes plain object errors instead of [object Object]', () => {
+    mockUseAccounts.mockReturnValue({
+      accounts: undefined,
+      isLoading: false,
+      error: { message: 'Conta indisponível', status: 500 },
+    });
+
+    const { result } = renderHook(() => useOpenFinanceCreditCards(), {
+      wrapper: createWrapper(),
+    });
+
+    expect(result.current.error).toBeInstanceOf(Error);
+    expect(result.current.error?.message).toBe('Conta indisponível');
+  });
+
+  it('returns empty cards without error when accounts list is empty', () => {
+    mockUseAccounts.mockReturnValue({
+      accounts: [],
+      isLoading: false,
+      error: null,
+    });
+
+    const { result } = renderHook(() => useOpenFinanceCreditCards(), {
+      wrapper: createWrapper(),
+    });
+
+    expect(result.current.cards).toEqual([]);
+    expect(result.current.error).toBeNull();
+  });
 });

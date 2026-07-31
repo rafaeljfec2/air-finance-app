@@ -60,22 +60,22 @@ export function CreditCardsV2PageMobile() {
     );
   }
 
-  if (cardsError) {
+  if (cards.length === 0) {
     return (
       <>
         <div className="flex h-screen flex-col overflow-hidden bg-background pb-20 dark:bg-background-dark">
-          <StatementErrorState error={cardsError} />
+          <EmptyOpenFinanceCards />
         </div>
         {renderMobileNavigation()}
       </>
     );
   }
 
-  if (cards.length === 0) {
+  if (cardsError) {
     return (
       <>
         <div className="flex h-screen flex-col overflow-hidden bg-background pb-20 dark:bg-background-dark">
-          <EmptyOpenFinanceCards />
+          <StatementErrorState error={cardsError} />
         </div>
         {renderMobileNavigation()}
       </>
