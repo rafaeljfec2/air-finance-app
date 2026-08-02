@@ -91,34 +91,6 @@ export function useBudgetPageController() {
     })),
   });
 
-  // Mapa de balances: { [cardName]: balance }
-  const realCardBalancesMap = useMemo(() => {
-    const map: Record<string, number> = {};
-    cardBalancesQueries.forEach((query, index) => {
-      const cardName = cardsWithAccounts[index].card.name;
-      if (query.data !== undefined) {
-        map[cardName] = Math.abs(query.data);
-      }
-    });
-    return map;
-  }, [cardBalancesQueries, cardsWithAccounts]);
-
-  // Sobrescreve os valores no array de payables
-  const finalPayables = useMemo(() => {
-    return payables.map((p) => {
-      const matchedCardName = Object.keys(realCardBalancesMap).find(
-        (name) =>
-          p.description.toLowerCase().includes(name.toLowerCase()) &&
-          p.description.toLowerCase().includes('cartão'),
-      );
-
-      if (matchedCardName) {
-        return { ...p, value: realCardBalancesMap[matchedCardName] };
-      }
-      return p;
-    });
-  }, [payables, realCardBalancesMap]);
-
   const activeCardAccountEntry = cardsWithAccounts.find((x) => x.card.id === activeCardTab);
   const activeCardRealBalance = cardBalancesQueries.find(
     (_, idx) => cardsWithAccounts[idx].card.id === activeCardTab,
@@ -135,7 +107,7 @@ export function useBudgetPageController() {
     isLoading,
     cashFlow,
     receivables,
-    payables: finalPayables,
+    payables,
     cards,
     activeCardTab,
     setActiveCardTab,
