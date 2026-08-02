@@ -79,6 +79,8 @@ export function CreditCardsV2PageDesktop() {
           openBill: openBillByCardId.get(card.id) ?? null,
           composedTotal: composed?.total ?? null,
           sourceState: composed?.sourceState,
+          closingDay: card.closingDay,
+          referenceDate: today,
         });
 
         return buildCreditCardOverview({

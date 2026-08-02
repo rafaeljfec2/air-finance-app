@@ -1,6 +1,6 @@
 import { formatDateToLocalISO } from '@/utils/date';
 
-import type { StatementPeriodRange } from './getCurrentCycleRange';
+import { cycleIndexOf, type StatementPeriodRange } from './getCurrentCycleRange';
 import {
   normalizeInstallmentBase,
   parseInstallmentFromDescription,
@@ -60,19 +60,6 @@ function parseLocalDateOnly(value: string): Date {
   return new Date(year ?? 0, (month ?? 1) - 1, day ?? 1);
 }
 
-function clampedDate(year: number, month: number, day: number): Date {
-  const lastDay = new Date(year, month + 1, 0).getDate();
-  return new Date(year, month, Math.min(day, lastDay));
-}
-
-function previousOccurrence(day: number, onOrBefore: Date): Date {
-  const candidate = clampedDate(onOrBefore.getFullYear(), onOrBefore.getMonth(), day);
-  if (candidate.getTime() <= onOrBefore.getTime()) {
-    return candidate;
-  }
-  return clampedDate(onOrBefore.getFullYear(), onOrBefore.getMonth() - 1, day);
-}
-
 function roundMoney(value: number): number {
   return Math.round(value * 100) / 100;
 }
@@ -106,11 +93,6 @@ function resolveInstallment(tx: OpenBillTransactionInput): ResolvedInstallment |
 }
 
 /** Monthly index of the cycle a transaction belongs to (one closing per month). */
-function cycleIndexOf(date: Date, closingDay: number): number {
-  const start = previousOccurrence(closingDay, date);
-  return start.getFullYear() * 12 + start.getMonth();
-}
-
 function groupKey(baseDescription: string, total: number): string {
   return `${normalizeInstallmentBase(baseDescription)}|${total}`;
 }
@@ -184,6 +166,10 @@ function computeCycleAmount(
   transactions: ReadonlyArray<OpenBillTransactionInput>,
   cycle: StatementPeriodRange,
 ): number {
+  if (cycle.startDate > cycle.endDate) {
+    return 0;
+  }
+
   let total = 0;
 
   for (const tx of transactions) {
@@ -235,7 +221,12 @@ export function projectInstallmentsForOpenBill(
     const dateOnly = toDateOnly(tx.transactionAt);
     const label = `${installment.current}/${installment.total}`;
 
-    if (tx.status === 'PENDING' && dateOnly >= cycle.startDate && dateOnly <= cycle.endDate) {
+    if (
+      cycle.startDate <= cycle.endDate &&
+      tx.status === 'PENDING' &&
+      dateOnly >= cycle.startDate &&
+      dateOnly <= cycle.endDate
+    ) {
       pendingInCycle.add(cycleKey(installment.baseDescription, label));
     }
 
@@ -259,7 +250,7 @@ export function projectInstallmentsForOpenBill(
     for (const chain of buildChains(occurrences)) {
       const latest = chain.latest;
 
-      if (latest.dateOnly >= cycle.startDate) {
+      if (cycle.startDate <= cycle.endDate && latest.dateOnly >= cycle.startDate) {
         continue;
       }
       if (latest.current >= latest.total) {

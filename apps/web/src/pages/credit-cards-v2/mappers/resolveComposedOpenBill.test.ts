@@ -18,12 +18,14 @@ function source(mode: CreditCardSourceState['mode']): CreditCardSourceState {
 }
 
 describe('resolveComposedOpenBill', () => {
-  it('prefers the composed budget total for OFX and COMBINED modes', () => {
+  it('prefers the composed budget total for OFX and COMBINED modes before closing', () => {
     expect(
       resolveComposedOpenBill({
         openBill,
         composedTotal: 11372.84,
         sourceState: source('COMBINED'),
+        closingDay: 30,
+        referenceDate: new Date(2026, 6, 20),
       }),
     ).toEqual({
       cycleAmount: 11372.84,
@@ -38,8 +40,22 @@ describe('resolveComposedOpenBill', () => {
         openBill,
         composedTotal: 11360.5,
         sourceState: source('OFX'),
+        closingDay: 30,
+        referenceDate: new Date(2026, 6, 20),
       })?.totalEstimated,
     ).toBe(11360.5);
+  });
+
+  it('prefers the open-cycle projection after the closing day', () => {
+    expect(
+      resolveComposedOpenBill({
+        openBill,
+        composedTotal: 11372.84,
+        sourceState: source('COMBINED'),
+        closingDay: 30,
+        referenceDate: new Date(2026, 6, 31),
+      }),
+    ).toEqual(openBill);
   });
 
   it('keeps the Open Finance projection when there is no OFX baseline', () => {

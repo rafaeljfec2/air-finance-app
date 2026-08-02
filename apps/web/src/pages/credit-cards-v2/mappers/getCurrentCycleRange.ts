@@ -10,7 +10,17 @@ function clampedDate(year: number, month: number, day: number): Date {
   return new Date(year, month, Math.min(day, lastDay));
 }
 
-function previousOccurrence(day: number, onOrBefore: Date): Date {
+function startOfLocalDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function addDays(date: Date, days: number): Date {
+  const next = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+export function previousOccurrence(day: number, onOrBefore: Date): Date {
   const candidate = clampedDate(onOrBefore.getFullYear(), onOrBefore.getMonth(), day);
   if (candidate.getTime() <= onOrBefore.getTime()) {
     return candidate;
@@ -18,9 +28,18 @@ function previousOccurrence(day: number, onOrBefore: Date): Date {
   return clampedDate(onOrBefore.getFullYear(), onOrBefore.getMonth() - 1, day);
 }
 
+export function nextOccurrence(day: number, onOrAfter: Date): Date {
+  const candidate = clampedDate(onOrAfter.getFullYear(), onOrAfter.getMonth(), day);
+  if (candidate.getTime() >= onOrAfter.getTime()) {
+    return candidate;
+  }
+  return clampedDate(onOrAfter.getFullYear(), onOrAfter.getMonth() + 1, day);
+}
+
 /**
- * Open bill cycle window: from the last closing day (inclusive) through today.
- * Used to fetch PENDING Open Finance transactions that compose the open bill.
+ * Open bill cycle window: day after the last closing through today.
+ * Purchases on the closing day belong to the closed cycle.
+ * When reference is the closing day, startDate > endDate (next cycle not open yet).
  */
 export function getCurrentCycleRange(
   closingDay: number | undefined,
@@ -30,9 +49,24 @@ export function getCurrentCycleRange(
     return null;
   }
 
-  const start = previousOccurrence(closingDay, referenceDate);
+  const day = startOfLocalDay(referenceDate);
+  const lastClose = previousOccurrence(closingDay, day);
+  const start = addDays(lastClose, 1);
+
   return {
     startDate: formatDateToLocalISO(start),
-    endDate: formatDateToLocalISO(referenceDate),
+    endDate: formatDateToLocalISO(day),
   };
+}
+
+/** Stable monthly index of the cycle containing `date` (by cycle-end closing). */
+export function cycleIndexOf(date: Date, closingDay: number): number {
+  const end = nextOccurrence(closingDay, startOfLocalDay(date));
+  return end.getFullYear() * 12 + end.getMonth();
+}
+
+export function isAfterClosingDay(closingDay: number, referenceDate: Date): boolean {
+  const day = startOfLocalDay(referenceDate);
+  const closeThisMonth = clampedDate(day.getFullYear(), day.getMonth(), closingDay);
+  return day.getTime() > closeThisMonth.getTime();
 }
