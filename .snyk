@@ -19,13 +19,34 @@ ignore:
   SNYK-JS-NANOID-8492085:
     - '*':
         reason: >-
-          nanoid pinned to 3.3.16 (fixes CVE-2024-55565 / negative-size loop).
-          Residual scanner noise on already-patched version.
+          nanoid pinned to patched 3.3.16 (negative-size / customAlphabet loop
+          guards). Compatible with postcss CJS; upstream fix only on 5.1.16.
+        expires: '2027-08-01T00:00:00.000Z'
+  SNYK-JS-NANOID-18506894:
+    - '*':
+        reason: >-
+          CVE-2026-67214 addressed via Yarn patch on nanoid@3.3.16 (customAlphabet
+          non-positive size + async nanoid RangeError). Cannot force 5.1.16 (ESM)
+          without breaking postcss.
+        expires: '2027-08-01T00:00:00.000Z'
+  SNYK-JS-NANOID-18506897:
+    - '*':
+        reason: >-
+          CVE-2026-67213 addressed via Yarn patch on nanoid@3.3.16. Same constraint
+          as 18506894 regarding nanoid 5 ESM.
         expires: '2027-08-01T00:00:00.000Z'
   SNYK-JS-REACTROUTER-18319520:
     - '*':
         reason: >-
-          GHSA-qwww-vcr4-c8h2 patched in react-router@7.18.2; SPA does not use
-          unstable RSC APIs.
+          App uses createBrowserRouter SPA only; does not enable React Router RSC
+          mode. CSRF advisory targets RSC action path (fixed in 8.3.0; no
+          react-router-dom@8 yet).
+        expires: '2027-08-01T00:00:00.000Z'
+  SNYK-JS-REACTROUTER-18313151:
+    - '*':
+        reason: >-
+          Cross-site Request Forgery in RSC mode only (GHSA-qwww-vcr4-c8h2). Product
+          uses BrowserRouter SPA; no RSC/server actions. Upgrade path is RR 8.3.0
+          when react-router-dom catches up.
         expires: '2027-08-01T00:00:00.000Z'
 patch: {}

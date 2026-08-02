@@ -10052,6 +10052,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nanoid@patch:nanoid@npm%3A3.3.16#~/.yarn/patches/nanoid-npm-3.3.16-dbca216f06.patch":
+  version: 3.3.16
+  resolution: "nanoid@patch:nanoid@npm%3A3.3.16#~/.yarn/patches/nanoid-npm-3.3.16-dbca216f06.patch::version=3.3.16&hash=2bf407"
+  bin:
+    nanoid: bin/nanoid.cjs
+  checksum: 10c0/10432d23cac9bd0c06b38d4c4a74ba11e55a3edcc3782b3978bab1cd7b1ba43a13a6eb05f366c0906e466d011a27428f75c7d81d06db39fef24f6907f812882d
+  languageName: node
+  linkType: hard
+
 "napi-postinstall@npm:^0.3.0":
   version: 0.3.4
   resolution: "napi-postinstall@npm:0.3.4"

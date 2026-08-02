@@ -1,0 +1,226 @@
+diff --git a/async/index.browser.cjs b/async/index.browser.cjs
+index 9f8c3a37bcfa36ab9c59b3fbdcac1041c1517de7..1572cd8c3bf45ea8f877883ae42f0d4dc405f156 100644
+--- a/async/index.browser.cjs
++++ b/async/index.browser.cjs
+@@ -14,7 +14,7 @@ let customAlphabet = (alphabet, defaultSize = 21) => {
+       let i = step | 0
+       while (i--) {
+         id += alphabet[bytes[i] & mask] || ''
+-        if (id.length === size) return id
++        if (id.length >= size) return id
+       }
+     }
+   }
+diff --git a/async/index.browser.js b/async/index.browser.js
+index 9e5da483f4618c21cb2737f0b41fec24f3bf1728..fb6442fa121af70bb3c72bac1784af49a19d6e59 100644
+--- a/async/index.browser.js
++++ b/async/index.browser.js
+@@ -14,7 +14,7 @@ let customAlphabet = (alphabet, defaultSize = 21) => {
+       let i = step | 0
+       while (i--) {
+         id += alphabet[bytes[i] & mask] || ''
+-        if (id.length === size) return id
++        if (id.length >= size) return id
+       }
+     }
+   }
+diff --git a/async/index.cjs b/async/index.cjs
+index d6db85661c164dabfa43c4bef10d9cfe79feee89..9a2886db8376f8cc88d5cd07d63a6ef23e9bf97b 100644
+--- a/async/index.cjs
++++ b/async/index.cjs
+@@ -19,8 +19,9 @@ let customAlphabet = (alphabet, defaultSize = 21) => {
+ 
+   let step = Math.ceil((1.6 * mask * defaultSize) / alphabet.length)
+ 
+-  let tick = (id, size = defaultSize) =>
+-    random(step).then(bytes => {
++  let tick = (id, size = defaultSize) => {
++    if (!(size > 0)) return Promise.resolve(id)
++    return random(step).then(bytes => {
+       let i = step
+       while (i--) {
+         id += alphabet[bytes[i] & mask] || ''
+@@ -28,17 +29,21 @@ let customAlphabet = (alphabet, defaultSize = 21) => {
+       }
+       return tick(id, size)
+     })
++  }
+ 
+   return size => tick('', size)
+ }
+ 
+-let nanoid = (size = 21) =>
+-  random((size |= 0)).then(bytes => {
++let nanoid = (size = 21) => {
++  size |= 0
++  if (size < 0) return Promise.reject(new RangeError('Wrong ID size'))
++  return random(size).then(bytes => {
+     let id = ''
+     while (size--) {
+       id += urlAlphabet[bytes[size] & 63]
+     }
+     return id
+   })
++}
+ 
+ module.exports = { nanoid, customAlphabet, random }
+diff --git a/async/index.js b/async/index.js
+index 4df59195c751fefa395f1c935d2250b662b396a8..22411edb551b34be644a1165219eb74cfb2938bb 100644
+--- a/async/index.js
++++ b/async/index.js
+@@ -19,8 +19,9 @@ let customAlphabet = (alphabet, defaultSize = 21) => {
+ 
+   let step = Math.ceil((1.6 * mask * defaultSize) / alphabet.length)
+ 
+-  let tick = (id, size = defaultSize) =>
+-    random(step).then(bytes => {
++  let tick = (id, size = defaultSize) => {
++    if (!(size > 0)) return Promise.resolve(id)
++    return random(step).then(bytes => {
+       let i = step
+       while (i--) {
+         id += alphabet[bytes[i] & mask] || ''
+@@ -28,17 +29,21 @@ let customAlphabet = (alphabet, defaultSize = 21) => {
+       }
+       return tick(id, size)
+     })
++  }
+ 
+   return size => tick('', size)
+ }
+ 
+-let nanoid = (size = 21) =>
+-  random((size |= 0)).then(bytes => {
++let nanoid = (size = 21) => {
++  size |= 0
++  if (size < 0) return Promise.reject(new RangeError('Wrong ID size'))
++  return random(size).then(bytes => {
+     let id = ''
+     while (size--) {
+       id += urlAlphabet[bytes[size] & 63]
+     }
+     return id
+   })
++}
+ 
+ export { nanoid, customAlphabet, random }
+diff --git a/async/index.native.js b/async/index.native.js
+index 9579c126ebff2567caa0d1d8a0b5cf9759a77692..d7b00a240a5e896c654390454d1ad0feb7ee2d44 100644
+--- a/async/index.native.js
++++ b/async/index.native.js
+@@ -10,8 +10,9 @@ let customAlphabet = (alphabet, defaultSize = 21) => {
+ 
+   let step = Math.ceil((1.6 * mask * defaultSize) / alphabet.length)
+ 
+-  let tick = (id, size = defaultSize) =>
+-    random(step).then(bytes => {
++  let tick = (id, size = defaultSize) => {
++    if (!(size > 0)) return Promise.resolve(id)
++    return random(step).then(bytes => {
+       let i = step
+       while (i--) {
+         id += alphabet[bytes[i] & mask] || ''
+@@ -19,17 +20,21 @@ let customAlphabet = (alphabet, defaultSize = 21) => {
+       }
+       return tick(id, size)
+     })
++  }
+ 
+   return size => tick('', size)
+ }
+ 
+-let nanoid = (size = 21) =>
+-  random((size |= 0)).then(bytes => {
++let nanoid = (size = 21) => {
++  size |= 0
++  if (size < 0) return Promise.reject(new RangeError('Wrong ID size'))
++  return random(size).then(bytes => {
+     let id = ''
+     while (size--) {
+       id += urlAlphabet[bytes[size] & 63]
+     }
+     return id
+   })
++}
+ 
+ export { nanoid, customAlphabet, random }
+diff --git a/index.browser.cjs b/index.browser.cjs
+index 2b4b7b669c20a4644ff05d717515259ae10f1647..91405b4e502cb14e584749491aeef113bacd0e60 100644
+--- a/index.browser.cjs
++++ b/index.browser.cjs
+@@ -11,13 +11,14 @@ let customRandom = (alphabet, defaultSize, getRandom) => {
+   let step = -~((1.6 * mask * defaultSize) / alphabet.length)
+ 
+   return (size = defaultSize) => {
++    if (!(size > 0)) return ''
+     let id = ''
+     while (true) {
+       let bytes = getRandom(step)
+       let j = step | 0
+       while (j--) {
+         id += alphabet[bytes[j] & mask] || ''
+-        if (id.length === size) return id
++        if (id.length >= size) return id
+       }
+     }
+   }
+diff --git a/index.browser.js b/index.browser.js
+index db69b3a6055033c514231545dd79042268c7abfa..97919b577ad0bb23a5afce9ef2043c772e810b43 100644
+--- a/index.browser.js
++++ b/index.browser.js
+@@ -11,13 +11,14 @@ let customRandom = (alphabet, defaultSize, getRandom) => {
+   let step = -~((1.6 * mask * defaultSize) / alphabet.length)
+ 
+   return (size = defaultSize) => {
++    if (!(size > 0)) return ''
+     let id = ''
+     while (true) {
+       let bytes = getRandom(step)
+       let j = step | 0
+       while (j--) {
+         id += alphabet[bytes[j] & mask] || ''
+-        if (id.length === size) return id
++        if (id.length >= size) return id
+       }
+     }
+   }
+diff --git a/index.cjs b/index.cjs
+index 9d50c52b8023c97bc1830c277011a382a0234b0f..709eefece38da479807b5af73d6af0af949e0467 100644
+--- a/index.cjs
++++ b/index.cjs
+@@ -30,13 +30,14 @@ let customRandom = (alphabet, defaultSize, getRandom) => {
+   let step = Math.ceil((1.6 * mask * defaultSize) / alphabet.length)
+ 
+   return (size = defaultSize) => {
++    if (!(size > 0)) return ''
+     let id = ''
+     while (true) {
+       let bytes = getRandom(step)
+       let i = step
+       while (i--) {
+         id += alphabet[bytes[i] & mask] || ''
+-        if (id.length === size) return id
++        if (id.length >= size) return id
+       }
+     }
+   }
+diff --git a/index.js b/index.js
+index c5d67b75563bdcd80c8a0d3f3e4202e0ddd0513a..8b4798e2387339e56211fc13fb9747fd19e09287 100644
+--- a/index.js
++++ b/index.js
+@@ -35,13 +35,14 @@ let customRandom = (alphabet, defaultSize, getRandom) => {
+   let step = Math.ceil((1.6 * mask * defaultSize) / alphabet.length)
+ 
+   return (size = defaultSize) => {
++    if (!(size > 0)) return ''
+     let id = ''
+     while (true) {
+       let bytes = getRandom(step)
+       let i = step
+       while (i--) {
+         id += alphabet[bytes[i] & mask] || ''
+-        if (id.length === size) return id
++        if (id.length >= size) return id
+       }
+     }
+   }
