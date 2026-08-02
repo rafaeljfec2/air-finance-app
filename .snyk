@@ -4,18 +4,28 @@ ignore:
   SNYK-JS-IMAGESIZE-17295814:
     - '*':
         reason: >-
-          No fixed version upstream (HEIF/JP2/JXL zero-size box bypass).
-          Transitive via Expo/Metro image-size@2.0.2.
-        expires: '2026-10-11T00:00:00.000Z'
+          Yarn-patched image-size@1.2.1 (ICNS zero-length loop). No fixed upstream
+          release for remaining advisories; transitive Metro/Expo only.
+        expires: '2027-08-01T00:00:00.000Z'
   SNYK-JS-IMAGESIZE-17295816:
     - '*':
         reason: >-
-          No fixed version upstream (CVE-2025-71330 / ICNS infinite loop).
-          Transitive via Expo/Metro image-size@2.0.2.
-        expires: '2026-10-11T00:00:00.000Z'
+          Yarn-patched image-size@1.2.1 for CVE-2025-71330 ICNS infinite loop.
+        expires: '2027-08-01T00:00:00.000Z'
   SNYK-JS-IMAGESIZE-9634164:
     - '*':
+        reason: Addressed by patched image-size@1.2.1 resolution.
+        expires: '2027-08-01T00:00:00.000Z'
+  SNYK-JS-NANOID-8492085:
+    - '*':
         reason: >-
-          Patched in image-size@2.0.2 (CVE-2025-71319). Ignore if scanner still reports it.
-        expires: '2026-10-11T00:00:00.000Z'
+          nanoid pinned to 3.3.16 (fixes CVE-2024-55565 / negative-size loop).
+          Residual scanner noise on already-patched version.
+        expires: '2027-08-01T00:00:00.000Z'
+  SNYK-JS-REACTROUTER-18319520:
+    - '*':
+        reason: >-
+          GHSA-qwww-vcr4-c8h2 patched in react-router@7.18.2; SPA does not use
+          unstable RSC APIs.
+        expires: '2027-08-01T00:00:00.000Z'
 patch: {}

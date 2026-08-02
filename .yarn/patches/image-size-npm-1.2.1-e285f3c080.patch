@@ -1,0 +1,32 @@
+diff --git a/dist/types/icns.js b/dist/types/icns.js
+index f2bfafef3723cb423b110304815e56e3f97f81e0..7b24027c4b78d3862685d15da8d629218f461def 100644
+--- a/dist/types/icns.js
++++ b/dist/types/icns.js
+@@ -82,7 +82,11 @@ exports.ICNS = {
+         let imageOffset = SIZE_HEADER;
+         let imageHeader = readImageHeader(input, imageOffset);
+         let imageSize = getImageSize(imageHeader[0]);
+-        imageOffset += imageHeader[1];
++        const firstEntryLength = imageHeader[1];
++        if (!Number.isFinite(firstEntryLength) || firstEntryLength < 8) {
++            return imageSize;
++        }
++        imageOffset += firstEntryLength;
+         if (imageOffset === fileLength)
+             return imageSize;
+         const result = {
+@@ -92,8 +96,13 @@ exports.ICNS = {
+         };
+         while (imageOffset < fileLength && imageOffset < inputLength) {
+             imageHeader = readImageHeader(input, imageOffset);
++            const entryLength = imageHeader[1];
++            // Guard against crafted ICNS entries with zero/invalid length (CVE-2025-71330).
++            if (!Number.isFinite(entryLength) || entryLength < 8) {
++                break;
++            }
+             imageSize = getImageSize(imageHeader[0]);
+-            imageOffset += imageHeader[1];
++            imageOffset += entryLength;
+             result.images.push(imageSize);
+         }
+         return result;
