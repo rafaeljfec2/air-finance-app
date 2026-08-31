@@ -9,6 +9,9 @@ interface CardStatProps {
   readonly highlight?: boolean;
   readonly blue?: boolean;
   readonly compact?: boolean;
+  readonly onClick?: () => void;
+  readonly isActive?: boolean;
+  readonly disabled?: boolean;
 }
 
 function AnimatedValue({ value }: Readonly<{ value: number }>) {
@@ -24,15 +27,27 @@ function AnimatedValue({ value }: Readonly<{ value: number }>) {
   return <motion.span>{display}</motion.span>;
 }
 
-export const CardStat: React.FC<CardStatProps> = ({
-  label,
-  value,
+function getCardStatClasses({
   positive,
   negative,
   highlight,
   blue,
   compact,
-}) => {
+  isActive,
+  isInteractive,
+}: {
+  readonly positive?: boolean;
+  readonly negative?: boolean;
+  readonly highlight?: boolean;
+  readonly blue?: boolean;
+  readonly compact?: boolean;
+  readonly isActive?: boolean;
+  readonly isInteractive: boolean;
+}): {
+  readonly containerClass: string;
+  readonly valueClass: string;
+  readonly paddingClass: string;
+} {
   const textSize = compact ? 'text-base sm:text-lg' : 'text-lg sm:text-xl';
   let valueClass = `font-bold ${textSize} text-text dark:text-text-dark`;
   let containerClass = 'bg-gray-100 dark:bg-gray-800/50';
@@ -51,18 +66,71 @@ export const CardStat: React.FC<CardStatProps> = ({
     containerClass = 'bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/10';
   }
 
+  if (isActive) {
+    containerClass = `${containerClass} ring-2 ring-primary-500/70 dark:ring-primary-400/70`;
+  }
+
+  if (isInteractive) {
+    containerClass = `${containerClass} cursor-pointer hover:brightness-105 dark:hover:brightness-110`;
+  }
+
   const paddingClass = compact ? 'p-2 sm:p-2.5' : 'p-3';
 
-  return (
-    <div
-      className={`flex flex-col gap-1 ${paddingClass} rounded-lg ${containerClass} transition-colors`}
-    >
+  return { containerClass, valueClass, paddingClass };
+}
+
+export const CardStat: React.FC<CardStatProps> = ({
+  label,
+  value,
+  positive,
+  negative,
+  highlight,
+  blue,
+  compact,
+  onClick,
+  isActive = false,
+  disabled = false,
+}) => {
+  const isInteractive = Boolean(onClick) && !disabled;
+  const { containerClass, valueClass, paddingClass } = getCardStatClasses({
+    positive,
+    negative,
+    highlight,
+    blue,
+    compact,
+    isActive,
+    isInteractive,
+  });
+
+  const content = (
+    <>
       <span className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">
         {label}
       </span>
       <span className={valueClass}>
         R$ <AnimatedValue value={value} />
       </span>
+    </>
+  );
+
+  if (isInteractive) {
+    return (
+      <button
+        type="button"
+        aria-pressed={isActive}
+        onClick={onClick}
+        className={`flex w-full flex-col gap-1 text-left ${paddingClass} rounded-lg ${containerClass} transition-colors`}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <div
+      className={`flex flex-col gap-1 ${paddingClass} rounded-lg ${containerClass} transition-colors`}
+    >
+      {content}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { BadgeStatus, CardStat } from '@/components/budget';
 import { CreditCardBrandIcon } from '@/components/budget/CreditCardBrandIcon';
@@ -11,9 +11,16 @@ import {
   type TableColumn,
 } from '@/components/budget/shared';
 import type { CreditCard, CreditCardBill } from '@/types/budget';
+import {
+  calculateCreditCardTotals,
+  filterCreditCardTransactions,
+  isDebitTransaction,
+  sumCreditCardTransactions,
+  type CreditCardGridFilter,
+} from '@/utils/creditCardTransactionFilters';
 import { formatDate } from '@/utils/date';
 import { formatCurrency } from '@/utils/formatters';
-import { extractInstallment, isFinishingInstallment } from '@/utils/installment.utils';
+import { isFinishingInstallment } from '@/utils/installment.utils';
 
 interface CreditCardsSectionProps {
   readonly cards: CreditCard[];
@@ -27,26 +34,6 @@ interface CreditCardsSectionProps {
 
 type Transaction = CreditCardBill['transactions'][number];
 
-const CREDIT_KEYWORDS = [
-  'pagamento recebido',
-  'recebido',
-  'crédito',
-  'credit',
-  'estorno',
-  'reembolso',
-  'devolução',
-];
-
-const CREDIT_CATEGORIES = [
-  'salario',
-  'salário',
-  'aluguel recebido',
-  'rendimento',
-  'receita',
-  'income',
-  'revenue',
-];
-
 const TABLE_COLUMNS: TableColumn[] = [
   { key: 'date', label: 'Data', width: 'w-[15%]', align: 'left' },
   { key: 'description', label: 'Descrição', width: 'w-[40%]', align: 'left' },
@@ -54,22 +41,15 @@ const TABLE_COLUMNS: TableColumn[] = [
   { key: 'value', label: 'Valor', width: 'w-[20%]', align: 'right' },
 ];
 
-function isDebitTransaction(transaction: Transaction): boolean {
-  const description = transaction.description.toLowerCase();
-  const category = transaction.category.toLowerCase();
-
-  const hasCreditKeyword = CREDIT_KEYWORDS.some((keyword) => description.includes(keyword));
-  const hasCreditCategory = CREDIT_CATEGORIES.some((cat) => category.includes(cat));
-
-  return !hasCreditKeyword && !hasCreditCategory;
-}
+const FILTER_LABELS: Record<CreditCardGridFilter, string> = {
+  all: 'Fatura',
+  installment: 'Parcelado',
+  cash: 'Crédito à vista',
+  finishing: 'Finalizando',
+};
 
 function sortByDateDesc(a: Transaction, b: Transaction): number {
   return new Date(b.date).getTime() - new Date(a.date).getTime();
-}
-
-function calculateTotal(items: Transaction[]): number {
-  return items.reduce((sum, item) => sum + item.value, 0);
 }
 
 function getCardButtonClass(card: CreditCard, isActive: boolean): string {
@@ -85,6 +65,24 @@ function getCardButtonClass(card: CreditCard, isActive: boolean): string {
   return brandColors[card.brand] ?? 'bg-primary-600 text-white dark:bg-primary-500';
 }
 
+function getFilteredGroupColor(
+  filter: CreditCardGridFilter,
+): 'emerald' | 'gray' | 'violet' | 'amber' {
+  if (filter === 'finishing') {
+    return 'emerald';
+  }
+
+  if (filter === 'all') {
+    return 'violet';
+  }
+
+  if (filter === 'installment') {
+    return 'amber';
+  }
+
+  return 'gray';
+}
+
 export function CreditCardsSection({
   cards,
   activeBill,
@@ -94,48 +92,31 @@ export function CreditCardsSection({
   isLoading,
   onActiveCardChange,
 }: CreditCardsSectionProps) {
+  const [activeFilter, setActiveFilter] = useState<CreditCardGridFilter | null>(null);
+
+  useEffect(() => {
+    setActiveFilter(null);
+  }, [activeCardTab]);
+
   const debitTransactions = useMemo(() => {
     if (!activeBill?.transactions || activeBill.transactions.length === 0) {
       return [];
     }
+
     return activeBill.transactions.filter(isDebitTransaction);
   }, [activeBill?.transactions]);
 
-  const totals = useMemo(() => {
-    if (debitTransactions.length === 0) {
-      return { totalParcelado: 0, totalVista: 0, totalFinalizando: 0 };
-    }
-
-    let totalParcelado = 0;
-    let totalVista = 0;
-    let totalFinalizando = 0;
-
-    debitTransactions.forEach((transaction) => {
-      const installment = extractInstallment(transaction.description);
-      const isParcelado = transaction.category === 'Parcelado' || installment !== null;
-
-      if (isParcelado) {
-        totalParcelado += transaction.value;
-        if (installment && installment.current === installment.total) {
-          totalFinalizando += transaction.value;
-        }
-      } else {
-        totalVista += transaction.value;
-      }
-    });
-
-    return { totalParcelado, totalVista, totalFinalizando };
-  }, [debitTransactions]);
+  const totals = useMemo(() => calculateCreditCardTotals(debitTransactions), [debitTransactions]);
 
   const { finishingTransactions, otherTransactions } = useMemo(() => {
     const finishing: Transaction[] = [];
     const other: Transaction[] = [];
 
-    debitTransactions.forEach((t) => {
-      if (isFinishingInstallment(t.description)) {
-        finishing.push(t);
+    debitTransactions.forEach((transaction) => {
+      if (isFinishingInstallment(transaction.description)) {
+        finishing.push(transaction);
       } else {
-        other.push(t);
+        other.push(transaction);
       }
     });
 
@@ -144,6 +125,18 @@ export function CreditCardsSection({
 
     return { finishingTransactions: finishing, otherTransactions: other };
   }, [debitTransactions]);
+
+  const filteredTransactions = useMemo(() => {
+    if (!activeFilter) {
+      return [];
+    }
+
+    return filterCreditCardTransactions(debitTransactions, activeFilter).sort(sortByDateDesc);
+  }, [activeFilter, debitTransactions]);
+
+  const handleFilterToggle = useCallback((filter: CreditCardGridFilter) => {
+    setActiveFilter((current) => (current === filter ? null : filter));
+  }, []);
 
   const renderCell = useCallback((item: Transaction, column: TableColumn) => {
     switch (column.key) {
@@ -181,14 +174,32 @@ export function CreditCardsSection({
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mb-6">
-        <CardStat label="Limite do cartão" value={activeCardLimit} highlight />
-        <CardStat label="Fatura" value={activeCardBillTotal} negative />
-        <CardStat label="Parcelado" value={totals.totalParcelado} />
-        <CardStat label="Crédito à vista" value={totals.totalVista} />
+        <CardStat label="Limite do cartão" value={activeCardLimit} highlight disabled />
+        <CardStat
+          label="Fatura"
+          value={activeCardBillTotal}
+          negative
+          onClick={() => handleFilterToggle('all')}
+          isActive={activeFilter === 'all'}
+        />
+        <CardStat
+          label="Parcelado"
+          value={totals.totalParcelado}
+          onClick={() => handleFilterToggle('installment')}
+          isActive={activeFilter === 'installment'}
+        />
+        <CardStat
+          label="Crédito à vista"
+          value={totals.totalVista}
+          onClick={() => handleFilterToggle('cash')}
+          isActive={activeFilter === 'cash'}
+        />
         <CardStat
           label="Finalizando"
           value={totals.totalFinalizando}
           highlight={totals.totalFinalizando > 0}
+          onClick={() => handleFilterToggle('finishing')}
+          isActive={activeFilter === 'finishing'}
         />
       </div>
 
@@ -220,6 +231,27 @@ export function CreditCardsSection({
       <div className="max-h-[50vh] overflow-y-auto pr-1">
         {debitTransactions.length === 0 ? (
           <EmptyState message="Nenhuma transação de cartão neste período." />
+        ) : activeFilter ? (
+          filteredTransactions.length === 0 ? (
+            <EmptyState message="Nenhuma transação para este filtro." />
+          ) : (
+            <div>
+              <GroupHeader
+                title={FILTER_LABELS[activeFilter]}
+                count={filteredTransactions.length}
+                total={sumCreditCardTransactions(filteredTransactions)}
+                color={getFilteredGroupColor(activeFilter)}
+              />
+              <GroupContainer color={getFilteredGroupColor(activeFilter)}>
+                <SectionTable
+                  columns={TABLE_COLUMNS}
+                  data={filteredTransactions}
+                  keyExtractor={(item) => item.id}
+                  renderCell={renderCell}
+                />
+              </GroupContainer>
+            </div>
+          )
         ) : (
           <div className="space-y-6">
             {finishingTransactions.length > 0 && (
@@ -227,7 +259,7 @@ export function CreditCardsSection({
                 <GroupHeader
                   title="Parcelas Finalizando"
                   count={finishingTransactions.length}
-                  total={calculateTotal(finishingTransactions)}
+                  total={sumCreditCardTransactions(finishingTransactions)}
                   color="emerald"
                 />
                 <GroupContainer color="emerald">
@@ -246,7 +278,7 @@ export function CreditCardsSection({
                 <GroupHeader
                   title="Outras Compras"
                   count={otherTransactions.length}
-                  total={calculateTotal(otherTransactions)}
+                  total={sumCreditCardTransactions(otherTransactions)}
                   color="gray"
                 />
                 <GroupContainer color="gray">
