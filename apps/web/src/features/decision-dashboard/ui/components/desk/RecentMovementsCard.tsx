@@ -137,7 +137,7 @@ export function RecentMovementsCard({ movements, isLoading }: Readonly<RecentMov
           to="/movements"
           className="inline-flex text-sm font-medium text-text-muted hover:text-text dark:text-text-muted-dark dark:hover:text-text-dark"
         >
-          Acessar movimentos financeiros →
+          Acessar Movimentação Financeira →
         </Link>
       </div>
     </section>

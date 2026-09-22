@@ -69,7 +69,7 @@ export function TimelineDesktopHeader({
     <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border px-4 py-3 dark:border-border-dark lg:px-6">
       <div className="min-w-0">
         <h1 className="text-lg font-bold leading-tight text-text dark:text-text-dark">
-          Movimentos Financeiros
+          Movimentação Financeira
         </h1>
         <p className="text-xs text-text-muted dark:text-text-muted-dark">
           A história do seu dinheiro, em ordem cronológica.
