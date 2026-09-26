@@ -2,15 +2,15 @@
 
 > This file is read by Claude Code on every turn. For the full project briefing (stack, commands, patterns, modes), follow the redirect below.
 
-## Primary source of truth
+## Shared contract
 
-**Read `AGENTS.md` at the project root.** It contains the universal briefing: identity, stack, structure, commands, protocols, non-negotiable patterns, and PR workflow.
+**`AGENTS.md` is the shared agent contract** (Cursor, Claude Code, Codex). This `CLAUDE.md` is the Claude Code adapter: area doc map and skills only. Do not treat this file as the product or repo contract.
 
 ```
 @AGENTS.md
 ```
 
-You MUST read `AGENTS.md` before any substantive code action.
+Read `AGENTS.md` before any substantive code action. Multi-root constitution: `air-finance-app-workspace/AGENTS.md`.
 
 ## Documentation map (read before working in an area)
 
@@ -58,13 +58,14 @@ Claude Code does not auto-load `.mdc` files. You MUST manually read the appropri
 
 Use the `Read` tool to load them before modifying files in the corresponding scope.
 
-## Precedence hierarchy
+## Coding conventions (this adapter)
 
-1. **SDD Protocol** (`.cursor/rules/general.mdc`) — always wins.
-2. **Architecture / Domain rules** — second.
-3. **Documentation** (`docs/`) — reference patterns and conventions.
-4. **Skills** — consultative, never override rules.
-5. **AGENTS.md / CLAUDE.md** — operational briefing, aligned with rules.
+Product hierarchy lives in the Workspace constitution / `AGENTS.md`, not here.
+
+1. **SDD Protocol** — `.cursor/rules/sdd-protocol.mdc`
+2. **Architecture / Domain rules** — `.cursor/rules/architecture.mdc`, `domain.mdc`
+3. **Repo docs** — `docs/`
+4. **Skills** — consultative; never override `AGENTS.md` or rules
 
 ## Non-negotiable patterns
 

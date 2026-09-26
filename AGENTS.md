@@ -1,68 +1,68 @@
 # AGENTS — air-finance-app
 
-Turborepo monorepo: React 18 + Vite (`apps/web`), mobile WebView app, and `packages/shared`.
+This repo is the AirFinance **frontend** (Turborepo: React 18 + Vite `apps/web`, mobile WebView, `packages/shared`).
+It is **not** Product OS, backend domain, or bank connectors.
 
-## Structure
+This Workspace is multi-root. Constitution: `air-finance-app-workspace/AGENTS.md`. Strategy: `connexto-os/docs/airfinance/`.
+
+## Read first
+
+1. Workspace constitution (`air-finance-app-workspace/AGENTS.md`) when the multi-root is open
+2. This `AGENTS.md` (shared contract for Cursor, Claude Code, Codex)
+3. SPEC + IS of the delivery in `connexto-os/docs/airfinance/`
+4. `docs/README.md` for the doc index
+5. `.cursor/rules/sdd-protocol.mdc` before generating feature code
+6. `HARNESS.md` after every change
+
+`CLAUDE.md` is a Claude Code adapter (doc map / skills). Do not read it instead of this file.
+
+## Hierarchy of truth
+
+Follow the Workspace constitution: Product OS → Blueprint → Platform → SPEC → Dev OS → IS → code.
+SPEC is the active contract **if** aligned with Product OS / Blueprint. Official-doc conflict → stop and escalate.
+
+## Do / Don't
+
+**Do:** reuse pages, hooks, services, UI primitives; mobile-first; TanStack Query for server state; Zustand for UI only; `??` not `||`; no `any`; TDD for hooks/services/logic.
+
+**Don't:** invent product/UX; skip `ViewDefault` / `LayoutAuth`; mock data outside tests; put domain rules only on the client; call banks directly (that is `connexto-integration-bank`).
+
+## Map
 
 | Path | Role |
 | --- | --- |
-| `apps/web` | Main product UI: `src/pages`, `src/components`, `src/hooks`, `src/services`, `src/stores`, `src/routes` |
-| `apps/mobile-webview` | WebView wrapper and mobile-oriented dev server |
+| `apps/web` | Product UI: `src/pages`, `components`, `hooks`, `services`, `stores`, `routes` |
+| `apps/mobile-webview` | WebView wrapper |
 | `packages/shared` | Shared types and utilities |
 
-## Commands (repository root)
+Flow: Route → Page → Hook → Service (`apiClient`) → TanStack Query → UI.
 
-- `yarn` — install dependencies
-- `yarn dev` — all dev tasks via Turbo
-- `yarn dev:web` — web app only
-- `yarn dev:mobile` — mobile WebView with tunnel (see script in root `package.json`)
-- `yarn build` — production build
-- `yarn lint` — ESLint across workspaces
-- `yarn typecheck` — TypeScript check
+## Commands
 
-## Route and feature flow
+```bash
+yarn
+yarn dev:web
+yarn build
+yarn lint
+yarn typecheck
+```
 
-1. Route in `apps/web/src/routes/`
-2. Page in `apps/web/src/pages/<feature>/`
-3. HTTP in `apps/web/src/services/`
-4. Data hooks with TanStack Query in `apps/web/src/hooks/` (or feature folder)
-5. UI composition with Tailwind + Radix/Headless under `components/`
+## Critical flows
 
-## Route categories (conceptual)
+- **Public:** marketing, auth, legal
+- **Authenticated:** dashboard, transactions, accounts, cards, budget, goals, open finance, settings
+- **Auth pages:** `ViewDefault`; public: `LayoutAuth`
 
-- **Public**: marketing, auth entry, legal
-- **Authenticated**: dashboard, transactions, accounts, cards, budget, goals, open finance, settings
-- **Admin / ops**: gated routes for operational tools when present
-- **SEO**: dedicated pages under `pages/seo/` with helmet metadata
+## Escalation
 
-## Environment
+Product, UX, journey, or SPEC vs OS/Blueprint → document and wait. Do not invent.
 
-- Configure per app (e.g. `apps/web` Vite env prefixes). Do not commit `.env` files with secrets.
+## Validation
 
-## AI agent guidance
+See `HARNESS.md`. Minimum: `yarn typecheck` + `yarn lint`. Before PR: also `yarn build`. Mobile 375px, dark mode, empty/loading/error.
 
-- **CLAUDE.md**: Read first — Claude Code briefing with doc map, skills, and non-negotiable patterns
-- **HARNESS.md**: Validation checklist — run after every change
-- **SDD Protocol**: `.cursor/rules/sdd-protocol.mdc` — mandatory compliance for code generation
+## Tool adapters
 
-## Cursor
-
-- Rules: `.cursor/rules/*.mdc` (replaces legacy `apps/web/.cursorrules` content)
-- SDD: `.cursor/rules/sdd-protocol.mdc` — always-on protocol for AI-assisted development
-- Repo skill: `.cursor/skills/frontend-dev/SKILL.md`
-
-## Docs
-
-- Start with `docs/README.md`, `docs/CREATING_PAGES.md`, and `docs/MOBILE_FIRST_GUIDE.md` for new work.
-- Full doc index: `docs/README.md`
-- Architecture: `docs/ARCHITECTURE.md`, `docs/FRONTEND_ARCHITECTURE.md`
-- Design system: `docs/DESIGN_SYSTEM.md`
-- Mobile: `docs/MOBILE_FIRST_GUIDE.md`
-- Auth: `docs/AUTH_SESSION_IMPLEMENTATION.md`
-- Security: `docs/SECURITY_FIX_REPORT.md`
-- Deploy: `docs/VERCEL_DEPLOY.md`
-- Migration: `docs/MIGRATION.md`
-- Tech stack: `docs/TECH_STACK.md`
-- Business domain: `docs/BUSINESS_DOMAIN.md`
-- Pricing: `docs/PRICING_ANALYSIS.md`
-- UX ideas: `docs/USABILITY_SUGGESTIONS.md`
+- **Claude Code:** `CLAUDE.md` (area doc map + skills)
+- **Cursor:** `.cursor/rules/*.mdc` (globs; SDD in `sdd-protocol.mdc`)
+- **Skill:** `.cursor/skills/frontend-dev/SKILL.md`
