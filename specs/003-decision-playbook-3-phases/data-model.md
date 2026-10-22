@@ -1,10 +1,10 @@
 # Data Model — Decision playbook 3 phases
 
-> Tipos compartilhados (frontend) + KPI driver por slug (backend). Sem persistência em banco nesta versão.
+> Shared types (frontend) + KPI driver per slug (backend). No database persistence in this version.
 
 ---
 
-## 1. Tipos do contrato (backend ↔ frontend)
+## 1. Contract types (backend ↔ frontend)
 
 ### `ThemePhase`
 
@@ -12,23 +12,23 @@
 type ThemePhase = 'red' | 'yellow' | 'green';
 ```
 
-Aparece no contrato HTTP como string (enum) **ou** `null`. Significados:
+Appears in the HTTP contract as string (enum) **or** `null`. Meanings:
 
-- `'red'` — usuário está em situação crítica para este tema; objetivo da fase é **parar de piorar**.
-- `'yellow'` — usuário está se ajustando; objetivo é **organizar e recuperar equilíbrio**.
-- `'green'` — usuário está saudável neste tema; objetivo é **manter** o controle.
-- `null` — não há fase aplicável (caso `primary_issue = data_incomplete`).
+- `'red'` — user is in a critical situation for this theme; phase goal is **stop getting worse**.
+- `'yellow'` — user is adjusting; goal is **organize and regain balance**.
+- `'green'` — user is healthy on this theme; goal is **maintain** control.
+- `null` — no applicable phase (`primary_issue = data_incomplete`).
 
-### Adição ao `DecisionEngineOutput`
+### Addition to `DecisionEngineOutput`
 
 ```ts
 interface DecisionEngineOutput {
-  // ... campos existentes (status, primary_issue, ordering_rationale, actions, ruleEngineVersion)
+  // ... existing fields (status, primary_issue, ordering_rationale, actions, ruleEngineVersion)
   theme_phase: ThemePhase | null;
 }
 ```
 
-No DTO HTTP do backend (`DecisionEngineResponseDto`) o campo é exposto como:
+On backend HTTP DTO (`DecisionEngineResponseDto`) the field is exposed as:
 
 ```ts
 @ApiProperty({
@@ -38,7 +38,7 @@ No DTO HTTP do backend (`DecisionEngineResponseDto`) o campo é exposto como:
 readonly theme_phase!: ThemePhase | null;
 ```
 
-No frontend (Zod) é **opcional + nullable** para backward compatibility com clientes antes do deploy:
+On frontend (Zod) it is **optional + nullable** for backward compatibility with clients before deploy:
 
 ```ts
 theme_phase: z.enum(['red', 'yellow', 'green']).nullable().optional()
@@ -46,21 +46,21 @@ theme_phase: z.enum(['red', 'yellow', 'green']).nullable().optional()
 
 ---
 
-## 2. Mapeamento `primary_issue` → KPI driver
+## 2. Mapping `primary_issue` → driver KPI
 
-| `primary_issue` | KPI driver | Fallback |
+| `primary_issue` | Driver KPI | Fallback |
 | --- | --- | --- |
-| `liquidity_risk` | `monthly_cash_flow` | pior nível entre `checking_runway_days` e `monthly_cash_flow` |
-| `debt_pressure` | `debt_service_to_income` | pior nível dos KPIs do degrau (apenas o próprio) |
-| `credit_overuse` | `credit_utilization_index` | pior nível dos KPIs do degrau (apenas o próprio) |
-| `high_commitment` | `income_committed_pct` | pior nível dos KPIs do degrau (apenas o próprio) |
-| `low_surplus` | `surplus_capacity` | pior nível dos KPIs do degrau (apenas o próprio) |
-| `low_savings` | `savings_rate` | pior nível dos KPIs do degrau (apenas o próprio) |
-| `high_fixed_cost` | `fixed_vs_variable_split` | pior nível dos KPIs do degrau (apenas o próprio) |
-| `healthy` | (n/a) | sempre `green` |
-| `data_incomplete` | (n/a) | sempre `null` |
+| `liquidity_risk` | `monthly_cash_flow` | worst level among `checking_runway_days` and `monthly_cash_flow` |
+| `debt_pressure` | `debt_service_to_income` | worst level among step KPIs (that step only) |
+| `credit_overuse` | `credit_utilization_index` | worst level among step KPIs (that step only) |
+| `high_commitment` | `income_committed_pct` | worst level among step KPIs (that step only) |
+| `low_surplus` | `surplus_capacity` | worst level among step KPIs (that step only) |
+| `low_savings` | `savings_rate` | worst level among step KPIs (that step only) |
+| `high_fixed_cost` | `fixed_vs_variable_split` | worst level among step KPIs (that step only) |
+| `healthy` | (n/a) | always `green` |
+| `data_incomplete` | (n/a) | always `null` |
 
-### Mapeamento nível → fase
+### Level → phase mapping
 
 ```text
 alert        → red
@@ -68,11 +68,11 @@ warn         → yellow
 ok | absent  → green
 ```
 
-(`healthy` e `data_incomplete` ignoram a tabela.)
+(`healthy` and `data_incomplete` ignore this table.)
 
 ---
 
-## 3. Tipos do catálogo (frontend)
+## 3. Catalog types (frontend)
 
 ```ts
 type PlaybookSlug =
@@ -87,58 +87,58 @@ type PlaybookSlug =
   | 'data_incomplete';
 
 interface PhaseContent {
-  readonly headline: string;        // ex.: "Pare de piorar"
-  readonly objective: string;       // 1 frase explicando o foco da fase
-  readonly actions: readonly string[]; // 3 a 5 frases, imperativo curto
+  readonly headline: string;        // e.g. "Stop getting worse"
+  readonly objective: string;       // one sentence explaining phase focus
+  readonly actions: readonly string[]; // 3–5 short imperative sentences
 }
 
 interface Playbook {
   readonly slug: PlaybookSlug;
-  readonly title: string;           // ex.: "Quase toda a renda já tem dono"
-  readonly explanation: string;     // 1-2 frases leigas explicando o problema
+  readonly title: string;           // e.g. "Almost all your income is already spoken for"
+  readonly explanation: string;     // 1–2 plain sentences explaining the problem
   readonly phases: {
     readonly red: PhaseContent;
     readonly yellow: PhaseContent;
     readonly green: PhaseContent;
   };
-  readonly rule: string;            // ex.: "Nunca comprometer mais de 25% da renda com parcelas"
-  readonly expectedImpact: string;  // 1 frase em tom positivo
+  readonly rule: string;            // e.g. "Never commit more than 25% of income to installments"
+  readonly expectedImpact: string;  // one positive-tone sentence
 }
 ```
 
-API pública do módulo:
+Public module API:
 
 ```ts
 function getPlaybook(slug: string): Playbook;
 const ALL_PLAYBOOKS: readonly Playbook[];
 ```
 
-`getPlaybook` para slug desconhecido devolve o playbook de `healthy` (fallback seguro).
+`getPlaybook` for unknown slug returns the `healthy` playbook (safe fallback).
 
 ---
 
-## 4. Regras de validação dos playbooks (`playbooks.test.ts`)
+## 4. Playbook validation rules (`playbooks.test.ts`)
 
-| Regra | Falha quando |
+| Rule | Fails when |
 | --- | --- |
-| **Cobertura** | qualquer um dos 9 slugs em `PlaybookSlug` não tem entrada em `ALL_PLAYBOOKS` |
-| **Campos obrigatórios** | `title`, `explanation`, `rule` ou `expectedImpact` vazios após `trim()` |
-| **3 a 5 ações por fase** | `phases.red.actions.length`, `phases.yellow.actions.length` ou `phases.green.actions.length` fora de `[3, 5]` |
-| **Headline e objective** | `phase.headline` ou `phase.objective` vazios após `trim()` |
-| **Linguagem leiga** | qualquer texto contém (case-insensitive) os termos: `KPI`, `índice`, `taxa de`, `rotativo`, `severity`, `snapshot` |
-| **Fallback** | `getPlaybook('unknown_slug_xyz')` não devolve `healthy` |
+| **Coverage** | any of the 9 slugs in `PlaybookSlug` has no entry in `ALL_PLAYBOOKS` |
+| **Required fields** | `title`, `explanation`, `rule`, or `expectedImpact` empty after `trim()` |
+| **3 to 5 actions per phase** | `phases.red.actions.length`, `phases.yellow.actions.length`, or `phases.green.actions.length` outside `[3, 5]` |
+| **Headline and objective** | `phase.headline` or `phase.objective` empty after `trim()` |
+| **Plain language** | any text contains (case-insensitive) a substring from the forbidden list in `playbooks.test.ts` |
+| **Fallback** | `getPlaybook('unknown_slug_xyz')` does not return `healthy` |
 
 ---
 
-## 5. Persistência
+## 5. Persistence
 
-**Nenhuma persistência em banco** nesta versão. O playbook é **estático em código** (frontend). A única "saída computada" no backend é o `theme_phase`, derivado em tempo de avaliação a partir dos KPIs já existentes.
+**No database persistence** in this version. Playbook is **static in code** (frontend). The only backend “computed output” is `theme_phase`, derived at evaluation time from existing KPIs.
 
-Se em uma futura versão o catálogo migrar para Mongo:
+If in a future version the catalog moves to Mongo:
 
-- Coleção sugerida: `decision_playbooks`.
-- Documento equivalente ao tipo `Playbook` acima, com `slug` (índice único).
-- Versionamento via campo `version: number` + `publishedAt: Date`.
-- Cache em memória do backend para evitar leitura por request.
+- Suggested collection: `decision_playbooks`.
+- Document equivalent to `Playbook` above, with `slug` (unique index).
+- Versioning via `version: number` + `publishedAt: Date`.
+- In-memory backend cache to avoid read per request.
 
-(Fora do escopo v1.)
+(Out of v1 scope.)

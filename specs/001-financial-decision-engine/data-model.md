@@ -2,13 +2,13 @@
 
 ## 1. Persistence (v1)
 
-**Nenhuma coleção Mongo obrigatória** para o motor na v1. A decisão é **derivada** de um snapshot em memória.
+**No Mongo collection required** for the engine in v1. The decision is **derived** from an in-memory snapshot.
 
-Opcional futuro:
+Optional future:
 
-| Entidade | Propósito |
+| Entity | Purpose |
 | --- | --- |
-| `DecisionAuditLog` | Armazenar `inputHash`, `output`, `ruleEngineVersion`, `companyId`, `createdAt` para suporte/LGPD |
+| `DecisionAuditLog` | Store `inputHash`, `output`, `ruleEngineVersion`, `companyId`, `createdAt` for support/LGPD |
 
 ## 2. Logical model (snapshot)
 
@@ -30,100 +30,100 @@ erDiagram
   }
 ```
 
-- **`severityDistance`:** distância à fronteira da zona (para FR-2); opcional no input — se ausente, resolver pode derivar de `value` + bandas fixas **somente se** bandas forem duplicadas no backend na v1; **recomendação:** composer envia `severityDistance` já calculado pelo mesmo módulo que calcula níveis, para single source of truth.
+- **`severityDistance`:** distance to the zone border (for FR-2); optional in the input — if absent, resolver can derive from `value` + fixed bands **only if** bands are duplicated in the backend in v1; **recommendation:** composer sends` severityDistance `already calculated by the same module that calculates levels, for single source of truth.
 
-## 3. Completude de dados (FR-0) — critérios mínimos v1
+## 3. Completeness of data (FR-0) — minimum criteria v1
 
-**Definição:** snapshot **completo** quando todas as condições abaixo são verdadeiras.
+**Definition:** full snapshot * * when all of the conditions below are true.
 
-| # | Regra | Se falhar |
+| # | Rule | If it fails |
 | --- | --- | --- |
-| C1 | `referencePeriod` presente (ISO `YYYY-MM`) | Incompleto |
-| C2 | `viewMode` presente | Incompleto |
-| C3 | `netIncomeMonth` informado e **> 0** (renda líquida do período — base para % e poupança) | Incompleto |
-| C4 | KPI obrigatório `monthly_cash_flow`: `value` numérico válido **e** `level` definido | Incompleto |
-| C5 | KPI obrigatório `savings_rate`: `level` definido (valor pode ser omitido só se política upstream marcar inválido → incompleto) | Incompleto |
-| C6 | KPI obrigatório `income_committed_pct`: `level` definido | Incompleto |
-| C7 | KPI obrigatório `credit_utilization_index`: `level` definido **e** se `level` ≠ `ok`, exige `value` numérico (uso %) para parametrizar impacto | Incompleto **apenas se** `value` ausente quando ≠ ok |
-| C8 | KPI obrigatório `surplus_capacity`: `level` definido | Incompleto |
-| C9 | KPI obrigatório `fixed_vs_variable_split`: `level` definido (interpretar como “share fixo alto” quando alert) | Incompleto |
+| C1 | `referencePeriod` present (ISO `YYYY-MM`) | Incomplete |
+| C2 | `viewMode` present | Incomplete |
+| C3 | `netIncomeMonth` reported and **> 0** (net income for the period — basis for % and savings) | Incomplete |
+| C4 | Mandatory KPI `monthly_cash_flow`: valid numeric `value` **and** `level` set | Incomplete |
+| C5 | Mandatory KPI `savings_rate`: `level` set (value can be omitted only if upstream policy marks invalid → incomplete) | Incomplete |
+| C6 | Mandatory KPI `income_committed_pct`: `level` set | Incomplete |
+| C7 | Required KPI `credit_utilization_index`: `level` set **and** if `level` ≠ `ok`, requires numeric `value` (% usage) to parameterize impact | Incomplete **only if** `value` missing when ≠ ok |
+| C8 | Required KPI `surplus_capacity`: `level` set | Incomplete |
+| C9 | Mandatory KPI `fixed_vs_variable_split`: `level` set (interpret as “high fixed share” when alert) | Incomplete |
 
-**KPIs opcionais (ausência ≠ incompleto):**
+** Optional KPIs (absence ≠ incomplete):**
 
-| KPI | Comportamento |
+| KPI | Behavior |
 | --- | --- |
-| `checking_runway_days` | Se ausente, degrau 1 liquidez considera **apenas** `monthly_cash_flow`. |
-| `debt_service_to_income` | Se ausente, pular degrau 2 (`debt_pressure`). |
+| `checking_runway_days` | If absent, liquidity step 1 considers **only** `monthly_cash_flow`. |
+| `debt_service_to_income` | If absent, skip step 2 (`debt_pressure`). |
 
-**Reason em FR-0:** popular `reason` com `["data_quality"]` ou lista dos `kpiId` que falharam completude.
+**Reason in FR-0:** populate `reason` with `["data_quality"]` or the list of `kpiId` values that failed completeness.
 
-## 4. Matriz ação × contexto (v1 seed)
+## 4. Action × context matrix (v1 seed)
 
-Parametrização: placeholders `{amount}`, `{pct}`, `{days}` substituídos quando número disponível; senão texto qualitativo permitido pela spec.
+Parameterization: placeholders` {amount} `,` {pct} `,` {days} `replaced when number available; otherwise qualitative text allowed by spec.
 
 ### `data_incomplete`
 
 | # | title | description | impact | reason |
 | --- | --- | --- | --- | --- |
-| 1 | Complete seus dados financeiros | Cadastre renda líquida do mês, limite dos cartões e movimentações para gerarmos recomendações seguras. | Complete os campos em vermelho na visão mensal para ver impacto em R$. | Dinâmico: KPIs/`data_quality` conforme §3 (campo `ordering_rationale` + `actions[].reason`) |
+| 1 | Complete your financial data | Register net income for the month, card limits and transactions to generate safe recommendations. | Complete the fields in red in the monthly view to see impact in $ R. | Dynamic: KPIs/`data_quality` as per §3 (field `ordering_rationale` + `actions[].reason`) |
 
 ### `healthy`
 
 | # | title | description | impact | reason |
 | --- | --- | --- | --- | --- |
-| 1 | Automatize sua sobra | Configure uma transferência fixa para reserva no dia após o pagamento. | Mesmo **R$ 50/mês** já consolidam hábito sem apertar o orçamento. | `["savings_rate"]` |
+| 1 | Automate your leftover | Set up a fixed transfer for booking the day after payment. | Even **$50/month** already consolidate habits without tightening the budget. | `["savings_rate"]` |
 
 ### `liquidity_risk`
 
 | # | title | description | impact | reason |
 | --- | --- | --- | --- | --- |
-| 1 | Pausar gastos não essenciais por 30 dias | Congele compras discricionárias até o fluxo voltar ao azul. | Reduz risco de cheque especial até **{amount}/mês** se você cortar o plano variável médio. | `monthly_cash_flow`, `checking_runway_days` |
-| 2 | Redesenhar datas de vencimento | Alinhe boletos e cartão para depois das entradas de renda. | Ganho de liquidez equivalente a **{days} dias** de folga de caixa. | `monthly_cash_flow` |
-| 3 | Usar apenas débito ou PIX até normalizar | Evite novas compras no crédito enquanto o caixa estiver negativo. | Impede aumento de **{pct}%** no uso do limite. | `credit_utilization_index`, `monthly_cash_flow` |
+| 1 | Pause non-essential spending for 30 days | Freeze discretionary purchases until the flow is back to blue. | Reduces overdraft risk up to **{amount}/month** if you cut the average variable plan. | `monthly_cash_flow`, `checking_runway_days` |
+| 2 | Redraw due dates | Align vouchers and card for after income entries. | Liquidity gain equivalent to **{days} days** of cash slack. | `monthly_cash_flow` |
+| 3 | Use only debit or PIX until normalized | Avoid new purchases on credit while the cashier is negative. | Prevents **{pct}%** increase in threshold usage. | `credit_utilization_index`, `monthly_cash_flow` |
 
 ### `debt_pressure`
 
 | # | title | description | impact | reason |
 | --- | --- | --- | --- | --- |
-| 1 | Negociar ou refinanciar o menor saldo de alto juro | Priorize cartão/rotativo antes de empréstimo barato. | Economia típica **{amount}/mês** em juros se taxa cair **{pct} p.p.** | `debt_service_to_income` |
-| 2 | Congelar novos parcelamentos | Não adicione parcelas até serviço da dívida cair abaixo de 25% da renda. | Libera até **{pct}%** da renda para caixa. | `debt_service_to_income`, `income_committed_pct` |
+| 1 | Negotiate or refinance the lowest high-interest balance | Prioritize card/revolving before cheap borrowing. | Typical savings **{amount}/month** in interest if rate drops **{pct} p.p.** | `debt_service_to_income` |
+| 2 | Freeze new installments | Do not add installments until debt service falls below 25% of income. | Releases up to **{pct}%** of income to cash. | `debt_service_to_income`, `income_committed_pct` |
 
 ### `credit_overuse`
 
 | # | title | description | impact | reason |
 | --- | --- | --- | --- | --- |
-| 1 | Pagar acima do mínimo no cartão principal | Destine valor fixo semanal até uso cair abaixo de 40%. | Reduz uso de **{pct}%** para meta **40%** em ~2–3 ciclos. | `credit_utilization_index` |
-| 2 | Parar compras no crédito até normalizar | Use débito até `credit_utilization_index` sair de alerta. | Alto impacto no caixa | `credit_utilization_index` |
+| 1 | Pay above the minimum on the main card | Allocate weekly lump sum until usage drops below 40%. | Reduces usage from **{pct}%** to target **40%** in ~2–3 cycles. | `credit_utilization_index` |
+| 2 | Stop purchases on credit until normalized | Use debit until `credit_utilization_index` goes off alert. | High cash impact | `credit_utilization_index` |
 
 ### `high_commitment`
 
 | # | title | description | impact | reason |
 | --- | --- | --- | --- | --- |
-| 1 | Cortar 2 assinaturas ou serviços fixos | Liste Netflix, academia duplicada, apps — negocie ou cancele. | Libera até **{amount}/mês**. | `income_committed_pct` |
-| 2 | Revisar moradia e seguros | Renegociar aluguel/condomínio ou trocar seguro auto/residencial. | Meta: reduzir comprometimento em **{pct} p.p.** | `income_committed_pct` |
+| 1 | Cut 2 subscriptions or fixed services | List Netflix, duplicate gym, apps — trade or cancel. | Releases up to **{amount}/month**. | `income_committed_pct` |
+| 2 | Review housing and insurance | Renegotiate rent/condominium or exchange auto/home insurance. | Goal: reduce commitment by **{pct} p.p.** | `income_committed_pct` |
 
 ### `low_surplus`
 
 | # | title | description | impact | reason |
 | --- | --- | --- | --- | --- |
-| 1 | Reduzir variável discricionário em 10% | Ajuste restaurante/ delivery até baseline voltar à mediana de 3 meses. | Recupera até **{amount}/mês** de sobra prevista. | `surplus_capacity` |
-| 2 | Remarcar compra grande | Adie acima de **{amount}** até próximo mês com sobra positiva. | Evita fluxo negativo pontual. | `surplus_capacity`, `monthly_cash_flow` |
+| 1 | Reduce discretionary variable by 10% | Restaurant/ delivery adjustment until baseline returns to the median of 3 months. | Recover up to **{amount}/month** to spare. | `surplus_capacity` |
+| 2 | Rebook large purchase | Postpone over **{amount}** until next month with positive surplus. | Prevents one-off negative flow. | `surplus_capacity`, `monthly_cash_flow` |
 
 ### `low_savings`
 
 | # | title | description | impact | reason |
 | --- | --- | --- | --- | --- |
-| 1 | Meta de poupança automática | Transferir **{pct}%** da renda no dia do pagamento. | Eleva taxa de poupança em **{pct} p.p.** imediatamente. | `savings_rate` |
-| 2 | Cortar um hábito semanal caro | Substituir 2 refeições externas por caseiras. | Economia típica **{amount}/mês**. | `savings_rate` |
+| 1 | Auto-save goal | Transfer **{pct}%** of income on checkout day. | Raises savings rate by **{pct} p.p.** immediately. | `savings_rate` |
+| 2 | Break an expensive weekly habit | Replace 2 external meals with homemade ones. | Typical savings **{amount}/month**. | `savings_rate` |
 
 ### `high_fixed_cost`
 
 | # | title | description | impact | reason |
 | --- | --- | --- | --- | --- |
-| 1 | Ganhar folga no que ainda dá para mexer | Financiamento de casa ou carro, aluguel e escola costumam ser contratos de longo prazo — priorize variável, evite novos fixos e revise planos de ciclo curto antes de mirar renegociação grande. | Direção: melhorar o equilíbrio entre fixos e o restante do mês em cerca de **{pct} p.p.** | `fixed_vs_variable_split` |
+| 1 | Gain slack in what you can still do | Home or car financing, rent and school are often long-term contracts — prioritize variable, avoid new fixes, and review short-cycle plans before targeting large renegotiation. | Direction: improve the balance between fixed and the rest of the month by about **{pct} p.p.** | `fixed_vs_variable_split` |
 
-**Seleção:** por `primary_issue`, escolher até **3** linhas de cima para baixo; remover linhas cujo `reason` não intersecta KPIs em `warn`/`alert` **exceto** primeira linha âncora do tema quando aplicável.
+**Selection:** by `primary_issue`, choose up to **3** lines from top to bottom; remove lines whose `reason` does not intersect KPIs in `warn`/`alert` **except** first anchor line of the theme when applicable.
 
-## 5. Versionamento
+## 5. Versioning
 
-- Alterações na matriz ou em C1–C9 exigem bump de `RULE_ENGINE_VERSION` e entrada em changelog interno.
+- Matrix or C1–C9 changes require `RULE_ENGINE_VERSION` bump and internal changelog input.

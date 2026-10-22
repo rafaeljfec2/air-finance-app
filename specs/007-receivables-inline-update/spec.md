@@ -1,67 +1,67 @@
-# Feature: Edição inline — Contas a Receber (modal expandido)
+# Feature: Inline editing — Accounts receivable (expanded modal)
 
-Adicionar ações de **atualizar status** (Recebido/Pendente) e **editar valor** na seção "Contas a Receber" do orçamento (`ReceivablesSection` / modal `BudgetExpandedModal`), com paridade UX em relação a Contas a Pagar (spec 006).
+Add **update status** (Received/Pending) and **edit value** actions in the budget **Accounts Receivable** section (`ReceivablesSection` / `BudgetExpandedModal` modal), with UX parity to Accounts Payable (spec 006).
 
-**Contexto:** o modal expandido de Contas a Receber é somente leitura. O usuário precisa marcar recebíveis como recebidos e ajustar valores sem sair do orçamento. Contas a Pagar já oferece esse fluxo via `usePayableActions` + `usePayableMutation`.
+**Context:** The expanded Accounts Receivable modal is read-only. Users need to mark receivables as received and adjust amounts without leaving the budget. Accounts Payable already supports this flow via `usePayableActions` + `usePayableMutation`.
 
-**Pré-requisitos assumidos:**
+**Assumed prerequisites:**
 
-- Endpoint existente `PATCH /companies/:companyId/transactions/:id` (via `transactionService.updateTransaction`).
-- Receivables mapeiam para transações REVENUE; `Transaction.reconciled` → UI status `RECEIVED` / `PENDING`.
+- Existing endpoint `PATCH /companies/:companyId/transactions/:id` (via `transactionService.updateTransaction`).
+- Receivables map to REVENUE transactions; `Transaction.reconciled` → UI status `RECEIVED` / `PENDING`.
 - Query keys: `['budget', companyId]`, `['transactions', companyId]`.
-- Reutilizar `usePayableMutation` (mesmo payload `{ value?, reconciled? }` e invalidação).
+- Reuse `usePayableMutation` (same payload `{ value?, reconciled? }` and cache invalidation).
 
-**Referência:** `specs/006-payables-unified-update/`
+**Reference:** `specs/006-payables-unified-update/`
 
 ---
 
-## Decisões de produto (v1) — fechadas
+## Product decisions (v1) — closed
 
-| Tema | Decisão |
+| Theme | Decision |
 | --- | --- |
-| Escopo | Apenas frontend (`apps/web`); sem mudança de contrato REST |
-| UX status | Um clique alterna Recebido ↔ Pendente e reflete após sucesso |
-| UX valor | Duplo-clique → editar → blur/Enter persiste em **uma** tentativa |
-| Cores status | `warning` (Pendente) / `success` (Recebido) — identidade receivables |
-| Editabilidade | Todos os receivables do budget são editáveis (sem exclusão `card-*`) |
-| Toasts | Feedback distinto por ação (valor vs status) |
-| Mutação | Reutilizar `usePayableMutation`; novo `useReceivableActions` |
-| Rollout | Direto; sem feature flag |
+| Scope | Frontend only (`apps/web`); no REST contract changes |
+| UX status | One click toggles Received ↔ Pending and reflects after success |
+| UX value | Double-click → edit → blur/Enter persists on the **first** attempt |
+| Status colors | `warning` (Pending) / `success` (Received) — receivables identity |
+| Editability | All budget receivables are editable (no `card-*` exclusion) |
+| Toasts | Distinct feedback per action (value vs status) |
+| Mutation | Reuse `usePayableMutation`; new `useReceivableActions` |
+| Rollout | Direct; no feature flag |
 
 ---
 
 ## User Stories
 
-- **US-1 — Um clique, uma ação**
-  Como usuário do orçamento, quero marcar uma conta a receber como recebida com um único clique no badge.
+- **US-1 — One click, one action**
+  As a budget user, I want to mark a receivable as received with a single click on the badge.
 
-- **US-2 — Valor persiste na primeira tentativa**
-  Como usuário, quero editar o valor de um recebível e ver o total atualizado após salvar uma vez (blur ou Enter).
+- **US-2 — Value persists on the first try**
+  As a user, I want to edit a receivable amount and see the updated total after saving once (blur or Enter).
 
-- **US-3 — Paridade sem duplicar mutação**
-  Como desenvolvedor, quero reutilizar a mutação unificada de payables para receivables, sem duplicar invalidação de cache.
-
----
-
-## Critérios de aceitação
-
-1. Dado um recebível pendente, ao clicar no badge "Pendente", o status muda para "Recebido" **na primeira interação** e o total do grupo recalcula após refetch.
-2. Dado um recebível com valor editável, ao alterar o valor e pressionar Enter (ou blur), o novo valor persiste **na primeira tentativa** e o total atualiza.
-3. Toasts distintos para status ("Marcado como recebido" / "Marcado como pendente") e valor.
-4. `useReceivableActions` reutiliza `usePayableMutation` sem duplicar invalidação.
-5. Testes unitários cobrem: toggle de status, save de valor, valor inválido, await da mutação.
-6. Card compacto `ReceivablesCard` permanece read-only.
-7. `yarn typecheck` e `yarn lint` passam; testes Vitest verdes.
+- **US-3 — Parity without duplicating mutation**
+  As a developer, I want to reuse the unified payables mutation for receivables without duplicating cache invalidation.
 
 ---
 
-## Fora de escopo (v1)
+## Acceptance criteria
 
-- Edição inline no `ReceivablesCard` compacto (continua read-only).
-- Backend: novos endpoints ou campos.
+1. Given a pending receivable, clicking the "Pending" badge changes status to "Received" on the **first interaction** and the group total recalculates after refetch.
+2. Given a receivable with an editable value, changing the value and pressing Enter (or blur) persists the new value on the **first attempt** and updates the total.
+3. Distinct toasts for status ("Marked as received" / "Marked as pending") and value.
+4. `useReceivableActions` reuses `usePayableMutation` without duplicating invalidation.
+5. Unit tests cover: status toggle, value save, invalid value, awaiting the mutation.
+6. Compact `ReceivablesCard` remains read-only.
+7. `yarn typecheck` and `yarn lint` pass; Vitest tests are green.
+
+---
+
+## Out of scope (v1)
+
+- Inline editing on the compact `ReceivablesCard` (stays read-only).
+- Backend: new endpoints or fields.
 - Optimistic updates.
-- Página `/receivables`.
-- Generalizar hooks payables/receivables em um único hook genérico.
+- `/receivables` page.
+- Generalizing payables/receivables hooks into a single generic hook.
 
 ---
 
@@ -70,4 +70,4 @@ Adicionar ações de **atualizar status** (Recebido/Pendente) e **editar valor**
 - `yarn typecheck`
 - `yarn lint`
 - Vitest: `useReceivableActions` + `ReceivablesSection` + types
-- Validação manual: modal "Contas a Receber" — toggle status e editar valor
+- Manual validation: "Accounts Receivable" modal — toggle status and edit value

@@ -12,7 +12,7 @@
   - Depends: T-001
   - File: `usePayableMutation.ts`
 
-- **T-003 [FE] — Expose `updateTransactionAsync` em `useTransactions`** ✅
+- **T-003 [FE] — Expose `updateTransactionAsync` in `useTransactions`** ✅
   - Depends: T-002
   - File: `apps/web/src/hooks/useTransactions.ts`
 
@@ -24,17 +24,17 @@
   - Depends: T-004, T-002
   - File: `usePayableActions.ts`
 
-- **T-006 [FE] — Migrar `PayablesSection`** ✅
+- **T-006 [FE] — Migrate `PayablesSection`** ✅
   - Depends: T-005
-  - Remove imports de hooks legados.
+  - Remove legacy hook imports.
 
-- **T-007 [FE] — Remover hooks legados** ✅
+- **T-007 [FE] — Remove legacy hooks** ✅
   - Delete `useEditableValue.ts`, `usePayableStatus.ts`
   - Depends: T-006
 
-## Validação
+## Validation
 
-- **T-008 [FE] — Quality gates** (parcial)
+- **T-008 [FE] — Quality gates** (partial)
   - `yarn vitest run src/components/budget/hooks/` ✅ 8/8
-  - `yarn typecheck` ⚠️ falha pré-existente em `useDecisionEngineEvaluateAuto.test.tsx` (`issue_drivers` ausente), não relacionada a 006
-  - `yarn lint` — rodar localmente se necessário
+  - `yarn typecheck` ⚠️ pre-existing failure in `useDecisionEngineEvaluateAuto.test.tsx` (missing `issue_drivers`), unrelated to 006
+  - `yarn lint` — run locally if needed

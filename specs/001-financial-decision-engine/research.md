@@ -2,34 +2,34 @@
 
 ## 1. Alternatives considered
 
-### A) Motor de regras externo (JSON / YAML / DMN)
+### A) External rules engine (JSON / YAML / DMN)
 
 - **Options:** `json-rules-engine`, Zeno engine patterns, DMN tables via Camunda.
-- **Rejected for v1:** adiciona parser, versionamento de artefatos externos e superfície de teste maior; time já domina TypeScript; spec exige determinismo simples.
-- **Future:** se produto exigir ajuste de copy/regras por tenant sem deploy, reavaliar serialização do catálogo.
+- **Rejected for v1:** adds parser, external artifact versioning, and larger test surface; team already knows TypeScript; spec requires simple determinism.
+- **Future:** if product requires per-tenant copy/rule changes without deploy, revisit catalog serialization.
 
-### B) LLM para priorização ou redação de ações
+### B) LLM for prioritization or action copy
 
-- **Rejected:** spec e constitution explícitos — **sem IA no core**; risco de não-determinismo e custo.
+- **Rejected:** spec and constitution explicit — **no AI in the core**; non-determinism and cost risk.
 
-### C) Single giant `switch` vs classes por política
+### C) Single giant `switch` vs policy classes
 
-- **Chosen:** classes pequenas (`CompletenessEvaluator`, `PrimaryIssueResolver`, …) + catálogo de ações em módulo dedicado — facilita TDD e mantém funções abaixo do limite de linhas do projeto.
+- **Chosen:** small classes (`CompletenessEvaluator`, `PrimaryIssueResolver`, …) + action catalog in a dedicated module — supports TDD and keeps functions under project line limits.
 
-### D) Persistir cada decisão em Mongo
+### D) Persist every decision in Mongo
 
-- **Deferred:** NFR pede **log** observável; persistência auditável pode ser fase 2 (`DecisionAuditLog`). v1: logs estruturados são suficientes.
+- **Deferred:** NFR requires observable **log**; auditable persistence can be phase 2 (`DecisionAuditLog`). v1: structured logs are enough.
 
-### E) Endpoint GET derivando KPIs internamente
+### E) GET endpoint deriving KPIs internally
 
-- **Alternative:** um único GET que chama Dashboard + Indebtedness internamente.
-- **Chosen for clarity:** **POST com body** (ou composer dedicado) para manter o motor **puro** e testável sem mockar meio Mongo no unit do resolver; agregador pode ser segunda PR.
+- **Alternative:** a single GET that calls Dashboard + Indebtedness internally.
+- **Chosen for clarity:** **POST with body** (or dedicated composer) to keep the engine **pure** and testable without mocking Mongo in resolver unit tests; aggregator can be a second PR.
 
 ## 2. References
 
-- Spec interna: `specs/001-financial-decision-engine/spec.md` v0.2  
+- Internal spec: `specs/001-financial-decision-engine/spec.md` v0.2  
 - NestJS modular patterns: `AGENTS.md` / `docs/MODULE_MAP.md` (`back-end-financeiro-nestjs`)  
-- Pino structured logging: já usado na API  
+- Pino structured logging: already used in the API  
 
 ## 3. Decision summary
 

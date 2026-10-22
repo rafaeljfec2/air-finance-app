@@ -17,9 +17,9 @@ Payables already support inline edit via `usePayableActions` → `usePayableMuta
 
 | Goal | Detail |
 | --- | --- |
-| **G1** | Parity UX with Contas a Pagar for status toggle and value edit |
+| **G1** | UX parity with Accounts Payable for status toggle and value edit |
 | **G2** | Reuse `usePayableMutation` (no second invalidation path) |
-| **G3** | Keep receivables visual identity (`warning`/`success`, labels Recebido/Pendente) |
+| **G3** | Keep receivables visual identity (`warning`/`success`, Received/Pending labels) |
 | **G4** | No backend or API contract changes |
 | **G5** | TDD: failing tests first for actions and section interaction |
 
@@ -72,14 +72,14 @@ Guards always return `true` (all budget receivables are real transactions). Mapp
 Mirror `usePayableActions` with:
 
 - Toggle: `newReconciled = currentStatus !== 'RECEIVED'`
-- Toasts: "Marcado como recebido" / "Marcado como pendente"
+- Toasts: "Marked as received" / "Marked as pending"
 - Same value parse / Enter / blur / Escape / `skipBlurSaveRef` pattern
 - Calls `updatePayable` from `usePayableMutation` (shared mutation)
 
 ### 4.3 `ReceivablesSection`
 
 - Replace `SectionTable` + `renderCell` with `ReceivableRow` + `ReceivablesTable`
-- Keep grouping: Parcelas Finalizando / Outras Receitas + `TotalFooter`
+- Keep grouping: Ending installments / Other revenue + `TotalFooter`
 - Status colors: `warning` / `success` (not payables `danger`)
 
 ## 5. Sequence — status toggle
@@ -101,7 +101,7 @@ sequenceDiagram
   M->>Q: invalidate budget + transactions
   M-->>A: resolved
   A->>A: toast success, clear togglingId
-  Q-->>R: refetch, UI shows Recebido
+  Q-->>R: refetch, UI shows Received
 ```
 
 ## 6. Testing strategy (TDD)

@@ -1,6 +1,6 @@
 # Data Model — Complete Financial Plan
 
-## Tipos do backend (`src/decision-engine/complete-plan/domain/complete-plan.types.ts`)
+## Backend types (`src/decision-engine/complete-plan/domain/complete-plan.types.ts`)
 
 ```ts
 export type InstallmentPriority = 'high' | 'medium' | 'low';
@@ -78,30 +78,30 @@ export interface CompletePlanOutput {
 }
 ```
 
-## Persistência — `AgentInsight`
+## Persistence — `AgentInsight`
 
-Reutiliza schema existente. Documento criado pelo `LLMNarrativeService`:
+Reuses existing schema. Document created by `LLMNarrativeService`:
 
-| Campo | Valor |
+| Field | Value |
 | --- | --- |
 | `agentId` | `complete-plan-narrative` |
 | `agentVersion` | `1.0.0` |
-| `companyId` | id da empresa |
-| `userId` | id do usuário que disparou |
-| `targetId` | mesma da empresa (chave de leitura) |
+| `companyId` | company id |
+| `userId` | id of user who triggered |
+| `targetId` | same as company (read key) |
 | `triggerType` | `on_demand` |
-| `contextHash` | sha256 do payload reduzido (24 chars) |
+| `contextHash` | sha256 of reduced payload (24 chars) |
 | `output` | `{ diagnosis, expectedOutcome }` |
 | `status` | `success` |
-| `expiresAt` | now + 7 dias |
+| `expiresAt` | now + 7 days |
 
-TTL aplicado via index `expireAfterSeconds: 0` já existente no schema.
+TTL applied via existing schema index `expireAfterSeconds: 0`.
 
-## Schema runtime (frontend, Zod)
+## Runtime schema (frontend, Zod)
 
-Definido em `src/services/completePlanService.ts` espelhando 1:1 o DTO. Aceita:
+Defined in `src/services/completePlanService.ts` mirroring DTO 1:1. Accepts:
 
-- `theme_phase` `null` (caso `data_incomplete`).
-- `categoryId` opcional/`null`.
+- `theme_phase` `null` (`data_incomplete` case).
+- optional/null `categoryId`.
 - `peakDaysOfMonth` `null`.
-- `creditUtilizationTrend` sempre `null`.
+- `creditUtilizationTrend` always `null`.

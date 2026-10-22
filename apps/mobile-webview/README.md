@@ -1,74 +1,74 @@
 # Air Finance Mobile (WebView)
 
-App mobile do Air Finance usando Expo e React Native WebView.
+Air Finance mobile app using Expo and React Native WebView.
 
-## Funcionalidades
+## Features
 
-- Carrega o app web dentro de um WebView
-- Intercepta e armazena tokens de autenticação
-- Suporte para iOS e Android
-- Desenvolvido com Expo para facilitar builds e deploys
+- Loads the web app inside a WebView
+- Intercepts and stores authentication tokens
+- iOS and Android support
+- Built with Expo for easier builds and deploys
 
-## Scripts Disponíveis
+## Available scripts
 
-- `yarn start` - Inicia o Expo Metro Bundler
-- `yarn android` - Roda no emulador/dispositivo Android
-- `yarn ios` - Roda no simulador/dispositivo iOS
-- `yarn web` - Roda no navegador (para testes)
-- `yarn lint` - Executa o linter
-- `yarn type-check` - Verifica tipos TypeScript
+- `yarn start` — Start the Expo Metro bundler
+- `yarn android` — Run on Android emulator/device
+- `yarn ios` — Run on iOS simulator/device
+- `yarn web` — Run in the browser (for testing)
+- `yarn lint` — Run the linter
+- `yarn type-check` — TypeScript type check
 
-## Configuração de Desenvolvimento
+## Development setup
 
-1. Certifique-se de que o app web está rodando em `http://localhost:5173`
-2. Execute `yarn start`
-3. Escaneie o QR code com o Expo Go (Android) ou Camera (iOS)
+1. Make sure the web app is running at `http://localhost:5173`
+2. Run `yarn start`
+3. Scan the QR code with Expo Go (Android) or Camera (iOS)
 
-## Configuração de Produção
+## Production setup
 
-Atualize a URL em `src/constants/webview.ts`:
+Update the URL in `src/constants/webview.ts`:
 
 ```typescript
 export const WEBSITE_URL = "https://app.airfinance.com.br";
 ```
 
-## Estrutura
+## Structure
 
-- `src/App.tsx` - Componente principal com WebView
-- `src/components/` - Componentes reutilizáveis
-- `src/hooks/` - Hooks customizados
-- `src/constants/` - Constantes e configurações
-- `assets/` - Ícones e imagens
+- `src/App.tsx` — Main component with WebView
+- `src/components/` — Reusable components
+- `src/hooks/` — Custom hooks
+- `src/constants/` — Constants and configuration
+- `assets/` — Icons and images
 
-## Comunicação com o Web App
+## Communication with the web app
 
-O app mobile se comunica com o web app através de:
+The mobile app communicates with the web app via:
 
-1. **postMessage**: Para enviar mensagens do web para o mobile
-2. **injectedJavaScript**: Para injetar código no WebView
-3. **Expo SecureStore**: Para armazenar tokens de forma segura
+1. **postMessage**: Send messages from web to mobile
+2. **injectedJavaScript**: Inject code into the WebView
+3. **Expo SecureStore**: Store tokens securely
 
-## Assets Necessários
+## Required assets
 
-Para publicar o app, você precisará criar os seguintes assets:
+To publish the app, create these assets:
 
 - `assets/icon.png` (1024x1024)
-- `assets/splash.png` (1284x2778 para iOS, 1920x3840 para Android)
+- `assets/splash.png` (1284x2778 for iOS, 1920x3840 for Android)
 - `assets/adaptive-icon.png` (1024x1024)
 - `assets/favicon.png` (48x48)
 
-## Build para Produção
+## Production build
 
-Para criar builds de produção, use o EAS Build:
+Use EAS Build for production builds:
 
 ```bash
-# Configurar EAS
+# Configure EAS
 npx eas-cli login
 npx eas build:configure
 
-# Build para Android
+# Android build
 yarn build:android
 
-# Build para iOS
+# iOS build
 yarn build:ios
 ```

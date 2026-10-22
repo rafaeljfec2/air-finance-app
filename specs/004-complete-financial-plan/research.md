@@ -1,63 +1,63 @@
 # Research — Complete Financial Plan
 
-## Por que híbrido (não 100% LLM, não 100% determinístico)?
+## Why hybrid (not 100% LLM, not 100% deterministic)?
 
-| Eixo | 100% determinístico | 100% LLM | **Híbrido (escolhido)** |
+| Axis | 100% deterministic | 100% LLM | **Hybrid (chosen)** |
 | --- | --- | --- | --- |
-| Confiabilidade dos números | Alta | Risco de alucinação numérica | Alta — LLM nunca toca números |
-| Latência | < 1s | 2-5s | ~1s (cache hit ~150ms) |
-| Custo | R$ 0 | R$ por request | R$ apenas em cache miss (TTL 7d) |
-| Tom humano / acolhedor | Limitado | Excelente | Bom — LLM nos 2 textos livres |
-| Manutenção da copy | Engenheiros editam código | Modelo "explica" | Engenheiros editam apenas fallback determinístico |
+| Number reliability | High | Risk of numeric hallucination | High — LLM never touches numbers |
+| Latency | < 1s | 2–5s | ~1s (cache hit ~150ms) |
+| Cost | R$ 0 | R$ per request | R$ only on cache miss (7d TTL) |
+| Human / supportive tone | Limited | Excellent | Good — LLM on 2 free-text fields |
+| Copy maintenance | Engineers edit code | Model “explains” | Engineers edit deterministic fallback only |
 
-A LLM responde apenas por `diagnosis` e `expectedOutcome` (texto livre). Tudo que tem número, prioridade, lista ou regra é determinístico.
+The LLM produces only `diagnosis` and `expectedOutcome` (free text). Everything with numbers, priority, lists, or rules is deterministic.
 
 ---
 
-## Cache — por que `AgentInsight` e não Redis?
+## Cache — why `AgentInsight` and not Redis?
 
-- Já existe schema, TTL via Mongo `expireAfterSeconds`, métricas e índice consistentes.
-- Mesma infra do `CreditCardInsightAgent`.
-- Sem nova dependência; sem servidor extra.
+- Schema already exists, TTL via Mongo `expireAfterSeconds`, metrics, and consistent index.
+- Same infra as `CreditCardInsightAgent`.
+- No new dependency; no extra server.
 
-`contextHash` agrega:
+`contextHash` aggregates:
 
-- `agentVersion` (invalida automaticamente em release).
+- `agentVersion` (auto-invalidates on release).
 - `primary_issue`, `theme_phase`, `referencePeriod`.
-- Buckets discretos (`step=0.05`) de `committedPct`, `proj30Pct`, `proj90Pct`.
-- Bucket de `reductionNeeded` (step=R$ 100).
-- Nomes das top categorias e lista de `peakDays`.
+- Discrete buckets (`step=0.05`) for `committedPct`, `proj30Pct`, `proj90Pct`.
+- `reductionNeeded` bucket (step=R$ 100).
+- Top category names and `peakDays` list.
 
-→ Variações pequenas no input não geram nova chamada à LLM, mantendo a narrativa estável.
+→ Small input variations do not trigger a new LLM call, keeping narrative stable.
 
 ---
 
-## Lacunas de dados conhecidas
+## Known data gaps
 
-| Dado | Estado V1 | Plano V2 |
+| Data | V1 state | V2 plan |
 | --- | --- | --- |
-| Histórico multi-mês de dia de pico | Ausente — usamos só o mês corrente | Agregação 3 meses + percentil |
-| Tendência intra-mês de utilização do limite | Ausente — `creditUtilizationTrend = null` | Série diária do consumo do cartão |
-| Score de prioridade da parcela | Heurístico (share do total) | Considerar custo total restante e juro implícito |
-| Sugestão para `installmentsStrategy` | Estática por `primary_issue` | Pode virar texto LLM curto se ROI for claro |
+| Multi-month peak-day history | Missing — current month only | 3-month aggregation + percentile |
+| Intra-month limit utilization trend | Missing — `creditUtilizationTrend = null` | Daily card consumption series |
+| Installment priority score | Heuristic (share of total) | Consider remaining total cost and implicit interest |
+| `installmentsStrategy` suggestion | Static per `primary_issue` | May become short LLM text if ROI is clear |
 
 ---
 
-## Por que endpoint separado e não estender `evaluate-auto`?
+## Why a separate endpoint instead of extending `evaluate-auto`?
 
-- Lazy-load no frontend → primeira renderização do `DecisionPage` continua igualmente rápida.
-- Cache da narrativa LLM totalmente isolado.
-- `evaluate-auto` permanece um endpoint puro/síncrono e barato.
-- Mais fácil de evoluir contratos sem quebrar consumidores existentes.
+- Frontend lazy-load → first `DecisionPage` render stays equally fast.
+- LLM narrative cache fully isolated.
+- `evaluate-auto` stays a pure/sync cheap endpoint.
+- Easier to evolve contracts without breaking existing consumers.
 
 ---
 
-## Risco e mitigação
+## Risk and mitigation
 
-| Risco | Mitigação |
+| Risk | Mitigation |
 | --- | --- |
-| LLM gera JSON inválido | `parseLLMContent` falha-soft, dispara fallback determinístico. |
-| LLM indisponível / sem chave | `try/catch` no service, fallback. |
-| Custo descontrolado | Rate limit existente (10/dia/empresa) + cache 7 dias por contextHash. |
-| Texto da LLM desalinhado da realidade | Prompt restrito; números proibidos no texto. |
-| Payload pesado | Parcelas limitadas a término ≤ 12 meses. |
+| LLM returns invalid JSON | `parseLLMContent` fails soft, triggers deterministic fallback. |
+| LLM unavailable / no key | `try/catch` in service, fallback. |
+| Uncontrolled cost | Existing rate limit (10/day/company) + 7-day cache per contextHash. |
+| LLM text misaligned with reality | Restrictive prompt; numbers forbidden in text. |
+| Heavy payload | Installments limited to end ≤ 12 months. |

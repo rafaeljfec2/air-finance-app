@@ -1,42 +1,42 @@
-# Páginas SEO
+# SEO pages
 
-Este diretório contém páginas de conteúdo para SEO, organizadas em clusters temáticos.
+This directory contains SEO content pages organized into thematic clusters.
 
-## Estrutura de Clusters
+## Cluster structure
 
-### Páginas Pilares (3)
+### Pillar pages (3)
 
-1. `/gestao-financeira-cpf` - Gestão Financeira CPF
-2. `/integracao-bancaria-cnpj` - Integração Bancária CNPJ
-3. `/inteligencia-artificial-financas` - Inteligência Artificial em Finanças
+1. `/gestao-financeira-cpf` — Personal finance management (CPF)
+2. `/integracao-bancaria-cnpj` — Banking integration (CNPJ)
+3. `/inteligencia-artificial-financas` — Artificial intelligence in finance
 
-### Subpáginas por Cluster
+### Subpages by cluster
 
-#### Gestão Financeira CPF
+#### Personal finance management (CPF)
 
 - `/gestao-financeira-cpf/controle-financeiro-pessoal`
 - `/gestao-financeira-cpf/organizacao-financeira-familiar`
 - `/gestao-financeira-cpf/score-credito`
 - `/gestao-financeira-cpf/gestao-financeira-com-ia`
 
-#### Integração Bancária CNPJ
+#### Banking integration (CNPJ)
 
 - `/integracao-bancaria-cnpj/integracao-bancaria-empresas`
 - `/integracao-bancaria-cnpj/open-banking-cnpj`
 - `/integracao-bancaria-cnpj/conciliacao-bancaria-automatica`
 - `/integracao-bancaria-cnpj/integracao-erp-api-bancaria`
 
-#### Inteligência Artificial
+#### Artificial intelligence
 
 - `/inteligencia-artificial-financas/ia-gestao-financeira`
 - `/inteligencia-artificial-financas/categorizacao-transacoes-ia`
 - `/inteligencia-artificial-financas/previsao-fluxo-caixa-ia`
 - `/inteligencia-artificial-financas/automacao-financeira-inteligente`
 
-## Como Criar Novas Subpáginas
+## How to create new subpages
 
-1. Criar arquivo em `src/pages/seo/{cluster}/{subpagina}/index.tsx`
-2. Usar componente `SEOHead` para meta tags
-3. Usar componente `InternalLink` para links internos
-4. Linkar para página pilar e subpáginas relacionadas
-5. Adicionar rota em `src/routes/index.tsx`
+1. Create a file at `src/pages/seo/{cluster}/{subpagina}/index.tsx`
+2. Use the `SEOHead` component for meta tags
+3. Use the `InternalLink` component for internal links
+4. Link to the pillar page and related subpages
+5. Add the route in `src/routes/index.tsx`

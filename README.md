@@ -1,86 +1,86 @@
 # Air Finance Monorepo
 
-Monorepo do sistema Air Finance, contendo o app web e o app mobile.
+Monorepo for the Air Finance system, containing the web app and the mobile app.
 
-## Estrutura do Projeto
+## Project structure
 
 ```
 air-finance-monorepo/
 ├── apps/
-│   ├── web/                    # Frontend React + Vite
-│   └── mobile-webview/         # App mobile Expo + WebView
+│   ├── web/                    # React + Vite frontend
+│   └── mobile-webview/         # Expo + WebView mobile app
 ├── packages/
-│   └── shared/                 # Código compartilhado
-│       ├── types/              # Tipos TypeScript
-│       ├── constants/          # Constantes e configs
-│       └── utils/              # Utilitários
+│   └── shared/                 # Shared code
+│       ├── types/              # TypeScript types
+│       ├── constants/          # Constants and configs
+│       └── utils/              # Utilities
 ├── package.json                # Root package.json
-├── turbo.json                  # Configuração Turborepo
-└── .yarnrc.yml                 # Configuração Yarn
+├── turbo.json                  # Turborepo configuration
+└── .yarnrc.yml                 # Yarn configuration
 ```
 
-## Tecnologias
+## Technologies
 
 - **Monorepo**: Yarn Workspaces + Turborepo
 - **Web**: React 18, TypeScript, Vite, TailwindCSS
 - **Mobile**: Expo, React Native, WebView
-- **Compartilhado**: TypeScript, constantes, utils
+- **Shared**: TypeScript, constants, utils
 
-## Pré-requisitos
+## Prerequisites
 
 - Node.js >= 18.0.0
 - Yarn >= 4.0.0
 
-## Instalação
+## Installation
 
 ```bash
-# Instalar Yarn 4 (se necessário)
+# Install Yarn 4 (if needed)
 corepack enable
 corepack prepare yarn@4.0.0 --activate
 
-# Instalar todas as dependências
+# Install all dependencies
 yarn install
 ```
 
-## Scripts Disponíveis
+## Available scripts
 
-### Desenvolvimento
+### Development
 
 ```bash
-# Rodar todos os apps em dev
+# Run all apps in dev mode
 yarn dev
 
-# Rodar apenas o web
+# Run web only
 yarn dev:web
 
-# Rodar apenas o mobile
+# Run mobile only
 yarn dev:mobile
 ```
 
 ### Build
 
 ```bash
-# Build de todos os projetos
+# Build all projects
 yarn build
 ```
 
-### Linting e Type Check
+### Linting and type check
 
 ```bash
-# Lint de todos os projetos
+# Lint all projects
 yarn lint
 
-# Fix automático de lint
+# Auto-fix lint issues
 yarn lint:fix
 
-# Type check de todos os projetos
+# Type-check all projects
 yarn typecheck
 ```
 
-### Limpeza
+### Cleanup
 
 ```bash
-# Limpar node_modules e cache
+# Remove node_modules and cache
 yarn clean
 ```
 
@@ -88,15 +88,15 @@ yarn clean
 
 ### @air-finance/web
 
-Frontend web desenvolvido com React, TypeScript e Vite.
+Web frontend built with React, TypeScript, and Vite.
 
-**Principais funcionalidades:**
+**Main features:**
 
-- Gestão financeira completa
-- Orçamentos e metas
-- Cartões de crédito
-- Relatórios e dashboards
-- Multi-empresa
+- Full financial management
+- Budgets and goals
+- Credit cards
+- Reports and dashboards
+- Multi-company
 
 **Scripts:**
 
@@ -106,18 +106,18 @@ yarn workspace @air-finance/web build
 yarn workspace @air-finance/web lint
 ```
 
-**Documentação:** [apps/web/README.md](apps/web/README.md)
+**Documentation:** [apps/web/README.md](apps/web/README.md)
 
 ### @air-finance/mobile-webview
 
-App mobile nativo usando Expo e WebView para carregar o app web.
+Native mobile app using Expo and WebView to load the web app.
 
-**Principais funcionalidades:**
+**Main features:**
 
-- Carrega o app web via WebView
-- Armazena tokens de autenticação
-- Suporte iOS e Android
-- Push notifications (futuro)
+- Loads the web app via WebView
+- Stores authentication tokens
+- iOS and Android support
+- Push notifications (future)
 
 **Scripts:**
 
@@ -127,99 +127,99 @@ yarn workspace @air-finance/mobile-webview android
 yarn workspace @air-finance/mobile-webview ios
 ```
 
-**Documentação:** [apps/mobile-webview/README.md](apps/mobile-webview/README.md)
+**Documentation:** [apps/mobile-webview/README.md](apps/mobile-webview/README.md)
 
 ### @air-finance/shared
 
-Package compartilhado entre web e mobile.
+Package shared between web and mobile.
 
-**Conteúdo:**
+**Contents:**
 
-- Tipos TypeScript comuns
-- Constantes de API e storage
-- Utilitários de storage e formatação
+- Common TypeScript types
+- API and storage constants
+- Storage and formatting utilities
 
-## Adicionar Dependências
+## Adding dependencies
 
 ```bash
-# Adicionar dependência ao workspace específico
+# Add a dependency to a specific workspace
 yarn workspace @air-finance/web add <package>
 yarn workspace @air-finance/mobile-webview add <package>
 yarn workspace @air-finance/shared add <package>
 
-# Adicionar dependência dev ao workspace específico
+# Add a dev dependency to a specific workspace
 yarn workspace @air-finance/web add -D <package>
 
-# Adicionar dependência na raiz
+# Add a dependency at the repo root
 yarn add -W <package>
 ```
 
-## Desenvolvimento Local
+## Local development
 
-### Web App
+### Web app
 
-1. Configure o arquivo `.env` em `apps/web/`
-2. Execute `yarn dev:web`
-3. Acesse `http://localhost:5173`
+1. Configure the `.env` file in `apps/web/`
+2. Run `yarn dev:web`
+3. Open `http://localhost:5173`
 
-### Mobile App
+### Mobile app
 
-1. Certifique-se de que o web app está rodando
-2. Execute `yarn dev:mobile`
-3. Escaneie o QR code com o Expo Go
+1. Make sure the web app is running
+2. Run `yarn dev:mobile`
+3. Scan the QR code with Expo Go
 
 ## Turborepo
 
-O projeto usa Turborepo para:
+The project uses Turborepo to:
 
-- Paralelizar tarefas de build, lint e test
-- Cachear resultados para builds mais rápidos
-- Gerenciar dependências entre workspaces
+- Parallelize build, lint, and test tasks
+- Cache results for faster builds
+- Manage dependencies between workspaces
 
-### Configuração
+### Configuration
 
-A configuração está em `turbo.json`. As principais tarefas são:
+Configuration lives in `turbo.json`. Main tasks:
 
-- `dev`: Modo desenvolvimento (persistent, sem cache)
-- `build`: Build de produção (com cache)
-- `lint`: Linting (com dependências)
-- `type-check`: Verificação de tipos
+- `dev`: Development mode (persistent, no cache)
+- `build`: Production build (cached)
+- `lint`: Linting (with dependencies)
+- `type-check`: Type checking
 
 ## CI/CD
 
-O projeto está preparado para CI/CD com GitHub Actions:
+The project is set up for CI/CD with GitHub Actions:
 
-- Build automático em PRs
-- Deploy automático em merge para main
-- Verificação de types e lint
+- Automatic builds on PRs
+- Automatic deploy on merge to main
+- Type and lint checks
 
-## Estrutura de Branches
+## Branch structure
 
-- `main` - Produção
-- `develop` - Desenvolvimento
-- `feature/*` - Features
-- `fix/*` - Correções
+- `main` — Production
+- `develop` — Development
+- `feature/*` — Features
+- `fix/*` — Fixes
 
-## Versionamento
+## Versioning
 
-O projeto segue [Semantic Versioning](https://semver.org/):
+The project follows [Semantic Versioning](https://semver.org/):
 
 - `MAJOR.MINOR.PATCH`
 - MAJOR: Breaking changes
-- MINOR: Novas features
+- MINOR: New features
 - PATCH: Bug fixes
 
-## Contribuindo
+## Contributing
 
-1. Crie uma branch a partir de `develop`
-2. Faça suas alterações
-3. Execute `yarn lint:fix` e `yarn typecheck`
-4. Abra um PR para `develop`
+1. Create a branch from `develop`
+2. Make your changes
+3. Run `yarn lint:fix` and `yarn typecheck`
+4. Open a PR to `develop`
 
-## Licença
+## License
 
-Proprietary - Todos os direitos reservados
+Proprietary — All rights reserved
 
-## Suporte
+## Support
 
-Para suporte, entre em contato com a equipe de desenvolvimento.
+For support, contact the development team.

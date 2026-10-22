@@ -35,10 +35,10 @@
   - Replace SectionTable with ReceivableRow / ReceivablesTable
   - File: `ReceivablesSection.tsx`
 
-## Validação
+## Validation
 
 - **T-007 [FE] — Quality gates** ✅
   - Vitest: types + actions + section — 13/13
   - `tsc --noEmit` ✅
   - ESLint (changed files) ✅
-  - Manual: `/budget` → Contas a Receber → toggle + edit value (pendente)
+  - Manual: `/budget` → Accounts Receivable → toggle + edit value (pending)

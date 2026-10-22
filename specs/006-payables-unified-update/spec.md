@@ -1,60 +1,60 @@
-# Feature: Unificação de mutações — Contas a Pagar (modal expandido)
+# Feature: Unified mutations — Accounts payable (expanded modal)
 
-Corrigir duplicação de lógica e falha silenciosa nas ações de **atualizar status** (Pago/Pendente) e **editar valor** na seção "Contas a Pagar" do orçamento (`PayablesSection` / modal `BudgetExpandedModal`).
+Fix duplicated logic and silent failures in **update status** (Paid/Pending) and **edit value** actions in the budget **Accounts Payable** section (`PayablesSection` / `BudgetExpandedModal` modal).
 
-**Contexto:** o usuário precisa clicar **duas vezes** para que status ou valor persistam. Causa raiz identificada: `useEditableValue` e `usePayableStatus` chamam `updateTransaction` via `mutate` (fire-and-forget) envolvido em `await Promise.resolve(...)`, que **não aguarda** a mutação. Além disso, ambos os hooks duplicam invalidação de cache, toasts e wiring de `useTransactions`.
+**Context:** users must click **twice** for status or value to persist. Root cause: `useEditableValue` and `usePayableStatus` call `updateTransaction` via `mutate` (fire-and-forget) wrapped in `await Promise.resolve(...)`, which **does not await** the mutation. Both hooks also duplicate cache invalidation, toasts, and `useTransactions` wiring.
 
-**Pré-requisitos assumidos:**
+**Assumed prerequisites:**
 
-- Endpoint existente `PATCH /companies/:companyId/transactions/:id` (via `transactionService.updateTransaction`).
-- Payables de contas recorrentes mapeiam para `Transaction.reconciled`; faturas de cartão (`id` prefixo `card-`) não são toggleáveis.
+- Existing endpoint `PATCH /companies/:companyId/transactions/:id` (via `transactionService.updateTransaction`).
+- Recurring account payables map to `Transaction.reconciled`; credit card invoices (`id` prefix `card-`) are not toggleable.
 - Query keys: `['budget', companyId]`, `['transactions', companyId]`.
 
 ---
 
-## Decisões de produto (v1) — fechadas
+## Product decisions (v1) — closed
 
-| Tema | Decisão |
+| Theme | Decision |
 | --- | --- |
-| Escopo | Apenas frontend (`apps/web`); sem mudança de contrato REST |
-| UX status | Um clique alterna Pago ↔ Pendente e reflete imediatamente após sucesso |
-| UX valor | Duplo-clique → editar → blur/Enter persiste em **uma** tentativa |
-| Faturas de cartão | Continuam somente leitura para status (prefixo `card-`) |
-| Toasts | Manter feedback distinto por ação (valor vs status), centralizando só a mutação |
-| Rollout | Replace direto dos hooks duplicados; sem feature flag |
+| Scope | Frontend only (`apps/web`); no REST contract changes |
+| UX status | One click toggles Paid ↔ Pending and reflects immediately after success |
+| UX value | Double-click → edit → blur/Enter persists on the **first** attempt |
+| Credit card invoices | Remain read-only for status (`card-` prefix) |
+| Toasts | Keep distinct feedback per action (value vs status), centralizing only the mutation |
+| Rollout | Direct replacement of duplicated hooks; no feature flag |
 
 ---
 
 ## User Stories
 
-- **US-1 — Um clique, uma ação**
-  Como usuário do orçamento, quero marcar uma conta como paga com um único clique, sem precisar repetir a ação.
+- **US-1 — One click, one action**
+  As a budget user, I want to mark an account as paid with a single click, without repeating the action.
 
-- **US-2 — Valor persiste na primeira tentativa**
-  Como usuário, quero editar o valor de uma conta a pagar e ver o total atualizado após salvar uma vez (blur ou Enter).
+- **US-2 — Value persists on the first try**
+  As a user, I want to edit a payable amount and see the updated total after saving once (blur or Enter).
 
-- **US-3 — Código sem duplicação**
-  Como desenvolvedor, quero uma única função de mutação para payables, para que invalidação de cache e tratamento de erro não se repitam em dois hooks.
-
----
-
-## Critérios de aceitação
-
-1. Dado um payable recorrente pendente, ao clicar no badge "Pendente", o status muda para "Pago" **na primeira interação** e o total do grupo recalcula após refetch.
-2. Dado um payable com valor editável, ao alterar o valor e pressionar Enter (ou blur), o novo valor persiste **na primeira tentativa** e o total atualiza.
-3. Dado um payable com id `card-*`, o badge de status permanece não clicável.
-4. `useEditableValue` e `usePayableStatus` são substituídos por um hook unificado (ou par composto com mutação compartilhada) sem duplicar invalidação/toasts/mutation wiring.
-5. Testes unitários cobrem: await real da mutação, invalidação de `budget` + `transactions`, toggle de status, save de valor, id não toggleável.
-6. `yarn typecheck` e `yarn lint` passam; testes Vitest do hook verdes.
+- **US-3 — Code without duplication**
+  As a developer, I want a single mutation function for payables so cache invalidation and error handling are not repeated across two hooks.
 
 ---
 
-## Fora de escopo (v1)
+## Acceptance criteria
 
-- Edição inline de status/valor no `PayablesCard` compacto (continua read-only).
-- Backend: novos endpoints ou campos.
-- Optimistic updates (pode ser follow-up).
-- Edição de faturas de cartão via API de credit-cards.
+1. Given a pending recurring payable, clicking the "Pending" badge changes status to "Paid" on the **first interaction** and the group total recalculates after refetch.
+2. Given a payable with an editable value, changing the value and pressing Enter (or blur) persists the new value on the **first attempt** and updates the total.
+3. Given a payable with id `card-*`, the status badge stays non-clickable.
+4. `useEditableValue` and `usePayableStatus` are replaced by a unified hook (or composed pair with shared mutation) without duplicating invalidation/toasts/mutation wiring.
+5. Unit tests cover: real mutation await, invalidation of `budget` + `transactions`, status toggle, value save, non-toggleable id.
+6. `yarn typecheck` and `yarn lint` pass; Vitest hook tests are green.
+
+---
+
+## Out of scope (v1)
+
+- Inline status/value editing on the compact `PayablesCard` (stays read-only).
+- Backend: new endpoints or fields.
+- Optimistic updates (possible follow-up).
+- Editing credit card invoices via the credit-cards API.
 
 ---
 
@@ -62,5 +62,5 @@ Corrigir duplicação de lógica e falha silenciosa nas ações de **atualizar s
 
 - `yarn typecheck` ✅
 - `yarn lint` ✅
-- Vitest: hook unificado + regressão PayablesSection (se aplicável) ✅
-- Validação manual: modal "Contas a Pagar" — toggle status e editar valor com um clique/tentativa cada
+- Vitest: unified hook + PayablesSection regression (if applicable) ✅
+- Manual validation: "Accounts Payable" modal — toggle status and edit value with one click/attempt each

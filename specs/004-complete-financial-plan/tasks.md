@@ -1,29 +1,29 @@
 # Tasks — Complete Financial Plan
 
-| ID | Status | Tarefa |
+| ID | Status | Task |
 | --- | --- | --- |
-| T-001 | ✅ | Backend: `InstallmentsSnapshotService` + spec (generaliza `getActiveInstallments` para empresa) |
-| T-002 | ✅ | Backend: puros `behavior-analyzer`, `projection-builder`, `personal-rules-builder` + specs |
-| T-003 | ✅ | Backend: `LLMNarrativeService` com cache via `AgentInsight` + fallback determinístico + spec |
+| T-001 | ✅ | Backend: `InstallmentsSnapshotService` + spec (generalizes `getActiveInstallments` for company) |
+| T-002 | ✅ | Backend: pure `behavior-analyzer`, `projection-builder`, `personal-rules-builder` + specs |
+| T-003 | ✅ | Backend: `LLMNarrativeService` with cache via `AgentInsight` + deterministic fallback + spec |
 | T-004 | ✅ | Backend: `CompletePlanService` (composer), Controller, DTO, Module + specs + e2e |
-| T-005 | ✅ | Backend: registrar `CompletePlanModule` no `app.module.ts` e validar Swagger |
+| T-005 | ✅ | Backend: register `CompletePlanModule` in `app.module.ts` and validate Swagger |
 | T-006 | ✅ | Frontend: `completePlanService` (Zod) + `useCompletePlan` + tests |
-| T-007 | ✅ | Frontend: `DecisionCompletePlanSection` + sub-cards (Diagnosis, Numbers, Projection, Installments, Behavior, Rules, Outcome) com tokens DS corretos + tests |
-| T-008 | ✅ | Frontend: integrar seção em `pages/decision/index.tsx` abaixo do PlaybookCard e estender invalidação do botão Atualizar |
-| T-009 | ✅ | Criar `specs/004-complete-financial-plan/` (spec, plan, research, data-model, contracts, tasks) |
-| T-010 | ✅ | Rodar lint/typecheck/tests no backend e no frontend; validação visual mobile + dark |
+| T-007 | ✅ | Frontend: `DecisionCompletePlanSection` + sub-cards (Diagnosis, Numbers, Projection, Installments, Behavior, Rules, Outcome) with correct DS tokens + tests |
+| T-008 | ✅ | Frontend: integrate section in `pages/decision/index.tsx` below PlaybookCard and extend Refresh button invalidation |
+| T-009 | ✅ | Create `specs/004-complete-financial-plan/` (spec, plan, research, data-model, contracts, tasks) |
+| T-010 | ✅ | Run lint/typecheck/tests on backend and frontend; visual validation mobile + dark |
 
 ---
 
-## Critérios de aceitação por tarefa
+## Acceptance criteria per task
 
-- **T-001** — Snapshot agrupa por `baseDescription + accountId`, descarta transações sem padrão de parcela, classifica `accountType` por tipo da conta, prioriza por share. ≥ 5 testes.
-- **T-002** — Pure functions com 100% de testes para top categorias, dias de pico, projeção 30/60/90 e regras por slug.
-- **T-003** — Hash de contexto determinístico, hit usa cache, miss persiste com TTL 7d, fallback ativa para JSON inválido e exceção.
-- **T-004** — Service orquestra composer + engine + snapshot + analyzers + LLM, controller usa guards, DTO documentado em Swagger, e2e válida shape e 400 em formato inválido.
-- **T-005** — `CompletePlanModule` listado em `app.module.ts`. Build passa. Endpoint aparece em `/swagger`.
-- **T-006** — `fetchCompletePlan` parseia, envia `referencePeriod`, rejeita payload inválido (Zod). 4+ testes vitest.
-- **T-007** — Componente raiz isola loading/erro/sucesso. Tokens DS corretos (sem `text-foreground`, sem `bg-muted`). Mobile-first. 5 testes.
-- **T-008** — Seção integrada após `DecisionPlaybookCard`. Botão Atualizar invalida `['decision-engine']` (cobre auto + complete-plan).
-- **T-009** — Pasta `specs/004-complete-financial-plan/` com `spec.md`, `plan.md`, `research.md`, `data-model.md`, `contracts/openapi.yaml`, `contracts/complete-plan.types.ts`, `tasks.md`.
-- **T-010** — `yarn lint` + `yarn typecheck` + suites de teste passam nos dois repos. Snapshot do componente em mobile (375px) e dark validados manualmente pelo time.
+- **T-001** — Snapshot groups by `baseDescription + accountId`, drops transactions without installment pattern, classifies `accountType` by account type, prioritizes by share. ≥ 5 tests.
+- **T-002** — Pure functions with 100% tests for top categories, peak days, 30/60/90 projection, and rules by slug.
+- **T-003** — Deterministic context hash, hit uses cache, miss persists with 7d TTL, fallback on invalid JSON and exception.
+- **T-004** — Service orchestrates composer + engine + snapshot + analyzers + LLM, controller uses guards, DTO documented in Swagger, e2e validates shape and 400 on invalid format.
+- **T-005** — `CompletePlanModule` listed in `app.module.ts`. Build passes. Endpoint appears in `/swagger`.
+- **T-006** — `fetchCompletePlan` parses, sends `referencePeriod`, rejects invalid payload (Zod). 4+ vitest tests.
+- **T-007** — Root component isolates loading/error/success. Correct DS tokens (no `text-foreground`, no `bg-muted`). Mobile-first. 5 tests.
+- **T-008** — Section integrated after `DecisionPlaybookCard`. Refresh button invalidates `['decision-engine']` (covers auto + complete-plan).
+- **T-009** — Folder `specs/004-complete-financial-plan/` with `spec.md`, `plan.md`, `research.md`, `data-model.md`, `contracts/openapi.yaml`, `contracts/complete-plan.types.ts`, `tasks.md`.
+- **T-010** — `yarn lint` + `yarn typecheck` + test suites pass in both repos. Component snapshot on mobile (375px) and dark validated manually by team.

@@ -1,66 +1,66 @@
-# Feature: Decision Engine — Composer automático (snapshot → `DecisionEngineInput`)
+# Feature: Decision Engine — Automatic composer (snapshot → `DecisionEngineInput`)
 
-Montar o **`DecisionEngineInput`** usado pelo motor de decisão financeira a partir de **dados reais** já existentes na API (transações, contas, cartões, resumos), **sem** reimplementar a lógica determinística de priorização/ações do `DecisionEngineService`.
+Build the **`DecisionEngineInput`** used by the financial decision engine from **real data** already available in the API (transactions, accounts, cards, summaries), **without** reimplementing the deterministic prioritization/action logic of `DecisionEngineService`.
 
 ## User Stories
 
-- **US-1 — Uma chamada para decidir**  
-  Como integrador do produto, quero um endpoint que **avalia a decisão** a partir do contexto da empresa e do período, **sem** montar manualmente o mapa de KPIs no cliente.
+- **US-1 — One call to decide**  
+  As a product integrator, I want an endpoint that **evaluates the decision** from company context and period, **without** manually building the KPI map on the client.
 
-- **US-2 — Fonte única de métricas**  
-  Como mantenedor, quero que o composer **reutilize** serviços já responsáveis por métricas (ex.: endividamento, resumo de dashboard), para **não duplicar** cálculos de negócio já consolidados.
+- **US-2 — Single metrics source**  
+  As a maintainer, I want the composer to **reuse** services already responsible for metrics (e.g., indebtedness, dashboard summary) so **business calculations already consolidated are not duplicated**.
 
-- **US-3 — Transparência de período**  
-  Como usuário final, quero que a decisão use o **mesmo mês de referência** que a visão financeira (YYYY-MM), alinhado ao que já mostramos em dashboard.
+- **US-3 — Period transparency**  
+  As an end user, I want the decision to use the **same reference month** as the financial view (YYYY-MM), aligned with what we already show on the dashboard.
 
-- **US-4 — Separação de responsabilidades**  
-  Como arquiteto, quero que o composer **não** aplique escada FR-1, status global nem seleção de ações — apenas **materializa** níveis/valores e completude conforme contrato do motor.
+- **US-4 — Separation of concerns**  
+  As an architect, I want the composer **not** to apply FR-1 ladder, global status, or action selection — only **materialize** levels/values and completeness per the engine contract.
 
 ## Functional Requirements
 
-**FR-1 — Entrada**  
-O endpoint `evaluate-auto` aceita `companyId` (path) e **`referencePeriod` opcional em query** (`YYYY-MM`; omitido = mês UTC corrente). Na v1 o snapshot usa **`viewMode` fixo `cash_flow`** até existir pipeline accrual dedicado.
+**FR-1 — Input**  
+The `evaluate-auto` endpoint accepts `companyId` (path) and **optional `referencePeriod` query** (`YYYY-MM`; omitted = current UTC month). In v1 the snapshot uses **fixed `viewMode` `cash_flow`** until a dedicated accrual pipeline exists.
 
-**FR-2 — Fontes de dados**  
-Deve obter dados via **serviços existentes** (ex.: métricas de endividamento, resumo e comparação do dashboard, agregações de despesas quando necessário para um KPI), em paralelo quando independentes.
+**FR-2 — Data sources**  
+Must fetch data via **existing services** (e.g., indebtedness metrics, dashboard summary and comparison, expense aggregations when needed for a KPI), in parallel when independent.
 
-**FR-3 — Saída**  
-Produzir um **`DecisionEngineInput`** compatível com o contrato compartilhado com o motor (`netIncomeMonth`, `kpis` com `level` obrigatório e `value`/`severityDistance` quando aplicável).
+**FR-3 — Output**  
+Produce a **`DecisionEngineInput`** compatible with the contract shared with the engine (`netIncomeMonth`, `kpis` with required `level` and `value`/`severityDistance` when applicable).
 
-**FR-4 — Mapeamento KPI → nível**  
-Regras de **zonas** (ok / warn / alert) para cada KPI presente no snapshot são **política do composer** (documentadas no plano), alinhadas onde possível aos status já expostos por APIs existentes; o motor **não** reinterpreta fontes brutas.
+**FR-4 — KPI → level mapping**  
+**Zone** rules (ok / warn / alert) for each KPI in the snapshot are **composer policy** (documented in the plan), aligned where possible with statuses already exposed by existing APIs; the engine **does not** reinterpret raw sources.
 
-**FR-5 — KPIs opcionais**  
-KPIs opcionais no motor (ex.: `checking_runway_days`, `debt_service_to_income`) podem **faltar** no snapshot se dados insuficientes; o motor já trata omissão vs incompletude.
+**FR-5 — Optional KPIs**  
+Optional engine KPIs (e.g., `checking_runway_days`, `debt_service_to_income`) may **be missing** from the snapshot if data is insufficient; the engine already handles omission vs incompleteness.
 
-**FR-6 — Integração HTTP**  
-Expor **`POST /companies/:companyId/decision-engine/evaluate-auto`** com mesma autenticação/autorização de leitura que o `evaluate` manual, retornando o **mesmo formato de resposta** do motor.
+**FR-6 — HTTP integration**  
+Expose **`POST /companies/:companyId/decision-engine/evaluate-auto`** with the same read authentication/authorization as manual `evaluate`, returning the **same response shape** as the engine.
 
-**FR-7 — Sem decisão no composer**  
-O composer **não** chama regras de `primary_issue`, `status` ou catálogo de ações fora do `DecisionEngineService`.
+**FR-7 — No decision in composer**  
+The composer **does not** invoke `primary_issue`, `status`, or action catalog rules outside `DecisionEngineService`.
 
 ## Non-Functional Requirements
 
 **NFR-1 — Performance**  
-Buscar fontes em **paralelo** quando independentes; latência aceitável para UX (ordem de centenas de ms em condições normais).
+Fetch sources **in parallel** when independent; latency acceptable for UX (on the order of hundreds of ms under normal conditions).
 
-**NFR-2 — Observabilidade**  
-Log estruturado opcional com `companyId`, `referencePeriod`, versão de mapeamento do composer (sem PII sensível além de ids já aceitos).
+**NFR-2 — Observability**  
+Optional structured log with `companyId`, `referencePeriod`, composer mapping version (no sensitive PII beyond already accepted ids).
 
-**NFR-3 — Segurança**  
-Respeitar **escopo da empresa** e mesmas permissões do endpoint manual; não aceitar `companyId` divergente do path.
+**NFR-3 — Security**  
+Respect **company scope** and the same permissions as the manual endpoint; do not accept `companyId` diverging from the path.
 
-**NFR-4 — Testabilidade**  
-Mapeamento puro extraído para funções/classes testáveis com **fixtures**; testes de integração do endpoint com dependências mockadas.
+**NFR-4 — Testability**  
+Pure mapping extracted to testable functions/classes with **fixtures**; endpoint integration tests with mocked dependencies.
 
 ## Out of Scope
 
-- Novo motor de KPIs paralelo ao dashboard/indebtedness.
-- Persistência de auditoria de decisões (fase futura).
-- UI no front (sprint separada).
-- Modo `accrual` com fontes diferentes do dashboard quando o produto ainda não expõe paridade — ver plano.
+- New KPI engine parallel to dashboard/indebtedness.
+- Decision audit persistence (future phase).
+- Front-end UI (separate sprint).
+- `accrual` mode with different dashboard sources when the product does not yet expose parity — see plan.
 
 ## Open Questions
 
-1. **Paridade `accrual`:** quando exposto na API, definir fontes distintas do dashboard; até lá o snapshot permanece **`cash_flow` apenas** (sem parâmetro público).
-2. **Pesos exatos** de zonas para KPIs derivados por heurística (ex.: `fixed_vs_variable_split` via categorias) — calibrar com produto após MVP.
+1. **`accrual` parity:** when exposed in the API, define distinct sources from the dashboard; until then the snapshot remains **`cash_flow` only** (no public parameter).
+2. **Exact zone weights** for heuristically derived KPIs (e.g., `fixed_vs_variable_split` via categories) — calibrate with product after MVP.

@@ -2,13 +2,13 @@
 
 **Feature:** `001-financial-decision-engine`  
 **Spec:** `spec.md` v0.2  
-**Target codebase:** `back-end-financeiro-nestjs` (implementação); este diretório mantém o SDD.
+**Target codebase:** `back-end-financeiro-nestjs` (implementation); this directory holds the SDD artifacts.
 
 ## 1. Goals
 
-- Serviço **determinístico**, **sem IA**, que transforma **snapshot de KPIs + níveis + completude** em `status`, `primary_issue`, `actions[]` conforme contrato.
-- **FR-0** (`data_incomplete`) eval **antes** de qualquer escada.
-- Camadas **testáveis** com dependências injetáveis; **controller fino** (HTTP + validação DTO apenas).
+- **Deterministic**, **non-AI** service that turns a **snapshot of KPIs + levels + completeness** into `status`, `primary_issue`, and `actions[]` per contract.
+- **FR-0** (`data_incomplete`) is evaluated **before** any ladder logic.
+- **Testable** layers with injectable dependencies; **thin controller** (HTTP + DTO validation only).
 
 ## 2. Architecture overview
 
@@ -18,40 +18,40 @@
 src/decision-engine/
 ├── decision-engine.module.ts
 ├── interfaces/http/
-│   └── decision-engine.controller.ts      # só roteamento + DTO + chama application
+│   └── decision-engine.controller.ts      # routing + DTO + calls application only
 ├── application/
-│   └── decision-engine.facade.ts          # orquestra chamada única ao domínio (opcional se service já for fino)
+│   └── decision-engine.facade.ts          # optional single domain call (skip if service is already thin)
 ├── domain/
-│   ├── decision-engine.service.ts         # orquestrador principal (entry do domínio)
-│   ├── completeness.evaluator.ts        # FR-0 — dados completos?
-│   ├── primary-issue.resolver.ts        # FR-1 + FR-2 — escada + desempate
+│   ├── decision-engine.service.ts         # main orchestrator (domain entry)
+│   ├── completeness.evaluator.ts        # FR-0 — data complete?
+│   ├── primary-issue.resolver.ts        # FR-1 + FR-2 — ladder + tie-break
 │   ├── status.resolver.ts               # FR-13 / FR-0 override
-│   ├── action-generator.service.ts      # FR-8/9/11 — catálogo + parametrização
-│   ├── constants.ts                     # RULE_ENGINE_VERSION, KPI_ORDER (desempate lex.), pesos FR-5/6
+│   ├── action-generator.service.ts      # FR-8/9/11 — catalog + parameterization
+│   ├── constants.ts                     # RULE_ENGINE_VERSION, KPI_ORDER (lex tie-break), FR-5/6 weights
 │   └── catalog/
-│       └── action-catalog.ts            # matriz primary_issue × templates de ação (PT-BR)
+│       └── action-catalog.ts            # primary_issue × action templates matrix (PT-BR copy)
 ├── dto/
 │   ├── decision-engine-request.dto.ts
 │   └── decision-engine-response.dto.ts
-└── *.spec.ts (colocados junto aos units testados)
+└── *.spec.ts (next to the units under test)
 ```
 
-**Nota:** Se `decision-engine.facade.ts` for redundante com `DecisionEngineService`, manter **um** entrypoint público (`DecisionEngineService`) registrado no módulo e omitir facade — o plano aceita os dois desenhos desde que o controller **não** contenha regra de negócio.
+**Note:** If `decision-engine.facade.ts` is redundant with `DecisionEngineService`, keep **one** public entrypoint (`DecisionEngineService`) registered on the module and omit the facade — this plan accepts either design as long as the controller contains **no** business rules.
 
-### 2.2 Responsabilidades
+### 2.2 Responsibilities
 
-| Componente | Responsabilidade |
+| Component | Responsibility |
 | --- | --- |
-| **CompletenessEvaluator** | Avalia `DecisionEngineInput.dataCompleteness` + regras duras (§7); retorna `true/false` e lista `missingKpis` / `invalidKpis`. |
-| **DecisionEngineService** | Se incompleto → monta resposta FR-0; senão → resolver `primary_issue` → `status` → `actions`. |
-| **PrimaryIssueResolver** | Aplica escada FR-1 nos **níveis** (`ok` \| `warn` \| `alert`); ignora degraus sem KPI; desempate FR-2. |
-| **StatusResolver** | `critical` / `attention` / `healthy` conforme FR-13; **FR-0** força `attention`. |
-| **ActionGeneratorService** | Consulta catálogo por `primary_issue` + níveis disparadores; parametriza `impact` com valores numéricos do input; limite 3; garante mínimo 1 para `healthy` e `data_incomplete`. |
+| **CompletenessEvaluator** | Evaluates `DecisionEngineInput.dataCompleteness` + hard rules (§7); returns `true/false` and `missingKpis` / `invalidKpis` lists. |
+| **DecisionEngineService** | If incomplete → build FR-0 response; else → resolve `primary_issue` → `status` → `actions`. |
+| **PrimaryIssueResolver** | Applies FR-1 ladder on **levels** (`ok` \| `warn` \| `alert`); skips rungs without KPI; FR-2 tie-break. |
+| **StatusResolver** | `critical` / `attention` / `healthy` per FR-13; **FR-0** forces `attention`. |
+| **ActionGeneratorService** | Looks up catalog by `primary_issue` + triggering levels; parameterizes `impact` with numeric input; max 3; ensures minimum 1 for `healthy` and `data_incomplete`. |
 
 ### 2.3 KPI input boundary
 
-- **Não** recalcular KPIs neste módulo na v1: o **cliente HTTP** (outro serviço Nest ou mesmo controller agregador) monta `DecisionEngineInput` a partir de serviços existentes (`Dashboard`, `Indebtedness`, etc.) **ou** expõe endpoint que delega a um **DecisionEngineComposerService** futuro no bounded context de “financial health”.
-- O motor **só** consome o contrato em `contracts/decision-engine.types.ts`.
+- **Do not** recalculate KPIs in this module in v1: the **HTTP client** (another Nest service or the same aggregating controller) builds `DecisionEngineInput` from existing services (`Dashboard`, `Indebtedness`, etc.) **or** exposes an endpoint that delegates to a future **DecisionEngineComposerService** in the “financial health” bounded context.
+- The engine **only** consumes the contract in `contracts/decision-engine.types.ts`.
 
 ### 2.4 Diagram (container)
 
@@ -78,102 +78,102 @@ flowchart TB
   DE --> PI
   DE --> SR
   DE --> AG
-  KPI -.->|monta snapshot| C
+  KPI -.->|build snapshot| C
 ```
 
-## 3. Catálogo `primary_issue` (v1)
+## 3. `primary_issue` catalog (v1)
 
-Alinhamento **spec FR-1** com os slugs solicitados pelo produto. A escada exige temas para **renda comprometida** e **sobra**; não apareciam na lista curta de 7 itens — **obrigatório** incluir para fidelidade à spec:
+Align **spec FR-1** with product-requested slugs. The ladder requires themes for **committed income** and **surplus**; they were missing from the short list of 7 items — **required** for spec fidelity:
 
-| Ordem FR-1 | `primary_issue` slug | KPI(s) principal(is) |
+| FR-1 order | `primary_issue` slug | Main KPI(s) |
 | --- | --- | --- |
-| FR-0 | `data_incomplete` | (política de completude) |
+| FR-0 | `data_incomplete` | (completeness policy) |
 | 1 | `liquidity_risk` | `checking_runway_days`, `monthly_cash_flow` |
 | 2 | `debt_pressure` | `debt_service_to_income` |
 | 3 | `credit_overuse` | `credit_utilization_index` |
 | 4 | **`high_commitment`** | `income_committed_pct` |
 | 5 | **`low_surplus`** | `surplus_capacity` |
 | 6 | `low_savings` | `savings_rate` |
-| 7 | `high_fixed_cost` | `fixed_vs_variable_split` (fixo excessivo) |
-| — | `healthy` | todos ok + dados completos |
+| 7 | `high_fixed_cost` | `fixed_vs_variable_split` (excess fixed share) |
+| — | `healthy` | all ok + complete data |
 
-**Aliases legados (evitar):** spec menciona nomes como `liquidity_crisis`; **não usar** na API — apenas os slugs desta tabela.
+**Legacy aliases (avoid):** spec mentions names like `liquidity_crisis`; **do not use** on the API — only slugs in this table.
 
-## 4. Priorização e determinismo
+## 4. Prioritization and determinism
 
-1. **CompletenessEvaluator** roda primeiro → se incompleto, retorno fixo (`primary_issue=data_incomplete`, `status=attention`, ações do catálogo FR-0).
-2. Caso completo: **PrimaryIssueResolver** percorre ordem 1→7; primeiro degrau com qualquer KPI em **`warn` ou `alert`** define o tema **apenas se** esse degrau é “ativo” (ver §7 para KPI opcional ausente = degrau omitido, não incompleto).
-3. **Desempate FR-2:** dentro do mesmo degrau, maior “severidade numérica” (distância à fronteira da zona); empate → ordem lexicográfica em `constants.ts` (`KPI_LEX_ORDER`).
-4. **Sem** `Math.random`, hora atual, ou I/O no caminho quente.
-5. **`RULE_ENGINE_VERSION`:** constante string (`"1.0.0"`) exportada; incluída em logs e opcionalmente em header HTTP `X-Decision-Engine-Version`.
+1. **CompletenessEvaluator** runs first → if incomplete, fixed return (`primary_issue=data_incomplete`, `status=attention`, FR-0 catalog actions).
+2. If complete: **PrimaryIssueResolver** walks order 1→7; first rung with any KPI in **`warn` or `alert`** sets the theme **only if** that rung is “active” (see §7: optional KPI absent = rung skipped, not incomplete).
+3. **FR-2 tie-break:** within the same rung, highest numeric “severity” (distance to zone boundary); tie → lexicographic order in `constants.ts` (`KPI_LEX_ORDER`).
+4. **No** `Math.random`, current time, or I/O on the hot path.
+5. **`RULE_ENGINE_VERSION`:** string constant (`"1.0.0"`) exported; included in logs and optionally HTTP header `X-Decision-Engine-Version`.
 
 ## 5. Status (`FR-13`)
 
-| Condição | `status` |
+| Condition | `status` |
 | --- | --- |
-| FR-0 disparado | `attention` |
-| Alert em nível 1–3 da escada **ou** `monthly_cash_flow` = `alert` | `critical` |
-| Caso contrário: existe `warn` ou `alert` em níveis 4–7 | `attention` |
-| Todos `ok` | `healthy` |
+| FR-0 triggered | `attention` |
+| Alert on ladder levels 1–3 **or** `monthly_cash_flow` = `alert` | `critical` |
+| Otherwise: `warn` or `alert` on levels 4–7 | `attention` |
+| All `ok` | `healthy` |
 
-## 6. Integração HTTP
+## 6. HTTP integration
 
-- **Rota sugerida:** `POST /companies/:companyId/decision-engine/evaluate`
-- **Guards:** `JwtAuthGuard`, `CompanyGuard`, permissão de leitura financeira (reutilizar padrão de `indebtedness` / `dashboard`).
-- **Body:** `DecisionEngineRequestDto` — espelha `DecisionEngineInput` (ver contracts).
-- **Response:** `DecisionEngineResponseDto` — espelha output JSON da spec.
-- **Controller:** valida DTO, chama `DecisionEngineService.evaluate(input)`, retorna DTO; **zero** branch de negócio.
+- **Suggested route:** `POST /companies/:companyId/decision-engine/evaluate`
+- **Guards:** `JwtAuthGuard`, `CompanyGuard`, financial read permission (reuse `indebtedness` / `dashboard` pattern).
+- **Body:** `DecisionEngineRequestDto` — mirrors `DecisionEngineInput` (see contracts).
+- **Response:** `DecisionEngineResponseDto` — mirrors spec JSON output.
+- **Controller:** validates DTO, calls `DecisionEngineService.evaluate(input)`, returns DTO; **zero** business branching.
 
-### Composer (fora do motor)
+### Composer (outside the engine)
 
-Um serviço separado (ex.: `DecisionEngineComposerService` em `dashboard` ou novo agregador) pode:
+A separate service (e.g. `DecisionEngineComposerService` in `dashboard` or a new aggregator) can:
 
-1. Coletar dados do período (`referenceMonth`, `cashFlowView`).
-2. Calcular ou buscar KPIs já existentes.
-3. Preencher `dataCompleteness` e `kpiSnapshots`.
-4. Chamar `DecisionEngineService.evaluate`.
+1. Collect period data (`referenceMonth`, `cashFlowView`).
+2. Calculate or fetch existing KPIs.
+3. Fill `dataCompleteness` and `kpiSnapshots`.
+4. Call `DecisionEngineService.evaluate`.
 
-Isso mantém o motor **puro** e facilita testes unitários com fixtures.
+This keeps the engine **pure** and simplifies unit tests with fixtures.
 
-## 7. Observabilidade
+## 7. Observability
 
-- **Log estruturado (Pino):** nível `info` por requisição bem-sucedida com campos:
+- **Structured log (Pino):** `info` per successful request with fields:
   - `ruleEngineVersion`
-  - `companyId` (id apenas)
+  - `companyId` (id only)
   - `primary_issue`, `status`
-  - lista de `{ kpiId, level }` recebidos
+  - list of `{ kpiId, level }` received
   - `data_complete: boolean`
-  - hash ou checksum opcional do payload normalizado (sem PII)
-- **Não** logar descrições longas de transações.
-- **Debug:** `debug` com árvore de decisão (qual degrau ganhou) apenas em ambiente dev ou flag.
+  - optional hash/checksum of normalized payload (no PII)
+- **Do not** log long transaction descriptions.
+- **Debug:** `debug` with decision tree (which rung won) only in dev or via flag.
 
 ## 8. Testing strategy (backend SDD)
 
-- **Unit:** `CompletenessEvaluator`, `PrimaryIssueResolver`, `StatusResolver`, `ActionGeneratorService`, `DecisionEngineService` com fixtures de input/output esperados.
-- **Casos obrigatórios:** FR-0 prevalece; healthy → exatamente 1 ação; critical quando nível 3 alert; desempate lexicográfico; KPI opcional ausente vs incompleto.
-- **Controller spec:** validação DTO + mock do service.
+- **Unit:** `CompletenessEvaluator`, `PrimaryIssueResolver`, `StatusResolver`, `ActionGeneratorService`, `DecisionEngineService` with expected input/output fixtures.
+- **Required cases:** FR-0 wins; healthy → exactly 1 action; critical when level 3 alert; lex tie-break; optional KPI absent vs incomplete.
+- **Controller spec:** DTO validation + mocked service.
 
 ## 9. Module registration
 
-- `DecisionEngineModule`: `providers` exportando `DecisionEngineService` se outros módulos precisarem; `controllers` com `DecisionEngineController`.
-- Import em `AppModule`.
-- **Sem** dependência circular: motor não importa `DashboardModule` diretamente; quem compõe o input importa ambos.
+- `DecisionEngineModule`: `providers` exporting `DecisionEngineService` if other modules need it; `controllers` with `DecisionEngineController`.
+- Import in `AppModule`.
+- **No** circular dependency: engine does not import `DashboardModule` directly; whoever composes input imports both.
 
 ## 10. Trade-offs
 
-| Decisão | Prós | Contras |
+| Decision | Pros | Cons |
 | --- | --- | --- |
-| Catálogo em TypeScript (v1) | Determinístico, tipado, fácil diff em PR | Mudança de copy exige deploy |
-| KPI numérico no input | UI pode mostrar “impact” parametrizado | Composer deve enviar números confiáveis |
-| Sem DSL externa | Sem parser/risco | Menos flexível para não-devs |
+| Catalog in TypeScript (v1) | Deterministic, typed, easy PR diff | Copy changes require deploy |
+| Numeric KPI in input | UI can show parameterized “impact” | Composer must send reliable numbers |
+| No external DSL | No parser/risk | Less flexible for non-devs |
 
 ## 11. Files to add (implementation checklist)
 
-- [ ] `src/decision-engine/**/*.ts` conforme árvore §2.1  
+- [ ] `src/decision-engine/**/*.ts` per §2.1 tree  
 - [ ] `decision-engine.module.ts` + `app.module.ts` import  
-- [ ] Testes `*.spec.ts`  
-- [ ] Swagger decorators no controller + DTOs (`@ApiProperty`)  
-- [ ] Export de tipos compartilháveis (opcional): duplicar interfaces no front via cópia manual ou pacote shared futuro — **fora deste plano**
+- [ ] `*.spec.ts` tests  
+- [ ] Swagger decorators on controller + DTOs (`@ApiProperty`)  
+- [ ] Export of shared types (optional): duplicate interfaces on the front via manual copy or future shared package — **out of scope for this plan**
 
 ---
 

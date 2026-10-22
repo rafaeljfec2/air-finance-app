@@ -19,110 +19,110 @@ Use the sections below for **closure, hardening, product alignment, and docs**.
 
 ### T1 [BE] — Deterministic installment snapshot cursor
 
-- **Descrição:** Em `InstallmentsSnapshotService`, garantir ordenação estável na leitura Mongo (ex.: `.sort({ paymentDate: 1, _id: 1 })`) e documentar em comentário mínimo ou doc interna a regra de qual transação define `monthlyValue` quando há múltiplas linhas no mesmo grupo (`baseDescription::accountId`).
-- **Aceite:**
-  - Teste reproduz duas transações futuras no mesmo grupo com `monthlyValue` diferentes e assert em **valor esperado fixo** após a regra escolhida.
-  - `explain` ou nota em PR confirma uso de índice compatível (ex.: `companyId` + `paymentDate` + `launchType` se aplicável).
-- **Dependências:** —
-- **Esforço:** M
+- **Description:** In `InstallmentsSnapshotService`, ensure stable sort on Mongo reads (e.g., `.sort({ paymentDate: 1, _id: 1 })`) and document in a minimal comment or internal doc which transaction defines `monthlyValue` when multiple rows exist in the same group (`baseDescription::accountId`).
+- **Acceptance:**
+  - Test reproduces two future transactions in the same group with different `monthlyValue` and asserts a **fixed expected value** after the chosen rule.
+  - `explain` or PR note confirms compatible index use (e.g., `companyId` + `paymentDate` + `launchType` if applicable).
+- **Dependencies:** —
+- **Effort:** M
 
-### T2 [BE] — Alinhar “start of day” snapshot vs reconcile vs Atlas
+### T2 [BE] — Align “start of day” snapshot vs reconcile vs Atlas
 
-- **Descrição:** Centralizar helper de “início do dia de referência” (UTC documentado vs TZ empresa — ver `research.md`); usar o mesmo instante no filtro `paymentDate` do snapshot e nos hints `referenceStartOfDayUtc` / `suggestedMongosh` do reconcile.
-- **Aceite:**
-  - Teste de borda: transação no limite UTC/local não alterna inclusão sem teste cobrindo o caso.
-  - `installments-reconcile` e snapshot usam o **mesmo** helper (sem duplicar `setHours` espalhado).
-- **Dependências:** —
-- **Esforço:** L *(se política for “só UTC”, pode cair para M — cortar escopo no PR)*
+- **Description:** Centralize “reference day start” helper (documented UTC vs company TZ — see `research.md`); use the same instant in snapshot `paymentDate` filter and reconcile hints `referenceStartOfDayUtc` / `suggestedMongosh`.
+- **Acceptance:**
+  - Edge test: transaction on UTC/local boundary does not flip inclusion without a test covering the case.
+  - `installments-reconcile` and snapshot use the **same** helper (no duplicated scattered `setHours`).
+- **Dependencies:** —
+- **Effort:** L *(if policy is “UTC only”, can drop to M — cut scope in PR)*
 
-### T3 [BE] — Observabilidade do composer (agregados de parcelas)
+### T3 [BE] — Composer observability (installment aggregates)
 
-- **Descrição:** Estender log estruturado em `composeBundle` / `loadSources` com contagens **agregadas** de parcelas (`items.length`, `totalMonthly`) sem payload bruto de transações.
-- **Aceite:** Log aparece em nível `log`/`debug` conforme política do projeto; sem PII além de ids já usados.
-- **Dependências:** —
-- **Esforço:** S
+- **Description:** Extend structured log in `composeBundle` / `loadSources` with **aggregated** installment counts (`items.length`, `totalMonthly`) without raw transaction payload.
+- **Acceptance:** Log at `log`/`debug` per project policy; no PII beyond ids already used.
+- **Dependencies:** —
+- **Effort:** S
 
-### T4 [BE] — Documentação de rotas na API
+### T4 [BE] — API route documentation
 
-- **Descrição:** Atualizar `back-end-financeiro-nestjs/docs/API_ROUTES.md` com `POST evaluate-auto`, `GET installments-reconcile`, e `POST complete-plan` (referência cruzada ao módulo `CompletePlanController`).
-- **Aceite:** Tabela ou lista com método, path, permissão, query params.
-- **Dependências:** —
-- **Esforço:** S
+- **Description:** Update `back-end-financeiro-nestjs/docs/API_ROUTES.md` with `POST evaluate-auto`, `GET installments-reconcile`, and `POST complete-plan` (cross-reference to `CompletePlanController` module).
+- **Acceptance:** Table or list with method, path, permission, query params.
+- **Dependencies:** —
+- **Effort:** S
 
-### T5 [BE] — Cobertura de testes pós-T1/T2
+### T5 [BE] — Test coverage after T1/T2
 
-- **Descrição:** Ajustar/estender `installments-snapshot.service.spec.ts` (se existir) ou testes de integração do composer para cobrir ordenação + boundary; garantir `installments-reconcile.service.spec.ts` cobre helper unificado quando T2 existir.
-- **Aceite:** `yarn test` no repositório API passa; novos testes com descrições em inglês.
-- **Dependências:** T1, T2 *(parcial: pode começar após T1)*
-- **Esforço:** M
+- **Description:** Adjust/extend `installments-snapshot.service.spec.ts` (if present) or composer integration tests for sort + boundary; ensure `installments-reconcile.service.spec.ts` covers unified helper when T2 exists.
+- **Acceptance:** `yarn test` in API repo passes; new tests with descriptions in English.
+- **Dependencies:** T1, T2 *(partial: can start after T1)*
+- **Effort:** M
 
-### T6 [BE] — Política futura `quantityInstallments` (opcional / produto)
+### T6 [BE] — Future `quantityInstallments` policy (optional / product)
 
-- **Descrição:** Se produto aprovar **B** em `research.md`, estender deteção além do regex; ADR + migração de expectativas de KPI. **Não iniciar sem decisão explícita.**
-- **Aceite:** ADR referenciado; testes de regressão para descrições só texto vs só campo.
-- **Dependências:** decisão produto/ADR
-- **Esforço:** L
+- **Description:** If product approves **B** in `research.md`, extend detection beyond regex; ADR + KPI expectation migration. **Do not start without explicit decision.**
+- **Acceptance:** Referenced ADR; regression tests for text-only vs field-only descriptions.
+- **Dependencies:** product/ADR decision
+- **Effort:** L
 
 ---
 
 ## Frontend [FE]
 
-### T7 [FE] — Seletor `referencePeriod` (YYYY-MM)
+### T7 [FE] — `referencePeriod` selector (YYYY-MM)
 
-- **Descrição:** Na rota de decisão (`/decision` ou equivalente), expor seletor mês/ano que envia `referencePeriod` na query de `evaluate-auto` (e opcionalmente link para mesmo período no complete-plan quando existir consumo).
-- **Aceite:** Estado de loading/erro preservado; query omitida = comportamento atual (mês UTC padrão da API).
-- **Dependências:** —
-- **Esforço:** M
+- **Description:** On the decision route (`/decision` or equivalent), expose month/year selector that sends `referencePeriod` on `evaluate-auto` query (and optionally link same period on complete-plan when consumed).
+- **Acceptance:** Loading/error state preserved; omitted query = current behavior (API default UTC month).
+- **Dependencies:** —
+- **Effort:** M
 
-### T8 [FE] — Labels PT-BR para `primary_issue`
+### T8 [FE] — PT-BR labels for `primary_issue`
 
-- **Descrição:** Mapa de apresentação (FE) ou endpoint de labels (BE) — preferir FE com mapa tipado a partir do union de slugs do contrato — para não exibir slug cru ao utilizador.
-- **Aceite:** Todos os `PrimaryIssueSlug` do contrato 001 têm label PT; teste de componente ou hook cobre pelo menos 3 slugs.
-- **Dependências:** —
-- **Esforço:** M
+- **Description:** Presentation map (FE) or labels endpoint (BE) — prefer FE typed map from contract slug union — so raw slug is not shown to the user.
+- **Acceptance:** All contract 001 `PrimaryIssueSlug` values have PT labels; component or hook test covers at least 3 slugs.
+- **Dependencies:** —
+- **Effort:** M
 
-### T9 [FE] — Copy explicativa “parcelas vs despesas futuras” (opcional)
+### T9 [FE] — Explanatory copy “installments vs future expenses” (optional)
 
-- **Descrição:** Tooltip ou texto curto na UI que usa dados de decisão/plano, ligando expectativa à **subcontagem** por regex (ou link para doc interno). Coordenar copy com produto.
-- **Aceite:** Copy aprovada; não altera KPIs sem spec.
-- **Dependências:** —
-- **Esforço:** S
+- **Description:** Tooltip or short UI text on decision/plan data, linking expectation to regex **subcount** (or link to internal doc). Coordinate copy with product.
+- **Acceptance:** Approved copy; does not change KPIs without spec.
+- **Dependencies:** —
+- **Effort:** S
 
 ---
 
 ## Shared [SHARED]
 
-### T10 [SHARED] — Corrigir escopo UI na spec 002
+### T10 [SHARED] — Fix UI scope in spec 002
 
-- **Descrição:** Editar `specs/002-decision-engine-composer/spec.md` secção **Out of Scope** / referências para alinhar com `specs/002-decision-engine-composer/review.md` e `specs/001-financial-decision-engine/spec.md` (UI em 001 ou 002 explicitamente).
-- **Aceite:** Uma única fonte de verdade; sem contradição “UI sprint separada” vs entrega feita.
-- **Dependências:** —
-- **Esforço:** S
+- **Description:** Edit `specs/002-decision-engine-composer/spec.md` **Out of Scope** / references to align with `specs/002-decision-engine-composer/review.md` and `specs/001-financial-decision-engine/spec.md` (UI in 001 or 002 explicitly).
+- **Acceptance:** Single source of truth; no “UI separate sprint” vs delivered contradiction.
+- **Dependencies:** —
+- **Effort:** S
 
-### T11 [SHARED] — Paridade contratos OpenAPI
+### T11 [SHARED] — OpenAPI contract parity
 
-- **Descrição:** Garantir que `specs/004-complete-financial-plan/contracts/openapi.yaml` referencia ou inclui `GET installments-reconcile` **ou** documentar em `004` que o fragmento canónico vive em `002/contracts/installments-reconcile.openapi.yaml` (link explícito no README da pasta specs).
-- **Aceite:** Leitor de specs encontra o contrato HTTP em ≤2 cliques.
-- **Dependências:** —
-- **Esforço:** S
+- **Description:** Ensure `specs/004-complete-financial-plan/contracts/openapi.yaml` references or includes `GET installments-reconcile` **or** document in `004` that the canonical fragment lives in `002/contracts/installments-reconcile.openapi.yaml` (explicit link in specs folder README).
+- **Acceptance:** Spec reader finds HTTP contract in ≤2 clicks.
+- **Dependencies:** —
+- **Effort:** S
 
 ---
 
 ## DevOps [DEVOPS]
 
-### T12 [DEVOPS] — Smoke HTTP opcional (staging)
+### T12 [DEVOPS] — Optional HTTP smoke (staging)
 
-- **Descrição:** Job ou script documentado em `DEVELOPMENT.md` / pipeline que chama `evaluate-auto` + `installments-reconcile` com token de serviço (segredos em CI vars), assert HTTP 200 + JSON mínimo.
-- **Aceite:** Falha de CI acionável; não roda contra prod sem gate separado.
-- **Dependências:** T4 *(paths estáveis)*
-- **Esforço:** L
+- **Description:** Job or script documented in `DEVELOPMENT.md` / pipeline calling `evaluate-auto` + `installments-reconcile` with service token (secrets in CI vars), assert HTTP 200 + minimal JSON.
+- **Acceptance:** Actionable CI failure; does not run against prod without separate gate.
+- **Dependencies:** T4 *(stable paths)*
+- **Effort:** L
 
-### T13 [DEVOPS] — Gate de ficheiros >500 linhas (chore transversal)
+### T13 [DEVOPS] — Files >500 lines gate (cross-cutting chore)
 
-- **Descrição:** `review.md` Minor: tratar ficheiros >500 fora do núcleo ou ajustar `quality-check.sh` com exceções documentadas — **não bloqueia** composer por si, mas desbloqueia CI monorepo.
-- **Aceite:** `quality-check.sh` verde na raiz **ou** lista de issues de refactor priorizadas.
-- **Dependências:** —
-- **Esforço:** L
+- **Description:** `review.md` Minor: handle files >500 outside core or adjust `quality-check.sh` with documented exceptions — **does not block** composer alone but unblocks monorepo CI.
+- **Acceptance:** `quality-check.sh` green at root **or** prioritized refactor issue list.
+- **Dependencies:** —
+- **Effort:** L
 
 ---
 
@@ -132,17 +132,17 @@ Use the sections below for **closure, hardening, product alignment, and docs**.
 T1 ─┬─> T5
 T2 ─┘
 T4 ──> T12
-T10, T11 (independentes de BE)
-T7, T8, T9 (FE paralelo a T1–T6 após baseline)
+T10, T11 (independent of BE)
+T7, T8, T9 (FE parallel to T1–T6 after baseline)
 ```
 
 ## Suggested dispatch order
 
-1. **T10** (spec) — desbloqueia comunicação produto.  
-2. **T1** + **T4** em paralelo (BE).  
-3. **T2** quando houver slot (BE, maior).  
-4. **T5** após T1/T2.  
-5. **T7** / **T8** (FE) em paralelo ao BE após T10.
+1. **T10** (spec) — unblocks product communication.  
+2. **T1** + **T4** in parallel (BE).  
+3. **T2** when capacity allows (BE, larger).  
+4. **T5** after T1/T2.  
+5. **T7** / **T8** (FE) parallel to BE after T10.
 
 ---
 
@@ -150,5 +150,5 @@ T7, T8, T9 (FE paralelo a T1–T6 após baseline)
 
 | Version | Date | Notes |
 | --- | --- | --- |
-| 0.1 | 2026-05-04 | Tarefas iniciais map/composer/endpoint |
-| 0.2 | 2026-05-04 | Plano v0.2: composeBundle, reconcile, baseline, FE/DEVOPS/SHARED |
+| 0.1 | 2026-05-04 | Initial tasks map/composer/endpoint |
+| 0.2 | 2026-05-04 | Plan v0.2: composeBundle, reconcile, baseline, FE/DEVOPS/SHARED |

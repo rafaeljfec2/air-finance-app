@@ -2,232 +2,232 @@
 
 **Target repo:** `back-end-financeiro-nestjs`  
 **Inputs:** `spec.md` v0.2, `plan.md`, `data-model.md`, `contracts/`  
-**Convention:** TDD obrigatório no backend — teste falhando antes do código de produção em cada componente.
+**Convention:** TDD required on the backend — failing test before production code for each component.
 
 ---
 
-## Domain — núcleo determinístico
+## Domain — deterministic core
 
-### T1 — [BE] Constantes e ordem da escada
+### T1 — [BE] Constants and ladder order
 
-**Descrição:** Criar `src/decision-engine/domain/constants.ts` com `RULE_ENGINE_VERSION`, lista ordenada de degraus FR-1 (pares: slug `PrimaryIssue` + ids de KPI), `KPI_LEX_ORDER` para desempate FR-2, e fatores FR-6 (inteiros fixos v1).
+**Description:** Create `src/decision-engine/domain/constants.ts` with `RULE_ENGINE_VERSION`, ordered FR-1 ladder steps (pairs: `PrimaryIssue` slug + KPI ids), `KPI_LEX_ORDER` for FR-2 tie-break, and FR-6 factors (fixed integers v1).
 
-**Critérios de aceite:**
-- Export único version semântico consumido por logs e resposta opcional.
-- Ordem da escada reproduz `plan.md` §3 (inclui `high_commitment`, `low_surplus`).
-- Nenhuma lógica condicional além de dados estáticos.
+**Acceptance criteria:**
+- Single semantic version export consumed by logs and optional response.
+- Ladder order matches `plan.md` §3 (includes `high_commitment`, `low_surplus`).
+- No conditional logic beyond static data.
 
-**Dependências:** —  
-**Esforço:** S
-
----
-
-### T2 — [BE] Tipos internos alinhados ao contrato
-
-**Descrição:** Adicionar `src/decision-engine/domain/decision-engine.types.ts` (ou reexport de `contracts/`) espelhando `contracts/decision-engine.types.ts` do SDD — `DecisionEngineInput`, `DecisionEngineOutput`, `KpiSnapshot`, enums.
-
-**Critérios de aceite:**
-- TypeScript estrito, sem `any`.
-- Tipos usados por todos os services do módulo.
-
-**Dependências:** T1  
-**Esforço:** S
+**Dependencies:** —  
+**Effort:** S
 
 ---
 
-### T3 — [BE] `CompletenessEvaluator` + testes unitários
+### T2 — [BE] Internal types aligned with contract
 
-**Descrição:** Implementar avaliação FR-0 conforme `data-model.md` §3 (C1–C9); retornar `{ complete: boolean; reasons: string[] }` com ids de KPI ou `data_quality`.
+**Description:** Add `src/decision-engine/domain/decision-engine.types.ts` (or re-export from `contracts/`) mirroring SDD `contracts/decision-engine.types.ts` — `DecisionEngineInput`, `DecisionEngineOutput`, `KpiSnapshot`, enums.
 
-**Critérios de aceite:**
-- Casos: renda nula ou ≤0 → incompleto; KPI obrigatório ausente → incompleto; opcionais `checking_runway_days` / `debt_service_to_income` ausentes → ainda completo.
-- `*.spec.ts` cobre happy path completo + 3 falhas distintas.
+**Acceptance criteria:**
+- Strict TypeScript, no `any`.
+- Types used by all module services.
 
-**Dependências:** T2  
-**Esforço:** M
-
----
-
-### T4 — [BE] `PrimaryIssueResolver` + testes unitários
-
-**Descrição:** Dado input completo e mapa de KPI→nível, retornar primeiro `primary_issue` na escada com `warn` ou `alert`; desempate FR-2 por `severityDistance` desc; empate → `KPI_LEX_ORDER`.
-
-**Critérios de aceite:**
-- `monthly_cash_flow` alert sem runway → `liquidity_risk`.
-- Só `credit_utilization_index` alert → `credit_overuse`.
-- Dois KPIs mesmo degrau → desempate determinístico reproduzível em teste.
-- Sem KPI opcional no degrau → pula degrau (ex.: sem `debt_service_to_income` → não escolhe `debt_pressure` por esse degrau).
-
-**Dependências:** T1, T2  
-**Esforço:** M
+**Dependencies:** T1  
+**Effort:** S
 
 ---
 
-### T5 — [BE] Catálogo estático de ações PT-BR
+### T3 — [BE] `CompletenessEvaluator` + unit tests
 
-**Descrição:** Implementar `domain/catalog/action-catalog.ts` com templates da matriz `data-model.md` §4 (placeholders `{amount}`, `{pct}`, `{days}`).
+**Description:** Implement FR-0 evaluation per `data-model.md` §3 (C1–C9); return `{ complete: boolean; reasons: string[] }` with KPI ids or `data_quality`.
 
-**Critérios de aceite:**
-- Cobrir todos os `primary_issue` exceto `healthy` compartilha entrada com catálogo dedicado de 1 micro-ação.
-- Função pura que lista candidatos por slug sem I/O.
+**Acceptance criteria:**
+- Cases: null or ≤0 income → incomplete; missing mandatory KPI → incomplete; optional `checking_runway_days` / `debt_service_to_income` absent → still complete.
+- `*.spec.ts` covers full happy path + 3 distinct failures.
 
-**Dependências:** T1  
-**Esforço:** M
-
----
-
-### T6 — [BE] `ActionGeneratorService` + testes unitários
-
-**Descrição:** Selecionar até 3 ações por `primary_issue`, filtrar por KPIs em `warn`/`alert` conforme `reason` do template; parametrizar `impact`; garantir exatamente 1 ação para `healthy` e `data_incomplete`.
-
-**Critérios de aceite:**
-- `credit_overuse` com só linha 2 aplicável → retorna ≤3 itens válidos.
-- `impact` usa valores numéricos do input quando regra definida; senão texto qualitativo permitido pela spec.
-- Testes: `healthy` → length 1; `data_incomplete` → length ≥1 sem R$ inventado.
-
-**Dependências:** T2, T5  
-**Esforço:** M
+**Dependencies:** T2  
+**Effort:** M
 
 ---
 
-### T7 — [BE] `StatusResolver` + testes unitários
+### T4 — [BE] `PrimaryIssueResolver` + unit tests
 
-**Descrição:** Implementar FR-13: `critical` para alert nos níveis 1–3 ou `monthly_cash_flow` alert; `attention` para warn/alert níveis 4–7 sem critical; `healthy` todos ok; FR-0 → `attention` curto-circuitado antes (contrato do caller).
+**Description:** Given complete input and KPI→level map, return first `primary_issue` on the ladder with `warn` or `alert`; FR-2 tie-break by `severityDistance` desc; tie → `KPI_LEX_ORDER`.
 
-**Critérios de aceite:**
-- Matriz de casos coberta em unit tests (mínimo 5 cenários).
+**Acceptance criteria:**
+- `monthly_cash_flow` alert without runway → `liquidity_risk`.
+- Only `credit_utilization_index` alert → `credit_overuse`.
+- Two KPIs same step → reproducible deterministic tie-break in test.
+- Missing optional KPI on step → skip step (e.g. no `debt_service_to_income` → do not pick `debt_pressure` for that step).
 
-**Dependências:** T1, T2  
-**Esforço:** S
-
----
-
-### T8 — [BE] `DecisionEngineService` (orquestração) + testes unitários
-
-**Descrição:** Fluxo: `CompletenessEvaluator` → se false montar output FR-0 (`primary_issue`, `status`, ações); senão `PrimaryIssueResolver` → se tema implícito “todos ok” usar `healthy` → `StatusResolver` → `ActionGeneratorService`. Injetar dependências via construtor Nest.
-
-**Critérios de aceite:**
-- **Cenários obrigatórios em teste:** `data_incomplete`; `healthy` (1 ação); fluxo negativo / liquidez → `liquidity_risk` + `critical` ou `attention` conforme níveis; **crédito alto** → `credit_overuse`.
-- Mesmo input → mesma saída (determinismo).
-- **Application facade omitida** se service for único entrypoint (conforme plano).
-
-**Dependências:** T3, T4, T6, T7  
-**Esforço:** M
+**Dependencies:** T1, T2  
+**Effort:** M
 
 ---
 
-## Interface HTTP — DTO e controller
+### T5 — [BE] Static PT-BR action catalog
 
-### T9 — [BE] DTOs request/response + validação
+**Description:** Implement `domain/catalog/action-catalog.ts` with templates from `data-model.md` §4 matrix (placeholders `{amount}`, `{pct}`, `{days}`).
 
-**Descrição:** `dto/decision-engine-request.dto.ts` e `decision-engine-response.dto.ts` com `class-validator` / `class-transformer`; espelhar OpenAPI `contracts/openapi.yaml`; `@ApiProperty` nos campos públicos.
+**Acceptance criteria:**
+- Cover all `primary_issue` values; `healthy` shares entry with dedicated 1 micro-action catalog.
+- Pure function listing candidates by slug with no I/O.
 
-**Critérios de aceite:**
-- `referencePeriod` formato validável (`YYYY-MM`).
-- `kpis` como objeto com valores validados (level obrigatório por entrada presente).
-- ValidationPipe global já existente rejeita corpo inválido com 400.
-
-**Dependências:** T2  
-**Esforço:** M
+**Dependencies:** T1  
+**Effort:** M
 
 ---
 
-### T10 — [BE] `DecisionEngineController` (fino)
+### T6 — [BE] `ActionGeneratorService` + unit tests
 
-**Descrição:** `POST companies/:companyId/decision-engine/evaluate` — aplicar `JwtAuthGuard`, `CompanyGuard`, guards de permissão alinhados a rotas similares (`indebtedness`, `dashboard`); montar `DecisionEngineInput` com `companyId` do path + body; chamar `DecisionEngineService.evaluate`; retornar DTO resposta.
+**Description:** Select up to 3 actions per `primary_issue`, filter by KPIs in `warn`/`alert` per template `reason`; parameterize `impact`; ensure exactly 1 action for `healthy` and `data_incomplete`.
 
-**Critérios de aceite:**
-- Zero ramificações de negócio no controller.
+**Acceptance criteria:**
+- `credit_overuse` with only row 2 applicable → returns ≤3 valid items.
+- `impact` uses numeric input when rule defined; otherwise qualitative text allowed by spec.
+- Tests: `healthy` → length 1; `data_incomplete` → length ≥1 without invented R$.
+
+**Dependencies:** T2, T5  
+**Effort:** M
+
+---
+
+### T7 — [BE] `StatusResolver` + unit tests
+
+**Description:** Implement FR-13: `critical` for alert on levels 1–3 or `monthly_cash_flow` alert; `attention` for warn/alert levels 4–7 without critical; `healthy` all ok; FR-0 → `attention` short-circuited first (caller contract).
+
+**Acceptance criteria:**
+- Case matrix covered in unit tests (minimum 5 scenarios).
+
+**Dependencies:** T1, T2  
+**Effort:** S
+
+---
+
+### T8 — [BE] `DecisionEngineService` (orchestration) + unit tests
+
+**Description:** Flow: `CompletenessEvaluator` → if false build FR-0 output (`primary_issue`, `status`, actions); else `PrimaryIssueResolver` → if implicit theme “all ok” use `healthy` → `StatusResolver` → `ActionGeneratorService`. Inject dependencies via Nest constructor.
+
+**Acceptance criteria:**
+- **Required test scenarios:** `data_incomplete`; `healthy` (1 action); negative flow / liquidity → `liquidity_risk` + `critical` or `attention` per levels; **high credit** → `credit_overuse`.
+- Same input → same output (determinism).
+- **Application facade omitted** if service is sole entrypoint (per plan).
+
+**Dependencies:** T3, T4, T6, T7  
+**Effort:** M
+
+---
+
+## HTTP interface — DTO and controller
+
+### T9 — [BE] Request/response DTOs + validation
+
+**Description:** `dto/decision-engine-request.dto.ts` and `decision-engine-response.dto.ts` with `class-validator` / `class-transformer`; mirror OpenAPI `contracts/openapi.yaml`; `@ApiProperty` on public fields.
+
+**Acceptance criteria:**
+- `referencePeriod` validatable format (`YYYY-MM`).
+- `kpis` as object with validated values (level required per present entry).
+- Existing global ValidationPipe rejects invalid body with 400.
+
+**Dependencies:** T2  
+**Effort:** M
+
+---
+
+### T10 — [BE] Thin `DecisionEngineController`
+
+**Description:** `POST companies/:companyId/decision-engine/evaluate` — apply `JwtAuthGuard`, `CompanyGuard`, permission guards aligned with similar routes (`indebtedness`, `dashboard`); build `DecisionEngineInput` from path `companyId` + body; call `DecisionEngineService.evaluate`; return response DTO.
+
+**Acceptance criteria:**
+- Zero business branches in controller.
 - Swagger `@ApiTags`, `@ApiOperation`, `@ApiResponse`.
-- 403 quando usuário não pertence à empresa.
+- 403 when user does not belong to company.
 
-**Dependências:** T8, T9  
-**Esforço:** M
-
----
-
-## Infraestrutura — módulo e observabilidade
-
-### T11 — [BE] `DecisionEngineModule` + registro no `AppModule`
-
-**Descrição:** Declarar providers (`CompletenessEvaluator`, `PrimaryIssueResolver`, `StatusResolver`, `ActionGeneratorService`, `DecisionEngineService`), controller, exports se necessário para composer futuro.
-
-**Critérios de aceite:**
-- App sobe sem erro de DI.
-- Nenhuma importação circular com Dashboard (motor não importa feature pesada).
-
-**Dependências:** T10  
-**Esforço:** S
+**Dependencies:** T8, T9  
+**Effort:** M
 
 ---
 
-### T12 — [BE] Logs estruturados (Pino)
+## Infrastructure — module and observability
 
-**Descrição:** No final de `DecisionEngineService.evaluate`, log `info` com `ruleEngineVersion`, `companyId`, `primary_issue`, `status`, array `{ kpiId, level }`, `data_complete`; **não** logar PII nem payload completo — opcional hash SHA-256 do JSON canonicalizado se útil para suporte.
+### T11 — [BE] `DecisionEngineModule` + `AppModule` registration
 
-**Critérios de aceite:**
-- Campos estáveis documentados em comentário breve ou `plan.md` já cobre — nenhuma secret no log.
-- Nível `debug` opcional com árvore de decisão atrás de env `DEBUG_DECISION_ENGINE=true`.
+**Description:** Declare providers (`CompletenessEvaluator`, `PrimaryIssueResolver`, `StatusResolver`, `ActionGeneratorService`, `DecisionEngineService`), controller, exports if needed for future composer.
 
-**Dependências:** T8  
-**Esforço:** S
+**Acceptance criteria:**
+- App boots without DI error.
+- No circular import with Dashboard (engine does not import heavy feature).
 
----
-
-## Testes de integração HTTP
-
-### T13 — [BE] Testes integração controller
-
-**Descrição:** `decision-engine.controller.integration.spec.ts` (ou e2e em `test/`) com `@nestjs/testing` + supertest: autenticação mockada ou fixture do projeto; POST válido retorna 200 e shape do contrato.
-
-**Critérios de aceite:**
-- Pelo menos um teste end-to-end por cenário: `data_incomplete`, `healthy`, `credit_overuse` (alert).
-- Validação 400 para body malformado.
-
-**Dependências:** T11, T12  
-**Esforço:** M
+**Dependencies:** T10  
+**Effort:** S
 
 ---
 
-## Documentação
+### T12 — [BE] Structured logs (Pino)
 
-### T14 — [DOCS] Atualizar rotas da API
+**Description:** At end of `DecisionEngineService.evaluate`, log `info` with `ruleEngineVersion`, `companyId`, `primary_issue`, `status`, `{ kpiId, level }` array, `data_complete`; **do not** log PII or full payload — optional SHA-256 hash of canonical JSON if useful for support.
 
-**Descrição:** Em `back-end-financeiro-nestjs/docs/API_ROUTES.md` (ou equivalente), documentar novo endpoint, auth e exemplo resumido.
+**Acceptance criteria:**
+- Stable fields documented in brief comment or `plan.md` already covers — no secrets in log.
+- Optional `debug` level with decision tree behind env `DEBUG_DECISION_ENGINE=true`.
 
-**Critérios de aceite:**
-- Link para prefixo global `/meu-financeiro/v1`.
-
-**Dependências:** T10  
-**Esforço:** S
+**Dependencies:** T8  
+**Effort:** S
 
 ---
 
-## Follow-up (fora do MVP desta lista)
+## HTTP integration tests
 
-| Item | Nota |
+### T13 — [BE] Controller integration tests
+
+**Description:** `decision-engine.controller.integration.spec.ts` (or e2e in `test/`) with `@nestjs/testing` + supertest: mocked auth or project fixture; valid POST returns 200 and contract shape.
+
+**Acceptance criteria:**
+- At least one end-to-end test per scenario: `data_incomplete`, `healthy`, `credit_overuse` (alert).
+- 400 validation for malformed body.
+
+**Dependencies:** T11, T12  
+**Effort:** M
+
+---
+
+## Documentation
+
+### T14 — [DOCS] Update API routes
+
+**Description:** In `back-end-financeiro-nestjs/docs/API_ROUTES.md` (or equivalent), document new endpoint, auth, and brief example.
+
+**Acceptance criteria:**
+- Link to global prefix `/meu-financeiro/v1`.
+
+**Dependencies:** T10  
+**Effort:** S
+
+---
+
+## Follow-up (outside this MVP list)
+
+| Item | Note |
 | --- | --- |
-| Composer automático | Serviço que monta `DecisionEngineInput` a partir de `Dashboard`/`Indebtedness` — tarefa separada após MVP do motor puro. |
-| Persistência `DecisionAuditLog` | Opcional fase 2. |
-| Frontend | Consumir endpoint na tela de decisão — `[FE]` em sprint posterior. |
+| Automatic composer | Service building `DecisionEngineInput` from `Dashboard`/`Indebtedness` — separate task after pure engine MVP. |
+| `DecisionAuditLog` persistence | Optional phase 2. |
+| Frontend | Consume endpoint on decision screen — `[FE]` in later sprint. |
 
 ---
 
-## Ordem sugerida de execução
+## Suggested execution order
 
 ```
 T1 → T2 → T3 → T4 → T7 → T5 → T6 → T8 → T9 → T10 → T11 → T12 → T13 → T14
 ```
 
-*(T7 antes de T6 para permitir testes de status isolados; T5 pode paralelizar com T3–T4 se necessário.)*
+*(T7 before T6 to allow isolated status tests; T5 can parallelize with T3–T4 if needed.)*
 
 ---
 
-## Resumo por tag
+## Summary by tag
 
 | Tag | Tasks |
 | --- | --- |
 | [BE] | T1–T13 |
 | [DOCS] | T14 |
-| [FE] | — (posterior) |
-| [DEVOPS] | — (sem novos secrets/env v1) |
+| [FE] | — (later) |
+| [DEVOPS] | — (no new secrets/env v1) |

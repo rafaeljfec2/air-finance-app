@@ -1,132 +1,132 @@
 # Air Finance Web App
 
-Aplicação web de gestão financeira pessoal desenvolvida com React, TypeScript e Vite, parte do monorepo Air Finance.
+Personal finance web application built with React, TypeScript, and Vite, part of the Air Finance monorepo.
 
-> **Nota**: Este é o workspace `@air-finance/web` do monorepo Air Finance. Para informações sobre a estrutura completa do monorepo, veja o [README principal](../../README.md).
+> **Note**: This is the `@air-finance/web` workspace in the Air Finance monorepo. For the full monorepo layout, see the [main README](../../README.md).
 
-## 🚀 Tecnologias
+## 🚀 Technologies
 
-- **React 18** - Biblioteca JavaScript para construção de interfaces
-- **TypeScript** - Superset do JavaScript com tipagem estática
-- **Vite** - Build tool e dev server de alta performance
-- **React Router v6** - Roteamento declarativo
-- **Tailwind CSS** - Framework CSS utility-first (Mobile-First)
-- **Zustand** - Biblioteca leve para gerenciamento de estado global
-- **React Query** (@tanstack/react-query) - Gerenciamento de dados do servidor
-- **Lucide React** - Biblioteca de ícones
-- **Class Variance Authority (CVA)** - Sistema de variantes de componentes
-- **@air-finance/shared** - Package compartilhado do monorepo (types, constants, utils)
+- **React 18** — JavaScript library for building user interfaces
+- **TypeScript** — JavaScript superset with static typing
+- **Vite** — High-performance build tool and dev server
+- **React Router v6** — Declarative routing
+- **Tailwind CSS** — Utility-first CSS framework (mobile-first)
+- **Zustand** — Lightweight global state management
+- **React Query** (@tanstack/react-query) — Server state management
+- **Lucide React** — Icon library
+- **Class Variance Authority (CVA)** — Component variant system
+- **@air-finance/shared** — Monorepo shared package (types, constants, utils)
 
-## 📱 Funcionalidades
+## 📱 Features
 
-- ✅ Gestão de empresas e múltiplas empresas
-- ✅ Cadastro e gestão de contas bancárias
-- ✅ Gestão de cartões de crédito
-- ✅ Categorização automática e manual de transações
-- ✅ Dashboard financeiro com métricas em tempo real
-- ✅ Relatórios e análises detalhadas
-- ✅ Importação de extratos OFX
-- ✅ Gestão de metas financeiras
-- ✅ Contas a pagar e receber
-- ✅ Classificação automática com IA
-- ✅ Tema claro/escuro
-- ✅ Design responsivo (Mobile-First)
-- ✅ Notificações toast personalizadas
-- ✅ Safe Area support (iOS/Android)
+- ✅ Company management and multi-company support
+- ✅ Bank account registration and management
+- ✅ Credit card management
+- ✅ Automatic and manual transaction categorization
+- ✅ Financial dashboard with real-time metrics
+- ✅ Detailed reports and analytics
+- ✅ OFX statement import
+- ✅ Financial goals management
+- ✅ Accounts payable and receivable
+- ✅ AI-powered automatic classification
+- ✅ Light/dark theme
+- ✅ Responsive design (mobile-first)
+- ✅ Custom toast notifications
+- ✅ Safe area support (iOS/Android)
 
-## 🚀 Como Executar (Monorepo)
+## 🚀 How to run (monorepo)
 
-### Pré-requisitos
+### Prerequisites
 
 - Node.js 22+
-- Yarn 4.0.0 (instalado via Corepack)
+- Yarn 4.0.0 (via Corepack)
 
-### Instalação
+### Installation
 
 ```bash
-# 1. Clone o repositório
+# 1. Clone the repository
 git clone https://github.com/rafaeljfec2/air-finance-app.git
 cd air-finance-app
 
-# 2. Habilitar Corepack para usar Yarn 4
+# 2. Enable Corepack for Yarn 4
 corepack enable
 
-# 3. Instalar todas as dependências
+# 3. Install all dependencies
 yarn install
 
-# 4. Iniciar o servidor de desenvolvimento
+# 4. Start the development server
 yarn dev:web
 ```
 
-A aplicação estará disponível em `http://localhost:3000`
+The app will be available at `http://localhost:3000`
 
-## 📦 Scripts Disponíveis
+## 📦 Available scripts
 
-### Scripts do Monorepo (executar da raiz)
+### Monorepo scripts (run from repo root)
 
 ```bash
-yarn dev:web           # Inicia apenas o web app
-yarn dev:mobile        # Inicia apenas o mobile app
-yarn build             # Build de todos os workspaces
-yarn lint              # Lint de todos os workspaces
-yarn typecheck         # Type check de todos os workspaces
+yarn dev:web           # Start web app only
+yarn dev:mobile        # Start mobile app only
+yarn build             # Build all workspaces
+yarn lint              # Lint all workspaces
+yarn typecheck         # Type-check all workspaces
 ```
 
-### Scripts do Workspace (executar em apps/web/)
+### Workspace scripts (run in apps/web/)
 
 ```bash
-yarn dev               # Servidor de desenvolvimento
-yarn build             # Build de produção
-yarn preview           # Preview da build
+yarn dev               # Development server
+yarn build             # Production build
+yarn preview           # Preview production build
 yarn lint              # ESLint
 yarn format            # Prettier
 yarn test              # Vitest
-yarn type-check        # Verificação de tipos
+yarn type-check        # Type checking
 ```
 
-## 🔗 Dependências Compartilhadas
+## 🔗 Shared dependencies
 
 ### @air-finance/shared
 
-Package compartilhado contendo:
+Shared package containing:
 
-- **Types**: Tipos TypeScript comuns (API responses, errors, pagination)
-- **Constants**: Constantes de API, storage keys, configurações
-- **Utils**: Utilitários de storage, formatação e helpers
+- **Types**: Common TypeScript types (API responses, errors, pagination)
+- **Constants**: API constants, storage keys, configuration
+- **Utils**: Storage, formatting, and helper utilities
 
 ```typescript
-// Exemplo de uso
+// Usage example
 import { API_CONFIG, STORAGE_KEYS } from '@air-finance/shared/constants';
 import { ApiResponse, ApiError } from '@air-finance/shared/types';
 import { StorageManager } from '@air-finance/shared/utils';
 ```
 
-## 📚 Documentação
+## 📚 Documentation
 
-- **[README do Monorepo](../../README.md)** - Visão geral do monorepo
-- **[Guia de Deploy](../../VERCEL_DEPLOY.md)** - Deploy na Vercel
-- **[Guia de Migração](../../MIGRATION.md)** - Migração para monorepo
-- **[Arquitetura Frontend](./docs/FRONTEND_ARCHITECTURE.md)** - Arquitetura completa
-- **[Criando Páginas](./docs/CREATING_PAGES.md)** - Guia para novas telas
-- **[Design System](./docs/DESIGN_SYSTEM.md)** - Sistema de design
-- **[Mobile First](./docs/MOBILE_FIRST_GUIDE.md)** - Padrões responsivos
+- **[Monorepo README](../../README.md)** — Monorepo overview
+- **[Deploy guide](../../VERCEL_DEPLOY.md)** — Vercel deployment
+- **[Migration guide](../../MIGRATION.md)** — Monorepo migration
+- **[Frontend architecture](./docs/FRONTEND_ARCHITECTURE.md)** — Full architecture
+- **[Creating pages](./docs/CREATING_PAGES.md)** — Guide for new screens
+- **[Design system](./docs/DESIGN_SYSTEM.md)** — Design system
+- **[Mobile first](./docs/MOBILE_FIRST_GUIDE.md)** — Responsive patterns
 
 ## 🚀 Deploy
 
-Deploy automatizado na Vercel para branch `main`.
+Automated Vercel deployment for the `main` branch.
 
-**Configuração**:
+**Configuration**:
 
-- Root Directory: `.` (raiz do monorepo)
+- Root Directory: `.` (monorepo root)
 - Build Command: `turbo run build --filter=@air-finance/web`
 - Output: `apps/web/dist`
 
-Veja [VERCEL_DEPLOY.md](../../VERCEL_DEPLOY.md) para detalhes.
+See [VERCEL_DEPLOY.md](../../VERCEL_DEPLOY.md) for details.
 
-## 👥 Autores
+## 👥 Authors
 
-- **Rafael de Jesus Ferreira** - Desenvolvimento e manutenção
+- **Rafael de Jesus Ferreira** — Development and maintenance
 
-## 📄 Licença
+## 📄 License
 
-MIT License - Veja [LICENSE](../../LICENSE) para detalhes
+MIT License — See [LICENSE](../../LICENSE) for details

@@ -1,143 +1,143 @@
-# Feature: Plano de decisão em 3 fases (vermelho / amarelo / verde) por tema
+# Feature: Three-phase decision plan (red / yellow / green) by theme
 
-Estender o motor de decisão financeira para entregar — junto com o "próximo passo" atual — um **plano educativo em três fases** (vermelho, amarelo, verde) por tema, com **regra contínua** simples e **resultado esperado** em linguagem leiga. O sistema não proíbe; ensina como continuar vivendo (parcelar, usar cartão) com regra clara.
+Extend the financial decision engine to deliver — alongside the current “next step” — an **educational three-phase plan** (red, yellow, green) per theme, with a simple **ongoing rule** and **expected outcome** in plain language. The system does not forbid; it teaches how to keep living (installments, card use) with a clear rule.
 
-**Pré-requisito assumido:** o motor descrito em `specs/001-financial-decision-engine/` já entrega `status`, `primary_issue` e `actions[]` parametrizados (R$ / %), e o composer descrito em `specs/002-decision-engine-composer/` monta os KPIs a partir das métricas reais do dashboard e endividamento.
+**Assumed prerequisite:** the engine in `specs/001-financial-decision-engine/` already returns `status`, `primary_issue`, and parameterized `actions[]` (R$ / %), and the composer in `specs/002-decision-engine-composer/` builds KPIs from real dashboard and indebtedness metrics.
 
 ---
 
-## Decisões de produto (v1) — fechadas
+## Product decisions (v1) — closed
 
-| Tema | Decisão |
+| Theme | Decision |
 | --- | --- |
-| Idioma | **PT-BR direto** em todas as cópias do plano (título, explicação, ações, regra, resultado). Sem i18n nesta versão. |
-| Catálogo | **Híbrido**: backend só decide a fase ativa por tema (`theme_phase`); todo o conteúdo PT-BR vive no **frontend** (`apps/web/src/pages/decision/playbooks/`). |
-| Coexistência | **Complementar**, não substitui: o "próximo passo" com impacto numérico (R$ / %) atual permanece intacto; o plano em 3 fases aparece **abaixo** dele. |
-| Acordeão | A fase ativa abre **expandida por padrão**; usuário pode expandir as outras (acessível via teclado). |
-| Persistência | **Sem persistência v1**: nenhum estado de "ações completadas" é salvo (todas neutras). |
+| Language | **Direct PT-BR** in all plan copy (title, explanation, actions, rule, outcome). No i18n in this version. |
+| Catalog | **Hybrid**: backend only decides active phase per theme (`theme_phase`); all PT-BR content lives on the **frontend** (`apps/web/src/pages/decision/playbooks/`). |
+| Coexistence | **Complementary**, not a replacement: the current “next step” with numeric impact (R$ / %) stays intact; the 3-phase plan appears **below** it. |
+| Accordion | Active phase opens **expanded by default**; user can expand others (keyboard accessible). |
+| Persistence | **No v1 persistence**: no “completed actions” state is saved (all neutral). |
 
 ---
 
 ## User Stories
 
-- **US-1 — Saber em que fase estou**  
-  Como usuário leigo, quero ver claramente em qual fase do tema principal estou (vermelho / amarelo / verde) para entender se preciso reagir, ajustar ou só manter.
+- **US-1 — Know which phase I am in**  
+  As a non-expert user, I want to see clearly which phase of the main theme I am in (red / yellow / green) so I know whether I need to react, adjust, or just maintain.
 
-- **US-2 — Saber o que fazer agora**  
-  Como usuário em qualquer fase, quero **3 a 5 ações práticas** da fase ativa, em frases curtas e sem jargão, para começar hoje.
+- **US-2 — Know what to do now**  
+  As a user in any phase, I want **3 to 5 practical actions** from the active phase, in short non-jargon sentences, so I can start today.
 
-- **US-3 — Entender a regra contínua**  
-  Como usuário que não entende finanças, quero **uma regra simples** ("nunca comprometer mais de 25% da renda com parcelas") para usar como guia no dia a dia.
+- **US-3 — Understand the ongoing rule**  
+  As a user who does not understand finance, I want **one simple rule** (“never commit more than 25% of income to installments”) as a day-to-day guide.
 
-- **US-4 — Visualizar o caminho completo**  
-  Como usuário curioso, quero poder abrir as fases que ainda não estou para entender o caminho da recuperação até o verde, sem perder o foco da fase atual.
+- **US-4 — See the full path**  
+  As a curious user, I want to open phases I am not in yet to understand the recovery path to green, without losing focus on the current phase.
 
-- **US-5 — Linguagem leiga**  
-  Como usuário sem conhecimento técnico, quero textos sem termos como "KPI", "índice", "taxa de juros", "rotativo" — só palavras que faço parte do meu cotidiano.
+- **US-5 — Plain language**  
+  As a non-technical user, I want text without terms like “KPI”, “index”, “interest rate”, “revolving” — only words from everyday life.
 
-**Critérios de aceitação (resumo)**
+**Acceptance criteria (summary)**
 
-- Dado o motor evaluate-auto retorna `primary_issue ≠ data_incomplete`, a resposta inclui `theme_phase ∈ {red, yellow, green}` e a UI mostra o card de plano com a fase correta expandida.
-- Dado `primary_issue = data_incomplete`, `theme_phase` é **null** e a UI mostra placeholder "Complete os dados primeiro" (sem fases).
-- Dado `primary_issue = healthy`, `theme_phase` é sempre **green**.
-- Cada um dos 9 slugs do catálogo (`liquidity_risk`, `debt_pressure`, `credit_overuse`, `high_commitment`, `low_surplus`, `low_savings`, `high_fixed_cost`, `healthy`, `data_incomplete`) tem playbook completo.
-- Cada fase de cada playbook tem entre **3 e 5 ações**, todas em PT-BR e sem termos da lista proibida.
-- O usuário pode expandir/recolher fases pelo teclado (`Enter` / `Space`).
-- A inclusão de `theme_phase` é **backward compatible**: clientes antigos ignoram o campo.
+- Given evaluate-auto returns `primary_issue ≠ data_incomplete`, the response includes `theme_phase ∈ {red, yellow, green}` and the UI shows the plan card with the correct phase expanded.
+- Given `primary_issue = data_incomplete`, `theme_phase` is **null** and the UI shows placeholder “Complete your data first” (no phases).
+- Given `primary_issue = healthy`, `theme_phase` is always **green**.
+- Each of the 9 catalog slugs (`liquidity_risk`, `debt_pressure`, `credit_overuse`, `high_commitment`, `low_surplus`, `low_savings`, `high_fixed_cost`, `healthy`, `data_incomplete`) has a complete playbook.
+- Each phase of each playbook has **3 to 5 actions**, all in PT-BR and without forbidden terms.
+- User can expand/collapse phases via keyboard (`Enter` / `Space`).
+- `theme_phase` inclusion is **backward compatible**: older clients ignore the field.
 
 ---
 
 ## Functional Requirements
 
-### Saída do motor (backend)
+### Engine output (backend)
 
-**FR-1 — Campo `theme_phase` na resposta**  
-A resposta de `POST /companies/:companyId/decision-engine/evaluate` e `.../evaluate-auto` ganha um campo `theme_phase` com tipo `'red' | 'yellow' | 'green' | null`. Campo é **opcional** no contrato (clientes antigos continuam funcionando).
+**FR-1 — `theme_phase` field in response**  
+The response of `POST /companies/:companyId/decision-engine/evaluate` and `.../evaluate-auto` gains a `theme_phase` field of type `'red' | 'yellow' | 'green' | null`. Field is **optional** in the contract (legacy clients keep working).
 
-**FR-2 — Mapping nível → fase**  
-Dado o `primary_issue` e o **KPI driver** correspondente (tabela em `data-model.md`), o nível desse KPI vira a fase:
+**FR-2 — Level → phase mapping**  
+Given `primary_issue` and the corresponding **driver KPI** (table in `data-model.md`), that KPI’s level becomes the phase:
 - `alert → red`
 - `warn → yellow`
 - `ok → green`
 - `primary_issue = healthy → green`
 - `primary_issue = data_incomplete → null`
 
-**FR-3 — Fallback de KPI driver ausente**  
-Se o KPI driver definido para o `primary_issue` não estiver presente em `kpis`, o resolver usa o **pior nível** entre os KPIs do degrau correspondente em `DECISION_LADDER` (definição em `specs/001-financial-decision-engine/`). Se nenhum KPI do degrau estiver presente, retorna `green`.
+**FR-3 — Missing driver KPI fallback**  
+If the driver KPI for `primary_issue` is not present in `kpis`, the resolver uses the **worst level** among KPIs in the matching step in `DECISION_LADDER` (defined in `specs/001-financial-decision-engine/`). If no KPI from the step is present, returns `green`.
 
-**FR-4 — Determinismo**  
-Para o mesmo input (slug + `KpiInputMap`), o resolver de fase produz **sempre** o mesmo resultado.
+**FR-4 — Determinism**  
+For the same input (slug + `KpiInputMap`), the phase resolver **always** produces the same result.
 
-### Conteúdo do plano (frontend)
+### Plan content (frontend)
 
-**FR-5 — Catálogo PT-BR no frontend**  
-Existe um catálogo estático em `apps/web/src/pages/decision/playbooks/` com **9 entradas** (uma por slug). Cada entrada exporta um `Playbook` com a forma de `data-model.md`.
+**FR-5 — PT-BR catalog on frontend**  
+Static catalog at `apps/web/src/pages/decision/playbooks/` with **9 entries** (one per slug). Each entry exports a `Playbook` with the shape in `data-model.md`.
 
-**FR-6 — Estrutura de cada Playbook**  
-Cada `Playbook` tem:
-- `title`: string PT-BR.
-- `explanation`: 1-2 frases leigas explicando o que está acontecendo.
-- `phases.red`, `phases.yellow`, `phases.green`: cada uma com `headline`, `objective` e `actions` (3-5 itens).
-- `rule`: regra contínua em uma frase.
-- `expectedImpact`: frase única em tom positivo descrevendo o resultado.
+**FR-6 — Each Playbook structure**  
+Each `Playbook` has:
+- `title`: PT-BR string.
+- `explanation`: 1–2 plain sentences explaining what is happening.
+- `phases.red`, `phases.yellow`, `phases.green`: each with `headline`, `objective`, and `actions` (3–5 items).
+- `rule`: one-sentence ongoing rule.
+- `expectedImpact`: single positive-tone outcome sentence.
 
-**FR-7 — `getPlaybook(slug)` resiliente**  
-A função pública `getPlaybook(slug: string): Playbook` devolve o `Playbook` correspondente; para slug desconhecido cai em **`healthy`** como default seguro (não estoura).
+**FR-7 — Resilient `getPlaybook(slug)`**  
+Public `getPlaybook(slug: string): Playbook` returns the matching `Playbook`; unknown slug falls back to **`healthy`** (does not throw).
 
-### UI (componente)
+### UI (component)
 
-**FR-8 — Componente `DecisionPlaybookCard`**  
-Renderizado **abaixo** de `DecisionStatusStrip`, `DecisionPrimaryBlock` e `DecisionSecondaryActions` na rota `/decision`. Mostra:
-1. `title` + Badge da fase ativa (`destructive`, âmbar custom, `success`).
+**FR-8 — `DecisionPlaybookCard` component**  
+Rendered **below** `DecisionStatusStrip`, `DecisionPrimaryBlock`, and `DecisionSecondaryActions` on route `/decision`. Shows:
+1. `title` + Badge for active phase (`destructive`, custom amber, `success`).
 2. `explanation`.
-3. Acordeão com 3 sub-blocos (vermelho / amarelo / verde): a **fase ativa fica expandida**; demais recolhidas.
-4. Bloco "Regra simples" com destaque (`border-l-4 border-l-primary-500`).
-5. Bloco "Resultado esperado" em tom positivo.
+3. Accordion with 3 sub-blocks (red / yellow / green): **active phase expanded**; others collapsed.
+4. “Simple rule” block highlighted (`border-l-4 border-l-primary-500`).
+5. “Expected outcome” block in positive tone.
 
-**FR-9 — Placeholder para `data_incomplete`**  
-Quando `theme_phase === null` (ou `undefined`), o card mostra apenas título, explicação e mensagem "Complete os dados para o app montar seu plano em fases." — sem acordeão.
+**FR-9 — Placeholder for `data_incomplete`**  
+When `theme_phase === null` (or `undefined`), the card shows only title, explanation, and message “Complete your data so the app can build your phased plan.” — no accordion.
 
-**FR-10 — Coexistência com a UI atual**  
-`DecisionStatusStrip`, `DecisionPrimaryBlock` (com impacto R$ / %) e `DecisionSecondaryActions` permanecem inalterados. O playbook complementa, não substitui.
+**FR-10 — Coexistence with current UI**  
+`DecisionStatusStrip`, `DecisionPrimaryBlock` (R$ / % impact), and `DecisionSecondaryActions` stay unchanged. Playbook complements, does not replace.
 
 ---
 
 ## Non-Functional Requirements
 
-**NFR-1 — Linguagem leiga**  
-Os textos de todos os playbooks **não** podem conter os termos: `KPI`, `índice`, `taxa de`, `rotativo`, `severity`, `snapshot`. Validação automatizada via teste em `playbooks.test.ts`.
+**NFR-1 — Plain language**  
+All playbook text **must not** contain forbidden substrings listed in `playbooks.test.ts` (PT-BR jargon such as index/rate/revolving equivalents, plus `KPI`, `severity`, `snapshot`). Automated validation via that test file.
 
-**NFR-2 — Determinismo**  
-Mesmo input → mesmo `theme_phase`. Coberto por teste no resolver e em `decision-engine.service.spec.ts`.
+**NFR-2 — Determinism**  
+Same input → same `theme_phase`. Covered by resolver test and `decision-engine.service.spec.ts`.
 
-**NFR-3 — Acessibilidade**  
-Acordeão com `<button aria-expanded aria-controls>` + `role="region"` no painel. Foco visível (`focus-visible:ring`). Touch ≥ 44px.
+**NFR-3 — Accessibility**  
+Accordion with `<button aria-expanded aria-controls>` + `role="region"` on panel. Visible focus (`focus-visible:ring`). Touch ≥ 44px.
 
 **NFR-4 — Mobile-first**  
-Layout começa em viewport pequena (`px-4`), enriquece em `sm:` (`px-6`). Suporte a dark mode via tokens do design system (`text-foreground`, `text-muted-foreground`, `bg-card`, `bg-muted/40`).
+Layout starts on small viewport (`px-4`), enriches at `sm:` (`px-6`). Dark mode via design system tokens (`text-foreground`, `text-muted-foreground`, `bg-card`, `bg-muted/40`).
 
-**NFR-5 — Sem novas dependências**  
-Implementação usa só primitivos já existentes (`Card`, `Badge`, `Button`, `lucide-react`). Nenhum pacote novo é adicionado.
+**NFR-5 — No new dependencies**  
+Implementation uses only existing primitives (`Card`, `Badge`, `Button`, `lucide-react`). No new packages.
 
 **NFR-6 — Backward compatibility**  
-A inclusão de `theme_phase` no contrato é via campo opcional/nullable. Clientes anteriores ao deploy continuam funcionando sem alteração.
+`theme_phase` in contract is optional/nullable. Clients before deploy keep working unchanged.
 
 ---
 
 ## Out of Scope (v1)
 
-- Persistência do progresso do usuário no plano (checklist com estado em Mongo).
-- Notificações quando o usuário avança de fase.
-- Mostrar playbooks de **outros temas** além do `primary_issue` (US-1 mantém foco em um problema por vez).
-- KPI dedicado a "parcelamentos ativos" (cobertura conceitual via `high_commitment` é suficiente para v1).
-- Configuração remota dos textos do playbook (v1 é estático em código).
-- Tradução / i18n.
+- Persisting user progress on the plan (Mongo checklist state).
+- Notifications when user advances phase.
+- Playbooks for **themes other than** `primary_issue` (US-1 keeps focus on one problem at a time).
+- Dedicated KPI for “active installments” (conceptual coverage via `high_commitment` is enough for v1).
+- Remote configuration of playbook text (v1 is static in code).
+- Translation / i18n.
 
 ---
 
 ## Open Questions
 
-*Nenhuma pendente para v1 — decisões fechadas na seção "Decisões de produto (v1)".*
+*None pending for v1 — decisions closed in “Product decisions (v1)” section.*
 
 ---
 

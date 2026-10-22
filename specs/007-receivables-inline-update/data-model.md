@@ -27,8 +27,8 @@ From `apps/web/src/types/budget.ts`:
 
 | UI status | `reconciled` | Toggle allowed |
 | --- | --- | --- |
-| Pendente | `false` | Yes |
-| Recebido | `true` | Yes |
+| Pending | `false` | Yes |
+| Received | `true` | Yes |
 
 ```mermaid
 stateDiagram-v2
