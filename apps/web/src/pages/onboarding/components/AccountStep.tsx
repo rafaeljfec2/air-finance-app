@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import {
   Banknote,
@@ -31,6 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useBanks } from '@/hooks/useBanks';
+import { zodResolver } from '@/lib/zodResolver';
 
 import { type AccountFormData, AccountSchema } from '../schemas';
 

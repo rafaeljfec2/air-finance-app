@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v3';
 
 import type { IndebtednessMetrics } from '@/types/indebtedness';
 import { parseApiError } from '@/utils/apiErrorHandler';

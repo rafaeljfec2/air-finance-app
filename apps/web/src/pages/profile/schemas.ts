@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v3';
 
 export const ProfilePersonalSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),

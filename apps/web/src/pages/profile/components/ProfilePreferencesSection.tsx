@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Calendar, DollarSign, Globe, Monitor, Moon, Palette, Save, Sun } from 'lucide-react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -7,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
+import { zodResolver } from '@/lib/zodResolver';
 import { useTheme } from '@/stores/useTheme';
 
 import { ProfilePreferencesSchema, type ProfilePreferencesFormValues } from '../schemas';

@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import {
   Building2,
@@ -24,6 +23,7 @@ import { ComboBox, type ComboBoxOption } from '@/components/ui/ComboBox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useBanks } from '@/hooks/useBanks';
+import { zodResolver } from '@/lib/zodResolver';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 
 import { type CreditCardFormData, CreditCardSchema } from '../schemas';

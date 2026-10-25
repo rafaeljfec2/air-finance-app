@@ -4,49 +4,89 @@ ignore:
   SNYK-JS-IMAGESIZE-17295814:
     - '*':
         reason: >-
-          Yarn-patched image-size@1.2.1 (ICNS zero-length loop). No fixed upstream
-          release for remaining advisories; transitive Metro/Expo only.
-        expires: '2027-08-01T00:00:00.000Z'
+          Yarn-patched image-size@1.2.1 (ICNS zero-length loop). Metro/Expo require
+          1.x; upstream fixedIn is only 2.0.3.
+        expires: '2027-10-25T00:00:00.000Z'
   SNYK-JS-IMAGESIZE-17295816:
     - '*':
         reason: >-
           Yarn-patched image-size@1.2.1 for CVE-2025-71330 ICNS infinite loop.
-        expires: '2027-08-01T00:00:00.000Z'
+          Metro/Expo cannot consume image-size@2.
+        expires: '2027-10-25T00:00:00.000Z'
   SNYK-JS-IMAGESIZE-9634164:
     - '*':
         reason: Addressed by patched image-size@1.2.1 resolution.
-        expires: '2027-08-01T00:00:00.000Z'
-  SNYK-JS-NANOID-8492085:
-    - '*':
-        reason: >-
-          nanoid pinned to patched 3.3.16 (negative-size / customAlphabet loop
-          guards). Compatible with postcss CJS; upstream fix only on 5.1.16.
-        expires: '2027-08-01T00:00:00.000Z'
-  SNYK-JS-NANOID-18506894:
-    - '*':
-        reason: >-
-          CVE-2026-67214 addressed via Yarn patch on nanoid@3.3.16 (customAlphabet
-          non-positive size + async nanoid RangeError). Cannot force 5.1.16 (ESM)
-          without breaking postcss.
-        expires: '2027-08-01T00:00:00.000Z'
-  SNYK-JS-NANOID-18506897:
-    - '*':
-        reason: >-
-          CVE-2026-67213 addressed via Yarn patch on nanoid@3.3.16. Same constraint
-          as 18506894 regarding nanoid 5 ESM.
-        expires: '2027-08-01T00:00:00.000Z'
+        expires: '2027-10-25T00:00:00.000Z'
   SNYK-JS-REACTROUTER-18319520:
     - '*':
         reason: >-
           App uses createBrowserRouter SPA only; does not enable React Router RSC
           mode. CSRF advisory targets RSC action path (fixed in 8.3.0; no
           react-router-dom@8 yet).
-        expires: '2027-08-01T00:00:00.000Z'
+        expires: '2027-10-25T00:00:00.000Z'
   SNYK-JS-REACTROUTER-18313151:
     - '*':
         reason: >-
           Cross-site Request Forgery in RSC mode only (GHSA-qwww-vcr4-c8h2). Product
           uses BrowserRouter SPA; no RSC/server actions. Upgrade path is RR 8.3.0
           when react-router-dom catches up.
-        expires: '2027-08-01T00:00:00.000Z'
+        expires: '2027-10-25T00:00:00.000Z'
+  SNYK-JS-BRACES-19963945:
+    - '*':
+        reason: >-
+          No upstream fixedIn for braces@3.0.3. Dev-only via micromatch/lint-staged /
+          tooling; not on the browser runtime path.
+        expires: '2027-10-25T00:00:00.000Z'
+  SNYK-JS-URIJS-19963963:
+    - '*':
+        reason: >-
+          No upstream fixedIn for uri-js@4.4.1. Transitive via ESLint ajv only;
+          ESLint 10 major deferred.
+        expires: '2027-10-25T00:00:00.000Z'
+  SNYK-JS-URIJS-19963961:
+    - '*':
+        reason: >-
+          No upstream fixedIn for uri-js@4.4.1. Transitive via ESLint ajv only;
+          ESLint 10 major deferred.
+        expires: '2027-10-25T00:00:00.000Z'
+  SNYK-JS-URIJS-20341609:
+    - '*':
+        reason: >-
+          No upstream fixedIn for uri-js@4.4.1. Transitive via ESLint ajv only;
+          ESLint 10 major deferred.
+        expires: '2027-10-25T00:00:00.000Z'
+  SNYK-JS-HTTPCACHESEMANTICS-19964064:
+    - '*':
+        reason: >-
+          No upstream fixedIn. Dev-only via vite/fsevents/node-gyp make-fetch-happen.
+        expires: '2027-10-25T00:00:00.000Z'
+  SNYK-JS-HTTPCACHESEMANTICS-19964068:
+    - '*':
+        reason: >-
+          No upstream fixedIn. Dev-only via vite/fsevents/node-gyp make-fetch-happen.
+        expires: '2027-10-25T00:00:00.000Z'
+  SNYK-JS-NODEFORGE-19635204:
+    - '*':
+        reason: >-
+          No upstream fixedIn for node-forge@1.4.0. Transitive Expo CLI only; not
+          shipped in the web production bundle.
+        expires: '2027-10-25T00:00:00.000Z'
+  SNYK-JS-PICOMATCH-21248802:
+    - '*':
+        reason: >-
+          No upstream fixedIn on picomatch 2.3.2 / 4.0.4 / 4.0.7. Dev-only glob
+          matching (vitest, expo, typescript-eslint).
+        expires: '2027-10-25T00:00:00.000Z'
+  SNYK-JS-ZOD-20510278:
+    - '*':
+        reason: >-
+          Expo CLI still pins zod@3. Web app uses zod@4.6.7 (schemas via zod/v3
+          compat). Root resolution to zod 4 would break Expo.
+        expires: '2027-10-25T00:00:00.000Z'
+  SNYK-JS-DEEPMERGE-19964053:
+    - '*':
+        reason: >-
+          No upstream fixedIn for deepmerge@4.3.1 (latest). Transitive via
+          @expo/config only; not on the web production runtime path.
+        expires: '2027-10-25T00:00:00.000Z'
 patch: {}

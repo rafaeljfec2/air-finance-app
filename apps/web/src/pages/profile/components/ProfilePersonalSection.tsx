@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
@@ -23,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { zodResolver } from '@/lib/zodResolver';
 import { formatPlanDisplayName } from '@/utils/planAdminDisplay';
 
 import { ProfilePersonalSchema, type ProfilePersonalFormValues } from '../schemas';

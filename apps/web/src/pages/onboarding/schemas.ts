@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v3';
 
 export const CompanySchema = z.object({
   name: z.string().min(3, 'Nome da empresa deve ter pelo menos 3 caracteres'),

@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Bot, CheckCircle2, Eye, EyeOff, Save, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -8,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
+import { zodResolver } from '@/lib/zodResolver';
 
 import { ProfileIntegrationsSchema, type ProfileIntegrationsFormValues } from '../schemas';
 

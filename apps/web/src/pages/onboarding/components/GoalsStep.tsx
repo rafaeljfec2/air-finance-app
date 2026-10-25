@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -15,6 +14,7 @@ import {
 import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { zodResolver } from '@/lib/zodResolver';
 import { formatDateToLocalISO } from '@/utils/date';
 import { formatCurrencyInput, parseCurrency } from '@/utils/formatters';
 

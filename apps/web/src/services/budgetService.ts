@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v3';
 
 import type { CashFlow, CreditCard, Payable, Receivable } from '@/types/budget';
 import { parseApiError } from '@/utils/apiErrorHandler';

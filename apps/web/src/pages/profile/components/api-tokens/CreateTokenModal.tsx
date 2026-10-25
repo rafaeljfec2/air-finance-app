@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Key, Shield } from 'lucide-react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -7,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/Modal';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
+import { zodResolver } from '@/lib/zodResolver';
 import type { CreateApiTokenPayload } from '@/services/apiTokenService';
 
 import { CreateApiTokenFormSchema, type CreateApiTokenFormValues } from '../../schemas';
